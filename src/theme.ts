@@ -10,7 +10,7 @@ const theme = deepMerge(grommet, {
                 light: "#EFEFEF"
             },
             "background-front": {
-                dark: "linear-gradient(180deg, #2D314D 0%, #272A4200 100%)",
+                dark: "#24263D",
                 light: "#FFFFFF"
             },
             "background-contrast": {
