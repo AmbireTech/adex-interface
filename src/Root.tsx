@@ -8,7 +8,7 @@ function Root() {
         <Box background="background-back" fill pad="medium" gap="medium">
             <Box width="medium" background="background-front" round='small'>
                 <Box pad="medium">
-                    <Paragraph>Ambire AdEx</Paragraph>
+                    <Paragraph>Ambire AdEx staging test</Paragraph>
                 </Box>
 
             </Box>
