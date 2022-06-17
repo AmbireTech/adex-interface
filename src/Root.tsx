@@ -1,18 +1,13 @@
-import {
-    Box,
-    Paragraph
-} from "grommet";
+
+import { HashRouter as Router } from "react-router-dom"
+import Platform from "components/Platform/Platform";
 
 function Root() {
     return (
-        <Box background="background-back" fill pad="medium" gap="medium">
-            <Box width="medium" background="background-front" round='small'>
-                <Box pad="medium">
-                    <Paragraph>Ambire AdEx staging test</Paragraph>
-                </Box>
+        <Router>
+            <Platform />
+        </Router>
 
-            </Box>
-        </Box>
     );
 }
 
