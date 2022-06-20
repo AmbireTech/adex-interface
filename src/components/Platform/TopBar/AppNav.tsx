@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import { Nav, Box, Anchor, Button } from "grommet"
+import { Nav, Box, Button } from "grommet"
 import { useAccount } from 'hooks'
 import { AccountType } from 'types'
 import { useNavigate, useMatch } from "react-router-dom"

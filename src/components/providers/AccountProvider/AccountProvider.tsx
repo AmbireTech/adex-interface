@@ -28,8 +28,8 @@ const AccountContext = createContext<IAccountContext>(defaultContext)
 const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
     const { sdk, safe } = useSafeAppsSDK()
     const [identity, setIdentity] = useState<IAccountContext['identity']>(defaultContext.identity)
-    const [name, _setName] = useState<IAccountContext['name']>(defaultContext.name)
-    const [accountType, _setAccountType] = useState<IAccountContext['accountType']>(defaultContext.accountType)
+    const [name] = useState<IAccountContext['name']>(defaultContext.name)
+    const [accountType] = useState<IAccountContext['accountType']>(defaultContext.accountType)
 
     const provider = useMemo(() => new ethers.providers.Web3Provider(new SafeAppProvider(safe, sdk)), [sdk, safe])
 
