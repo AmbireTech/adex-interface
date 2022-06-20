@@ -3,18 +3,33 @@ import { ethers, providers } from 'ethers'
 import { SafeAppProvider } from '@gnosis.pm/safe-apps-provider'
 import { useSafeAppsSDK } from 'lib/safe-apps-react-sdk'
 
-interface IAccountContext {
-    identity: string | null,
-    name: string | null,
-    provider: providers.Web3Provider,
+enum AccountType {
+    UNSET,
+    ADVERTISER,
+    PUBLISHER
 }
 
-const AccountContext = createContext<IAccountContext | null>(null)
+interface IAccountContext {
+    accountType: AccountType
+    identity: string | null,
+    name: string | null,
+    provider: providers.Web3Provider | null
+}
+
+const defaultContext = {
+    accountType: AccountType.UNSET,
+    identity: null,
+    name: null,
+    provider: null
+}
+
+const AccountContext = createContext<IAccountContext>(defaultContext)
 
 const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
     const { sdk, safe } = useSafeAppsSDK()
-    const [identity, setIdentity] = useState<string | null>(null)
-    const [name, setName] = useState(null)
+    const [identity, setIdentity] = useState<IAccountContext['identity']>(defaultContext.identity)
+    const [name, _setName] = useState<IAccountContext['name']>(defaultContext.name)
+    const [accountType, _setAccountType] = useState<IAccountContext['accountType']>(defaultContext.accountType)
 
     const provider = useMemo(() => new ethers.providers.Web3Provider(new SafeAppProvider(safe, sdk)), [sdk, safe])
 
@@ -22,12 +37,12 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
         setIdentity(safe?.safeAddress || null)
     }, [safe.safeAddress])
 
-
     return (<AccountContext.Provider
         value={{
             identity,
             name,
-            provider
+            provider,
+            accountType
         }}
     >
         {children}
@@ -35,6 +50,6 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
     )
 }
 
-export { AccountContext }
+export { AccountType, AccountContext }
 export default AccountProvider
 
