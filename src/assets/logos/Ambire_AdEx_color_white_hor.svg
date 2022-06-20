@@ -6,11 +6,11 @@ viewBox="0 0 11736.43 5677.61"
  xmlns:xlink="http://www.w3.org/1999/xlink">
  <defs>
   <style type="text/css">
-   <![CDATA[
+   <!-- <![CDATA[
     .fil0 {fill:white}
     .fil2 {fill:url(#id0)}
     .fil1 {fill:url(#id1)}
-   ]]>
+   ]]> -->
   </style>
   <linearGradient id="id0" gradientUnits="objectBoundingBox" x1="100%" y1="50%" x2="4.44089e-14%" y2="50%">
    <stop offset="0" style="stop-opacity:1; stop-color:#6000FF"/>
