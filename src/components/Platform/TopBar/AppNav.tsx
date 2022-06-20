@@ -1,29 +1,37 @@
 import { FC } from 'react'
-import { Nav, Box, Anchor } from "grommet"
+import { Nav, Box, Anchor, Button } from "grommet"
 import { useAccount } from 'hooks'
 import { AccountType } from 'types'
-import { useNavigate } from "react-router-dom"
-
+import { useNavigate, useMatch } from "react-router-dom"
 
 const AppNav: FC = () => {
     const { accountType } = useAccount()
     const navigate = useNavigate()
 
     return (
-        <Nav direction='row' background='brand' pad='small' gap='small' wrap>
-            <Box pad={{ vertical: 'small' }}>
-                <Anchor onClick={() => navigate('/')}>
-                    Dashboard
-                </Anchor>
+        <Nav direction='row' background='brand' pad={{ horizontal: 'xsmall' }} gap='small' wrap justify='stretch'>
+
+            <Box pad={{ vertical: 'xsmall' }}>
+                <Button
+                    label='Dashboard'
+                    size='small'
+                    fill='horizontal'
+                    secondary
+                    active={!!useMatch('/')}
+                    onClick={() => navigate('/')} />
             </Box>
 
-            {accountType === AccountType.UNSET &&
-                <Box pad={{ vertical: 'small' }}>
-                    <Anchor onClick={() => navigate('/Audiences')}>
-                        Audiences
-                    </Anchor>
-                </Box>
-            }
+            <Box pad={{ vertical: 'xsmall' }}
+                hidden={accountType !== AccountType.UNSET}
+            >
+                <Button
+                    label='Audiences'
+                    size='small'
+                    fill='horizontal'
+                    secondary
+                    active={!!useMatch('/audiences')}
+                    onClick={() => navigate('/audiences')} />
+            </Box>
 
         </Nav>
     )

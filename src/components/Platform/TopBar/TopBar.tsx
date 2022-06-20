@@ -13,7 +13,7 @@ const TopBar: FC = () => {
         <Box>
             <Header
                 background="brand"
-                pad={{ vertical: 'small', horizontal: 'medium' }}
+                pad={{ vertical: 'xsmall', horizontal: 'medium' }}
                 align='center'
             >
                 <Box height='32px'>
