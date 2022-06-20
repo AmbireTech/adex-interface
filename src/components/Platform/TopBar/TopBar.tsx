@@ -3,26 +3,30 @@ import { Header, Image, Box } from "grommet"
 import { useAccount } from 'hooks'
 import AdxLogo from 'assets/logos/Ambire_AdEx_color_white_hor.svg'
 import { shortenedAddress } from 'lib/formatters'
+import AppNav from './AppNav'
 
 
-const Dashboard: FC = () => {
-    const account = useAccount()
+const TopBar: FC = () => {
+    const { identity } = useAccount()
 
     return (
-        <Header
-            background="brand"
-            pad={{ vertical: 'small', horizontal: 'medium' }}
-            align='center'
-        >
-            <Box height='xxsmall'>
-                <Image
-                    fill='vertical'
-                    src={AdxLogo}
-                />
-            </Box>
-            {shortenedAddress(account?.identity || 'NO ADDR')}
-        </Header>
+        <Box>
+            <Header
+                background="brand"
+                pad={{ vertical: 'small', horizontal: 'medium' }}
+                align='center'
+            >
+                <Box height='32px'>
+                    <Image
+                        fill='vertical'
+                        src={AdxLogo}
+                    />
+                </Box>
+                {shortenedAddress(identity || 'NO ADDR')}
+            </Header>
+            <AppNav />
+        </Box>
     )
 }
 
-export default Dashboard
+export default TopBar
