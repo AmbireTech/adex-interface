@@ -4,28 +4,28 @@ import { SafeAppProvider } from '@gnosis.pm/safe-apps-provider'
 import { useSafeAppsSDK } from 'lib/safe-apps-react-sdk'
 
 interface IAccountContext {
-    id: string | null,
+    identity: string | null,
     name: string | null,
-    provider: providers.Web3Provider
+    provider: providers.Web3Provider,
 }
 
 const AccountContext = createContext<IAccountContext | null>(null)
 
 const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
     const { sdk, safe } = useSafeAppsSDK()
-    const [id, setId] = useState<string | null>(null)
+    const [identity, setIdentity] = useState<string | null>(null)
     const [name, setName] = useState(null)
 
-    const provider = new ethers.providers.Web3Provider(new SafeAppProvider(safe, sdk))
+    const provider = useMemo(() => new ethers.providers.Web3Provider(new SafeAppProvider(safe, sdk)), [sdk, safe])
 
     useEffect(() => {
-        setId(safe?.safeAddress || null)
+        setIdentity(safe?.safeAddress || null)
     }, [safe.safeAddress])
 
 
     return (<AccountContext.Provider
         value={{
-            id,
+            identity,
             name,
             provider
         }}
