@@ -1,5 +1,5 @@
 import { FC, useState } from 'react'
-import { Box, Tag, Select, Form, TextInput, FormField, MaskedInput, RadioButtonGroup } from 'grommet'
+import { Box, Tag, Select, Form, TextInput, FormField, RadioButtonGroup, Button } from 'grommet'
 import { useAccount } from 'hooks'
 import { shortenedAddress } from 'lib/formatters'
 import { IAdExAccount } from 'types'
@@ -35,26 +35,21 @@ const AccountSelector: FC<IAccountSelector> = () => {
                     {(adexAccount) => <AccountOption adexAccount={adexAccount} />}
                 </Select >
                 :
-                <Box>
+                <Box pad='small'>
                     <Box>Create AdEx account</Box>
                     <Form>
-                        <FormField label='Name' name='name'>
+                        <FormField label='Name' name='name' required>
                             <TextInput name='name' />
                         </FormField>
-                        <FormField label='Email' name='email' required>
-                            <MaskedInput
-                                name='email'
-                                mask={[
-                                    {
-                                        regexp: /^\w+([\.\-+]?\w+)*@\w+([\.\-]?\w+)*(\.\w{2,3})+$/,
-                                        placeholder: 'example@maymail.com'
-                                    },
-                                ]}
-                            />
+                        <FormField label='Email' name='email' required
+                            validate={{ regexp: /^\w+([+\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/ }}
+                        >
+                            <TextInput name='email' />
                         </FormField>
-                        <FormField name='role' label='Account type'>
+                        <FormField name='role' label='Account type' required>
                             <RadioButtonGroup name='role' options={['Advertiser', 'Publisher']} />
                         </FormField>
+                        <Button type='submit' label='Create' primary />
                     </Form>
                 </Box>
             }
