@@ -1,5 +1,1 @@
-import { AccountType } from "components/providers/AccountProvider/AccountProvider"
-
-export {
-    AccountType
-}
+export *  from "components/providers/AccountProvider/AccountProvider"
