@@ -1,15 +1,16 @@
 
-import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
+import { Routes, Route, Navigate } from 'react-router-dom'
 import Platform from 'components/Platform/Platform'
 import AccountSelector from 'components/AccountSelector/AccountSelector'
 import { useAccount } from 'hooks'
+import { Main } from "grommet"
 
 function Root() {
 
     const { authenticated } = useAccount()
 
     return (
-        <Router>
+        <Main>
             <Routes>
                 <Route path='/account-select'
                     element={<AccountSelector />}
@@ -27,9 +28,8 @@ function Root() {
                     }
                 />
             </Routes>
-        </Router>
-
-    );
+        </Main>
+    )
 }
 
-export default Root;
+export default Root
