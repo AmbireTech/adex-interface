@@ -2,10 +2,10 @@ import { FC, useState } from 'react'
 import { Box, Tag, Select, Form, TextInput, FormField, RadioButtonGroup, Button } from 'grommet'
 import { useAccount } from 'hooks'
 import { shortenedAddress } from 'lib/formatters'
-import { IAdExAccount } from 'types'
+import { IAdExAccount, AccountType } from 'types'
+import { useNavigate } from "react-router-dom"
 
-interface IAccountSelector {
-}
+interface IAccountSelector { }
 
 const AccountOption = ({ adexAccount }: { adexAccount: IAdExAccount | null }) =>
     <Box pad='small' gap='small' direction='row' flex={{ grow: 1 }} >
@@ -15,9 +15,19 @@ const AccountOption = ({ adexAccount }: { adexAccount: IAdExAccount | null }) =>
     </Box>
 
 const AccountSelector: FC<IAccountSelector> = () => {
-
-    const { identity, availableAdexAccounts } = useAccount()
+    const navigate = useNavigate()
+    const { identity, availableAdexAccounts, registerAdexUser } = useAccount()
     const [selected, setSelected] = useState<IAdExAccount | null>(null)
+    const [loading, setLoading] = useState(false)
+
+    const onSubmit = async ({ value }: { value: IAdExAccount }) => {
+        setLoading(true)
+        const { error } = await registerAdexUser(value)
+        setLoading(false)
+
+        if(!error) navigate('/')
+    }
+
 
     return (
         <Box>
@@ -37,7 +47,7 @@ const AccountSelector: FC<IAccountSelector> = () => {
                 :
                 <Box pad='small'>
                     <Box>Create AdEx account</Box>
-                    <Form>
+                    <Form onSubmit={onSubmit}>
                         <FormField label='Name' name='name' required>
                             <TextInput name='name' />
                         </FormField>
@@ -47,9 +57,20 @@ const AccountSelector: FC<IAccountSelector> = () => {
                             <TextInput name='email' />
                         </FormField>
                         <FormField name='role' label='Account type' required>
-                            <RadioButtonGroup name='role' options={['Advertiser', 'Publisher']} />
+                            <RadioButtonGroup name='role' options={[
+                                {
+                                    id: AccountType.ADVERTISER.toString(),
+                                    value: AccountType.ADVERTISER,
+                                    label: 'Advertiser'
+                                },
+                                {
+                                    id: AccountType.PUBLISHER.toString(),
+                                    value: AccountType.PUBLISHER,
+                                    label: 'Publisher'
+                                }
+                            ]} />
                         </FormField>
-                        <Button type='submit' label='Create' primary />
+                        <Button type='submit' label='Create' primary disabled={loading} />
                     </Form>
                 </Box>
             }
