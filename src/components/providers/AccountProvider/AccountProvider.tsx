@@ -1,31 +1,16 @@
-import { createContext, useState, FC, PropsWithChildren, useMemo, useEffect } from 'react'
+import { createContext, useState, FC, PropsWithChildren, useMemo, useEffect, useCallback } from 'react'
 import { ethers, providers } from 'ethers'
 import { SafeAppProvider } from '@gnosis.pm/safe-apps-provider'
 import { useSafeAppsSDK } from 'lib/safe-apps-react-sdk'
-
-enum AccountType {
-    UNSET,
-    ADVERTISER,
-    PUBLISHER
-}
-
-// TODO:
-enum AdExRole {
-    USER,
-    ADMIN,
-    OWNER
-}
-
-export interface IAdExAccount {
-    name: string,
-    users: Array<string>,
-    adexIdentity: string,
-}
+import { registerUser } from 'lib/platform'
+import { AccountType, AppError, IAdExAccount } from 'types'
 
 const testAccount: IAdExAccount = {
     name: 'Gosho',
-    users: ['0x123453'],
-    adexIdentity: '0x70fC54B13FA83571006c289B9A6bbAE69dfD4e46'
+    email: 'gosho@myyanko.com',
+    users: [],
+    adexIdentity: '0x70fC54B13FA83571006c289B9A6bbAE69dfD4e46',
+    role: AccountType.UNSET
 }
 
 interface IAccountContext {
@@ -34,8 +19,8 @@ interface IAccountContext {
     identity: string | null,
     provider: providers.Web3Provider | null,
     authenticated: boolean,
-    availableAdexAccounts: Array<IAdExAccount>
-
+    availableAdexAccounts: Array<IAdExAccount>,
+    registerAdexUser: (adexUser: IAdExAccount) => Promise<{ adexUser: IAdExAccount, error?: AppError }>
 }
 
 const defaultContext = {
@@ -44,18 +29,30 @@ const defaultContext = {
     identity: null,
     provider: null,
     authenticated: false,
-    availableAdexAccounts: [testAccount]
+    availableAdexAccounts: [testAccount],
+    registerAdexUser: registerUser
 }
 
 const AccountContext = createContext<IAccountContext>(defaultContext)
 
+// TODO: persist data
 const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
     const { sdk, safe } = useSafeAppsSDK()
     const [identity, setIdentity] = useState<IAccountContext['identity']>(defaultContext.identity)
-    const [adexAccount] = useState<IAccountContext['adexAccount']>(defaultContext.adexAccount)
+    const [adexAccount, setAdexAccount] = useState<IAccountContext['adexAccount']>(defaultContext.adexAccount)
     const [accountType] = useState<IAccountContext['accountType']>(defaultContext.accountType)
-    const [authenticated] = useState<IAccountContext['authenticated']>(defaultContext.authenticated)
+    const [authenticated, setAuthenticated] = useState<IAccountContext['authenticated']>(defaultContext.authenticated)
     const [availableAdexAccounts] = useState<IAccountContext['availableAdexAccounts']>(defaultContext.availableAdexAccounts)
+    const registerAdexUser = useCallback(async (user: IAdExAccount) => {
+        const { adexUser, error } = await registerUser(user)
+
+        if (!error) {
+            setAdexAccount(adexUser)
+            setAuthenticated(true)
+        }
+
+        return { adexUser, error }
+    }, [])
 
     const provider = useMemo(() => new ethers.providers.Web3Provider(new SafeAppProvider(safe, sdk)), [sdk, safe])
 
@@ -65,8 +62,9 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
         provider,
         accountType,
         authenticated,
-        availableAdexAccounts
-    }), [identity, adexAccount, provider, accountType, authenticated, availableAdexAccounts])
+        availableAdexAccounts,
+        registerAdexUser
+    }), [identity, adexAccount, provider, accountType, authenticated, availableAdexAccounts, registerAdexUser])
 
     useEffect(() => {
         setIdentity(safe?.safeAddress || null)
@@ -80,6 +78,6 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
     )
 }
 
-export { AccountType, AccountContext, AdExRole }
+export { AccountContext }
 export default AccountProvider
 
