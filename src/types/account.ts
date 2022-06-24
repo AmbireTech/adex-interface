@@ -13,7 +13,7 @@ export enum AdExRole {
 
 export interface IAdExAccount {
     name: string,
-    users: Array<string>,
+    signers: Array<string>,
     email: string,
     adexIdentity: string,
     role: AccountType
