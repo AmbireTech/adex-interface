@@ -1,29 +1,11 @@
 import { createContext, useState, FC, PropsWithChildren, useEffect, useCallback, ReactNode, createRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Close } from 'grommet-icons'
-import { Layer, Box, LayerPositionType } from 'grommet'
+import { Layer, Box, Button } from 'grommet'
+import { ToastOptions, ToastPositionType, IToastProvider, Toast } from './types'
 
-type ToastOptions = {
-    timeout?: number,
-    error?: boolean,
-    position?: string,
-    sticky?: boolean,
-    badge?: ReactNode,
-    onClick?: () => {},
-    url?: string,
-    route?: string,
-}
 
-interface IToastProvider {
-    addToast: (content: ReactNode, options?: ToastOptions) => number,
-    removeToast: (id: number) => void
-}
 
-interface Toast extends ToastOptions {
-    id: number,
-    content: ReactNode,
-    ref: any
-}
 
 const defaultOptions: ToastOptions = {
     timeout: 8000,
@@ -31,6 +13,7 @@ const defaultOptions: ToastOptions = {
     position: 'bottom',
     sticky: false,
     badge: null,
+    status: 'unknown'
 }
 
 const ToastContext = createContext<IToastProvider>({
@@ -99,24 +82,36 @@ const ToastProvider: FC<PropsWithChildren> = ({ children }) => {
             {!!layers && Object.entries(layers).map(([position, layerToasts]) => (
                 <Layer
                     key={position}
-                    position={position as LayerPositionType || 'top'}
+                    position={position as ToastPositionType || 'top'}
                     modal={false}>
-                    {
-                        layerToasts.map(({ id, ref, url, route, error, sticky, badge, position, content, onClick }) => (
+                    <Box overflow={{ vertical: 'auto', horizontal: 'visible' }}>
+                        {
+                            layerToasts.map(({ id, ref, url, route, error, status, sticky, badge, position, content, onClick }) => (
 
-                            <Box key={id} margin='small'
-                                pad='small'
-                            >
-                                <Box
-                                    onClick={() => onToastClick(id, onClick, url, route)}
+                                <Box key={id} margin='xxsmall'
+                                    pad='small'
+                                    background={`status-${status}`}
                                 >
-                                    {content}
-                                    {sticky && <Close onClick={() => removeToast(id)} />}
-                                </Box>
-                            </Box>
+                                    <Box
+                                        direction='row'
+                                        gap='small'
+                                        justify='start'
+                                    >
+                                        <Box onClick={() => onToastClick(id, onClick, url, route)}>
+                                            {content}
+                                        </Box>
+                                        {sticky &&
 
-                        ))
-                    }
+                                            <Button plain icon={<Close />}
+                                                onClick={() => removeToast(id)}
+                                            />
+                                        }
+                                    </Box>
+                                </Box>
+
+                            ))
+                        }
+                    </Box>
 
                 </Layer>
             ))}
@@ -124,8 +119,7 @@ const ToastProvider: FC<PropsWithChildren> = ({ children }) => {
 
             {children}
         </ToastContext.Provider>
-    );
-};
+    )
+}
 
-export { ToastContext };
-export default ToastProvider;
+export { ToastContext, ToastProvider }

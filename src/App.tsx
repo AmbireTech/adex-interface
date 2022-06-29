@@ -1,8 +1,8 @@
-import React from 'react';
 import { Grommet } from 'grommet';
 import theme from './theme';
 import Root from './Root'
 import AccountProvider from 'components/providers/AccountProvider/AccountProvider'
+import { ToastProvider } from 'components/providers/ToastProvider'
 import SafeProvider from 'lib/safe-apps-react-sdk'
 import { HashRouter as Router } from 'react-router-dom'
 
@@ -10,13 +10,15 @@ import { HashRouter as Router } from 'react-router-dom'
 function App() {
   return (
     <Grommet theme={theme} themeMode='dark' full>
-      <SafeProvider>
-        <AccountProvider>
-          <Router>
-            <Root />
-          </Router>
-        </AccountProvider>
-      </SafeProvider>
+      <Router>
+        <ToastProvider>
+          <SafeProvider>
+            <AccountProvider>
+              <Root />
+            </AccountProvider>
+          </SafeProvider>
+        </ToastProvider>
+      </Router>
     </Grommet>
   );
 }
