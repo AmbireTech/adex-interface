@@ -17,8 +17,8 @@ const AppNav: FC = () => {
                     size='small'
                     fill='horizontal'
                     secondary
-                    active={!!useMatch('/')}
-                    onClick={() => navigate('/')} />
+                    active={!!useMatch('/platform/dashboard')}
+                    onClick={() => navigate('/platform/dashboard')} />
             </Box>
 
             <Box pad={{ vertical: 'xsmall' }}

@@ -18,16 +18,16 @@ function Root() {
                 <Route path='account-select'
                     element={<AccountSelector />}
                 />
-                <Route path='platform/*'
+                <Route path='/platform/*'
                     element={
                         authenticated ?
                             <Platform />
-                            : <Navigate replace to='account-select' />
+                            : <Navigate replace to='/account-select' />
                     }
                 />
                 <Route path="/"
                     element={
-                        <Navigate replace to={authenticated ? 'platform/dashboard' : 'account-select'} />
+                        <Navigate replace to={authenticated ? '/platform/dashboard' : '/account-select'} />
                     }
                 />
             </Routes>
