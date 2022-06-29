@@ -4,7 +4,6 @@ import TopBar from 'components/Platform/TopBar/TopBar'
 import Dashboard from 'components/Platform/Dashboard/Dashboard'
 import Audiences from 'components/Platform/Audiences/Audiences'
 
-
 interface IPlatform {
 }
 
@@ -14,10 +13,10 @@ const Platform: FC<IPlatform> = () => {
         <Fragment>
             <TopBar />
             <Routes>
-                <Route path='/'
+                <Route path='dashboard'
                     element={<Dashboard />}
                 />
-                <Route path='/audiences'
+                <Route path='audiences'
                     element={<Audiences />}
                 />
             </Routes>
