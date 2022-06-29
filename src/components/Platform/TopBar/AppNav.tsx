@@ -29,8 +29,8 @@ const AppNav: FC = () => {
                     size='small'
                     fill='horizontal'
                     secondary
-                    active={!!useMatch('/audiences')}
-                    onClick={() => navigate('/audiences')} />
+                    active={!!useMatch('/platform/audiences')}
+                    onClick={() => navigate('/platform/audiences')} />
             </Box>
 
         </Nav>
