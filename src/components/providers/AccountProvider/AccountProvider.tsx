@@ -21,7 +21,8 @@ interface IAccountContext {
     provider: providers.Web3Provider | null,
     authenticated: boolean,
     availableAdexAccounts: Array<IAdExAccount>,
-    registerAdexUser: (adexUser: IAdExAccount | null) => Promise<{ adexUser: IAdExAccount | null, error?: AppError }>
+    registerAdexUser: (adexUser: IAdExAccount | null) => Promise<{ adexUser: IAdExAccount | null, error?: AppError }>,
+    logout: () => void
 }
 
 const defaultContext = {
@@ -31,7 +32,8 @@ const defaultContext = {
     provider: null,
     authenticated: false,
     availableAdexAccounts: [],
-    registerAdexUser: registerUser
+    registerAdexUser: registerUser,
+    logout: () => { }
 }
 
 const AccountContext = createContext<IAccountContext>(defaultContext)
@@ -45,8 +47,9 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
         defaultValue: null,
     })
     const [accountType] = useState<IAccountContext['accountType']>(defaultContext.accountType)
-    const [authenticated, setAuthenticated] = useState<IAccountContext['authenticated']>(defaultContext.authenticated)
+    // const [authenticated, setAuthenticated] = useState<IAccountContext['authenticated']>(defaultContext.authenticated)
     const [availableAdexAccounts] = useState<IAccountContext['availableAdexAccounts']>(defaultContext.availableAdexAccounts)
+    const authenticated = !!adexAccount
 
     const registerAdexUser = useCallback(async (user: IAdExAccount | null) => {
         if (!identity) return { adexUser: null }
@@ -54,12 +57,17 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
         const { adexUser, error } = await registerUser(user, identity)
         if (adexUser && identity && !error) {
             setAdexAccount({ ...adexUser, signers: [identity] })
-            setAuthenticated(true)
         }
         return { adexUser, error }
     }, [identity, setAdexAccount])
 
+    // useEffect(() => {
+    //     console.log({adexAccount})
+    //     setAuthenticated(!!adexAccount)
+    // }, [adexAccount])
+
     const provider = useMemo(() => new ethers.providers.Web3Provider(new SafeAppProvider(safe, sdk)), [sdk, safe])
+    const logout =  useCallback(() => setAdexAccount(null), [setAdexAccount])
 
     const contextValue = useMemo(() => ({
         identity,
@@ -68,8 +76,9 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
         accountType,
         authenticated,
         availableAdexAccounts,
-        registerAdexUser
-    }), [identity, adexAccount, provider, accountType, authenticated, availableAdexAccounts, registerAdexUser])
+        registerAdexUser,
+        logout
+    }), [identity, adexAccount, provider, accountType, authenticated, availableAdexAccounts, registerAdexUser, logout])
 
     useEffect(() => {
         setIdentity(safe?.safeAddress || null)

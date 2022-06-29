@@ -1,5 +1,6 @@
 import { FC } from 'react'
-import { Header, Image, Box } from "grommet"
+import { Header, Image, Box, Button } from 'grommet'
+import { Logout } from 'grommet-icons'
 import { useAccount } from 'hooks'
 import AdxLogo from 'assets/logos/Ambire_AdEx_color_white_hor.svg'
 import { shortenedAddress } from 'lib/formatters'
@@ -7,7 +8,7 @@ import AppNav from './AppNav'
 
 
 const TopBar: FC = () => {
-    const { identity } = useAccount()
+    const { identity, logout } = useAccount()
 
     return (
         <Box>
@@ -22,7 +23,12 @@ const TopBar: FC = () => {
                         src={AdxLogo}
                     />
                 </Box>
-                {shortenedAddress(identity || 'NO ADDR')}
+
+                <Box pad='small' direction='row' gap='small'>
+                    {shortenedAddress(identity || 'NO ADDR')}  <Button plain onClick={logout} icon={<Logout />} />
+                </Box>
+
+
             </Header>
             <AppNav />
         </Box>
