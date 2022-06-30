@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import { Header, Image, Box, Button } from 'grommet'
+import { Header, Image, Box, Button, Text } from 'grommet'
 import { Logout } from 'grommet-icons'
 import { useAccount } from 'hooks'
 import AdxLogo from 'assets/logos/Ambire_AdEx_color_white_hor.svg'
@@ -8,7 +8,7 @@ import AppNav from './AppNav'
 
 
 const TopBar: FC = () => {
-    const { identity, logout } = useAccount()
+    const { identity, adexAccount, logout } = useAccount()
 
     return (
         <Box>
@@ -24,11 +24,17 @@ const TopBar: FC = () => {
                     />
                 </Box>
 
-                <Box pad='small' direction='row' gap='small'>
-                    {shortenedAddress(identity || 'NO ADDR')}  <Button plain onClick={logout} icon={<Logout />} />
+                <Box pad='small' direction='row' gap='small' align='start'>
+                    <Box direction='column' gap='small'>
+                        <Box>
+                            <Text size='small'>{adexAccount?.email}</Text>
+                        </Box>
+                        <Box >
+                            <Text size='xsmall'>({shortenedAddress(identity || 'NO ADDR')})</Text>
+                        </Box>
+                    </Box>
+                    <Button size='small' plain onClick={logout} icon={<Logout />} />
                 </Box>
-
-
             </Header>
             <AppNav />
         </Box>
