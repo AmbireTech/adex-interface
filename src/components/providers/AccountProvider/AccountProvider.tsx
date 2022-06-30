@@ -2,7 +2,7 @@ import { createContext, useState, FC, PropsWithChildren, useMemo, useEffect, use
 import { ethers, providers } from 'ethers'
 import { SafeAppProvider } from '@gnosis.pm/safe-apps-provider'
 import { useSafeAppsSDK } from 'lib/safe-apps-react-sdk'
-import { registerUser } from 'lib/platform'
+import { registerUser, getAdexAccountsByIdentity } from 'lib/platform'
 import { AccountType, AppError, IAdExAccount } from 'types'
 import { useLocalStorage } from 'hooks'
 
@@ -22,6 +22,7 @@ interface IAccountContext {
     authenticated: boolean,
     availableAdexAccounts: Array<IAdExAccount>,
     registerAdexUser: (adexUser: IAdExAccount | null) => Promise<{ adexUser: IAdExAccount | null, error?: AppError }>,
+    selectAdexUser: (adexIdentity: string | null) => IAdExAccount | null,
     logout: () => void
 }
 
@@ -33,6 +34,7 @@ const defaultContext = {
     authenticated: false,
     availableAdexAccounts: [],
     registerAdexUser: registerUser,
+    selectAdexUser: () => null,
     logout: () => { }
 }
 
@@ -47,27 +49,54 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
         defaultValue: null,
     })
     const [accountType] = useState<IAccountContext['accountType']>(defaultContext.accountType)
-    // const [authenticated, setAuthenticated] = useState<IAccountContext['authenticated']>(defaultContext.authenticated)
-    const [availableAdexAccounts] = useState<IAccountContext['availableAdexAccounts']>(defaultContext.availableAdexAccounts)
-    const authenticated = !!adexAccount
+    const [availableAdexAccounts, setAvailableAdexAccounts] = useState<IAccountContext['availableAdexAccounts']>(defaultContext.availableAdexAccounts)
+    // const authenticated = !!adexAccount
 
     const registerAdexUser = useCallback(async (user: IAdExAccount | null) => {
         if (!identity) return { adexUser: null }
 
         const { adexUser, error } = await registerUser(user, identity)
+
+        console.log({ adexUser })
         if (adexUser && identity && !error) {
-            setAdexAccount({ ...adexUser, signers: [identity] })
+            setAdexAccount(adexUser)
+            setAvailableAdexAccounts(prev => [...prev, adexUser])
         }
         return { adexUser, error }
-    }, [identity, setAdexAccount])
+    }, [identity, setAdexAccount, setAvailableAdexAccounts])
 
-    // useEffect(() => {
-    //     console.log({adexAccount})
-    //     setAuthenticated(!!adexAccount)
-    // }, [adexAccount])
 
+    const selectAdexUser = useCallback((adexIdentity: string | null) => {
+
+        console.log({ adexIdentity })
+        if (!adexIdentity) return null
+
+        const selected = availableAdexAccounts.find(x => x.adexIdentity === adexIdentity) || null
+        console.log({ selected })
+
+        setAdexAccount(selected)
+        return (selected)
+    }, [availableAdexAccounts, setAdexAccount])
+
+    useEffect(() => {
+        if (!identity) {
+            setAvailableAdexAccounts([])
+            return
+        }
+
+        const getIdentities = async () => {
+            const { identityAccounts } = await getAdexAccountsByIdentity(identity)
+            setAvailableAdexAccounts(identityAccounts)
+        }
+
+        getIdentities()
+
+
+    }, [identity])
+
+    const authenticated = useMemo(() => !!adexAccount, [adexAccount])
     const provider = useMemo(() => new ethers.providers.Web3Provider(new SafeAppProvider(safe, sdk)), [sdk, safe])
-    const logout =  useCallback(() => setAdexAccount(null), [setAdexAccount])
+    const logout = useCallback(() => setAdexAccount(null), [setAdexAccount])
 
     const contextValue = useMemo(() => ({
         identity,
@@ -77,8 +106,9 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
         authenticated,
         availableAdexAccounts,
         registerAdexUser,
-        logout
-    }), [identity, adexAccount, provider, accountType, authenticated, availableAdexAccounts, registerAdexUser, logout])
+        logout,
+        selectAdexUser
+    }), [identity, adexAccount, provider, accountType, authenticated, availableAdexAccounts, registerAdexUser, logout, selectAdexUser])
 
     useEffect(() => {
         setIdentity(safe?.safeAddress || null)
