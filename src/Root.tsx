@@ -6,7 +6,6 @@ import { useAccount, useToasts } from 'hooks'
 import { Main } from "grommet"
 
 function Root() {
-
     const { authenticated } = useAccount()
     const location = useLocation()
     const { addToast } = useToasts()
@@ -15,8 +14,12 @@ function Root() {
         <Main>
             <div onClick={() => addToast('adex', { url: 'https://www.adex.network/' })}>{location.pathname}</div>
             <Routes>
-                <Route path='account-select'
-                    element={<AccountSelector />}
+                <Route path='/account-select'
+                    element={
+                        !authenticated ?
+                            <AccountSelector />
+                            : <Navigate replace to='/platform/dashboard' />
+                    }
                 />
                 <Route path='/platform/*'
                     element={
