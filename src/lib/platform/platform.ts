@@ -11,13 +11,13 @@ export async function registerUser(adexUser: IAdExAccount | null, signer?: strin
     return { adexUser: registered, error }
 }
 
-export async function getAdexAccountsByIdentity(identity: string): Promise<{ identityAccounts: Array<IAdExAccount>, error?: AppError }> {
+export async function getAdexAccountByIdentity(identity: string): Promise<{ identityAccount: IAdExAccount | null, error?: AppError }> {
     // TODO:
 
     const current: Array<IAdExAccount> = [{ "name": "kora", "email": "mi@yan.co", "role": 1, "signers": ["0x70fC54B13FA83571006c289B9A6bbAE69dfD4eA4"], adexIdentity: "69x70fC54B13FA83571006c289B9A6bbAE69dfD4eA4" }]
 
 
 
-    return { identityAccounts: [...current].filter(x => x.signers.includes(identity)) }
+    return { identityAccount: [...current].find(x => x.signers.includes(identity)) || null }
 
 }
