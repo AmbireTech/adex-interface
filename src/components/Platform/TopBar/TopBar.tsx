@@ -8,7 +8,7 @@ import AppNav from './AppNav'
 
 
 const TopBar: FC = () => {
-    const { identity, adexAccount, logout } = useAccount()
+    const { identity, adexAccount } = useAccount()
 
     return (
         <Box>
@@ -33,7 +33,6 @@ const TopBar: FC = () => {
                             <Text size='xsmall'>({shortenedAddress(identity || 'NO ADDR')})</Text>
                         </Box>
                     </Box>
-                    <Button size='small' plain onClick={logout} icon={<Logout />} />
                 </Box>
             </Header>
             <AppNav />
