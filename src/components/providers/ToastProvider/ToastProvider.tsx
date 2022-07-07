@@ -4,9 +4,6 @@ import { Close } from 'grommet-icons'
 import { Layer, Box, Button } from 'grommet'
 import { ToastOptions, ToastPositionType, IToastProvider, Toast } from './types'
 
-
-
-
 const defaultOptions: ToastOptions = {
     timeout: 8000,
     error: false,

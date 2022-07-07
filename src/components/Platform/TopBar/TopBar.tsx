@@ -1,10 +1,9 @@
 import { FC } from 'react'
-import { Header, Image, Box, Button, Text } from 'grommet'
-import { Logout } from 'grommet-icons'
+import { Header, Image, Box, Text } from 'grommet'
 import { useAccount } from 'hooks'
 import AdxLogo from 'assets/logos/Ambire_AdEx_color_white_hor.svg'
 import { shortenedAddress } from 'lib/formatters'
-import AppNav from './AppNav'
+// import AppNav from './AppNav'
 
 
 const TopBar: FC = () => {
@@ -35,7 +34,7 @@ const TopBar: FC = () => {
                     </Box>
                 </Box>
             </Header>
-            <AppNav />
+            {/* <AppNav /> */}
         </Box>
     )
 }
