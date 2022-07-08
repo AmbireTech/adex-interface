@@ -1,9 +1,43 @@
 import { FC } from 'react'
-import { Nav, Box, Button, Sidebar } from "grommet"
+import { Nav, Box, Button, Sidebar, Text, Grommet } from 'grommet'
+import { ThemeType } from 'grommet/themes'
 import { useAccount } from 'hooks'
 import { AccountType } from 'types'
 import { useNavigate, useMatch } from 'react-router-dom'
-import { Dashboard, Group } from 'grommet-icons'
+import { Template, Group, } from 'grommet-icons'
+
+
+const sdeNavTheme: ThemeType = {
+    button: {
+        border: {
+            radius: undefined,
+            color: '#2196f3',
+        },
+        disabled: {
+            color: '#fe2693',
+            opacity: '.2',
+            border: {
+                color: '#000000',
+                width: '10px',
+            },
+        },
+        padding: {
+            vertical: '12px',
+            horizontal: '24px',
+        },
+        primary: {
+            color: '#2196f3',
+        },
+        active: {
+            background: {
+                color: {
+                    dark: '#80FFDB',
+                    light: "#00C8FF"
+                }
+            }
+        }
+    }
+}
 
 const AppNav: FC = () => {
     const { accountType } = useAccount()
@@ -11,40 +45,41 @@ const AppNav: FC = () => {
 
     return (
         <Sidebar
-            background="brand"
-            pad={{ left: 'medium', right: 'large', vertical: 'medium' }}
+            background="background-sidebar"
+            width='260px'
+            overflow={{ vertical: 'auto', horizontal: 'hidden' }}
+            flex='grow'
+            pad={{ horizontal: '0', vertical: 'small' }}
         >
-            <Nav gap='small'>
+            <Grommet theme={sdeNavTheme}>
+                <Nav gap='0'>
 
-                <Box pad={{ vertical: 'xsmall' }}>
                     <Button
-                        label='Dashboard'
-                        size='medium'
-                        plain
-                        hoverIndicator
-                        secondary
+                        // hoverIndicator='active-sidebar'
                         active={!!useMatch('/platform/dashboard')}
                         onClick={() => navigate('/platform/dashboard')}
-                        icon={<Dashboard />}
-                    />
-                </Box>
+                    >
+                        <Box pad="small" direction="row" align="center" gap="small">
+                            <Template color='accent-1' />
+                            <Text>Dashboard</Text>
+                        </Box>
+                    </Button>
 
-                <Box pad={{ vertical: 'xsmall' }}
-                    hidden={accountType !== AccountType.UNSET}
-                >
+
                     <Button
-                        label='Audiences'
-                        size='medium'
-                        plain
-                        hoverIndicator
-                        secondary
+                        // hoverIndicator='active-sidebar'
                         active={!!useMatch('/platform/audiences')}
                         onClick={() => navigate('/platform/audiences')}
-                        icon={<Group />}
-                    />
-                </Box>
+                    >
+                        <Box pad="small" direction="row" align="center" gap="small">
+                            <Group color='accent-1' />
+                            <Text>Audiences</Text>
+                        </Box>
+                    </Button>
 
-            </Nav>
+                </Nav>
+            </Grommet>
+
         </Sidebar>
     )
 }

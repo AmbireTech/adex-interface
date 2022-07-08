@@ -12,7 +12,7 @@ const TopBar: FC = () => {
     return (
         <Box>
             <Header
-                background="brand"
+                background="dark"
                 pad={{ vertical: 'xsmall', horizontal: 'medium' }}
                 align='center'
             >
