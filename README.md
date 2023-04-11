@@ -3,10 +3,7 @@
 
 ## Running
 
-### It is supposed to run as [Ambire wallet plugin](https://github.com/AmbireTech/wallet) using [gnosis safe apps sdk](https://github.com/safe-global/safe-apps-sdk) -  [Ambire wallet way (including transactions batching)](https://github.com/AmbireTech/wallet/blob/main/how-to-create-a-plugin.md)
-
-### see the [Ambire wallet README](https://github.com/AmbireTech/wallet/blob/main/README.md) to run it then navigate to `/wallet/adex` (TODO)
-
+### It is supposed to run as standalone app using [Ambire Login SDK](https://github.com/AmbireTech/wallet-login-sdk).
 
 ## Available Scripts
 
@@ -58,4 +55,4 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/t
 
 - [Create React App](https://github.com/facebook/create-react-app).
 - [Grommet](https://github.com/grommet/grommet)
-- [Gnosis safe apps sdk](https://github.com/safe-global/safe-apps-sdk)
+- [Ambire Login SDK](https://github.com/AmbireTech/wallet-login-sdk)
