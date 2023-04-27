@@ -1,17 +1,17 @@
-import { AppShell, Navbar, Header } from '@mantine/core'
+// import { useState } from 'react'
+import { AppShell, Header } from '@mantine/core'
+import SideNav from '../SideNav/SideNav'
 
 function Dashboard() {
+  // const [opened, setOpened] = useState(false)
   return (
     <AppShell
       padding="md"
-      navbar={
-        <Navbar width={{ base: 210 }} height="100%" p="xs">
-          {/* Navbar content */}
-        </Navbar>
-      }
+      layout="alt"
+      navbar={<SideNav />}
       header={
         <Header height={60} p="xs">
-          {/* Header content */}
+          Header here
         </Header>
       }
       styles={(theme) => ({
