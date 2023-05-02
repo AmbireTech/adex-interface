@@ -1,6 +1,7 @@
 // import { useState } from 'react'
-import { AppShell, Header } from '@mantine/core'
+import { AppShell } from '@mantine/core'
 import SideNav from '../SideNav/SideNav'
+import TopBar from '../TopBar/TopBar'
 
 function Dashboard() {
   // const [opened, setOpened] = useState(false)
@@ -12,11 +13,7 @@ function Dashboard() {
       padding="md"
       layout="alt"
       navbar={<SideNav />}
-      header={
-        <Header height={60} p="xs">
-          Header here
-        </Header>
-      }
+      header={<TopBar />}
       styles={(theme) => ({
         main: {
           backgroundColor:
