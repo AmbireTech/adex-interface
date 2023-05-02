@@ -4,6 +4,9 @@ import SideNav from '../SideNav/SideNav'
 
 function Dashboard() {
   // const [opened, setOpened] = useState(false)
+
+  // husky test
+
   return (
     <AppShell
       padding="md"
