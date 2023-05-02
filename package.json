@@ -26,7 +26,12 @@
     "eject": "react-scripts eject",
     "lint": "eslint --ext .js,.jsx,.ts,.tsx src/",
     "prettify": "prettier --write 'src/**/*.{js,jsx,ts,tsx,json,css,scss,md}'",
-    "lint:fix": "eslint src/ --ext .js,.jsx,.ts,.tsx --fix"
+    "lint:fix": "eslint src/ --ext .js,.jsx,.ts,.tsx --fix",
+    "prepare": "husky install"
+  },
+  "lint-staged": {
+    "src/**/*.{js,jsx,ts,tsx}": "eslint --cache --fix",
+    "src/**/*.{js,jsx,ts,tsx,json,css,scss,md}": "prettier --write --ignore-unknown"
   },
   "browserslist": {
     "production": [
@@ -52,6 +57,8 @@
     "eslint-plugin-prettier": "^4.2.1",
     "eslint-plugin-react": "^7.32.2",
     "eslint-plugin-react-hooks": "^4.6.0",
+    "husky": "^8.0.3",
+    "lint-staged": "^13.2.2",
     "prettier": "^2.8.8"
   },
   "engines": {
