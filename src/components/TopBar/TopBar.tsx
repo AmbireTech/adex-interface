@@ -1,5 +1,5 @@
 import { Title, Text, Header, Flex, ActionIcon, Group, Indicator } from '@mantine/core'
-import BellIcon from '../../resources/icons/Bell'
+import BellIcon from 'resources/icons/Bell'
 
 function TopBar() {
   return (
