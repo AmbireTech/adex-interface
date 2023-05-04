@@ -1,7 +1,7 @@
 // import { useState } from 'react'
 import { AppShell } from '@mantine/core'
-import SideNav from 'components/SideNav/SideNav'
-import TopBar from 'components/TopBar/TopBar'
+import SideNav from 'components/SideNav'
+import TopBar from 'components/TopBar'
 
 function Dashboard() {
   // const [opened, setOpened] = useState(false)
