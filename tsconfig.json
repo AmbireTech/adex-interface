@@ -1,8 +1,7 @@
 {
   "compilerOptions": {
     "baseUrl": "src",
-    "jsx": "react-jsx",
-    "target": "es6",
+    "target": "es5",
     "lib": [
       "dom",
       "dom.iterable",
@@ -20,10 +19,9 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "useUnknownInCatchVariables": false
+    "jsx": "react-jsx"
   },
   "include": [
     "src"
-  ],
-  "exclude": ["node_modules", "build", "src/assets"]
+  ]
 }

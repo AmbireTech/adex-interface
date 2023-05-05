@@ -1,12 +1,11 @@
 export enum ErrorLevel {
-    WARNING,
-    ERROR,
-    CRITICAL
+  WARNING,
+  ERROR,
+  CRITICAL
 }
 
 export type AppError = {
-    severity: ErrorLevel,
-    error: Error,
-    message: string
-
+  severity: ErrorLevel
+  error: Error
+  message: string
 }
