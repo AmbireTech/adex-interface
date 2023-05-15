@@ -1,12 +1,13 @@
 import { MantineProvider } from '@mantine/core'
 import { AccountProvider } from 'contexts/AccountContext'
-import Root from 'Root'
+import { RouterProvider } from 'react-router-dom'
+import { router } from 'Router'
 
 function App() {
   return (
     <AccountProvider>
       <MantineProvider withGlobalStyles withNormalizeCSS>
-        <Root />
+        <RouterProvider router={router} />
       </MantineProvider>
     </AccountProvider>
   )

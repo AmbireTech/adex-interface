@@ -2,6 +2,7 @@
 import { AppShell } from '@mantine/core'
 import SideNav from 'components/SideNav'
 import TopBar from 'components/TopBar'
+import { Outlet } from 'react-router-dom'
 
 function Dashboard() {
   // const [opened, setOpened] = useState(false)
@@ -21,6 +22,7 @@ function Dashboard() {
         }
       })}
     >
+      <Outlet />
       {/* Your application here */}
     </AppShell>
   )
