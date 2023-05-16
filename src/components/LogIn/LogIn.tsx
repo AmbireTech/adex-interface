@@ -11,7 +11,10 @@ function LogIn() {
         </Grid.Col>
         <Grid.Col md={4} order={2} xs={12} orderXs={1} orderMd={2}>
           <Center h="100%">
-            <Button onClick={connectWallet}>{`Test account conect ${adexAccount?.address}`}</Button>
+            <Button
+              variant="gradient"
+              onClick={connectWallet}
+            >{`Test account conect ${adexAccount?.address}`}</Button>
           </Center>
         </Grid.Col>
       </Grid>
