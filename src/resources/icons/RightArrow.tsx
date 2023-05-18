@@ -1,0 +1,16 @@
+export default function RightArrowIcon(): JSX.Element {
+  return (
+    <svg viewBox="0 0 18.384 10.202" xmlns="http://www.w3.org/2000/svg">
+      <g
+        fill="none"
+        stroke="#3c4149"
+        strokeLinecap="round"
+        strokeWidth="1.5"
+        data-name="right arrow"
+      >
+        <path d="M.749 5.101h15.535" data-name="Path 2627" />
+        <path d="M13.594 1.061l4.04 4.04-4.04 4.04" data-name="Path 2628" />
+      </g>
+    </svg>
+  )
+}
