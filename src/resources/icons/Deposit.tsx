@@ -1,7 +1,8 @@
 import React from 'react'
-import { AppIconProps } from 'types/components/Icon'
+import { AppIconProps, defaultProps } from 'types/components/Icon'
 
-const DepositIcon: React.FC<AppIconProps> = ({ color }) => {
+// TODO: use default props for all the icons - find if there is better syntax
+const DepositIcon: React.FC<AppIconProps> = ({ color = defaultProps.color }) => {
   return (
     <svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg" data-name="Deposit icon">
       <path d="M0 0h60v60H0z" fill="none" />
