@@ -28,10 +28,11 @@ export const lightTheme: MantineThemeOverride = {
       '#00302D',
       '#00221F',
       '#001816'
-    ],
-    attention: ['#FFBE4D', '#FFBE4D', '#FFBE4D'],
-    warning: ['#FF6A42', '#FF6A42', '#FF6A421A'],
-    error: ['#FB185C', '#FB185C80', '#FB185C80']
+    ]
+    // NOTE: needs 10 shades to work https://mantine.dev/theming/colors/
+    // attention: ['#FFBE4D', '#FFBE4D', '#FFBE4D'],
+    // warning: ['#FF6A42', '#FF6A42', '#FF6A421A'],
+    // error: ['#FB185C', '#FB185C80', '#FB185C80']
   },
   primaryColor: 'brand',
   primaryShade: 3,
