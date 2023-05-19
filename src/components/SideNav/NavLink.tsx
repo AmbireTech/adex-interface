@@ -1,4 +1,4 @@
-import { ThemeIcon, UnstyledButton, Group, Text } from '@mantine/core'
+import { UnstyledButton, Group, Text, ThemeIcon } from '@mantine/core'
 
 function NavLink({
   icon,
@@ -26,7 +26,9 @@ function NavLink({
       })}
     >
       <Group>
-        <ThemeIcon variant="light">{icon}</ThemeIcon>
+        <ThemeIcon variant="outline" color="blue">
+          {icon}
+        </ThemeIcon>
 
         <Text size="sm">{label}</Text>
       </Group>

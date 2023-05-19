@@ -1,8 +1,11 @@
-export default function DepositIcon(): JSX.Element {
+import React from 'react'
+import { AppIconProps } from 'types/components/Icon'
+
+const DepositIcon: React.FC<AppIconProps> = ({ color }) => {
   return (
     <svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg" data-name="Deposit icon">
       <path d="M0 0h60v60H0z" fill="none" />
-      <g fill="none" stroke="#6a2aff" strokeLinecap="round" strokeWidth="2.8" data-name="Group 328">
+      <g fill="none" stroke={color} strokeLinecap="round" strokeWidth="2.8" data-name="Group 328">
         <path
           d="M27.515 37.974v3.739c0 3.168-2.947 5.728-6.575 5.728s-6.595-2.561-6.595-5.729v-3.738c0 3.168 2.947 5.415 6.593 5.415 3.63-.001 6.577-2.266 6.577-5.415z"
           data-name="Path 2111"
@@ -27,3 +30,5 @@ export default function DepositIcon(): JSX.Element {
     </svg>
   )
 }
+
+export default DepositIcon
