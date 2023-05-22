@@ -1,9 +1,18 @@
-export default function TimeIcon(): JSX.Element {
+import React from 'react'
+import { AppIconProps, defaultProps } from 'types/components/Icon'
+
+const TimeIcon: React.FC<AppIconProps> = ({ color, size, ...rest }) => {
   return (
-    <svg viewBox="0 0 24.057 25.861" xmlns="http://www.w3.org/2000/svg">
+    <svg
+      viewBox="0 0 24.057 25.861"
+      xmlns="http://www.w3.org/2000/svg"
+      width={size}
+      height={size}
+      {...rest}
+    >
       <g
         fill="none"
-        stroke="#3c4149"
+        stroke={color}
         strokeLinecap="round"
         strokeWidth="1.5"
         data-name="Statements icon"
@@ -23,3 +32,7 @@ export default function TimeIcon(): JSX.Element {
     </svg>
   )
 }
+
+TimeIcon.defaultProps = defaultProps
+
+export default TimeIcon

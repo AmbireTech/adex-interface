@@ -1,9 +1,18 @@
-export default function VisibilityIcon(): JSX.Element {
+import React from 'react'
+import { AppIconProps, defaultProps } from 'types/components/Icon'
+
+const VisibilityIcon: React.FC<AppIconProps> = ({ color, size, ...rest }) => {
   return (
-    <svg viewBox="0 0 21.835 18.414" xmlns="http://www.w3.org/2000/svg">
+    <svg
+      viewBox="0 0 21.835 18.414"
+      xmlns="http://www.w3.org/2000/svg"
+      width={size}
+      height={size}
+      {...rest}
+    >
       <g
         fill="none"
-        stroke="#3c4149"
+        stroke={color}
         strokeLinecap="round"
         strokeWidth="1.5"
         data-name="visibillity icon"
@@ -20,3 +29,7 @@ export default function VisibilityIcon(): JSX.Element {
     </svg>
   )
 }
+
+VisibilityIcon.defaultProps = defaultProps
+
+export default VisibilityIcon

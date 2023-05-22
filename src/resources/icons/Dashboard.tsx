@@ -1,12 +1,21 @@
-export default function DashboardIcon(): JSX.Element {
+import React from 'react'
+import { AppIconProps, defaultProps } from 'types/components/Icon'
+
+const DashboardIcon: React.FC<AppIconProps> = ({ color, size, ...rest }) => {
   return (
-    <svg viewBox="0 0 26 26" xmlns="http://www.w3.org/2000/svg">
+    <svg
+      viewBox="0 0 26 26"
+      xmlns="http://www.w3.org/2000/svg"
+      width={size}
+      height={size}
+      {...rest}
+    >
       <g data-name="Dashboard icon">
         <path d="M0 0h26v26H0z" fill="none" />
         <g data-name="Style=Linear">
           <g
             fill="none"
-            stroke="#3c4149"
+            stroke={color}
             strokeLinecap="round"
             strokeWidth="1.5"
             data-name="vuesax/linear/element-3"
@@ -18,3 +27,7 @@ export default function DashboardIcon(): JSX.Element {
     </svg>
   )
 }
+
+DashboardIcon.defaultProps = defaultProps
+
+export default DashboardIcon

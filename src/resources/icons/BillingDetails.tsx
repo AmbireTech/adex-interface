@@ -1,9 +1,18 @@
-export default function BillingDetailsIcon() {
+import React from 'react'
+import { AppIconProps, defaultProps } from 'types/components/Icon'
+
+const BillingDetailsIcon: React.FC<AppIconProps> = ({ color, size, ...rest }) => {
   return (
-    <svg viewBox="0 0 23.459 25.85" xmlns="http://www.w3.org/2000/svg">
+    <svg
+      viewBox="0 0 23.459 25.85"
+      xmlns="http://www.w3.org/2000/svg"
+      width={size}
+      height={size}
+      {...rest}
+    >
       <g
         fill="none"
-        stroke="#3c4149"
+        stroke={color}
         strokeLinecap="round"
         strokeWidth="1.5"
         data-name="Billing details icon"
@@ -23,3 +32,7 @@ export default function BillingDetailsIcon() {
     </svg>
   )
 }
+
+BillingDetailsIcon.defaultProps = defaultProps
+
+export default BillingDetailsIcon

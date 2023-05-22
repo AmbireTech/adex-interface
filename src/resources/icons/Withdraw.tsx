@@ -1,7 +1,16 @@
-export default function WithdrawIcon(): JSX.Element {
+import React from 'react'
+import { AppIconProps, defaultProps } from 'types/components/Icon'
+
+const WithdrawIcon: React.FC<AppIconProps> = ({ color, size, ...rest }) => {
   return (
-    <svg viewBox="0 0 21.811 18.5" xmlns="http://www.w3.org/2000/svg">
-      <g fill="none" stroke="#3c4149" strokeLinecap="round" strokeWidth="1.5">
+    <svg
+      viewBox="0 0 21.811 18.5"
+      xmlns="http://www.w3.org/2000/svg"
+      width={size}
+      height={size}
+      {...rest}
+    >
+      <g fill="none" stroke={color} strokeLinecap="round" strokeWidth="1.5">
         <path d="M.75 5.749h12.5" data-name="Path 2959" />
         <path d="M4.75 13.749h2" data-name="Path 2960" />
         <path d="M9.25 13.749h4" data-name="Path 2961" />
@@ -15,3 +24,7 @@ export default function WithdrawIcon(): JSX.Element {
     </svg>
   )
 }
+
+WithdrawIcon.defaultProps = defaultProps
+
+export default WithdrawIcon

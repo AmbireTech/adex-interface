@@ -1,7 +1,16 @@
-export default function ImageIcon(): JSX.Element {
+import React from 'react'
+import { AppIconProps, defaultProps } from 'types/components/Icon'
+
+const ImageIcon: React.FC<AppIconProps> = ({ color, size, ...rest }) => {
   return (
-    <svg viewBox="0 0 21.808 21.5" xmlns="http://www.w3.org/2000/svg">
-      <g fill="none" stroke="#3c4149" strokeLinecap="round" strokeWidth="1.5">
+    <svg
+      viewBox="0 0 21.808 21.5"
+      xmlns="http://www.w3.org/2000/svg"
+      width={size}
+      height={size}
+      {...rest}
+    >
+      <g fill="none" stroke={color} strokeLinecap="round" strokeWidth="1.5">
         <path
           d="M7.749 20.75h6c5 0 7-2 7-7v-6c0-5-2-7-7-7h-6c-5 0-7 2-7 7v6c0 5 2 7 7 7z"
           data-name="Path 2829"
@@ -15,3 +24,7 @@ export default function ImageIcon(): JSX.Element {
     </svg>
   )
 }
+
+ImageIcon.defaultProps = defaultProps
+
+export default ImageIcon

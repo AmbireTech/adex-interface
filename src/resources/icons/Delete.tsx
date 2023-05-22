@@ -1,13 +1,16 @@
-export default function DeleteIcon(): JSX.Element {
+import React from 'react'
+import { AppIconProps, defaultProps } from 'types/components/Icon'
+
+const DeleteIcon: React.FC<AppIconProps> = ({ color, size, ...rest }) => {
   return (
-    <svg viewBox="0 0 19.64 21.5" xmlns="http://www.w3.org/2000/svg">
-      <g
-        fill="none"
-        stroke="#3c4149"
-        strokeLinecap="round"
-        strokeWidth="1.5"
-        data-name="delete icon"
-      >
+    <svg
+      viewBox="0 0 19.64 21.5"
+      xmlns="http://www.w3.org/2000/svg"
+      width={size}
+      height={size}
+      {...rest}
+    >
+      <g fill="none" stroke={color} strokeLinecap="round" strokeWidth="1.5" data-name="delete icon">
         <path
           d="M18.82 4.73c-3.33-.33-6.68-.5-10.02-.5a59.068 59.068 0 00-5.94.3l-2.04.2"
           data-name="Path 2346"
@@ -26,3 +29,7 @@ export default function DeleteIcon(): JSX.Element {
     </svg>
   )
 }
+
+DeleteIcon.defaultProps = defaultProps
+
+export default DeleteIcon

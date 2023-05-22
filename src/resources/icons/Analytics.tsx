@@ -1,12 +1,21 @@
-export default function AnalyticsIcon(): JSX.Element {
+import React from 'react'
+import { AppIconProps, defaultProps } from 'types/components/Icon'
+
+const AnalyticsIcon: React.FC<AppIconProps> = ({ color, size, ...rest }) => {
   return (
-    <svg viewBox="0 0 21.5 21.5" xmlns="http://www.w3.org/2000/svg">
+    <svg
+      viewBox="0 0 21.5 21.5"
+      xmlns="http://www.w3.org/2000/svg"
+      width={size}
+      height={size}
+      {...rest}
+    >
       <g
         fill="none"
-        stroke="#3c4149"
+        stroke={color}
         strokeLinecap="round"
         strokeWidth="1.5"
-        data-name="Analitycs icon"
+        data-name="Analytics icon"
       >
         <path d="M5.63 16.9v-2.07" data-name="Path 2165" />
         <path d="M10.75 16.9v-4.14" data-name="Path 2166" />
@@ -21,3 +30,7 @@ export default function AnalyticsIcon(): JSX.Element {
     </svg>
   )
 }
+
+AnalyticsIcon.defaultProps = defaultProps
+
+export default AnalyticsIcon

@@ -1,9 +1,18 @@
-export default function DuplicateIcon(): JSX.Element {
+import React from 'react'
+import { AppIconProps, defaultProps } from 'types/components/Icon'
+
+const DuplicateIcon: React.FC<AppIconProps> = ({ color, size, ...rest }) => {
   return (
-    <svg viewBox="0 0 21.5 21.5" xmlns="http://www.w3.org/2000/svg">
+    <svg
+      viewBox="0 0 21.5 21.5"
+      xmlns="http://www.w3.org/2000/svg"
+      width={size}
+      height={size}
+      {...rest}
+    >
       <g
         fill="none"
-        stroke="#3c4149"
+        stroke={color}
         strokeLinecap="round"
         strokeWidth="1.5"
         data-name="duplicate icon"
@@ -21,3 +30,7 @@ export default function DuplicateIcon(): JSX.Element {
     </svg>
   )
 }
+
+DuplicateIcon.defaultProps = defaultProps
+
+export default DuplicateIcon
