@@ -1,4 +1,4 @@
-import { Group, Text, ActionIcon, ThemeIcon } from '@mantine/core'
+import { UnstyledButton, Group, Text, ThemeIcon } from '@mantine/core'
 
 function NavLink({
   icon,
@@ -10,7 +10,7 @@ function NavLink({
   action?: () => void
 }) {
   return (
-    <ActionIcon
+    <UnstyledButton
       title={label}
       onClick={action}
       sx={(theme) => ({
@@ -34,7 +34,7 @@ function NavLink({
 
         <Text size="sm">{label}</Text>
       </Group>
-    </ActionIcon>
+    </UnstyledButton>
   )
 }
 
