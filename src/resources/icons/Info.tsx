@@ -1,7 +1,16 @@
-export default function InfoIcon(): JSX.Element {
+import React from 'react'
+import { AppIconProps, defaultProps } from 'types/components/Icon'
+
+const InfoIcon: React.FC<AppIconProps> = ({ color, size, ...rest }) => {
   return (
-    <svg viewBox="0 0 21.5 21.5" xmlns="http://www.w3.org/2000/svg">
-      <g fill="none" stroke="#3c4149" strokeLinecap="round">
+    <svg
+      viewBox="0 0 21.5 21.5"
+      xmlns="http://www.w3.org/2000/svg"
+      width={size}
+      height={size}
+      {...rest}
+    >
+      <g fill="none" stroke={color} strokeLinecap="round">
         <path
           d="M10.75.75a10 10 0 11-10 10 10.029 10.029 0 0110-10z"
           strokeWidth="1.5"
@@ -13,3 +22,7 @@ export default function InfoIcon(): JSX.Element {
     </svg>
   )
 }
+
+InfoIcon.defaultProps = defaultProps
+
+export default InfoIcon

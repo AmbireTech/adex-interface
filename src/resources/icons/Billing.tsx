@@ -1,14 +1,18 @@
-export default function BillingIcon(): JSX.Element {
+import React from 'react'
+import { AppIconProps, defaultProps } from 'types/components/Icon'
+
+const BillingIcon: React.FC<AppIconProps> = ({ color, size, ...rest }) => {
   return (
-    <svg viewBox="0 0 26 26" xmlns="http://www.w3.org/2000/svg" data-name="Billing icon">
+    <svg
+      viewBox="0 0 26 26"
+      xmlns="http://www.w3.org/2000/svg"
+      data-name="Billing icon"
+      width={size}
+      height={size}
+      {...rest}
+    >
       <path d="M0 0h26v26H0z" fill="none" />
-      <g
-        fill="none"
-        stroke="#3c4149"
-        strokeLinecap="round"
-        strokeWidth="1.5"
-        data-name="Group 1014"
-      >
+      <g fill="none" stroke={color} strokeLinecap="round" strokeWidth="1.5" data-name="Group 1014">
         <path
           d="M9.672 15.33a2.272 2.272 0 002.22 2.33H14.4a1.988 1.988 0 001.94-2.03 1.75 1.75 0 00-1.32-1.93l-4.03-1.4a1.75 1.75 0 01-1.32-1.93 1.988 1.988 0 011.94-2.03h2.51a2.272 2.272 0 012.22 2.33"
           data-name="Path 2391"
@@ -22,3 +26,7 @@ export default function BillingIcon(): JSX.Element {
     </svg>
   )
 }
+
+BillingIcon.defaultProps = defaultProps
+
+export default BillingIcon

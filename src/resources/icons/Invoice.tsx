@@ -1,9 +1,18 @@
-export default function InvoiceIcon(): JSX.Element {
+import React from 'react'
+import { AppIconProps, defaultProps } from 'types/components/Icon'
+
+const InvoiceIcon: React.FC<AppIconProps> = ({ color, size, ...rest }) => {
   return (
-    <svg viewBox="0 0 21.943 25.55" xmlns="http://www.w3.org/2000/svg">
+    <svg
+      viewBox="0 0 21.943 25.55"
+      xmlns="http://www.w3.org/2000/svg"
+      width={size}
+      height={size}
+      {...rest}
+    >
       <g
         fill="none"
-        stroke="#3c4149"
+        stroke={color}
         strokeLinecap="round"
         strokeWidth="1.5"
         data-name="invoice icon"
@@ -18,3 +27,7 @@ export default function InvoiceIcon(): JSX.Element {
     </svg>
   )
 }
+
+InvoiceIcon.defaultProps = defaultProps
+
+export default InvoiceIcon
