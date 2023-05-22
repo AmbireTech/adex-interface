@@ -10,7 +10,7 @@ const BellIcon: React.FC<AppIconProps> = ({ color, size, ...rest }) => {
       height={size}
       {...rest}
     >
-      <g fill="none" stroke="#3c4149" strokeWidth="1.5">
+      <g fill="none" stroke={color} strokeWidth="1.5">
         <path
           d="M8.806 1.72a6 6 0 00-6 6v2.89a4.778 4.778 0 01-.57 2.06l-1.15 1.91a1.919 1.919 0 001.08 2.93 20.921 20.921 0 0013.27 0 2 2 0 001.08-2.93l-1.15-1.91a4.91 4.91 0 01-.56-2.06V7.72a6.018 6.018 0 00-6-6z"
           strokeLinecap="round"
