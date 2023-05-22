@@ -1,10 +1,20 @@
 import React from 'react'
 import { AppIconProps, defaultProps } from 'types/components/Icon'
 
-// TODO: use default props for all the icons - find if there is better syntax
-const DepositIcon: React.FC<AppIconProps> = ({ color = defaultProps.color }) => {
+// NOTE: add `DepositIcon.defaultProps = defaultProps` see below before export
+// NOTE: add color where used e.g. in <path/>, <g/> etc. in 'fill' and 'stroke' where it is NOT 'none'
+// Add: width and height = size
+// Add: {...rest}
+const DepositIcon: React.FC<AppIconProps> = ({ color, size, rest }) => {
   return (
-    <svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg" data-name="Deposit icon">
+    <svg
+      viewBox="0 0 60 60"
+      width={size}
+      height={size}
+      xmlns="http://www.w3.org/2000/svg"
+      data-name="Deposit icon"
+      {...rest}
+    >
       <path d="M0 0h60v60H0z" fill="none" />
       <g fill="none" stroke={color} strokeLinecap="round" strokeWidth="2.8" data-name="Group 328">
         <path
@@ -31,5 +41,7 @@ const DepositIcon: React.FC<AppIconProps> = ({ color = defaultProps.color }) => 
     </svg>
   )
 }
+
+DepositIcon.defaultProps = defaultProps
 
 export default DepositIcon
