@@ -5,7 +5,7 @@ import { AppIconProps, defaultProps } from 'types/components/Icon'
 // NOTE: add color where used e.g. in <path/>, <g/> etc. in 'fill' and 'stroke' where it is NOT 'none'
 // Add: width and height = size
 // Add: {...rest}
-const DepositIcon: React.FC<AppIconProps> = ({ color, size, rest }) => {
+const DepositIcon: React.FC<AppIconProps> = ({ color, size, ...rest }) => {
   return (
     <svg
       viewBox="0 0 60 60"
