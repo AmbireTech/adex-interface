@@ -73,15 +73,7 @@ const CustomCard = ({
             {text}
           </Text>
         </Group>
-        <Button
-          onClick={action}
-          size="lg"
-          variant="outline"
-          color="green"
-          radius="md"
-          mt="sm"
-          styles={styles}
-        >
+        <Button onClick={action} size="lg" variant="outline" radius="md" mt="sm" styles={styles}>
           {buttonLabel}
         </Button>
       </Flex>
