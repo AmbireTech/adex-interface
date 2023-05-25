@@ -1,4 +1,4 @@
-import { Button, Box, Group, Text, Flex, rem } from '@mantine/core'
+import { Button, Box, Group, Text, Flex, rem, useMantineTheme, Title } from '@mantine/core'
 import { useState } from 'react'
 
 const CustomCard = ({
@@ -16,6 +16,7 @@ const CustomCard = ({
   buttonLabel: string
   action: () => void
 }) => {
+  const thm = useMantineTheme()
   const [isHovered, setIsHovered] = useState(false)
 
   const handleMouseEvent = () => {
@@ -26,6 +27,19 @@ const CustomCard = ({
     transition: 'transform 0.3s ease-in-out',
     transform: isHovered ? 'scale(1.3)' : 'scale(1)'
   }
+
+  const styles = (theme: any) => ({
+    root: {
+      transition: 'all 0.3s ease-in-out',
+      backgroundColor: isHovered ? color : 'transparent',
+      color: isHovered ? theme.white : color,
+      border: `1.5px solid ${color}`,
+      '&:hover': {
+        color: theme.white,
+        backgroundColor: color
+      }
+    }
+  })
 
   return (
     <Box
@@ -50,12 +64,24 @@ const CustomCard = ({
       })}
     >
       <Flex mih={50} gap="sm" justify="center" align="center" direction="column" wrap="wrap">
-        <h2>{title}</h2>
-        <div style={iconStyles}>{icon}</div>
-        <Group position="apart" mt="md" mb="xs">
-          <Text size="xl">{text}</Text>
+        <Title order={2} style={{ color: thm.colors.gray[5] }}>
+          {title}
+        </Title>
+        <Box style={iconStyles}>{icon}</Box>
+        <Group position="apart" mb="xs">
+          <Text size="lg" w={rem(160)}>
+            {text}
+          </Text>
         </Group>
-        <Button onClick={action} variant="light" color="green" mt="md" radius="md">
+        <Button
+          onClick={action}
+          size="lg"
+          variant="outline"
+          color="green"
+          radius="md"
+          mt="sm"
+          styles={styles}
+        >
           {buttonLabel}
         </Button>
       </Flex>

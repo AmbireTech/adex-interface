@@ -1,4 +1,4 @@
-import { Center, Container, Grid, useMantineTheme, rem } from '@mantine/core'
+import { Container, Grid, useMantineTheme, rem, Center, Title } from '@mantine/core'
 import DepositIcon from 'resources/icons/Deposit'
 import CampaignIcon from 'resources/icons/Campaign'
 import CustomCard from './CustomCard'
@@ -8,8 +8,11 @@ const GetStarted = () => {
   return (
     <Container fluid h="100vh">
       <Center h="70%">
-        <Grid justify="space-around" align="center">
-          <Grid.Col span={4}>
+        <Grid grow justify="space-around" align="center">
+          <Grid.Col>
+            <Title order={3}>Get started with AdEx</Title>
+          </Grid.Col>
+          <Grid.Col md={1} order={1} xs={12}>
             <CustomCard
               title="Step 1"
               text="Add funds to your account"
@@ -19,7 +22,7 @@ const GetStarted = () => {
               action={() => console.log('Add funds clicked')}
             />
           </Grid.Col>
-          <Grid.Col span={4}>
+          <Grid.Col md={4} order={2} xs={12}>
             <CustomCard
               title="Step 2"
               text="Create new campaign"
