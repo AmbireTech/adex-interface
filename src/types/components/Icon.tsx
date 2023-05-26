@@ -5,6 +5,6 @@ export interface AppIconProps {
 }
 
 export const defaultProps: AppIconProps = {
-  size: 'inherit',
+  size: '36px',
   color: 'currentColor'
 }
