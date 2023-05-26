@@ -1,41 +1,63 @@
-import { UnstyledButton, Group, Text, ThemeIcon } from '@mantine/core'
+import { UnstyledButton, Group, Text, ThemeIcon, createStyles } from '@mantine/core'
+import { Link } from 'react-router-dom'
 
-function NavLink({
+const useStyles = createStyles((theme) => {
+  return {
+    button: {
+      display: 'block',
+      width: '100%',
+      height: '100%',
+      padding: theme.spacing.xs,
+      borderRadius: 'none',
+      position: 'relative'
+    },
+    active: {
+      backgroundColor: theme.fn.lighten(theme.fn.primaryColor(), 0.8),
+      '&:before': {
+        content: '""',
+        position: 'absolute',
+        left: 0,
+        top: 0,
+        bottom: 0,
+        width: 5,
+        backgroundColor: theme.fn.primaryColor()
+      }
+    }
+  }
+})
+
+function CNavLink({
+  to = '',
   icon,
   label,
-  action
+  action,
+  active
 }: {
+  to?: string
   icon?: React.ReactNode
   label: string
   action?: () => void
+  active?: boolean
 }) {
+  const { classes, cx } = useStyles()
   return (
     <UnstyledButton
+      to={to}
+      component={Link}
       title={label}
       onClick={action}
-      sx={(theme) => ({
-        display: 'block',
-        width: '100%',
-        height: '100%',
-        padding: theme.spacing.xs,
-        borderRadius: theme.radius.sm,
-        color: theme.colorScheme === 'dark' ? theme.colors.dark[0] : theme.black,
-
-        '&:hover': {
-          backgroundColor:
-            theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[0]
-        }
-      })}
+      className={cx(classes.button, { [classes.active]: active })}
+      px="xl"
     >
       <Group>
         <ThemeIcon variant="outline" color="blue">
           {icon}
         </ThemeIcon>
 
-        <Text size="sm">{label}</Text>
+        <Text size="lg">{label}</Text>
       </Group>
     </UnstyledButton>
   )
 }
 
-export default NavLink
+export default CNavLink
