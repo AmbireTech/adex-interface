@@ -1,5 +1,46 @@
-import { Button, Box, Group, Text, Flex, rem, useMantineTheme, Title } from '@mantine/core'
-import { useState } from 'react'
+import {
+  Button,
+  Box,
+  Group,
+  Text,
+  Flex,
+  rem,
+  Title,
+  createStyles,
+  ThemeIcon,
+  MantineColor
+} from '@mantine/core'
+import { useHover } from '@mantine/hooks'
+
+interface StylesProps {
+  color: MantineColor
+  hovered: boolean
+}
+
+const useStyles = createStyles((theme, { color, hovered }: StylesProps) => ({
+  wrapper: {
+    transition: theme.transitionTimingFunction,
+    transitionDuration: '0.3s',
+    backgroundColor: hovered ? theme.fn.lighten(theme.colors[color][3], 0.97) : theme.white,
+    textAlign: 'center',
+    padding: theme.spacing.xl,
+    borderRadius: theme.radius.md,
+    height: rem(330),
+    width: rem(294),
+    border: '1px solid',
+    borderColor: hovered ? theme.fn.lighten(theme.colors[color][3], 0.5) : theme.colors.gray[1],
+    boxShadow: hovered ? theme.shadows.md : ''
+  },
+  icon: {
+    transition: theme.transitionTimingFunction,
+    transitionDuration: '0.3s',
+    transform: hovered ? 'scale(1.3)' : 'scale(1)'
+  },
+  button: {
+    transition: theme.transitionTimingFunction,
+    transitionDuration: '0.5s'
+  }
+}))
 
 const CustomCard = ({
   icon,
@@ -10,70 +51,45 @@ const CustomCard = ({
   action
 }: {
   icon: React.ReactNode
-  color: string
+  color: MantineColor
   title: string
   text: string
   buttonLabel: string
   action: () => void
 }) => {
-  const thm = useMantineTheme()
-  const [isHovered, setIsHovered] = useState(false)
-
-  const handleMouseEvent = () => {
-    setIsHovered((prevState) => !prevState)
-  }
-
-  const iconStyles = {
-    transition: 'transform 0.3s ease-in-out',
-    transform: isHovered ? 'scale(1.3)' : 'scale(1)'
-  }
-
-  const styles = (theme: any) => ({
-    root: {
-      transition: 'all 0.3s ease-in-out',
-      backgroundColor: isHovered ? color : 'transparent',
-      color: isHovered ? theme.white : color,
-      border: `1.5px solid ${color}`,
-      '&:hover': {
-        color: theme.white,
-        backgroundColor: color
-      }
-    }
-  })
+  const { hovered, ref } = useHover()
+  const { classes } = useStyles({ color, hovered })
 
   return (
-    <Box
-      onMouseOver={handleMouseEvent}
-      onMouseOut={handleMouseEvent}
-      sx={(theme) => ({
-        backgroundColor: theme.white,
-        textAlign: 'center',
-        padding: theme.spacing.xl,
-        borderRadius: theme.radius.md,
-        height: rem(330),
-        width: rem(294),
-        transition: 'all 0.3s ease-in-out',
-        border: '1px solid',
-        borderColor: theme.colors.gray[1],
-
-        '&:hover': {
-          backgroundColor: theme.fn.lighten(color, 0.97),
-          borderColor: theme.fn.lighten(color, 0.5),
-          boxShadow: 'rgba(149, 157, 165, 0.2) 0px 8px 24px'
-        }
-      })}
-    >
+    <Box ref={ref} className={classes.wrapper}>
       <Flex mih={50} gap="sm" justify="center" align="center" direction="column" wrap="wrap">
-        <Title order={2} style={{ color: thm.colors.gray[5] }}>
+        <Title mt="sm" color="gray.5" order={2}>
           {title}
         </Title>
-        <Box style={iconStyles}>{icon}</Box>
+        <Box className={classes.icon}>
+          <ThemeIcon
+            variant="outline"
+            color={color}
+            size={rem(60)}
+            style={{ border: 'none', background: 'none' }}
+          >
+            {icon}
+          </ThemeIcon>
+        </Box>
         <Group position="apart" mb="xs">
           <Text size="lg" w={rem(160)}>
             {text}
           </Text>
         </Group>
-        <Button onClick={action} size="lg" variant="outline" radius="md" mt="sm" styles={styles}>
+        <Button
+          onClick={action}
+          size="lg"
+          variant={hovered ? 'filled' : 'outline'}
+          radius="md"
+          mt="sm"
+          color={color}
+          className={classes.button}
+        >
           {buttonLabel}
         </Button>
       </Flex>

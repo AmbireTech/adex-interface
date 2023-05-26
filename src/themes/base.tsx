@@ -3,6 +3,7 @@ import { MantineThemeOverride, DEFAULT_THEME } from '@mantine/core'
 // NOTE: Put here components overrides for sizes, form, animations etc. In light/(dark) theme - only colors
 export const baseTheme: MantineThemeOverride = {
   ...DEFAULT_THEME,
+  transitionTimingFunction: 'ease-in-out',
   focusRing: 'never',
   defaultRadius: 'md',
   white: '#fefefe',
