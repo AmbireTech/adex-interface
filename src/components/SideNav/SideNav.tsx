@@ -5,6 +5,7 @@ import DashboardIcon from 'resources/icons/Dashboard'
 import DepositIcon from 'resources/icons/Deposit'
 import BillingIcon from 'resources/icons/Billing'
 import HelpIcon from 'resources/icons/Help'
+import AdExLogo from 'resources/logos/AdExLogo'
 import NavLink from './NavLink'
 
 function SideNav() {
@@ -14,7 +15,9 @@ function SideNav() {
   const match = useMatch(location.pathname)
   return (
     <Navbar width={{ base: 210 }} height="100%" p="xs">
-      <Navbar.Section mt="xs">AdEx logo here</Navbar.Section>
+      <Navbar.Section mt="xs">
+        <AdExLogo />
+      </Navbar.Section>
       <Navbar.Section mt="xs" grow component={ScrollArea} mx="-xs">
         <Box py="md">
           <NavLink
