@@ -21,14 +21,18 @@ const useStyles = createStyles((theme, { color, hovered }: StylesProps) => ({
   wrapper: {
     transition: theme.transitionTimingFunction,
     transitionDuration: '0.3s',
-    backgroundColor: hovered ? theme.fn.lighten(theme.colors[color][3], 0.97) : theme.white,
+    backgroundColor: hovered
+      ? theme.fn.lighten(theme.colors[color][theme.fn.primaryShade()], 0.97)
+      : theme.white,
     textAlign: 'center',
     padding: theme.spacing.xl,
     borderRadius: theme.radius.md,
     height: rem(330),
     width: rem(294),
     border: '1px solid',
-    borderColor: hovered ? theme.fn.lighten(theme.colors[color][3], 0.5) : theme.colors.gray[1],
+    borderColor: hovered
+      ? theme.fn.lighten(theme.colors[color][theme.fn.primaryShade()], 0.5)
+      : theme.colors.gray[1],
     boxShadow: hovered ? theme.shadows.md : ''
   },
   icon: {
@@ -38,7 +42,8 @@ const useStyles = createStyles((theme, { color, hovered }: StylesProps) => ({
   },
   button: {
     transition: theme.transitionTimingFunction,
-    transitionDuration: '0.5s'
+    transitionDuration: '0.5s',
+    padding: '0'
   }
 }))
 
@@ -82,6 +87,7 @@ const CustomCard = ({
           </Text>
         </Group>
         <Button
+          w="75%"
           onClick={action}
           size="lg"
           variant={hovered ? 'filled' : 'outline'}

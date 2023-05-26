@@ -20,7 +20,9 @@ export const baseTheme: MantineThemeOverride = {
     Button: {
       styles: {
         root: {
-          borderRadius: '100px'
+          borderRadius: '100px',
+          fontWeight: 'normal',
+          fontSize: '16px'
         }
       }
     }
