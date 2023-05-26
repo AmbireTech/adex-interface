@@ -1,4 +1,4 @@
-import { UnstyledButton, Group, Text, ThemeIcon, createStyles } from '@mantine/core'
+import { UnstyledButton, Group, Text, createStyles } from '@mantine/core'
 import { Link } from 'react-router-dom'
 
 const useStyles = createStyles((theme) => {
@@ -9,10 +9,13 @@ const useStyles = createStyles((theme) => {
       height: '100%',
       padding: theme.spacing.xs,
       borderRadius: 'none',
-      position: 'relative'
+      position: 'relative',
+      opacity: 0.69
     },
     active: {
-      backgroundColor: theme.fn.lighten(theme.fn.primaryColor(), 0.8),
+      backgroundColor: theme.fn.primaryColor() + theme.other.shades.hexColorSuffix.lightest,
+      fontWeight: theme.other.fontWeights.bold,
+      opacity: 1,
       '&:before': {
         content: '""',
         position: 'absolute',
@@ -22,11 +25,17 @@ const useStyles = createStyles((theme) => {
         width: 5,
         backgroundColor: theme.fn.primaryColor()
       }
+    },
+    icon: {
+      height: 26,
+      display: 'flex',
+      alignItems: 'center',
+      marginRight: theme.spacing.xs
     }
   }
 })
 
-function CNavLink({
+function NavLink({
   to = '',
   icon,
   label,
@@ -50,14 +59,11 @@ function CNavLink({
       px="xl"
     >
       <Group>
-        <ThemeIcon variant="outline" color="blue">
-          {icon}
-        </ThemeIcon>
-
+        <span className={classes.icon}>{icon}</span>
         <Text size="lg">{label}</Text>
       </Group>
     </UnstyledButton>
   )
 }
 
-export default CNavLink
+export default NavLink
