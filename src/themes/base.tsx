@@ -14,7 +14,7 @@ export const baseTheme: MantineThemeOverride = {
   focusRing: 'never',
   defaultRadius: 'md',
   white: '#fefefe',
-  black: '#010101',
+  black: '#3C4149',
   fontFamily: 'Roboto, sans-serif',
   headings: {
     fontFamily: 'Roboto, sans-serif',
@@ -32,5 +32,38 @@ export const baseTheme: MantineThemeOverride = {
       }
     }
   },
-  primaryShade: { light: 3, dark: 4 }
+  primaryShade: { light: 3, dark: 4 },
+  /**
+   * Custom properties
+   * Add here some useful non default theme stuff
+   */
+  other: {
+    /**
+     * Shades: used to match our custom theme
+     */
+    shades: {
+      /**
+       * lighten: e.g. theme.fn.lighten(theme.fn.primaryColor(), theme.other.shades.lighten.lighter)
+       */
+      lighten: {
+        lighter: 0.5,
+        lightest: 0.92
+      },
+      /**
+       * hexColorSuffix: e.g. theme.fn.primaryColor() + theme.other.shades.hexColorSuffix.lighter
+       */
+      hexColorSuffix: {
+        lighter: '80',
+        lightest: '14'
+      }
+    },
+    /**
+     * fontWeights: for consistency outside the default components
+     */
+    fontWeights: {
+      bold: 700,
+      medium: 500,
+      regular: 400
+    }
+  }
 }
