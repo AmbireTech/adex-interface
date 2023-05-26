@@ -1,24 +1,27 @@
-import { Navbar, ScrollArea, Box } from '@mantine/core'
+import { Navbar, ScrollArea, Box, UnstyledButton, Text } from '@mantine/core'
 import useAccount from 'hooks/useAccount'
-import { useMatch, useLocation, useResolvedPath } from 'react-router-dom'
+import { useMatch, useLocation, useResolvedPath, Link } from 'react-router-dom'
 import DashboardIcon from 'resources/icons/Dashboard'
 import DepositIcon from 'resources/icons/Deposit'
 import BillingIcon from 'resources/icons/Billing'
 import HelpIcon from 'resources/icons/Help'
 import AdExLogo from 'resources/logos/AdExLogo'
+import { useMemo } from 'react'
 import NavLink from './NavLink'
 
 function SideNav() {
   const { connectWallet, disconnectWallet, adexAccount } = useAccount()
-  // const navigate = useNavigate()
   const location = useLocation()
   const match = useMatch(location.pathname)
+  const year = useMemo(() => new Date().getFullYear(), [])
   return (
     <Navbar width={{ base: 210 }} height="100%" p="xs">
       <Navbar.Section mt="xs">
-        <AdExLogo />
+        <UnstyledButton style={{ display: 'block', height: 69 }} component={Link} to="" h={2}>
+          <AdExLogo />
+        </UnstyledButton>
       </Navbar.Section>
-      <Navbar.Section mt="xs" grow component={ScrollArea} mx="-xs">
+      <Navbar.Section mt="xs" mx="-xs" grow component={ScrollArea}>
         <Box py="md">
           <NavLink
             to=""
@@ -45,6 +48,11 @@ function SideNav() {
             action={disconnectWallet}
           />
         </Box>
+      </Navbar.Section>
+      <Navbar.Section mx="xs">
+        <Text size="sm">©{year} AdEx.</Text>
+        <Text size="sm">All Rights Reserved.</Text>
+        <Text size="sm">V.0.00.01</Text>
       </Navbar.Section>
     </Navbar>
   )
