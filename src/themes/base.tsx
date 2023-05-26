@@ -1,4 +1,12 @@
-import { MantineThemeOverride, DEFAULT_THEME } from '@mantine/core'
+import { MantineThemeOverride, DEFAULT_THEME, Tuple, DefaultMantineColor } from '@mantine/core'
+
+type ExtendedCustomColors = 'brand' | 'secondary' | DefaultMantineColor
+
+declare module '@mantine/core' {
+  export interface MantineThemeColorsOverride {
+    colors: Record<ExtendedCustomColors, Tuple<string, 10>>
+  }
+}
 
 // NOTE: Put here components overrides for sizes, form, animations etc. In light/(dark) theme - only colors
 export const baseTheme: MantineThemeOverride = {
@@ -23,5 +31,6 @@ export const baseTheme: MantineThemeOverride = {
         }
       }
     }
-  }
+  },
+  primaryShade: { light: 3, dark: 4 }
 }

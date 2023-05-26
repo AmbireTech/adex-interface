@@ -35,7 +35,6 @@ export const lightTheme: MantineThemeOverride = {
     // error: ['#FB185C', '#FB185C80', '#FB185C80']
   },
   primaryColor: 'brand',
-  primaryShade: 3,
   defaultGradient: {
     from: 'brand',
     to: 'secondary',
