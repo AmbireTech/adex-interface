@@ -1,4 +1,4 @@
-import { Navbar, ScrollArea, Box, UnstyledButton, Text } from '@mantine/core'
+import { Navbar, ScrollArea, Box, UnstyledButton, Text, Button } from '@mantine/core'
 import useAccount from 'hooks/useAccount'
 import { useMatch, useLocation, useResolvedPath, Link } from 'react-router-dom'
 import DashboardIcon from 'resources/icons/Dashboard'
@@ -50,6 +50,11 @@ function SideNav() {
         </Box>
       </Navbar.Section>
       <Navbar.Section mx="xs">
+        <Button fullWidth variant="outline" size="md">
+          See more
+        </Button>
+      </Navbar.Section>
+      <Navbar.Section mx="xs" mt="xl">
         <Text size="sm">©{year} AdEx.</Text>
         <Text size="sm">All Rights Reserved.</Text>
         <Text size="sm">V.0.00.01</Text>
