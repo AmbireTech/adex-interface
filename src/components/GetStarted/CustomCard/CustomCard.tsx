@@ -15,13 +15,11 @@ import { useHover } from '@mantine/hooks'
 interface StylesProps {
   color: MantineColor
   hovered: boolean
-  isBtnFilled?: boolean
 }
 
-const useStyles = createStyles((theme, { color, hovered, isBtnFilled }: StylesProps) => ({
+const useStyles = createStyles((theme, { color, hovered }: StylesProps) => ({
   wrapper: {
     transition: theme.transitionTimingFunction,
-    transitionDuration: '0.3s',
     backgroundColor: hovered
       ? theme.fn.lighten(theme.colors[color][theme.fn.primaryShade()], 0.97)
       : theme.white,
@@ -32,24 +30,16 @@ const useStyles = createStyles((theme, { color, hovered, isBtnFilled }: StylesPr
     width: rem(294),
     border: '1px solid',
     borderColor: hovered
-      ? theme.fn.lighten(theme.colors[color][theme.fn.primaryShade()], 0.5)
+      ? theme.colors[color][theme.fn.primaryShade()] + theme.other.shades.hexColorSuffix.lighter
       : theme.colors.gray[1],
     boxShadow: hovered ? theme.shadows.md : ''
   },
   icon: {
     transition: theme.transitionTimingFunction,
-    transitionDuration: '0.3s',
-    transform: hovered ? 'scale(1.3)' : 'scale(1)'
+    transform: hovered ? 'scale(1.5)' : 'scale(1)'
   },
   button: {
-    transition: theme.transitionTimingFunction,
-    transitionDuration: '0.5s',
-    border: '1.5px solid',
-    padding: '0',
-    backgroundColor:
-      !isBtnFilled || hovered
-        ? ''
-        : theme.fn.lighten(theme.colors[color][theme.fn.primaryShade()], 0.9)
+    padding: '0'
   }
 }))
 
@@ -59,7 +49,6 @@ const CustomCard = ({
   title,
   text,
   buttonLabel,
-  isBtnFilled = false,
   action
 }: {
   icon: React.ReactNode
@@ -67,11 +56,10 @@ const CustomCard = ({
   title: string
   text: string
   buttonLabel: string
-  isBtnFilled?: boolean
   action: () => void
 }) => {
   const { hovered, ref } = useHover()
-  const { classes } = useStyles({ color, hovered, isBtnFilled })
+  const { classes } = useStyles({ color, hovered })
 
   return (
     <Box ref={ref} className={classes.wrapper}>
@@ -98,8 +86,7 @@ const CustomCard = ({
           w="75%"
           onClick={action}
           size="lg"
-          variant={hovered ? 'filled' : 'outline'}
-          radius="md"
+          variant="outline"
           mt="sm"
           color={color}
           className={classes.button}

@@ -1,4 +1,4 @@
-import { Tuple, DefaultMantineColor, MantineThemeOverride } from '@mantine/core'
+import { MantineThemeOverride } from '@mantine/core'
 import { baseTheme } from './base'
 
 export const lightTheme: MantineThemeOverride = {
@@ -39,13 +39,5 @@ export const lightTheme: MantineThemeOverride = {
     from: 'brand',
     to: 'secondary',
     deg: 90
-  }
-}
-
-type ExtendedCustomColors = 'brand' | 'secondary' | DefaultMantineColor
-
-declare module '@mantine/core' {
-  export interface MantineThemeColorsOverride {
-    colors: Record<ExtendedCustomColors, Tuple<string, 10>>
   }
 }

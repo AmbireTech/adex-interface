@@ -37,7 +37,6 @@ const GetStarted = () => {
               color="secondary"
               buttonLabel="Create a campaign"
               action={() => console.log('Create a campaign clicked')}
-              isBtnFilled
             />
           </Grid.Col>
         </Grid>
