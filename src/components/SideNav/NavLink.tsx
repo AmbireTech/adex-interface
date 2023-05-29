@@ -1,38 +1,66 @@
-import { UnstyledButton, Group, Text, ThemeIcon } from '@mantine/core'
+import { UnstyledButton, Group, Text, createStyles } from '@mantine/core'
+import { Link } from 'react-router-dom'
+
+const useStyles = createStyles((theme) => {
+  return {
+    button: {
+      display: 'block',
+      width: '100%',
+      height: '100%',
+      padding: theme.spacing.xs,
+      borderRadius: 'none',
+      position: 'relative',
+      opacity: 0.69
+    },
+    active: {
+      backgroundColor: theme.fn.primaryColor() + theme.other.shades.hexColorSuffix.lightest,
+      fontWeight: theme.other.fontWeights.bold,
+      opacity: 1,
+      '&:before': {
+        content: '""',
+        position: 'absolute',
+        left: 0,
+        top: 0,
+        bottom: 0,
+        width: 5,
+        backgroundColor: theme.fn.primaryColor()
+      }
+    },
+    icon: {
+      height: 26,
+      display: 'flex',
+      alignItems: 'center',
+      marginRight: theme.spacing.xs
+    }
+  }
+})
 
 function NavLink({
+  to = '',
   icon,
   label,
-  action
+  action,
+  active
 }: {
+  to?: string
   icon?: React.ReactNode
   label: string
   action?: () => void
+  active?: boolean
 }) {
+  const { classes, cx } = useStyles()
   return (
     <UnstyledButton
+      to={to}
+      component={Link}
       title={label}
       onClick={action}
-      sx={(theme) => ({
-        display: 'block',
-        width: '100%',
-        height: '100%',
-        padding: theme.spacing.xs,
-        borderRadius: theme.radius.sm,
-        color: theme.colorScheme === 'dark' ? theme.colors.dark[0] : theme.black,
-
-        '&:hover': {
-          backgroundColor:
-            theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[0]
-        }
-      })}
+      className={cx(classes.button, { [classes.active]: active })}
+      px="xl"
     >
       <Group>
-        <ThemeIcon variant="outline" color="blue">
-          {icon}
-        </ThemeIcon>
-
-        <Text size="sm">{label}</Text>
+        <span className={classes.icon}>{icon}</span>
+        <Text size="lg">{label}</Text>
       </Group>
     </UnstyledButton>
   )
