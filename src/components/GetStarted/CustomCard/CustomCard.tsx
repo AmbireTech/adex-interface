@@ -15,9 +15,10 @@ import { useHover } from '@mantine/hooks'
 interface StylesProps {
   color: MantineColor
   hovered: boolean
+  isBtnFilled?: boolean
 }
 
-const useStyles = createStyles((theme, { color, hovered }: StylesProps) => ({
+const useStyles = createStyles((theme, { color, hovered, isBtnFilled }: StylesProps) => ({
   wrapper: {
     transition: theme.transitionTimingFunction,
     transitionDuration: '0.3s',
@@ -43,7 +44,12 @@ const useStyles = createStyles((theme, { color, hovered }: StylesProps) => ({
   button: {
     transition: theme.transitionTimingFunction,
     transitionDuration: '0.5s',
-    padding: '0'
+    border: '1.5px solid',
+    padding: '0',
+    backgroundColor:
+      !isBtnFilled || hovered
+        ? ''
+        : theme.fn.lighten(theme.colors[color][theme.fn.primaryShade()], 0.9)
   }
 }))
 
@@ -53,6 +59,7 @@ const CustomCard = ({
   title,
   text,
   buttonLabel,
+  isBtnFilled = false,
   action
 }: {
   icon: React.ReactNode
@@ -60,10 +67,11 @@ const CustomCard = ({
   title: string
   text: string
   buttonLabel: string
+  isBtnFilled?: boolean
   action: () => void
 }) => {
   const { hovered, ref } = useHover()
-  const { classes } = useStyles({ color, hovered })
+  const { classes } = useStyles({ color, hovered, isBtnFilled })
 
   return (
     <Box ref={ref} className={classes.wrapper}>
