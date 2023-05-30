@@ -65,7 +65,11 @@ export const baseTheme: MantineThemeOverride = {
   headings: {
     fontFamily: 'Roboto, sans-serif',
     sizes: {
-      //   h1: { fontSize: '3rem', fontWeight: '600', lineHeight: '3.6rem' }
+      h1: { fontSize: '4.1662rem', fontWeight: '600', lineHeight: '5,2081rem' },
+      h2: { fontSize: '2.5rem', fontWeight: '400', lineHeight: '3,25rem' },
+      h3: { fontSize: '1.6669rem', fontWeight: '600', lineHeight: '2.25rem' },
+      h4: { fontSize: '1.6669rem', fontWeight: '400', lineHeight: '2.25rem' },
+      h5: { fontSize: '1.1669rem', fontWeight: '500', lineHeight: '1.6919rem' }
       // ...
     }
   },
