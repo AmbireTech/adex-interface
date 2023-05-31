@@ -1,11 +1,12 @@
 // import { useState } from 'react'
-import { AppShell } from '@mantine/core'
+import { AppShell, Navbar, Header, MediaQuery, Burger } from '@mantine/core'
 import SideNav from 'components/SideNav'
 import TopBar from 'components/TopBar'
+import { useState } from 'react'
 import { Outlet } from 'react-router-dom'
 
 function Dashboard() {
-  // const [opened, setOpened] = useState(false)
+  const [opened, setOpened] = useState(false)
 
   // husky test
 
@@ -13,8 +14,45 @@ function Dashboard() {
     <AppShell
       padding="md"
       layout="alt"
-      navbar={<SideNav />}
-      header={<TopBar />}
+      navbarOffsetBreakpoint="sm"
+      asideOffsetBreakpoint="sm"
+      fixed
+      navbar={
+        <Navbar hiddenBreakpoint="sm" width={{ sm: 210 }} height="100%" p="xs" hidden={!opened}>
+          <MediaQuery largerThan="sm" styles={{ display: 'none' }}>
+            <Burger
+              opened={opened}
+              onClick={() => setOpened((o) => !o)}
+              size="md"
+              color="grey"
+              mr="xl"
+            />
+          </MediaQuery>
+          <SideNav />
+        </Navbar>
+      }
+      header={
+        <Header
+          height={90}
+          p="sm"
+          style={{
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center'
+          }}
+        >
+          <MediaQuery largerThan="sm" styles={{ display: 'none' }}>
+            <Burger
+              opened={opened}
+              onClick={() => setOpened((o) => !o)}
+              size="md"
+              color="grey"
+              mr="xl"
+            />
+          </MediaQuery>
+          <TopBar />
+        </Header>
+      }
       styles={(theme) => ({
         main: {
           backgroundColor:

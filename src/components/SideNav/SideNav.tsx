@@ -15,7 +15,7 @@ function SideNav() {
   const match = useMatch(location.pathname)
   const year = useMemo(() => new Date().getFullYear(), [])
   return (
-    <Navbar width={{ base: 210 }} height="100%" p="xs">
+    <>
       <Navbar.Section mt="xs">
         <UnstyledButton style={{ display: 'block', height: 69 }} component={Link} to="" h={2}>
           <AdExLogo />
@@ -59,7 +59,7 @@ function SideNav() {
         <Text size="sm">All Rights Reserved.</Text>
         <Text size="sm">V.0.00.01</Text>
       </Navbar.Section>
-    </Navbar>
+    </>
   )
 }
 
