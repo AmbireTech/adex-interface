@@ -69,49 +69,72 @@ export const baseTheme: MantineThemeOverride = {
       // ...
     }
   },
-  transitionTimingFunction: '0.2s ease-out',
+  transitionTimingFunction: '0.3s ease-out',
   components: {
     Button: {
-      styles: (theme, params: ButtonStylesParams, { variant }) => ({
-        root: {
-          borderRadius: '100px',
-          borderWidth: 2,
-          // TODO: outline button needs fixing the background to be rounded form the start
-          background:
-            variant === 'outline'
-              ? theme.fn.rgba(
-                  theme.colors[params.color || theme.primaryColor][theme.fn.primaryShade()],
-                  theme.other.shades.rgba.lightest
-                )
-              : '',
-          backgroundImage:
-            variant === 'outline'
-              ? theme.fn.radialGradient(
-                  theme.colors[params.color || theme.primaryColor][theme.fn.primaryShade()],
-                  theme.colors[params.color || theme.primaryColor][theme.fn.primaryShade()]
-                )
-              : '',
-          backgroundSize: variant === 'outline' ? '0% 100%' : '',
-          backgroundPosition: variant === 'outline' ? '50% 50%' : '',
-          backgroundRepeat: 'no-repeat',
-          transition:
-            variant === 'outline'
-              ? `background-size ${theme.transitionTimingFunction}, color ${theme.transitionTimingFunction}`
-              : '',
-          // TODO: active etc.
-          '&:hover': {
-            color:
+      styles: (theme, params: ButtonStylesParams, { variant }) => {
+        const outlineHoverBgColor = theme.fn.rgba(
+          theme.colors[params.color || theme.primaryColor][theme.fn.primaryShade()],
+          theme.other.shades.rgba.lightest
+        )
+
+        const outlineHoverBgGradient = theme.fn.radialGradient(
+          outlineHoverBgColor,
+          outlineHoverBgColor
+        )
+
+        const filledHoverBgColor =
+          theme.colors[params.color || theme.primaryColor][theme.fn.primaryShade() + 1]
+
+        const filledHoverBgGradient = theme.fn.radialGradient(
+          filledHoverBgColor,
+          filledHoverBgColor
+        )
+
+        const customHover = variant === 'outline' || variant === 'filled'
+
+        return {
+          root: {
+            borderRadius: '100px',
+            borderWidth: 2,
+            // TODO: outline button needs fixing the background to be rounded form the start
+            // background:
+            //   variant === 'outline'
+            //     ? theme.fn.rgba(
+            //         theme.colors[params.color || theme.primaryColor][theme.fn.primaryShade()],
+            //         theme.other.shades.rgba.lightest
+            //       )
+            //     : '',
+            backgroundImage:
+              // eslint-disable-next-line no-nested-ternary
               variant === 'outline'
-                ? theme.fn.variant({
-                    color: params.color,
-                    variant: 'filled',
-                    gradient: params.gradient
-                  }).color
+                ? outlineHoverBgGradient
+                : variant === 'filled'
+                ? filledHoverBgGradient
                 : '',
-            backgroundSize: '100% 100%'
+            backgroundSize: customHover ? '0% 100%' : '',
+            backgroundPosition: customHover ? '50% 50%' : '',
+            backgroundRepeat: 'no-repeat',
+            transition: customHover ? `background-size ${theme.transitionTimingFunction}` : '',
+            // TODO: active etc.
+            '&:hover': {
+              // color:
+              //   variant === 'outline'
+              //     ? theme.fn.variant({
+              //         color: params.color,
+              //         variant: 'filled',
+              //         gradient: params.gradient
+              //       }).color
+              //     : '',
+              backgroundSize: '100% 100%',
+              backgroundColor:
+                variant === 'filled'
+                  ? theme.colors[params.color || theme.primaryColor][theme.fn.primaryShade()]
+                  : ''
+            }
           }
         }
-      })
+      }
     }
   },
   primaryShade: { light: 3, dark: 4 }

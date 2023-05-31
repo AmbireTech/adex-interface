@@ -54,6 +54,11 @@ function SideNav() {
           See more
         </Button>
       </Navbar.Section>
+      <Navbar.Section mx="xs">
+        <Button fullWidth variant="filled" size="md">
+          See more but filled
+        </Button>
+      </Navbar.Section>
       <Navbar.Section mx="xs" mt="xl">
         <Text size="sm">©{year} AdEx.</Text>
         <Text size="sm">All Rights Reserved.</Text>
