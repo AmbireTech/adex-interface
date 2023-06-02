@@ -7,6 +7,7 @@
     "@emotion/react": "^11.10.6",
     "@mantine/core": "^6.0.8",
     "@mantine/hooks": "^6.0.8",
+    "@mantine/styles": "^6.0.13",
     "@testing-library/jest-dom": "^5.14.1",
     "@testing-library/react": "^13.0.0",
     "@testing-library/user-event": "^13.2.1",
