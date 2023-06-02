@@ -25,15 +25,14 @@ const GetStarted = () => {
               height={330}
               title="Step 1"
               text="Add funds to your account"
-              icon={<DepositIcon size="40px" />}
+              icon={<DepositIcon size="60px" />}
               color="secondary"
               direction="column"
             >
               <Button
-                w="75%"
+                w="70%"
                 size="lg"
                 variant="filled"
-                mt="sm"
                 color="secondary"
                 onClick={() => console.log('Add funds clicked')}
               >
@@ -46,16 +45,15 @@ const GetStarted = () => {
               width={294}
               height={330}
               title="Step 2"
-              text="Create new campaign"
-              icon={<CampaignIcon size="40px" />}
+              text="Create a new campaign"
+              icon={<CampaignIcon size="60px" />}
               color="secondary"
               direction="column"
             >
               <Button
-                w="75%"
+                w="70%"
                 size="lg"
                 variant="filled"
-                mt="sm"
                 color="secondary"
                 p="0"
                 onClick={() => console.log('Create a campaign clicked')}

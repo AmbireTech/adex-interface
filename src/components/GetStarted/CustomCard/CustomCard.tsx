@@ -16,7 +16,6 @@ const useStyles = createStyles(
     wrapper: {
       transition: `all ${theme.transitionTimingFunction}`,
       textAlign: 'center',
-      padding: theme.spacing.xl,
       borderRadius: theme.radius.md,
       height: `${rem(height)}`,
       width: `${rem(width)}`,
@@ -31,10 +30,9 @@ const useStyles = createStyles(
     },
     icon: {
       transition: theme.transitionTimingFunction,
-      transform: hovered && !hasAction ? 'scale(1.5)' : 'scale(1)'
-    },
-    button: {
-      padding: '0'
+      transform: hovered && !hasAction ? 'scale(1.5)' : 'scale(1)',
+      marginTop: theme.spacing.sm,
+      marginBottom: theme.spacing.sm
     },
     iconTest: {
       display: 'flex',
@@ -72,12 +70,16 @@ const CustomCard = ({
 
   return (
     <Box ref={ref} className={classes.wrapper} onClick={action}>
-      <Flex mih={50} gap="sm" justify="center" align="center" direction={direction} wrap="wrap">
-        {title && (
-          <Title mt="sm" color="gray.5" order={2}>
-            {title}
-          </Title>
-        )}
+      <Flex
+        mih={50}
+        h="inherit"
+        gap="md"
+        justify="center"
+        align="center"
+        direction={direction}
+        wrap="wrap"
+      >
+        {title && <Title order={2}>{title}</Title>}
         {icon && (
           <Box className={classes.icon}>
             <span className={classes.iconTest}>{icon}</span>
@@ -91,8 +93,8 @@ const CustomCard = ({
             </Text>
           </Group>
         ) : (
-          <Group position="apart" mb="xs">
-            <Text size="lg" maw={rem(160)}>
+          <Group position="apart">
+            <Text size="xl" inline maw={rem(160)} color="gray.7">
               {text}
             </Text>
           </Group>
