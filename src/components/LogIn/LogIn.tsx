@@ -34,6 +34,7 @@ function LogIn() {
   const { classes } = useStyles()
   const { connectWallet } = useAccount()
   const year = useMemo(() => new Date().getFullYear(), [])
+
   return (
     <Container fluid h="100vh" className={classes.container}>
       <Grid grow h="100%" justify="stretch" align="center">
@@ -63,7 +64,7 @@ function LogIn() {
         </Grid.Col>
         <Grid.Col md={12} order={3} xs={12} orderXs={3} orderMd={3}>
           <Stack spacing="xs" align="center">
-            <Button variant="outline" size="xl" onClick={connectWallet}>
+            <Button variant="filled" size="xl" onClick={connectWallet}>
               Get Started
             </Button>
             {/* TODO: change the href  */}
