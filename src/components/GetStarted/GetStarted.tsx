@@ -26,15 +26,15 @@ const GetStarted = () => {
               title="Step 1"
               text="Add funds to your account"
               icon={<DepositIcon size="40px" />}
-              color="brand"
+              color="secondary"
               direction="column"
             >
               <Button
                 w="75%"
                 size="lg"
-                variant="outline"
+                variant="filled"
                 mt="sm"
-                color="brand"
+                color="secondary"
                 onClick={() => console.log('Add funds clicked')}
               >
                 Add funds
@@ -54,7 +54,7 @@ const GetStarted = () => {
               <Button
                 w="75%"
                 size="lg"
-                variant="outline"
+                variant="filled"
                 mt="sm"
                 color="secondary"
                 p="0"
