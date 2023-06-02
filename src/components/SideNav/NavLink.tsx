@@ -13,8 +13,9 @@ const useStyles = createStyles((theme) => {
       opacity: 0.69
     },
     active: {
-      backgroundColor: theme.fn.primaryColor() + theme.other.shades.hexColorSuffix.lightest,
-      fontWeight: theme.other.fontWeights.bold,
+      // backgroundColor: theme.fn.primaryColor() + theme.other.shades.hexColorSuffix.lightest,
+      color: theme.fn.primaryColor(),
+      fontWeight: theme.other.fontWeights.regular,
       opacity: 1,
       '&:before': {
         content: '""',

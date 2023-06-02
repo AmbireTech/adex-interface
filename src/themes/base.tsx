@@ -60,7 +60,7 @@ export const baseTheme: MantineThemeOverride = {
   focusRing: 'never',
   defaultRadius: 'md',
   white: '#fefefe',
-  black: '#3C4149',
+  black: '#141C33',
   fontFamily: 'Roboto, sans-serif',
   headings: {
     fontFamily: 'Roboto, sans-serif',
@@ -72,6 +72,9 @@ export const baseTheme: MantineThemeOverride = {
   transitionTimingFunction: '0.3s ease-out',
   components: {
     Button: {
+      defaultProps: {
+        radius: 'xl'
+      },
       styles: (theme, params: ButtonStylesParams, { variant }) => {
         const outlineHoverBgColor = theme.fn.rgba(
           theme.colors[params.color || theme.primaryColor][theme.fn.primaryShade()],
@@ -95,9 +98,6 @@ export const baseTheme: MantineThemeOverride = {
 
         return {
           root: {
-            borderRadius: '100px',
-            borderWidth: 2,
-            // TODO: outline button needs fixing the background to be rounded form the start
             // background:
             //   variant === 'outline'
             //     ? theme.fn.rgba(
@@ -116,6 +116,7 @@ export const baseTheme: MantineThemeOverride = {
             backgroundPosition: customHover ? '50% 50%' : '',
             backgroundRepeat: 'no-repeat',
             transition: customHover ? `background-size ${theme.transitionTimingFunction}` : '',
+            borderWidth: variant === 'filled' ? 0 : 2,
             // TODO: active etc.
             '&:hover': {
               // color:
