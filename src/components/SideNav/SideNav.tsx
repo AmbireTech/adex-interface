@@ -1,4 +1,12 @@
-import { Navbar, ScrollArea, Box, UnstyledButton, Text, Button } from '@mantine/core'
+import {
+  Navbar,
+  ScrollArea,
+  Box,
+  UnstyledButton,
+  Text,
+  Button,
+  useMantineTheme
+} from '@mantine/core'
 import useAccount from 'hooks/useAccount'
 import { useMatch, useLocation, useResolvedPath, Link } from 'react-router-dom'
 import DashboardIcon from 'resources/icons/Dashboard'
@@ -14,11 +22,13 @@ function SideNav() {
   const location = useLocation()
   const match = useMatch(location.pathname)
   const year = useMemo(() => new Date().getFullYear(), [])
+  const theme = useMantineTheme()
+
   return (
     <>
       <Navbar.Section mt="xs">
         <UnstyledButton style={{ display: 'block', height: 69 }} component={Link} to="" h={2}>
-          <AdExLogo />
+          <AdExLogo text={theme.colorScheme === 'dark' ? theme.white : theme.black} />
         </UnstyledButton>
       </Navbar.Section>
       <Navbar.Section mt="xs" mx="-xs" grow component={ScrollArea}>
@@ -49,8 +59,13 @@ function SideNav() {
           />
         </Box>
       </Navbar.Section>
-      <Navbar.Section mx="xs">
-        <Button fullWidth variant="outline" size="md">
+      <Navbar.Section m="xs">
+        <Button fullWidth variant="outline" size="sm">
+          See more
+        </Button>
+      </Navbar.Section>
+      <Navbar.Section m="xs">
+        <Button fullWidth variant="filled" size="sm">
           See more
         </Button>
       </Navbar.Section>
