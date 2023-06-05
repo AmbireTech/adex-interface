@@ -1,7 +1,5 @@
 import { Box, Group, Text, Flex, rem, Title, createStyles, MantineColor } from '@mantine/core'
 import { useHover } from '@mantine/hooks'
-import React, { CSSProperties } from 'react'
-import { SystemProp } from '@mantine/styles'
 
 interface StylesProps {
   color: MantineColor
@@ -51,7 +49,6 @@ const CustomCard = ({
   width,
   height,
   children,
-  direction,
   action
 }: {
   icon?: React.ReactNode
@@ -62,7 +59,6 @@ const CustomCard = ({
   width: number
   height: number
   children?: React.ReactNode
-  direction: SystemProp<CSSProperties['flexDirection']>
   action?: () => void
 }) => {
   const { hovered, ref } = useHover()
@@ -76,7 +72,7 @@ const CustomCard = ({
         gap="md"
         justify="center"
         align="center"
-        direction={direction}
+        direction="column"
         wrap="wrap"
       >
         {title && <Title order={2}>{title}</Title>}

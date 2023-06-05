@@ -27,7 +27,6 @@ const GetStarted = () => {
               text="Add funds to your account"
               icon={<DepositIcon size="60px" />}
               color="secondary"
-              direction="column"
             >
               <Button
                 w="70%"
@@ -48,7 +47,6 @@ const GetStarted = () => {
               text="Create a new campaign"
               icon={<CampaignIcon size="60px" />}
               color="secondary"
-              direction="column"
             >
               <Button
                 w="70%"
@@ -69,7 +67,6 @@ const GetStarted = () => {
               text="Statments"
               iconLeft={<CampaignIcon size="24px" />}
               color="secondary"
-              direction="row"
               action={() => console.log('Statement clicked')}
             />
           </Grid.Col>
@@ -80,7 +77,6 @@ const GetStarted = () => {
               icon={<CampaignIcon size="60px" />}
               text="Desktop"
               color="brand"
-              direction="column"
               action={() => console.log('Desktop clicked')}
             />
           </Grid.Col>
