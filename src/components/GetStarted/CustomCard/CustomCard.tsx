@@ -93,7 +93,7 @@ const CustomCard = ({
           </Group>
         ) : (
           <Group position="apart">
-            <Text size="xl" inline maw={rem(160)} color="gray.7">
+            <Text size="xl" inline maw={rem(160)} color="darkVariation">
               {text}
             </Text>
           </Group>
