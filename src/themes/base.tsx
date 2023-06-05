@@ -69,7 +69,7 @@ export const baseTheme: MantineThemeOverride = {
       // ...
     }
   },
-  transitionTimingFunction: '0.3s ease-out',
+  transitionTimingFunction: 'ease-out',
   components: {
     Button: {
       defaultProps: {
