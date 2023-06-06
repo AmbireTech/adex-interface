@@ -29,11 +29,11 @@ export const lightTheme: MantineThemeOverride = {
       '#151923',
       '#111319'
     ],
-    // NOTE: Dark variation color is using for secondary text
-    darkVariation: [
+    secondaryText: [
+      '#858A9A',
       '#747B91',
       '#656E88',
-      '#586280', // Dark Variation
+      '#586280', // SecondaryText
       '#535A70',
       '#4D5262',
       '#474B56',
