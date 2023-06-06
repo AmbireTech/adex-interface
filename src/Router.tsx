@@ -1,9 +1,12 @@
 import Dashboard from 'components/Dashboard'
 import LogIn from 'components/LogIn'
 import Billing from 'components/Billing'
+import BillingDetails from 'components/Billing/BillingDetails'
 import { createBrowserRouter, Navigate, useLocation } from 'react-router-dom'
 
 import useAccount from 'hooks/useAccount'
+import Invoices from 'components/Billing/Invoices'
+import Statements from 'components/Billing/Statements'
 
 function RequireAuth({ children }: { children: JSX.Element }) {
   const { authenticated } = useAccount()
@@ -38,8 +41,23 @@ export const router = createBrowserRouter([
     ),
     children: [
       {
+        // TODO: add RequireAuth
         path: 'billing',
-        element: <Billing />
+        element: <Billing />,
+        children: [
+          {
+            path: 'billing-details',
+            element: <BillingDetails />
+          },
+          {
+            path: 'invoices',
+            element: <Invoices />
+          },
+          {
+            path: 'statements',
+            element: <Statements />
+          }
+        ]
       }
     ]
   }
