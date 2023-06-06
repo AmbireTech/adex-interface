@@ -1,7 +1,7 @@
 import { Container, Grid, Flex, Title, Button } from '@mantine/core'
 import DepositIcon from 'resources/icons/Deposit'
 import CampaignIcon from 'resources/icons/Campaign'
-import CustomCard from './CustomCard'
+import CustomCard from 'components/common/CustomCard'
 
 const GetStarted = () => {
   return (

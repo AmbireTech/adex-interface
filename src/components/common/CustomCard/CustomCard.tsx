@@ -18,6 +18,7 @@ const useStyles = createStyles((theme, { color, width, height, hasAction }: Styl
     border: 'transparent',
     boxShadow: theme.shadows.xs,
     cursor: hasAction ? 'pointer' : '',
+    backgroundColor: theme.white,
     '&:hover': {
       boxShadow: theme.shadows.md,
       border: `1px solid ${theme.fn.lighten(
@@ -41,6 +42,13 @@ const useStyles = createStyles((theme, { color, width, height, hasAction }: Styl
       transitionTimingFunction: theme.transitionTimingFunction,
       transition: 'transform 0.3s'
     }
+  },
+  active: {
+    boxShadow: theme.shadows.md,
+    border: `1px solid ${theme.fn.lighten(
+      theme.colors[color][theme.fn.primaryShade()],
+      theme.other.shades.lighten.lighter
+    )}`
   }
 }))
 
@@ -53,7 +61,10 @@ const CustomCard = ({
   width,
   height,
   children,
-  action
+  action,
+  component,
+  to,
+  active
 }: {
   icon?: React.ReactNode
   iconLeft?: React.ReactNode
@@ -64,11 +75,19 @@ const CustomCard = ({
   height: number
   children?: React.ReactNode
   action?: () => void
+  component?: any
+  to?: string
+  active?: boolean
 }) => {
-  const { classes } = useStyles({ color, width, height, hasAction: !!action })
+  const { classes, cx } = useStyles({ color, width, height, hasAction: !!component })
 
   return (
-    <Box className={classes.wrapper} onClick={action}>
+    <Box
+      className={cx(classes.wrapper, { [classes.active]: active })}
+      component={component}
+      to={to}
+      onClick={action}
+    >
       <Flex
         mih={50}
         h="inherit"

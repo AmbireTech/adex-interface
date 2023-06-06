@@ -1,5 +1,9 @@
-import { Box, Container, Grid, Stack, createStyles } from '@mantine/core'
-import { Link, Outlet } from 'react-router-dom'
+import { Container, Grid, Stack, createStyles } from '@mantine/core'
+import CustomCard from 'components/common/CustomCard'
+import { Link, Outlet, useLocation, useMatch, useResolvedPath } from 'react-router-dom'
+import BillingDetailsIcon from 'resources/icons/BillingDetails'
+import InvoiceIcon from 'resources/icons/Invoice'
+import StatementsIcon from 'resources/icons/Statements'
 
 const useStyles = createStyles((theme) => {
   return {
@@ -13,38 +17,43 @@ const useStyles = createStyles((theme) => {
 
 function Billing() {
   const { classes } = useStyles()
+  const location = useLocation()
+  const match = useMatch(location.pathname)
 
   return (
-    <Grid p="10px">
+    <Grid>
       <Grid.Col span="content">
         <Stack>
-          <Box
+          <CustomCard
+            width={300}
+            height={100}
+            text="Billing details"
+            iconLeft={<BillingDetailsIcon size="24px" />}
+            color="secondary"
             component={Link}
-            w="300px"
-            h="100px"
-            style={{ border: '1px solid black' }}
             to="billing-details"
-          >
-            Billing details
-          </Box>
-          <Box
+            active={useResolvedPath('billing-details').pathname === match?.pathname}
+          />
+          <CustomCard
+            width={300}
+            height={100}
+            text="Invoices"
+            iconLeft={<InvoiceIcon size="24px" />}
+            color="secondary"
             component={Link}
-            w="300px"
-            h="100px"
-            style={{ border: '1px solid black' }}
             to="invoices"
-          >
-            Invoices
-          </Box>
-          <Box
+            active={useResolvedPath('invoices').pathname === match?.pathname}
+          />
+          <CustomCard
+            width={300}
+            height={100}
+            text="Statements"
+            iconLeft={<StatementsIcon size="24px" />}
+            color="secondary"
             component={Link}
-            w="300px"
-            h="100px"
-            style={{ border: '1px solid black' }}
             to="statements"
-          >
-            Statements
-          </Box>
+            active={useResolvedPath('statements').pathname === match?.pathname}
+          />
         </Stack>
       </Grid.Col>
       <Grid.Col span={5}>
