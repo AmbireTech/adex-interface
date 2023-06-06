@@ -6,15 +6,7 @@ import CustomCard from './CustomCard'
 const GetStarted = () => {
   return (
     <Container>
-      <Flex
-        mt="25%"
-        mih={50}
-        gap="sm"
-        justify="space-around"
-        align="center"
-        direction="column"
-        wrap="wrap"
-      >
+      <Flex mih={50} gap="sm" justify="space-around" align="center" direction="column" wrap="wrap">
         <Grid grow justify="center" align="center">
           <Grid.Col>
             <Title order={3}>Get started with AdEx</Title>
