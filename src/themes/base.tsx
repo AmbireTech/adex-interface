@@ -6,7 +6,7 @@ import {
   ButtonStylesParams
 } from '@mantine/core'
 
-type ExtendedCustomColors = 'brand' | 'secondary' | DefaultMantineColor
+type ExtendedCustomColors = 'brand' | 'secondary' | 'secondaryText' | DefaultMantineColor
 
 declare module '@mantine/core' {
   export interface MantineThemeColorsOverride {
@@ -69,7 +69,7 @@ export const baseTheme: MantineThemeOverride = {
       // ...
     }
   },
-  transitionTimingFunction: '0.3s ease-out',
+  transitionTimingFunction: 'ease-out',
   components: {
     Button: {
       defaultProps: {

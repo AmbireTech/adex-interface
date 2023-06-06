@@ -2,6 +2,7 @@ import Dashboard from 'components/Dashboard'
 import LogIn from 'components/LogIn'
 import Billing from 'components/Billing'
 import BillingDetails from 'components/Billing/BillingDetails'
+import GetStarted from 'components/GetStarted'
 import { createBrowserRouter, Navigate, useLocation } from 'react-router-dom'
 
 import useAccount from 'hooks/useAccount'
@@ -58,6 +59,10 @@ export const router = createBrowserRouter([
             element: <Statements />
           }
         ]
+      },
+      {
+        path: 'get-started',
+        element: <GetStarted />
       }
     ]
   }
