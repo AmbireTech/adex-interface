@@ -7,7 +7,7 @@ import { createBrowserRouter, Navigate, useLocation } from 'react-router-dom'
 
 import useAccount from 'hooks/useAccount'
 import Invoices from 'components/Billing/Invoices'
-import Statements from 'components/Billing/Statements'
+import AccountStatements from 'components/Billing/AccountStatements'
 
 function RequireAuth({ children }: { children: JSX.Element }) {
   const { authenticated } = useAccount()
@@ -55,8 +55,8 @@ export const router = createBrowserRouter([
             element: <Invoices />
           },
           {
-            path: 'statements',
-            element: <Statements />
+            path: 'account-statements',
+            element: <AccountStatements />
           }
         ]
       },

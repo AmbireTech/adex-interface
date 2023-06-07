@@ -47,12 +47,12 @@ function Billing() {
           <CustomCard
             width={300}
             height={100}
-            text="Statements"
+            text="Account Statements"
             iconLeft={<StatementsIcon size="24px" />}
             color="secondary"
             component={Link}
-            to="statements"
-            active={useResolvedPath('statements').pathname === match?.pathname}
+            to="account-statements"
+            active={useResolvedPath('account-statements').pathname === match?.pathname}
           />
         </Stack>
       </Grid.Col>
