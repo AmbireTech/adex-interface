@@ -52,16 +52,6 @@ const GetStarted = () => {
               </Button>
             </CustomCard>
           </Grid.Col>
-          <Grid.Col md={4} order={3} xs={12}>
-            <CustomCard
-              width={300}
-              height={100}
-              text="Statments"
-              iconLeft={<CampaignIcon size="24px" />}
-              color="secondary"
-              action={() => console.log('Statement clicked')}
-            />
-          </Grid.Col>
           <Grid.Col md={4} order={4} xs={12}>
             <CustomCard
               width={164}

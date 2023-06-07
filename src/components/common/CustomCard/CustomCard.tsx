@@ -19,6 +19,8 @@ const useStyles = createStyles((theme, { color, width, height, hasAction }: Styl
     boxShadow: theme.shadows.xs,
     cursor: hasAction ? 'pointer' : '',
     backgroundColor: theme.white,
+    textDecoration: 'none',
+    color: hasAction ? theme.black : '',
     '&:hover': {
       boxShadow: theme.shadows.md,
       border: `1px solid ${theme.fn.lighten(
@@ -37,7 +39,7 @@ const useStyles = createStyles((theme, { color, width, height, hasAction }: Styl
   icon: {
     display: 'flex',
     alignItems: 'center',
-    color: theme.colors[color][theme.fn.primaryShade()],
+    color: hasAction ? theme.black : theme.colors[color][theme.fn.primaryShade()],
     svg: {
       transitionTimingFunction: theme.transitionTimingFunction,
       transition: 'transform 0.3s'
@@ -48,7 +50,10 @@ const useStyles = createStyles((theme, { color, width, height, hasAction }: Styl
     border: `1px solid ${theme.fn.lighten(
       theme.colors[color][theme.fn.primaryShade()],
       theme.other.shades.lighten.lighter
-    )}`
+    )}`,
+    svg: {
+      color: theme.colors[color][theme.fn.primaryShade()]
+    }
   }
 }))
 
