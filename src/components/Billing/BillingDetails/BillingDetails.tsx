@@ -17,7 +17,7 @@ const BillingDetails = () => {
   })
   return (
     <form onSubmit={form.onSubmit((values) => console.log(values))}>
-      <Grid grow>
+      <Grid h="100%" grow>
         <Grid.Col>
           <span>Company details</span>
         </Grid.Col>

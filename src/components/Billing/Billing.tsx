@@ -10,7 +10,11 @@ const useStyles = createStyles((theme) => {
     container: {
       backgroundColor: theme.white,
       borderRadius: theme.radius.sm,
-      boxShadow: theme.shadows.xs
+      boxShadow: theme.shadows.xs,
+      overflow: 'hidden',
+      overflowY: 'scroll',
+      overflowX: 'scroll',
+      padding: 20
     }
   }
 })
@@ -56,8 +60,8 @@ function Billing() {
           />
         </Stack>
       </Grid.Col>
-      <Grid.Col span={5}>
-        <Container fluid h="70vh" className={classes.container}>
+      <Grid.Col span="content">
+        <Container fluid h={730} w={600} miw={350} className={classes.container}>
           <Outlet />
         </Container>
       </Grid.Col>
