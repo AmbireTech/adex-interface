@@ -1,4 +1,6 @@
-const invoiceElements = [
+import { IInvoiceDetails, IInvoices, IStatements } from 'types'
+
+const invoiceElements: IInvoices[] = [
   {
     companyName: 'Company Name Long 1',
     campaignPeriod: { from: '08/03/23', to: '12/03/23' },
@@ -540,7 +542,7 @@ const invoiceElements = [
     amountSpent: '3000.00 DAI'
   }
 ]
-const statementElements = [
+const statementElements: IStatements[] = [
   {
     documentName: 'Statement March 2023',
     dateOfIssue: '31.03.2023'
@@ -582,4 +584,70 @@ const statementElements = [
     dateOfIssue: '31.03.2023'
   }
 ]
-export { invoiceElements, statementElements }
+const invoiceDetails: IInvoiceDetails = {
+  invoiceId: 'BDG0086',
+  invoiceDate: '01.02.2023',
+  seller: {
+    name: 'UAB Bitdegree',
+    address: 'address line 1',
+    city: 'City 1',
+    country: 'Country 1',
+    regNumber: '304503203',
+    vatRegNumber: 'LT100011416217',
+    ethAddress: '0x2F0FC72542A8bD8ds1c51B2751686A3Bf3eks42w'
+  },
+  buyer: {
+    name: 'AdEx Network',
+    address: 'address line 2',
+    city: 'City 2',
+    country: 'Country 2',
+    regNumber: '304503203',
+    vatRegNumber: 'LT100011416217',
+    ethAddress: '0x2F0FC72542A8bD8ds1c51B2751686A3Bf3eks42w'
+  },
+  invoiceData: [
+    {
+      description: 'Exposure service Exposure service Exposure service',
+      unitOfMeasure: 'Vienetas',
+      quantity: 1,
+      priceInUsd: '3940.00',
+      amountInUsd: '3940.00'
+    },
+    {
+      description: 'Test',
+      unitOfMeasure: 'Vienetas',
+      quantity: 2,
+      priceInUsd: '10.00',
+      amountInUsd: '20.00'
+    },
+    {
+      description: 'Exposure service Exposure service Exposure service',
+      unitOfMeasure: 'Vienetas',
+      quantity: 1,
+      priceInUsd: '3940.00',
+      amountInUsd: '3940.00'
+    },
+    {
+      description: 'Test',
+      unitOfMeasure: 'Vienetas',
+      quantity: 2,
+      priceInUsd: '10.00',
+      amountInUsd: '20.00'
+    },
+    {
+      description: 'Exposure service Exposure service Exposure service',
+      unitOfMeasure: 'Vienetas',
+      quantity: 1,
+      priceInUsd: '3940.00',
+      amountInUsd: '3940.00'
+    },
+    {
+      description: 'Test',
+      unitOfMeasure: 'Vienetas',
+      quantity: 2,
+      priceInUsd: '10.00',
+      amountInUsd: '20.00'
+    }
+  ]
+}
+export { invoiceElements, statementElements, invoiceDetails }

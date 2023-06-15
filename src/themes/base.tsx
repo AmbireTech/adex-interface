@@ -6,7 +6,13 @@ import {
   ButtonStylesParams
 } from '@mantine/core'
 
-type ExtendedCustomColors = 'brand' | 'secondary' | 'secondaryText' | DefaultMantineColor
+type ExtendedCustomColors =
+  | 'brand'
+  | 'secondary'
+  | 'secondaryText'
+  | 'lightBackground'
+  | 'decorativeBorders'
+  | DefaultMantineColor
 
 declare module '@mantine/core' {
   export interface MantineThemeColorsOverride {
@@ -55,6 +61,12 @@ export const baseTheme: MantineThemeOverride = {
       bold: 700,
       medium: 500,
       regular: 400
+    },
+    /**
+     * Add print-specific styles. Usage: [theme.other.media.print]
+     */
+    media: {
+      print: '@media print'
     }
   },
   focusRing: 'never',
