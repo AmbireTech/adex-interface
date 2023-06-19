@@ -33,11 +33,9 @@ const useStyles = createStyles((theme) => ({
       zIndex: 9999,
       top: 0,
       left: 0,
-      transform: 'translate(-50%, -50%)',
       width: '100%',
       height: '100%',
-      overflow: 'hidden',
-      pageBreakInside: 'avoid',
+      breakInside: 'auto',
       border: 'none',
       boxShadow: 'none',
       button: {
@@ -116,7 +114,7 @@ const CustomTable = ({
 
   return (
     <Flex h="100%" justify="space-between" direction="column" align="center">
-      <Table highlightOnHover verticalSpacing="md">
+      <Table highlightOnHover verticalSpacing={15}>
         <thead>{head}</thead>
         <tbody>{rows}</tbody>
       </Table>

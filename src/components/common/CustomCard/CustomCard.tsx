@@ -111,7 +111,7 @@ const CustomCard = ({
         {iconLeft && text ? (
           <Group position="center">
             <span className={classes.icon}>{iconLeft}</span>
-            <Text size="lg" align="start" maw={rem(160)}>
+            <Text size="lg" align="start" maw={rem(176)}>
               {text}
             </Text>
           </Group>

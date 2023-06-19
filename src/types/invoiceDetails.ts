@@ -22,8 +22,8 @@ export interface IInvoiceData {
   description: string
   unitOfMeasure: string
   quantity: number
-  priceInUsd: string
-  amountInUsd: string
+  priceInUsd: number
+  amountInUsd: number
 }
 
 export interface IInvoiceDetails {
@@ -32,4 +32,5 @@ export interface IInvoiceDetails {
   seller: ISeller
   buyer: IBuyer
   invoiceData: IInvoiceData[]
+  vatPercentageInUSD: number
 }

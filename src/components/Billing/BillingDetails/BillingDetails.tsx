@@ -1,23 +1,21 @@
-import { Button, Center, Grid, NumberInput, Select, TextInput } from '@mantine/core'
+import { Button, Flex, Grid, NumberInput, Select, TextInput } from '@mantine/core'
 import { useForm } from '@mantine/form'
+import { initBillingDetails } from 'components/Billing/Invoices/mockedData'
 
 const BillingDetails = () => {
   const form = useForm({
-    initialValues: {
-      firstName: '',
-      lastName: '',
-      companyName: '',
-      companyNumber: 1,
-      companyNumberPrim: 2,
-      companyAddress: '',
-      companyCountry: '',
-      companyCity: '',
-      companyZipCode: 0
+    initialValues: initBillingDetails,
+    validate: {
+      firstName: (value: string) =>
+        value.length < 2 ? 'First name must have at least 2 letters' : null,
+      lastName: (value: string) =>
+        value.length < 2 ? 'Last name must have at least 2 letters' : null
+      // TODO: add validations for all the input fields
     }
   })
   return (
     <form onSubmit={form.onSubmit((values) => console.log(values))}>
-      <Grid h="100%" grow>
+      <Grid gutter="xs">
         <Grid.Col>
           <span>Company details</span>
         </Grid.Col>
@@ -25,7 +23,7 @@ const BillingDetails = () => {
           <TextInput
             variant="filled"
             radius="sm"
-            size="md"
+            size="lg"
             placeholder="First name"
             {...form.getInputProps('firstName')}
           />
@@ -34,7 +32,7 @@ const BillingDetails = () => {
           <TextInput
             variant="filled"
             radius="sm"
-            size="md"
+            size="lg"
             placeholder="Last name"
             {...form.getInputProps('lastName')}
           />
@@ -43,7 +41,7 @@ const BillingDetails = () => {
           <TextInput
             variant="filled"
             radius="sm"
-            size="md"
+            size="lg"
             placeholder="Company name"
             {...form.getInputProps('companyName')}
           />
@@ -52,7 +50,7 @@ const BillingDetails = () => {
           <NumberInput
             variant="filled"
             radius="sm"
-            size="md"
+            size="lg"
             hideControls
             // TODO: change the placeholder
             placeholder="Company number"
@@ -63,7 +61,7 @@ const BillingDetails = () => {
           <NumberInput
             variant="filled"
             radius="sm"
-            size="md"
+            size="lg"
             hideControls
             // TODO: change the placeholder
             placeholder="Company number 2"
@@ -77,7 +75,7 @@ const BillingDetails = () => {
           <TextInput
             variant="filled"
             radius="sm"
-            size="md"
+            size="lg"
             placeholder="Address"
             {...form.getInputProps('companyAddress')}
           />
@@ -85,7 +83,7 @@ const BillingDetails = () => {
         <Grid.Col>
           <Select
             variant="filled"
-            size="md"
+            size="lg"
             data={['Country 1', 'Country 2', 'Country 3']}
             placeholder="Select Country"
             {...form.getInputProps('companyCountry')}
@@ -94,7 +92,7 @@ const BillingDetails = () => {
         <Grid.Col span={6}>
           <Select
             variant="filled"
-            size="md"
+            size="lg"
             data={['City 1', 'City 2', 'City 3']}
             placeholder="Select City"
             {...form.getInputProps('companyCity')}
@@ -104,7 +102,7 @@ const BillingDetails = () => {
           <NumberInput
             variant="filled"
             radius="sm"
-            size="md"
+            size="lg"
             hideControls
             // TODO: change the placeholder
             // Check if the input should be Number
@@ -112,14 +110,12 @@ const BillingDetails = () => {
             {...form.getInputProps('companyZipCode')}
           />
         </Grid.Col>
-        <Grid.Col span={12}>
-          <Center>
-            <Button type="submit" variant="outline">
-              Confirm
-            </Button>
-          </Center>
-        </Grid.Col>
       </Grid>
+      <Flex mih={200} justify="center" align="end" wrap="wrap">
+        <Button miw={260} size="lg" type="submit" color="secondary" variant="outline">
+          Confirmed
+        </Button>
+      </Flex>
     </form>
   )
 }

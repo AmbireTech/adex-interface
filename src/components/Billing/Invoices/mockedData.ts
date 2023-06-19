@@ -1,4 +1,4 @@
-import { IInvoiceDetails, IInvoices, IStatements } from 'types'
+import { IBillingDetails, IInvoiceDetails, IInvoices, IStatements } from 'types'
 
 const invoiceElements: IInvoices[] = [
   {
@@ -610,44 +610,43 @@ const invoiceDetails: IInvoiceDetails = {
       description: 'Exposure service Exposure service Exposure service',
       unitOfMeasure: 'Vienetas',
       quantity: 1,
-      priceInUsd: '3940.00',
-      amountInUsd: '3940.00'
+      priceInUsd: 3940.0,
+      amountInUsd: 3940.0
     },
     {
       description: 'Test',
       unitOfMeasure: 'Vienetas',
       quantity: 2,
-      priceInUsd: '10.00',
-      amountInUsd: '20.00'
+      priceInUsd: 10.0,
+      amountInUsd: 20.0
     },
     {
       description: 'Exposure service Exposure service Exposure service',
       unitOfMeasure: 'Vienetas',
       quantity: 1,
-      priceInUsd: '3940.00',
-      amountInUsd: '3940.00'
+      priceInUsd: 3940.0,
+      amountInUsd: 3940.0
     },
     {
       description: 'Test',
       unitOfMeasure: 'Vienetas',
       quantity: 2,
-      priceInUsd: '10.00',
-      amountInUsd: '20.00'
-    },
-    {
-      description: 'Exposure service Exposure service Exposure service',
-      unitOfMeasure: 'Vienetas',
-      quantity: 1,
-      priceInUsd: '3940.00',
-      amountInUsd: '3940.00'
-    },
-    {
-      description: 'Test',
-      unitOfMeasure: 'Vienetas',
-      quantity: 2,
-      priceInUsd: '10.00',
-      amountInUsd: '20.00'
+      priceInUsd: 10.0,
+      amountInUsd: 20.0
     }
-  ]
+  ],
+  vatPercentageInUSD: 10
 }
-export { invoiceElements, statementElements, invoiceDetails }
+const initBillingDetails: IBillingDetails = {
+  firstName: '',
+  lastName: '',
+  companyName: '',
+  companyNumber: 1,
+  companyNumberPrim: 2,
+  companyAddress: '',
+  companyCountry: '',
+  companyCity: '',
+  companyZipCode: 0
+}
+
+export { invoiceElements, statementElements, invoiceDetails, initBillingDetails }

@@ -1,5 +1,6 @@
 import { Grid, Space, Table, createStyles } from '@mantine/core'
 import { invoiceDetails } from 'components/Billing/Invoices/mockedData'
+import { useMemo } from 'react'
 
 const useStyles = createStyles((theme) => ({
   wrapper: {
@@ -37,6 +38,10 @@ const InvoicesPDF = () => {
       year: 'numeric',
       month: 'long'
     })
+
+  const calculateTotal = useMemo(() => {
+    return invoiceDetails.invoiceData.map((item) => item.amountInUsd).reduce((a, b) => a + b, 0)
+  }, [])
 
   return (
     <Grid grow align="center">
@@ -111,19 +116,19 @@ const InvoicesPDF = () => {
         Total Exl. VAT, USD
       </Grid.Col>
       <Grid.Col span={2} className={cx(classes.right, classes.bold)}>
-        3490.00
+        {calculateTotal.toFixed(2)}
       </Grid.Col>
       <Grid.Col span={9} className={cx(classes.right, classes.bold)}>
         VAT 0%, USD
       </Grid.Col>
       <Grid.Col span={2} className={cx(classes.right, classes.bold)}>
-        0.00
+        {invoiceDetails.vatPercentageInUSD.toFixed(2)}
       </Grid.Col>
       <Grid.Col span={9} className={cx(classes.right, classes.bold)}>
         Total Incl. VAT, USD
       </Grid.Col>
       <Grid.Col span={2} className={cx(classes.right, classes.bold)}>
-        3490.00
+        {(calculateTotal + invoiceDetails.vatPercentageInUSD).toFixed(2)}
       </Grid.Col>
       <Grid.Col span={12}>
         <Space h="xl" />
