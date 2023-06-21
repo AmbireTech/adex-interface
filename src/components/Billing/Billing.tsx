@@ -12,8 +12,6 @@ const useStyles = createStyles((theme) => {
       borderRadius: theme.radius.sm,
       boxShadow: theme.shadows.xs,
       overflow: 'hidden',
-      overflowY: 'scroll',
-      overflowX: 'scroll',
       padding: 20
     }
   }

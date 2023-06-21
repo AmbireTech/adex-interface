@@ -21,7 +21,6 @@ const useStyles = createStyles((theme) => ({
     borderRadius: theme.radius.md,
     borderColor: theme.colors.decorativeBorders[theme.fn.primaryShade()],
     padding: 20,
-    overflowY: 'scroll',
     [theme.other.media.print]: {
       border: 'none',
       padding: 0
