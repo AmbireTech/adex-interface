@@ -1,1 +1,1 @@
-export * from './BillingDetailsProvider'
+export * from './BillingDetailsContext'
