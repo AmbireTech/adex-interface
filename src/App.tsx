@@ -1,5 +1,6 @@
 import { Global, MantineProvider } from '@mantine/core'
 import { AccountProvider } from 'contexts/AccountContext'
+import BillingDetailsContext from 'contexts/CompanyDetailsContext/BillingDetailsContext'
 import { RouterProvider } from 'react-router-dom'
 import { router } from 'Router'
 import { lightTheme } from 'themes'
@@ -24,7 +25,9 @@ function App() {
     <AccountProvider>
       <MantineProvider withGlobalStyles withNormalizeCSS theme={lightTheme}>
         <GlobalStyles />
-        <RouterProvider router={router} />
+        <BillingDetailsContext>
+          <RouterProvider router={router} />
+        </BillingDetailsContext>
       </MantineProvider>
     </AccountProvider>
   )

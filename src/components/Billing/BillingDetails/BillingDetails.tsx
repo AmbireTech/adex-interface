@@ -1,18 +1,8 @@
 import { Button, Flex, Grid, NumberInput, Select, TextInput } from '@mantine/core'
-import { useForm } from '@mantine/form'
-import { initBillingDetails } from 'components/Billing/Invoices/mockedData'
+import { useBillingDetailsFormContext } from 'contexts/CompanyDetailsContext'
 
 const BillingDetails = () => {
-  const form = useForm({
-    initialValues: initBillingDetails,
-    validate: {
-      firstName: (value: string) =>
-        value.length < 2 ? 'First name must have at least 2 letters' : null,
-      lastName: (value: string) =>
-        value.length < 2 ? 'Last name must have at least 2 letters' : null
-      // TODO: add validations for all the input fields
-    }
-  })
+  const form = useBillingDetailsFormContext()
   return (
     <form onSubmit={form.onSubmit((values) => console.log(values))}>
       <Grid gutter="xs">
