@@ -1,8 +1,13 @@
 import { FC, PropsWithChildren } from 'react'
 import { initBillingDetails } from 'components/Billing/Invoices/mockedData'
-import { BillingDetailsFormProvider, useBillingDetailsForm } from './CompanyDetailsContext'
+// import { BillingDetailsFormProvider, useBillingDetailsForm } from './CompanyDetailsContext'
+import { createFormContext } from '@mantine/form'
+import { IBillingDetails } from 'types'
 
-const BillingDetailsContext: FC<PropsWithChildren> = ({ children }) => {
+const [BillingDetailsFormProvider, useBillingDetailsFormContext, useBillingDetailsForm] =
+  createFormContext<IBillingDetails>()
+
+const BillingDetailsProvider: FC<PropsWithChildren> = ({ children }) => {
   const billingDetailsForm = useBillingDetailsForm({
     initialValues: initBillingDetails,
     validate: {
@@ -19,4 +24,4 @@ const BillingDetailsContext: FC<PropsWithChildren> = ({ children }) => {
   )
 }
 
-export default BillingDetailsContext
+export { BillingDetailsProvider, useBillingDetailsFormContext }

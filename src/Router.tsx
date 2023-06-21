@@ -42,8 +42,6 @@ export const router = createBrowserRouter([
     ),
     children: [
       {
-        // TODO: add RequireAuth
-        // TODO: Remove it from dashboard route
         path: 'billing',
         element: <Billing />,
         children: [

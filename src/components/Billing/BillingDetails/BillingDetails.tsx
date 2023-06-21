@@ -1,5 +1,5 @@
 import { Button, Flex, Grid, NumberInput, Select, TextInput } from '@mantine/core'
-import { useBillingDetailsFormContext } from 'contexts/CompanyDetailsContext'
+import { useBillingDetailsFormContext } from 'contexts/BillingDetailsContext'
 
 const BillingDetails = () => {
   const form = useBillingDetailsFormContext()
