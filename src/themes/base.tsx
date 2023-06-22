@@ -66,7 +66,8 @@ export const baseTheme: MantineThemeOverride = {
      * Add print-specific styles. Usage: [theme.other.media.print]
      */
     media: {
-      print: '@media print'
+      print: '@media print',
+      mobile: '@media(max-width:475px)'
     }
   },
   focusRing: 'never',
