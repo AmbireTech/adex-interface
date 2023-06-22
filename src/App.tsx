@@ -9,10 +9,9 @@ function GlobalStyles() {
   return (
     <Global
       styles={(theme) => ({
-        'html, body': {
+        '#root': {
           [theme.other.media.print]: {
-            height: '100%',
-            overflow: 'hidden'
+            display: 'none'
           }
         }
       })}
