@@ -17,49 +17,13 @@ import InvoicesPDF from './InvoicesPDF'
 
 const useStyles = createStyles((theme) => ({
   wrapper: {
-    maxHeight: 'calc(100vh - 270px)',
-    maxWidth: 750,
-    overflow: 'hidden',
     border: '1px solid',
-    borderRadius: theme.radius.md,
     borderColor: theme.colors.decorativeBorders[theme.fn.primaryShade()],
-    padding: 20,
-    [theme.other.media.print]: {
-      border: 'none',
-      padding: 0,
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      maxWidth: '100%',
-      maxHeight: '100%',
-      breakInside: 'auto'
-    },
-    [theme.other.media.mobile]: {
-      overflowX: 'auto'
-    },
-    '&:hover': {
-      overflow: 'auto'
-    }
-  },
-  content: {
-    overflow: 'hidden',
-    height: '100%',
-    [theme.other.media.print]: {
-      padding: 0,
-      margin: 0,
-      boxShadow: 'none',
-      overflow: 'hidden',
-      button: {
-        display: 'none'
-      }
-    }
+    padding: 20
   },
   header: {
     backgroundColor: theme.colors.lightBackground[theme.fn.primaryShade()],
-    padding: 30,
-    [theme.other.media.print]: {
-      display: 'none'
-    }
+    padding: 30
   },
   title: {
     fontSize: theme.fontSizes.xl,
@@ -67,6 +31,14 @@ const useStyles = createStyles((theme) => ({
   },
   close: {
     color: theme.black
+  },
+  printable: {
+    [theme.other.media.print]: {
+      // NOTE: it's not fixed to body nut to some modal probably
+      // position: 'fixed',
+      // top: 0,
+      // left: 0
+    }
   }
 }))
 
@@ -146,20 +118,24 @@ const CustomTable = ({
         opened={opened}
         onClose={close}
         centered
+        radius="sm"
         classNames={{
-          content: classes.content,
           header: classes.header,
           title: classes.title,
           close: classes.close
         }}
       >
-        <Group position="right">
-          <Button mt="md" mb="md" onClick={() => window.print()}>
-            Print
-          </Button>
-        </Group>
-        <div className={classes.wrapper}>
-          <InvoicesPDF />
+        <div>
+          <Group position="right">
+            <Button mt="md" mb="md" onClick={() => window.print()}>
+              Print
+            </Button>
+          </Group>
+          <div className={classes.wrapper}>
+            <div id="printable" className={classes.printable}>
+              <InvoicesPDF />
+            </div>
+          </div>
         </div>
       </Modal>
     </Flex>

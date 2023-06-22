@@ -9,9 +9,12 @@ function GlobalStyles() {
   return (
     <Global
       styles={(theme) => ({
-        '#root': {
-          [theme.other.media.print]: {
-            display: 'none'
+        [theme.other.media.print]: {
+          body: {
+            visibility: 'hidden'
+          },
+          'body #printable': {
+            visibility: 'visible'
           }
         }
       })}
