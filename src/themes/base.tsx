@@ -149,6 +149,31 @@ export const baseTheme: MantineThemeOverride = {
           }
         }
       }
+    },
+    Modal: {
+      styles: (theme) => {
+        return {
+          root: {
+            [theme.other.media.print]: {
+              overflow: 'visible'
+            }
+          },
+          inner: {
+            [theme.other.media.print]: {
+              overflow: 'visible',
+              // Fixes double print, no idea why with fixed it prints twice
+              position: 'absolute',
+              // Fix if used with "centered" modal prop
+              alignItems: 'flex-start'
+            }
+          },
+          content: {
+            [theme.other.media.print]: {
+              overflow: 'visible'
+            }
+          }
+        }
+      }
     }
   },
   primaryShade: { light: 3, dark: 4 }

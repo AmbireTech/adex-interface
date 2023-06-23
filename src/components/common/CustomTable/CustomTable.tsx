@@ -16,27 +16,6 @@ import { IInvoices, IStatements } from 'types'
 import InvoicesPDF from './InvoicesPDF'
 
 const useStyles = createStyles((theme) => ({
-  // NOTE: should be added to theme modal object root, inner and content
-  // Hax to work with modal
-  root: {
-    [theme.other.media.print]: {
-      overflow: 'visible'
-    }
-  },
-  inner: {
-    [theme.other.media.print]: {
-      overflow: 'visible',
-      // Fixes double print, no idea why with fixed it prints twice
-      position: 'absolute',
-      // Fix if used with "centered" modal prop
-      alignItems: 'flex-start'
-    }
-  },
-  content: {
-    [theme.other.media.print]: {
-      overflow: 'visible'
-    }
-  },
   wrapper: {
     border: '1px solid',
     borderColor: theme.colors.decorativeBorders[theme.fn.primaryShade()],
@@ -96,8 +75,6 @@ const CustomTable = ({
       {columns.map((column: string) => {
         return column === 'campaignPeriod' ? (
           <td key={column}>
-            {/* <div>{e[column].from}</div>
-            <div>{e[column].to}</div> */}
             {e[column].from} - {e[column].to}
           </td>
         ) : (
@@ -109,9 +86,6 @@ const CustomTable = ({
           <ActionIcon title="View PDF" onClick={open}>
             <VisibilityIcon />
           </ActionIcon>
-          {/* <ActionIcon title="Download PDF" onClick={() => console.log('Download clicked')}>
-            <DownloadIcon />
-          </ActionIcon> */}
         </Group>
       </td>
     </tr>
@@ -145,9 +119,6 @@ const CustomTable = ({
         centered
         radius="sm"
         classNames={{
-          root: classes.root,
-          inner: classes.inner,
-          content: classes.content,
           header: classes.header,
           title: classes.title,
           close: classes.close
