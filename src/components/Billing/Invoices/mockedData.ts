@@ -584,6 +584,8 @@ const statementElements: IStatements[] = [
     dateOfIssue: '31.03.2023'
   }
 ]
+// const invoiceElements: IInvoices[] | null = null
+// const statementElements: IStatements[] | null = null
 const invoiceDetails: IInvoiceDetails = {
   invoiceId: 'BDG0086',
   invoiceDate: '01.02.2023',
