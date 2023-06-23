@@ -10,7 +10,6 @@ import {
 } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
 import { useState } from 'react'
-// import DownloadIcon from 'resources/icons/Download'
 import VisibilityIcon from 'resources/icons/Visibility'
 import { IInvoices, IStatements } from 'types'
 import InvoicesPDF from './InvoicesPDF'
@@ -18,6 +17,7 @@ import InvoicesPDF from './InvoicesPDF'
 const useStyles = createStyles((theme) => ({
   wrapper: {
     border: '1px solid',
+    borderRadius: theme.radius.sm,
     borderColor: theme.colors.decorativeBorders[theme.fn.primaryShade()],
     padding: 20
   },
@@ -69,16 +69,19 @@ const CustomTable = ({
       <th key="Action">Action</th>
     </tr>
   )
+
   const rows = list.map((e, index) => (
     // eslint-disable-next-line
     <tr key={index}>
       {columns.map((column: string) => {
-        return column === 'campaignPeriod' ? (
+        return (
           <td key={column}>
-            {e[column].from} - {e[column].to}
+            {typeof e[column] === 'object' &&
+            typeof e[column].from === 'string' &&
+            typeof e[column].to === 'string'
+              ? `${e[column].from} - ${e[column].to}`
+              : e[column]}
           </td>
-        ) : (
-          <td key={column}>{e[column]}</td>
         )
       })}
       <td>
