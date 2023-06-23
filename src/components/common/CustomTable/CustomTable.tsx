@@ -16,6 +16,27 @@ import { IInvoices, IStatements } from 'types'
 import InvoicesPDF from './InvoicesPDF'
 
 const useStyles = createStyles((theme) => ({
+  // NOTE: should be added to theme modal object root, inner and content
+  // Hax to work with modal
+  root: {
+    [theme.other.media.print]: {
+      overflow: 'visible'
+    }
+  },
+  inner: {
+    [theme.other.media.print]: {
+      overflow: 'visible',
+      // Fixes double print, no idea why with fixed it prints twice
+      position: 'absolute',
+      // Fix if used with "centered" modal prop
+      alignItems: 'flex-start'
+    }
+  },
+  content: {
+    [theme.other.media.print]: {
+      overflow: 'visible'
+    }
+  },
   wrapper: {
     border: '1px solid',
     borderColor: theme.colors.decorativeBorders[theme.fn.primaryShade()],
@@ -34,10 +55,14 @@ const useStyles = createStyles((theme) => ({
   },
   printable: {
     [theme.other.media.print]: {
-      // NOTE: it's not fixed to body nut to some modal probably
-      // position: 'fixed',
-      // top: 0,
-      // left: 0
+      // NOTE: it's not fixed/absolute to body but modal.inner
+      overflow: 'visible',
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      bottom: 0,
+      width: '100%',
+      padding: 30 // TODO
     }
   }
 }))
@@ -120,6 +145,9 @@ const CustomTable = ({
         centered
         radius="sm"
         classNames={{
+          root: classes.root,
+          inner: classes.inner,
+          content: classes.content,
           header: classes.header,
           title: classes.title,
           close: classes.close

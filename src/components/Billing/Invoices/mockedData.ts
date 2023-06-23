@@ -614,6 +614,62 @@ const invoiceDetails: IInvoiceDetails = {
       amountInUsd: 3940.0
     },
     {
+      description: 'Exposure service Exposure service Exposure service',
+      unitOfMeasure: 'Vienetas',
+      quantity: 1,
+      priceInUsd: 3940.0,
+      amountInUsd: 3940.0
+    },
+    {
+      description: 'Exposure service Exposure service Exposure service',
+      unitOfMeasure: 'Vienetas',
+      quantity: 1,
+      priceInUsd: 3940.0,
+      amountInUsd: 3940.0
+    },
+    {
+      description: 'Exposure service Exposure service Exposure service',
+      unitOfMeasure: 'Vienetas',
+      quantity: 1,
+      priceInUsd: 3940.0,
+      amountInUsd: 3940.0
+    },
+    {
+      description: 'Exposure service Exposure service Exposure service',
+      unitOfMeasure: 'Vienetas',
+      quantity: 1,
+      priceInUsd: 3940.0,
+      amountInUsd: 3940.0
+    },
+    {
+      description: 'Exposure service Exposure service Exposure service',
+      unitOfMeasure: 'Vienetas',
+      quantity: 1,
+      priceInUsd: 3940.0,
+      amountInUsd: 3940.0
+    },
+    {
+      description: 'Exposure service Exposure service Exposure service',
+      unitOfMeasure: 'Vienetas',
+      quantity: 1,
+      priceInUsd: 3940.0,
+      amountInUsd: 3940.0
+    },
+    {
+      description: 'Exposure service Exposure service Exposure service',
+      unitOfMeasure: 'Vienetas',
+      quantity: 1,
+      priceInUsd: 3940.0,
+      amountInUsd: 3940.0
+    },
+    {
+      description: 'Exposure service Exposure service Exposure service',
+      unitOfMeasure: 'Vienetas',
+      quantity: 1,
+      priceInUsd: 3940.0,
+      amountInUsd: 3940.0
+    },
+    {
       description: 'Test',
       unitOfMeasure: 'Vienetas',
       quantity: 2,
