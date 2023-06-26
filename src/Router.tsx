@@ -50,11 +50,11 @@ export const router = createBrowserRouter([
             element: <BillingDetails />
           },
           {
-            path: 'invoices',
+            path: 'invoices/:page?',
             element: <Invoices />
           },
           {
-            path: 'account-statements',
+            path: 'account-statements/:page?',
             element: <AccountStatements />
           }
         ]
