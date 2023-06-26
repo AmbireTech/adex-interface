@@ -12,6 +12,7 @@ import { useDisclosure } from '@mantine/hooks'
 import VisibilityIcon from 'resources/icons/Visibility'
 import { IInvoices, IStatements } from 'types'
 import usePagination from 'hooks/usePagination'
+import { useMemo } from 'react'
 import InvoicesPDF from './InvoicesPDF'
 
 const useStyles = createStyles((theme) => ({
@@ -57,10 +58,12 @@ const CustomTable = ({
   const [opened, { open, close }] = useDisclosure(false)
   const columns: string[] = Object.keys(elements[0])
   const maxItemsPerPage = 10
-  const { maxPages, defaultPage, list, onNextPage, onPreviousPage, onChange } = usePagination({
-    elements,
-    maxItemsPerPage
-  })
+  const { maxPages, defaultPage, startIndex, endIndex, onNextPage, onPreviousPage, onChange } =
+    usePagination({
+      elementsLength: elements.length,
+      maxItemsPerPage
+    })
+  const list = useMemo(() => elements.slice(startIndex, endIndex), [elements, startIndex, endIndex])
 
   const head = (
     <tr>

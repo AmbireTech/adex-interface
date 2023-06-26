@@ -1,32 +1,24 @@
 import useBasePath from 'hooks/useBasePath'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { IInvoices, IStatements } from 'types'
+import { IUsePagination, IUsePaginationProps } from 'types/usePagination'
 
-function usePagination({
-  elements,
-  maxItemsPerPage
-}: {
-  elements: IInvoices[] | IStatements[]
-  maxItemsPerPage: number
-}) {
+function usePagination({ elementsLength, maxItemsPerPage }: IUsePaginationProps): IUsePagination {
   const params = useParams()
   const navigate = useNavigate()
   const basePath = useBasePath()
-
   const maxPages = useMemo(
-    () => Math.ceil(elements.length / maxItemsPerPage),
-    [elements.length, maxItemsPerPage]
+    () => Math.ceil(elementsLength / maxItemsPerPage),
+    [elementsLength, maxItemsPerPage]
   )
   const defaultPage = useMemo(
     () => Math.min(Math.max(Number(params.page), 1), maxPages) || 1,
     [params.page, maxPages]
   )
   const [page, setPage] = useState(defaultPage)
-  const list = useMemo(
-    () => elements.slice((page - 1) * maxItemsPerPage, page * maxItemsPerPage),
-    [elements, page, maxItemsPerPage]
-  )
+  const startIndex = useMemo(() => (page - 1) * maxItemsPerPage, [page, maxItemsPerPage])
+  const endIndex = useMemo(() => page * maxItemsPerPage, [page, maxItemsPerPage])
+
   const onNextPage = useCallback(
     () => page < maxPages && setPage((prevState) => prevState + 1),
     [page, maxPages]
@@ -41,6 +33,14 @@ function usePagination({
 
   useEffect(() => navigate(`${basePath}/${page}`, { replace: true }), [basePath, page, navigate])
 
-  return { maxPages, defaultPage, list, onNextPage, onPreviousPage, onChange }
+  return {
+    maxPages,
+    defaultPage,
+    startIndex,
+    endIndex,
+    onNextPage,
+    onPreviousPage,
+    onChange
+  }
 }
 export default usePagination
