@@ -9,9 +9,9 @@ import {
   createStyles
 } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
-import { useState } from 'react'
 import VisibilityIcon from 'resources/icons/Visibility'
 import { IInvoices, IStatements } from 'types'
+import usePagination from 'hooks/usePagination'
 import InvoicesPDF from './InvoicesPDF'
 
 const useStyles = createStyles((theme) => ({
@@ -57,10 +57,11 @@ const CustomTable = ({
   const [opened, { open, close }] = useDisclosure(false)
   const columns: string[] = Object.keys(elements[0])
   const maxItemsPerPage = 10
-  const defaultPage = 1
-  const [page, setPage] = useState(defaultPage)
-  const maxPages = Math.ceil(elements.length / maxItemsPerPage)
-  const list = elements.slice((page - 1) * maxItemsPerPage, page * maxItemsPerPage)
+  const { maxPages, defaultPage, list, onNextPage, onPreviousPage, onChange } = usePagination({
+    elements,
+    maxItemsPerPage
+  })
+
   const head = (
     <tr>
       {headings.map((heading) => (
@@ -105,13 +106,9 @@ const CustomTable = ({
           total={maxPages}
           boundaries={1}
           defaultValue={defaultPage}
-          onNextPage={() =>
-            setPage((prevState) => (prevState + 1 <= maxPages ? prevState + 1 : prevState))
-          }
-          onPreviousPage={() =>
-            setPage((prevState) => (prevState - 1 >= defaultPage ? prevState - 1 : prevState))
-          }
-          onChange={(value) => setPage(value)}
+          onNextPage={onNextPage}
+          onPreviousPage={onPreviousPage}
+          onChange={(value) => onChange(value)}
         />
       </Group>
       <Modal
