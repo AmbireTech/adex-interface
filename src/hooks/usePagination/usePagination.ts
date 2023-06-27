@@ -1,21 +1,14 @@
-import useBasePath from 'hooks/useBasePath'
-import { useCallback, useLayoutEffect, useMemo, useState } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useCallback, useMemo, useState } from 'react'
 import { IUsePagination, IUsePaginationProps } from 'types'
 
 function usePagination({ elementsLength, maxItemsPerPage }: IUsePaginationProps): IUsePagination {
-  const params = useParams()
-  const navigate = useNavigate()
-  const basePath = useBasePath()
+  const defaultPage = 1
+  const [page, setPage] = useState<number>(defaultPage)
   const maxPages = useMemo(
     () => Math.ceil(elementsLength / maxItemsPerPage),
     [elementsLength, maxItemsPerPage]
   )
-  const defaultPage = useMemo(
-    () => Math.min(Math.max(Number(params.page), 1), maxPages) || 1,
-    [params.page, maxPages]
-  )
-  const [page, setPage] = useState<number>(defaultPage)
+
   const startIndex = useMemo(() => (page - 1) * maxItemsPerPage, [page, maxItemsPerPage])
   const endIndex = useMemo(() => page * maxItemsPerPage, [page, maxItemsPerPage])
 
@@ -24,13 +17,6 @@ function usePagination({ elementsLength, maxItemsPerPage }: IUsePaginationProps)
   const onChange = useCallback((value: number) => {
     setPage(value)
   }, [])
-
-  const updatePageParam = useCallback(() => {
-    navigate(`${basePath}/${page}`, { replace: true })
-  }, [basePath, page, navigate])
-
-  // Note: using useLayoutEffect to update the page param before the DOM is painted
-  useLayoutEffect(() => updatePageParam(), [updatePageParam])
 
   return {
     maxPages,

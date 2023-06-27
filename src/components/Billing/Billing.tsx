@@ -1,7 +1,6 @@
 import { Container, Grid, Stack, createStyles } from '@mantine/core'
 import CustomCard from 'components/common/CustomCard'
-import useBasePath from 'hooks/useBasePath'
-import { Link, Outlet, useResolvedPath } from 'react-router-dom'
+import { Link, Outlet, useResolvedPath, useLocation, useMatch } from 'react-router-dom'
 import BillingDetailsIcon from 'resources/icons/BillingDetails'
 import InvoiceIcon from 'resources/icons/Invoice'
 import StatementsIcon from 'resources/icons/Statements'
@@ -20,7 +19,8 @@ const useStyles = createStyles((theme) => {
 
 function Billing() {
   const { classes } = useStyles()
-  const basePath = useBasePath()
+  const location = useLocation()
+  const match = useMatch(location.pathname)
 
   return (
     <Grid>
@@ -34,7 +34,7 @@ function Billing() {
             color="secondary"
             component={Link}
             to="billing-details"
-            active={useResolvedPath('billing-details').pathname === basePath}
+            active={useResolvedPath('billing-details').pathname === match?.pathname}
           />
           <CustomCard
             width={300}
@@ -43,8 +43,8 @@ function Billing() {
             iconLeft={<InvoiceIcon size="24px" />}
             color="secondary"
             component={Link}
-            to="invoices/1"
-            active={useResolvedPath('invoices').pathname === basePath}
+            to="invoices"
+            active={useResolvedPath('invoices').pathname === match?.pathname}
           />
           <CustomCard
             width={300}
@@ -53,8 +53,8 @@ function Billing() {
             iconLeft={<StatementsIcon size="24px" />}
             color="secondary"
             component={Link}
-            to="account-statements/1"
-            active={useResolvedPath('account-statements').pathname === basePath}
+            to="account-statements"
+            active={useResolvedPath('account-statements').pathname === match?.pathname}
           />
         </Stack>
       </Grid.Col>
