@@ -1,7 +1,7 @@
 import useBasePath from 'hooks/useBasePath'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { IUsePagination, IUsePaginationProps } from 'types/usePagination'
+import { IUsePagination, IUsePaginationProps } from 'types'
 
 function usePagination({ elementsLength, maxItemsPerPage }: IUsePaginationProps): IUsePagination {
   const params = useParams()
@@ -15,18 +15,12 @@ function usePagination({ elementsLength, maxItemsPerPage }: IUsePaginationProps)
     () => Math.min(Math.max(Number(params.page), 1), maxPages) || 1,
     [params.page, maxPages]
   )
-  const [page, setPage] = useState(defaultPage)
+  const [page, setPage] = useState<number>(defaultPage)
   const startIndex = useMemo(() => (page - 1) * maxItemsPerPage, [page, maxItemsPerPage])
   const endIndex = useMemo(() => page * maxItemsPerPage, [page, maxItemsPerPage])
 
-  const onNextPage = useCallback(
-    () => page < maxPages && setPage((prevState) => prevState + 1),
-    [page, maxPages]
-  )
-  const onPreviousPage = useCallback(
-    () => page > 1 && setPage((prevState) => prevState - 1),
-    [page]
-  )
+  const onNextPage = () => setPage((prevState) => prevState + 1)
+  const onPreviousPage = () => setPage((prevState) => prevState - 1)
   const onChange = useCallback((value: number) => {
     setPage(value)
   }, [])

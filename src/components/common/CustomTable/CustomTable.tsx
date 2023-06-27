@@ -10,7 +10,7 @@ import {
 } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
 import VisibilityIcon from 'resources/icons/Visibility'
-import { IInvoices, IStatements } from 'types'
+import { ICustomTableProps } from 'types'
 import usePagination from 'hooks/usePagination'
 import { useMemo } from 'react'
 import InvoicesPDF from './InvoicesPDF'
@@ -47,13 +47,7 @@ const useStyles = createStyles((theme) => ({
   }
 }))
 
-const CustomTable = ({
-  headings,
-  elements
-}: {
-  headings: string[]
-  elements: IInvoices[] | IStatements[]
-}) => {
+const CustomTable = ({ headings, elements }: ICustomTableProps) => {
   const { classes } = useStyles()
   const [opened, { open, close }] = useDisclosure(false)
   const columns: string[] = Object.keys(elements[0])
