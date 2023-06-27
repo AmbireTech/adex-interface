@@ -43,7 +43,7 @@ function Billing() {
             iconLeft={<InvoiceIcon size="24px" />}
             color="secondary"
             component={Link}
-            to="invoices"
+            to="invoices/1"
             active={useResolvedPath('invoices').pathname === basePath}
           />
           <CustomCard
@@ -53,7 +53,7 @@ function Billing() {
             iconLeft={<StatementsIcon size="24px" />}
             color="secondary"
             component={Link}
-            to="account-statements"
+            to="account-statements/1"
             active={useResolvedPath('account-statements').pathname === basePath}
           />
         </Stack>

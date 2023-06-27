@@ -1,5 +1,5 @@
 import useBasePath from 'hooks/useBasePath'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useLayoutEffect, useMemo, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { IUsePagination, IUsePaginationProps } from 'types'
 
@@ -25,7 +25,12 @@ function usePagination({ elementsLength, maxItemsPerPage }: IUsePaginationProps)
     setPage(value)
   }, [])
 
-  useEffect(() => navigate(`${basePath}/${page}`, { replace: true }), [basePath, page, navigate])
+  const updatePageParam = useCallback(() => {
+    navigate(`${basePath}/${page}`, { replace: true })
+  }, [basePath, page, navigate])
+
+  // Note: using useLayoutEffect to update the page param before the DOM is painted
+  useLayoutEffect(() => updatePageParam(), [updatePageParam])
 
   return {
     maxPages,

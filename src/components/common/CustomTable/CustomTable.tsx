@@ -57,7 +57,9 @@ const CustomTable = ({ headings, elements }: ICustomTableProps) => {
       elementsLength: elements.length,
       maxItemsPerPage
     })
-  const list = useMemo(() => elements.slice(startIndex, endIndex), [elements, startIndex, endIndex])
+  const list = useMemo(() => {
+    return elements.slice(startIndex, endIndex)
+  }, [elements, startIndex, endIndex])
 
   const head = (
     <tr>
