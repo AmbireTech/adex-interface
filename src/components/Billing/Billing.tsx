@@ -1,9 +1,18 @@
 import { Container, Grid, Stack, createStyles } from '@mantine/core'
 import CustomCard from 'components/common/CustomCard'
-import { Link, Outlet, useResolvedPath, useLocation, useMatch } from 'react-router-dom'
+import { useState } from 'react'
 import BillingDetailsIcon from 'resources/icons/BillingDetails'
 import InvoiceIcon from 'resources/icons/Invoice'
 import StatementsIcon from 'resources/icons/Statements'
+import BillingDetails from './BillingDetails'
+import Invoices from './Invoices'
+import AccountStatements from './AccountStatements'
+
+enum TabType {
+  BillingTab,
+  InvoicesTab,
+  StatementsTab
+}
 
 const useStyles = createStyles((theme) => {
   return {
@@ -17,10 +26,23 @@ const useStyles = createStyles((theme) => {
   }
 })
 
+const TabSwitch = ({ selectedTab }: { selectedTab: TabType }) => {
+  switch (selectedTab) {
+    case TabType.BillingTab:
+      return <BillingDetails />
+    case TabType.InvoicesTab:
+      return <Invoices />
+    case TabType.StatementsTab:
+      return <AccountStatements />
+    default:
+      return <BillingDetails />
+  }
+}
+
 function Billing() {
   const { classes } = useStyles()
-  const location = useLocation()
-  const match = useMatch(location.pathname)
+  const [selectedTab, setSelectedTab] = useState<TabType>(TabType.BillingTab)
+  const handleTabClicked = (value: TabType) => setSelectedTab(value)
 
   return (
     <Grid>
@@ -32,9 +54,8 @@ function Billing() {
             text="Billing details"
             iconLeft={<BillingDetailsIcon size="24px" />}
             color="secondary"
-            component={Link}
-            to="billing-details"
-            active={useResolvedPath('billing-details').pathname === match?.pathname}
+            active={selectedTab === TabType.BillingTab}
+            action={() => handleTabClicked(TabType.BillingTab)}
           />
           <CustomCard
             width={300}
@@ -42,9 +63,8 @@ function Billing() {
             text="Invoices"
             iconLeft={<InvoiceIcon size="24px" />}
             color="secondary"
-            component={Link}
-            to="invoices"
-            active={useResolvedPath('invoices').pathname === match?.pathname}
+            active={selectedTab === TabType.InvoicesTab}
+            action={() => handleTabClicked(TabType.InvoicesTab)}
           />
           <CustomCard
             width={300}
@@ -52,15 +72,14 @@ function Billing() {
             text="Account Statements"
             iconLeft={<StatementsIcon size="24px" />}
             color="secondary"
-            component={Link}
-            to="account-statements"
-            active={useResolvedPath('account-statements').pathname === match?.pathname}
+            active={selectedTab === TabType.StatementsTab}
+            action={() => handleTabClicked(TabType.StatementsTab)}
           />
         </Stack>
       </Grid.Col>
       <Grid.Col span="content">
         <Container fluid h={730} w={600} miw={350} className={classes.container}>
-          <Outlet />
+          <TabSwitch selectedTab={selectedTab} />
         </Container>
       </Grid.Col>
     </Grid>

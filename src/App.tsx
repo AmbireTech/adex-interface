@@ -1,6 +1,6 @@
 import { Global, MantineProvider } from '@mantine/core'
 import { AccountProvider } from 'contexts/AccountContext'
-import { BillingDetailsProvider } from 'contexts/BillingDetailsContext/BillingDetailsContext'
+import { BillingDetailsProvider } from 'contexts/BillingDetailsContext'
 import { RouterProvider } from 'react-router-dom'
 import { router } from 'Router'
 import { lightTheme } from 'themes'

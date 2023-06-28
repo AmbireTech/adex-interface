@@ -1,61 +1,57 @@
-import { Box, Group, Text, Flex, rem, Title, createStyles, MantineColor } from '@mantine/core'
+import { Box, Group, Text, Flex, rem, Title, createStyles } from '@mantine/core'
+import { ICustomCardProps, ICustomCardStyleProps } from 'types'
 
-interface StylesProps {
-  color: MantineColor
-  width: number
-  height: number
-  hasAction: boolean
-}
-
-const useStyles = createStyles((theme, { color, width, height, hasAction }: StylesProps) => ({
-  wrapper: {
-    transitionTimingFunction: theme.transitionTimingFunction,
-    transition: 'all 0.3s',
-    textAlign: 'center',
-    borderRadius: theme.radius.md,
-    height: `${rem(height)}`,
-    width: `${rem(width)}`,
-    border: 'transparent',
-    boxShadow: theme.shadows.xs,
-    cursor: hasAction ? 'pointer' : '',
-    backgroundColor: theme.white,
-    textDecoration: 'none',
-    color: hasAction ? theme.black : '',
-    '&:hover': {
+const useStyles = createStyles(
+  (theme, { color, width, height, hasAction }: ICustomCardStyleProps) => ({
+    wrapper: {
+      transitionTimingFunction: theme.transitionTimingFunction,
+      transition: 'all 0.3s',
+      textAlign: 'center',
+      borderRadius: theme.radius.md,
+      height: `${rem(height)}`,
+      width: `${rem(width)}`,
+      border: 'transparent',
+      boxShadow: theme.shadows.xs,
+      cursor: hasAction ? 'pointer' : '',
+      backgroundColor: theme.white,
+      textDecoration: 'none',
+      color: hasAction ? theme.black : '',
+      '&:hover': {
+        boxShadow: theme.shadows.md,
+        border: `1px solid ${theme.fn.lighten(
+          theme.colors[color][theme.fn.primaryShade()],
+          theme.other.shades.lighten.lighter
+        )}`,
+        svg: {
+          transform: !hasAction ? 'scale(1.5)' : 'scale(1)'
+        }
+      }
+    },
+    iconWrapper: {
+      marginTop: theme.spacing.sm,
+      marginBottom: theme.spacing.sm
+    },
+    icon: {
+      display: 'flex',
+      alignItems: 'center',
+      color: hasAction ? theme.black : theme.colors[color][theme.fn.primaryShade()],
+      svg: {
+        transitionTimingFunction: theme.transitionTimingFunction,
+        transition: 'transform 0.3s'
+      }
+    },
+    active: {
       boxShadow: theme.shadows.md,
       border: `1px solid ${theme.fn.lighten(
         theme.colors[color][theme.fn.primaryShade()],
         theme.other.shades.lighten.lighter
       )}`,
       svg: {
-        transform: !hasAction ? 'scale(1.5)' : 'scale(1)'
+        color: theme.colors[color][theme.fn.primaryShade()]
       }
     }
-  },
-  iconWrapper: {
-    marginTop: theme.spacing.sm,
-    marginBottom: theme.spacing.sm
-  },
-  icon: {
-    display: 'flex',
-    alignItems: 'center',
-    color: hasAction ? theme.black : theme.colors[color][theme.fn.primaryShade()],
-    svg: {
-      transitionTimingFunction: theme.transitionTimingFunction,
-      transition: 'transform 0.3s'
-    }
-  },
-  active: {
-    boxShadow: theme.shadows.md,
-    border: `1px solid ${theme.fn.lighten(
-      theme.colors[color][theme.fn.primaryShade()],
-      theme.other.shades.lighten.lighter
-    )}`,
-    svg: {
-      color: theme.colors[color][theme.fn.primaryShade()]
-    }
-  }
-}))
+  })
+)
 
 const CustomCard = ({
   icon,
@@ -70,20 +66,7 @@ const CustomCard = ({
   component,
   to,
   active
-}: {
-  icon?: React.ReactNode
-  iconLeft?: React.ReactNode
-  color: MantineColor
-  title?: string
-  text: string
-  width: number
-  height: number
-  children?: React.ReactNode
-  action?: () => void
-  component?: any
-  to?: string
-  active?: boolean
-}) => {
+}: ICustomCardProps) => {
   const { classes, cx } = useStyles({ color, width, height, hasAction: !!component })
 
   return (
