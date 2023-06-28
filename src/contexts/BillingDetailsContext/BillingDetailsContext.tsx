@@ -1,5 +1,5 @@
 import { FC, PropsWithChildren } from 'react'
-import { initBillingDetails } from 'components/Billing/Invoices/mockedData'
+import { initBillingDetails } from 'components/Billing/mockedData'
 // import { BillingDetailsFormProvider, useBillingDetailsForm } from './CompanyDetailsContext'
 import { createFormContext } from '@mantine/form'
 import { IBillingDetails } from 'types'

@@ -1,5 +1,5 @@
 import { Grid, Space, Table, createStyles } from '@mantine/core'
-import { invoiceDetails } from 'components/Billing/Invoices/mockedData'
+import { invoiceDetails } from 'components/Billing/mockedData'
 import { useMemo } from 'react'
 
 const useStyles = createStyles((theme) => ({

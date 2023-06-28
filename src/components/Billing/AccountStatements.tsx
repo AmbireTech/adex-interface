@@ -1,6 +1,6 @@
 import { Title } from '@mantine/core'
 import CustomTable from 'components/common/CustomTable'
-import { statementElements } from '../Invoices/mockedData'
+import { statementElements } from './mockedData'
 
 const AccountStatements = () => {
   const columnTitles = ['Document', 'Date of issue']
