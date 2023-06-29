@@ -13,9 +13,8 @@ const useStyles = createStyles(
       border: 'transparent',
       boxShadow: theme.shadows.xs,
       cursor: hasAction ? 'pointer' : '',
-      backgroundColor: theme.white,
+      backgroundColor: theme.colors.mainBackground[theme.fn.primaryShade()],
       textDecoration: 'none',
-      color: hasAction ? theme.black : '',
       '&:hover': {
         boxShadow: theme.shadows.md,
         border: `1px solid ${theme.fn.lighten(
@@ -34,7 +33,7 @@ const useStyles = createStyles(
     icon: {
       display: 'flex',
       alignItems: 'center',
-      color: hasAction ? theme.black : theme.colors[color][theme.fn.primaryShade()],
+      color: !hasAction ? theme.colors[color][theme.fn.primaryShade()] : '',
       svg: {
         transitionTimingFunction: theme.transitionTimingFunction,
         transition: 'transform 0.3s'
@@ -67,7 +66,7 @@ const CustomCard = ({
   to,
   active
 }: ICustomCardProps) => {
-  const { classes, cx } = useStyles({ color, width, height, hasAction: !!component })
+  const { classes, cx } = useStyles({ color, width, height, hasAction: !!action })
 
   return (
     <Box

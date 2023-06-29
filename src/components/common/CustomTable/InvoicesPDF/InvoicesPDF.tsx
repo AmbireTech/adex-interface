@@ -22,7 +22,7 @@ const useStyles = createStyles((theme) => ({
   },
   bold: {
     fontWeight: theme.other.fontWeights.bold,
-    color: theme.black
+    color: theme.colors.mainText[theme.fn.primaryShade()]
   },
   italic: {
     fontStyle: 'italic'

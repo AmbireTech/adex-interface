@@ -31,7 +31,7 @@ const useStyles = createStyles((theme) => ({
     fontWeight: theme.other.fontWeights.bold
   },
   close: {
-    color: theme.black
+    color: theme.colors.mainText[theme.fn.primaryShade()]
   },
   printable: {
     [theme.other.media.print]: {

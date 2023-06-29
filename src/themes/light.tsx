@@ -29,6 +29,18 @@ export const lightTheme: MantineThemeOverride = {
       '#151923',
       '#111319'
     ],
+    mainText: [
+      '#252A3A',
+      '#1F2537',
+      '#192035',
+      '#141C33', // MainText
+      '#151B2B',
+      '#151925',
+      '#141720',
+      '#13151B',
+      '#121418',
+      '#111215'
+    ],
     secondaryText: [
       '#858A9A',
       '#747B91',
@@ -64,6 +76,18 @@ export const lightTheme: MantineThemeOverride = {
       '#7687B8',
       '#6677AA',
       '#5B6B99'
+    ],
+    mainBackground: [
+      '#FFFFFF',
+      '#FFFFFF',
+      '#FFFFFF',
+      '#FCFCFC', // MainBackground
+      '#E3E3E3',
+      '#CCCCCC',
+      '#B8B8B8',
+      '#A5A5A5',
+      '#959595',
+      '#868686'
     ]
     // NOTE: needs 10 shades to work https://mantine.dev/theming/colors/
     // attention: ['#FFBE4D', '#FFBE4D', '#FFBE4D'],

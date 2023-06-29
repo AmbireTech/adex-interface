@@ -9,9 +9,11 @@ import {
 type ExtendedCustomColors =
   | 'brand'
   | 'secondary'
+  | 'mainText'
   | 'secondaryText'
   | 'lightBackground'
   | 'decorativeBorders'
+  | 'mainBackground'
   | DefaultMantineColor
 
 declare module '@mantine/core' {

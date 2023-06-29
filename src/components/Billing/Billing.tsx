@@ -17,7 +17,7 @@ enum TabType {
 const useStyles = createStyles((theme) => {
   return {
     container: {
-      backgroundColor: theme.white,
+      backgroundColor: theme.colors.mainBackground[theme.fn.primaryShade()],
       borderRadius: theme.radius.sm,
       boxShadow: theme.shadows.xs,
       overflow: 'hidden',
