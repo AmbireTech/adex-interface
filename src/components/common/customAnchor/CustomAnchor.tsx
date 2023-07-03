@@ -38,7 +38,6 @@ const CustomAnchor = ({
   ...rest
 }: ICustomAnchor) => {
   const { classes, cx } = useStyles()
-  console.log('externalIcon', externalIcon)
   const isExternal = target && target === '_blank'
   const url = isExternal ? getUrl(href) : href
   const linkProps: AnchorProps = {
@@ -73,7 +72,14 @@ export const ExternalAnchor = ({
   externalIcon,
   ...rest
 }: ICustomAnchor) => (
-  <CustomAnchor target="_blank" color={color} externalIcon={externalIcon} href={href} {...rest}>
+  <CustomAnchor
+    target="_blank"
+    color={color}
+    externalIcon={externalIcon}
+    style={style}
+    href={href}
+    {...rest}
+  >
     {children}
   </CustomAnchor>
 )

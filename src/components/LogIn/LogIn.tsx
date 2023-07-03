@@ -3,7 +3,6 @@ import {
   Container,
   Button,
   createStyles,
-  Image,
   Title,
   Group,
   Text,
@@ -12,7 +11,6 @@ import {
   Flex
 } from '@mantine/core'
 import LogInBackground from 'resources/backgrounds/pattern.svg'
-import PCimage from 'resources/images/pc@2x.png'
 import AdExLogo from 'resources/logos/AdExLogo'
 import { useMemo } from 'react'
 import HelpIcon from 'resources/icons/Help'
@@ -35,51 +33,47 @@ function LogIn() {
 
   return (
     <Container fluid h="100vh" className={classes.container}>
-      <Flex h="100%" pt="md" pb="md" direction="column" justify="space-between">
-        <Stack spacing="xl" align="center">
-          <Stack spacing="xs" align="center">
-            <div style={{ height: '100px' }}>
-              <AdExLogo />
-            </div>
-            <Title order={1}>Welcome to AdEx</Title>
-            <Title order={2}>Open-source, transparent & fraud-proof display advertising</Title>
-          </Stack>
-          {/* The image should be changed */}
-          <Image src={PCimage} maw={600} />
-          <Stack spacing="xs" align="center">
-            <Button variant="filled" size="xl" onClick={connectWallet}>
-              Get Started
-            </Button>
-            {/* TODO: change the href  */}
-            <ExternalAnchor color="dimmed" href="https://mantine.dev/" target="_blank">
-              FAQ/Tutorials
-            </ExternalAnchor>
-          </Stack>
+      <Flex h="100%" pt="xl" pb="xl" direction="column" justify="space-between" align="center">
+        <Stack>
+          <div style={{ height: '100px' }}>
+            <AdExLogo />
+          </div>
         </Stack>
-        <Group position="right">
-          <Stack spacing="xs" align="center">
-            <Group spacing="xs">
-              <ThemeIcon
-                variant="outline"
-                size="sm"
-                color="secondaryText"
-                style={{ border: 'none', background: 'none' }}
-              >
-                <HelpIcon />
-              </ThemeIcon>
-              {/* TODO: change the href  */}
-              <ExternalAnchor color="dimmed" href="https://mantine.dev/">
-                Help Center
-              </ExternalAnchor>
-            </Group>
-            <Text size="sm" color="dimmed">
-              ©{year} AdEx. All Rights Reserved.
-            </Text>
-            <Text size="sm" color="dimmed">
-              V.0.00.01
-            </Text>
-          </Stack>
-        </Group>
+        <Stack>
+          <Title align="center" order={1}>
+            Welcome to AdEx
+          </Title>
+          <Title align="center" color="secondaryText" order={2}>
+            Open-source, transparent & fraud-proof display advertising
+          </Title>
+        </Stack>
+        <Stack>
+          <Button variant="filled" size="xl" onClick={connectWallet}>
+            Get Started
+          </Button>
+        </Stack>
+        <Stack align="center">
+          <Group spacing="xs">
+            <ThemeIcon
+              variant="outline"
+              size="sm"
+              color="secondaryText"
+              style={{ border: 'none', background: 'none' }}
+            >
+              <HelpIcon />
+            </ThemeIcon>
+            {/* TODO: change the href  */}
+            <ExternalAnchor color="secondaryText" href="https://mantine.dev/">
+              Help Center
+            </ExternalAnchor>
+          </Group>
+          <Text size="sm" color="secondaryText">
+            ©{year} AdEx. All Rights Reserved.
+          </Text>
+          <Text size="sm" color="secondaryText">
+            V.0.00.01
+          </Text>
+        </Stack>
       </Flex>
     </Container>
   )
