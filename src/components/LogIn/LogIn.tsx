@@ -8,9 +8,7 @@ import {
   Group,
   Text,
   Stack,
-  UnstyledButton,
   ThemeIcon,
-  Anchor,
   Flex
 } from '@mantine/core'
 import LogInBackground from 'resources/backgrounds/pattern.svg'
@@ -18,6 +16,7 @@ import PCimage from 'resources/images/pc@2x.png'
 import AdExLogo from 'resources/logos/AdExLogo'
 import { useMemo } from 'react'
 import HelpIcon from 'resources/icons/Help'
+import { ExternalAnchor } from 'components/common/customAnchor/CustomAnchor'
 
 const useStyles = createStyles(() => {
   return {
@@ -52,29 +51,27 @@ function LogIn() {
               Get Started
             </Button>
             {/* TODO: change the href  */}
-            <Anchor color="dimmed" href="https://mantine.dev/" target="_blank">
+            <ExternalAnchor color="dimmed" href="https://mantine.dev/" target="_blank">
               FAQ/Tutorials
-            </Anchor>
+            </ExternalAnchor>
           </Stack>
         </Stack>
         <Group position="right">
           <Stack spacing="xs" align="center">
-            <UnstyledButton>
-              <Group spacing="xs">
-                <ThemeIcon
-                  variant="outline"
-                  size={20}
-                  color="gray.6"
-                  style={{ border: 'none', background: 'none' }}
-                >
-                  <HelpIcon />
-                </ThemeIcon>
-                {/* TODO: change the href  */}
-                <Anchor color="dimmed" href="https://mantine.dev/" target="_blank">
-                  Help Center
-                </Anchor>
-              </Group>
-            </UnstyledButton>
+            <Group spacing="xs">
+              <ThemeIcon
+                variant="outline"
+                size="sm"
+                color="secondaryText"
+                style={{ border: 'none', background: 'none' }}
+              >
+                <HelpIcon />
+              </ThemeIcon>
+              {/* TODO: change the href  */}
+              <ExternalAnchor color="dimmed" href="https://mantine.dev/">
+                Help Center
+              </ExternalAnchor>
+            </Group>
             <Text size="sm" color="dimmed">
               ©{year} AdEx. All Rights Reserved.
             </Text>
