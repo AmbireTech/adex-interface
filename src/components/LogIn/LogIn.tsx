@@ -6,11 +6,13 @@ import {
   Title,
   Group,
   Text,
-  Stack,
   ThemeIcon,
-  Flex
+  Flex,
+  rem
 } from '@mantine/core'
 import LogInBackground from 'resources/backgrounds/pattern.svg'
+import LowerShape from 'resources/backgrounds/lowerShape.svg'
+import UpperShape from 'resources/backgrounds/upperShape.svg'
 import AdExLogo from 'resources/logos/AdExLogo'
 import { useMemo } from 'react'
 import HelpIcon from 'resources/icons/Help'
@@ -19,9 +21,19 @@ import { ExternalAnchor } from 'components/common/customAnchor/CustomAnchor'
 const useStyles = createStyles(() => {
   return {
     container: {
-      // TODO: Change with a new background pattern
-      backgroundImage: `url(${LogInBackground})`,
-      backgroundRepeat: 'repeat-x'
+      backgroundImage: `url(${LowerShape}), url(${UpperShape}), url(${LogInBackground})`,
+      backgroundRepeat: 'no-repeat',
+      backgroundSize: 'contain, contain, 120%'
+    },
+    logoContainer: {
+      height: rem(100)
+    },
+    icon: {
+      border: 'none',
+      background: 'none'
+    },
+    subTitle: {
+      maxWidth: rem(800)
     }
   }
 })
@@ -34,35 +46,25 @@ function LogIn() {
   return (
     <Container fluid h="100vh" className={classes.container}>
       <Flex h="100%" pt="xl" pb="xl" direction="column" justify="space-between" align="center">
-        <Stack>
-          <div style={{ height: '100px' }}>
-            <AdExLogo />
-          </div>
-        </Stack>
-        <Stack>
+        <div className={classes.logoContainer}>
+          <AdExLogo />
+        </div>
+        <div>
           <Title align="center" order={1}>
             Welcome to AdEx
           </Title>
-          <Title align="center" color="secondaryText" order={2}>
+          <Title className={classes.subTitle} align="center" color="secondaryText" order={2}>
             Open-source, transparent & fraud-proof display advertising
           </Title>
-        </Stack>
-        <Stack>
-          <Button variant="filled" size="xl" onClick={connectWallet}>
-            Get Started
-          </Button>
-        </Stack>
-        <Stack align="center">
-          <Group spacing="xs">
-            <ThemeIcon
-              variant="outline"
-              size="sm"
-              color="secondaryText"
-              style={{ border: 'none', background: 'none' }}
-            >
+        </div>
+        <Button variant="filled" size="xl" onClick={connectWallet}>
+          Get Started
+        </Button>
+        <Flex direction="column" align="center">
+          <Group mb="sm" spacing="xs">
+            <ThemeIcon variant="outline" size="sm" color="secondaryText" className={classes.icon}>
               <HelpIcon />
             </ThemeIcon>
-            {/* TODO: change the href  */}
             <ExternalAnchor color="secondaryText" href="https://mantine.dev/">
               Help Center
             </ExternalAnchor>
@@ -73,7 +75,7 @@ function LogIn() {
           <Text size="sm" color="secondaryText">
             V.0.00.01
           </Text>
-        </Stack>
+        </Flex>
       </Flex>
     </Container>
   )
