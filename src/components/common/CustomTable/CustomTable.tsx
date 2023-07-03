@@ -50,7 +50,7 @@ const useStyles = createStyles((theme) => ({
 const CustomTable = ({ headings, elements }: ICustomTableProps) => {
   const { classes } = useStyles()
   const [opened, { open, close }] = useDisclosure(false)
-  const columns: string[] = Object.keys(elements[0])
+  const columns: string[] = useMemo(() => Object.keys(elements[0]), [elements])
   const maxItemsPerPage = 10
   const { maxPages, defaultPage, startIndex, endIndex, onNextPage, onPreviousPage, onChange } =
     usePagination({
@@ -61,43 +61,48 @@ const CustomTable = ({ headings, elements }: ICustomTableProps) => {
     return elements.slice(startIndex, endIndex)
   }, [elements, startIndex, endIndex])
 
-  const head = (
-    <tr>
-      {headings.map((heading) => (
-        <th key={heading}>{heading}</th>
-      ))}
-      <th key="Action">Action</th>
-    </tr>
+  const head = useMemo(
+    () => headings.map((heading) => <th key={heading}>{heading}</th>),
+    [headings]
   )
 
-  const rows = list.map((e, index) => (
-    // eslint-disable-next-line
-    <tr key={index}>
-      {columns.map((column: string) => {
-        return (
-          <td key={column}>
-            {typeof e[column] === 'object' &&
-            typeof e[column].from === 'string' &&
-            typeof e[column].to === 'string'
-              ? `${e[column].from} - ${e[column].to}`
-              : e[column]}
+  const rows = useMemo(
+    () =>
+      list.map((e, index) => (
+        // eslint-disable-next-line
+        <tr key={index}>
+          {columns.map((column: string) => {
+            return (
+              <td key={column}>
+                {typeof e[column] === 'object' &&
+                typeof e[column].from === 'string' &&
+                typeof e[column].to === 'string'
+                  ? `${e[column].from} - ${e[column].to}`
+                  : e[column]}
+              </td>
+            )
+          })}
+          <td>
+            <Group>
+              <ActionIcon title="View PDF" onClick={open}>
+                <VisibilityIcon />
+              </ActionIcon>
+            </Group>
           </td>
-        )
-      })}
-      <td>
-        <Group>
-          <ActionIcon title="View PDF" onClick={open}>
-            <VisibilityIcon />
-          </ActionIcon>
-        </Group>
-      </td>
-    </tr>
-  ))
+        </tr>
+      )),
+    [columns, list, open]
+  )
 
   return (
     <Flex h="100%" justify="space-between" direction="column" align="center">
       <Table highlightOnHover verticalSpacing={15}>
-        <thead>{head}</thead>
+        <thead>
+          <tr>
+            {head}
+            <th key="Action">Action</th>
+          </tr>
+        </thead>
         <tbody>{rows}</tbody>
       </Table>
       <Group position="right">
