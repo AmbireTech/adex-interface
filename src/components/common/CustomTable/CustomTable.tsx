@@ -20,11 +20,11 @@ const useStyles = createStyles((theme) => ({
     border: '1px solid',
     borderRadius: theme.radius.sm,
     borderColor: theme.colors.decorativeBorders[theme.fn.primaryShade()],
-    padding: 20
+    padding: theme.spacing.lg
   },
   header: {
     backgroundColor: theme.colors.lightBackground[theme.fn.primaryShade()],
-    padding: 30
+    padding: theme.spacing.xl
   },
   title: {
     fontSize: theme.fontSizes.xl,
@@ -42,7 +42,7 @@ const useStyles = createStyles((theme) => ({
       left: 0,
       bottom: 0,
       width: '100%',
-      padding: 30 // TODO
+      padding: theme.spacing.xl
     }
   }
 }))

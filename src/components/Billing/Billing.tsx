@@ -21,7 +21,7 @@ const useStyles = createStyles((theme) => {
       borderRadius: theme.radius.sm,
       boxShadow: theme.shadows.xs,
       overflow: 'hidden',
-      padding: 20
+      padding: theme.spacing.lg
     }
   }
 })
@@ -45,7 +45,7 @@ function Billing() {
   const handleTabClicked = (value: TabType) => setSelectedTab(value)
 
   return (
-    <Grid>
+    <Grid gutter="xl">
       <Grid.Col span="content">
         <Stack>
           <CustomCard
@@ -77,8 +77,8 @@ function Billing() {
           />
         </Stack>
       </Grid.Col>
-      <Grid.Col span="content">
-        <Container fluid h={730} w={600} miw={350} className={classes.container}>
+      <Grid.Col span={5}>
+        <Container className={classes.container}>
           <TabSwitch selectedTab={selectedTab} />
         </Container>
       </Grid.Col>
