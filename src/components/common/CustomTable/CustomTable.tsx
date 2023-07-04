@@ -50,7 +50,10 @@ const useStyles = createStyles((theme) => ({
 const CustomTable = ({ headings, elements }: ICustomTableProps) => {
   const { classes } = useStyles()
   const [opened, { open, close }] = useDisclosure(false)
-  const columns: string[] = useMemo(() => Object.keys(elements[0]), [elements])
+  const columns: string[] = useMemo(
+    () => Object.keys(elements[0]).filter((e: string) => e !== 'id'),
+    [elements]
+  )
   const maxItemsPerPage = 10
   const { maxPages, defaultPage, startIndex, endIndex, onNextPage, onPreviousPage, onChange } =
     usePagination({
@@ -68,9 +71,8 @@ const CustomTable = ({ headings, elements }: ICustomTableProps) => {
 
   const rows = useMemo(
     () =>
-      list.map((e, index) => (
-        // eslint-disable-next-line
-        <tr key={index}>
+      list.map((e) => (
+        <tr key={e.id}>
           {columns.map((column: string) => {
             return (
               <td key={column}>
