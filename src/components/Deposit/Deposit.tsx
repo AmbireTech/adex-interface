@@ -34,13 +34,29 @@ const data = [
   }
 ]
 
+enum DepositMethods {
+  SendCrypto,
+  TopUpWithFiat
+}
+
+const TabSwitch = ({ selectedTab }: { selectedTab: DepositMethods | null }) => {
+  switch (selectedTab) {
+    case DepositMethods.SendCrypto:
+      return <h1>SEND CRYPTO</h1>
+    case DepositMethods.TopUpWithFiat:
+      return <h1>TOP UP FIAT</h1>
+    default:
+      return <div />
+  }
+}
+
 const Deposit = () => {
   const { classes } = useStyles()
   const [network, setNetwork] = useState(data[0].value)
+  const [selectedTab, setSelectedTab] = useState<DepositMethods | null>(null)
+  const handleTabClicked = (value: DepositMethods) => setSelectedTab(value)
   const handleChange = (value: string) => setNetwork(value)
-  const getIcon = () => {
-    return data.find(({ value }) => value === network)?.image
-  }
+  const getIcon = () => data.find(({ value }) => value === network)?.image
 
   return (
     <Container size="xs" className={classes.container} pb="lg" pt="lg">
@@ -63,7 +79,8 @@ const Deposit = () => {
             icon={<SendCryptoIcon size="30px" />}
             text="Send Cryptocurrency"
             color="brand"
-            action={() => console.log('Desktop clicked')}
+            // active={selectedTab === DepositMethods.SendCrypto}
+            action={() => handleTabClicked(DepositMethods.SendCrypto)}
             noGap
           />
         </Grid.Col>
@@ -74,9 +91,13 @@ const Deposit = () => {
             icon={<DepositIcon size="30px" />}
             text="Top Up with Fiat"
             color="brand"
-            action={() => console.log('Desktop clicked')}
+            // active={selectedTab === DepositMethods.TopUpWithFiat}
+            action={() => handleTabClicked(DepositMethods.TopUpWithFiat)}
             noGap
           />
+        </Grid.Col>
+        <Grid.Col span={12}>
+          <TabSwitch selectedTab={selectedTab} />
         </Grid.Col>
       </Grid>
     </Container>
