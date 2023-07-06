@@ -1,4 +1,4 @@
-import { Container, Grid, Select, createStyles } from '@mantine/core'
+import { Container, Grid, Select, createStyles, Text } from '@mantine/core'
 import { useState } from 'react'
 import EthereumIcon from 'resources/networks/Ethereum'
 import PolygonIcon from 'resources/networks/Polygon'
@@ -6,6 +6,7 @@ import CustomCard from 'components/GetStarted/CustomCard'
 import SendCryptoIcon from 'resources/icons/SendCrypto'
 import DepositIcon from 'resources/icons/Deposit'
 import SelectItem from './SelectItem'
+import SendCryptocurrency from './SendCryptocurrency'
 
 const useStyles = createStyles((theme) => ({
   container: {
@@ -42,7 +43,7 @@ enum DepositMethods {
 const TabSwitch = ({ selectedTab }: { selectedTab: DepositMethods | null }) => {
   switch (selectedTab) {
     case DepositMethods.SendCrypto:
-      return <h1>SEND CRYPTO</h1>
+      return <SendCryptocurrency />
     case DepositMethods.TopUpWithFiat:
       return <h1>TOP UP FIAT</h1>
     default:
@@ -61,16 +62,25 @@ const Deposit = () => {
   return (
     <Container size="xs" className={classes.container} pb="lg" pt="lg">
       <Grid grow align="center">
+        <Grid.Col>
+          <Text size="sm" color="secondaryText" fw="bold">
+            Select Network
+          </Text>
+        </Grid.Col>
         <Grid.Col span={12}>
           <Select
             variant="filled"
-            label="Select Network"
             data={data}
             itemComponent={SelectItem}
             defaultValue={network}
             onChange={handleChange}
             icon={getIcon()}
           />
+        </Grid.Col>
+        <Grid.Col>
+          <Text size="sm" color="secondaryText" fw="bold">
+            Choose Method
+          </Text>
         </Grid.Col>
         <Grid.Col span={6} className={classes.center}>
           <CustomCard

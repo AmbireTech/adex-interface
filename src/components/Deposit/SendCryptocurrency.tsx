@@ -1,0 +1,64 @@
+import { ActionIcon, Alert, CopyButton, TextInput, Text, Grid, createStyles } from '@mantine/core'
+import useAccount from 'hooks/useAccount'
+import CopyIcon from 'resources/icons/Copy'
+import InfoIcon from 'resources/icons/Info'
+import { QRCodeSVG } from 'qrcode.react'
+
+const useStyles = createStyles((theme) => ({
+  center: {
+    display: 'flex',
+    justifyContent: 'center'
+  },
+  qrCodeWrapper: {
+    display: 'inline-block',
+    border: '10px solid',
+    padding: theme.spacing.sm,
+    // TODO: change the border color after the billing PR has been merged
+    borderColor: theme.colors.secondaryText[theme.fn.primaryShade()],
+    borderRadius: theme.radius.md
+  }
+}))
+
+const SendCryptocurrency = () => {
+  const { classes } = useStyles()
+  const { adexAccount } = useAccount()
+  const accountAddress = adexAccount?.address || ''
+
+  return (
+    <Grid gutter="xl" align="center">
+      <Grid.Col>
+        <Alert icon={<InfoIcon size="1rem" />} color="red">
+          AdEx operates only with ADX, USDC, USDT or DAI. Please make sure you deposit only these
+          coins.
+        </Alert>
+      </Grid.Col>
+      <Grid.Col>
+        <Text size="sm" mb="xs" color="brand">
+          Min. campaign budget: $200
+        </Text>
+        <TextInput
+          value={accountAddress}
+          variant="filled"
+          size="md"
+          rightSection={
+            <CopyButton value={accountAddress} timeout={2000}>
+              {({ copied, copy }) => (
+                // TODO: fix the color of the copy icon
+                <ActionIcon color={copied ? 'teal' : 'brand'} onClick={copy}>
+                  <CopyIcon size="1rem" />
+                </ActionIcon>
+              )}
+            </CopyButton>
+          }
+        />
+      </Grid.Col>
+      <Grid.Col className={classes.center}>
+        <div className={classes.qrCodeWrapper}>
+          <QRCodeSVG value={accountAddress} />
+        </div>
+      </Grid.Col>
+    </Grid>
+  )
+}
+
+export default SendCryptocurrency
