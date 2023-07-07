@@ -73,9 +73,8 @@ const TopUpWithFiat = () => {
           coins.
         </Alert>
       </Grid.Col>
-      {/* <Grid.Col> */}
       {providers.map(({ logo, name, type, fees, limits, currencies, onClick }) => (
-        <Grid.Col p="md">
+        <Grid.Col p="md" key={name}>
           <FiatProvider
             key={name}
             logo={logo}
@@ -88,7 +87,6 @@ const TopUpWithFiat = () => {
           />
         </Grid.Col>
       ))}
-      {/* </Grid.Col> */}
     </Grid>
   )
 }

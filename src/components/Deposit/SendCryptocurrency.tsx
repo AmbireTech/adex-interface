@@ -1,4 +1,4 @@
-import { ActionIcon, Alert, CopyButton, TextInput, Text, Grid, createStyles } from '@mantine/core'
+import { ActionIcon, Alert, CopyButton, Text, Grid, createStyles, Group } from '@mantine/core'
 import useAccount from 'hooks/useAccount'
 import CopyIcon from 'resources/icons/Copy'
 import InfoIcon from 'resources/icons/Info'
@@ -10,10 +10,17 @@ const useStyles = createStyles((theme) => ({
     justifyContent: 'center'
   },
   qrCodeWrapper: {
-    display: 'inline-block',
+    display: 'flex',
     border: '15px solid',
     padding: theme.spacing.sm,
     borderColor: theme.colors.lightBackground[theme.fn.primaryShade()],
+    borderRadius: theme.radius.md
+  },
+  addressWrapper: {
+    backgroundColor: theme.colors.lightBackground[theme.fn.primaryShade()],
+    padding: theme.spacing.xs,
+    border: '1px solid',
+    borderColor: theme.colors.decorativeBorders[theme.fn.primaryShade()],
     borderRadius: theme.radius.md
   }
 }))
@@ -35,21 +42,17 @@ const SendCryptocurrency = () => {
         <Text size="sm" mb="xs" color="brand">
           Min. campaign budget: $200
         </Text>
-        <TextInput
-          value={accountAddress}
-          variant="filled"
-          size="md"
-          rightSection={
-            <CopyButton value={accountAddress} timeout={2000}>
-              {({ copied, copy }) => (
-                // TODO: fix the color of the copy icon
-                <ActionIcon color={copied ? 'teal' : 'brand'} onClick={copy}>
-                  <CopyIcon size="1rem" />
-                </ActionIcon>
-              )}
-            </CopyButton>
-          }
-        />
+        <Group position="apart" className={classes.addressWrapper}>
+          <Text>{accountAddress}</Text>
+          <CopyButton value={accountAddress} timeout={2000}>
+            {({ copied, copy }) => (
+              // TODO: fix the color of the copy icon
+              <ActionIcon color={copied ? 'teal' : 'brand'} onClick={copy}>
+                <CopyIcon size="1rem" />
+              </ActionIcon>
+            )}
+          </CopyButton>
+        </Group>
       </Grid.Col>
       <Grid.Col className={classes.center}>
         <div className={classes.qrCodeWrapper}>
