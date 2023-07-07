@@ -13,7 +13,7 @@ const useStyles = createStyles((theme, { color }: IDepositMethodButtonStylesProp
       boxShadow: theme.shadows.sm,
       borderColor: theme.colors[color][theme.fn.primaryShade()],
       color: theme.colors[color][theme.fn.primaryShade()],
-      background: 'none',
+      background: theme.colors.mainBackground[theme.fn.primaryShade()],
       svg: {
         color: theme.colors[color][theme.fn.primaryShade()]
       }
@@ -23,7 +23,7 @@ const useStyles = createStyles((theme, { color }: IDepositMethodButtonStylesProp
     boxShadow: theme.shadows.sm,
     borderColor: theme.colors[color][theme.fn.primaryShade()],
     color: theme.colors[color][theme.fn.primaryShade()],
-    background: 'none',
+    background: theme.colors.mainBackground[theme.fn.primaryShade()],
     svg: {
       color: theme.colors[color][theme.fn.primaryShade()]
     }

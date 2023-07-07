@@ -12,8 +12,7 @@ import DepositMethodButton from './DepositMethodButton'
 
 const useStyles = createStyles((theme) => ({
   container: {
-    // change bg color with one from the theme
-    background: 'white',
+    background: theme.colors.mainBackground[theme.fn.primaryShade()],
     boxShadow: theme.shadows.sm,
     borderRadius: theme.radius.sm,
     marginTop: theme.spacing.xl

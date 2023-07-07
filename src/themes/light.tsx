@@ -64,6 +64,18 @@ export const lightTheme: MantineThemeOverride = {
       '#7687B8',
       '#6677AA',
       '#5B6B99'
+    ],
+    mainBackground: [
+      '#FFFFFF',
+      '#FFFFFF',
+      '#FFFFFF',
+      '#FCFCFC', // MainBackground
+      '#E3E3E3',
+      '#CCCCCC',
+      '#B8B8B8',
+      '#A5A5A5',
+      '#959595',
+      '#868686'
     ]
     // NOTE: needs 10 shades to work https://mantine.dev/theming/colors/
     // attention: ['#FFBE4D', '#FFBE4D', '#FFBE4D'],
