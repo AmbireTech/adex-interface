@@ -25,12 +25,12 @@ const useStyles = createStyles((theme) => ({
 
 const data = [
   {
-    image: <EthereumIcon />,
+    image: <EthereumIcon size="30px" />,
     label: 'Ethereum',
     value: 'ethereum'
   },
   {
-    image: <PolygonIcon />,
+    image: <PolygonIcon size="30px" />,
     label: 'Polygon',
     value: 'polygon'
   }
