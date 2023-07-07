@@ -42,7 +42,7 @@ function SideNav() {
           <NavLink
             to="deposit"
             icon={<DepositIcon />}
-            label="Deposit"
+            label="Top Up Account"
             active={useResolvedPath('deposit').pathname === match?.pathname}
           />
           <NavLink
