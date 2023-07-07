@@ -1,6 +1,7 @@
-import { Flex, UnstyledButton, Text, createStyles, MantineColor } from '@mantine/core'
+import { Flex, UnstyledButton, Text, createStyles } from '@mantine/core'
+import { IDepositMethodButtonProps, IDepositMethodButtonStylesProps } from 'types'
 
-const useStyles = createStyles((theme, { color }: { color: MantineColor }) => ({
+const useStyles = createStyles((theme, { color }: IDepositMethodButtonStylesProps) => ({
   methodButton: {
     height: '100%',
     width: '100%',
@@ -29,19 +30,7 @@ const useStyles = createStyles((theme, { color }: { color: MantineColor }) => ({
   }
 }))
 
-const MethodButton = ({
-  icon,
-  label,
-  color,
-  active,
-  action
-}: {
-  icon: React.ReactNode
-  label: string
-  color: MantineColor
-  active: boolean
-  action: () => void
-}) => {
+const DepositMethodButton = ({ icon, label, color, active, action }: IDepositMethodButtonProps) => {
   const { classes, cx } = useStyles({ color })
   return (
     <UnstyledButton
@@ -56,4 +45,4 @@ const MethodButton = ({
   )
 }
 
-export default MethodButton
+export default DepositMethodButton

@@ -1,2 +1,7 @@
 export * from './error'
 export * from './account'
+export * from './deposit'
+export * from './fiatProvider'
+export * from './depositMethodButton'
+export * from './selectItem'
+export * from './topUpWithFiat'

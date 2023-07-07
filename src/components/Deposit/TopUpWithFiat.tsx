@@ -5,18 +5,8 @@ import GUARDARIAN_LOGO from 'resources/payment-providers/guardarian.svg'
 import MOONPAY_LOGO from 'resources/payment-providers/moonpay.svg'
 import PAYTRIE_LOGO from 'resources/payment-providers/paytrie.svg'
 import RAMP_LOGO from 'resources/payment-providers/ramp.svg'
+import { IPaymentProviders } from 'types'
 import FiatProvider from './FiatProvieder'
-
-interface IPaymentProviders {
-  logo: any
-  name: string
-  type: string
-  fees: string
-  limits: string
-  currencies: string
-  networks: string[]
-  onClick: () => void
-}
 
 const TopUpWithFiat = () => {
   const providers: IPaymentProviders[] = [

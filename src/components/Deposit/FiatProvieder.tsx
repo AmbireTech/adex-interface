@@ -1,8 +1,8 @@
 import { Grid, Title, Text, createStyles } from '@mantine/core'
+import { IFiatProviderProps } from 'types'
 
 const useStyles = createStyles((theme) => ({
   wrapper: {
-    // TODO: change bg and border colors
     backgroundColor: theme.colors.lightBackground[theme.fn.primaryShade()],
     border: '1px solid',
     borderColor: theme.colors.decorativeBorders[theme.fn.primaryShade()],
@@ -13,15 +13,6 @@ const useStyles = createStyles((theme) => ({
     fontSize: theme.fontSizes.sm
   }
 }))
-interface IFiatProviderProps {
-  logo: any
-  name: string
-  type: string
-  fees: string
-  limits: string
-  currencies: string
-  onClick: () => void
-}
 
 const FiatProvider = ({
   logo,

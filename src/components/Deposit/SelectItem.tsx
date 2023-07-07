@@ -1,10 +1,6 @@
 import { Group, Text } from '@mantine/core'
 import { forwardRef } from 'react'
-
-interface ItemProps extends React.ComponentPropsWithoutRef<'div'> {
-  image: React.ReactNode
-  label: string
-}
+import { ItemProps } from 'types'
 
 const SelectItem = forwardRef<HTMLDivElement, ItemProps>(
   ({ image, label, ...others }: ItemProps, ref) => {

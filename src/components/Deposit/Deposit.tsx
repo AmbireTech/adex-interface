@@ -4,10 +4,11 @@ import EthereumIcon from 'resources/networks/Ethereum'
 import PolygonIcon from 'resources/networks/Polygon'
 import SendCryptoIcon from 'resources/icons/SendCrypto'
 import DepositIcon from 'resources/icons/Deposit'
+import { DepositMethods, ITabSwitchDeposit } from 'types'
 import SelectItem from './SelectItem'
 import SendCryptocurrency from './SendCryptocurrency'
 import TopUpWithFiat from './TopUpWithFiat'
-import MethodButton from './MethodButton'
+import DepositMethodButton from './DepositMethodButton'
 
 const useStyles = createStyles((theme) => ({
   container: {
@@ -36,12 +37,7 @@ const data = [
   }
 ]
 
-enum DepositMethods {
-  SendCrypto,
-  TopUpFiat
-}
-
-const TabSwitch = ({ selectedTab }: { selectedTab: DepositMethods | null }) => {
+const TabSwitch = ({ selectedTab }: ITabSwitchDeposit) => {
   switch (selectedTab) {
     case DepositMethods.SendCrypto:
       return <SendCryptocurrency />
@@ -84,7 +80,7 @@ const Deposit = () => {
           </Text>
         </Grid.Col>
         <Grid.Col span={6} className={classes.center}>
-          <MethodButton
+          <DepositMethodButton
             icon={<SendCryptoIcon size="30px" />}
             label="Send Cryptocurrency"
             color="brand"
@@ -93,7 +89,7 @@ const Deposit = () => {
           />
         </Grid.Col>
         <Grid.Col span={6} className={classes.center}>
-          <MethodButton
+          <DepositMethodButton
             icon={<DepositIcon size="30px" />}
             label="Top Up with Fiat"
             color="brand"
