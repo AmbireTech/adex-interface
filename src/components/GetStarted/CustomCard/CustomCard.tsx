@@ -5,47 +5,44 @@ interface StylesProps {
   width: number
   height: number
   hasAction: boolean
-  noGap: boolean
 }
 
-const useStyles = createStyles(
-  (theme, { color, width, height, hasAction, noGap }: StylesProps) => ({
-    wrapper: {
-      transitionTimingFunction: theme.transitionTimingFunction,
-      transition: 'all 0.3s',
-      textAlign: 'center',
-      borderRadius: theme.radius.md,
-      height: `${rem(height)}`,
-      width: `${rem(width)}`,
-      border: 'transparent',
-      boxShadow: theme.shadows.xs,
-      cursor: hasAction ? 'pointer' : '',
-      '&:hover': {
-        boxShadow: theme.shadows.md,
-        border: `1px solid ${theme.fn.lighten(
-          theme.colors[color][theme.fn.primaryShade()],
-          theme.other.shades.lighten.lighter
-        )}`,
-        svg: {
-          transform: !hasAction ? 'scale(1.5)' : 'scale(1)'
-        }
-      }
-    },
-    iconWrapper: {
-      marginTop: !noGap ? theme.spacing.sm : '',
-      marginBottom: !noGap ? theme.spacing.sm : ''
-    },
-    icon: {
-      display: 'flex',
-      alignItems: 'center',
-      color: theme.colors[color][theme.fn.primaryShade()],
+const useStyles = createStyles((theme, { color, width, height, hasAction }: StylesProps) => ({
+  wrapper: {
+    transitionTimingFunction: theme.transitionTimingFunction,
+    transition: 'all 0.3s',
+    textAlign: 'center',
+    borderRadius: theme.radius.md,
+    height: `${rem(height)}`,
+    width: `${rem(width)}`,
+    border: 'transparent',
+    boxShadow: theme.shadows.xs,
+    cursor: hasAction ? 'pointer' : '',
+    '&:hover': {
+      boxShadow: theme.shadows.md,
+      border: `1px solid ${theme.fn.lighten(
+        theme.colors[color][theme.fn.primaryShade()],
+        theme.other.shades.lighten.lighter
+      )}`,
       svg: {
-        transitionTimingFunction: theme.transitionTimingFunction,
-        transition: 'transform 0.3s'
+        transform: !hasAction ? 'scale(1.5)' : 'scale(1)'
       }
     }
-  })
-)
+  },
+  iconWrapper: {
+    marginTop: theme.spacing.sm,
+    marginBottom: theme.spacing.sm
+  },
+  icon: {
+    display: 'flex',
+    alignItems: 'center',
+    color: theme.colors[color][theme.fn.primaryShade()],
+    svg: {
+      transitionTimingFunction: theme.transitionTimingFunction,
+      transition: 'transform 0.3s'
+    }
+  }
+}))
 
 const CustomCard = ({
   icon,
@@ -56,8 +53,7 @@ const CustomCard = ({
   width,
   height,
   children,
-  action,
-  noGap
+  action
 }: {
   icon?: React.ReactNode
   iconLeft?: React.ReactNode
@@ -68,9 +64,8 @@ const CustomCard = ({
   height: number
   children?: React.ReactNode
   action?: () => void
-  noGap?: boolean
 }) => {
-  const { classes } = useStyles({ color, width, height, hasAction: !!action, noGap: !!noGap })
+  const { classes } = useStyles({ color, width, height, hasAction: !!action })
 
   return (
     <Box className={classes.wrapper} onClick={action}>
@@ -98,7 +93,7 @@ const CustomCard = ({
           </Group>
         ) : (
           <Group position="apart">
-            <Text size="xl" inline maw={!noGap ? rem(160) : rem(200)} color="secondaryText">
+            <Text size="xl" inline maw={rem(160)} color="secondaryText">
               {text}
             </Text>
           </Group>
