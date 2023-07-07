@@ -2,11 +2,12 @@ import { Container, Grid, Select, createStyles, Text } from '@mantine/core'
 import { useState } from 'react'
 import EthereumIcon from 'resources/networks/Ethereum'
 import PolygonIcon from 'resources/networks/Polygon'
-import CustomCard from 'components/GetStarted/CustomCard'
 import SendCryptoIcon from 'resources/icons/SendCrypto'
 import DepositIcon from 'resources/icons/Deposit'
 import SelectItem from './SelectItem'
 import SendCryptocurrency from './SendCryptocurrency'
+import TopUpWithFiat from './TopUpWithFiat'
+import MethodButton from './MethodButton'
 
 const useStyles = createStyles((theme) => ({
   container: {
@@ -37,15 +38,15 @@ const data = [
 
 enum DepositMethods {
   SendCrypto,
-  TopUpWithFiat
+  TopUpFiat
 }
 
 const TabSwitch = ({ selectedTab }: { selectedTab: DepositMethods | null }) => {
   switch (selectedTab) {
     case DepositMethods.SendCrypto:
       return <SendCryptocurrency />
-    case DepositMethods.TopUpWithFiat:
-      return <h1>TOP UP FIAT</h1>
+    case DepositMethods.TopUpFiat:
+      return <TopUpWithFiat />
     default:
       return <div />
   }
@@ -60,7 +61,7 @@ const Deposit = () => {
   const getIcon = () => data.find(({ value }) => value === network)?.image
 
   return (
-    <Container size="xs" className={classes.container} pb="lg" pt="lg">
+    <Container size="xs" className={classes.container} pt="lg" pb="lg">
       <Grid grow align="center">
         <Grid.Col>
           <Text size="sm" color="secondaryText" fw="bold">
@@ -83,27 +84,21 @@ const Deposit = () => {
           </Text>
         </Grid.Col>
         <Grid.Col span={6} className={classes.center}>
-          <CustomCard
-            width={230}
-            height={96}
+          <MethodButton
             icon={<SendCryptoIcon size="30px" />}
-            text="Send Cryptocurrency"
+            label="Send Cryptocurrency"
             color="brand"
-            // active={selectedTab === DepositMethods.SendCrypto}
+            active={selectedTab === DepositMethods.SendCrypto}
             action={() => handleTabClicked(DepositMethods.SendCrypto)}
-            noGap
           />
         </Grid.Col>
         <Grid.Col span={6} className={classes.center}>
-          <CustomCard
-            width={230}
-            height={96}
+          <MethodButton
             icon={<DepositIcon size="30px" />}
-            text="Top Up with Fiat"
+            label="Top Up with Fiat"
             color="brand"
-            // active={selectedTab === DepositMethods.TopUpWithFiat}
-            action={() => handleTabClicked(DepositMethods.TopUpWithFiat)}
-            noGap
+            active={selectedTab === DepositMethods.TopUpFiat}
+            action={() => handleTabClicked(DepositMethods.TopUpFiat)}
           />
         </Grid.Col>
         <Grid.Col span={12}>

@@ -11,10 +11,9 @@ const useStyles = createStyles((theme) => ({
   },
   qrCodeWrapper: {
     display: 'inline-block',
-    border: '10px solid',
+    border: '15px solid',
     padding: theme.spacing.sm,
-    // TODO: change the border color after the billing PR has been merged
-    borderColor: theme.colors.secondaryText[theme.fn.primaryShade()],
+    borderColor: theme.colors.lightBackground[theme.fn.primaryShade()],
     borderRadius: theme.radius.md
   }
 }))

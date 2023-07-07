@@ -40,6 +40,30 @@ export const lightTheme: MantineThemeOverride = {
       '#41444C',
       '#3C3E44',
       '#37383C'
+    ],
+    lightBackground: [
+      '#FAFAFC',
+      '#F6F6F9',
+      '#F2F2F6',
+      '#F5F6FA', // LightBackground
+      '#EDEFF3',
+      '#E6E8ED',
+      '#E0E2E8',
+      '#D8DBE1',
+      '#D2D5DB',
+      '#CACED2'
+    ],
+    decorativeBorders: [
+      '#FFFFFF',
+      '#FFFFFF',
+      '#FCFDFE',
+      '#DAE0F2', // DecorativeBorders
+      '#BAC5E4',
+      '#A0ADD5',
+      '#8998C6',
+      '#7687B8',
+      '#6677AA',
+      '#5B6B99'
     ]
     // NOTE: needs 10 shades to work https://mantine.dev/theming/colors/
     // attention: ['#FFBE4D', '#FFBE4D', '#FFBE4D'],
