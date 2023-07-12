@@ -44,6 +44,11 @@ const useStyles = createStyles((theme) => ({
       width: '100%',
       padding: theme.spacing.xl
     }
+  },
+  actionIcon: {
+    '&:hover': {
+      color: theme.colors.brand[theme.fn.primaryShade()]
+    }
   }
 }))
 
@@ -86,7 +91,12 @@ const CustomTable = ({ headings, elements }: ICustomTableProps) => {
           })}
           <td>
             <Group>
-              <ActionIcon title="View PDF" onClick={open}>
+              <ActionIcon
+                title="View PDF"
+                variant="transparent"
+                onClick={open}
+                className={classes.actionIcon}
+              >
                 <VisibilityIcon />
               </ActionIcon>
             </Group>
