@@ -40,7 +40,7 @@ function SideNav() {
             active={useResolvedPath('').pathname === match?.pathname}
           />
           <NavLink
-            to="deposit"
+            to="/dashboard/deposit"
             icon={<DepositIcon />}
             label="Top Up Account"
             active={useResolvedPath('deposit').pathname === match?.pathname}
