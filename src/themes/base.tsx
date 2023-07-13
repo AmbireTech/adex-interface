@@ -9,6 +9,7 @@ import {
 type ExtendedCustomColors =
   | 'brand'
   | 'secondary'
+  | 'mainText'
   | 'secondaryText'
   | 'lightBackground'
   | 'decorativeBorders'
@@ -62,6 +63,13 @@ export const baseTheme: MantineThemeOverride = {
       bold: 700,
       medium: 500,
       regular: 400
+    },
+    /**
+     * Add print-specific styles. Usage: [theme.other.media.print]
+     */
+    media: {
+      print: '@media print',
+      mobile: '@media(max-width:475px)'
     }
   },
   focusRing: 'never',
@@ -72,7 +80,11 @@ export const baseTheme: MantineThemeOverride = {
   headings: {
     fontFamily: 'Roboto, sans-serif',
     sizes: {
-      //   h1: { fontSize: '3rem', fontWeight: '600', lineHeight: '3.6rem' }
+      h1: { fontSize: '4.1662rem', fontWeight: '600', lineHeight: '5,2081rem' },
+      h2: { fontSize: '2.5rem', fontWeight: '400', lineHeight: '3,25rem' },
+      h3: { fontSize: '1.6669rem', fontWeight: '600', lineHeight: '2.25rem' },
+      h4: { fontSize: '1.6669rem', fontWeight: '400', lineHeight: '2.25rem' },
+      h5: { fontSize: '1.1669rem', fontWeight: '500', lineHeight: '1.6919rem' }
       // ...
     }
   },
@@ -139,6 +151,31 @@ export const baseTheme: MantineThemeOverride = {
                 variant === 'filled'
                   ? theme.colors[params.color || theme.primaryColor][theme.fn.primaryShade()]
                   : ''
+            }
+          }
+        }
+      }
+    },
+    Modal: {
+      styles: (theme) => {
+        return {
+          root: {
+            [theme.other.media.print]: {
+              overflow: 'visible'
+            }
+          },
+          inner: {
+            [theme.other.media.print]: {
+              overflow: 'visible',
+              // Fixes double print, no idea why with fixed it prints twice
+              position: 'absolute',
+              // Fix if used with "centered" modal prop
+              alignItems: 'flex-start'
+            }
+          },
+          content: {
+            [theme.other.media.print]: {
+              overflow: 'visible'
             }
           }
         }

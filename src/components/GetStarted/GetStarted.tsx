@@ -1,7 +1,7 @@
 import { Container, Grid, Flex, Title, Button } from '@mantine/core'
 import DepositIcon from 'resources/icons/Deposit'
 import CampaignIcon from 'resources/icons/Campaign'
-import CustomCard from './CustomCard'
+import CustomCard from 'components/common/CustomCard'
 
 const GetStarted = () => {
   return (
@@ -51,16 +51,6 @@ const GetStarted = () => {
                 Create a campaign
               </Button>
             </CustomCard>
-          </Grid.Col>
-          <Grid.Col md={4} order={3} xs={12}>
-            <CustomCard
-              width={300}
-              height={100}
-              text="Statments"
-              iconLeft={<CampaignIcon size="24px" />}
-              color="secondary"
-              action={() => console.log('Statement clicked')}
-            />
           </Grid.Col>
           <Grid.Col md={4} order={4} xs={12}>
             <CustomCard
