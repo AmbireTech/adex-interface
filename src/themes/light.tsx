@@ -42,16 +42,16 @@ export const lightTheme: MantineThemeOverride = {
       '#111215'
     ],
     secondaryText: [
-      '#858A9A',
-      '#747B91',
-      '#656E88',
-      '#586280', // SecondaryText
-      '#535A70',
-      '#4D5262',
-      '#474B56',
-      '#41444C',
-      '#3C3E44',
-      '#37383C'
+      '#79808F',
+      '#6B7386',
+      '#5E677D',
+      '#525C75', // SecondaryText
+      '#4D5466',
+      '#484D5A',
+      '#42464F',
+      '#3D3F46',
+      '#37393E',
+      '#323437'
     ],
     lightBackground: [
       '#FAFAFC',
