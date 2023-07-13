@@ -65,7 +65,7 @@ function LogIn() {
             <ThemeIcon variant="outline" size="sm" color="secondaryText" className={classes.icon}>
               <HelpIcon />
             </ThemeIcon>
-            <ExternalAnchor color="secondaryText" href="https://mantine.dev/">
+            <ExternalAnchor target="_blank" href="https://mantine.dev/" color="secondaryText">
               Help Center
             </ExternalAnchor>
           </Group>

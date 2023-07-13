@@ -1,10 +1,12 @@
-import { AnchorProps } from '@mantine/core'
+import { AnchorProps, MantineColor } from '@mantine/core'
 
+export interface ICustomAnchorStylesProps {
+  color: MantineColor
+}
 export interface ICustomAnchor extends AnchorProps {
   href: string
-  target?: string
-  label?: string
+  target: string
   externalIcon?: boolean
-  component?: any
-  fullWidth?: boolean
+  isExternal?: boolean
+  color: MantineColor
 }
