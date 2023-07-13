@@ -3,13 +3,12 @@ import { Anchor, createPolymorphicComponent } from '@mantine/core'
 import { CustomAnchorProps } from 'types'
 
 const DefaultCustomAnchor = forwardRef<HTMLAnchorElement, CustomAnchorProps>(
-  ({ external, children, color, ...props }, ref) => (
+  ({ external, children, ...props }, ref) => (
     <Anchor
       {...props}
       target={external ? '_blank' : undefined}
       rel={external ? 'noopener noreferrer' : undefined}
       ref={ref}
-      color={color}
     >
       {children}
     </Anchor>
