@@ -1,1 +1,3 @@
-export { ExternalAnchor, default as Anchor } from './CustomAnchor'
+import CustomAnchor from './CustomAnchor'
+
+export default CustomAnchor

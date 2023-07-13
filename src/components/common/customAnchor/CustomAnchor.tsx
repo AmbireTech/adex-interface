@@ -1,17 +1,15 @@
 import { forwardRef } from 'react'
-import { Anchor, AnchorProps, createPolymorphicComponent } from '@mantine/core'
-
-interface CustomAnchorProps extends AnchorProps {
-  external?: boolean
-}
+import { Anchor, createPolymorphicComponent } from '@mantine/core'
+import { CustomAnchorProps } from 'types'
 
 const DefaultCustomAnchor = forwardRef<HTMLAnchorElement, CustomAnchorProps>(
-  ({ external, children, ...props }, ref) => (
+  ({ external, children, color, ...props }, ref) => (
     <Anchor
       {...props}
       target={external ? '_blank' : undefined}
-      rel={external ? '' : undefined}
+      rel={external ? 'noopener noreferrer' : undefined}
       ref={ref}
+      color={color}
     >
       {children}
     </Anchor>
