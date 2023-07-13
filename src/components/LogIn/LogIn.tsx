@@ -16,7 +16,7 @@ import UpperShape from 'resources/backgrounds/upperShape.svg'
 import AdExLogo from 'resources/logos/AdExLogo'
 import { useMemo } from 'react'
 import HelpIcon from 'resources/icons/Help'
-import { ExternalAnchor } from 'components/common/customAnchor/CustomAnchor'
+import CustomAnchor from 'components/common/customAnchor/CustomAnchor'
 
 const useStyles = createStyles(() => {
   return {
@@ -65,9 +65,9 @@ function LogIn() {
             <ThemeIcon variant="outline" size="sm" color="secondaryText" className={classes.icon}>
               <HelpIcon />
             </ThemeIcon>
-            <ExternalAnchor target="_blank" href="https://mantine.dev/" color="secondaryText">
+            <CustomAnchor external href="https://mantine.dev/" color="secondaryText">
               Help Center
-            </ExternalAnchor>
+            </CustomAnchor>
           </Group>
           <Text size="sm" color="secondaryText">
             ©{year} AdEx. All Rights Reserved.
