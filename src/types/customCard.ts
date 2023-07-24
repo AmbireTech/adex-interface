@@ -6,18 +6,20 @@ export interface ICustomCardProps {
   color: MantineColor
   title?: string
   text: string
-  width: number
-  height: number
+  width: number | string
+  height: number | string
   children?: React.ReactNode
   action?: () => void
   component?: any
   to?: string
   active?: boolean
+  border?: boolean
 }
 
 export interface ICustomCardStyleProps {
   color: MantineColor
-  width: number
-  height: number
+  width: number | string
+  height: number | string
   hasAction: boolean
+  hasBorder: boolean
 }

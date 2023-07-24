@@ -5,10 +5,10 @@ import PolygonIcon from 'resources/networks/Polygon'
 import SendCryptoIcon from 'resources/icons/SendCrypto'
 import DepositIcon from 'resources/icons/Deposit'
 import { DepositMethods, ITabSwitchDeposit } from 'types'
+import CustomCard from 'components/common/CustomCard'
 import SelectItem from './SelectItem'
 import SendCryptocurrency from './SendCryptocurrency'
 import TopUpWithFiat from './TopUpWithFiat'
-import DepositMethodButton from './DepositMethodButton'
 
 const useStyles = createStyles((theme) => ({
   container: {
@@ -79,21 +79,27 @@ const Deposit = () => {
           </Text>
         </Grid.Col>
         <Grid.Col span={6} className={classes.center}>
-          <DepositMethodButton
+          <CustomCard
             icon={<SendCryptoIcon size="30px" />}
-            label="Send Cryptocurrency"
+            width="100%"
+            height="100%"
+            text="Send Cryptocurrency"
             color="brand"
             active={selectedTab === DepositMethods.SendCrypto}
             action={() => handleTabClicked(DepositMethods.SendCrypto)}
+            border
           />
         </Grid.Col>
         <Grid.Col span={6} className={classes.center}>
-          <DepositMethodButton
+          <CustomCard
             icon={<DepositIcon size="30px" />}
-            label="Top Up with Fiat"
+            width="100%"
+            height="100%"
+            text="Top Up with Fiat"
             color="brand"
             active={selectedTab === DepositMethods.TopUpFiat}
             action={() => handleTabClicked(DepositMethods.TopUpFiat)}
+            border
           />
         </Grid.Col>
         <Grid.Col span={12}>

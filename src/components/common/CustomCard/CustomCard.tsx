@@ -1,28 +1,37 @@
-import { Box, Group, Text, Flex, rem, Title, createStyles } from '@mantine/core'
+import { Box, Flex, rem, Title, createStyles } from '@mantine/core'
 import { ICustomCardProps, ICustomCardStyleProps } from 'types'
 
 const useStyles = createStyles(
-  (theme, { color, width, height, hasAction }: ICustomCardStyleProps) => ({
+  (theme, { color, width, height, hasBorder, hasAction }: ICustomCardStyleProps) => ({
     wrapper: {
       transitionTimingFunction: theme.transitionTimingFunction,
       transition: 'all 0.3s',
       textAlign: 'center',
       borderRadius: theme.radius.md,
-      height: `${rem(height)}`,
-      width: `${rem(width)}`,
-      border: 'transparent',
-      boxShadow: theme.shadows.xs,
+      height: typeof height === 'string' ? height : rem(height),
+      width: typeof width === 'string' ? width : rem(width),
+      border: hasBorder
+        ? `1px solid ${theme.colors.decorativeBorders[theme.fn.primaryShade()]}`
+        : 'transparent',
+      boxShadow: !hasBorder ? theme.shadows.xs : undefined,
       cursor: hasAction ? 'pointer' : '',
-      backgroundColor: theme.colors.mainBackground[theme.fn.primaryShade()],
+      backgroundColor: hasBorder
+        ? theme.colors.lightBackground[theme.fn.primaryShade()]
+        : theme.colors.mainBackground[theme.fn.primaryShade()],
       textDecoration: 'none',
       '&:hover': {
-        boxShadow: theme.shadows.md,
+        backgroundColor: hasBorder ? theme.colors.mainBackground[theme.fn.primaryShade()] : 'none',
+        boxShadow: !hasBorder ? theme.shadows.md : undefined,
         border: `1px solid ${theme.fn.lighten(
           theme.colors[color][theme.fn.primaryShade()],
           theme.other.shades.lighten.lighter
         )}`,
         svg: {
+          color: hasBorder ? theme.colors[color][theme.fn.primaryShade()] : undefined,
           transform: !hasAction ? 'scale(1.5)' : 'scale(1)'
+        },
+        '#text': {
+          color: hasBorder ? theme.colors.brand[theme.fn.primaryShade()] : undefined
         }
       }
     },
@@ -33,20 +42,31 @@ const useStyles = createStyles(
     icon: {
       display: 'flex',
       alignItems: 'center',
-      color: !hasAction ? theme.colors[color][theme.fn.primaryShade()] : '',
+      color: !hasAction ? theme.colors[color][theme.fn.primaryShade()] : undefined,
       svg: {
         transitionTimingFunction: theme.transitionTimingFunction,
         transition: 'transform 0.3s'
       }
     },
+    text: {
+      display: 'flex',
+      maxWidth: !hasAction ? '70%' : undefined,
+      gap: theme.spacing.md,
+      fontSize: !hasAction ? theme.fontSizes.xl : undefined,
+      color: theme.colors.secondaryText[theme.fn.primaryShade()]
+    },
     active: {
-      boxShadow: theme.shadows.md,
+      backgroundColor: hasBorder ? theme.colors.mainBackground[theme.fn.primaryShade()] : '',
+      boxShadow: !hasBorder ? theme.shadows.md : undefined,
       border: `1px solid ${theme.fn.lighten(
         theme.colors[color][theme.fn.primaryShade()],
         theme.other.shades.lighten.lighter
       )}`,
       svg: {
         color: theme.colors[color][theme.fn.primaryShade()]
+      },
+      '#text': {
+        color: hasBorder ? theme.colors.brand[theme.fn.primaryShade()] : undefined
       }
     }
   })
@@ -64,9 +84,16 @@ const CustomCard = ({
   action,
   component,
   to,
-  active
+  active,
+  border
 }: ICustomCardProps) => {
-  const { classes, cx } = useStyles({ color, width, height, hasAction: !!action })
+  const { classes, cx } = useStyles({
+    color,
+    width,
+    height,
+    hasBorder: !!border,
+    hasAction: !!action
+  })
 
   return (
     <Box
@@ -77,33 +104,23 @@ const CustomCard = ({
     >
       <Flex
         mih={50}
-        h="inherit"
-        gap="md"
-        justify="center"
+        h="100%"
+        p="sm"
+        justify="space-around"
         align="center"
         direction="column"
         wrap="wrap"
       >
         {title && <Title order={2}>{title}</Title>}
         {icon && (
-          <Box className={classes.iconWrapper}>
+          <div className={classes.iconWrapper}>
             <span className={classes.icon}>{icon}</span>
-          </Box>
+          </div>
         )}
-        {iconLeft && text ? (
-          <Group position="center">
-            <span className={classes.icon}>{iconLeft}</span>
-            <Text size="lg" align="start" maw={rem(176)}>
-              {text}
-            </Text>
-          </Group>
-        ) : (
-          <Group position="apart">
-            <Text size="xl" inline maw={rem(160)} color="secondaryText">
-              {text}
-            </Text>
-          </Group>
-        )}
+        <span className={classes.text}>
+          {iconLeft && <span className={classes.icon}>{iconLeft}</span>}
+          <span id="text">{text}</span>
+        </span>
         {children}
       </Flex>
     </Box>
