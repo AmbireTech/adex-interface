@@ -1,5 +1,10 @@
 import { MantineColor } from '@mantine/core'
 
+export enum CustomCardType {
+  depositBtn,
+  billingBtn
+}
+
 export interface ICustomCardProps {
   icon?: React.ReactNode
   iconLeft?: React.ReactNode
@@ -13,13 +18,13 @@ export interface ICustomCardProps {
   component?: any
   to?: string
   active?: boolean
-  border?: boolean
+  type?: CustomCardType
 }
 
 export interface ICustomCardStyleProps {
   color: MantineColor
   width: number | string
   height: number | string
-  hasAction: boolean
-  hasBorder: boolean
+  isBillingBtn: boolean
+  isDepositBtn: boolean
 }

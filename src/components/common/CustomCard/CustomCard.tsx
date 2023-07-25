@@ -1,8 +1,8 @@
 import { Box, Flex, rem, Title, createStyles } from '@mantine/core'
-import { ICustomCardProps, ICustomCardStyleProps } from 'types'
+import { CustomCardType, ICustomCardProps, ICustomCardStyleProps } from 'types'
 
 const useStyles = createStyles(
-  (theme, { color, width, height, hasBorder, hasAction }: ICustomCardStyleProps) => ({
+  (theme, { color, width, height, isDepositBtn, isBillingBtn }: ICustomCardStyleProps) => ({
     wrapper: {
       transitionTimingFunction: theme.transitionTimingFunction,
       transition: 'all 0.3s',
@@ -10,28 +10,30 @@ const useStyles = createStyles(
       borderRadius: theme.radius.md,
       height: typeof height === 'string' ? height : rem(height),
       width: typeof width === 'string' ? width : rem(width),
-      border: hasBorder
+      border: isDepositBtn
         ? `1px solid ${theme.colors.decorativeBorders[theme.fn.primaryShade()]}`
         : 'transparent',
-      boxShadow: !hasBorder ? theme.shadows.xs : undefined,
-      cursor: hasAction ? 'pointer' : '',
-      backgroundColor: hasBorder
+      boxShadow: !isDepositBtn ? theme.shadows.xs : undefined,
+      cursor: isBillingBtn ? 'pointer' : undefined,
+      backgroundColor: isDepositBtn
         ? theme.colors.lightBackground[theme.fn.primaryShade()]
         : theme.colors.mainBackground[theme.fn.primaryShade()],
       textDecoration: 'none',
       '&:hover': {
-        backgroundColor: hasBorder ? theme.colors.mainBackground[theme.fn.primaryShade()] : 'none',
-        boxShadow: !hasBorder ? theme.shadows.md : undefined,
+        backgroundColor: isDepositBtn
+          ? theme.colors.mainBackground[theme.fn.primaryShade()]
+          : 'none',
+        boxShadow: !isDepositBtn ? theme.shadows.md : undefined,
         border: `1px solid ${theme.fn.lighten(
           theme.colors[color][theme.fn.primaryShade()],
           theme.other.shades.lighten.lighter
         )}`,
         svg: {
-          color: hasBorder ? theme.colors[color][theme.fn.primaryShade()] : undefined,
-          transform: !hasAction ? 'scale(1.5)' : 'scale(1)'
+          color: isDepositBtn ? theme.colors[color][theme.fn.primaryShade()] : undefined,
+          transform: !isBillingBtn ? 'scale(1.5)' : 'scale(1)'
         },
         '#text': {
-          color: hasBorder ? theme.colors.brand[theme.fn.primaryShade()] : undefined
+          color: isDepositBtn ? theme.colors.brand[theme.fn.primaryShade()] : undefined
         }
       }
     },
@@ -42,7 +44,7 @@ const useStyles = createStyles(
     icon: {
       display: 'flex',
       alignItems: 'center',
-      color: !hasAction ? theme.colors[color][theme.fn.primaryShade()] : undefined,
+      color: !isBillingBtn ? theme.colors[color][theme.fn.primaryShade()] : undefined,
       svg: {
         transitionTimingFunction: theme.transitionTimingFunction,
         transition: 'transform 0.3s'
@@ -50,14 +52,14 @@ const useStyles = createStyles(
     },
     text: {
       display: 'flex',
-      maxWidth: !hasAction ? '70%' : undefined,
+      maxWidth: !isBillingBtn ? '70%' : undefined,
       gap: theme.spacing.md,
-      fontSize: !hasAction ? theme.fontSizes.xl : undefined,
+      fontSize: !isBillingBtn ? theme.fontSizes.xl : undefined,
       color: theme.colors.secondaryText[theme.fn.primaryShade()]
     },
     active: {
-      backgroundColor: hasBorder ? theme.colors.mainBackground[theme.fn.primaryShade()] : '',
-      boxShadow: !hasBorder ? theme.shadows.md : undefined,
+      backgroundColor: isDepositBtn ? theme.colors.mainBackground[theme.fn.primaryShade()] : '',
+      boxShadow: !isDepositBtn ? theme.shadows.md : undefined,
       border: `1px solid ${theme.fn.lighten(
         theme.colors[color][theme.fn.primaryShade()],
         theme.other.shades.lighten.lighter
@@ -66,7 +68,7 @@ const useStyles = createStyles(
         color: theme.colors[color][theme.fn.primaryShade()]
       },
       '#text': {
-        color: hasBorder ? theme.colors.brand[theme.fn.primaryShade()] : undefined
+        color: isDepositBtn ? theme.colors.brand[theme.fn.primaryShade()] : undefined
       }
     }
   })
@@ -85,14 +87,14 @@ const CustomCard = ({
   component,
   to,
   active,
-  border
+  type
 }: ICustomCardProps) => {
   const { classes, cx } = useStyles({
     color,
     width,
     height,
-    hasBorder: !!border,
-    hasAction: !!action
+    isDepositBtn: type === CustomCardType.depositBtn,
+    isBillingBtn: type === CustomCardType.billingBtn
   })
 
   return (

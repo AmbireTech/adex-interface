@@ -4,7 +4,7 @@ import EthereumIcon from 'resources/networks/Ethereum'
 import PolygonIcon from 'resources/networks/Polygon'
 import SendCryptoIcon from 'resources/icons/SendCrypto'
 import DepositIcon from 'resources/icons/Deposit'
-import { DepositMethods, ITabSwitchDeposit } from 'types'
+import { CustomCardType, DepositMethods, ITabSwitchDeposit } from 'types'
 import CustomCard from 'components/common/CustomCard'
 import SelectItem from './SelectItem'
 import SendCryptocurrency from './SendCryptocurrency'
@@ -87,7 +87,7 @@ const Deposit = () => {
             color="brand"
             active={selectedTab === DepositMethods.SendCrypto}
             action={() => handleTabClicked(DepositMethods.SendCrypto)}
-            border
+            type={CustomCardType.depositBtn}
           />
         </Grid.Col>
         <Grid.Col span={6} className={classes.center}>
@@ -99,7 +99,7 @@ const Deposit = () => {
             color="brand"
             active={selectedTab === DepositMethods.TopUpFiat}
             action={() => handleTabClicked(DepositMethods.TopUpFiat)}
-            border
+            type={CustomCardType.depositBtn}
           />
         </Grid.Col>
         <Grid.Col span={12}>
