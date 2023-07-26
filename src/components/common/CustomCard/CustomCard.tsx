@@ -54,7 +54,7 @@ const useStyles = createStyles(
       display: 'flex',
       maxWidth: !isBillingBtn ? '70%' : undefined,
       gap: theme.spacing.md,
-      fontSize: !isBillingBtn ? theme.fontSizes.xl : undefined,
+      fontSize: !isBillingBtn && !isDepositBtn ? theme.fontSizes.xl : undefined,
       color: theme.colors.secondaryText[theme.fn.primaryShade()]
     },
     active: {
