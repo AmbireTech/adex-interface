@@ -14,7 +14,7 @@ const useStyles = createStyles(
         ? `1px solid ${theme.colors.decorativeBorders[theme.fn.primaryShade()]}`
         : 'transparent',
       boxShadow: !isDepositBtn ? theme.shadows.xs : undefined,
-      cursor: isBillingBtn ? 'pointer' : undefined,
+      cursor: isBillingBtn || isDepositBtn ? 'pointer' : undefined,
       backgroundColor: isDepositBtn
         ? theme.colors.lightBackground[theme.fn.primaryShade()]
         : theme.colors.mainBackground[theme.fn.primaryShade()],
@@ -30,7 +30,7 @@ const useStyles = createStyles(
         )}`,
         svg: {
           color: isDepositBtn ? theme.colors[color][theme.fn.primaryShade()] : undefined,
-          transform: !isBillingBtn ? 'scale(1.5)' : 'scale(1)'
+          transform: !isBillingBtn && !isDepositBtn ? 'scale(1.5)' : 'scale(1)'
         },
         '#text': {
           color: isDepositBtn ? theme.colors.brand[theme.fn.primaryShade()] : undefined
