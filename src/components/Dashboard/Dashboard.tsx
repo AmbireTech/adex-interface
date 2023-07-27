@@ -1,11 +1,18 @@
 // import { useState } from 'react'
-import { AppShell, Navbar, Header, MediaQuery, Burger } from '@mantine/core'
+import { AppShell, Navbar, Header, MediaQuery, Burger, createStyles } from '@mantine/core'
 import SideNav from 'components/SideNav'
 import TopBar from 'components/TopBar'
 import { useState } from 'react'
 import { Outlet } from 'react-router-dom'
 
+const useStyles = createStyles((theme) => ({
+  header: {
+    backgroundColor: theme.colors.mainBackground[theme.fn.primaryShade()]
+  }
+}))
+
 function Dashboard() {
+  const { classes } = useStyles()
   const [opened, setOpened] = useState(false)
 
   // husky test
@@ -34,7 +41,9 @@ function Dashboard() {
       header={
         <Header
           height={90}
-          p="sm"
+          mr="xl"
+          ml="xl"
+          className={classes.header}
           style={{
             display: 'flex',
             flexDirection: 'row',
@@ -56,7 +65,9 @@ function Dashboard() {
       styles={(theme) => ({
         main: {
           backgroundColor:
-            theme.colorScheme === 'dark' ? theme.colors.dark[8] : theme.colors.gray[0]
+            theme.colorScheme === 'dark'
+              ? theme.colors.dark[8]
+              : theme.colors.mainBackground[theme.fn.primaryShade()]
         }
       })}
     >
