@@ -87,7 +87,7 @@ const Deposit = () => {
             color="brand"
             active={selectedTab === DepositMethods.SendCrypto}
             action={() => handleTabClicked(DepositMethods.SendCrypto)}
-            type={CustomCardType.depositBtn}
+            variant={CustomCardType.border}
           />
         </Grid.Col>
         <Grid.Col span={6} className={classes.center}>
@@ -99,7 +99,7 @@ const Deposit = () => {
             color="brand"
             active={selectedTab === DepositMethods.TopUpFiat}
             action={() => handleTabClicked(DepositMethods.TopUpFiat)}
-            type={CustomCardType.depositBtn}
+            variant={CustomCardType.border}
           />
         </Grid.Col>
         <Grid.Col span={12}>

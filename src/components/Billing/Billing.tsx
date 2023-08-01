@@ -57,7 +57,7 @@ function Billing() {
             color="secondary"
             active={selectedTab === TabType.BillingTab}
             action={() => handleTabClicked(TabType.BillingTab)}
-            type={CustomCardType.billingBtn}
+            variant={CustomCardType.shadow}
           />
           <CustomCard
             width={300}
@@ -67,7 +67,7 @@ function Billing() {
             color="secondary"
             active={selectedTab === TabType.InvoicesTab}
             action={() => handleTabClicked(TabType.InvoicesTab)}
-            type={CustomCardType.billingBtn}
+            variant={CustomCardType.shadow}
           />
           <CustomCard
             width={300}
@@ -77,7 +77,7 @@ function Billing() {
             color="secondary"
             active={selectedTab === TabType.StatementsTab}
             action={() => handleTabClicked(TabType.StatementsTab)}
-            type={CustomCardType.billingBtn}
+            variant={CustomCardType.shadow}
           />
         </Stack>
       </Grid.Col>
