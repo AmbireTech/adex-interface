@@ -8,6 +8,7 @@ import {
   Menu,
   rem,
   createStyles
+  // NavLink
 } from '@mantine/core'
 import { capitalizeFirstLetter, formatDate, maskAddress } from 'helpers/formatters'
 import useAccount from 'hooks/useAccount'
@@ -19,6 +20,7 @@ import ValidatorsIcon from 'resources/icons/Validators'
 import WithdrawIcon from 'resources/icons/Withdraw'
 import Blockies from 'components/common/Blockies'
 import { useLocation } from 'react-router-dom'
+import StakingIcon from 'resources/icons/Staking'
 
 const useStyles = createStyles(() => ({
   rotateUpsideDown: {
@@ -31,10 +33,10 @@ function TopBar() {
   const { adexAccount } = useAccount()
   const location = useLocation()
   const splitPath = location.pathname.split('/')
-  const title = splitPath[splitPath.length - 1]
+  const title =
+    splitPath[splitPath.length - 1] === '' ? 'dashboard' : splitPath[splitPath.length - 1]
 
   const [opened, setOpened] = useState<boolean>(false)
-  const handleOpenClose = () => setOpened((prevState) => !prevState)
 
   return (
     <Flex direction="row" gap="md" justify="space-between" align="center" style={{ flexGrow: 1 }}>
@@ -52,7 +54,7 @@ function TopBar() {
             </ActionIcon>
           </Indicator>
         </Group>
-        <Menu onOpen={handleOpenClose} onClose={handleOpenClose}>
+        <Menu opened={opened} onChange={setOpened} width={rem(200)}>
           <Menu.Target>
             <Flex direction="row" gap="md" align="center">
               <Blockies seedString={adexAccount?.address || ''} />
@@ -72,8 +74,7 @@ function TopBar() {
           </Menu.Target>
           <Menu.Dropdown>
             <Menu.Item rightSection={<WithdrawIcon size={rem(14)} />}>Withdraw funds</Menu.Item>
-            {/* TODO: Change the icon for Staking */}
-            <Menu.Item rightSection={<WithdrawIcon size={rem(14)} />}>Staking</Menu.Item>
+            <Menu.Item rightSection={<StakingIcon size={rem(14)} />}>Staking</Menu.Item>
             <Menu.Item rightSection={<ValidatorsIcon size={rem(14)} />}>Validators</Menu.Item>
             <Menu.Item rightSection={<LogoutIcon size={rem(14)} />}>Log out</Menu.Item>
           </Menu.Dropdown>

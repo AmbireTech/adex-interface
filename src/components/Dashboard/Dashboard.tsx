@@ -5,9 +5,9 @@ import TopBar from 'components/TopBar'
 import { useState } from 'react'
 import { Outlet } from 'react-router-dom'
 
-const useStyles = createStyles((theme) => ({
+const useStyles = createStyles(() => ({
   header: {
-    backgroundColor: theme.colors.mainBackground[theme.fn.primaryShade()]
+    backgroundColor: 'inherit'
   }
 }))
 
@@ -67,7 +67,7 @@ function Dashboard() {
           backgroundColor:
             theme.colorScheme === 'dark'
               ? theme.colors.dark[8]
-              : theme.colors.mainBackground[theme.fn.primaryShade()]
+              : theme.colors.lightBackground[theme.fn.primaryShade()]
         }
       })}
     >
