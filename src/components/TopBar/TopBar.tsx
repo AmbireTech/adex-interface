@@ -25,6 +25,9 @@ import StakingIcon from 'resources/icons/Staking'
 const useStyles = createStyles(() => ({
   rotateUpsideDown: {
     transform: 'rotate(180deg)'
+  },
+  menu: {
+    cursor: 'pointer'
   }
 }))
 
@@ -54,31 +57,33 @@ function TopBar() {
             </ActionIcon>
           </Indicator>
         </Group>
-        <Menu opened={opened} onChange={setOpened} width={rem(200)}>
-          <Menu.Target>
-            <Flex direction="row" gap="md" align="center">
-              <Blockies seedString={adexAccount?.address || ''} />
-              <Flex direction="column">
-                <Text inline weight="bold" size="xs">
-                  John Doe
-                </Text>
-                <Text inline color="secondaryText" size="xs">
-                  {maskAddress(adexAccount?.address || '')}
-                </Text>
+        <div className={classes.menu}>
+          <Menu opened={opened} onChange={setOpened} width={rem(200)}>
+            <Menu.Target>
+              <Flex direction="row" gap="md" align="center">
+                <Blockies seedString={adexAccount?.address || ''} />
+                <Flex direction="column">
+                  <Text inline weight="bold" size="xs">
+                    John Doe
+                  </Text>
+                  <Text inline color="secondaryText" size="xs">
+                    {maskAddress(adexAccount?.address || '')}
+                  </Text>
+                </Flex>
+                <DownArrowIcon
+                  size={rem(10)}
+                  className={cx({ [classes.rotateUpsideDown]: opened })}
+                />
               </Flex>
-              <DownArrowIcon
-                size={rem(10)}
-                className={cx({ [classes.rotateUpsideDown]: opened })}
-              />
-            </Flex>
-          </Menu.Target>
-          <Menu.Dropdown>
-            <Menu.Item rightSection={<WithdrawIcon size={rem(14)} />}>Withdraw funds</Menu.Item>
-            <Menu.Item rightSection={<StakingIcon size={rem(14)} />}>Staking</Menu.Item>
-            <Menu.Item rightSection={<ValidatorsIcon size={rem(14)} />}>Validators</Menu.Item>
-            <Menu.Item rightSection={<LogoutIcon size={rem(14)} />}>Log out</Menu.Item>
-          </Menu.Dropdown>
-        </Menu>
+            </Menu.Target>
+            <Menu.Dropdown>
+              <Menu.Item rightSection={<WithdrawIcon size={rem(14)} />}>Withdraw funds</Menu.Item>
+              <Menu.Item rightSection={<StakingIcon size={rem(14)} />}>Staking</Menu.Item>
+              <Menu.Item rightSection={<ValidatorsIcon size={rem(14)} />}>Validators</Menu.Item>
+              <Menu.Item rightSection={<LogoutIcon size={rem(14)} />}>Log out</Menu.Item>
+            </Menu.Dropdown>
+          </Menu>
+        </div>
       </Flex>
     </Flex>
   )
