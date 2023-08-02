@@ -42,7 +42,10 @@ const useStyles = createStyles(
     icon: {
       display: 'flex',
       alignItems: 'center',
-      color: !shadow ? theme.colors[color][theme.fn.primaryShade()] : undefined,
+      color:
+        !shadow && !border
+          ? theme.colors[color][theme.fn.primaryShade()]
+          : theme.colors.secondaryText[theme.fn.primaryShade()],
       svg: {
         transitionTimingFunction: theme.transitionTimingFunction,
         transition: 'transform 0.3s'
