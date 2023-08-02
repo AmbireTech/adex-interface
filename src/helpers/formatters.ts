@@ -1,27 +1,10 @@
-export const formatDate = (date: Date) => {
-  const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
-  const months = [
-    'January',
-    'February',
-    'March',
-    'April',
-    'May',
-    'June',
-    'July',
-    'August',
-    'September',
-    'October',
-    'November',
-    'December'
-  ]
-
-  const weekday = weekdays[date.getDay()]
-  const day = date.getDate()
-  const month = months[date.getMonth()]
-  const year = date.getFullYear()
-
-  return `${weekday}, ${day} ${month} ${year}`
-}
+export const formatDate = (date: Date) =>
+  date.toLocaleDateString(undefined, {
+    weekday: 'short',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric'
+  })
 
 export const maskAddress = (address: string) =>
   address.length
