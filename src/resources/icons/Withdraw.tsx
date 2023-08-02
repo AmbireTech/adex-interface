@@ -1,7 +1,7 @@
 import React from 'react'
 import { AppIconProps, defaultProps } from 'types/components/Icon'
 
-const WithdrawIcon: React.FC<AppIconProps> = ({ color, size, ...rest }) => {
+const WithdrawIcon: React.FC<AppIconProps> = ({ color, size, strokeWidth, ...rest }) => {
   return (
     <svg
       viewBox="0 0 21.811 18.5"
@@ -10,7 +10,7 @@ const WithdrawIcon: React.FC<AppIconProps> = ({ color, size, ...rest }) => {
       height={size}
       {...rest}
     >
-      <g fill="none" stroke={color} strokeLinecap="round" strokeWidth="1.5">
+      <g fill="none" stroke={color} strokeLinecap="round" strokeWidth={strokeWidth}>
         <path d="M.75 5.749h12.5" data-name="Path 2959" />
         <path d="M4.75 13.749h2" data-name="Path 2960" />
         <path d="M9.25 13.749h4" data-name="Path 2961" />

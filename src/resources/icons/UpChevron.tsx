@@ -1,7 +1,7 @@
 import React from 'react'
 import { AppIconProps, defaultProps } from 'types/components/Icon'
 
-const UpChevronIcon: React.FC<AppIconProps> = ({ color, size, ...rest }) => {
+const UpChevronIcon: React.FC<AppIconProps> = ({ color, size, strokeWidth, ...rest }) => {
   return (
     <svg
       viewBox="0 0 21.5 21.5"
@@ -10,7 +10,13 @@ const UpChevronIcon: React.FC<AppIconProps> = ({ color, size, ...rest }) => {
       height={size}
       {...rest}
     >
-      <g fill="none" stroke={color} strokeLinecap="round" strokeWidth="1.5" data-name="up chevron">
+      <g
+        fill="none"
+        stroke={color}
+        strokeLinecap="round"
+        strokeWidth={strokeWidth}
+        data-name="up chevron"
+      >
         <path
           d="M13.751.75h-6c-5 0-7 2-7 7v6c0 5 2 7 7 7h6c5 0 7-2 7-7v-6c0-5-2-7-7-7z"
           data-name="Path 2883"

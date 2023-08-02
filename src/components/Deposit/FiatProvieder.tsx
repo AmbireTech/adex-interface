@@ -7,7 +7,12 @@ const useStyles = createStyles((theme) => ({
     border: '1px solid',
     borderColor: theme.colors.decorativeBorders[theme.fn.primaryShade()],
     borderRadius: theme.radius.sm,
-    padding: theme.spacing.xs
+    padding: theme.spacing.xs,
+    cursor: 'pointer',
+    '&:hover': {
+      borderColor: theme.colors.brand[theme.fn.primaryShade()],
+      boxShadow: theme.shadows.md
+    }
   },
   fontSizeSmall: {
     fontSize: theme.fontSizes.sm

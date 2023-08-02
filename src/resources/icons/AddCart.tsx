@@ -1,7 +1,7 @@
 import React from 'react'
 import { AppIconProps, defaultProps } from 'types/components/Icon'
 
-const AddCartIcon: React.FC<AppIconProps> = ({ color, size, ...rest }) => {
+const AddCartIcon: React.FC<AppIconProps> = ({ color, size, strokeWidth, ...rest }) => {
   return (
     <svg
       viewBox="0 0 24 24"
@@ -25,7 +25,7 @@ const AddCartIcon: React.FC<AppIconProps> = ({ color, size, ...rest }) => {
         fill="none"
         stroke={color}
         strokeLinecap="round"
-        strokeWidth="1.5"
+        strokeWidth={strokeWidth}
         transform="translate(-19.682 -19.682)"
         data-name="add card icon"
       >

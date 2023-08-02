@@ -1,7 +1,7 @@
 import React from 'react'
 import { AppIconProps, defaultProps } from 'types/components/Icon'
 
-const IncludeIcon: React.FC<AppIconProps> = ({ color, size, ...rest }) => {
+const IncludeIcon: React.FC<AppIconProps> = ({ color, size, strokeWidth, ...rest }) => {
   return (
     <svg
       viewBox="0 0 13.5 13.5"
@@ -10,7 +10,7 @@ const IncludeIcon: React.FC<AppIconProps> = ({ color, size, ...rest }) => {
       height={size}
       {...rest}
     >
-      <g fill="none" stroke={color} strokeLinecap="round" strokeWidth="1.5">
+      <g fill="none" stroke={color} strokeLinecap="round" strokeWidth={strokeWidth}>
         <path d="M.75 6.75h12" data-name="Path 2857" />
         <path d="M6.75 12.75v-12" data-name="Path 2858" />
       </g>

@@ -1,7 +1,7 @@
 import React from 'react'
 import { AppIconProps, defaultProps } from 'types/components/Icon'
 
-const CopyIcon: React.FC<AppIconProps> = ({ color, size, ...rest }) => {
+const CopyIcon: React.FC<AppIconProps> = ({ color, size, strokeWidth, ...rest }) => {
   return (
     <svg
       viewBox="0 0 25.5 25.5"
@@ -10,7 +10,13 @@ const CopyIcon: React.FC<AppIconProps> = ({ color, size, ...rest }) => {
       height={size}
       {...rest}
     >
-      <g fill="none" stroke={color} strokeLinecap="round" strokeWidth="1.5" data-name="Copy icon">
+      <g
+        fill="none"
+        stroke={color}
+        strokeLinecap="round"
+        strokeWidth={strokeWidth}
+        data-name="Copy icon"
+      >
         <path
           d="M17.55 13.83v5.04c0 4.2-1.68 5.88-5.88 5.88H6.63c-4.2 0-5.88-1.68-5.88-5.88v-5.04c0-4.2 1.68-5.88 5.88-5.88h5.04c4.2 0 5.88 1.68 5.88 5.88z"
           data-name="Path 2666"

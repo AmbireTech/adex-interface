@@ -1,7 +1,7 @@
 import React from 'react'
 import { AppIconProps, defaultProps } from 'types/components/Icon'
 
-const DownArrowIcon: React.FC<AppIconProps> = ({ color, size, ...rest }) => {
+const DownArrowIcon: React.FC<AppIconProps> = ({ color, size, strokeWidth, ...rest }) => {
   return (
     <svg
       viewBox="0 0 10.519 6.01"
@@ -16,7 +16,7 @@ const DownArrowIcon: React.FC<AppIconProps> = ({ color, size, ...rest }) => {
           fill="none"
           stroke={color}
           strokeLinecap="round"
-          strokeWidth="1.5"
+          strokeWidth={strokeWidth}
           data-name="Path 2653"
         />
       </g>

@@ -1,7 +1,7 @@
 import React from 'react'
 import { AppIconProps, defaultProps } from 'types/components/Icon'
 
-const EditIcon: React.FC<AppIconProps> = ({ color, size, ...rest }) => {
+const EditIcon: React.FC<AppIconProps> = ({ color, size, strokeWidth, ...rest }) => {
   return (
     <svg
       viewBox="0 0 21.751 21.76"
@@ -10,7 +10,13 @@ const EditIcon: React.FC<AppIconProps> = ({ color, size, ...rest }) => {
       height={size}
       {...rest}
     >
-      <g fill="none" stroke={color} strokeLinecap="round" strokeWidth="1.5" data-name="edit icon">
+      <g
+        fill="none"
+        stroke={color}
+        strokeLinecap="round"
+        strokeWidth={strokeWidth}
+        data-name="edit icon"
+      >
         <path d="M9.75 1.01h-2c-5 0-7 2-7 7v6c0 5 2 7 7 7h6c5 0 7-2 7-7v-2" data-name="Path 2225" />
         <path
           d="M14.79 2.03L6.91 9.91a2.712 2.712 0 00-.66 1.32l-.43 3.01a1.424 1.424 0 001.7 1.7l3.01-.43a2.8 2.8 0 001.32-.66l7.88-7.88c1.36-1.36 2-2.94 0-4.94s-3.58-1.36-4.94 0z"

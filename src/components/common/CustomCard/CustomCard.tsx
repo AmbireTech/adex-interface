@@ -21,7 +21,7 @@ const useStyles = createStyles(
       textDecoration: 'none',
       '&:hover': {
         backgroundColor: border ? theme.colors.mainBackground[theme.fn.primaryShade()] : 'none',
-        boxShadow: !border ? theme.shadows.md : undefined,
+        boxShadow: theme.shadows.md,
         border: `1px solid ${theme.fn.lighten(
           theme.colors[color][theme.fn.primaryShade()],
           theme.other.shades.lighten.lighter
@@ -57,7 +57,7 @@ const useStyles = createStyles(
     },
     active: {
       backgroundColor: border ? theme.colors.mainBackground[theme.fn.primaryShade()] : '',
-      boxShadow: !border ? theme.shadows.md : undefined,
+      boxShadow: theme.shadows.md,
       border: `1px solid ${theme.fn.lighten(
         theme.colors[color][theme.fn.primaryShade()],
         theme.other.shades.lighten.lighter

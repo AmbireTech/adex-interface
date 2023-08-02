@@ -80,7 +80,7 @@ const Deposit = () => {
         </Grid.Col>
         <Grid.Col span={6} className={classes.center}>
           <CustomCard
-            icon={<SendCryptoIcon size="30px" />}
+            icon={<SendCryptoIcon size="30px" strokeWidth="2" />}
             width="100%"
             height="100%"
             text="Send Cryptocurrency"
@@ -92,7 +92,7 @@ const Deposit = () => {
         </Grid.Col>
         <Grid.Col span={6} className={classes.center}>
           <CustomCard
-            icon={<DepositIcon size="30px" />}
+            icon={<DepositIcon size="30px" strokeWidth="2" />}
             width="100%"
             height="100%"
             text="Top Up with Fiat"

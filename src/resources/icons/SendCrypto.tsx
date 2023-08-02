@@ -1,7 +1,7 @@
 import React from 'react'
 import { AppIconProps, defaultProps } from 'types/components/Icon'
 
-const SendCryptoIcon: React.FC<AppIconProps> = ({ color, size, ...rest }) => {
+const SendCryptoIcon: React.FC<AppIconProps> = ({ color, size, strokeWidth, ...rest }) => {
   return (
     <svg
       viewBox="0 0 34.533 34.533"
@@ -10,7 +10,13 @@ const SendCryptoIcon: React.FC<AppIconProps> = ({ color, size, ...rest }) => {
       height={size}
       {...rest}
     >
-      <g fill="none" stroke={color} strokeLinecap="round" strokeWidth="2" data-name="Group 1134">
+      <g
+        fill="none"
+        stroke={color}
+        strokeLinecap="round"
+        strokeWidth={strokeWidth}
+        data-name="Group 1134"
+      >
         <path
           d="M13.045 20.284a2.747 2.747 0 002.682 2.81h3.018a2.391 2.391 0 002.329-2.457 2.121 2.121 0 00-1.59-2.329l-4.833-1.685a2.11 2.11 0 01-1.59-2.329 2.4 2.4 0 012.329-2.457h3.019a2.747 2.747 0 012.682 2.81"
           data-name="Path 3075"
