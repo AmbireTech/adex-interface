@@ -1,7 +1,7 @@
 import { Flex, createStyles, rem, Image, Text } from '@mantine/core'
 import { useState } from 'react'
 import DownArrowIcon from 'resources/icons/DownArrow'
-import ethLogo from 'resources/logos/ethereumIcon.png'
+import { accountBalance } from './mockedData'
 
 const useStyles = createStyles((theme) => ({
   rotateUpsideDown: {
@@ -10,11 +10,8 @@ const useStyles = createStyles((theme) => ({
   menu: {
     cursor: 'pointer'
   },
-  balanceWrapper: {
-    width: '100%',
-    display: 'flex',
-    justifyContent: 'space-between',
-    fontSize: theme.fontSizes.xs
+  secondaryColor: {
+    color: theme.colors.secondaryText[theme.fn.primaryShade()]
   }
 }))
 
@@ -48,33 +45,25 @@ const Balance = () => {
         className={classes.menu}
         onClick={() => setOpened((prevState) => !prevState)}
       >
-        <FormattedBalance balance={42000.69} />
-        <DownArrowIcon size={rem(10)} className={cx({ [classes.rotateUpsideDown]: opened })} />
+        <FormattedBalance balance={accountBalance.totalInUSD} />
+        {!!accountBalance.balanceByTokens.length && (
+          <DownArrowIcon size={rem(10)} className={cx({ [classes.rotateUpsideDown]: opened })} />
+        )}
       </Flex>
 
-      {opened && (
+      {opened && !!accountBalance.balanceByTokens.length && (
         <Flex direction="column">
-          <div className={classes.balanceWrapper}>
-            <Flex align="center">
-              <Image maw={15} mx="auto" radius="md" src={ethLogo} alt="eth" />
-              10,999.00 ADX
+          {accountBalance.balanceByTokens.map((item) => (
+            <Flex justify="space-between" key={item.id} className={classes.secondaryColor}>
+              <Flex align="center">
+                <Image maw={15} mx="auto" radius="md" src={item.icon} alt={item.symbol} />
+                <Text size="xs">
+                  {item.amount.toLocaleString()} {item.symbol}
+                </Text>
+              </Flex>
+              <Text size="xs">on {item.network}</Text>
             </Flex>
-            <div>on Ethereum</div>
-          </div>
-          <div className={classes.balanceWrapper}>
-            <Flex align="center">
-              <Image maw={15} mx="auto" radius="md" src={ethLogo} alt="eth" />
-              10,999.00 ADX
-            </Flex>
-            <div>on Ethereum</div>
-          </div>
-          <div className={classes.balanceWrapper}>
-            <Flex align="center">
-              <Image maw={15} mx="auto" radius="md" src={ethLogo} alt="eth" />
-              10,999.00 ADX
-            </Flex>
-            <div>on Ethereum</div>
-          </div>
+          ))}
         </Flex>
       )}
     </>
