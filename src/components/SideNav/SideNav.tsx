@@ -6,7 +6,8 @@ import {
   Text,
   Button,
   useMantineTheme,
-  createStyles
+  createStyles,
+  rem
 } from '@mantine/core'
 // import useAccount from 'hooks/useAccount'
 import { useMatch, useLocation, useResolvedPath, Link } from 'react-router-dom'
@@ -20,6 +21,13 @@ import NavLink from './NavLink'
 import Balance from './Balance'
 
 const useStyles = createStyles((theme) => ({
+  logo: {
+    display: 'block',
+    width: rem(103),
+    height: rem(40),
+    marginTop: theme.spacing.md,
+    marginBottom: theme.spacing.md
+  },
   balance: {
     borderBottom: `1px solid ${theme.colors.decorativeBorders[theme.fn.primaryShade()]}`,
     paddingTop: theme.spacing.sm,
@@ -43,13 +51,13 @@ function SideNav() {
 
   return (
     <>
-      <Navbar.Section mt="xs">
-        <UnstyledButton style={{ display: 'block', height: 69 }} component={Link} to="" h={2}>
+      <Navbar.Section>
+        <UnstyledButton component={Link} to="" className={classes.logo}>
           <AdExLogo
             text={
               theme.colorScheme === 'dark'
                 ? theme.white
-                : theme.primaryColor[theme.fn.primaryShade()]
+                : theme.colors.brandDarker[theme.fn.primaryShade()]
             }
           />
         </UnstyledButton>

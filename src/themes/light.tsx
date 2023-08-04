@@ -17,6 +17,18 @@ export const lightTheme: MantineThemeOverride = {
       '#1D2230',
       '#181B24'
     ],
+    brandDarker: [
+      '#415898',
+      '#314B94',
+      '#223F92',
+      '#123391', // BrandDarker
+      '#1C3377',
+      '#213263',
+      '#243053',
+      '#242D47',
+      '#242A3C',
+      '#222734'
+    ],
     secondary: [
       '#C1CAE3',
       '#8196D1',

@@ -8,6 +8,7 @@ import {
 
 type ExtendedCustomColors =
   | 'brand'
+  | 'brandDarker'
   | 'secondary'
   | 'mainText'
   | 'secondaryText'
