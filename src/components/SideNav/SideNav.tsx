@@ -91,23 +91,8 @@ function SideNav() {
             active={useResolvedPath('billing').pathname === match?.pathname}
           />
           <NavLink icon={<HelpIcon />} label="Help Center" />
-          {/* <NavLink label={`Test account login ${adexAccount?.address}`} action={connectWallet} />
-          <NavLink
-            label={`Test account disconnect ${adexAccount?.address}`}
-            action={disconnectWallet}
-          /> */}
         </Box>
       </Navbar.Section>
-      {/* <Navbar.Section m="xs">
-        <Button fullWidth variant="outline" size="sm">
-          See more
-        </Button>
-      </Navbar.Section>
-      <Navbar.Section m="xs">
-        <Button fullWidth variant="filled" size="sm">
-          See more
-        </Button>
-      </Navbar.Section> */}
       <Navbar.Section mx="xs" mt="xl">
         <Text size="sm">©{year} AdEx.</Text>
         <Text size="sm">All Rights Reserved.</Text>
