@@ -18,7 +18,7 @@ function Dashboard() {
       asideOffsetBreakpoint="sm"
       fixed
       navbar={
-        <Navbar hiddenBreakpoint="sm" width={{ sm: 210 }} height="100%" p="xs" hidden={!opened}>
+        <Navbar hiddenBreakpoint="sm" width={{ sm: 227 }} height="100%" p="xs" hidden={!opened}>
           <MediaQuery largerThan="sm" styles={{ display: 'none' }}>
             <Burger
               opened={opened}

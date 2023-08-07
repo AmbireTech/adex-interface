@@ -35,7 +35,7 @@ const Balance = () => {
   const [opened, setOpened] = useState<boolean>(false)
   return (
     <>
-      <Text size="sm" color="secondaryText" weight="bold">
+      <Text size="sm" color="mainText" weight="bold">
         Balance
       </Text>
       <Flex

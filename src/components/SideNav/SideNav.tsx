@@ -94,9 +94,15 @@ function SideNav() {
         </Box>
       </Navbar.Section>
       <Navbar.Section mx="xs" mt="xl">
-        <Text size="sm">©{year} AdEx.</Text>
-        <Text size="sm">All Rights Reserved.</Text>
-        <Text size="sm">V.0.00.01</Text>
+        <Text color="secondaryText" size="sm">
+          ©{year} AdEx.
+        </Text>
+        <Text color="secondaryText" size="sm">
+          All Rights Reserved.
+        </Text>
+        <Text color="secondaryText" size="sm">
+          V.0.00.01
+        </Text>
       </Navbar.Section>
     </>
   )

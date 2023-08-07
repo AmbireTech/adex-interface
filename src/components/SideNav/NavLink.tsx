@@ -10,7 +10,13 @@ const useStyles = createStyles((theme) => {
       padding: theme.spacing.xs,
       borderRadius: 'none',
       position: 'relative',
-      opacity: 0.69
+      color: theme.fn.lighten(
+        theme.colors.mainText[theme.fn.primaryShade()],
+        theme.other.shades.lighten.lighter
+      ),
+      '&:hover': {
+        background: theme.colors.lightBackground[theme.fn.primaryShade()]
+      }
     },
     active: {
       // backgroundColor: theme.fn.primaryColor() + theme.other.shades.hexColorSuffix.lightest,
