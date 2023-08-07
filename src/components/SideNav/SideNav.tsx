@@ -37,7 +37,8 @@ const useStyles = createStyles((theme) => ({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: theme.spacing.md
+    marginTop: theme.spacing.xl,
+    marginBottom: theme.spacing.xl
   }
 }))
 
@@ -70,8 +71,8 @@ function SideNav() {
           New Campaign
         </Button>
       </Navbar.Section>
-      <Navbar.Section mt="xs" mx="-xs" grow component={ScrollArea}>
-        <Box py="md">
+      <Navbar.Section mx="-xs" grow component={ScrollArea}>
+        <Box>
           <NavLink
             to=""
             icon={<DashboardIcon />}
