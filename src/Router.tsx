@@ -1,5 +1,6 @@
 import UserPanel from 'components/UserPanel'
 import LogIn from 'components/LogIn'
+import Dashboard from 'components/Dashboard'
 import Billing from 'components/Billing'
 import GetStarted from 'components/GetStarted'
 import { createBrowserRouter, Navigate, useLocation } from 'react-router-dom'
@@ -31,6 +32,7 @@ export const router = createBrowserRouter([
     element: <LogIn />
   },
   {
+    // TODO: rename the path
     path: '/dashboard',
     element: (
       <RequireAuth>
@@ -38,6 +40,10 @@ export const router = createBrowserRouter([
       </RequireAuth>
     ),
     children: [
+      {
+        path: 'dashboard',
+        element: <Dashboard />
+      },
       {
         path: 'billing',
         element: <Billing />

@@ -34,10 +34,10 @@ function SideNav() {
       <Navbar.Section mt="xs" mx="-xs" grow component={ScrollArea}>
         <Box py="md">
           <NavLink
-            to=""
+            to="dashboard"
             icon={<DashboardIcon />}
             label="Dashboard"
-            active={useResolvedPath('').pathname === match?.pathname}
+            active={useResolvedPath('dashboard').pathname === match?.pathname}
           />
           <NavLink
             to="deposit"
