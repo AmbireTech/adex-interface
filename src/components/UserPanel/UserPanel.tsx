@@ -5,7 +5,7 @@ import TopBar from 'components/TopBar'
 import { useState } from 'react'
 import { Outlet } from 'react-router-dom'
 
-function Dashboard() {
+function UserPanel() {
   const [opened, setOpened] = useState(false)
 
   // husky test
@@ -66,4 +66,4 @@ function Dashboard() {
   )
 }
 
-export default Dashboard
+export default UserPanel

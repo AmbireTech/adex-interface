@@ -1,4 +1,4 @@
-import Dashboard from 'components/Dashboard'
+import UserPanel from 'components/UserPanel'
 import LogIn from 'components/LogIn'
 import Billing from 'components/Billing'
 import GetStarted from 'components/GetStarted'
@@ -22,7 +22,7 @@ export const router = createBrowserRouter([
     path: '/',
     element: (
       <RequireAuth>
-        <Dashboard />
+        <UserPanel />
       </RequireAuth>
     )
   },
@@ -34,7 +34,7 @@ export const router = createBrowserRouter([
     path: '/dashboard',
     element: (
       <RequireAuth>
-        <Dashboard />
+        <UserPanel />
       </RequireAuth>
     ),
     children: [
