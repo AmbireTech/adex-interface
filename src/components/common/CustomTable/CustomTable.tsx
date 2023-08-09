@@ -3,9 +3,19 @@ import VisibilityIcon from 'resources/icons/Visibility'
 import { ICustomTableProps } from 'types'
 import usePagination from 'hooks/usePagination'
 import { useMemo } from 'react'
+import AnalyticsIcon from 'resources/icons/Analytics'
+import DuplicateIcon from 'resources/icons/Duplicate'
+import DeleteIcon from 'resources/icons/Delete'
 import ActionButton from './ActionButton/ActionButton'
 
-const CustomTable = ({ headings, elements, onPreview }: ICustomTableProps) => {
+const CustomTable = ({
+  headings,
+  elements,
+  onPreview,
+  onAnalytics,
+  onDuplicate,
+  onDelete
+}: ICustomTableProps) => {
   const columns: string[] = useMemo(
     () => Object.keys(elements[0]).filter((e: string) => e !== 'id'),
     [elements]
@@ -25,8 +35,7 @@ const CustomTable = ({ headings, elements, onPreview }: ICustomTableProps) => {
     [headings]
   )
 
-  // TODO: add all the events here
-  const hasAction = !!onPreview
+  const hasAction = !!onPreview || !!onAnalytics || !!onDuplicate || !!onDelete
 
   const rows = useMemo(
     () =>
@@ -50,8 +59,29 @@ const CustomTable = ({ headings, elements, onPreview }: ICustomTableProps) => {
                   {!!onPreview && (
                     <ActionButton
                       title="View PDF"
-                      icon={<VisibilityIcon />}
+                      icon={<VisibilityIcon size="20px" />}
                       action={() => onPreview(e)}
+                    />
+                  )}
+                  {!!onAnalytics && (
+                    <ActionButton
+                      title="View Analytics"
+                      icon={<AnalyticsIcon size="20px" />}
+                      action={() => onAnalytics(e)}
+                    />
+                  )}
+                  {!!onDuplicate && (
+                    <ActionButton
+                      title="Duplicate"
+                      icon={<DuplicateIcon size="20px" />}
+                      action={() => onDuplicate(e)}
+                    />
+                  )}
+                  {!!onDelete && (
+                    <ActionButton
+                      title="Delete"
+                      icon={<DeleteIcon size="20px" />}
+                      action={() => onDelete(e)}
                     />
                   )}
                 </Group>
@@ -60,7 +90,7 @@ const CustomTable = ({ headings, elements, onPreview }: ICustomTableProps) => {
           </tr>
         )
       }),
-    [columns, list, onPreview, hasAction]
+    [columns, list, hasAction, onPreview, onAnalytics, onDuplicate, onDelete]
   )
 
   return (

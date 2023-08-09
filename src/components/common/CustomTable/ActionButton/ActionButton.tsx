@@ -20,7 +20,13 @@ const ActionButton = ({
 }) => {
   const { classes } = useStyles()
   return (
-    <ActionIcon title={title} variant="transparent" onClick={action} className={classes.actionIcon}>
+    <ActionIcon
+      title={title}
+      color="secondaryText"
+      variant="transparent"
+      onClick={action}
+      className={classes.actionIcon}
+    >
       {icon}
     </ActionIcon>
   )

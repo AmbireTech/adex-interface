@@ -29,13 +29,36 @@ const elements = [
   }
 ]
 
+const handlePreview = (item: any) => {
+  console.log('item', item)
+}
+
+const handleAnalytics = (item: any) => {
+  console.log('item', item)
+}
+
+const handleDuplicate = (item: any) => {
+  console.log('item', item)
+}
+
+const handleDelete = (item: any) => {
+  console.log('item', item)
+}
+
 const Dashboard = () => {
   return (
-    <Flex>
+    <Flex justify="start">
       <Text size="sm" color="secondaryText" weight="bold">
         All Campaigns
       </Text>
-      <CustomTable headings={headings} elements={elements} />
+      <CustomTable
+        headings={headings}
+        elements={elements}
+        onPreview={handlePreview}
+        onAnalytics={handleAnalytics}
+        onDuplicate={handleDuplicate}
+        onDelete={handleDelete}
+      />
     </Flex>
   )
 }
