@@ -88,6 +88,42 @@ export const lightTheme: MantineThemeOverride = {
       '#A5A5A5',
       '#959595',
       '#868686'
+    ],
+    success: [
+      '#45B591',
+      '#32B188',
+      '#1FB081',
+      '#0CB07B', // Success
+      '#1A9069',
+      '#22775B',
+      '#26634F',
+      '#285445',
+      '#28473D',
+      '#273D36'
+    ],
+    info: [
+      '#BAA8E3',
+      '#A083E4',
+      '#865AED',
+      '#6A2AFF',
+      '#5F25E7',
+      '#5A2BC5',
+      '#5635A4',
+      '#523A89',
+      '#4C3B74',
+      '#473A64'
+    ],
+    draft: [
+      '#EBC9C0',
+      '#E9AC9B',
+      '#EF8C72',
+      '#FF6A42',
+      '#E95D38',
+      '#D25432',
+      '#B15239',
+      '#94503E',
+      '#7E4D40',
+      '#6C483F'
     ]
     // NOTE: needs 10 shades to work https://mantine.dev/theming/colors/
     // attention: ['#FFBE4D', '#FFBE4D', '#FFBE4D'],

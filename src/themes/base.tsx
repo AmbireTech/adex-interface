@@ -14,6 +14,9 @@ type ExtendedCustomColors =
   | 'lightBackground'
   | 'decorativeBorders'
   | 'mainBackground'
+  | 'success'
+  | 'info'
+  | 'draft'
   | DefaultMantineColor
 
 declare module '@mantine/core' {
