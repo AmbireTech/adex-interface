@@ -1,60 +1,11 @@
-import {
-  ActionIcon,
-  Button,
-  Flex,
-  Group,
-  Modal,
-  Pagination,
-  Table,
-  createStyles
-} from '@mantine/core'
-import { useDisclosure } from '@mantine/hooks'
+import { Flex, Group, Pagination, Table } from '@mantine/core'
 import VisibilityIcon from 'resources/icons/Visibility'
 import { ICustomTableProps } from 'types'
 import usePagination from 'hooks/usePagination'
 import { useMemo } from 'react'
-import InvoicesPDF from './InvoicesPDF'
+import ActionButton from './ActionButton/ActionButton'
 
-const useStyles = createStyles((theme) => ({
-  wrapper: {
-    border: '1px solid',
-    borderRadius: theme.radius.sm,
-    borderColor: theme.colors.decorativeBorders[theme.fn.primaryShade()],
-    padding: theme.spacing.lg
-  },
-  header: {
-    backgroundColor: theme.colors.lightBackground[theme.fn.primaryShade()],
-    padding: theme.spacing.xl
-  },
-  title: {
-    fontSize: theme.fontSizes.xl,
-    fontWeight: theme.other.fontWeights.bold
-  },
-  close: {
-    color: theme.colors.mainText[theme.fn.primaryShade()]
-  },
-  printable: {
-    [theme.other.media.print]: {
-      // NOTE: it's not fixed/absolute to body but modal.inner
-      overflow: 'visible',
-      position: 'absolute',
-      top: 0,
-      left: 0,
-      bottom: 0,
-      width: '100%',
-      padding: theme.spacing.xl
-    }
-  },
-  actionIcon: {
-    '&:hover': {
-      color: theme.colors.brand[theme.fn.primaryShade()]
-    }
-  }
-}))
-
-const CustomTable = ({ headings, elements }: ICustomTableProps) => {
-  const { classes } = useStyles()
-  const [opened, { open, close }] = useDisclosure(false)
+const CustomTable = ({ headings, elements, onPreview }: ICustomTableProps) => {
   const columns: string[] = useMemo(
     () => Object.keys(elements[0]).filter((e: string) => e !== 'id'),
     [elements]
@@ -74,36 +25,42 @@ const CustomTable = ({ headings, elements }: ICustomTableProps) => {
     [headings]
   )
 
+  // TODO: add all the events here
+  const hasAction = !!onPreview
+
   const rows = useMemo(
     () =>
-      list.map((e) => (
-        <tr key={e.id}>
-          {columns.map((column: string) => {
-            return (
-              <td key={column}>
-                {typeof e[column] === 'object' &&
-                typeof e[column].from === 'string' &&
-                typeof e[column].to === 'string'
-                  ? `${e[column].from} - ${e[column].to}`
-                  : e[column]}
+      list.map((e) => {
+        return (
+          <tr key={e.id}>
+            {columns.map((column: string) => {
+              return (
+                <td key={column}>
+                  {typeof e[column] === 'object' &&
+                  typeof e[column].from === 'string' &&
+                  typeof e[column].to === 'string'
+                    ? `${e[column].from} - ${e[column].to}`
+                    : e[column]}
+                </td>
+              )
+            })}
+            {hasAction && (
+              <td>
+                <Group>
+                  {!!onPreview && (
+                    <ActionButton
+                      title="View PDF"
+                      icon={<VisibilityIcon />}
+                      action={() => onPreview(e)}
+                    />
+                  )}
+                </Group>
               </td>
-            )
-          })}
-          <td>
-            <Group>
-              <ActionIcon
-                title="View PDF"
-                variant="transparent"
-                onClick={open}
-                className={classes.actionIcon}
-              >
-                <VisibilityIcon />
-              </ActionIcon>
-            </Group>
-          </td>
-        </tr>
-      )),
-    [columns, list, open]
+            )}
+          </tr>
+        )
+      }),
+    [columns, list, onPreview, hasAction]
   )
 
   return (
@@ -112,7 +69,7 @@ const CustomTable = ({ headings, elements }: ICustomTableProps) => {
         <thead>
           <tr>
             {head}
-            <th key="Action">Action</th>
+            {hasAction && <th key="Action">Action</th>}
           </tr>
         </thead>
         <tbody>{rows}</tbody>
@@ -127,32 +84,6 @@ const CustomTable = ({ headings, elements }: ICustomTableProps) => {
           onChange={(value) => onChange(value)}
         />
       </Group>
-      <Modal
-        title="Invoice"
-        size="xl"
-        opened={opened}
-        onClose={close}
-        centered
-        radius="sm"
-        classNames={{
-          header: classes.header,
-          title: classes.title,
-          close: classes.close
-        }}
-      >
-        <div>
-          <Group position="right">
-            <Button mt="md" mb="md" onClick={() => window.print()}>
-              Print
-            </Button>
-          </Group>
-          <div className={classes.wrapper}>
-            <div id="printable" className={classes.printable}>
-              <InvoicesPDF />
-            </div>
-          </div>
-        </div>
-      </Modal>
     </Flex>
   )
 }
