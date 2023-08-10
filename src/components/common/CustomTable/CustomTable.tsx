@@ -132,7 +132,7 @@ const CustomTable = ({
         </thead>
         <tbody>{rows}</tbody>
       </Table>
-      <Group position="right" mt="md">
+      <Group w="100%" position="right" mt="xl">
         <Pagination
           total={maxPages}
           boundaries={1}
