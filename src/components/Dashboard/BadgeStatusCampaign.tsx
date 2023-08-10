@@ -1,18 +1,10 @@
 import { Badge, Flex, Text } from '@mantine/core'
-import { ReactNode } from 'react'
 import CompletedIcon from 'resources/icons/CompletedIcon'
 import DraftIcon from 'resources/icons/Draft'
 import UnderReviewIcon from 'resources/icons/UnderReview'
+import { BadgeType, IBadgeConfig } from 'types'
 
-type BadgeType = 'draft' | 'underReview' | 'completed'
-
-type BadgeConfig = {
-  color: string
-  text: string
-  icon: ReactNode
-}
-
-const conf: Record<BadgeType, BadgeConfig> = {
+const conf: Record<BadgeType, IBadgeConfig> = {
   draft: {
     color: 'draft',
     text: 'Draft',
