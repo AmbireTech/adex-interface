@@ -1,22 +1,10 @@
-import { Container, Flex, Text, createStyles } from '@mantine/core'
+import { Container, Flex, Text } from '@mantine/core'
 import CustomTable from 'components/common/CustomTable'
 import { BadgeType } from 'types'
 import BadgeStatusCampaign from './BadgeStatusCampaign'
 import { dashboardTableElements } from './mockData'
 
-const useStyles = createStyles((theme) => ({
-  container: {
-    backgroundColor: theme.colors.mainBackground[theme.fn.primaryShade()],
-    borderRadius: theme.radius.sm,
-    boxShadow: theme.shadows.xs,
-    overflow: 'hidden',
-    padding: theme.spacing.lg,
-    margin: 0
-  }
-}))
-
 const Dashboard = () => {
-  const { classes } = useStyles()
   const headings = [
     'Campaign name',
     'Model',
@@ -55,12 +43,13 @@ const Dashboard = () => {
   }
 
   return (
-    <Flex direction="column" justify="start">
-      <Text size="sm" color="secondaryText" weight="bold">
-        All Campaigns
-      </Text>
-      <Container fluid className={classes.container}>
+    <Container fluid>
+      <Flex direction="column" justify="start">
+        <Text size="sm" color="secondaryText" weight="bold" mb="md">
+          All Campaigns
+        </Text>
         <CustomTable
+          background
           headings={headings}
           elements={elements}
           onPreview={handlePreview}
@@ -68,8 +57,8 @@ const Dashboard = () => {
           onDuplicate={handleDuplicate}
           onDelete={handleDelete}
         />
-      </Container>
-    </Flex>
+      </Flex>
+    </Container>
   )
 }
 

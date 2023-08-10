@@ -1,4 +1,4 @@
-import { Flex, Group, Pagination, Table } from '@mantine/core'
+import { Flex, Group, Pagination, Table, createStyles } from '@mantine/core'
 import VisibilityIcon from 'resources/icons/Visibility'
 import { ICustomTableProps } from 'types'
 import usePagination from 'hooks/usePagination'
@@ -8,7 +8,25 @@ import DuplicateIcon from 'resources/icons/Duplicate'
 import DeleteIcon from 'resources/icons/Delete'
 import ActionButton from './ActionButton/ActionButton'
 
+const useStyles = createStyles((theme) => ({
+  header: {
+    backgroundColor: theme.colors.alternativeBackground[theme.fn.primaryShade()]
+  },
+  border: {
+    borderRadius: theme.radius.md,
+    overflow: 'hidden'
+  },
+  background: {
+    backgroundColor: theme.colors.mainBackground[theme.fn.primaryShade()],
+    boxShadow: theme.shadows.xs
+  },
+  '#headerTitle': {
+    color: 'green'
+  }
+}))
+
 const CustomTable = ({
+  background,
   headings,
   elements,
   onPreview,
@@ -16,6 +34,7 @@ const CustomTable = ({
   onDuplicate,
   onDelete
 }: ICustomTableProps) => {
+  const { classes, cx } = useStyles()
   const columns: string[] = useMemo(
     () => Object.keys(elements[0]).filter((e: string) => e !== 'id'),
     [elements]
@@ -31,7 +50,12 @@ const CustomTable = ({
   }, [elements, startIndex, endIndex])
 
   const head = useMemo(
-    () => headings.map((heading) => <th key={heading}>{heading}</th>),
+    () =>
+      headings.map((heading) => (
+        <th id="headerTitle" key={heading}>
+          {heading}
+        </th>
+      )),
     [headings]
   )
 
@@ -95,8 +119,12 @@ const CustomTable = ({
 
   return (
     <Flex h="100%" justify="space-between" direction="column" align="center">
-      <Table highlightOnHover verticalSpacing={15}>
-        <thead>
+      <Table
+        highlightOnHover
+        verticalSpacing={15}
+        className={cx(classes.border, { [classes.background]: background })}
+      >
+        <thead className={classes.header}>
           <tr>
             {head}
             {hasAction && <th key="Action">Action</th>}
@@ -104,7 +132,7 @@ const CustomTable = ({
         </thead>
         <tbody>{rows}</tbody>
       </Table>
-      <Group position="right">
+      <Group position="right" mt="md">
         <Pagination
           total={maxPages}
           boundaries={1}

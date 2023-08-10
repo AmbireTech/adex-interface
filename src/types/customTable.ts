@@ -3,6 +3,7 @@ import { IInvoices } from './invoices'
 import { IStatements } from './statements'
 
 export interface ICustomTableProps extends PropsWithChildren {
+  background?: boolean
   headings: string[]
   elements: IInvoices[] | IStatements[] | any[]
   onPreview?: (e: any) => any
