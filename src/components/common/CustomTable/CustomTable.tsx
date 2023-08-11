@@ -19,9 +19,6 @@ const useStyles = createStyles((theme) => ({
   background: {
     backgroundColor: theme.colors.mainBackground[theme.fn.primaryShade()],
     boxShadow: theme.shadows.xs
-  },
-  '#headerTitle': {
-    color: 'green'
   }
 }))
 
@@ -50,12 +47,7 @@ const CustomTable = ({
   }, [elements, startIndex, endIndex])
 
   const head = useMemo(
-    () =>
-      headings.map((heading) => (
-        <th id="headerTitle" key={heading}>
-          {heading}
-        </th>
-      )),
+    () => headings.map((heading) => <th key={heading}>{heading}</th>),
     [headings]
   )
 

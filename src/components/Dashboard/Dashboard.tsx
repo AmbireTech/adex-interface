@@ -1,10 +1,15 @@
 import { Container, Flex, Text } from '@mantine/core'
+import { useState } from 'react'
+import { useDisclosure } from '@mantine/hooks'
 import CustomTable from 'components/common/CustomTable'
-import { BadgeType } from 'types'
+import { BadgeType, ICampaignData } from 'types'
+import { CampaignDetailsModal } from 'components/common/Modals'
 import BadgeStatusCampaign from './BadgeStatusCampaign'
 import { dashboardTableElements } from './mockData'
 
 const Dashboard = () => {
+  const [opened, { open, close }] = useDisclosure(false)
+  const [selectedItem, setSelectedItem] = useState<ICampaignData | null>(null)
   const headings = [
     'Campaign name',
     'Model',
@@ -28,6 +33,8 @@ const Dashboard = () => {
 
   const handlePreview = (item: any) => {
     console.log('item', item)
+    setSelectedItem(item)
+    open()
   }
 
   const handleAnalytics = (item: any) => {
@@ -58,6 +65,7 @@ const Dashboard = () => {
           onDelete={handleDelete}
         />
       </Flex>
+      <CampaignDetailsModal item={selectedItem} opened={opened} close={close} />
     </Container>
   )
 }
