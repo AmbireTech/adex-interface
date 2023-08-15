@@ -14,7 +14,117 @@ const dashboardTableElements: ICampaignData[] = [
     period: {
       from: '08.02.23',
       to: '08.03.23'
-    }
+    },
+    placements: [
+      {
+        id: 1,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 2,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 3,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 4,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 12,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 5,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 6,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 7,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 8,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 9,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 10,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 11,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      }
+    ]
   },
   {
     id: 2,
@@ -29,7 +139,18 @@ const dashboardTableElements: ICampaignData[] = [
     period: {
       from: '08.02.23',
       to: '08.03.23'
-    }
+    },
+    placements: [
+      {
+        id: 1,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      }
+    ]
   },
   {
     id: 3,
@@ -44,7 +165,117 @@ const dashboardTableElements: ICampaignData[] = [
     period: {
       from: '08.02.23',
       to: '08.03.23'
-    }
+    },
+    placements: [
+      {
+        id: 1,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 2,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 3,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 4,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 12,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 5,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 6,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 7,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 8,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 9,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 10,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 11,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      }
+    ]
   },
   {
     id: 4,
@@ -59,7 +290,117 @@ const dashboardTableElements: ICampaignData[] = [
     period: {
       from: '08.02.23',
       to: '08.03.23'
-    }
+    },
+    placements: [
+      {
+        id: 1,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 2,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 3,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 4,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 12,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 5,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 6,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 7,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 8,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 9,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 10,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 11,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      }
+    ]
   },
   {
     id: 5,
@@ -74,7 +415,117 @@ const dashboardTableElements: ICampaignData[] = [
     period: {
       from: '08.02.23',
       to: '08.03.23'
-    }
+    },
+    placements: [
+      {
+        id: 1,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 2,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 3,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 4,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 12,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 5,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 6,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 7,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 8,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 9,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 10,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 11,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      }
+    ]
   },
   {
     id: 6,
@@ -89,7 +540,117 @@ const dashboardTableElements: ICampaignData[] = [
     period: {
       from: '08.02.23',
       to: '08.03.23'
-    }
+    },
+    placements: [
+      {
+        id: 1,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 2,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 3,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 4,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 12,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 5,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 6,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 7,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 8,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 9,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 10,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 11,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      }
+    ]
   },
   {
     id: 7,
@@ -104,7 +665,117 @@ const dashboardTableElements: ICampaignData[] = [
     period: {
       from: '08.02.23',
       to: '08.03.23'
-    }
+    },
+    placements: [
+      {
+        id: 1,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 2,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 3,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 4,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 12,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 5,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 6,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 7,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 8,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 9,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 10,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 11,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      }
+    ]
   },
   {
     id: 8,
@@ -119,7 +790,117 @@ const dashboardTableElements: ICampaignData[] = [
     period: {
       from: '08.02.23',
       to: '08.03.23'
-    }
+    },
+    placements: [
+      {
+        id: 1,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 2,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 3,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 4,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 12,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 5,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 6,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 7,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 8,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 9,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 10,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 11,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      }
+    ]
   },
   {
     id: 9,
@@ -134,7 +915,117 @@ const dashboardTableElements: ICampaignData[] = [
     period: {
       from: '08.02.23',
       to: '08.03.23'
-    }
+    },
+    placements: [
+      {
+        id: 1,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 2,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 3,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 4,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 12,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 5,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 6,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 7,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 8,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 9,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 10,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 11,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      }
+    ]
   },
   {
     id: 10,
@@ -149,7 +1040,117 @@ const dashboardTableElements: ICampaignData[] = [
     period: {
       from: '08.02.23',
       to: '08.03.23'
-    }
+    },
+    placements: [
+      {
+        id: 1,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 2,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 3,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 4,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 12,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 5,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 6,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 7,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 8,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 9,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 10,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 11,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      }
+    ]
   },
   {
     id: 11,
@@ -164,7 +1165,117 @@ const dashboardTableElements: ICampaignData[] = [
     period: {
       from: '08.02.23',
       to: '08.03.23'
-    }
+    },
+    placements: [
+      {
+        id: 1,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 2,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 3,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 4,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 12,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 5,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 6,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 7,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 8,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 9,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 10,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 11,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      }
+    ]
   },
   {
     id: 12,
@@ -179,7 +1290,117 @@ const dashboardTableElements: ICampaignData[] = [
     period: {
       from: '08.02.23',
       to: '08.03.23'
-    }
+    },
+    placements: [
+      {
+        id: 1,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 2,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 3,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 4,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 12,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 5,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 6,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 7,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 8,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 9,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 10,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      },
+      {
+        id: 11,
+        website: 'animefire.net',
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '186.53 DAI',
+        averageCPM: '0.15 DAI'
+      }
+    ]
   }
 ]
 

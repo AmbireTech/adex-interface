@@ -3,6 +3,16 @@ interface IPeriod {
   to: string
 }
 
+export interface IPlacements {
+  id: number
+  website: string
+  impressions: number
+  clicks: number
+  ctrPercents: number
+  spent: string
+  averageCPM: string
+}
+
 export interface ICampaignData {
   id: number
   campaignName: string
@@ -14,4 +24,5 @@ export interface ICampaignData {
   clicks: number
   ctr: number
   period: IPeriod
+  placements: IPlacements[]
 }

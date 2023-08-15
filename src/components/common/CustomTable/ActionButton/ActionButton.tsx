@@ -1,5 +1,5 @@
-import { ActionIcon, createStyles } from '@mantine/core'
-import { ReactNode } from 'react'
+import { ActionIcon, Flex, createStyles } from '@mantine/core'
+import { IActionButtonProps } from 'types'
 
 const useStyles = createStyles((theme) => ({
   actionIcon: {
@@ -9,26 +9,22 @@ const useStyles = createStyles((theme) => ({
   }
 }))
 
-const ActionButton = ({
-  action,
-  icon,
-  title
-}: {
-  action: (e: any) => any
-  icon: ReactNode
-  title: string
-}) => {
+const ActionButton = ({ action, icon, title, children }: IActionButtonProps) => {
   const { classes } = useStyles()
   return (
-    <ActionIcon
-      title={title}
-      color="secondaryText"
-      variant="transparent"
-      onClick={action}
-      className={classes.actionIcon}
-    >
-      {icon}
-    </ActionIcon>
+    <Flex align="center">
+      <ActionIcon
+        title={title}
+        color="secondaryText"
+        variant="transparent"
+        onClick={action}
+        className={classes.actionIcon}
+        mr="md"
+      >
+        {icon}
+      </ActionIcon>
+      {children}
+    </Flex>
   )
 }
 

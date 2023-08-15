@@ -4,12 +4,14 @@ import { useDisclosure } from '@mantine/hooks'
 import CustomTable from 'components/common/CustomTable'
 import { BadgeType, ICampaignData } from 'types'
 import { CampaignDetailsModal } from 'components/common/Modals'
+import { useNavigate } from 'react-router-dom'
 import BadgeStatusCampaign from './BadgeStatusCampaign'
 import { dashboardTableElements } from './mockData'
 
 const Dashboard = () => {
   const [opened, { open, close }] = useDisclosure(false)
   const [selectedItem, setSelectedItem] = useState<ICampaignData | null>(null)
+  const navigate = useNavigate()
   const headings = [
     'Campaign name',
     'Model',
@@ -24,28 +26,33 @@ const Dashboard = () => {
 
   const elements = dashboardTableElements.map((el) => {
     return {
-      ...el,
+      id: el.id,
+      campaignName: el.campaignName,
+      model: el.model,
       status: <BadgeStatusCampaign type={el.status as BadgeType} />,
+      served: el.served,
+      budget: el.budget,
       impressions: el.impressions.toLocaleString(),
-      clicks: el.clicks.toLocaleString()
+      clicks: el.clicks.toLocaleString(),
+      ctr: el.ctr,
+      period: el.period
     }
   })
 
-  const handlePreview = (item: any) => {
-    console.log('item', item)
+  const handlePreview = (item: ICampaignData) => {
     setSelectedItem(item)
     open()
   }
 
-  const handleAnalytics = (item: any) => {
+  const handleAnalytics = (item: ICampaignData) => {
+    navigate(`/dashboard/campaign-analytics/${item.id}`)
+  }
+
+  const handleDuplicate = (item: ICampaignData) => {
     console.log('item', item)
   }
 
-  const handleDuplicate = (item: any) => {
-    console.log('item', item)
-  }
-
-  const handleDelete = (item: any) => {
+  const handleDelete = (item: ICampaignData) => {
     console.log('item', item)
   }
 

@@ -3,6 +3,7 @@ import LogIn from 'components/LogIn'
 import Dashboard from 'components/Dashboard'
 import Billing from 'components/Billing'
 import GetStarted from 'components/GetStarted'
+import CampaignAnalytics from 'components/CampaignAnalytics'
 import { createBrowserRouter, Navigate, useLocation } from 'react-router-dom'
 
 import useAccount from 'hooks/useAccount'
@@ -44,6 +45,7 @@ export const router = createBrowserRouter([
         path: 'dashboard',
         element: <Dashboard />
       },
+      { path: 'campaign-analytics/:id', element: <CampaignAnalytics /> },
       {
         path: 'billing',
         element: <Billing />
