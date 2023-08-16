@@ -5,6 +5,7 @@ import DownloadIcon from 'resources/icons/Download'
 import LeftChevronIcon from 'resources/icons/LeftChevron'
 import Placements from './Placements'
 import { dashboardTableElements } from '../Dashboard/mockData'
+import Creatives from './Creatives'
 
 const GoBack = ({ title }: { title: string }) => {
   const navigate = useNavigate()
@@ -60,7 +61,7 @@ const CampaignAnalytics = () => {
           REGIONS
         </Tabs.Panel>
         <Tabs.Panel value="creatives" pt="xs">
-          CREATIVES
+          <Creatives creatives={campaignDetails?.creatives} />
         </Tabs.Panel>
       </Tabs>
     </Container>

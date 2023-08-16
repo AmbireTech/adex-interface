@@ -1,4 +1,5 @@
 import { ICampaignData } from 'types'
+import Banner from 'resources/banners/banner1.png'
 
 const dashboardTableElements: ICampaignData[] = [
   {
@@ -124,6 +125,16 @@ const dashboardTableElements: ICampaignData[] = [
         spent: '186.53 DAI',
         averageCPM: '0.15 DAI'
       }
+    ],
+    creatives: [
+      {
+        id: 1,
+        media: Banner,
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '18.53 DAI'
+      }
     ]
   },
   {
@@ -149,6 +160,16 @@ const dashboardTableElements: ICampaignData[] = [
         ctrPercents: 0.712,
         spent: '186.53 DAI',
         averageCPM: '0.15 DAI'
+      }
+    ],
+    creatives: [
+      {
+        id: 1,
+        media: Banner,
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '18.53 DAI'
       }
     ]
   },
@@ -275,6 +296,16 @@ const dashboardTableElements: ICampaignData[] = [
         spent: '186.53 DAI',
         averageCPM: '0.15 DAI'
       }
+    ],
+    creatives: [
+      {
+        id: 1,
+        media: Banner,
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '18.53 DAI'
+      }
     ]
   },
   {
@@ -399,6 +430,16 @@ const dashboardTableElements: ICampaignData[] = [
         ctrPercents: 0.712,
         spent: '186.53 DAI',
         averageCPM: '0.15 DAI'
+      }
+    ],
+    creatives: [
+      {
+        id: 1,
+        media: Banner,
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '18.53 DAI'
       }
     ]
   },
@@ -525,6 +566,16 @@ const dashboardTableElements: ICampaignData[] = [
         spent: '186.53 DAI',
         averageCPM: '0.15 DAI'
       }
+    ],
+    creatives: [
+      {
+        id: 1,
+        media: Banner,
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '18.53 DAI'
+      }
     ]
   },
   {
@@ -649,6 +700,16 @@ const dashboardTableElements: ICampaignData[] = [
         ctrPercents: 0.712,
         spent: '186.53 DAI',
         averageCPM: '0.15 DAI'
+      }
+    ],
+    creatives: [
+      {
+        id: 1,
+        media: Banner,
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '18.53 DAI'
       }
     ]
   },
@@ -775,6 +836,16 @@ const dashboardTableElements: ICampaignData[] = [
         spent: '186.53 DAI',
         averageCPM: '0.15 DAI'
       }
+    ],
+    creatives: [
+      {
+        id: 1,
+        media: Banner,
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '18.53 DAI'
+      }
     ]
   },
   {
@@ -899,6 +970,16 @@ const dashboardTableElements: ICampaignData[] = [
         ctrPercents: 0.712,
         spent: '186.53 DAI',
         averageCPM: '0.15 DAI'
+      }
+    ],
+    creatives: [
+      {
+        id: 1,
+        media: Banner,
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '18.53 DAI'
       }
     ]
   },
@@ -1025,6 +1106,16 @@ const dashboardTableElements: ICampaignData[] = [
         spent: '186.53 DAI',
         averageCPM: '0.15 DAI'
       }
+    ],
+    creatives: [
+      {
+        id: 1,
+        media: Banner,
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '18.53 DAI'
+      }
     ]
   },
   {
@@ -1149,6 +1240,16 @@ const dashboardTableElements: ICampaignData[] = [
         ctrPercents: 0.712,
         spent: '186.53 DAI',
         averageCPM: '0.15 DAI'
+      }
+    ],
+    creatives: [
+      {
+        id: 1,
+        media: Banner,
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '18.53 DAI'
       }
     ]
   },
@@ -1275,6 +1376,16 @@ const dashboardTableElements: ICampaignData[] = [
         spent: '186.53 DAI',
         averageCPM: '0.15 DAI'
       }
+    ],
+    creatives: [
+      {
+        id: 1,
+        media: Banner,
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '18.53 DAI'
+      }
     ]
   },
   {
@@ -1399,6 +1510,16 @@ const dashboardTableElements: ICampaignData[] = [
         ctrPercents: 0.712,
         spent: '186.53 DAI',
         averageCPM: '0.15 DAI'
+      }
+    ],
+    creatives: [
+      {
+        id: 1,
+        media: Banner,
+        impressions: 1204527,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        spent: '18.53 DAI'
       }
     ]
   }

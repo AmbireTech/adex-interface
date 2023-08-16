@@ -13,6 +13,15 @@ export interface IPlacements {
   averageCPM: string
 }
 
+export interface ICreative {
+  id: number
+  media: string
+  impressions: number
+  clicks: number
+  ctrPercents: number
+  spent: string
+}
+
 export interface ICampaignData {
   id: number
   campaignName: string
@@ -25,4 +34,5 @@ export interface ICampaignData {
   ctr: number
   period: IPeriod
   placements: IPlacements[]
+  creatives: ICreative[]
 }

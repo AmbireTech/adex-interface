@@ -12,7 +12,7 @@ const Placements = ({ placements }: { placements: IPlacements[] | undefined }) =
     ...item,
     impressions: item.impressions.toLocaleString(),
     clicks: item.clicks.toLocaleString(),
-    ctrPercents: `${item.ctrPercents}%`
+    ctrPercents: `${item.ctrPercents} %`
   }))
   return <CustomTable background headings={headings} elements={elements} />
 }
