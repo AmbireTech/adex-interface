@@ -59,7 +59,7 @@ const CampaignAnalytics = () => {
           <Placements placements={campaignDetails?.placements} />
         </Tabs.Panel>
         <Tabs.Panel value="regions" pt="xs">
-          <Regions placements={campaignDetails?.placements} />
+          <Regions regions={campaignDetails?.regions} />
         </Tabs.Panel>
         <Tabs.Panel value="creatives" pt="xs">
           <Creatives creatives={campaignDetails?.creatives} />

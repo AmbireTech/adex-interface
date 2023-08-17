@@ -135,6 +135,18 @@ const dashboardTableElements: ICampaignData[] = [
         ctrPercents: 0.712,
         spent: '18.53 DAI'
       }
+    ],
+    regions: [
+      {
+        id: 1,
+        country: 'United States',
+        share: 48.44,
+        impressions: 12343421,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        averageCPM: '0.15 DAI',
+        spent: '181.53 DAI'
+      }
     ]
   },
   {
@@ -170,6 +182,18 @@ const dashboardTableElements: ICampaignData[] = [
         clicks: 10048,
         ctrPercents: 0.712,
         spent: '18.53 DAI'
+      }
+    ],
+    regions: [
+      {
+        id: 1,
+        country: 'United States',
+        share: 48.44,
+        impressions: 12343421,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        averageCPM: '0.15 DAI',
+        spent: '181.53 DAI'
       }
     ]
   },
@@ -306,6 +330,18 @@ const dashboardTableElements: ICampaignData[] = [
         ctrPercents: 0.712,
         spent: '18.53 DAI'
       }
+    ],
+    regions: [
+      {
+        id: 1,
+        country: 'United States',
+        share: 48.44,
+        impressions: 12343421,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        averageCPM: '0.15 DAI',
+        spent: '181.53 DAI'
+      }
     ]
   },
   {
@@ -440,6 +476,18 @@ const dashboardTableElements: ICampaignData[] = [
         clicks: 10048,
         ctrPercents: 0.712,
         spent: '18.53 DAI'
+      }
+    ],
+    regions: [
+      {
+        id: 1,
+        country: 'United States',
+        share: 48.44,
+        impressions: 12343421,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        averageCPM: '0.15 DAI',
+        spent: '181.53 DAI'
       }
     ]
   },
@@ -576,6 +624,18 @@ const dashboardTableElements: ICampaignData[] = [
         ctrPercents: 0.712,
         spent: '18.53 DAI'
       }
+    ],
+    regions: [
+      {
+        id: 1,
+        country: 'United States',
+        share: 48.44,
+        impressions: 12343421,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        averageCPM: '0.15 DAI',
+        spent: '181.53 DAI'
+      }
     ]
   },
   {
@@ -710,6 +770,18 @@ const dashboardTableElements: ICampaignData[] = [
         clicks: 10048,
         ctrPercents: 0.712,
         spent: '18.53 DAI'
+      }
+    ],
+    regions: [
+      {
+        id: 1,
+        country: 'United States',
+        share: 48.44,
+        impressions: 12343421,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        averageCPM: '0.15 DAI',
+        spent: '181.53 DAI'
       }
     ]
   },
@@ -846,6 +918,18 @@ const dashboardTableElements: ICampaignData[] = [
         ctrPercents: 0.712,
         spent: '18.53 DAI'
       }
+    ],
+    regions: [
+      {
+        id: 1,
+        country: 'United States',
+        share: 48.44,
+        impressions: 12343421,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        averageCPM: '0.15 DAI',
+        spent: '181.53 DAI'
+      }
     ]
   },
   {
@@ -980,6 +1064,18 @@ const dashboardTableElements: ICampaignData[] = [
         clicks: 10048,
         ctrPercents: 0.712,
         spent: '18.53 DAI'
+      }
+    ],
+    regions: [
+      {
+        id: 1,
+        country: 'United States',
+        share: 48.44,
+        impressions: 12343421,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        averageCPM: '0.15 DAI',
+        spent: '181.53 DAI'
       }
     ]
   },
@@ -1116,6 +1212,18 @@ const dashboardTableElements: ICampaignData[] = [
         ctrPercents: 0.712,
         spent: '18.53 DAI'
       }
+    ],
+    regions: [
+      {
+        id: 1,
+        country: 'United States',
+        share: 48.44,
+        impressions: 12343421,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        averageCPM: '0.15 DAI',
+        spent: '181.53 DAI'
+      }
     ]
   },
   {
@@ -1250,6 +1358,18 @@ const dashboardTableElements: ICampaignData[] = [
         clicks: 10048,
         ctrPercents: 0.712,
         spent: '18.53 DAI'
+      }
+    ],
+    regions: [
+      {
+        id: 1,
+        country: 'United States',
+        share: 48.44,
+        impressions: 12343421,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        averageCPM: '0.15 DAI',
+        spent: '181.53 DAI'
       }
     ]
   },
@@ -1386,6 +1506,18 @@ const dashboardTableElements: ICampaignData[] = [
         ctrPercents: 0.712,
         spent: '18.53 DAI'
       }
+    ],
+    regions: [
+      {
+        id: 1,
+        country: 'United States',
+        share: 48.44,
+        impressions: 12343421,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        averageCPM: '0.15 DAI',
+        spent: '181.53 DAI'
+      }
     ]
   },
   {
@@ -1520,6 +1652,18 @@ const dashboardTableElements: ICampaignData[] = [
         clicks: 10048,
         ctrPercents: 0.712,
         spent: '18.53 DAI'
+      }
+    ],
+    regions: [
+      {
+        id: 1,
+        country: 'United States',
+        share: 48.44,
+        impressions: 12343421,
+        clicks: 10048,
+        ctrPercents: 0.712,
+        averageCPM: '0.15 DAI',
+        spent: '181.53 DAI'
       }
     ]
   }

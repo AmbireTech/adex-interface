@@ -1,14 +1,14 @@
 import CustomTableWithDropdown from 'components/common/CustomTableWithDropdown'
-import { IPlacements } from 'types'
+import { IRegion } from 'types'
 
-const headings = ['Website', 'Impressions', 'Clicks', 'CTR%', 'Spent', 'Average CPM']
+const headings = ['Country', 'Share', 'Impressions', 'Clicks', 'CTR%', 'Average CPM', 'Spent']
 
-const Regions = ({ placements }: { placements: IPlacements[] | undefined }) => {
-  if (!placements?.length) {
+const Regions = ({ regions }: { regions: IRegion[] | undefined }) => {
+  if (!regions?.length) {
     return <div>No placement found</div>
   }
 
-  const elements = placements?.map((item) => ({
+  const elements = regions?.map((item) => ({
     ...item,
     impressions: item.impressions.toLocaleString(),
     clicks: item.clicks.toLocaleString(),

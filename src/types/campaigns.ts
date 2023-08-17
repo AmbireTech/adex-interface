@@ -3,7 +3,7 @@ interface IPeriod {
   to: string
 }
 
-export interface IPlacements {
+export interface IPlacement {
   id: number
   website: string
   impressions: number
@@ -22,6 +22,17 @@ export interface ICreative {
   spent: string
 }
 
+export interface IRegion {
+  id: number
+  country: string
+  share: number
+  impressions: number
+  clicks: number
+  ctrPercents: number
+  averageCPM: string
+  spent: string
+}
+
 export interface ICampaignData {
   id: number
   campaignName: string
@@ -33,6 +44,7 @@ export interface ICampaignData {
   clicks: number
   ctr: number
   period: IPeriod
-  placements: IPlacements[]
+  placements: IPlacement[]
   creatives: ICreative[]
+  regions: IRegion[]
 }

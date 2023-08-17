@@ -1,9 +1,9 @@
 import CustomTable from 'components/common/CustomTable'
-import { IPlacements } from 'types'
+import { IPlacement } from 'types'
 
 const headings = ['Website', 'Impressions', 'Clicks', 'CTR%', 'Spent', 'Average CPM']
 
-const Placements = ({ placements }: { placements: IPlacements[] | undefined }) => {
+const Placements = ({ placements }: { placements: IPlacement[] | undefined }) => {
   if (!placements?.length) {
     return <div>No placement found</div>
   }
