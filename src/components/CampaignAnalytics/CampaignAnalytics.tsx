@@ -6,6 +6,7 @@ import LeftChevronIcon from 'resources/icons/LeftChevron'
 import Placements from './Placements'
 import { dashboardTableElements } from '../Dashboard/mockData'
 import Creatives from './Creatives'
+import Regions from './Regions'
 
 const GoBack = ({ title }: { title: string }) => {
   const navigate = useNavigate()
@@ -58,7 +59,7 @@ const CampaignAnalytics = () => {
           <Placements placements={campaignDetails?.placements} />
         </Tabs.Panel>
         <Tabs.Panel value="regions" pt="xs">
-          REGIONS
+          <Regions placements={campaignDetails?.placements} />
         </Tabs.Panel>
         <Tabs.Panel value="creatives" pt="xs">
           <Creatives creatives={campaignDetails?.creatives} />
