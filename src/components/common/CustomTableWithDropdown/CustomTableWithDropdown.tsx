@@ -84,8 +84,8 @@ const CustomTableWithDropdown = ({ background, headings, elements }: ICustomTabl
             </tr>
             {expandedRows.includes(e.id.toString()) && (
               <tr>
-                <td colSpan={headings.length}>
-                  <h1>World map here</h1>
+                <td colSpan={headings.length} height={600}>
+                  {/* content here */}
                 </td>
               </tr>
             )}
