@@ -5,7 +5,13 @@ import TopBar from 'components/TopBar'
 import { useState } from 'react'
 import { Outlet } from 'react-router-dom'
 
-const useStyles = createStyles(() => ({
+const useStyles = createStyles((theme) => ({
+  main: {
+    backgroundColor:
+      theme.colorScheme === 'dark'
+        ? theme.colors.darkBackground[theme.fn.primaryShade()]
+        : theme.colors.lightBackground[theme.fn.primaryShade()]
+  },
   header: {
     backgroundColor: 'inherit'
   }
@@ -24,6 +30,7 @@ function Dashboard() {
       navbarOffsetBreakpoint="sm"
       asideOffsetBreakpoint="sm"
       fixed
+      className={classes.main}
       navbar={
         <Navbar hiddenBreakpoint="sm" width={{ sm: 210 }} height="100%" p="xs" hidden={!opened}>
           <MediaQuery largerThan="sm" styles={{ display: 'none' }}>
@@ -62,14 +69,6 @@ function Dashboard() {
           <TopBar />
         </Header>
       }
-      styles={(theme) => ({
-        main: {
-          backgroundColor:
-            theme.colorScheme === 'dark'
-              ? theme.colors.dark[8]
-              : theme.colors.lightBackground[theme.fn.primaryShade()]
-        }
-      })}
     >
       <Outlet />
       {/* Your application here */}

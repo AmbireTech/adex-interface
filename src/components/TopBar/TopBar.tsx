@@ -7,12 +7,12 @@ import {
   Indicator,
   Menu,
   rem,
-  createStyles
-  // NavLink
+  createStyles,
+  UnstyledButton
 } from '@mantine/core'
 import { capitalizeFirstLetter, formatDate, maskAddress } from 'helpers/formatters'
 import useAccount from 'hooks/useAccount'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import BellIcon from 'resources/icons/Bell'
 import DownArrowIcon from 'resources/icons/DownArrow'
 import LogoutIcon from 'resources/icons/Logout'
@@ -22,12 +22,22 @@ import Blockies from 'components/common/Blockies'
 import { useLocation } from 'react-router-dom'
 import StakingIcon from 'resources/icons/Staking'
 
-const useStyles = createStyles(() => ({
+const useStyles = createStyles((theme) => ({
   rotateUpsideDown: {
-    transform: 'rotate(180deg)'
+    transform: 'scale(-1)'
   },
   menu: {
     cursor: 'pointer'
+  },
+  icon: {
+    width: rem(14),
+    height: rem(14)
+  },
+  item: {
+    '&:hover': {
+      border: `1px solid ${theme.colors.decorativeBorders[theme.fn.primaryShade()]}`,
+      borderRadius: theme.radius.sm
+    }
   }
 }))
 
@@ -36,8 +46,10 @@ function TopBar() {
   const { adexAccount } = useAccount()
   const location = useLocation()
   const splitPath = location.pathname.split('/')
-  const title =
-    splitPath[splitPath.length - 1] === '' ? 'dashboard' : splitPath[splitPath.length - 1]
+  const title = useMemo(
+    () => (splitPath[splitPath.length - 1] === '' ? 'dashboard' : splitPath[splitPath.length - 1]),
+    [splitPath]
+  )
 
   const [opened, setOpened] = useState<boolean>(false)
 
@@ -57,33 +69,43 @@ function TopBar() {
             </ActionIcon>
           </Indicator>
         </Group>
-        <div className={classes.menu}>
-          <Menu opened={opened} onChange={setOpened} width={rem(200)}>
-            <Menu.Target>
-              <Flex direction="row" gap="md" align="center">
+
+        <Menu
+          opened={opened}
+          onChange={setOpened}
+          width={rem(200)}
+          classNames={{ item: classes.item }}
+        >
+          <Menu.Target>
+            <UnstyledButton>
+              <Group>
                 <Blockies seedString={adexAccount?.address || ''} />
-                <Flex direction="column">
-                  <Text inline weight="bold" size="xs">
+                <div>
+                  <Text weight="bold" size="xs">
                     John Doe
                   </Text>
-                  <Text inline color="secondaryText" size="xs">
+                  <Text color="secondaryText" size="xs">
                     {maskAddress(adexAccount?.address || '')}
                   </Text>
-                </Flex>
+                </div>
                 <DownArrowIcon
                   size={rem(10)}
                   className={cx({ [classes.rotateUpsideDown]: opened })}
                 />
-              </Flex>
-            </Menu.Target>
-            <Menu.Dropdown>
-              <Menu.Item rightSection={<WithdrawIcon size={rem(14)} />}>Withdraw funds</Menu.Item>
-              <Menu.Item rightSection={<StakingIcon size={rem(14)} />}>Staking</Menu.Item>
-              <Menu.Item rightSection={<ValidatorsIcon size={rem(14)} />}>Validators</Menu.Item>
-              <Menu.Item rightSection={<LogoutIcon size={rem(14)} />}>Log out</Menu.Item>
-            </Menu.Dropdown>
-          </Menu>
-        </div>
+              </Group>
+            </UnstyledButton>
+          </Menu.Target>
+          <Menu.Dropdown>
+            <Menu.Item rightSection={<WithdrawIcon className={classes.icon} />}>
+              Withdraw funds
+            </Menu.Item>
+            <Menu.Item rightSection={<StakingIcon className={classes.icon} />}>Staking</Menu.Item>
+            <Menu.Item rightSection={<ValidatorsIcon className={classes.icon} />}>
+              Validators
+            </Menu.Item>
+            <Menu.Item rightSection={<LogoutIcon className={classes.icon} />}>Log out</Menu.Item>
+          </Menu.Dropdown>
+        </Menu>
       </Flex>
     </Flex>
   )
