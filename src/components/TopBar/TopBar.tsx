@@ -45,7 +45,7 @@ function TopBar() {
   const { classes, cx } = useStyles()
   const { adexAccount } = useAccount()
   const location = useLocation()
-  const splitPath = location.pathname.split('/')
+  const splitPath = useMemo(() => location.pathname.split('/'), [location.pathname])
   const title = useMemo(
     () => (splitPath[splitPath.length - 1] === '' ? 'dashboard' : splitPath[splitPath.length - 1]),
     [splitPath]
