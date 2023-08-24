@@ -5,9 +5,9 @@ import { accountBalance } from './mockedData'
 
 const useStyles = createStyles((theme) => ({
   rotateUpsideDown: {
-    transform: 'rotate(180deg)'
+    transform: 'scale(-1)'
   },
-  menu: {
+  pointer: {
     cursor: 'pointer'
   },
   secondaryColor: {
@@ -38,20 +38,18 @@ const Balance = () => {
       <Text size="sm" color="mainText" weight="bold">
         Balance
       </Text>
-      <Flex
-        direction="row"
-        align="center"
-        justify="space-between"
-        className={classes.menu}
-        onClick={() => setOpened((prevState) => !prevState)}
-      >
+      <Flex direction="row" align="center" justify="space-between">
         <FormattedBalance balance={accountBalance.totalInUSD} />
         {!!accountBalance.balanceByTokens.length && (
-          <DownArrowIcon size={rem(10)} className={cx({ [classes.rotateUpsideDown]: opened })} />
+          <DownArrowIcon
+            size={rem(10)}
+            className={cx(classes.pointer, { [classes.rotateUpsideDown]: opened })}
+            onClick={() => setOpened((prevState) => !prevState)}
+          />
         )}
       </Flex>
 
-      {opened && !!accountBalance.balanceByTokens.length && (
+      {opened && (
         <Flex direction="column">
           {accountBalance.balanceByTokens.map((item) => (
             <Flex justify="space-between" key={item.id} className={classes.secondaryColor}>

@@ -17,6 +17,7 @@ import BillingIcon from 'resources/icons/Billing'
 import HelpIcon from 'resources/icons/Help'
 import AdExLogo from 'resources/logos/AdExLogo'
 import { useMemo } from 'react'
+import { appVersion } from 'helpers'
 import NavLink from './NavLink'
 import Balance from './Balance'
 
@@ -102,7 +103,7 @@ function SideNav() {
           All Rights Reserved.
         </Text>
         <Text color="secondaryText" size="sm">
-          V.0.00.01
+          V.{appVersion}
         </Text>
       </Navbar.Section>
     </>
