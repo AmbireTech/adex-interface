@@ -8,7 +8,7 @@ const headings = ['Country', 'Share', 'Impressions', 'Clicks', 'CTR%', 'Average 
 
 const Regions = ({ regions }: { regions: IRegion[] | undefined }) => {
   if (!regions?.length) {
-    return <div>No placement found</div>
+    return <div>No regions found</div>
   }
 
   const elements = regions?.map((item) => ({

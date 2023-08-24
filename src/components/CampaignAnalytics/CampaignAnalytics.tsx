@@ -7,6 +7,7 @@ import Placements from './Placements'
 import { dashboardTableElements } from '../Dashboard/mockData'
 import Creatives from './Creatives'
 import Regions from './Regions'
+import TimeFrame from './TimeFrame'
 
 const GoBack = ({ title }: { title: string }) => {
   const navigate = useNavigate()
@@ -53,7 +54,7 @@ const CampaignAnalytics = () => {
           </Flex>
         </Flex>
         <Tabs.Panel value="timeframe" pt="xs">
-          TIME FRAME
+          <TimeFrame timeFrames={[{}]} />
         </Tabs.Panel>
         <Tabs.Panel value="placements" pt="xs">
           <Placements placements={campaignDetails?.placements} />
