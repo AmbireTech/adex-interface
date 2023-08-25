@@ -1,6 +1,8 @@
 import { Flex, createStyles, rem, Image, Text } from '@mantine/core'
 import { useState } from 'react'
+
 import DownArrowIcon from 'resources/icons/DownArrow'
+import { formatCurrency } from 'helpers'
 import { accountBalance } from './mockedData'
 
 const useStyles = createStyles((theme) => ({
@@ -16,15 +18,22 @@ const useStyles = createStyles((theme) => ({
 }))
 
 const FormattedBalance = ({ balance }: { balance: number }) => {
-  const splitByDecimal = balance.toLocaleString().split('.')
-  if (!splitByDecimal[1]) splitByDecimal[1] = '00'
+  const digitsAfterFloatingPoint: number = 2
+  const formattedBalance = formatCurrency(balance, digitsAfterFloatingPoint)
+
+  const integerPart = formattedBalance.substring(
+    0,
+    formattedBalance.length - (digitsAfterFloatingPoint + 1)
+  )
+  const decimalPart = formattedBalance.substring(formattedBalance.length - digitsAfterFloatingPoint)
+
   return (
     <Flex direction="row" align="baseline" justify="flex-start">
       <Text size="lg" weight="bold">
-        $ {splitByDecimal[0]}
+        $ {integerPart}
       </Text>
       <Text size="sm" weight="bold">
-        .{splitByDecimal[1]}
+        .{decimalPart}
       </Text>
     </Flex>
   )
