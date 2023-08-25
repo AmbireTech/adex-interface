@@ -4,7 +4,6 @@ import { useState } from 'react'
 import BillingDetailsIcon from 'resources/icons/BillingDetails'
 import InvoiceIcon from 'resources/icons/Invoice'
 import StatementsIcon from 'resources/icons/Statements'
-import { CustomCardType } from 'types'
 import BillingDetails from './BillingDetails'
 import Invoices from './Invoices'
 import AccountStatements from './AccountStatements'
@@ -57,7 +56,7 @@ function Billing() {
             color="secondary"
             active={selectedTab === TabType.BillingTab}
             action={() => handleTabClicked(TabType.BillingTab)}
-            variant={CustomCardType.shadow}
+            variant="shadow"
           />
           <CustomCard
             width={300}
@@ -67,7 +66,7 @@ function Billing() {
             color="secondary"
             active={selectedTab === TabType.InvoicesTab}
             action={() => handleTabClicked(TabType.InvoicesTab)}
-            variant={CustomCardType.shadow}
+            variant="shadow"
           />
           <CustomCard
             width={300}
@@ -77,7 +76,7 @@ function Billing() {
             color="secondary"
             active={selectedTab === TabType.StatementsTab}
             action={() => handleTabClicked(TabType.StatementsTab)}
-            variant={CustomCardType.shadow}
+            variant="shadow"
           />
         </Stack>
       </Grid.Col>

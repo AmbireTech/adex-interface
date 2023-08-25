@@ -3,8 +3,11 @@ import {
   DEFAULT_THEME,
   Tuple,
   DefaultMantineColor,
-  ButtonStylesParams
+  ButtonStylesParams,
+  rem,
+  AlertStylesParams
 } from '@mantine/core'
+import DownArrowIcon from 'resources/icons/DownArrow'
 
 type ExtendedCustomColors =
   | 'brand'
@@ -14,6 +17,7 @@ type ExtendedCustomColors =
   | 'lightBackground'
   | 'decorativeBorders'
   | 'mainBackground'
+  | 'attention'
   | DefaultMantineColor
 
 declare module '@mantine/core' {
@@ -90,6 +94,41 @@ export const baseTheme: MantineThemeOverride = {
   },
   transitionTimingFunction: 'ease-out',
   components: {
+    Alert: {
+      styles: (theme, { color }: AlertStylesParams, { variant }) => {
+        const custom = variant === 'outline'
+        return {
+          root: {
+            background: custom
+              ? theme.fn.lighten(
+                  theme.colors[color][theme.fn.primaryShade()],
+                  theme.other.shades.lighten.lightest
+                )
+              : '',
+            borderColor: custom ? theme.colors[color][theme.fn.primaryShade()] : '',
+            svg: {
+              color: custom ? theme.colors[color][theme.fn.primaryShade()] : '',
+              marginTop: custom ? theme.spacing.md : '',
+              width: rem(30),
+              height: rem(30)
+            }
+          },
+          message: {
+            color: custom ? theme.colors.mainText[theme.fn.primaryShade()] : ''
+          }
+        }
+      }
+    },
+    Select: {
+      defaultProps: {
+        size: 'md',
+        rightSectionWidth: 30,
+        rightSection: <DownArrowIcon size={rem(10)} />
+      },
+      styles: () => ({
+        rightSection: { pointerEvents: 'none' }
+      })
+    },
     Button: {
       defaultProps: {
         radius: 'xl'

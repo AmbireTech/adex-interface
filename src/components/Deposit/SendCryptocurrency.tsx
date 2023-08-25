@@ -33,7 +33,7 @@ const SendCryptocurrency = () => {
   return (
     <Grid gutter="xl" align="center">
       <Grid.Col>
-        <Alert icon={<InfoIcon size="1rem" />} color="red">
+        <Alert icon={<InfoIcon />} color="attention" variant="outline">
           AdEx operates only with ADX, USDC, USDT or DAI. Please make sure you deposit only these
           coins.
         </Alert>

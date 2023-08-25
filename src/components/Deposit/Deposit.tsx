@@ -1,10 +1,10 @@
 import { Container, Grid, Select, createStyles, Text } from '@mantine/core'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import EthereumIcon from 'resources/networks/Ethereum'
 import PolygonIcon from 'resources/networks/Polygon'
 import SendCryptoIcon from 'resources/icons/SendCrypto'
 import DepositIcon from 'resources/icons/Deposit'
-import { CustomCardType, DepositMethods, ITabSwitchDeposit } from 'types'
+import { DepositMethods, ITabSwitchDeposit } from 'types'
 import CustomCard from 'components/common/CustomCard'
 import SelectItem from './SelectItem'
 import SendCryptocurrency from './SendCryptocurrency'
@@ -38,9 +38,9 @@ const data = [
 
 const TabSwitch = ({ selectedTab }: ITabSwitchDeposit) => {
   switch (selectedTab) {
-    case DepositMethods.SendCrypto:
+    case 'sendCrypto':
       return <SendCryptocurrency />
-    case DepositMethods.TopUpFiat:
+    case 'topUpFiat':
       return <TopUpWithFiat />
     default:
       return <div />
@@ -51,9 +51,7 @@ const Deposit = () => {
   const { classes } = useStyles()
   const [network, setNetwork] = useState(data[0].value)
   const [selectedTab, setSelectedTab] = useState<DepositMethods | null>(null)
-  const handleTabClicked = (value: DepositMethods) => setSelectedTab(value)
-  const handleChange = (value: string) => setNetwork(value)
-  const getIcon = () => data.find(({ value }) => value === network)?.image
+  const icon = useMemo(() => data.find(({ value }) => value === network)?.image, [network])
 
   return (
     <Container size="xs" className={classes.container} pt="lg" pb="lg">
@@ -68,9 +66,9 @@ const Deposit = () => {
             variant="filled"
             data={data}
             itemComponent={SelectItem}
-            defaultValue={network}
-            onChange={handleChange}
-            icon={getIcon()}
+            value={network}
+            onChange={(value: string) => setNetwork(value)}
+            icon={icon}
           />
         </Grid.Col>
         <Grid.Col>
@@ -85,9 +83,9 @@ const Deposit = () => {
             height="100%"
             text="Send Cryptocurrency"
             color="brand"
-            active={selectedTab === DepositMethods.SendCrypto}
-            action={() => handleTabClicked(DepositMethods.SendCrypto)}
-            variant={CustomCardType.border}
+            active={selectedTab === 'sendCrypto'}
+            action={() => setSelectedTab('sendCrypto')}
+            variant="border"
           />
         </Grid.Col>
         <Grid.Col span={6} className={classes.center}>
@@ -97,9 +95,9 @@ const Deposit = () => {
             height="100%"
             text="Top Up with Fiat"
             color="brand"
-            active={selectedTab === DepositMethods.TopUpFiat}
-            action={() => handleTabClicked(DepositMethods.TopUpFiat)}
-            variant={CustomCardType.border}
+            active={selectedTab === 'topUpFiat'}
+            action={() => setSelectedTab('topUpFiat')}
+            variant="border"
           />
         </Grid.Col>
         <Grid.Col span={12}>

@@ -1,5 +1,5 @@
 import { Box, Flex, rem, Title, createStyles } from '@mantine/core'
-import { CustomCardType, ICustomCardProps, ICustomCardStyleProps } from 'types'
+import { ICustomCardProps, ICustomCardStyleProps } from 'types'
 
 const useStyles = createStyles(
   (theme, { color, width, height, border, shadow }: ICustomCardStyleProps) => ({
@@ -94,8 +94,8 @@ const CustomCard = ({
     color,
     width,
     height,
-    border: variant === CustomCardType.border,
-    shadow: variant === CustomCardType.shadow
+    border: variant === 'border',
+    shadow: variant === 'shadow'
   })
 
   return (
