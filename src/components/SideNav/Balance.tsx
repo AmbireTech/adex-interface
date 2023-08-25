@@ -23,7 +23,7 @@ const FormattedBalance = ({ balance }: { balance: number }) => {
 
   const integerPart = formattedBalance.substring(
     0,
-    formattedBalance.length - (digitsAfterFloatingPoint + 1)
+    formattedBalance.length - digitsAfterFloatingPoint
   )
   const decimalPart = formattedBalance.substring(formattedBalance.length - digitsAfterFloatingPoint)
 
@@ -33,7 +33,7 @@ const FormattedBalance = ({ balance }: { balance: number }) => {
         $ {integerPart}
       </Text>
       <Text size="sm" weight="bold">
-        .{decimalPart}
+        {decimalPart}
       </Text>
     </Flex>
   )
