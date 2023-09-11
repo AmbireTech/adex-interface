@@ -5,6 +5,8 @@ import DownArrowIcon from 'resources/icons/DownArrow'
 import { formatCurrency } from 'helpers'
 import { accountBalance } from './mockedData'
 
+const DIGITS_AFTER_FLOATING_POINT: number = 2
+
 const useStyles = createStyles((theme) => ({
   rotateUpsideDown: {
     transform: 'scale(-1)'
@@ -18,14 +20,15 @@ const useStyles = createStyles((theme) => ({
 }))
 
 const FormattedBalance = ({ balance }: { balance: number }) => {
-  const digitsAfterFloatingPoint: number = 2
-  const formattedBalance = formatCurrency(balance, digitsAfterFloatingPoint)
+  const formattedBalance = formatCurrency(balance, DIGITS_AFTER_FLOATING_POINT)
 
   const integerPart = formattedBalance.substring(
     0,
-    formattedBalance.length - digitsAfterFloatingPoint
+    formattedBalance.length - DIGITS_AFTER_FLOATING_POINT
   )
-  const decimalPart = formattedBalance.substring(formattedBalance.length - digitsAfterFloatingPoint)
+  const decimalPart = formattedBalance.substring(
+    formattedBalance.length - DIGITS_AFTER_FLOATING_POINT
+  )
 
   return (
     <Flex direction="row" align="baseline" justify="flex-start">
@@ -65,7 +68,7 @@ const Balance = () => {
               <Flex align="center">
                 <Image maw={15} mx="auto" radius="md" src={item.icon} alt={item.symbol} />
                 <Text size="xs">
-                  {item.amount.toLocaleString()} {item.symbol}
+                  {formatCurrency(item.amount, DIGITS_AFTER_FLOATING_POINT)} {item.symbol}
                 </Text>
               </Flex>
               <Text size="xs">on {item.network}</Text>
