@@ -1,9 +1,10 @@
 import { MantineThemeOverride } from '@mantine/core'
 import { baseTheme } from './base'
 
-export const lightTheme: MantineThemeOverride = {
+export const darkTheme: MantineThemeOverride = {
   ...baseTheme,
-  colorScheme: 'light',
+  colorScheme: 'dark',
+  //   TODO: Change all the colors/shades with the dark ones
   colors: {
     brand: [
       '#ECEFF7',
@@ -16,18 +17,6 @@ export const lightTheme: MantineThemeOverride = {
       '#232A40',
       '#1D2230',
       '#181B24'
-    ],
-    brandDarker: [
-      '#415898',
-      '#314B94',
-      '#223F92',
-      '#123391', // BrandDarker
-      '#1C3377',
-      '#213263',
-      '#243053',
-      '#242D47',
-      '#242A3C',
-      '#222734'
     ],
     secondary: [
       '#C1CAE3',
@@ -65,11 +54,11 @@ export const lightTheme: MantineThemeOverride = {
       '#37393E',
       '#323437'
     ],
-    lightBackground: [
+    darkBackground: [
       '#FAFAFC',
       '#F6F6F9',
       '#F2F2F6',
-      '#F5F6FA', // LightBackground
+      '#F5F6FA', // DarkBackground
       '#EDEFF3',
       '#E6E8ED',
       '#E0E2E8',
@@ -100,30 +89,6 @@ export const lightTheme: MantineThemeOverride = {
       '#A5A5A5',
       '#959595',
       '#868686'
-    ],
-    attention: [
-      '#D6AF7F',
-      '#DBA25B',
-      '#E89731',
-      '#FF8E01', // Attention
-      '#CF7D17',
-      '#AA6F25',
-      '#8D632E',
-      '#765832',
-      '#644E33',
-      '#564632'
-    ],
-    secondaryAccent: [
-      '#E3B4A7',
-      '#E49782',
-      '#ED7959',
-      '#FF5729', // SecondaryAccent
-      '#E74E24',
-      '#C54C2B',
-      '#A34C35',
-      '#894A39',
-      '#74473B',
-      '#63433A'
     ]
     // NOTE: needs 10 shades to work https://mantine.dev/theming/colors/
     // attention: ['#FFBE4D', '#FFBE4D', '#FFBE4D'],
