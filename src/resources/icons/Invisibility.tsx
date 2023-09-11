@@ -1,7 +1,7 @@
 import React from 'react'
 import { AppIconProps, defaultProps } from 'types/components/Icon'
 
-const InvisibilityIcon: React.FC<AppIconProps> = ({ color, size, ...rest }) => {
+const InvisibilityIcon: React.FC<AppIconProps> = ({ color, size, strokeWidth, ...rest }) => {
   return (
     <svg
       viewBox="0 0 22.557 22.557"
@@ -10,7 +10,7 @@ const InvisibilityIcon: React.FC<AppIconProps> = ({ color, size, ...rest }) => {
       height={size}
       {...rest}
     >
-      <g fill="none" stroke={color} strokeLinecap="round" strokeWidth="1.5">
+      <g fill="none" stroke={color} strokeLinecap="round" strokeWidth={strokeWidth}>
         <path d="M13.864 8.694l-5.17 5.17a3.656 3.656 0 115.17-5.17z" data-name="Path 2277" />
         <path
           d="M17.226 4.913a9.841 9.841 0 00-5.947-2.084c-3.607 0-6.969 2.125-9.309 5.8a5.442 5.442 0 000 5.3 14.639 14.639 0 002.769 3.239"

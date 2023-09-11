@@ -103,7 +103,7 @@ const CustomTable = ({ headings, elements }: ICustomTableProps) => {
           </td>
         </tr>
       )),
-    [columns, list, open]
+    [columns, list, open, classes.actionIcon]
   )
 
   return (

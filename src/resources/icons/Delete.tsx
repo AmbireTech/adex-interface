@@ -1,7 +1,7 @@
 import React from 'react'
 import { AppIconProps, defaultProps } from 'types/components/Icon'
 
-const DeleteIcon: React.FC<AppIconProps> = ({ color, size, ...rest }) => {
+const DeleteIcon: React.FC<AppIconProps> = ({ color, size, strokeWidth, ...rest }) => {
   return (
     <svg
       viewBox="0 0 19.64 21.5"
@@ -10,7 +10,13 @@ const DeleteIcon: React.FC<AppIconProps> = ({ color, size, ...rest }) => {
       height={size}
       {...rest}
     >
-      <g fill="none" stroke={color} strokeLinecap="round" strokeWidth="1.5" data-name="delete icon">
+      <g
+        fill="none"
+        stroke={color}
+        strokeLinecap="round"
+        strokeWidth={strokeWidth}
+        data-name="delete icon"
+      >
         <path
           d="M18.82 4.73c-3.33-.33-6.68-.5-10.02-.5a59.068 59.068 0 00-5.94.3l-2.04.2"
           data-name="Path 2346"

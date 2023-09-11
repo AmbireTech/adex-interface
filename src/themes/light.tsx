@@ -101,6 +101,18 @@ export const lightTheme: MantineThemeOverride = {
       '#959595',
       '#868686'
     ],
+    attention: [
+      '#D6AF7F',
+      '#DBA25B',
+      '#E89731',
+      '#FF8E01', // Attention
+      '#CF7D17',
+      '#AA6F25',
+      '#8D632E',
+      '#765832',
+      '#644E33',
+      '#564632'
+    ],
     secondaryAccent: [
       '#E3B4A7',
       '#E49782',
