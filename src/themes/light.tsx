@@ -17,6 +17,18 @@ export const lightTheme: MantineThemeOverride = {
       '#1D2230',
       '#181B24'
     ],
+    brandDarker: [
+      '#415898',
+      '#314B94',
+      '#223F92',
+      '#123391', // BrandDarker
+      '#1C3377',
+      '#213263',
+      '#243053',
+      '#242D47',
+      '#242A3C',
+      '#222734'
+    ],
     secondary: [
       '#C1CAE3',
       '#8196D1',
@@ -88,6 +100,18 @@ export const lightTheme: MantineThemeOverride = {
       '#A5A5A5',
       '#959595',
       '#868686'
+    ],
+    secondaryAccent: [
+      '#E3B4A7',
+      '#E49782',
+      '#ED7959',
+      '#FF5729', // SecondaryAccent
+      '#E74E24',
+      '#C54C2B',
+      '#A34C35',
+      '#894A39',
+      '#74473B',
+      '#63433A'
     ]
     // NOTE: needs 10 shades to work https://mantine.dev/theming/colors/
     // attention: ['#FFBE4D', '#FFBE4D', '#FFBE4D'],

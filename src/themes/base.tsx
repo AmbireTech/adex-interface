@@ -8,12 +8,14 @@ import {
 
 type ExtendedCustomColors =
   | 'brand'
+  | 'brandDarker'
   | 'secondary'
   | 'mainText'
   | 'secondaryText'
   | 'lightBackground'
   | 'decorativeBorders'
   | 'mainBackground'
+  | 'secondaryAccent'
   | 'darkBackground'
   | DefaultMantineColor
 
@@ -22,6 +24,8 @@ declare module '@mantine/core' {
     colors: Record<ExtendedCustomColors, Tuple<string, 10>>
   }
 }
+
+const SIDE_BAR_WIDTH = 227
 
 // NOTE: Put here components overrides for sizes, form, animations etc. In light/(dark) theme - only colors
 export const baseTheme: MantineThemeOverride = {
@@ -177,6 +181,17 @@ export const baseTheme: MantineThemeOverride = {
           content: {
             [theme.other.media.print]: {
               overflow: 'visible'
+            }
+          }
+        }
+      }
+    },
+    AppShell: {
+      styles: () => {
+        return {
+          body: {
+            nav: {
+              width: SIDE_BAR_WIDTH
             }
           }
         }

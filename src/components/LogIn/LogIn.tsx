@@ -8,7 +8,8 @@ import {
   Text,
   ThemeIcon,
   Flex,
-  rem
+  rem,
+  useMantineTheme
 } from '@mantine/core'
 import LogInBackground from 'resources/backgrounds/pattern.svg'
 import LowerShape from 'resources/backgrounds/lowerShape.svg'
@@ -26,7 +27,7 @@ const useStyles = createStyles(() => {
       backgroundSize: 'contain, contain, 120%'
     },
     logoContainer: {
-      height: rem(100)
+      width: rem(191)
     },
     icon: {
       border: 'none',
@@ -42,12 +43,19 @@ function LogIn() {
   const { classes } = useStyles()
   const { connectWallet } = useAccount()
   const year = useMemo(() => new Date().getFullYear(), [])
+  const theme = useMantineTheme()
 
   return (
     <Container fluid h="100vh" className={classes.container}>
-      <Flex h="100%" pt="xl" pb="xl" direction="column" justify="space-between" align="center">
+      <Flex h="100%" pt="xl" pb="xl" direction="column" justify="space-around" align="center">
         <div className={classes.logoContainer}>
-          <AdExLogo />
+          <AdExLogo
+            text={
+              theme.colorScheme === 'dark'
+                ? theme.white
+                : theme.colors.brandDarker[theme.fn.primaryShade()]
+            }
+          />
         </div>
         <div>
           <Title align="center" order={1}>
