@@ -1,11 +1,24 @@
 // import { useState } from 'react'
-import { AppShell, Navbar, Header, MediaQuery, Burger } from '@mantine/core'
+import { AppShell, Navbar, Header, MediaQuery, Burger, createStyles } from '@mantine/core'
 import SideNav from 'components/SideNav'
 import TopBar from 'components/TopBar'
 import { useState } from 'react'
 import { Outlet } from 'react-router-dom'
 
+const useStyles = createStyles((theme) => ({
+  main: {
+    backgroundColor:
+      theme.colorScheme === 'dark'
+        ? theme.colors.darkBackground[theme.fn.primaryShade()]
+        : theme.colors.lightBackground[theme.fn.primaryShade()]
+  },
+  header: {
+    backgroundColor: 'inherit'
+  }
+}))
+
 function Dashboard() {
+  const { classes } = useStyles()
   const [opened, setOpened] = useState(false)
 
   // husky test
@@ -17,6 +30,7 @@ function Dashboard() {
       navbarOffsetBreakpoint="sm"
       asideOffsetBreakpoint="sm"
       fixed
+      className={classes.main}
       navbar={
         <Navbar hiddenBreakpoint="sm" width={{ sm: 227 }} height="100%" p="xs" hidden={!opened}>
           <MediaQuery largerThan="sm" styles={{ display: 'none' }}>
@@ -34,7 +48,9 @@ function Dashboard() {
       header={
         <Header
           height={90}
-          p="sm"
+          mr="xl"
+          ml="xl"
+          className={classes.header}
           style={{
             display: 'flex',
             flexDirection: 'row',
@@ -53,12 +69,6 @@ function Dashboard() {
           <TopBar />
         </Header>
       }
-      styles={(theme) => ({
-        main: {
-          backgroundColor:
-            theme.colorScheme === 'dark' ? theme.colors.dark[8] : theme.colors.gray[0]
-        }
-      })}
     >
       <Outlet />
       {/* Your application here */}
