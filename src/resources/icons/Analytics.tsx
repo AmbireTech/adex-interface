@@ -1,7 +1,7 @@
 import React from 'react'
 import { AppIconProps, defaultProps } from 'types/components/Icon'
 
-const AnalyticsIcon: React.FC<AppIconProps> = ({ color, size, ...rest }) => {
+const AnalyticsIcon: React.FC<AppIconProps> = ({ color, size, strokeWidth, ...rest }) => {
   return (
     <svg
       viewBox="0 0 21.5 21.5"
@@ -14,7 +14,7 @@ const AnalyticsIcon: React.FC<AppIconProps> = ({ color, size, ...rest }) => {
         fill="none"
         stroke={color}
         strokeLinecap="round"
-        strokeWidth="1.5"
+        strokeWidth={strokeWidth}
         data-name="Analytics icon"
       >
         <path d="M5.63 16.9v-2.07" data-name="Path 2165" />

@@ -1,7 +1,7 @@
 import React from 'react'
 import { AppIconProps, defaultProps } from 'types/components/Icon'
 
-const VisibilityIcon: React.FC<AppIconProps> = ({ color, size, ...rest }) => {
+const VisibilityIcon: React.FC<AppIconProps> = ({ color, size, strokeWidth, ...rest }) => {
   return (
     <svg
       viewBox="0 0 21.835 18.414"
@@ -14,7 +14,7 @@ const VisibilityIcon: React.FC<AppIconProps> = ({ color, size, ...rest }) => {
         fill="none"
         stroke={color}
         strokeLinecap="round"
-        strokeWidth="1.5"
+        strokeWidth={strokeWidth}
         data-name="visibillity icon"
       >
         <path

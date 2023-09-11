@@ -7,6 +7,7 @@ import CampaignAnalytics from 'components/CampaignAnalytics'
 import { createBrowserRouter, Navigate, useLocation } from 'react-router-dom'
 
 import useAccount from 'hooks/useAccount'
+import Deposit from 'components/Deposit'
 
 function RequireAuth({ children }: { children: JSX.Element }) {
   const { authenticated } = useAccount()
@@ -53,6 +54,10 @@ export const router = createBrowserRouter([
       {
         path: 'get-started',
         element: <GetStarted />
+      },
+      {
+        path: 'deposit',
+        element: <Deposit />
       }
     ]
   }

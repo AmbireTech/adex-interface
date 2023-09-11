@@ -1,42 +1,44 @@
 import React from 'react'
 import { AppIconProps, defaultProps } from 'types/components/Icon'
 
-// NOTE: add `DepositIcon.defaultProps = defaultProps` see below before export
-// NOTE: add color where used e.g. in <path/>, <g/> etc. in 'fill' and 'stroke' where it is NOT 'none'
-// Add: width and height = size
-// Add: {...rest}
-const DepositIcon: React.FC<AppIconProps> = ({ color, size, ...rest }) => {
+const DepositIcon: React.FC<AppIconProps> = ({ color, size, strokeWidth, ...rest }) => {
   return (
     <svg
-      viewBox="0 0 60 60"
+      viewBox="0 0 38.757 36"
+      xmlns="http://www.w3.org/2000/svg"
       width={size}
       height={size}
-      xmlns="http://www.w3.org/2000/svg"
-      data-name="Deposit icon"
       {...rest}
     >
-      <path d="M0 0h60v60H0z" fill="none" />
-      <g fill="none" stroke={color} strokeLinecap="round" strokeWidth="2.8" data-name="Group 328">
-        <path
-          d="M27.515 37.974v3.739c0 3.168-2.947 5.728-6.575 5.728s-6.595-2.561-6.595-5.729v-3.738c0 3.168 2.947 5.415 6.593 5.415 3.63-.001 6.577-2.266 6.577-5.415z"
-          data-name="Path 2111"
-        />
-        <path
-          d="M27.512 32.908a4.831 4.831 0 01-.7 2.5 6.768 6.768 0 01-5.894 2.91 6.811 6.811 0 01-5.893-2.902 4.831 4.831 0 01-.7-2.5 5.35 5.35 0 011.915-4.034 7.029 7.029 0 014.66-1.676 7.125 7.125 0 014.66 1.676 5.236 5.236 0 011.952 4.026z"
-          data-name="Path 2112"
-        />
-        <path
-          d="M27.515 32.908v5.065c0 3.168-2.947 5.415-6.575 5.415s-6.595-2.266-6.595-5.415v-5.065c0-3.168 2.947-5.728 6.593-5.728a7.125 7.125 0 014.66 1.676 5.388 5.388 0 011.917 4.052z"
-          data-name="Path 2113"
-        />
-        <path
-          d="M48.232 27.124v3.794a1.891 1.891 0 01-1.842 1.879h-3.61a3.927 3.927 0 01-3.978-3.444 3.795 3.795 0 013.757-4.107h3.831a1.891 1.891 0 011.842 1.878z"
-          data-name="Path 2114"
-        />
-        <path
-          d="M11.397 26.259v-3.683c0-5.01 3.02-8.509 7.717-9.1a9.8 9.8 0 011.492-.111h16.575a8.422 8.422 0 011.381.092c4.752.553 7.827 4.07 7.827 9.117v2.671h-3.83a3.795 3.795 0 00-3.762 4.109 3.927 3.927 0 003.983 3.441h3.61v2.671c0 5.525-3.683 9.209-9.209 9.209h-4.6"
-          data-name="Path 2115"
-        />
+      <g data-name="Deposit icon">
+        <g
+          fill="none"
+          stroke={color}
+          strokeLinecap="round"
+          strokeWidth={strokeWidth}
+          data-name="Group 328"
+        >
+          <path
+            d="M17.084 25.554v3.731c0 3.161-2.94 5.716-6.561 5.716s-6.581-2.556-6.581-5.717v-3.73c0 3.161 2.94 5.4 6.579 5.4 3.621.003 6.563-2.258 6.563-5.4z"
+            data-name="Path 2111"
+          />
+          <path
+            d="M17.081 20.5a4.82 4.82 0 01-.7 2.5 6.754 6.754 0 01-5.881 2.9A6.8 6.8 0 014.619 23a4.821 4.821 0 01-.7-2.5 5.338 5.338 0 011.913-4.025 7.014 7.014 0 014.65-1.672 7.11 7.11 0 014.65 1.672 5.225 5.225 0 011.949 4.025z"
+            data-name="Path 2112"
+          />
+          <path
+            d="M17.084 20.499v5.054c0 3.161-2.94 5.4-6.561 5.4s-6.579-2.261-6.579-5.4v-5.054c0-3.161 2.94-5.716 6.579-5.716a7.11 7.11 0 014.65 1.672 5.376 5.376 0 011.911 4.044z"
+            data-name="Path 2113"
+          />
+          <path
+            d="M37.759 14.732v3.786a1.887 1.887 0 01-1.838 1.875h-3.6a3.919 3.919 0 01-3.97-3.437 3.787 3.787 0 013.749-4.1h3.819a1.887 1.887 0 011.84 1.876z"
+            data-name="Path 2114"
+          />
+          <path
+            d="M1 13.865v-3.676c0-5 3.014-8.491 7.7-9.079A9.78 9.78 0 0110.189 1h16.54a8.4 8.4 0 011.378.092c4.742.551 7.811 4.062 7.811 9.1v2.665H32.1a3.787 3.787 0 00-3.749 4.1 3.919 3.919 0 003.97 3.437h3.6v2.665c0 5.513-3.676 9.189-9.189 9.189h-4.597"
+            data-name="Path 2115"
+          />
+        </g>
       </g>
     </svg>
   )

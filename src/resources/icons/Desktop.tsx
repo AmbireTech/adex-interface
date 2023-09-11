@@ -1,7 +1,7 @@
 import React from 'react'
 import { AppIconProps, defaultProps } from 'types/components/Icon'
 
-const DesktopIcon: React.FC<AppIconProps> = ({ color, size, ...rest }) => {
+const DesktopIcon: React.FC<AppIconProps> = ({ color, size, strokeWidth, ...rest }) => {
   return (
     <svg
       viewBox="0 0 36.8 36.783"
@@ -10,7 +10,7 @@ const DesktopIcon: React.FC<AppIconProps> = ({ color, size, ...rest }) => {
       height={size}
       {...rest}
     >
-      <g fill="none" stroke={color} strokeLinecap="round" strokeWidth="2.8">
+      <g fill="none" stroke={color} strokeLinecap="round" strokeWidth={strokeWidth}>
         <path
           d="M10.355 1.4h16.091a22.765 22.765 0 012.974.152c4.707.524 5.981 2.724 5.981 8.746V20.99c0 6.023-1.274 8.222-5.981 8.746a22.6 22.6 0 01-2.974.152H10.355a22.766 22.766 0 01-2.974-.152C2.674 29.212 1.4 27.012 1.4 20.99V10.3c0-6.023 1.274-8.222 5.981-8.746a22.765 22.765 0 012.974-.154z"
           data-name="Path 2820"

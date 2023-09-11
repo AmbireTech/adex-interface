@@ -1,7 +1,7 @@
 import React from 'react'
 import { AppIconProps, defaultProps } from 'types/components/Icon'
 
-const CloseIcon: React.FC<AppIconProps> = ({ color, size, ...rest }) => {
+const CloseIcon: React.FC<AppIconProps> = ({ color, size, strokeWidth, ...rest }) => {
   return (
     <svg
       viewBox="0 0 32 32"
@@ -21,7 +21,7 @@ const CloseIcon: React.FC<AppIconProps> = ({ color, size, ...rest }) => {
           fill="none"
           stroke={color}
           strokeLinecap="round"
-          strokeWidth="1.5"
+          strokeWidth={strokeWidth}
           data-name="Path 2637"
         />
         <path
@@ -29,7 +29,7 @@ const CloseIcon: React.FC<AppIconProps> = ({ color, size, ...rest }) => {
           fill="none"
           stroke={color}
           strokeLinecap="round"
-          strokeWidth="1.5"
+          strokeWidth={strokeWidth}
           data-name="Path 2638"
         />
       </g>

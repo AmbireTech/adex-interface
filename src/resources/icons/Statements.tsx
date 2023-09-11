@@ -1,7 +1,7 @@
 import React from 'react'
 import { AppIconProps, defaultProps } from 'types/components/Icon'
 
-const StatementsIcon: React.FC<AppIconProps> = ({ color, size, ...rest }) => {
+const StatementsIcon: React.FC<AppIconProps> = ({ color, size, strokeWidth, ...rest }) => {
   return (
     <svg
       viewBox="0 0 24.057 25.861"
@@ -14,7 +14,7 @@ const StatementsIcon: React.FC<AppIconProps> = ({ color, size, ...rest }) => {
         fill="none"
         stroke={color}
         strokeLinecap="round"
-        strokeWidth="1.5"
+        strokeWidth={strokeWidth}
         data-name="Statements icon"
       >
         <path

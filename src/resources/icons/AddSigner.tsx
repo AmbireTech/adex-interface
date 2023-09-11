@@ -1,7 +1,7 @@
 import React from 'react'
 import { AppIconProps, defaultProps } from 'types/components/Icon'
 
-const AddSignerIcon: React.FC<AppIconProps> = ({ color, size, ...rest }) => {
+const AddSignerIcon: React.FC<AppIconProps> = ({ color, size, strokeWidth, ...rest }) => {
   return (
     <svg
       viewBox="0 0 21.5 21.5"
@@ -10,7 +10,13 @@ const AddSignerIcon: React.FC<AppIconProps> = ({ color, size, ...rest }) => {
       height={size}
       {...rest}
     >
-      <g fill="none" stroke={color} strokeLinecap="round" strokeWidth="1.5" data-name="Add signer">
+      <g
+        fill="none"
+        stroke={color}
+        strokeLinecap="round"
+        strokeWidth={strokeWidth}
+        data-name="Add signer"
+      >
         <path
           d="M14.75.75h-8q-6 0-6 6v13a1 1 0 001 1h13q6 0 6-6v-8q0-6-6-6z"
           data-name="Path 2990"
