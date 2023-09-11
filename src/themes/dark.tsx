@@ -1,9 +1,10 @@
 import { MantineThemeOverride } from '@mantine/core'
 import { baseTheme } from './base'
 
-export const lightTheme: MantineThemeOverride = {
+export const darkTheme: MantineThemeOverride = {
   ...baseTheme,
-  colorScheme: 'light',
+  colorScheme: 'dark',
+  //   TODO: Change all the colors/shades with the dark ones
   colors: {
     brand: [
       '#ECEFF7',
@@ -16,18 +17,6 @@ export const lightTheme: MantineThemeOverride = {
       '#232A40',
       '#1D2230',
       '#181B24'
-    ],
-    brandDarker: [
-      '#415898',
-      '#314B94',
-      '#223F92',
-      '#123391', // BrandDarker
-      '#1C3377',
-      '#213263',
-      '#243053',
-      '#242D47',
-      '#242A3C',
-      '#222734'
     ],
     secondary: [
       '#C1CAE3',
@@ -65,11 +54,11 @@ export const lightTheme: MantineThemeOverride = {
       '#37393E',
       '#323437'
     ],
-    lightBackground: [
+    darkBackground: [
       '#FAFAFC',
       '#F6F6F9',
       '#F2F2F6',
-      '#F5F6FA', // LightBackground
+      '#F5F6FA', // DarkBackground
       '#EDEFF3',
       '#E6E8ED',
       '#E0E2E8',
@@ -100,66 +89,6 @@ export const lightTheme: MantineThemeOverride = {
       '#A5A5A5',
       '#959595',
       '#868686'
-    ],
-    success: [
-      '#45B591',
-      '#32B188',
-      '#1FB081',
-      '#0CB07B', // Success
-      '#1A9069',
-      '#22775B',
-      '#26634F',
-      '#285445',
-      '#28473D',
-      '#273D36'
-    ],
-    info: [
-      '#BAA8E3',
-      '#A083E4',
-      '#865AED',
-      '#6A2AFF',
-      '#5F25E7',
-      '#5A2BC5',
-      '#5635A4',
-      '#523A89',
-      '#4C3B74',
-      '#473A64'
-    ],
-    draft: [
-      '#EBC9C0',
-      '#E9AC9B',
-      '#EF8C72',
-      '#FF6A42',
-      '#E95D38',
-      '#D25432',
-      '#B15239',
-      '#94503E',
-      '#7E4D40',
-      '#6C483F'
-    ],
-    alternativeBackground: [
-      '#FFFFFF',
-      '#FFFFFF',
-      '#FFFFFF',
-      '#EBEEFA', // Alternative bg
-      '#C9D0EC',
-      '#AEB7DB',
-      '#99A2C9',
-      '#8891B7',
-      '#7982A5',
-      '#6D7595'
-    ],
-    secondaryAccent: [
-      '#E3B4A7',
-      '#E49782',
-      '#ED7959',
-      '#FF5729', // SecondaryAccent
-      '#E74E24',
-      '#C54C2B',
-      '#A34C35',
-      '#894A39',
-      '#74473B',
-      '#63433A'
     ]
     // NOTE: needs 10 shades to work https://mantine.dev/theming/colors/
     // attention: ['#FFBE4D', '#FFBE4D', '#FFBE4D'],
