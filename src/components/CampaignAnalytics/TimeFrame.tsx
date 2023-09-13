@@ -1,12 +1,13 @@
 import { Grid } from '@mantine/core'
 import { ParentSize } from '@visx/responsive'
-import Example from 'components/common/Chart/Example'
+import TimeFrameChart from 'components/common/Chart/TimeFrameChart'
+import { ITimeFrameData } from 'types'
 
-const TimeFrame = ({ timeFrames }: { timeFrames: any[] | undefined }) => {
+const TimeFrame = ({ timeFrames }: { timeFrames: ITimeFrameData[] | undefined }) => {
   if (!timeFrames?.length) {
-    return <div>No placement found</div>
+    return <div>No time frames found</div>
   }
-
+  console.log('timeFrameData', timeFrames)
   //   const elements = timeFrames?.map((item) => ({
   //     ...item,
   //     impressions: item.impressions.toLocaleString(),
@@ -19,7 +20,9 @@ const TimeFrame = ({ timeFrames }: { timeFrames: any[] | undefined }) => {
         <h1>Controls here</h1>
       </Grid.Col>
       <Grid.Col>
-        <ParentSize>{() => <Example width={1000} height={420} />}</ParentSize>
+        <ParentSize>
+          {() => <TimeFrameChart width={1000} height={420} timeFrameData={timeFrames} />}
+        </ParentSize>
       </Grid.Col>
     </Grid>
   )

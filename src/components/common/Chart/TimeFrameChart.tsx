@@ -1,18 +1,21 @@
-import { CityTemperature } from '@visx/mock-data/lib/mocks/cityTemperature'
+// import { ITimeFrameData } from '@visx/mock-data/lib/mocks/ITimeFrameData'
 
-import ExampleControls from './Chart'
+import { ITimeFrameData } from 'types'
+import ChartControls from './Chart'
 import CustomChartBackground from './CustomChartBackground'
 
 export type XYChartProps = {
   width: number
   height: number
+  timeFrameData: ITimeFrameData[]
 }
 
-type City = 'San Francisco' | 'New York' | 'Austin'
+// type City = 'San Francisco' | 'New York' | 'Austin'
+type Metrics = 'Impressions' | 'Clicks and CRT' | 'Average CPM' | 'Total spent'
 
-export default function Example({ height, width }: XYChartProps) {
+export default function TimeFrameChart({ height, width, timeFrameData }: XYChartProps) {
   return (
-    <ExampleControls>
+    <ChartControls data={timeFrameData}>
       {({
         accessors,
         animationTrajectory,
@@ -77,7 +80,9 @@ export default function Example({ height, width }: XYChartProps) {
           width={width}
           captureEvents={!editAnnotationLabelPosition}
           onPointerUp={(d) => {
-            setAnnotationDataKey(d.key as 'New York' | 'San Francisco' | 'Austin')
+            setAnnotationDataKey(
+              d.key as 'Impressions' | 'Clicks and CRT' | 'Average CPM' | 'Total spent'
+            )
             setAnnotationDataIndex(d.index)
           }}
         >
@@ -92,82 +97,82 @@ export default function Example({ height, width }: XYChartProps) {
           {renderBarStack && (
             <BarStack offset={stackOffset}>
               <BarSeries
-                dataKey="New York"
+                dataKey="Impressions"
                 data={data}
-                xAccessor={accessors.x['New York']}
-                yAccessor={accessors.y['New York']}
+                xAccessor={accessors.x.Impressions}
+                yAccessor={accessors.y.Impressions}
               />
               <BarSeries
-                dataKey="San Francisco"
+                dataKey="Clicks and CRT"
                 data={data}
-                xAccessor={accessors.x['San Francisco']}
-                yAccessor={accessors.y['San Francisco']}
+                xAccessor={accessors.x['Clicks and CRT']}
+                yAccessor={accessors.y['Clicks and CRT']}
               />
               <BarSeries
-                dataKey="Austin"
+                dataKey="Average CPM"
                 data={data}
-                xAccessor={accessors.x.Austin}
-                yAccessor={accessors.y.Austin}
+                xAccessor={accessors.x['Average CPM']}
+                yAccessor={accessors.y['Average CPM']}
               />
             </BarStack>
           )}
           {renderBarGroup && (
             <BarGroup>
               <BarSeries
-                dataKey="New York"
+                dataKey="Impressions"
                 data={data}
-                xAccessor={accessors.x['New York']}
-                yAccessor={accessors.y['New York']}
-                colorAccessor={colorAccessorFactory('New York')}
+                xAccessor={accessors.x.Impressions}
+                yAccessor={accessors.y.Impressions}
+                colorAccessor={colorAccessorFactory('Impressions')}
               />
               <BarSeries
-                dataKey="San Francisco"
+                dataKey="Clicks and CRT"
                 data={data}
-                xAccessor={accessors.x['San Francisco']}
-                yAccessor={accessors.y['San Francisco']}
-                colorAccessor={colorAccessorFactory('San Francisco')}
+                xAccessor={accessors.x['Clicks and CRT']}
+                yAccessor={accessors.y['Clicks and CRT']}
+                colorAccessor={colorAccessorFactory('Clicks and CRT')}
               />
               <BarSeries
-                dataKey="Austin"
+                dataKey="Average CPM"
                 data={data}
-                xAccessor={accessors.x.Austin}
-                yAccessor={accessors.y.Austin}
-                colorAccessor={colorAccessorFactory('Austin')}
+                xAccessor={accessors.x['Average CPM']}
+                yAccessor={accessors.y['Average CPM']}
+                colorAccessor={colorAccessorFactory('Average CPM')}
               />
             </BarGroup>
           )}
           {renderBarSeries && (
             <BarSeries
-              dataKey="New York"
+              dataKey="Impressions"
               data={data}
-              xAccessor={accessors.x['New York']}
-              yAccessor={accessors.y['New York']}
-              colorAccessor={colorAccessorFactory('New York')}
+              xAccessor={accessors.x.Impressions}
+              yAccessor={accessors.y.Impressions}
+              colorAccessor={colorAccessorFactory('Impressions')}
             />
           )}
           {renderAreaSeries && (
             <>
               <AreaSeries
-                dataKey="Austin"
+                dataKey="Average CPM"
                 data={data}
-                xAccessor={accessors.x.Austin}
-                yAccessor={accessors.y.Austin}
+                xAccessor={accessors.x['Average CPM']}
+                yAccessor={accessors.y['Average CPM']}
                 fillOpacity={0.4}
                 curve={curve}
               />
               <AreaSeries
-                dataKey="New York"
+                dataKey="Impressions"
                 data={data}
-                xAccessor={accessors.x['New York']}
-                yAccessor={accessors.y['New York']}
+                xAccessor={accessors.x.Impressions}
+                yAccessor={accessors.y.Impressions}
                 fillOpacity={0.4}
                 curve={curve}
               />
               <AreaSeries
-                dataKey="San Francisco"
+                dataKey="Clicks and CRT"
                 data={data}
-                xAccessor={accessors.x['San Francisco']}
-                yAccessor={accessors.y['San Francisco']}
+                xAccessor={accessors.x['Clicks and CRT']}
+                yAccessor={accessors.y['Clicks and CRT']}
                 fillOpacity={0.4}
                 curve={curve}
               />
@@ -176,24 +181,24 @@ export default function Example({ height, width }: XYChartProps) {
           {renderAreaStack && (
             <AreaStack curve={curve} offset={stackOffset} renderLine={stackOffset !== 'wiggle'}>
               <AreaSeries
-                dataKey="Austin"
+                dataKey="Average CPM"
                 data={data}
-                xAccessor={accessors.x.Austin}
-                yAccessor={accessors.y.Austin}
+                xAccessor={accessors.x['Average CPM']}
+                yAccessor={accessors.y['Average CPM']}
                 fillOpacity={0.4}
               />
               <AreaSeries
-                dataKey="New York"
+                dataKey="Impressions"
                 data={data}
-                xAccessor={accessors.x['New York']}
-                yAccessor={accessors.y['New York']}
+                xAccessor={accessors.x.Impressions}
+                yAccessor={accessors.y.Impressions}
                 fillOpacity={0.4}
               />
               <AreaSeries
-                dataKey="San Francisco"
+                dataKey="Clicks and CRT"
                 data={data}
-                xAccessor={accessors.x['San Francisco']}
-                yAccessor={accessors.y['San Francisco']}
+                xAccessor={accessors.x['Clicks and CRT']}
+                yAccessor={accessors.y['Clicks and CRT']}
                 fillOpacity={0.4}
               />
             </AreaStack>
@@ -201,38 +206,38 @@ export default function Example({ height, width }: XYChartProps) {
           {renderLineSeries && (
             <>
               <LineSeries
-                dataKey="Austin"
+                dataKey="Average CPM"
                 data={data}
-                xAccessor={accessors.x.Austin}
-                yAccessor={accessors.y.Austin}
+                xAccessor={accessors.x['Average CPM']}
+                yAccessor={accessors.y['Average CPM']}
                 curve={curve}
               />
               {!renderBarSeries && (
                 <LineSeries
-                  dataKey="New York"
+                  dataKey="Impressions"
                   data={data}
-                  xAccessor={accessors.x['New York']}
-                  yAccessor={accessors.y['New York']}
+                  xAccessor={accessors.x.Impressions}
+                  yAccessor={accessors.y.Impressions}
                   curve={curve}
                 />
               )}
               <LineSeries
-                dataKey="San Francisco"
+                dataKey="Clicks and CRT"
                 data={data}
-                xAccessor={accessors.x['San Francisco']}
-                yAccessor={accessors.y['San Francisco']}
+                xAccessor={accessors.x['Clicks and CRT']}
+                yAccessor={accessors.y['Clicks and CRT']}
                 curve={curve}
               />
             </>
           )}
           {renderGlyphSeries && (
             <GlyphSeries
-              dataKey="San Francisco"
+              dataKey="Clicks and CRT"
               data={data}
-              xAccessor={accessors.x['San Francisco']}
-              yAccessor={accessors.y['San Francisco']}
+              xAccessor={accessors.x['Clicks and CRT']}
+              yAccessor={accessors.y['Clicks and CRT']}
               renderGlyph={renderGlyph}
-              colorAccessor={colorAccessorFactory('San Francisco')}
+              colorAccessor={colorAccessorFactory('Clicks and CRT')}
             />
           )}
           <Axis
@@ -279,7 +284,7 @@ export default function Example({ height, width }: XYChartProps) {
             </Annotation>
           )}
           {showTooltip && (
-            <Tooltip<CityTemperature>
+            <Tooltip<ITimeFrameData>
               showHorizontalCrosshair={showHorizontalCrosshair}
               showVerticalCrosshair={showVerticalCrosshair}
               snapTooltipToDatumX={snapTooltipToDatumX}
@@ -300,7 +305,7 @@ export default function Example({ height, width }: XYChartProps) {
                     (sharedTooltip
                       ? Object.keys(tooltipData?.datumByKey ?? {})
                       : [tooltipData?.nearestDatum?.key]
-                    ).filter((city) => city) as City[]
+                    ).filter((city) => city) as Metrics[]
                   ).map((city) => {
                     const temperature =
                       tooltipData?.nearestDatum?.datum &&
@@ -331,6 +336,6 @@ export default function Example({ height, width }: XYChartProps) {
           )}
         </XYChart>
       )}
-    </ExampleControls>
+    </ChartControls>
   )
 }

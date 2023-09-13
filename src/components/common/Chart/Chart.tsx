@@ -4,7 +4,8 @@ import { XYChartTheme } from '@visx/xychart'
 import { PatternLines } from '@visx/pattern'
 import { GlyphProps } from '@visx/xychart/lib/types'
 import { AnimationTrajectory } from '@visx/react-spring/lib/types'
-import cityTemperature, { CityTemperature } from '@visx/mock-data/lib/mocks/cityTemperature'
+// import ITimeFrameData, { CityTemperature } from '@visx/mock-data/lib/mocks/cityTemperature'
+import { ITimeFrameData } from 'types'
 import { GlyphStar } from '@visx/glyph'
 import { curveLinear, curveStep, curveCardinal } from '@visx/curve'
 import { RenderTooltipGlyphProps } from '@visx/xychart/lib/components/Tooltip'
@@ -13,22 +14,24 @@ import getAnimatedOrUnanimatedComponents from './getAnimatedOrUnanimatedComponen
 
 const dateScaleConfig = { type: 'band', paddingInner: 0.3 } as const
 const temperatureScaleConfig = { type: 'linear' } as const
-const numTicks = 4
-const data = cityTemperature.slice(225, 275)
+const numTicks = 20
+// const data = ITimeFrameData.slice(225, 275)
 
-const getDate = (d: CityTemperature) => d.date
-const getSfTemperature = (d: CityTemperature) => Number(d['San Francisco'])
-const getNyTemperature = (d: CityTemperature) => Number(d['New York'])
-const getAustinTemperature = (d: CityTemperature) => Number(d.Austin)
+const getDate = (d: ITimeFrameData) => d.date
+const getImpressions = (d: ITimeFrameData) => Number(d.impressions)
+const getClickAndCRT = (d: ITimeFrameData) => Number(d.clickAndCRT)
+const getAverageCPM = (d: ITimeFrameData) => Number(d.averageCPM)
+const getSpent = (d: ITimeFrameData) => Number(d.spent)
 const defaultAnnotationDataIndex = 13
 const selectedDatumPatternId = 'xychart-selected-datum'
 
-type Accessor = (d: CityTemperature) => number | string
+type Accessor = (d: ITimeFrameData) => number | string
 
 interface Accessors {
-  'San Francisco': Accessor
-  'New York': Accessor
-  Austin: Accessor
+  Impressions: Accessor
+  'Clicks and CRT': Accessor
+  'Average CPM': Accessor
+  'Total spent': Accessor
 }
 
 type DataKey = keyof Accessors
@@ -43,16 +46,16 @@ type ProvidedProps = {
   }
   animationTrajectory?: AnimationTrajectory
   annotationDataKey: DataKey | null
-  annotationDatum?: CityTemperature
+  annotationDatum?: ITimeFrameData
   annotationLabelPosition: { dx: number; dy: number }
   annotationType?: 'line' | 'circle'
-  colorAccessorFactory: (key: DataKey) => (d: CityTemperature) => string | null
+  colorAccessorFactory: (key: DataKey) => (d: ITimeFrameData) => string | null
   config: {
     x: SimpleScaleConfig
     y: SimpleScaleConfig
   }
   curve: typeof curveLinear | typeof curveCardinal | typeof curveStep
-  data: CityTemperature[]
+  data: ITimeFrameData[]
   editAnnotationLabelPosition: boolean
   numTicks: number
   setAnnotationDataIndex: (index: number) => void
@@ -63,10 +66,10 @@ type ProvidedProps = {
   renderBarGroup: boolean
   renderBarSeries: boolean
   renderBarStack: boolean
-  renderGlyph: React.FC<GlyphProps<CityTemperature>>
+  renderGlyph: React.FC<GlyphProps<ITimeFrameData>>
   renderGlyphSeries: boolean
   enableTooltipGlyph: boolean
-  renderTooltipGlyph: React.FC<RenderTooltipGlyphProps<CityTemperature>>
+  renderTooltipGlyph: React.FC<RenderTooltipGlyphProps<ITimeFrameData>>
   renderHorizontally: boolean
   renderLineSeries: boolean
   sharedTooltip: boolean
@@ -85,6 +88,7 @@ type ProvidedProps = {
 
 type ControlsProps = {
   children: (props: ProvidedProps) => React.ReactNode
+  data: ITimeFrameData[]
 }
 
 const useStyles = createStyles(() => ({
@@ -102,7 +106,7 @@ const useStyles = createStyles(() => ({
   }
 }))
 
-export default function ExampleControls({ children }: ControlsProps) {
+export default function ChartControls({ children, data }: ControlsProps) {
   const theme = customTheme as XYChartTheme
   const { classes } = useStyles()
   const [showGridRows, showGridColumns] = [true, false]
@@ -121,7 +125,7 @@ export default function ExampleControls({ children }: ControlsProps) {
       onPointerMove,
       onPointerOut,
       onPointerUp
-    }: GlyphProps<CityTemperature>) => {
+    }: GlyphProps<ITimeFrameData>) => {
       const handlers = { onPointerMove, onPointerOut, onPointerUp }
 
       return (
@@ -146,7 +150,7 @@ export default function ExampleControls({ children }: ControlsProps) {
       onPointerMove,
       onPointerOut,
       onPointerUp
-    }: RenderTooltipGlyphProps<CityTemperature>) => {
+    }: RenderTooltipGlyphProps<ITimeFrameData>) => {
       const handlers = { onPointerMove, onPointerOut, onPointerUp }
 
       return (
@@ -164,7 +168,7 @@ export default function ExampleControls({ children }: ControlsProps) {
   )
   // for series that support it, return a colorAccessor which returns a custom color if the datum is selected
   const colorAccessorFactory = useCallback(
-    (dataKey: DataKey) => (d: CityTemperature) =>
+    (dataKey: DataKey) => (d: ITimeFrameData) =>
       annotationDataKey === dataKey && d === data[annotationDataIndex]
         ? `url(#${selectedDatumPatternId})`
         : null,
@@ -173,14 +177,16 @@ export default function ExampleControls({ children }: ControlsProps) {
 
   const accessors = {
     x: {
-      'San Francisco': getDate,
-      'New York': getDate,
-      Austin: getDate
+      Impressions: getDate,
+      'Clicks and CRT': getDate,
+      'Average CPM': getDate,
+      'Total spent': getDate
     },
     y: {
-      'San Francisco': getSfTemperature,
-      'New York': getNyTemperature,
-      Austin: getAustinTemperature
+      Impressions: getImpressions,
+      'Clicks and CRT': getClickAndCRT,
+      'Average CPM': getAverageCPM,
+      'Total spent': getSpent
     },
     date: getDate
   }
@@ -194,7 +200,7 @@ export default function ExampleControls({ children }: ControlsProps) {
     <>
       {children({
         accessors,
-        animationTrajectory: 'min',
+        animationTrajectory: 'center',
         annotationDataKey,
         annotationDatum: data[annotationDataIndex],
         annotationLabelPosition,
