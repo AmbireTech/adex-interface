@@ -1,5 +1,5 @@
 import { createStyles } from '@mantine/core'
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import { XYChartTheme } from '@visx/xychart'
 import { PatternLines } from '@visx/pattern'
 import { GlyphProps } from '@visx/xychart/lib/types'
@@ -14,8 +14,7 @@ import getAnimatedOrUnanimatedComponents from './getAnimatedOrUnanimatedComponen
 
 const dateScaleConfig = { type: 'band', paddingInner: 0.3 } as const
 const temperatureScaleConfig = { type: 'linear' } as const
-const numTicks = 20
-// const data = ITimeFrameData.slice(225, 275)
+const numTicks = 4
 
 const getDate = (d: ITimeFrameData) => d.date
 const getImpressions = (d: ITimeFrameData) => Number(d.impressions)
@@ -107,6 +106,25 @@ const useStyles = createStyles(() => ({
 }))
 
 export default function ChartControls({ children, data }: ControlsProps) {
+  const maxImpressions = useMemo(() => Math.max(...data.map((i) => i.impressions)), [data])
+  const maxClickAndCRT = useMemo(() => Math.max(...data.map((i) => i.clickAndCRT)), [data])
+  const maxAverageCPM = useMemo(() => Math.max(...data.map((i) => i.averageCPM)), [data])
+  const maxSpent = useMemo(() => Math.max(...data.map((i) => i.spent)), [data])
+
+  const scaledData = useMemo(
+    () =>
+      data.map((item) => {
+        return {
+          ...item,
+          impressions: Math.log(1 + item.impressions) / Math.log(1 + maxImpressions),
+          clickAndCRT: Math.log(1 + item.clickAndCRT) / Math.log(1 + maxClickAndCRT),
+          averageCPM: Math.log(1 + item.averageCPM) / Math.log(1 + maxAverageCPM),
+          spent: Math.log(1 + item.spent) / Math.log(1 + maxSpent)
+        }
+      }),
+    [data, maxAverageCPM, maxClickAndCRT, maxImpressions, maxSpent]
+  )
+
   const theme = customTheme as XYChartTheme
   const { classes } = useStyles()
   const [showGridRows, showGridColumns] = [true, false]
@@ -172,7 +190,7 @@ export default function ChartControls({ children, data }: ControlsProps) {
       annotationDataKey === dataKey && d === data[annotationDataIndex]
         ? `url(#${selectedDatumPatternId})`
         : null,
-    [annotationDataIndex, annotationDataKey]
+    [annotationDataIndex, annotationDataKey, data]
   )
 
   const accessors = {
@@ -207,8 +225,8 @@ export default function ChartControls({ children, data }: ControlsProps) {
         annotationType: 'circle',
         colorAccessorFactory,
         config,
-        curve: curveCardinal,
-        data,
+        curve: curveLinear,
+        data: scaledData,
         editAnnotationLabelPosition: false,
         numTicks,
         renderBarGroup: false,
@@ -219,8 +237,8 @@ export default function ChartControls({ children, data }: ControlsProps) {
         enableTooltipGlyph: false,
         renderTooltipGlyph,
         renderHorizontally: false,
-        renderAreaSeries: false,
-        renderAreaStack: true,
+        renderAreaSeries: true,
+        renderAreaStack: false,
         renderLineSeries: false,
         setAnnotationDataIndex,
         setAnnotationDataKey,

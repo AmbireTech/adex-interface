@@ -114,6 +114,12 @@ export default function TimeFrameChart({ height, width, timeFrameData }: XYChart
                 xAccessor={accessors.x['Average CPM']}
                 yAccessor={accessors.y['Average CPM']}
               />
+              <BarSeries
+                dataKey="Total spent"
+                data={data}
+                xAccessor={accessors.x['Total spent']}
+                yAccessor={accessors.y['Total spent']}
+              />
             </BarStack>
           )}
           {renderBarGroup && (
@@ -138,6 +144,13 @@ export default function TimeFrameChart({ height, width, timeFrameData }: XYChart
                 xAccessor={accessors.x['Average CPM']}
                 yAccessor={accessors.y['Average CPM']}
                 colorAccessor={colorAccessorFactory('Average CPM')}
+              />
+              <BarSeries
+                dataKey="Total spent"
+                data={data}
+                xAccessor={accessors.x['Total spent']}
+                yAccessor={accessors.y['Total spent']}
+                colorAccessor={colorAccessorFactory('Total spent')}
               />
             </BarGroup>
           )}
@@ -176,6 +189,14 @@ export default function TimeFrameChart({ height, width, timeFrameData }: XYChart
                 fillOpacity={0.4}
                 curve={curve}
               />
+              <AreaSeries
+                dataKey="Total spent"
+                data={data}
+                xAccessor={accessors.x['Total spent']}
+                yAccessor={accessors.y['Total spent']}
+                fillOpacity={0.4}
+                curve={curve}
+              />
             </>
           )}
           {renderAreaStack && (
@@ -199,6 +220,13 @@ export default function TimeFrameChart({ height, width, timeFrameData }: XYChart
                 data={data}
                 xAccessor={accessors.x['Clicks and CRT']}
                 yAccessor={accessors.y['Clicks and CRT']}
+                fillOpacity={0.4}
+              />
+              <AreaSeries
+                dataKey="Total spent"
+                data={data}
+                xAccessor={accessors.x['Total spent']}
+                yAccessor={accessors.y['Total spent']}
                 fillOpacity={0.4}
               />
             </AreaStack>
@@ -226,6 +254,13 @@ export default function TimeFrameChart({ height, width, timeFrameData }: XYChart
                 data={data}
                 xAccessor={accessors.x['Clicks and CRT']}
                 yAccessor={accessors.y['Clicks and CRT']}
+                curve={curve}
+              />
+              <LineSeries
+                dataKey="Total spent"
+                data={data}
+                xAccessor={accessors.x['Total spent']}
+                yAccessor={accessors.y['Total spent']}
                 curve={curve}
               />
             </>
