@@ -1,5 +1,3 @@
-// import { ITimeFrameData } from '@visx/mock-data/lib/mocks/ITimeFrameData'
-
 import { ITimeFrameData } from 'types'
 import ChartControls from './Chart'
 import CustomChartBackground from './CustomChartBackground'
@@ -10,7 +8,6 @@ export type XYChartProps = {
   timeFrameData: ITimeFrameData[]
 }
 
-// type City = 'San Francisco' | 'New York' | 'Austin'
 type Metrics = 'Impressions' | 'Clicks and CRT' | 'Average CPM' | 'Total spent'
 
 export default function TimeFrameChart({ height, width, timeFrameData }: XYChartProps) {
