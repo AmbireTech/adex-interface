@@ -1,15 +1,13 @@
-import { createStyles } from '@mantine/core'
+import { createStyles, useMantineTheme } from '@mantine/core'
 import React, { useCallback, useMemo, useState } from 'react'
-import { XYChartTheme } from '@visx/xychart'
+import { XYChartTheme, buildChartTheme } from '@visx/xychart'
 import { PatternLines } from '@visx/pattern'
 import { GlyphProps } from '@visx/xychart/lib/types'
 import { AnimationTrajectory } from '@visx/react-spring/lib/types'
-// import ITimeFrameData, { CityTemperature } from '@visx/mock-data/lib/mocks/cityTemperature'
 import { ITimeFrameData } from 'types'
 import { GlyphStar } from '@visx/glyph'
 import { curveLinear, curveStep, curveCardinal } from '@visx/curve'
 import { RenderTooltipGlyphProps } from '@visx/xychart/lib/components/Tooltip'
-import customTheme from './customTheme'
 import getAnimatedOrUnanimatedComponents from './getAnimatedOrUnanimatedComponents'
 
 const dateScaleConfig = { type: 'band', paddingInner: 0.3 } as const
@@ -66,7 +64,6 @@ type ProvidedProps = {
   renderBarSeries: boolean
   renderBarStack: boolean
   renderGlyph: React.FC<GlyphProps<ITimeFrameData>>
-  renderGlyphSeries: boolean
   enableTooltipGlyph: boolean
   renderTooltipGlyph: React.FC<RenderTooltipGlyphProps<ITimeFrameData>>
   renderHorizontally: boolean
@@ -116,16 +113,32 @@ export default function ChartControls({ children, data }: ControlsProps) {
       data.map((item) => {
         return {
           ...item,
-          impressions: Math.log(1 + item.impressions) / Math.log(1 + maxImpressions),
-          clickAndCRT: Math.log(1 + item.clickAndCRT) / Math.log(1 + maxClickAndCRT),
-          averageCPM: Math.log(1 + item.averageCPM) / Math.log(1 + maxAverageCPM),
-          spent: Math.log(1 + item.spent) / Math.log(1 + maxSpent)
+          impressions:
+            item.impressions && Math.log(1 + item.impressions) / Math.log(1 + maxImpressions),
+          clickAndCRT:
+            item.clickAndCRT && Math.log(1 + item.clickAndCRT) / Math.log(1 + maxClickAndCRT),
+          averageCPM:
+            item.averageCPM && Math.log(1 + item.averageCPM) / Math.log(1 + maxAverageCPM),
+          spent: item.spent && Math.log(1 + item.spent) / Math.log(1 + maxSpent)
         }
       }),
     [data, maxAverageCPM, maxClickAndCRT, maxImpressions, maxSpent]
   )
 
-  const theme = customTheme as XYChartTheme
+  const appTheme = useMantineTheme()
+  const theme = buildChartTheme({
+    backgroundColor: 'white',
+    colors: [
+      appTheme.colors.chartColorOne[appTheme.fn.primaryShade()],
+      appTheme.colors.chartColorTwo[appTheme.fn.primaryShade()],
+      appTheme.colors.chartColorThree[appTheme.fn.primaryShade()],
+      appTheme.colors.chartColorFour[appTheme.fn.primaryShade()]
+    ],
+    gridColor: '#336d88',
+    gridColorDark: '#1d1b38',
+    svgLabelBig: { fill: '#1d1b38' },
+    tickLength: 8
+  }) as XYChartTheme
   const { classes } = useStyles()
   const [showGridRows, showGridColumns] = [true, false]
   const [annotationDataKey, setAnnotationDataKey] =
@@ -232,7 +245,6 @@ export default function ChartControls({ children, data }: ControlsProps) {
         renderBarGroup: false,
         renderBarSeries: false,
         renderBarStack: false,
-        renderGlyphSeries: false,
         renderGlyph,
         enableTooltipGlyph: false,
         renderTooltipGlyph,

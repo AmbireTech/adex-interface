@@ -25,6 +25,10 @@ type ExtendedCustomColors =
   | 'attention'
   | 'secondaryAccent'
   | 'darkBackground'
+  | 'chartColorOne'
+  | 'chartColorTwo'
+  | 'chartColorThree'
+  | 'chartColorFour'
   | DefaultMantineColor
 
 declare module '@mantine/core' {

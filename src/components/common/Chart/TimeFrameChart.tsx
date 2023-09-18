@@ -6,11 +6,19 @@ export type XYChartProps = {
   width: number
   height: number
   timeFrameData: ITimeFrameData[]
+  // TODO: Add type for it
+  metricsToShow: any
 }
 
 type Metrics = 'Impressions' | 'Clicks and CRT' | 'Average CPM' | 'Total spent'
 
-export default function TimeFrameChart({ height, width, timeFrameData }: XYChartProps) {
+export default function TimeFrameChart({
+  height,
+  width,
+  timeFrameData,
+  metricsToShow
+}: XYChartProps) {
+  console.log('metricsToShow', metricsToShow)
   return (
     <ChartControls data={timeFrameData}>
       {({
@@ -20,23 +28,16 @@ export default function TimeFrameChart({ height, width, timeFrameData }: XYChart
         annotationDatum,
         annotationLabelPosition,
         annotationType,
-        colorAccessorFactory,
         config,
         curve,
         data,
         editAnnotationLabelPosition,
         numTicks,
         renderAreaSeries,
-        renderAreaStack,
         renderBarGroup,
-        renderBarSeries,
-        renderBarStack,
-        renderGlyph,
-        renderGlyphSeries,
         enableTooltipGlyph,
         renderTooltipGlyph,
         renderHorizontally,
-        renderLineSeries,
         setAnnotationDataIndex,
         setAnnotationDataKey,
         setAnnotationLabelPosition,
@@ -54,14 +55,8 @@ export default function TimeFrameChart({ height, width, timeFrameData }: XYChart
         yAxisOrientation,
         Annotation,
         AreaSeries,
-        AreaStack,
         Axis,
-        BarGroup,
-        BarSeries,
-        BarStack,
-        GlyphSeries,
         Grid,
-        LineSeries,
         AnnotationCircleSubject,
         AnnotationConnector,
         AnnotationLabel,
@@ -91,196 +86,58 @@ export default function TimeFrameChart({ height, width, timeFrameData }: XYChart
             animationTrajectory={animationTrajectory}
             numTicks={numTicks}
           />
-          {renderBarStack && (
-            <BarStack offset={stackOffset}>
-              <BarSeries
-                dataKey="Impressions"
-                data={data}
-                xAccessor={accessors.x.Impressions}
-                yAccessor={accessors.y.Impressions}
-              />
-              <BarSeries
-                dataKey="Clicks and CRT"
-                data={data}
-                xAccessor={accessors.x['Clicks and CRT']}
-                yAccessor={accessors.y['Clicks and CRT']}
-              />
-              <BarSeries
-                dataKey="Average CPM"
-                data={data}
-                xAccessor={accessors.x['Average CPM']}
-                yAccessor={accessors.y['Average CPM']}
-              />
-              <BarSeries
-                dataKey="Total spent"
-                data={data}
-                xAccessor={accessors.x['Total spent']}
-                yAccessor={accessors.y['Total spent']}
-              />
-            </BarStack>
-          )}
-          {renderBarGroup && (
-            <BarGroup>
-              <BarSeries
-                dataKey="Impressions"
-                data={data}
-                xAccessor={accessors.x.Impressions}
-                yAccessor={accessors.y.Impressions}
-                colorAccessor={colorAccessorFactory('Impressions')}
-              />
-              <BarSeries
-                dataKey="Clicks and CRT"
-                data={data}
-                xAccessor={accessors.x['Clicks and CRT']}
-                yAccessor={accessors.y['Clicks and CRT']}
-                colorAccessor={colorAccessorFactory('Clicks and CRT')}
-              />
-              <BarSeries
-                dataKey="Average CPM"
-                data={data}
-                xAccessor={accessors.x['Average CPM']}
-                yAccessor={accessors.y['Average CPM']}
-                colorAccessor={colorAccessorFactory('Average CPM')}
-              />
-              <BarSeries
-                dataKey="Total spent"
-                data={data}
-                xAccessor={accessors.x['Total spent']}
-                yAccessor={accessors.y['Total spent']}
-                colorAccessor={colorAccessorFactory('Total spent')}
-              />
-            </BarGroup>
-          )}
-          {renderBarSeries && (
-            <BarSeries
-              dataKey="Impressions"
-              data={data}
-              xAccessor={accessors.x.Impressions}
-              yAccessor={accessors.y.Impressions}
-              colorAccessor={colorAccessorFactory('Impressions')}
-            />
-          )}
           {renderAreaSeries && (
             <>
-              <AreaSeries
-                dataKey="Average CPM"
-                data={data}
-                xAccessor={accessors.x['Average CPM']}
-                yAccessor={accessors.y['Average CPM']}
-                fillOpacity={0.4}
-                curve={curve}
-              />
-              <AreaSeries
-                dataKey="Impressions"
-                data={data}
-                xAccessor={accessors.x.Impressions}
-                yAccessor={accessors.y.Impressions}
-                fillOpacity={0.4}
-                curve={curve}
-              />
-              <AreaSeries
-                dataKey="Clicks and CRT"
-                data={data}
-                xAccessor={accessors.x['Clicks and CRT']}
-                yAccessor={accessors.y['Clicks and CRT']}
-                fillOpacity={0.4}
-                curve={curve}
-              />
-              <AreaSeries
-                dataKey="Total spent"
-                data={data}
-                xAccessor={accessors.x['Total spent']}
-                yAccessor={accessors.y['Total spent']}
-                fillOpacity={0.4}
-                curve={curve}
-              />
-            </>
-          )}
-          {renderAreaStack && (
-            <AreaStack curve={curve} offset={stackOffset} renderLine={stackOffset !== 'wiggle'}>
-              <AreaSeries
-                dataKey="Average CPM"
-                data={data}
-                xAccessor={accessors.x['Average CPM']}
-                yAccessor={accessors.y['Average CPM']}
-                fillOpacity={0.4}
-              />
-              <AreaSeries
-                dataKey="Impressions"
-                data={data}
-                xAccessor={accessors.x.Impressions}
-                yAccessor={accessors.y.Impressions}
-                fillOpacity={0.4}
-              />
-              <AreaSeries
-                dataKey="Clicks and CRT"
-                data={data}
-                xAccessor={accessors.x['Clicks and CRT']}
-                yAccessor={accessors.y['Clicks and CRT']}
-                fillOpacity={0.4}
-              />
-              <AreaSeries
-                dataKey="Total spent"
-                data={data}
-                xAccessor={accessors.x['Total spent']}
-                yAccessor={accessors.y['Total spent']}
-                fillOpacity={0.4}
-              />
-            </AreaStack>
-          )}
-          {renderLineSeries && (
-            <>
-              <LineSeries
-                dataKey="Average CPM"
-                data={data}
-                xAccessor={accessors.x['Average CPM']}
-                yAccessor={accessors.y['Average CPM']}
-                curve={curve}
-              />
-              {!renderBarSeries && (
-                <LineSeries
+              {metricsToShow.impressions && (
+                <AreaSeries
                   dataKey="Impressions"
                   data={data}
                   xAccessor={accessors.x.Impressions}
                   yAccessor={accessors.y.Impressions}
+                  fillOpacity={0.4}
                   curve={curve}
                 />
               )}
-              <LineSeries
-                dataKey="Clicks and CRT"
-                data={data}
-                xAccessor={accessors.x['Clicks and CRT']}
-                yAccessor={accessors.y['Clicks and CRT']}
-                curve={curve}
-              />
-              <LineSeries
-                dataKey="Total spent"
-                data={data}
-                xAccessor={accessors.x['Total spent']}
-                yAccessor={accessors.y['Total spent']}
-                curve={curve}
-              />
+              {metricsToShow.clickAndCRT && (
+                <AreaSeries
+                  dataKey="Clicks and CRT"
+                  data={data}
+                  xAccessor={accessors.x['Clicks and CRT']}
+                  yAccessor={accessors.y['Clicks and CRT']}
+                  fillOpacity={0.4}
+                  curve={curve}
+                />
+              )}
+              {metricsToShow.averageCPM && (
+                <AreaSeries
+                  dataKey="Average CPM"
+                  data={data}
+                  xAccessor={accessors.x['Average CPM']}
+                  yAccessor={accessors.y['Average CPM']}
+                  fillOpacity={0.4}
+                  curve={curve}
+                />
+              )}
+              {metricsToShow.spent && (
+                <AreaSeries
+                  dataKey="Total spent"
+                  data={data}
+                  xAccessor={accessors.x['Total spent']}
+                  yAccessor={accessors.y['Total spent']}
+                  fillOpacity={0.4}
+                  curve={curve}
+                />
+              )}
             </>
-          )}
-          {renderGlyphSeries && (
-            <GlyphSeries
-              dataKey="Clicks and CRT"
-              data={data}
-              xAccessor={accessors.x['Clicks and CRT']}
-              yAccessor={accessors.y['Clicks and CRT']}
-              renderGlyph={renderGlyph}
-              colorAccessor={colorAccessorFactory('Clicks and CRT')}
-            />
           )}
           <Axis
             key={`time-axis-${animationTrajectory}-${renderHorizontally}`}
             orientation={renderHorizontally ? yAxisOrientation : xAxisOrientation}
-            numTicks={numTicks}
+            numTicks={numTicks + 5}
             animationTrajectory={animationTrajectory}
           />
           <Axis
             key={`temp-axis-${animationTrajectory}-${renderHorizontally}`}
-            label={stackOffset == null ? 'Temperature (°F)' : 'Fraction of total temperature'}
             orientation={renderHorizontally ? xAxisOrientation : yAxisOrientation}
             numTicks={numTicks}
             animationTrajectory={animationTrajectory}
