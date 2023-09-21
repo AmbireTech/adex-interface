@@ -1,16 +1,6 @@
-import { ITimeFrameData } from 'types'
+import { ITimeFrameData, Metrics, XYChartProps } from 'types'
 import ChartControls from './Chart'
 import CustomChartBackground from './CustomChartBackground'
-
-export type XYChartProps = {
-  width: number
-  height: number
-  timeFrameData: ITimeFrameData[]
-  // TODO: Add type for it
-  metricsToShow: any
-}
-
-type Metrics = 'Impressions' | 'Clicks and CRT' | 'Average CPM' | 'Total spent'
 
 export default function TimeFrameChart({
   height,
@@ -18,9 +8,8 @@ export default function TimeFrameChart({
   timeFrameData,
   metricsToShow
 }: XYChartProps) {
-  console.log('metricsToShow', metricsToShow)
   return (
-    <ChartControls data={timeFrameData}>
+    <ChartControls data={timeFrameData} metricsToShow={metricsToShow}>
       {({
         accessors,
         animationTrajectory,

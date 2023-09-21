@@ -1,4 +1,5 @@
-import { Container, Flex, Tabs, Text } from '@mantine/core'
+import { useEffect, useState } from 'react'
+import { Button, Container, Flex, Tabs, Text } from '@mantine/core'
 import ActionButton from 'components/common/CustomTable/ActionButton/ActionButton'
 import { useNavigate, useParams } from 'react-router-dom'
 import DownloadIcon from 'resources/icons/Download'
@@ -23,6 +24,14 @@ const GoBack = ({ title }: { title: string }) => {
 
 const CampaignAnalytics = () => {
   const { id } = useParams()
+  const [activeTab, setActiveTab] = useState<string | null>('placements')
+  const [isMapBtnShown, setIsMapBtnShown] = useState<boolean>(false)
+  const [isMapVisible, setIsMapVisible] = useState<boolean>(false)
+
+  useEffect(
+    () => (activeTab === 'regions' ? setIsMapBtnShown(true) : setIsMapBtnShown(false)),
+    [activeTab]
+  )
 
   if (!id || Number.isNaN(parseInt(id, 10))) {
     return <div>Invalid campaign ID</div>
@@ -35,9 +44,10 @@ const CampaignAnalytics = () => {
       <GoBack title="Campaign Analytics" />
       <Tabs
         color="brand"
-        defaultValue="placements"
+        value={activeTab}
+        onTabChange={setActiveTab}
         styles={() => ({
-          tabsList: { border: 'none', padding: '20px' }
+          tabsList: { border: 'none', padding: '20px 0' }
         })}
       >
         <Flex justify="space-between" align="baseline">
@@ -48,6 +58,11 @@ const CampaignAnalytics = () => {
             <Tabs.Tab value="creatives">CREATIVES</Tabs.Tab>
           </Tabs.List>
           <Flex align="center">
+            {isMapBtnShown && (
+              <Button mr="md" onClick={() => setIsMapVisible((prev) => !prev)}>
+                {isMapVisible ? 'Hide World Map' : 'Show World Map'}
+              </Button>
+            )}
             <Text size="sm" mr="sm">
               Download CSV
             </Text>
@@ -61,7 +76,7 @@ const CampaignAnalytics = () => {
           <Placements placements={campaignDetails?.placements} />
         </Tabs.Panel>
         <Tabs.Panel value="regions" pt="xs">
-          <Regions regions={campaignDetails?.regions} />
+          <Regions regions={campaignDetails?.regions} isMapVisible={isMapVisible} />
         </Tabs.Panel>
         <Tabs.Panel value="creatives" pt="xs">
           <Creatives creatives={campaignDetails?.creatives} />

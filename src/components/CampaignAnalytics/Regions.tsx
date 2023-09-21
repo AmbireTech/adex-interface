@@ -1,12 +1,18 @@
-import CustomTableWithDropdown from 'components/common/CustomTableWithDropdown'
 import { IRegion } from 'types'
 import { ParentSize } from '@visx/responsive'
 import { Grid } from '@mantine/core'
+import CustomTable from 'components/common/CustomTable'
 import GeoCustom from '../common/CustomTableWithDropdown/WorldMap'
 
 const headings = ['Country', 'Share', 'Impressions', 'Clicks', 'CTR%', 'Average CPM', 'Spent']
 
-const Regions = ({ regions }: { regions: IRegion[] | undefined }) => {
+const Regions = ({
+  regions,
+  isMapVisible
+}: {
+  regions: IRegion[] | undefined
+  isMapVisible: boolean
+}) => {
   if (!regions?.length) {
     return <div>No regions found</div>
   }
@@ -19,15 +25,17 @@ const Regions = ({ regions }: { regions: IRegion[] | undefined }) => {
   }))
   return (
     <Grid grow>
-      <Grid.Col h={420}>
-        <ParentSize>
-          {({ height, width }) => (
-            <GeoCustom width={width} height={height} events regions={regions} />
-          )}
-        </ParentSize>
-      </Grid.Col>
+      {isMapVisible && (
+        <Grid.Col h={420}>
+          <ParentSize>
+            {({ height, width }) => (
+              <GeoCustom width={width} height={height} events regions={regions} />
+            )}
+          </ParentSize>
+        </Grid.Col>
+      )}
       <Grid.Col>
-        <CustomTableWithDropdown background headings={headings} elements={elements} />
+        <CustomTable background headings={headings} elements={elements} />
       </Grid.Col>
     </Grid>
   )

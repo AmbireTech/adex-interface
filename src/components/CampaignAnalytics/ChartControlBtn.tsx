@@ -1,21 +1,9 @@
 import { useState } from 'react'
-import { Box, Flex, MantineColor, Text, createStyles } from '@mantine/core'
+import { Box, Flex, Text, createStyles } from '@mantine/core'
 import InvisibilityIcon from 'resources/icons/Invisibility'
 import VisibilityIcon from 'resources/icons/Visibility'
 import InfoFilledIcon from 'resources/icons/InfoFilled'
-
-interface ChartControlBtnStyleProps {
-  bgColor: MantineColor
-  whiteFontColor: boolean
-}
-
-interface ChartControlBtnProps {
-  value: string
-  text: string
-  bgColor: MantineColor
-  onClick: any
-  whiteFontColor?: boolean
-}
+import { ChartControlBtnProps, ChartControlBtnStyleProps } from 'types'
 
 const useStyles = createStyles((theme, { bgColor, whiteFontColor }: ChartControlBtnStyleProps) => ({
   chartControls: {
@@ -49,9 +37,13 @@ const ChartControlBtn = ({
 }: ChartControlBtnProps) => {
   const { classes } = useStyles({ bgColor, whiteFontColor: !!whiteFontColor })
   const [visible, setVisible] = useState<boolean>(true)
+
   const handleClick = () => {
-    setVisible((prev) => !prev)
-    onClick(visible)
+    setVisible((prev) => {
+      const updatedVisible = !prev
+      onClick(updatedVisible)
+      return updatedVisible
+    })
   }
 
   return (
@@ -61,9 +53,9 @@ const ChartControlBtn = ({
           {value}
         </Text>
         {visible ? (
-          <InvisibilityIcon className={classes.iconSizeLg} />
-        ) : (
           <VisibilityIcon className={classes.iconSizeLg} />
+        ) : (
+          <InvisibilityIcon className={classes.iconSizeLg} />
         )}
       </Flex>
       <Text size="sm">
