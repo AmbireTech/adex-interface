@@ -1,3 +1,4 @@
+export type TabType = 'placements' | 'regions' | 'creatives' | 'timeframe'
 interface IPeriod {
   from: string
   to: string
@@ -33,6 +34,15 @@ export interface IRegion {
   spent: string
 }
 
+export interface ITimeFrameData {
+  [index: string]: any
+  date: string
+  impressions: number
+  clickAndCRT: number
+  averageCPM: number
+  spent: number
+}
+
 export interface ICampaignData {
   id: number
   campaignName: string
@@ -47,4 +57,5 @@ export interface ICampaignData {
   placements: IPlacement[]
   creatives: ICreative[]
   regions: IRegion[]
+  timeframe: ITimeFrameData[]
 }

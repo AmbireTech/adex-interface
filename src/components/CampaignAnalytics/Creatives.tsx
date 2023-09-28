@@ -5,6 +5,7 @@ import { CreativePreviewModal } from 'components/common/Modals'
 import { useState } from 'react'
 import { useDisclosure } from '@mantine/hooks'
 import { ICreative } from 'types'
+import { formatCurrency } from 'helpers'
 
 const useStyles = createStyles((theme) => ({
   icon: {
@@ -42,8 +43,8 @@ const Creatives = ({ creatives }: { creatives: ICreative[] | undefined }) => {
           />
         </Flex>
       ),
-      impressions: item.impressions.toLocaleString(),
-      clicks: item.clicks.toLocaleString(),
+      impressions: formatCurrency(item.impressions, 0),
+      clicks: formatCurrency(item.clicks, 0),
       ctrPercents: `${item.ctrPercents} %`
     }
   })

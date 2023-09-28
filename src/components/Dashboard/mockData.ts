@@ -257,6 +257,78 @@ const dashboardTableElements: ICampaignData[] = [
         averageCPM: '0.15 DAI',
         spent: '181.53 DAI'
       }
+    ],
+    timeframe: [
+      {
+        date: '01-01-2023',
+        impressions: 9146,
+        clickAndCRT: 96,
+        averageCPM: 0.164,
+        spent: 1.5032
+      },
+      {
+        date: '02-01-2023',
+        impressions: 300,
+        clickAndCRT: 3,
+        averageCPM: 0.0063,
+        spent: 1.01
+      },
+      {
+        date: '03-01-2023',
+        impressions: 30568,
+        clickAndCRT: 21,
+        averageCPM: 0.153,
+        spent: 4.21
+      },
+      {
+        date: '04-01-2023',
+        impressions: 21000,
+        clickAndCRT: 232,
+        averageCPM: 0.111,
+        spent: 3.21
+      },
+      {
+        date: '05-01-2023',
+        impressions: 16000,
+        clickAndCRT: 55,
+        averageCPM: 0.089,
+        spent: 2.21
+      },
+      {
+        date: '06-01-2023',
+        impressions: 9146,
+        clickAndCRT: 96,
+        averageCPM: 0.164,
+        spent: 1.5032
+      },
+      {
+        date: '07-01-2023',
+        impressions: 300,
+        clickAndCRT: 3,
+        averageCPM: 0.0063,
+        spent: 1.01
+      },
+      {
+        date: '08-01-2023',
+        impressions: 30568,
+        clickAndCRT: 21,
+        averageCPM: 0.153,
+        spent: 4.21
+      },
+      {
+        date: '09-01-2023',
+        impressions: 21000,
+        clickAndCRT: 232,
+        averageCPM: 0.111,
+        spent: 3.21
+      },
+      {
+        date: '10-01-2023',
+        impressions: 16000,
+        clickAndCRT: 55,
+        averageCPM: 0.089,
+        spent: 2.21
+      }
     ]
   },
   {
@@ -304,6 +376,78 @@ const dashboardTableElements: ICampaignData[] = [
         ctrPercents: 0.712,
         averageCPM: '0.15 DAI',
         spent: '181.53 DAI'
+      }
+    ],
+    timeframe: [
+      {
+        date: '01-01-2023',
+        impressions: 9146,
+        clickAndCRT: 96,
+        averageCPM: 0.164,
+        spent: 1.5032
+      },
+      {
+        date: '02-01-2023',
+        impressions: 300,
+        clickAndCRT: 3,
+        averageCPM: 0.0063,
+        spent: 1.01
+      },
+      {
+        date: '03-01-2023',
+        impressions: 30568,
+        clickAndCRT: 21,
+        averageCPM: 0.153,
+        spent: 4.21
+      },
+      {
+        date: '04-01-2023',
+        impressions: 21000,
+        clickAndCRT: 232,
+        averageCPM: 0.111,
+        spent: 3.21
+      },
+      {
+        date: '05-01-2023',
+        impressions: 16000,
+        clickAndCRT: 55,
+        averageCPM: 0.089,
+        spent: 2.21
+      },
+      {
+        date: '06-01-2023',
+        impressions: 9146,
+        clickAndCRT: 96,
+        averageCPM: 0.164,
+        spent: 1.5032
+      },
+      {
+        date: '07-01-2023',
+        impressions: 300,
+        clickAndCRT: 3,
+        averageCPM: 0.0063,
+        spent: 1.01
+      },
+      {
+        date: '08-01-2023',
+        impressions: 30568,
+        clickAndCRT: 21,
+        averageCPM: 0.153,
+        spent: 4.21
+      },
+      {
+        date: '09-01-2023',
+        impressions: 21000,
+        clickAndCRT: 232,
+        averageCPM: 0.111,
+        spent: 3.21
+      },
+      {
+        date: '10-01-2023',
+        impressions: 16000,
+        clickAndCRT: 55,
+        averageCPM: 0.089,
+        spent: 2.21
       }
     ]
   },
@@ -452,6 +596,15 @@ const dashboardTableElements: ICampaignData[] = [
         averageCPM: '0.15 DAI',
         spent: '181.53 DAI'
       }
+    ],
+    timeframe: [
+      {
+        date: '01-01-2023',
+        impressions: 9146,
+        clickAndCRT: 96,
+        averageCPM: 0.164,
+        spent: 1.5032
+      }
     ]
   },
   {
@@ -598,6 +751,15 @@ const dashboardTableElements: ICampaignData[] = [
         ctrPercents: 0.712,
         averageCPM: '0.15 DAI',
         spent: '181.53 DAI'
+      }
+    ],
+    timeframe: [
+      {
+        date: '01-01-2023',
+        impressions: 9146,
+        clickAndCRT: 96,
+        averageCPM: 0.164,
+        spent: 1.5032
       }
     ]
   },
@@ -746,6 +908,15 @@ const dashboardTableElements: ICampaignData[] = [
         averageCPM: '0.15 DAI',
         spent: '181.53 DAI'
       }
+    ],
+    timeframe: [
+      {
+        date: '01-01-2023',
+        impressions: 9146,
+        clickAndCRT: 96,
+        averageCPM: 0.164,
+        spent: 1.5032
+      }
     ]
   },
   {
@@ -892,6 +1063,15 @@ const dashboardTableElements: ICampaignData[] = [
         ctrPercents: 0.712,
         averageCPM: '0.15 DAI',
         spent: '181.53 DAI'
+      }
+    ],
+    timeframe: [
+      {
+        date: '01-01-2023',
+        impressions: 9146,
+        clickAndCRT: 96,
+        averageCPM: 0.164,
+        spent: 1.5032
       }
     ]
   },
@@ -1040,6 +1220,15 @@ const dashboardTableElements: ICampaignData[] = [
         averageCPM: '0.15 DAI',
         spent: '181.53 DAI'
       }
+    ],
+    timeframe: [
+      {
+        date: '01-01-2023',
+        impressions: 9146,
+        clickAndCRT: 96,
+        averageCPM: 0.164,
+        spent: 1.5032
+      }
     ]
   },
   {
@@ -1186,6 +1375,15 @@ const dashboardTableElements: ICampaignData[] = [
         ctrPercents: 0.712,
         averageCPM: '0.15 DAI',
         spent: '181.53 DAI'
+      }
+    ],
+    timeframe: [
+      {
+        date: '01-01-2023',
+        impressions: 9146,
+        clickAndCRT: 96,
+        averageCPM: 0.164,
+        spent: 1.5032
       }
     ]
   },
@@ -1334,6 +1532,15 @@ const dashboardTableElements: ICampaignData[] = [
         averageCPM: '0.15 DAI',
         spent: '181.53 DAI'
       }
+    ],
+    timeframe: [
+      {
+        date: '01-01-2023',
+        impressions: 9146,
+        clickAndCRT: 96,
+        averageCPM: 0.164,
+        spent: 1.5032
+      }
     ]
   },
   {
@@ -1480,6 +1687,15 @@ const dashboardTableElements: ICampaignData[] = [
         ctrPercents: 0.712,
         averageCPM: '0.15 DAI',
         spent: '181.53 DAI'
+      }
+    ],
+    timeframe: [
+      {
+        date: '01-01-2023',
+        impressions: 9146,
+        clickAndCRT: 96,
+        averageCPM: 0.164,
+        spent: 1.5032
       }
     ]
   },
@@ -1628,6 +1844,15 @@ const dashboardTableElements: ICampaignData[] = [
         averageCPM: '0.15 DAI',
         spent: '181.53 DAI'
       }
+    ],
+    timeframe: [
+      {
+        date: '01-01-2023',
+        impressions: 9146,
+        clickAndCRT: 96,
+        averageCPM: 0.164,
+        spent: 1.5032
+      }
     ]
   },
   {
@@ -1774,6 +1999,15 @@ const dashboardTableElements: ICampaignData[] = [
         ctrPercents: 0.712,
         averageCPM: '0.15 DAI',
         spent: '181.53 DAI'
+      }
+    ],
+    timeframe: [
+      {
+        date: '01-01-2023',
+        impressions: 9146,
+        clickAndCRT: 96,
+        averageCPM: 0.164,
+        spent: 1.5032
       }
     ]
   }

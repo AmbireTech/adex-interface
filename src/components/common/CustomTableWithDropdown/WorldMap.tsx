@@ -10,7 +10,6 @@ import topology from './world-topo.json'
 export type GeoCustomProps = {
   width: number
   height: number
-  events?: boolean
   regions?: IRegion[]
 }
 
@@ -21,7 +20,7 @@ interface FeatureShape {
   properties: { name: string }
 }
 
-export const background = '#252b7e'
+export const background = 'white'
 
 // @ts-expect-error
 const world = topojson.feature(topology, topology.objects.units) as {
@@ -61,45 +60,16 @@ const useStyles = createStyles(() => ({
   dragging: {
     cursor: 'grabbing'
   },
-  btn: {
-    margin: 0,
-    textAlign: 'center',
-    border: 'none',
-    background: '#dde1fe',
-    color: '#222',
-    padding: '0 4px',
-    borderTop: '1px solid #8993f9'
-  },
-  btnLg: {
-    fontSize: '12px',
-    lineHeight: 1,
-    padding: '4px'
-  },
-  btnZoom: {
-    width: '26px',
-    fontSize: '22px'
-  },
-  btnBottom: {
-    marginBottom: '1rem'
-  },
-  controls: {
-    position: 'absolute',
-    bottom: '20px',
-    right: '15px',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'flexEnd'
-  },
   label: {
     fontSize: '12px'
   }
 }))
 
-export default function GeoCustom({ width, height, events = true, regions }: GeoCustomProps) {
-  const { classes, cx } = useStyles()
+export default function GeoCustom({ width, height, regions }: GeoCustomProps) {
+  const { classes } = useStyles()
   const centerX = width / 2
   const centerY = height / 2
-  const initialScale = (width / 1100) * 100
+  const initialScale = (width / 500) * 100
 
   return width < 10 ? null : (
     <Zoom<SVGSVGElement>
@@ -164,51 +134,7 @@ export default function GeoCustom({ width, height, events = true, regions }: Geo
                   )
                 }}
               </CustomProjection>
-
-              {/** intercept all mouse events */}
-              {/* <rect
-                x={0}
-                y={0}
-                width={width}
-                height={height}
-                rx={14}
-                fill="transparent"
-                onTouchStart={zoom.dragStart}
-                onTouchMove={zoom.dragMove}
-                onTouchEnd={zoom.dragEnd}
-                onMouseDown={zoom.dragStart}
-                onMouseMove={zoom.dragMove}
-                onMouseUp={zoom.dragEnd}
-                onMouseLeave={() => {
-                  if (zoom.isDragging) zoom.dragEnd()
-                }}
-              /> */}
             </svg>
-            {events && (
-              <div className={classes.controls}>
-                <button
-                  type="button"
-                  className={cx(classes.btn, classes.btnZoom)}
-                  onClick={() => zoom.scale({ scaleX: 1.2, scaleY: 1.2 })}
-                >
-                  +
-                </button>
-                <button
-                  type="button"
-                  className={cx(classes.btn, classes.btnZoom, classes.btnBottom)}
-                  onClick={() => zoom.scale({ scaleX: 0.8, scaleY: 0.8 })}
-                >
-                  -
-                </button>
-                <button
-                  type="button"
-                  className={cx(classes.btn, classes.btnLg)}
-                  onClick={zoom.reset}
-                >
-                  Reset
-                </button>
-              </div>
-            )}
           </div>
         )
       }}

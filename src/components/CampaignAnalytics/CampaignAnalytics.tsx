@@ -2,14 +2,15 @@ import { useEffect, useState } from 'react'
 import { Button, Container, Flex, Tabs, Text } from '@mantine/core'
 import ActionButton from 'components/common/CustomTable/ActionButton/ActionButton'
 import { useNavigate, useParams } from 'react-router-dom'
-import DownloadIcon from 'resources/icons/Download'
+import { TabType } from 'types'
 import LeftChevronIcon from 'resources/icons/LeftChevron'
+import DownloadCSV from 'components/common/DownloadCSV'
 import Placements from './Placements'
 import { dashboardTableElements } from '../Dashboard/mockData'
 import Creatives from './Creatives'
 import Regions from './Regions'
 import TimeFrame from './TimeFrame'
-import { timeFrameData } from './mockData'
+import { generateCVSData } from './CvsDownloadConfigurations'
 
 const GoBack = ({ title }: { title: string }) => {
   const navigate = useNavigate()
@@ -24,20 +25,25 @@ const GoBack = ({ title }: { title: string }) => {
 
 const CampaignAnalytics = () => {
   const { id } = useParams()
-  const [activeTab, setActiveTab] = useState<string | null>('placements')
-  const [isMapBtnShown, setIsMapBtnShown] = useState<boolean>(false)
-  const [isMapVisible, setIsMapVisible] = useState<boolean>(false)
-
-  useEffect(
-    () => (activeTab === 'regions' ? setIsMapBtnShown(true) : setIsMapBtnShown(false)),
-    [activeTab]
-  )
-
   if (!id || Number.isNaN(parseInt(id, 10))) {
     return <div>Invalid campaign ID</div>
   }
 
+  const [activeTab, setActiveTab] = useState<TabType | null>('placements')
+  const [isMapBtnShown, setIsMapBtnShown] = useState<boolean>(false)
+  const [isMapVisible, setIsMapVisible] = useState<boolean>(false)
   const campaignDetails = dashboardTableElements.find((item) => item.id === parseInt(id, 10))
+  const [csvData, setCsvData] = useState(generateCVSData('placements', campaignDetails?.placements))
+
+  useEffect(() => {
+    activeTab === 'regions' ? setIsMapBtnShown(true) : setIsMapBtnShown(false)
+    const tabName = activeTab as TabType
+    setCsvData(generateCVSData(tabName, campaignDetails?.[tabName]))
+  }, [activeTab, campaignDetails])
+
+  const handleTabChange = (value: TabType) => {
+    setActiveTab(value)
+  }
 
   return (
     <Container fluid>
@@ -45,7 +51,7 @@ const CampaignAnalytics = () => {
       <Tabs
         color="brand"
         value={activeTab}
-        onTabChange={setActiveTab}
+        onTabChange={handleTabChange}
         styles={() => ({
           tabsList: { border: 'none', padding: '20px 0' }
         })}
@@ -63,14 +69,17 @@ const CampaignAnalytics = () => {
                 {isMapVisible ? 'Hide World Map' : 'Show World Map'}
               </Button>
             )}
-            <Text size="sm" mr="sm">
-              Download CSV
-            </Text>
-            <DownloadIcon size="24px" />
+            {activeTab !== 'timeframe' && (
+              <DownloadCSV
+                data={csvData.tabData}
+                mapHeadersToDataProperties={csvData.mapHeadersToDataProperties}
+                filename={csvData.filename}
+              />
+            )}
           </Flex>
         </Flex>
         <Tabs.Panel value="timeframe" pt="xs">
-          <TimeFrame timeFrames={timeFrameData} />
+          <TimeFrame timeFrames={campaignDetails?.timeframe} />
         </Tabs.Panel>
         <Tabs.Panel value="placements" pt="xs">
           <Placements placements={campaignDetails?.placements} />

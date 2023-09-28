@@ -29,7 +29,7 @@ const Regions = ({
         <Grid.Col h={420}>
           <ParentSize>
             {({ height, width }) => (
-              <GeoCustom width={width} height={height} events regions={regions} />
+              <GeoCustom width={width / 2} height={height} regions={regions} />
             )}
           </ParentSize>
         </Grid.Col>
