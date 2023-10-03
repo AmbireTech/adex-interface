@@ -55,8 +55,6 @@ const TimeFrame = ({ timeFrames }: { timeFrames: ITimeFrameData[] | undefined })
     return filteredObj
   })
 
-  console.log('filteredData', filteredData)
-
   const totalSum = sumArrayProperties(timeFrames)
 
   const handleImpressionsClick = (value: boolean, propNameToRemove: string) => {

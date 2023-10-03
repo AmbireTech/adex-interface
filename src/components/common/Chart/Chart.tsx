@@ -77,7 +77,7 @@ const ChartControls = ({ children, data, metricsToShow }: ControlsProps) => {
       appTheme.fn
     ]
   )
-  console.log('colors', colors)
+
   const theme = buildChartTheme({
     backgroundColor: 'white',
     colors,
