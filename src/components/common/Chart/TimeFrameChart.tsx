@@ -2,6 +2,19 @@ import { ITimeFrameData, Metrics, XYChartProps } from 'types'
 import ChartControls from './Chart'
 import CustomChartBackground from './CustomChartBackground'
 
+const updateTooltipData = (obj: any, values: any) => {
+  const keys = Object.keys(obj)
+  keys.forEach((key) => {
+    const value = obj[key]
+    if (value && typeof value === 'object') {
+      updateTooltipData(value, values)
+    } else if (Object.prototype.hasOwnProperty.call(values, key)) {
+      // eslint-disable-next-line
+      obj[key] = values[key]
+    }
+  })
+}
+
 export default function TimeFrameChart({
   height,
   width,
@@ -151,7 +164,7 @@ export default function TimeFrameChart({
               )}
               <AnnotationLabel
                 title={annotationDataKey}
-                subtitle={`${annotationDatum.date}, ${annotationDatum[annotationDataKey]}°F`}
+                subtitle={`${annotationDatum.date}, ${annotationDatum[annotationDataKey]}`}
                 width={135}
                 backgroundProps={{
                   stroke: theme.gridStyles.stroke,
@@ -170,46 +183,52 @@ export default function TimeFrameChart({
               showDatumGlyph={(snapTooltipToDatumX || snapTooltipToDatumY) && !renderBarGroup}
               showSeriesGlyphs={sharedTooltip && !renderBarGroup}
               renderGlyph={enableTooltipGlyph ? renderTooltipGlyph : undefined}
-              renderTooltip={({ tooltipData, colorScale }) => (
-                <>
-                  {/** date */}
-                  {(tooltipData?.nearestDatum?.datum &&
-                    accessors.date(tooltipData?.nearestDatum?.datum)) ||
-                    'No date'}
-                  <br />
-                  <br />
-                  {/** temperatures */}
-                  {(
-                    (sharedTooltip
-                      ? Object.keys(tooltipData?.datumByKey ?? {})
-                      : [tooltipData?.nearestDatum?.key]
-                    ).filter((city) => city) as Metrics[]
-                  ).map((city) => {
-                    const temperature =
-                      tooltipData?.nearestDatum?.datum &&
-                      accessors[renderHorizontally ? 'x' : 'y'][city](
-                        tooltipData?.nearestDatum?.datum
-                      )
+              renderTooltip={({ tooltipData, colorScale }) => {
+                const copiedData = JSON.parse(JSON.stringify(tooltipData)) as typeof tooltipData
+                const foundTimeFrameItem = timeFrameData.find(
+                  (i) => i.date === copiedData?.datumByKey.Impressions.datum.date
+                )
+                updateTooltipData(copiedData, foundTimeFrameItem)
 
-                    return (
-                      <div key={city}>
-                        <em
-                          style={{
-                            color: colorScale?.(city),
-                            textDecoration:
-                              tooltipData?.nearestDatum?.key === city ? 'underline' : undefined
-                          }}
-                        >
-                          {city}
-                        </em>{' '}
-                        {temperature == null || Number.isNaN(temperature)
-                          ? '–'
-                          : `${temperature}° F`}
-                      </div>
-                    )
-                  })}
-                </>
-              )}
+                return (
+                  <>
+                    {/** date */}
+                    {(copiedData?.nearestDatum?.datum &&
+                      accessors.date(copiedData?.nearestDatum?.datum)) ||
+                      'No date'}
+                    <br />
+                    <br />
+                    {/** value */}
+                    {(
+                      (sharedTooltip
+                        ? Object.keys(copiedData?.datumByKey ?? {})
+                        : [copiedData?.nearestDatum?.key]
+                      ).filter((item) => item) as Metrics[]
+                    ).map((item) => {
+                      const value =
+                        copiedData?.nearestDatum?.datum &&
+                        accessors[renderHorizontally ? 'x' : 'y'][item](
+                          copiedData?.nearestDatum?.datum
+                        )
+
+                      return (
+                        <div key={item}>
+                          <em
+                            style={{
+                              color: colorScale?.(item),
+                              textDecoration:
+                                copiedData?.nearestDatum?.key === item ? 'underline' : undefined
+                            }}
+                          >
+                            {item}
+                          </em>{' '}
+                          {value == null || Number.isNaN(value) ? '–' : value}
+                        </div>
+                      )
+                    })}
+                  </>
+                )
+              }}
             />
           )}
         </XYChart>

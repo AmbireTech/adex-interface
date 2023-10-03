@@ -36,7 +36,7 @@ const useStyles = createStyles(() => ({
   }
 }))
 
-export default function ChartControls({ children, data, metricsToShow }: ControlsProps) {
+const ChartControls = ({ children, data, metricsToShow }: ControlsProps) => {
   const maxImpressions = useMemo(() => Math.max(...data.map((i) => i.impressions)), [data])
   const maxClickAndCRT = useMemo(() => Math.max(...data.map((i) => i.clickAndCRT)), [data])
   const maxAverageCPM = useMemo(() => Math.max(...data.map((i) => i.averageCPM)), [data])
@@ -210,7 +210,6 @@ export default function ChartControls({ children, data, metricsToShow }: Control
         showVerticalCrosshair: true,
         snapTooltipToDatumX: true,
         snapTooltipToDatumY: true,
-        // stackOffset,
         theme,
         xAxisOrientation: 'bottom',
         yAxisOrientation: 'left',
@@ -230,3 +229,5 @@ export default function ChartControls({ children, data, metricsToShow }: Control
     </>
   )
 }
+
+export default ChartControls
