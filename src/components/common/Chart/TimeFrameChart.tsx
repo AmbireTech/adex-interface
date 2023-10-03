@@ -1,3 +1,4 @@
+import { createStyles } from '@mantine/core'
 import { ITimeFrameData, Metrics, XYChartProps } from 'types'
 import ChartControls from './Chart'
 import CustomChartBackground from './CustomChartBackground'
@@ -15,12 +16,25 @@ const updateTooltipData = (obj: any, values: any) => {
   })
 }
 
-export default function TimeFrameChart({
-  height,
-  width,
-  timeFrameData,
-  metricsToShow
-}: XYChartProps) {
+const useStyles = createStyles((theme) => ({
+  row: {
+    display: 'flex',
+    justifyContent: 'start',
+    alignItems: 'center',
+    fontWeight: 'normal',
+    color: theme.colors.mainText[theme.fn.primaryShade()]
+  },
+  dot: {
+    height: 6,
+    width: 6,
+    borderRadius: '50%',
+    display: 'inline-block',
+    marginRight: theme.spacing.xs
+  }
+}))
+
+const TimeFrameChart = ({ height, width, timeFrameData, metricsToShow }: XYChartProps) => {
+  const { classes } = useStyles()
   return (
     <ChartControls data={timeFrameData} metricsToShow={metricsToShow}>
       {({
@@ -191,14 +205,7 @@ export default function TimeFrameChart({
                 updateTooltipData(copiedData, foundTimeFrameItem)
 
                 return (
-                  <>
-                    {/** date */}
-                    {(copiedData?.nearestDatum?.datum &&
-                      accessors.date(copiedData?.nearestDatum?.datum)) ||
-                      'No date'}
-                    <br />
-                    <br />
-                    {/** value */}
+                  <div>
                     {(
                       (sharedTooltip
                         ? Object.keys(copiedData?.datumByKey ?? {})
@@ -212,21 +219,20 @@ export default function TimeFrameChart({
                         )
 
                       return (
-                        <div key={item}>
-                          <em
+                        <div className={classes.row} key={item}>
+                          <span
+                            className={classes.dot}
                             style={{
-                              color: colorScale?.(item),
-                              textDecoration:
-                                copiedData?.nearestDatum?.key === item ? 'underline' : undefined
+                              backgroundColor: colorScale?.(item)
                             }}
-                          >
-                            {item}
-                          </em>{' '}
-                          {value == null || Number.isNaN(value) ? '–' : value}
+                          />
+                          <span>
+                            {item}: {value == null || Number.isNaN(value) ? '–' : value}
+                          </span>
                         </div>
                       )
                     })}
-                  </>
+                  </div>
                 )
               }}
             />
@@ -236,3 +242,5 @@ export default function TimeFrameChart({
     </ChartControls>
   )
 }
+
+export default TimeFrameChart
