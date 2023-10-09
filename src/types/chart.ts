@@ -25,9 +25,9 @@ export type ProvidedProps = {
     date: Accessor
   }
   animationTrajectory?: AnimationTrajectory
-  annotationDataKey: DataKey | null
+  annotationDataKey?: DataKey | null
   annotationDatum?: ITimeFrameData
-  annotationLabelPosition: { dx: number; dy: number }
+  annotationLabelPosition?: { dx: number; dy: number }
   annotationType?: 'line' | 'circle'
   colorAccessorFactory: (key: DataKey) => (d: ITimeFrameData) => string | null
   config: {
@@ -38,9 +38,9 @@ export type ProvidedProps = {
   data: ITimeFrameData[]
   editAnnotationLabelPosition: boolean
   numTicks: number
-  setAnnotationDataIndex: (index: number) => void
+  setAnnotationDataIndex?: (index: number) => void
   setAnnotationDataKey: (key: DataKey | null) => void
-  setAnnotationLabelPosition: (position: { dx: number; dy: number }) => void
+  setAnnotationLabelPosition?: (position: { dx: number; dy: number }) => void
   renderAreaSeries: boolean
   renderAreaStack: boolean
   renderBarGroup: boolean

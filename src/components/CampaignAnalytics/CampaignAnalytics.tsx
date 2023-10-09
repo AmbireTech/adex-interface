@@ -29,7 +29,7 @@ const CampaignAnalytics = () => {
     return <div>Invalid campaign ID</div>
   }
 
-  const [activeTab, setActiveTab] = useState<TabType | null>('placements')
+  const [activeTab, setActiveTab] = useState<TabType | null>('timeframe')
   const [isMapBtnShown, setIsMapBtnShown] = useState<boolean>(false)
   const [isMapVisible, setIsMapVisible] = useState<boolean>(false)
   const campaignDetails = dashboardTableElements.find((item) => item.id === parseInt(id, 10))
@@ -79,7 +79,7 @@ const CampaignAnalytics = () => {
           </Flex>
         </Flex>
         <Tabs.Panel value="timeframe" pt="xs">
-          <TimeFrame timeFrames={campaignDetails?.timeframe} />
+          <TimeFrame timeFrames={campaignDetails?.timeframe} period={campaignDetails?.period} />
         </Tabs.Panel>
         <Tabs.Panel value="placements" pt="xs">
           <Placements placements={campaignDetails?.placements} />

@@ -1,7 +1,6 @@
-import { createStyles, useMantineTheme } from '@mantine/core'
+import { useMantineTheme } from '@mantine/core'
 import { useCallback, useMemo, useState } from 'react'
 import { XYChartTheme, buildChartTheme } from '@visx/xychart'
-import { PatternLines } from '@visx/pattern'
 import { GlyphProps } from '@visx/xychart/lib/types'
 import { ControlsProps, DataKey, ITimeFrameData, ProvidedProps } from 'types'
 import { GlyphStar } from '@visx/glyph'
@@ -20,21 +19,6 @@ const getAverageCPM = (d: ITimeFrameData) => Number(d.averageCPM)
 const getSpent = (d: ITimeFrameData) => Number(d.spent)
 const defaultAnnotationDataIndex = 13
 const selectedDatumPatternId = 'xychart-selected-datum'
-
-const useStyles = createStyles(() => ({
-  controls: {
-    fontSize: 13,
-    lineHeight: '1.5em'
-  },
-  label: {
-    fontSize: '12px'
-  },
-  patternLines: {
-    position: 'absolute',
-    pointerEvents: 'none',
-    opacity: 0
-  }
-}))
 
 const ChartControls = ({ children, data, metricsToShow }: ControlsProps) => {
   const maxImpressions = useMemo(() => Math.max(...data.map((i) => i.impressions)), [data])
@@ -86,13 +70,10 @@ const ChartControls = ({ children, data, metricsToShow }: ControlsProps) => {
     svgLabelBig: { fill: '#1d1b38' },
     tickLength: 8
   }) as XYChartTheme
-  const { classes } = useStyles()
   const [showGridRows, showGridColumns] = [true, false]
   const [annotationDataKey, setAnnotationDataKey] =
     useState<ProvidedProps['annotationDataKey']>(null)
-
-  const [annotationLabelPosition, setAnnotationLabelPosition] = useState({ dx: -40, dy: 0 })
-  const [annotationDataIndex, setAnnotationDataIndex] = useState(defaultAnnotationDataIndex)
+  const [annotationDataIndex] = useState(defaultAnnotationDataIndex)
   const glyphOutline = theme.gridStyles.stroke
   const renderGlyph = useCallback(
     ({
@@ -178,11 +159,6 @@ const ChartControls = ({ children, data, metricsToShow }: ControlsProps) => {
     <>
       {children({
         accessors,
-        animationTrajectory: 'center',
-        annotationDataKey,
-        annotationDatum: data[annotationDataIndex],
-        annotationLabelPosition,
-        annotationType: 'circle',
         colorAccessorFactory,
         config,
         curve: curveLinear,
@@ -199,9 +175,7 @@ const ChartControls = ({ children, data, metricsToShow }: ControlsProps) => {
         renderAreaSeries: true,
         renderAreaStack: false,
         renderLineSeries: false,
-        setAnnotationDataIndex,
         setAnnotationDataKey,
-        setAnnotationLabelPosition,
         sharedTooltip: true,
         showGridColumns,
         showGridRows,
@@ -209,23 +183,12 @@ const ChartControls = ({ children, data, metricsToShow }: ControlsProps) => {
         showTooltip: true,
         showVerticalCrosshair: true,
         snapTooltipToDatumX: true,
-        snapTooltipToDatumY: true,
+        snapTooltipToDatumY: false,
         theme,
         xAxisOrientation: 'bottom',
         yAxisOrientation: 'left',
         ...getAnimatedOrUnanimatedComponents(true)
       })}
-      {/** This style is used for annotated elements via colorAccessor. */}
-      <svg className={classes.patternLines}>
-        <PatternLines
-          id={selectedDatumPatternId}
-          width={6}
-          height={6}
-          orientation={['diagonalRightToLeft']}
-          stroke={theme?.axisStyles.x.bottom.axisLine.stroke}
-          strokeWidth={1.5}
-        />
-      </svg>
     </>
   )
 }

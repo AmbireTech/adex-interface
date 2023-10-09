@@ -1,8 +1,7 @@
 import { useMemo, useState } from 'react'
-import { Grid, Title, createStyles } from '@mantine/core'
-import { ParentSize } from '@visx/responsive'
+import { Grid, Title, createStyles, Flex, Text } from '@mantine/core'
 import TimeFrameChart from 'components/common/Chart/TimeFrameChart'
-import { ITimeFrameData } from 'types'
+import { IPeriod, ITimeFrameData } from 'types'
 import { formatCurrency } from 'helpers'
 import useWindowSize from 'hooks/useWindowSize'
 import ChartControlBtn from './ChartControlBtn'
@@ -14,6 +13,13 @@ const useStyles = createStyles((theme) => ({
     padding: theme.spacing.lg,
     marginBottom: theme.spacing.md,
     boxShadow: theme.shadows.sm
+  },
+  lighterGray: {
+    color: theme.fn.lighten(
+      theme.colors.mainText[theme.fn.primaryShade()],
+      theme.other.shades.lighten.lighter
+    ),
+    fontSize: theme.fontSizes.sm
   }
 }))
 
@@ -30,7 +36,13 @@ function sumArrayProperties(array: ITimeFrameData[]) {
   return result
 }
 
-const TimeFrame = ({ timeFrames }: { timeFrames: ITimeFrameData[] | undefined }) => {
+const TimeFrame = ({
+  timeFrames,
+  period
+}: {
+  timeFrames: ITimeFrameData[] | undefined
+  period: IPeriod | undefined
+}) => {
   const { classes } = useStyles()
   const [windowWidth] = useWindowSize()
 
@@ -110,21 +122,20 @@ const TimeFrame = ({ timeFrames }: { timeFrames: ITimeFrameData[] | undefined })
           </Grid.Col>
         </Grid>
       </Grid.Col>
-      <Grid.Col className={classes.wrapper} h={420}>
+      <Grid.Col className={classes.wrapper}>
         <Title order={5}>Chart</Title>
-        <ParentSize>
-          {({ height }) => {
-            const reducedHeight = height - 20
-            return (
-              <TimeFrameChart
-                width={windowWidth >= 768 ? windowWidth - 315 : windowWidth - 100}
-                height={reducedHeight}
-                timeFrameData={filteredData}
-                metricsToShow={metricsToShow}
-              />
-            )
-          }}
-        </ParentSize>
+        <TimeFrameChart
+          width={windowWidth >= 768 ? windowWidth - 315 : windowWidth - 100}
+          height={420}
+          timeFrameData={filteredData}
+          metricsToShow={metricsToShow}
+        />
+        {period && (
+          <Flex align="center" justify="space-between" ml="xl" mr="xl">
+            <Text className={classes.lighterGray}>Starts: {period.from}</Text>
+            <Text className={classes.lighterGray}>Ends: {period.to}</Text>
+          </Flex>
+        )}
       </Grid.Col>
     </Grid>
   )

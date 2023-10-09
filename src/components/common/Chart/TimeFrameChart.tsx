@@ -40,10 +40,6 @@ const TimeFrameChart = ({ height, width, timeFrameData, metricsToShow }: XYChart
       {({
         accessors,
         animationTrajectory,
-        annotationDataKey,
-        annotationDatum,
-        annotationLabelPosition,
-        annotationType,
         config,
         curve,
         data,
@@ -54,9 +50,6 @@ const TimeFrameChart = ({ height, width, timeFrameData, metricsToShow }: XYChart
         enableTooltipGlyph,
         renderTooltipGlyph,
         renderHorizontally,
-        setAnnotationDataIndex,
-        setAnnotationDataKey,
-        setAnnotationLabelPosition,
         sharedTooltip,
         showGridColumns,
         showGridRows,
@@ -69,14 +62,9 @@ const TimeFrameChart = ({ height, width, timeFrameData, metricsToShow }: XYChart
         theme,
         xAxisOrientation,
         yAxisOrientation,
-        Annotation,
         AreaSeries,
         Axis,
         Grid,
-        AnnotationCircleSubject,
-        AnnotationConnector,
-        AnnotationLabel,
-        AnnotationLineSubject,
         Tooltip,
         XYChart
       }) => (
@@ -87,12 +75,6 @@ const TimeFrameChart = ({ height, width, timeFrameData, metricsToShow }: XYChart
           height={Math.min(400, height)}
           width={width}
           captureEvents={!editAnnotationLabelPosition}
-          onPointerUp={(d) => {
-            setAnnotationDataKey(
-              d.key as 'Impressions' | 'Clicks and CRT' | 'Average CPM' | 'Total spent'
-            )
-            setAnnotationDataIndex(d.index)
-          }}
         >
           <CustomChartBackground />
           <Grid
@@ -149,7 +131,7 @@ const TimeFrameChart = ({ height, width, timeFrameData, metricsToShow }: XYChart
           <Axis
             key={`time-axis-${animationTrajectory}-${renderHorizontally}`}
             orientation={renderHorizontally ? yAxisOrientation : xAxisOrientation}
-            numTicks={numTicks + 5}
+            numTicks={numTicks}
             animationTrajectory={animationTrajectory}
           />
           <Axis
@@ -160,34 +142,6 @@ const TimeFrameChart = ({ height, width, timeFrameData, metricsToShow }: XYChart
             // values don't make sense in stream graph
             tickFormat={stackOffset === 'wiggle' ? () => '' : undefined}
           />
-          {annotationDataKey && annotationDatum && (
-            <Annotation
-              dataKey={annotationDataKey}
-              datum={annotationDatum}
-              dx={annotationLabelPosition.dx}
-              dy={annotationLabelPosition.dy}
-              editable={editAnnotationLabelPosition}
-              canEditSubject={false}
-              onDragEnd={({ dx, dy }) => setAnnotationLabelPosition({ dx, dy })}
-            >
-              <AnnotationConnector />
-              {annotationType === 'circle' ? (
-                <AnnotationCircleSubject />
-              ) : (
-                <AnnotationLineSubject />
-              )}
-              <AnnotationLabel
-                title={annotationDataKey}
-                subtitle={`${annotationDatum.date}, ${annotationDatum[annotationDataKey]}`}
-                width={135}
-                backgroundProps={{
-                  stroke: theme.gridStyles.stroke,
-                  strokeOpacity: 0.5,
-                  fillOpacity: 0.8
-                }}
-              />
-            </Annotation>
-          )}
           {showTooltip && (
             <Tooltip<ITimeFrameData>
               showHorizontalCrosshair={showHorizontalCrosshair}

@@ -1,5 +1,5 @@
 export type TabType = 'placements' | 'regions' | 'creatives' | 'timeframe'
-interface IPeriod {
+export interface IPeriod {
   from: string
   to: string
 }
