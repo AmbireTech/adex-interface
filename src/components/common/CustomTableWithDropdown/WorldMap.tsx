@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import * as topojson from 'topojson-client'
 import { scaleQuantize } from '@visx/scale'
 import { CustomProjection } from '@visx/geo'
@@ -67,9 +68,9 @@ const useStyles = createStyles(() => ({
 
 export default function GeoCustom({ width, height, regions }: GeoCustomProps) {
   const { classes } = useStyles()
-  const centerX = width / 2
-  const centerY = height / 2
-  const initialScale = (width / 500) * 100
+  const centerX = useMemo(() => width / 2, [width])
+  const centerY = useMemo(() => height / 2, [height])
+  const initialScale = useMemo(() => (width / 1000) * 100, [width])
 
   return width < 10 ? null : (
     <Zoom<SVGSVGElement>

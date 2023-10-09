@@ -1,9 +1,10 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Grid, Title, createStyles } from '@mantine/core'
 import { ParentSize } from '@visx/responsive'
 import TimeFrameChart from 'components/common/Chart/TimeFrameChart'
 import { ITimeFrameData } from 'types'
 import { formatCurrency } from 'helpers'
+import useWindowSize from 'hooks/useWindowSize'
 import ChartControlBtn from './ChartControlBtn'
 
 const useStyles = createStyles((theme) => ({
@@ -18,7 +19,6 @@ const useStyles = createStyles((theme) => ({
 
 function sumArrayProperties(array: ITimeFrameData[]) {
   const result = {} as ITimeFrameData
-
   array.forEach((obj) => {
     Object.keys(obj).forEach((key) => {
       if (Object.prototype.hasOwnProperty.call(obj, key) && typeof obj[key] === 'number' && key) {
@@ -32,6 +32,8 @@ function sumArrayProperties(array: ITimeFrameData[]) {
 
 const TimeFrame = ({ timeFrames }: { timeFrames: ITimeFrameData[] | undefined }) => {
   const { classes } = useStyles()
+  const [windowWidth] = useWindowSize()
+
   if (!timeFrames?.length) {
     return <div>No time frames found</div>
   }
@@ -43,19 +45,21 @@ const TimeFrame = ({ timeFrames }: { timeFrames: ITimeFrameData[] | undefined })
     spent: true
   })
 
-  const filteredData = timeFrames.map((obj) => {
-    const filteredObj = {} as any
+  const filteredData = useMemo(() => {
+    return timeFrames.map((obj) => {
+      const filteredObj = {} as any
 
-    Object.keys(obj).forEach((prop) => {
-      if ((metricsToShow as Record<string, boolean>)[prop]) {
-        filteredObj[prop] = obj[prop]
-      }
+      Object.keys(obj).forEach((prop) => {
+        if ((metricsToShow as Record<string, boolean>)[prop]) {
+          filteredObj[prop] = obj[prop]
+        }
+      })
+
+      return filteredObj
     })
+  }, [timeFrames, metricsToShow])
 
-    return filteredObj
-  })
-
-  const totalSum = sumArrayProperties(timeFrames)
+  const totalSum = useMemo(() => sumArrayProperties(timeFrames), [timeFrames])
 
   const handleImpressionsClick = (value: boolean, propNameToRemove: string) => {
     setMetricsToShow((prev) => ({ ...prev, [propNameToRemove]: value }))
@@ -109,14 +113,17 @@ const TimeFrame = ({ timeFrames }: { timeFrames: ITimeFrameData[] | undefined })
       <Grid.Col className={classes.wrapper} h={420}>
         <Title order={5}>Chart</Title>
         <ParentSize>
-          {({ width, height }) => (
-            <TimeFrameChart
-              width={width}
-              height={height - 20}
-              timeFrameData={filteredData}
-              metricsToShow={metricsToShow}
-            />
-          )}
+          {({ height }) => {
+            const reducedHeight = height - 20
+            return (
+              <TimeFrameChart
+                width={windowWidth >= 768 ? windowWidth - 315 : windowWidth - 100}
+                height={reducedHeight}
+                timeFrameData={filteredData}
+                metricsToShow={metricsToShow}
+              />
+            )
+          }}
         </ParentSize>
       </Grid.Col>
     </Grid>

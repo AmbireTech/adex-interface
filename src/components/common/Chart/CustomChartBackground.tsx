@@ -1,5 +1,4 @@
 import React, { useContext } from 'react'
-import { PatternLines } from '@visx/pattern'
 import { DataContext } from '@visx/xychart'
 
 const patternId = 'xy-chart-pattern'
@@ -12,14 +11,6 @@ export default function CustomChartBackground() {
 
   return (
     <>
-      <PatternLines
-        id={patternId}
-        width={16}
-        height={16}
-        orientation={['diagonal']}
-        stroke={theme?.gridStyles?.stroke}
-        strokeWidth={1}
-      />
       <rect x={0} y={0} width={width} height={height} fill={theme?.backgroundColor ?? '#fff'} />
       <rect
         x={margin.left}

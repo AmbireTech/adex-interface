@@ -8,22 +8,22 @@ import { useNavigate } from 'react-router-dom'
 import BadgeStatusCampaign from './BadgeStatusCampaign'
 import { dashboardTableElements } from './mockData'
 
+const headings = [
+  'Campaign name',
+  'Model',
+  'Status',
+  'Served',
+  'Budget',
+  'Impressions',
+  'Clicks',
+  'CTR',
+  'Period'
+]
+
 const Dashboard = () => {
   const [opened, { open, close }] = useDisclosure(false)
   const [selectedItem, setSelectedItem] = useState<ICampaignData | null>(null)
   const navigate = useNavigate()
-  const headings = [
-    'Campaign name',
-    'Model',
-    'Status',
-    'Served',
-    'Budget',
-    'Impressions',
-    'Clicks',
-    'CTR',
-    'Period'
-  ]
-
   const elements = dashboardTableElements.map((el) => {
     return {
       id: el.id,

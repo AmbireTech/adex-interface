@@ -1,4 +1,3 @@
-// import { useState } from 'react'
 import { AppShell, Navbar, Header, MediaQuery, Burger, createStyles } from '@mantine/core'
 import SideNav from 'components/SideNav'
 import TopBar from 'components/TopBar'

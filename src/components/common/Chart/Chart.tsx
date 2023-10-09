@@ -91,7 +91,7 @@ const ChartControls = ({ children, data, metricsToShow }: ControlsProps) => {
   const [annotationDataKey, setAnnotationDataKey] =
     useState<ProvidedProps['annotationDataKey']>(null)
 
-  const [annotationLabelPosition, setAnnotationLabelPosition] = useState({ dx: -40, dy: -20 })
+  const [annotationLabelPosition, setAnnotationLabelPosition] = useState({ dx: -40, dy: 0 })
   const [annotationDataIndex, setAnnotationDataIndex] = useState(defaultAnnotationDataIndex)
   const glyphOutline = theme.gridStyles.stroke
   const renderGlyph = useCallback(
