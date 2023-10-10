@@ -30,6 +30,9 @@ const useStyles = createStyles((theme) => ({
     borderRadius: '50%',
     display: 'inline-block',
     marginRight: theme.spacing.xs
+  },
+  hidden: {
+    display: 'none'
   }
 }))
 
@@ -86,46 +89,42 @@ const TimeFrameChart = ({ height, width, timeFrameData, metricsToShow }: XYChart
           />
           {renderAreaSeries && (
             <>
-              {metricsToShow.impressions && (
-                <AreaSeries
-                  dataKey="Impressions"
-                  data={data}
-                  xAccessor={accessors.x.Impressions}
-                  yAccessor={accessors.y.Impressions}
-                  fillOpacity={0.4}
-                  curve={curve}
-                />
-              )}
-              {metricsToShow.clickAndCRT && (
-                <AreaSeries
-                  dataKey="Clicks and CRT"
-                  data={data}
-                  xAccessor={accessors.x['Clicks and CRT']}
-                  yAccessor={accessors.y['Clicks and CRT']}
-                  fillOpacity={0.4}
-                  curve={curve}
-                />
-              )}
-              {metricsToShow.averageCPM && (
-                <AreaSeries
-                  dataKey="Average CPM"
-                  data={data}
-                  xAccessor={accessors.x['Average CPM']}
-                  yAccessor={accessors.y['Average CPM']}
-                  fillOpacity={0.4}
-                  curve={curve}
-                />
-              )}
-              {metricsToShow.spent && (
-                <AreaSeries
-                  dataKey="Total spent"
-                  data={data}
-                  xAccessor={accessors.x['Total spent']}
-                  yAccessor={accessors.y['Total spent']}
-                  fillOpacity={0.4}
-                  curve={curve}
-                />
-              )}
+              <AreaSeries
+                className={!metricsToShow.impressions ? classes.hidden : undefined}
+                dataKey="Impressions"
+                data={data}
+                xAccessor={accessors.x.Impressions}
+                yAccessor={accessors.y.Impressions}
+                fillOpacity={0.4}
+                curve={curve}
+              />
+              <AreaSeries
+                className={!metricsToShow.clickAndCRT ? classes.hidden : undefined}
+                dataKey="Clicks and CRT"
+                data={data}
+                xAccessor={accessors.x['Clicks and CRT']}
+                yAccessor={accessors.y['Clicks and CRT']}
+                fillOpacity={0.4}
+                curve={curve}
+              />
+              <AreaSeries
+                className={!metricsToShow.averageCPM ? classes.hidden : undefined}
+                dataKey="Average CPM"
+                data={data}
+                xAccessor={accessors.x['Average CPM']}
+                yAccessor={accessors.y['Average CPM']}
+                fillOpacity={0.4}
+                curve={curve}
+              />
+              <AreaSeries
+                className={!metricsToShow.spent ? classes.hidden : undefined}
+                dataKey="Total spent"
+                data={data}
+                xAccessor={accessors.x['Total spent']}
+                yAccessor={accessors.y['Total spent']}
+                fillOpacity={0.4}
+                curve={curve}
+              />
             </>
           )}
           <Axis
@@ -172,18 +171,22 @@ const TimeFrameChart = ({ height, width, timeFrameData, metricsToShow }: XYChart
                           copiedData?.nearestDatum?.datum
                         )
 
+                      const dotColor = colorScale?.(item)
+
                       return (
-                        <div className={classes.row} key={item}>
-                          <span
-                            className={classes.dot}
-                            style={{
-                              backgroundColor: colorScale?.(item)
-                            }}
-                          />
-                          <span>
-                            {item}: {value == null || Number.isNaN(value) ? '–' : value}
-                          </span>
-                        </div>
+                        dotColor && (
+                          <div className={classes.row} key={item}>
+                            <span
+                              className={classes.dot}
+                              style={{
+                                backgroundColor: dotColor
+                              }}
+                            />
+                            <span>
+                              {item}: {value == null || Number.isNaN(value) ? '–' : value}
+                            </span>
+                          </div>
+                        )
                       )
                     })}
                   </div>

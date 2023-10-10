@@ -42,13 +42,12 @@ const ChartControls = ({ children, data, metricsToShow }: ControlsProps) => {
 
   const appTheme = useMantineTheme()
   const colors = useMemo(
-    () =>
-      [
-        metricsToShow.impressions && appTheme.colors.chartColorOne[appTheme.fn.primaryShade()],
-        metricsToShow.clickAndCRT && appTheme.colors.chartColorTwo[appTheme.fn.primaryShade()],
-        metricsToShow.averageCPM && appTheme.colors.chartColorThree[appTheme.fn.primaryShade()],
-        metricsToShow.spent && appTheme.colors.chartColorFour[appTheme.fn.primaryShade()]
-      ].filter((i) => !!i),
+    () => [
+      metricsToShow.impressions && appTheme.colors.chartColorOne[appTheme.fn.primaryShade()],
+      metricsToShow.clickAndCRT && appTheme.colors.chartColorTwo[appTheme.fn.primaryShade()],
+      metricsToShow.averageCPM && appTheme.colors.chartColorThree[appTheme.fn.primaryShade()],
+      metricsToShow.spent && appTheme.colors.chartColorFour[appTheme.fn.primaryShade()]
+    ],
     [
       metricsToShow.impressions,
       metricsToShow.clickAndCRT,
