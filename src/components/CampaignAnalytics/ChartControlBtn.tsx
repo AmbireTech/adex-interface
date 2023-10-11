@@ -16,7 +16,7 @@ const useStyles = createStyles((theme, { bgColor, whiteFontColor }: ChartControl
     borderRadius: theme.radius.md,
     padding: theme.spacing.sm,
     cursor: 'pointer',
-    color: whiteFontColor ? 'white' : ''
+    color: whiteFontColor ? theme.colors.mainBackground[theme.fn.primaryShade()] : ''
   },
   iconSizeSm: {
     width: 10,

@@ -42,12 +42,13 @@ const ChartControls = ({ children, data, metricsToShow }: ControlsProps) => {
 
   const appTheme = useMantineTheme()
   const colors = useMemo(
-    () => [
-      metricsToShow.impressions && appTheme.colors.chartColorOne[appTheme.fn.primaryShade()],
-      metricsToShow.clickAndCRT && appTheme.colors.chartColorTwo[appTheme.fn.primaryShade()],
-      metricsToShow.averageCPM && appTheme.colors.chartColorThree[appTheme.fn.primaryShade()],
-      metricsToShow.spent && appTheme.colors.chartColorFour[appTheme.fn.primaryShade()]
-    ],
+    () =>
+      [
+        metricsToShow.impressions && appTheme.colors.chartColorOne[appTheme.fn.primaryShade()],
+        metricsToShow.clickAndCRT && appTheme.colors.chartColorTwo[appTheme.fn.primaryShade()],
+        metricsToShow.averageCPM && appTheme.colors.chartColorThree[appTheme.fn.primaryShade()],
+        metricsToShow.spent && appTheme.colors.chartColorFour[appTheme.fn.primaryShade()]
+      ].map((x) => (!x ? x.toString() : x)),
     [
       metricsToShow.impressions,
       metricsToShow.clickAndCRT,
@@ -61,12 +62,17 @@ const ChartControls = ({ children, data, metricsToShow }: ControlsProps) => {
     ]
   )
 
+  const gridColor = appTheme.fn.lighten(
+    appTheme.colors.mainText[appTheme.fn.primaryShade()],
+    appTheme.other.shades.lighten.lighter
+  )
+
   const theme = buildChartTheme({
-    backgroundColor: 'white',
+    backgroundColor: appTheme.colors.mainBackground[appTheme.fn.primaryShade()],
     colors,
-    gridColor: '#336d88',
-    gridColorDark: '#1d1b38',
-    svgLabelBig: { fill: '#1d1b38' },
+    gridColor,
+    gridColorDark: gridColor,
+    svgLabelBig: { fill: appTheme.colors.mainBackground[appTheme.fn.primaryShade()] },
     tickLength: 8
   }) as XYChartTheme
   const [showGridRows, showGridColumns] = [true, false]
@@ -158,6 +164,7 @@ const ChartControls = ({ children, data, metricsToShow }: ControlsProps) => {
     <>
       {children({
         accessors,
+        animationTrajectory: 'center',
         colorAccessorFactory,
         config,
         curve: curveLinear,
@@ -186,7 +193,7 @@ const ChartControls = ({ children, data, metricsToShow }: ControlsProps) => {
         theme,
         xAxisOrientation: 'bottom',
         yAxisOrientation: 'left',
-        ...getAnimatedOrUnanimatedComponents(true)
+        ...getAnimatedOrUnanimatedComponents(false)
       })}
     </>
   )

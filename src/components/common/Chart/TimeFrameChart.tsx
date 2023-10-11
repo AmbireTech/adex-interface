@@ -1,7 +1,6 @@
 import { createStyles } from '@mantine/core'
 import { ITimeFrameData, Metrics, XYChartProps } from 'types'
 import ChartControls from './Chart'
-import CustomChartBackground from './CustomChartBackground'
 
 const updateTooltipData = (obj: any, values: any) => {
   const keys = Object.keys(obj)
@@ -38,6 +37,7 @@ const useStyles = createStyles((theme) => ({
 
 const TimeFrameChart = ({ height, width, timeFrameData, metricsToShow }: XYChartProps) => {
   const { classes } = useStyles()
+  const filledOpacity = 0.1
   return (
     <ChartControls data={timeFrameData} metricsToShow={metricsToShow}>
       {({
@@ -61,7 +61,6 @@ const TimeFrameChart = ({ height, width, timeFrameData, metricsToShow }: XYChart
         showVerticalCrosshair,
         snapTooltipToDatumX,
         snapTooltipToDatumY,
-        stackOffset,
         theme,
         xAxisOrientation,
         yAxisOrientation,
@@ -79,7 +78,7 @@ const TimeFrameChart = ({ height, width, timeFrameData, metricsToShow }: XYChart
           width={width}
           captureEvents={!editAnnotationLabelPosition}
         >
-          <CustomChartBackground />
+          {/* <CustomChartBackground /> */}
           <Grid
             key={`grid-${animationTrajectory}`} // force animate on update
             rows={showGridRows}
@@ -95,7 +94,7 @@ const TimeFrameChart = ({ height, width, timeFrameData, metricsToShow }: XYChart
                 data={data}
                 xAccessor={accessors.x.Impressions}
                 yAccessor={accessors.y.Impressions}
-                fillOpacity={0.4}
+                fillOpacity={filledOpacity}
                 curve={curve}
               />
               <AreaSeries
@@ -104,7 +103,7 @@ const TimeFrameChart = ({ height, width, timeFrameData, metricsToShow }: XYChart
                 data={data}
                 xAccessor={accessors.x['Clicks and CRT']}
                 yAccessor={accessors.y['Clicks and CRT']}
-                fillOpacity={0.4}
+                fillOpacity={filledOpacity}
                 curve={curve}
               />
               <AreaSeries
@@ -113,7 +112,7 @@ const TimeFrameChart = ({ height, width, timeFrameData, metricsToShow }: XYChart
                 data={data}
                 xAccessor={accessors.x['Average CPM']}
                 yAccessor={accessors.y['Average CPM']}
-                fillOpacity={0.4}
+                fillOpacity={filledOpacity}
                 curve={curve}
               />
               <AreaSeries
@@ -122,7 +121,7 @@ const TimeFrameChart = ({ height, width, timeFrameData, metricsToShow }: XYChart
                 data={data}
                 xAccessor={accessors.x['Total spent']}
                 yAccessor={accessors.y['Total spent']}
-                fillOpacity={0.4}
+                fillOpacity={filledOpacity}
                 curve={curve}
               />
             </>
@@ -136,10 +135,9 @@ const TimeFrameChart = ({ height, width, timeFrameData, metricsToShow }: XYChart
           <Axis
             key={`temp-axis-${animationTrajectory}-${renderHorizontally}`}
             orientation={renderHorizontally ? xAxisOrientation : yAxisOrientation}
-            numTicks={numTicks}
+            numTicks={0}
+            hideAxisLine
             animationTrajectory={animationTrajectory}
-            // values don't make sense in stream graph
-            tickFormat={stackOffset === 'wiggle' ? () => '' : undefined}
           />
           {showTooltip && (
             <Tooltip<ITimeFrameData>
@@ -174,7 +172,7 @@ const TimeFrameChart = ({ height, width, timeFrameData, metricsToShow }: XYChart
                       const dotColor = colorScale?.(item)
 
                       return (
-                        dotColor && (
+                        dotColor !== 'false' && (
                           <div className={classes.row} key={item}>
                             <span
                               className={classes.dot}

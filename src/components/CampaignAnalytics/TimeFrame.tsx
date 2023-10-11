@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Grid, Title, createStyles, Flex, Text } from '@mantine/core'
 import TimeFrameChart from 'components/common/Chart/TimeFrameChart'
 import { IPeriod, ITimeFrameData } from 'types'
@@ -8,7 +8,7 @@ import ChartControlBtn from './ChartControlBtn'
 
 const useStyles = createStyles((theme) => ({
   wrapper: {
-    background: 'white',
+    background: theme.colors.mainBackground[theme.fn.primaryShade()],
     borderRadius: theme.radius.md,
     padding: theme.spacing.lg,
     marginBottom: theme.spacing.md,
@@ -45,6 +45,7 @@ const TimeFrame = ({
 }) => {
   const { classes } = useStyles()
   const [windowWidth] = useWindowSize()
+  const [filteredData, setFilteredData] = useState<any[]>([])
 
   if (!timeFrames?.length) {
     return <div>No time frames found</div>
@@ -57,8 +58,8 @@ const TimeFrame = ({
     spent: true
   })
 
-  const filteredData = useMemo(() => {
-    return timeFrames.map((obj) => {
+  useEffect(() => {
+    const result = timeFrames.map((obj) => {
       const filteredObj = {} as any
 
       Object.keys(obj).forEach((prop) => {
@@ -69,6 +70,7 @@ const TimeFrame = ({
 
       return filteredObj
     })
+    setFilteredData(result)
   }, [timeFrames, metricsToShow])
 
   const totalSum = useMemo(() => sumArrayProperties(timeFrames), [timeFrames])
