@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import * as topojson from 'topojson-client'
 import { scaleQuantize } from '@visx/scale'
-import { CustomProjection } from '@visx/geo'
+import { CustomProjection, Graticule } from '@visx/geo'
 import { Zoom } from '@visx/zoom'
 import { geoNaturalEarth1 } from 'd3-geo'
 import { Tooltip, createStyles } from '@mantine/core'
@@ -35,18 +35,17 @@ const color = scaleQuantize({
     Math.max(...world.features.map((f) => f.geometry.coordinates.length))
   ],
   range: [
-    '#019ece',
-    '#f4448b',
-    '#fccf35',
-    '#82b75d',
-    '#b33c88',
-    '#fc5e2f',
-    '#f94b3a',
-    '#f63a48',
-    '#dde1fe',
-    '#8993f9',
-    '#b6c8fb',
-    '#65fe8d'
+    '#EDEDFC',
+    '#C8C9F8',
+    '#AEB1F8',
+    '#939AF5',
+    '#7484F3',
+    '#4E6FF1',
+    '#2C5CDE',
+    '#224AB5',
+    '#19388F',
+    '#142867',
+    '#0E1942'
   ]
 })
 
@@ -108,6 +107,10 @@ export default function GeoCustom({ width, height, regions }: GeoCustomProps) {
                 {(customProjection) => {
                   return (
                     <g>
+                      <Graticule
+                        graticule={(g) => customProjection.path(g) || ''}
+                        stroke="#EBEEFA"
+                      />
                       {customProjection.features.map(({ feature, path }) => {
                         const selectedRegion = regions?.find(
                           (region) => region.country === feature.properties.name
