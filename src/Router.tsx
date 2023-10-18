@@ -6,6 +6,7 @@ import { createBrowserRouter, Navigate, useLocation } from 'react-router-dom'
 
 import useAccount from 'hooks/useAccount'
 import Deposit from 'components/Deposit'
+import CreateCampaign from 'components/CreateCampaign'
 
 function RequireAuth({ children }: { children: JSX.Element }) {
   const { authenticated } = useAccount()
@@ -50,6 +51,10 @@ export const router = createBrowserRouter([
       {
         path: 'deposit',
         element: <Deposit />
+      },
+      {
+        path: 'create-campaign',
+        element: <CreateCampaign />
       }
     ]
   }

@@ -225,15 +225,9 @@ export const baseTheme: MantineThemeOverride = {
         }
       }
     },
-    AppShell: {
-      styles: () => {
-        return {
-          body: {
-            nav: {
-              width: SIDE_BAR_WIDTH
-            }
-          }
-        }
+    Navbar: {
+      defaultProps: {
+        width: { sm: SIDE_BAR_WIDTH }
       }
     }
   },

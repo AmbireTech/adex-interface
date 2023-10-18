@@ -68,7 +68,13 @@ function SideNav() {
         <Balance />
       </Navbar.Section>
       <Navbar.Section className={classes.newCampaign}>
-        <Button variant="filled" color="secondaryAccent" size="md">
+        <Button
+          variant="filled"
+          color="secondaryAccent"
+          size="md"
+          component={Link}
+          to="/dashboard/create-campaign"
+        >
           New Campaign
         </Button>
       </Navbar.Section>
