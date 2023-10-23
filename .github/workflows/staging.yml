@@ -22,6 +22,4 @@ jobs:
           branch: gh-pages
           folder: ./build
           destination_dir: ./staging
-          cname: v5-staging.adex.network
-          clean-exclude: |
-            staging
+          cname: v5.adex.network
