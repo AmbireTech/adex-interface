@@ -1,4 +1,4 @@
-import { createStyles } from '@mantine/core'
+import { Flex, createStyles, Text } from '@mantine/core'
 
 type ShapeVariants =
   | 'mediumRectangle'
@@ -12,31 +12,52 @@ type ShapeVariants =
 const variants = {
   mediumRectangle: {
     width: 32,
-    height: 26
+    height: 26,
+    bannerSizes: '300x250',
+    bannerName: 'Medium rectangle',
+    checked: false
   },
   skyscraper: {
     width: 16,
-    height: 60
+    height: 60,
+    bannerSizes: '160x600',
+    bannerName: 'Skyscraper',
+    checked: false
   },
   leaderboard: {
     width: 88,
-    height: 12
+    height: 12,
+    bannerSizes: '728x90',
+    bannerName: 'Leaderboard',
+    checked: false
   },
   billboard: {
     width: 96,
-    height: 27
+    height: 27,
+    bannerSizes: '970x250',
+    bannerName: 'Billboard',
+    checked: false
   },
   halfPage: {
     width: 32,
-    height: 64
+    height: 64,
+    bannerSizes: '300x600',
+    bannerName: 'Half Page',
+    checked: false
   },
   mobileBanner: {
     width: 86,
-    height: 14
+    height: 14,
+    bannerSizes: '300x50',
+    bannerName: 'Mobile Banner',
+    checked: false
   },
   mobileLeaderboard: {
     width: 90,
-    height: 14
+    height: 14,
+    bannerSizes: '320x50',
+    bannerName: 'Mobile Leaderboard',
+    checked: false
   }
 }
 
@@ -64,9 +85,16 @@ const useStyles = createStyles((theme, { variant }: { variant: ShapeVariants }) 
 const BannerSizeMock = ({ variant }: { variant: ShapeVariants }) => {
   const { classes } = useStyles({ variant })
   return (
-    <div className={classes.wrapper}>
-      <div className={classes.inner} />
-    </div>
+    <Flex direction="column" align="center">
+      <div className={classes.wrapper}>
+        <div className={classes.inner} />
+        {/* <Text size="sm" style={{ position: 'absolute' }}>
+          {variants[variant].bannerSizes}
+        </Text> */}
+      </div>
+      <Text size="sm">{variants[variant].bannerSizes}</Text>
+      {/* <Text size="sm">{variants[variant].bannerName}</Text> */}
+    </Flex>
   )
 }
 
