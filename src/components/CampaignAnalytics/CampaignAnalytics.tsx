@@ -12,7 +12,7 @@ import Regions from './Regions'
 import TimeFrame from './TimeFrame'
 import { generateCVSData } from './CvsDownloadConfigurations'
 
-const GoBack = useCallback(({ title }: { title: string }) => {
+const GoBack = ({ title }: { title: string }) => {
   const navigate = useNavigate()
   const handleClick = () => navigate(-1)
 
@@ -21,7 +21,7 @@ const GoBack = useCallback(({ title }: { title: string }) => {
       <Text size="sm">{title}</Text>
     </ActionButton>
   )
-}, [])
+}
 
 const CampaignAnalytics = () => {
   const { id } = useParams()
