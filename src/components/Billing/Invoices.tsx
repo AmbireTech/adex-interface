@@ -6,10 +6,11 @@ import { useCallback } from 'react'
 
 import { invoiceElements } from './mockedData'
 
+const columnTitles = ['Company Name', 'Campaign Period', 'Amount Spent']
+
 const Invoices = () => {
   const [opened, { open, close }] = useDisclosure(false)
 
-  const columnTitles = ['Company Name', 'Campaign Period', 'Amount Spent']
   const handlePreview = useCallback(
     (item: any) => {
       console.log('item', item)

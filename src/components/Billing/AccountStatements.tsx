@@ -5,9 +5,10 @@ import { useDisclosure } from '@mantine/hooks'
 import { PrintModal } from 'components/common/Modals'
 import { statementElements } from './mockedData'
 
+const columnTitles = ['Document', 'Date of issue']
+
 const AccountStatements = () => {
   const [opened, { open, close }] = useDisclosure(false)
-  const columnTitles = ['Document', 'Date of issue']
   const handlePreview = useCallback(
     (item: any) => {
       console.log('item', item)
