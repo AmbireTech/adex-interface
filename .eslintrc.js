@@ -21,6 +21,7 @@ module.exports = {
         useTabs: false
       }
     ],
+    'no-console': 'off', // TEMP
     'func-names': 0,
     'prefer-destructuring': 0,
     '@typescript-eslint/semi': 'off',
