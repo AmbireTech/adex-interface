@@ -1,8 +1,8 @@
 import { IRegion } from 'types'
-// import { ParentSize } from '@visx/responsive'
+import { useMemo } from 'react'
 import { Grid } from '@mantine/core'
+import { useViewportSize } from '@mantine/hooks'
 import CustomTable from 'components/common/CustomTable'
-import useWindowSize from 'hooks/useWindowSize'
 import GeoCustom from '../common/CustomTableWithDropdown/WorldMap'
 
 const headings = ['Country', 'Share', 'Impressions', 'Clicks', 'CTR%', 'Average CPM', 'Spent']
@@ -14,17 +14,22 @@ const Regions = ({
   regions: IRegion[] | undefined
   isMapVisible: boolean
 }) => {
-  const [windowWidth] = useWindowSize()
+  const { width: windowWidth } = useViewportSize()
   if (!regions?.length) {
     return <div>No regions found</div>
   }
 
-  const elements = regions?.map((item) => ({
-    ...item,
-    impressions: item.impressions.toLocaleString(),
-    clicks: item.clicks.toLocaleString(),
-    ctrPercents: `${item.ctrPercents} %`
-  }))
+  const elements = useMemo(
+    () =>
+      regions?.map((item) => ({
+        ...item,
+        impressions: item.impressions.toLocaleString(),
+        clicks: item.clicks.toLocaleString(),
+        ctrPercents: `${item.ctrPercents} %`
+      })),
+    [regions]
+  )
+
   return (
     <Grid grow>
       {isMapVisible && (

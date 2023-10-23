@@ -1,9 +1,9 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Grid, Title, createStyles, Flex, Text } from '@mantine/core'
 import TimeFrameChart from 'components/common/Chart/TimeFrameChart'
 import { IPeriod, ITimeFrameData } from 'types'
 import { formatCurrency } from 'helpers'
-import useWindowSize from 'hooks/useWindowSize'
+import { useViewportSize } from '@mantine/hooks'
 import ChartControlBtn from './ChartControlBtn'
 
 const useStyles = createStyles((theme) => ({
@@ -44,7 +44,7 @@ const TimeFrame = ({
   period: IPeriod | undefined
 }) => {
   const { classes } = useStyles()
-  const [windowWidth] = useWindowSize()
+  const { width: windowWidth } = useViewportSize()
   const [filteredData, setFilteredData] = useState<any[]>([])
 
   if (!timeFrames?.length) {
@@ -75,9 +75,9 @@ const TimeFrame = ({
 
   const totalSum = useMemo(() => sumArrayProperties(timeFrames), [timeFrames])
 
-  const handleImpressionsClick = (value: boolean, propNameToRemove: string) => {
+  const handleImpressionsClick = useCallback((value: boolean, propNameToRemove: string) => {
     setMetricsToShow((prev) => ({ ...prev, [propNameToRemove]: value }))
-  }
+  }, [])
 
   return (
     <Grid grow>

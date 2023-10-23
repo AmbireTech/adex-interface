@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import { Box, Flex, Text, createStyles } from '@mantine/core'
 import InvisibilityIcon from 'resources/icons/Invisibility'
 import VisibilityIcon from 'resources/icons/Visibility'
@@ -38,13 +38,13 @@ const ChartControlBtn = ({
   const { classes } = useStyles({ bgColor, whiteFontColor: !!whiteFontColor })
   const [visible, setVisible] = useState<boolean>(true)
 
-  const handleClick = () => {
+  const handleClick = useCallback(() => {
     setVisible((prev) => {
       const updatedVisible = !prev
       onClick(updatedVisible)
       return updatedVisible
     })
-  }
+  }, [onClick])
 
   return (
     <Box className={classes.chartControls} onClick={handleClick}>

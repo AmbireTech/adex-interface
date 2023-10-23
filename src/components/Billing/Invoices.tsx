@@ -2,6 +2,7 @@ import { Title } from '@mantine/core'
 import CustomTable from 'components/common/CustomTable'
 import { PrintModal } from 'components/common/Modals'
 import { useDisclosure } from '@mantine/hooks'
+import { useCallback } from 'react'
 
 import { invoiceElements } from './mockedData'
 
@@ -9,10 +10,13 @@ const Invoices = () => {
   const [opened, { open, close }] = useDisclosure(false)
 
   const columnTitles = ['Company Name', 'Campaign Period', 'Amount Spent']
-  const handlePreview = (item: any) => {
-    console.log('item', item)
-    open()
-  }
+  const handlePreview = useCallback(
+    (item: any) => {
+      console.log('item', item)
+      open()
+    },
+    [open]
+  )
 
   return invoiceElements && invoiceElements.length ? (
     <>

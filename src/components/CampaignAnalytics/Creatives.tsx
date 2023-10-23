@@ -2,7 +2,7 @@ import CustomTable from 'components/common/CustomTable'
 import { Flex, Image, createStyles } from '@mantine/core'
 import UrlIcon from 'resources/icons/Url'
 import { CreativePreviewModal } from 'components/common/Modals'
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import { useDisclosure } from '@mantine/hooks'
 import { ICreative } from 'types'
 import { formatCurrency } from 'helpers'
@@ -24,10 +24,14 @@ const Creatives = ({ creatives }: { creatives: ICreative[] | undefined }) => {
   }
   const headings = ['Media', 'Impressions', 'Clicks', 'CTR%', 'Spent']
   const [selectedMedia, setSelectedMedia] = useState('')
-  const handleMediaClick = (media: string) => {
-    setSelectedMedia(media)
-    open()
-  }
+  const handleMediaClick = useCallback(
+    (media: string) => {
+      setSelectedMedia(media)
+      open()
+    },
+    [open]
+  )
+
   const elements = creatives?.map((item) => {
     return {
       ...item,

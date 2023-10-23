@@ -62,9 +62,13 @@ const ChartControls = ({ children, data, metricsToShow }: ControlsProps) => {
     ]
   )
 
-  const gridColor = appTheme.fn.lighten(
-    appTheme.colors.mainText[appTheme.fn.primaryShade()],
-    appTheme.other.shades.lighten.lighter
+  const gridColor = useMemo(
+    () =>
+      appTheme.fn.lighten(
+        appTheme.colors.mainText[appTheme.fn.primaryShade()],
+        appTheme.other.shades.lighten.lighter
+      ),
+    [appTheme.colors.mainText, appTheme.fn, appTheme.other.shades.lighten.lighter]
   )
 
   const theme = buildChartTheme({

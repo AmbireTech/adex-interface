@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { Button, Container, Flex, Tabs, Text } from '@mantine/core'
 import ActionButton from 'components/common/CustomTable/ActionButton/ActionButton'
 import { useNavigate, useParams } from 'react-router-dom'
@@ -12,7 +12,7 @@ import Regions from './Regions'
 import TimeFrame from './TimeFrame'
 import { generateCVSData } from './CvsDownloadConfigurations'
 
-const GoBack = ({ title }: { title: string }) => {
+const GoBack = useCallback(({ title }: { title: string }) => {
   const navigate = useNavigate()
   const handleClick = () => navigate(-1)
 
@@ -21,14 +21,14 @@ const GoBack = ({ title }: { title: string }) => {
       <Text size="sm">{title}</Text>
     </ActionButton>
   )
-}
+}, [])
 
 const CampaignAnalytics = () => {
   const { id } = useParams()
   if (!id || Number.isNaN(parseInt(id, 10))) {
     return <div>Invalid campaign ID</div>
   }
-
+  // TODO: state management for elements
   const [activeTab, setActiveTab] = useState<TabType | null>('timeframe')
   const [isMapBtnShown, setIsMapBtnShown] = useState<boolean>(false)
   const [isMapVisible, setIsMapVisible] = useState<boolean>(false)
@@ -41,9 +41,9 @@ const CampaignAnalytics = () => {
     setCsvData(generateCVSData(tabName, campaignDetails?.[tabName]))
   }, [activeTab, campaignDetails])
 
-  const handleTabChange = (value: TabType) => {
+  const handleTabChange = useCallback((value: TabType) => {
     setActiveTab(value)
-  }
+  }, [])
 
   return (
     <Container fluid>

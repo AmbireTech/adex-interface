@@ -1,5 +1,5 @@
 import { Container, Flex, Text } from '@mantine/core'
-import { useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { useDisclosure } from '@mantine/hooks'
 import CustomTable from 'components/common/CustomTable'
 import { BadgeType, ICampaignData } from 'types'
@@ -24,37 +24,47 @@ const Dashboard = () => {
   const [opened, { open, close }] = useDisclosure(false)
   const [selectedItem, setSelectedItem] = useState<ICampaignData | null>(null)
   const navigate = useNavigate()
-  const elements = dashboardTableElements.map((el) => {
-    return {
-      id: el.id,
-      campaignName: el.campaignName,
-      model: el.model,
-      status: <BadgeStatusCampaign type={el.status as BadgeType} />,
-      served: el.served,
-      budget: el.budget,
-      impressions: el.impressions.toLocaleString(),
-      clicks: el.clicks.toLocaleString(),
-      ctr: el.ctr,
-      period: el.period
-    }
-  })
+  const elements = useMemo(
+    () =>
+      dashboardTableElements.map((el) => {
+        return {
+          id: el.id,
+          campaignName: el.campaignName,
+          model: el.model,
+          status: <BadgeStatusCampaign type={el.status as BadgeType} />,
+          served: el.served,
+          budget: el.budget,
+          impressions: el.impressions.toLocaleString(),
+          clicks: el.clicks.toLocaleString(),
+          ctr: el.ctr,
+          period: el.period
+        }
+      }),
+    []
+  )
 
-  const handlePreview = (item: ICampaignData) => {
-    setSelectedItem(item)
-    open()
-  }
+  const handlePreview = useCallback(
+    (item: ICampaignData) => {
+      setSelectedItem(item)
+      open()
+    },
+    [open]
+  )
 
-  const handleAnalytics = (item: ICampaignData) => {
-    navigate(`/dashboard/campaign-analytics/${item.id}`)
-  }
+  const handleAnalytics = useCallback(
+    (item: ICampaignData) => {
+      navigate(`/dashboard/campaign-analytics/${item.id}`)
+    },
+    [navigate]
+  )
 
-  const handleDuplicate = (item: ICampaignData) => {
+  const handleDuplicate = useCallback((item: ICampaignData) => {
     console.log('item', item)
-  }
+  }, [])
 
-  const handleDelete = (item: ICampaignData) => {
+  const handleDelete = useCallback((item: ICampaignData) => {
     console.log('item', item)
-  }
+  }, [])
 
   return (
     <Container fluid>
