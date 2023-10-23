@@ -1,7 +1,9 @@
-import Dashboard from 'components/Dashboard'
+import UserPanel from 'components/UserPanel'
 import LogIn from 'components/LogIn'
+import Dashboard from 'components/Dashboard'
 import Billing from 'components/Billing'
 import GetStarted from 'components/GetStarted'
+import CampaignAnalytics from 'components/CampaignAnalytics'
 import { createBrowserRouter, Navigate, useLocation } from 'react-router-dom'
 
 import useAccount from 'hooks/useAccount'
@@ -23,7 +25,7 @@ export const router = createBrowserRouter([
     path: '/',
     element: (
       <RequireAuth>
-        <Dashboard />
+        <UserPanel />
       </RequireAuth>
     )
   },
@@ -32,13 +34,19 @@ export const router = createBrowserRouter([
     element: <LogIn />
   },
   {
+    // TODO: rename the path
     path: '/dashboard',
     element: (
       <RequireAuth>
-        <Dashboard />
+        <UserPanel />
       </RequireAuth>
     ),
     children: [
+      {
+        path: 'dashboard',
+        element: <Dashboard />
+      },
+      { path: 'campaign-analytics/:id', element: <CampaignAnalytics /> },
       {
         path: 'billing',
         element: <Billing />

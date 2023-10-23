@@ -1,60 +1,37 @@
-import {
-  ActionIcon,
-  Button,
-  Flex,
-  Group,
-  Modal,
-  Pagination,
-  Table,
-  createStyles
-} from '@mantine/core'
-import { useDisclosure } from '@mantine/hooks'
+import { Flex, Group, Pagination, Table, createStyles } from '@mantine/core'
 import VisibilityIcon from 'resources/icons/Visibility'
 import { ICustomTableProps } from 'types'
 import usePagination from 'hooks/usePagination'
 import { useMemo } from 'react'
-import InvoicesPDF from './InvoicesPDF'
+import AnalyticsIcon from 'resources/icons/Analytics'
+import DuplicateIcon from 'resources/icons/Duplicate'
+import DeleteIcon from 'resources/icons/Delete'
+import ActionButton from './ActionButton/ActionButton'
 
 const useStyles = createStyles((theme) => ({
-  wrapper: {
-    border: '1px solid',
-    borderRadius: theme.radius.sm,
-    borderColor: theme.colors.decorativeBorders[theme.fn.primaryShade()],
-    padding: theme.spacing.lg
-  },
   header: {
-    backgroundColor: theme.colors.lightBackground[theme.fn.primaryShade()],
-    padding: theme.spacing.xl
+    backgroundColor: theme.colors.alternativeBackground[theme.fn.primaryShade()]
   },
-  title: {
-    fontSize: theme.fontSizes.xl,
-    fontWeight: theme.other.fontWeights.bold
+  border: {
+    borderRadius: theme.radius.md,
+    overflow: 'hidden'
   },
-  close: {
-    color: theme.colors.mainText[theme.fn.primaryShade()]
-  },
-  printable: {
-    [theme.other.media.print]: {
-      // NOTE: it's not fixed/absolute to body but modal.inner
-      overflow: 'visible',
-      position: 'absolute',
-      top: 0,
-      left: 0,
-      bottom: 0,
-      width: '100%',
-      padding: theme.spacing.xl
-    }
-  },
-  actionIcon: {
-    '&:hover': {
-      color: theme.colors.brand[theme.fn.primaryShade()]
-    }
+  background: {
+    backgroundColor: theme.colors.mainBackground[theme.fn.primaryShade()],
+    boxShadow: theme.shadows.xs
   }
 }))
 
-const CustomTable = ({ headings, elements }: ICustomTableProps) => {
-  const { classes } = useStyles()
-  const [opened, { open, close }] = useDisclosure(false)
+const CustomTable = ({
+  background,
+  headings,
+  elements,
+  onPreview,
+  onAnalytics,
+  onDuplicate,
+  onDelete
+}: ICustomTableProps) => {
+  const { classes, cx } = useStyles()
   const columns: string[] = useMemo(
     () => Object.keys(elements[0]).filter((e: string) => e !== 'id'),
     [elements]
@@ -74,50 +51,80 @@ const CustomTable = ({ headings, elements }: ICustomTableProps) => {
     [headings]
   )
 
+  const hasAction = !!onPreview || !!onAnalytics || !!onDuplicate || !!onDelete
+
   const rows = useMemo(
     () =>
-      list.map((e) => (
-        <tr key={e.id}>
-          {columns.map((column: string) => {
-            return (
-              <td key={column}>
-                {typeof e[column] === 'object' &&
-                typeof e[column].from === 'string' &&
-                typeof e[column].to === 'string'
-                  ? `${e[column].from} - ${e[column].to}`
-                  : e[column]}
+      list.map((e) => {
+        return (
+          <tr key={e.id}>
+            {columns.map((column: string) => {
+              return (
+                <td key={column}>
+                  {typeof e[column] === 'object' &&
+                  typeof e[column].from === 'string' &&
+                  typeof e[column].to === 'string'
+                    ? `${e[column].from} - ${e[column].to}`
+                    : e[column]}
+                </td>
+              )
+            })}
+            {hasAction && (
+              <td>
+                <Group>
+                  {!!onPreview && (
+                    <ActionButton
+                      title="View PDF"
+                      icon={<VisibilityIcon size="20px" />}
+                      action={() => onPreview(e)}
+                    />
+                  )}
+                  {!!onAnalytics && (
+                    <ActionButton
+                      title="View Analytics"
+                      icon={<AnalyticsIcon size="20px" />}
+                      action={() => onAnalytics(e)}
+                    />
+                  )}
+                  {!!onDuplicate && (
+                    <ActionButton
+                      title="Duplicate"
+                      icon={<DuplicateIcon size="20px" />}
+                      action={() => onDuplicate(e)}
+                    />
+                  )}
+                  {!!onDelete && (
+                    <ActionButton
+                      title="Delete"
+                      icon={<DeleteIcon size="20px" />}
+                      action={() => onDelete(e)}
+                    />
+                  )}
+                </Group>
               </td>
-            )
-          })}
-          <td>
-            <Group>
-              <ActionIcon
-                title="View PDF"
-                variant="transparent"
-                onClick={open}
-                className={classes.actionIcon}
-              >
-                <VisibilityIcon />
-              </ActionIcon>
-            </Group>
-          </td>
-        </tr>
-      )),
-    [columns, list, open, classes.actionIcon]
+            )}
+          </tr>
+        )
+      }),
+    [columns, list, hasAction, onPreview, onAnalytics, onDuplicate, onDelete]
   )
 
   return (
     <Flex h="100%" justify="space-between" direction="column" align="center">
-      <Table highlightOnHover verticalSpacing={15}>
-        <thead>
+      <Table
+        highlightOnHover
+        verticalSpacing={15}
+        className={cx(classes.border, { [classes.background]: background })}
+      >
+        <thead className={classes.header}>
           <tr>
             {head}
-            <th key="Action">Action</th>
+            {hasAction && <th key="Action">Action</th>}
           </tr>
         </thead>
         <tbody>{rows}</tbody>
       </Table>
-      <Group position="right">
+      <Group w="100%" position="right" mt="xl">
         <Pagination
           total={maxPages}
           boundaries={1}
@@ -127,32 +134,6 @@ const CustomTable = ({ headings, elements }: ICustomTableProps) => {
           onChange={(value) => onChange(value)}
         />
       </Group>
-      <Modal
-        title="Invoice"
-        size="xl"
-        opened={opened}
-        onClose={close}
-        centered
-        radius="sm"
-        classNames={{
-          header: classes.header,
-          title: classes.title,
-          close: classes.close
-        }}
-      >
-        <div>
-          <Group position="right">
-            <Button mt="md" mb="md" onClick={() => window.print()}>
-              Print
-            </Button>
-          </Group>
-          <div className={classes.wrapper}>
-            <div id="printable" className={classes.printable}>
-              <InvoicesPDF />
-            </div>
-          </div>
-        </div>
-      </Modal>
     </Flex>
   )
 }
