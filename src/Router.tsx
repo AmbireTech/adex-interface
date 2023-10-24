@@ -20,45 +20,50 @@ function RequireAuth({ children }: { children: JSX.Element }) {
   return children
 }
 
-export const router = createBrowserRouter([
+export const router = createBrowserRouter(
+  [
+    {
+      path: '/',
+      element: (
+        <RequireAuth>
+          <UserPanel />
+        </RequireAuth>
+      )
+    },
+    {
+      path: '/login',
+      element: <LogIn />
+    },
+    {
+      // TODO: rename the path
+      path: '/dashboard',
+      element: (
+        <RequireAuth>
+          <UserPanel />
+        </RequireAuth>
+      ),
+      children: [
+        {
+          path: 'dashboard',
+          element: <Dashboard />
+        },
+        { path: 'campaign-analytics/:id', element: <CampaignAnalytics /> },
+        {
+          path: 'billing',
+          element: <Billing />
+        },
+        {
+          path: 'get-started',
+          element: <GetStarted />
+        },
+        {
+          path: 'deposit',
+          element: <Deposit />
+        }
+      ]
+    }
+  ],
   {
-    path: '/',
-    element: (
-      <RequireAuth>
-        <UserPanel />
-      </RequireAuth>
-    )
-  },
-  {
-    path: '/login',
-    element: <LogIn />
-  },
-  {
-    // TODO: rename the path
-    path: '/dashboard',
-    element: (
-      <RequireAuth>
-        <UserPanel />
-      </RequireAuth>
-    ),
-    children: [
-      {
-        path: 'dashboard',
-        element: <Dashboard />
-      },
-      { path: 'campaign-analytics/:id', element: <CampaignAnalytics /> },
-      {
-        path: 'billing',
-        element: <Billing />
-      },
-      {
-        path: 'get-started',
-        element: <GetStarted />
-      },
-      {
-        path: 'deposit',
-        element: <Deposit />
-      }
-    ]
+    basename: `/${process.env.PUBLIC_URL}`
   }
-])
+)

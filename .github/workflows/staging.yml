@@ -12,8 +12,14 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: ./.github/actions/setup
-      - run: yarn prepare
-      - run: yarn build
+      - name: Prepare
+        run: yarn prepare
+      - name: Build 🛠️
+        run: yarn build
+        env:
+          BASE_NAME: staging
+      - name: GH pages 404
+        run: cp ./build/index.html ./build/404.html
 
       - name: Release (staging 🧪🔬)
         if: github.ref == 'refs/heads/development'
