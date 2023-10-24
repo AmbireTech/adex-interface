@@ -21,8 +21,6 @@ jobs:
 
       - name: Build 🛠️
         run: yarn build
-        env:
-          BASE_NAME: staging
 
       - name: GH pages 404
         run: cp ./build/index.html ./build/404.html
