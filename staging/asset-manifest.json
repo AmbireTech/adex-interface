@@ -1,6 +1,6 @@
 {
   "files": {
-    "main.js": "./static/js/main.2577086a.js",
+    "main.js": "./static/js/main.7f8e1877.js",
     "static/js/787.353397ad.chunk.js": "./static/js/787.353397ad.chunk.js",
     "static/media/banner1.png": "./static/media/banner1.7de871a1293d1b8f9209.png",
     "static/media/moonpay.svg": "./static/media/moonpay.08a193d43c7ffa13cc2a23702d82be84.svg",
@@ -11,10 +11,10 @@
     "index.html": "./index.html",
     "static/media/upperShape.svg": "./static/media/upperShape.a56b648850d4e4e6115307acf1da8b5c.svg",
     "static/media/lowerShape.svg": "./static/media/lowerShape.0bcd4cdd6e7898a6cfb9978b2faa135c.svg",
-    "main.2577086a.js.map": "./static/js/main.2577086a.js.map",
+    "main.7f8e1877.js.map": "./static/js/main.7f8e1877.js.map",
     "787.353397ad.chunk.js.map": "./static/js/787.353397ad.chunk.js.map"
   },
   "entrypoints": [
-    "static/js/main.2577086a.js"
+    "static/js/main.7f8e1877.js"
   ]
 }
