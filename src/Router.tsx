@@ -22,6 +22,8 @@ function RequireAuth({ children }: { children: JSX.Element }) {
   return children
 }
 
+console.log('basename 1 - ', process.env.BASE_NAME)
+
 export const router = createBrowserRouter(
   [
     {
