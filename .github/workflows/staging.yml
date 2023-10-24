@@ -10,14 +10,20 @@ jobs:
     concurrency: ci-${{ github.ref }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: ./.github/actions/setup
+      - name: Checkout 🛎️
+        uses: actions/checkout@v3
+
+      - name: Setup 🦞
+        uses: ./.github/actions/setup
+
       - name: Prepare
         run: yarn prepare
+
       - name: Build 🛠️
         run: yarn build
         env:
           BASE_NAME: staging
+
       - name: GH pages 404
         run: cp ./build/index.html ./build/404.html
 
@@ -27,5 +33,5 @@ jobs:
         with:
           branch: gh-pages
           folder: ./build
-          destination_dir: ./staging
+          target-folder: ./staging
           cname: v5.adex.network
