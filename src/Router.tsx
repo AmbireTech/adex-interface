@@ -66,6 +66,6 @@ export const router = createBrowserRouter(
     }
   ],
   {
-    basename: `/${process.env.BASE_NAME}`
+    basename: `/${process.env.BASE_NAME || ''}`
   }
 )
