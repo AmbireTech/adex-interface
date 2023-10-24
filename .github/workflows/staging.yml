@@ -1,0 +1,25 @@
+name: Release (staging 🧪🔬)
+on:
+  push:
+    branches:
+      - development
+permissions:
+  contents: write
+jobs:
+  release:
+    concurrency: ci-${{ github.ref }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./.github/actions/setup
+      - run: yarn prepare
+      - run: yarn build
+
+      - name: Release (staging 🧪🔬)
+        if: github.ref == 'refs/heads/development'
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          branch: gh-pages
+          folder: ./build
+          destination_dir: ./staging
+          cname: v5.adex.network

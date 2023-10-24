@@ -68,7 +68,7 @@ function NavLink({
     >
       <Group>
         <span className={classes.icon}>{icon}</span>
-        <Text size="lg">{label}</Text>
+        <Text size="md">{label}</Text>
       </Group>
     </UnstyledButton>
   )

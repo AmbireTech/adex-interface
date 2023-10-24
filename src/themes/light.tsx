@@ -101,6 +101,54 @@ export const lightTheme: MantineThemeOverride = {
       '#959595',
       '#868686'
     ],
+    success: [
+      '#45B591',
+      '#32B188',
+      '#1FB081',
+      '#0CB07B', // Success
+      '#1A9069',
+      '#22775B',
+      '#26634F',
+      '#285445',
+      '#28473D',
+      '#273D36'
+    ],
+    info: [
+      '#BAA8E3',
+      '#A083E4',
+      '#865AED',
+      '#6A2AFF',
+      '#5F25E7',
+      '#5A2BC5',
+      '#5635A4',
+      '#523A89',
+      '#4C3B74',
+      '#473A64'
+    ],
+    draft: [
+      '#EBC9C0',
+      '#E9AC9B',
+      '#EF8C72',
+      '#FF6A42',
+      '#E95D38',
+      '#D25432',
+      '#B15239',
+      '#94503E',
+      '#7E4D40',
+      '#6C483F'
+    ],
+    alternativeBackground: [
+      '#FFFFFF',
+      '#FFFFFF',
+      '#FFFFFF',
+      '#EBEEFA', // Alternative bg
+      '#C9D0EC',
+      '#AEB7DB',
+      '#99A2C9',
+      '#8891B7',
+      '#7982A5',
+      '#6D7595'
+    ],
     attention: [
       '#D6AF7F',
       '#DBA25B',
@@ -124,6 +172,54 @@ export const lightTheme: MantineThemeOverride = {
       '#894A39',
       '#74473B',
       '#63433A'
+    ],
+    chartColorOne: [
+      '#AC9ED2',
+      '#957FD0',
+      '#7D5DD3',
+      '#6437DE', // ChartColorOne
+      '#5C35C4',
+      '#583DA4',
+      '#54408A',
+      '#4F4076',
+      '#493F65',
+      '#433C57'
+    ],
+    chartColorTwo: [
+      '#89BDCA',
+      '#6AB6CA',
+      '#48B4D0',
+      '#21B7DE', // ChartColorTwo
+      '#2F9BB7',
+      '#368498',
+      '#3A7280',
+      '#3A636D',
+      '#39565E',
+      '#374B51'
+    ],
+    chartColorThree: [
+      '#D7C0AA',
+      '#D3AE8B',
+      '#D59D69',
+      '#DE8E43', // ChartColorThree
+      '#C8803C',
+      '#AA7341',
+      '#8F6844',
+      '#7A5E44',
+      '#695542',
+      '#5B4C3F'
+    ],
+    chartColorFour: [
+      '#C9C37C',
+      '#CCC25B',
+      '#D5C837',
+      '#DECD16', // ChartColorFour
+      '#B6AA26',
+      '#978E2F',
+      '#7E7834',
+      '#6B6635',
+      '#5B5835',
+      '#4F4C33'
     ]
     // NOTE: needs 10 shades to work https://mantine.dev/theming/colors/
     // attention: ['#FFBE4D', '#FFBE4D', '#FFBE4D'],

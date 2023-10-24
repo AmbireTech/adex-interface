@@ -1,78 +1,89 @@
-// import { useState } from 'react'
-import { AppShell, Navbar, Header, MediaQuery, Burger, createStyles } from '@mantine/core'
-import SideNav from 'components/SideNav'
-import TopBar from 'components/TopBar'
-import { useState } from 'react'
-import { Outlet } from 'react-router-dom'
+import { Container, Flex, Text } from '@mantine/core'
+import { useCallback, useMemo, useState } from 'react'
+import { useDisclosure } from '@mantine/hooks'
+import CustomTable from 'components/common/CustomTable'
+import { BadgeType, ICampaignData } from 'types'
+import { CampaignDetailsModal } from 'components/common/Modals'
+import { useNavigate } from 'react-router-dom'
+import BadgeStatusCampaign from './BadgeStatusCampaign'
+import { dashboardTableElements } from './mockData'
 
-const useStyles = createStyles((theme) => ({
-  main: {
-    backgroundColor:
-      theme.colorScheme === 'dark'
-        ? theme.colors.darkBackground[theme.fn.primaryShade()]
-        : theme.colors.lightBackground[theme.fn.primaryShade()]
-  },
-  header: {
-    backgroundColor: 'inherit'
-  }
-}))
+const headings = [
+  'Campaign name',
+  'Model',
+  'Status',
+  'Served',
+  'Budget',
+  'Impressions',
+  'Clicks',
+  'CTR',
+  'Period'
+]
 
-function Dashboard() {
-  const { classes } = useStyles()
-  const [opened, setOpened] = useState(false)
+const Dashboard = () => {
+  const [opened, { open, close }] = useDisclosure(false)
+  const [selectedItem, setSelectedItem] = useState<ICampaignData | null>(null)
+  const navigate = useNavigate()
+  const elements = useMemo(
+    () =>
+      dashboardTableElements.map((el) => {
+        return {
+          id: el.id,
+          campaignName: el.campaignName,
+          model: el.model,
+          status: <BadgeStatusCampaign type={el.status as BadgeType} />,
+          served: el.served,
+          budget: el.budget,
+          impressions: el.impressions.toLocaleString(),
+          clicks: el.clicks.toLocaleString(),
+          ctr: el.ctr,
+          period: el.period
+        }
+      }),
+    []
+  )
 
-  // husky test
+  const handlePreview = useCallback(
+    (item: ICampaignData) => {
+      setSelectedItem(item)
+      open()
+    },
+    [open]
+  )
+
+  const handleAnalytics = useCallback(
+    (item: ICampaignData) => {
+      navigate(`/dashboard/campaign-analytics/${item.id}`)
+    },
+    [navigate]
+  )
+
+  const handleDuplicate = useCallback((item: ICampaignData) => {
+    console.log('item', item)
+  }, [])
+
+  const handleDelete = useCallback((item: ICampaignData) => {
+    console.log('item', item)
+  }, [])
 
   return (
-    <AppShell
-      padding="md"
-      layout="alt"
-      navbarOffsetBreakpoint="sm"
-      asideOffsetBreakpoint="sm"
-      fixed
-      className={classes.main}
-      navbar={
-        <Navbar hiddenBreakpoint="sm" height="100%" p="xs" hidden={!opened}>
-          <MediaQuery largerThan="sm" styles={{ display: 'none' }}>
-            <Burger
-              opened={opened}
-              onClick={() => setOpened((o) => !o)}
-              size="md"
-              color="grey"
-              mr="xl"
-            />
-          </MediaQuery>
-          <SideNav />
-        </Navbar>
-      }
-      header={
-        <Header
-          height={90}
-          mr="xl"
-          ml="xl"
-          className={classes.header}
-          style={{
-            display: 'flex',
-            flexDirection: 'row',
-            alignItems: 'center'
-          }}
-        >
-          <MediaQuery largerThan="sm" styles={{ display: 'none' }}>
-            <Burger
-              opened={opened}
-              onClick={() => setOpened((o) => !o)}
-              size="md"
-              color="grey"
-              mr="xl"
-            />
-          </MediaQuery>
-          <TopBar />
-        </Header>
-      }
-    >
-      <Outlet />
-      {/* Your application here */}
-    </AppShell>
+    <Container fluid>
+      <Flex direction="column" justify="start">
+        <Text size="sm" color="secondaryText" weight="bold" mb="md">
+          All Campaigns
+        </Text>
+        <CustomTable
+          background
+          headings={headings}
+          elements={elements}
+          onPreview={handlePreview}
+          onAnalytics={handleAnalytics}
+          onDuplicate={handleDuplicate}
+          onDelete={handleDelete}
+        />
+      </Flex>
+      <CampaignDetailsModal item={selectedItem} opened={opened} close={close} />
+    </Container>
   )
 }
 

@@ -18,9 +18,17 @@ type ExtendedCustomColors =
   | 'lightBackground'
   | 'decorativeBorders'
   | 'mainBackground'
+  | 'success'
+  | 'info'
+  | 'draft'
+  | 'alternativeBackground'
   | 'attention'
   | 'secondaryAccent'
   | 'darkBackground'
+  | 'chartColorOne'
+  | 'chartColorTwo'
+  | 'chartColorThree'
+  | 'chartColorFour'
   | DefaultMantineColor
 
 declare module '@mantine/core' {

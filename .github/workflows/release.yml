@@ -1,0 +1,26 @@
+name: Release (prod 🍩🐼)
+on:
+  push:
+    branches:
+      - main
+permissions:
+  contents: write
+jobs:
+  release:
+    concurrency: ci-${{ github.ref }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./.github/actions/setup
+      - run: yarn prepare
+      - run: yarn build
+
+      - name: Release (prod 🍩🐼)
+        if: github.ref == 'refs/heads/main'
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          branch: gh-pages
+          folder: ./build
+          cname: v5.adex.network
+          clean-exclude: |
+            staging
