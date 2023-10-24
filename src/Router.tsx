@@ -13,6 +13,8 @@ function RequireAuth({ children }: { children: JSX.Element }) {
   const { authenticated } = useAccount()
   const location = useLocation()
 
+  console.log('basename - ', process.env.BASE_NAME)
+
   if (!authenticated) {
     return <Navigate to="/login" state={{ from: location }} replace />
   }
