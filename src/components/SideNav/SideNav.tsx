@@ -75,19 +75,19 @@ function SideNav() {
       <Navbar.Section mx="-xs" grow component={ScrollArea}>
         <Box>
           <NavLink
-            to="/dashboard/dashboard"
+            to="/dashboard"
             icon={<DashboardIcon />}
             label="Dashboard"
             active={useResolvedPath('dashboard').pathname === match?.pathname}
           />
           <NavLink
-            to="/dashboard/deposit"
+            to="/deposit"
             icon={<DepositIcon />}
             label="Top Up Account"
             active={useResolvedPath('deposit').pathname === match?.pathname}
           />
           <NavLink
-            to="/dashboard/billing"
+            to="/billing"
             icon={<BillingIcon />}
             label="Billing"
             active={useResolvedPath('billing').pathname === match?.pathname}
