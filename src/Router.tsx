@@ -27,20 +27,8 @@ console.log('basename 1 - ', process.env.BASE_NAME)
 export const router = createBrowserRouter(
   [
     {
-      path: '/',
-      element: (
-        <RequireAuth>
-          <UserPanel />
-        </RequireAuth>
-      )
-    },
-    {
-      path: '/login',
-      element: <LogIn />
-    },
-    {
       // TODO: rename the path
-      path: '/dashboard',
+      path: '/',
       element: (
         <RequireAuth>
           <UserPanel />
@@ -65,9 +53,13 @@ export const router = createBrowserRouter(
           element: <Deposit />
         }
       ]
+    },
+    {
+      path: '/login',
+      element: <LogIn />
     }
   ],
   {
-    basename: '.'
+    basename: '/staging'
   }
 )
