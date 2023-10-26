@@ -22,6 +22,7 @@ jobs:
       - name: Build 🛠️
         env:
           REACT_APP_BASE_NAME: staging
+          REACT_APP_ENV: staging
         run: yarn build
 
       - name: GH pages 404
