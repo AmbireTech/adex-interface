@@ -1,6 +1,9 @@
-# Getting Started with Create React App
+## Ambire AdEx dapp
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+
+## Running
+
+### It is supposed to run as standalone app using [Ambire Login SDK](https://github.com/AmbireTech/wallet-login-sdk).
 
 ## Available Scripts
 
@@ -43,4 +46,7 @@ You don’t have to ever use `eject`. The curated feature set is suitable for sm
 
 You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+- [Create React App](https://github.com/facebook/create-react-app).
+- [Grommet](https://github.com/grommet/grommet)
+- [Ambire Login SDK](https://github.com/AmbireTech/wallet-login-sdk)
+
