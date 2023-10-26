@@ -4,6 +4,7 @@ import Dashboard from 'components/Dashboard'
 import Billing from 'components/Billing'
 import GetStarted from 'components/GetStarted'
 import CampaignAnalytics from 'components/CampaignAnalytics'
+import NotFound404 from 'components/404/404'
 import { createBrowserRouter, Navigate, useLocation } from 'react-router-dom'
 
 import useAccount from 'hooks/useAccount'
@@ -53,6 +54,10 @@ export const router = createBrowserRouter(
     {
       path: '/login',
       element: <LogIn />
+    },
+    {
+      path: '*',
+      element: <NotFound404 />
     }
   ],
   {

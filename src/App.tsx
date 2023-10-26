@@ -5,7 +5,7 @@ import { RouterProvider } from 'react-router-dom'
 import { router } from 'Router'
 import { lightTheme } from 'themes'
 
-const ENV = process.env.REACT_APP_ENV || 'staging'
+const ENV = process.env.REACT_APP_ENV
 
 function GlobalStyles() {
   return (
