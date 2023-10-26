@@ -13,7 +13,7 @@ function RequireAuth({ children }: { children: JSX.Element }) {
   const { authenticated } = useAccount()
   const location = useLocation()
 
-  console.log('basename - ', process.env.BASE_NAME)
+  console.log('basename - ', process.env.REACT_APP_BASE_NAME)
 
   if (!authenticated) {
     return <Navigate to="/login" state={{ from: location }} replace />
@@ -22,7 +22,7 @@ function RequireAuth({ children }: { children: JSX.Element }) {
   return children
 }
 
-console.log('basename 1 - ', process.env.BASE_NAME)
+console.log('basename 1 - ', process.env.REACT_APP_BASE_NAME)
 
 export const router = createBrowserRouter(
   [
