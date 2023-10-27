@@ -21,6 +21,7 @@ jobs:
 
       - name: Build 🛠️
         env:
+          PUBLIC_URL: https://v5.adex.network/staging
           REACT_APP_BASE_NAME: staging
           REACT_APP_ENV: staging
         run: yarn build
