@@ -29,6 +29,7 @@ type ExtendedCustomColors =
   | 'chartColorTwo'
   | 'chartColorThree'
   | 'chartColorFour'
+  | 'warning'
   | DefaultMantineColor
 
 declare module '@mantine/core' {

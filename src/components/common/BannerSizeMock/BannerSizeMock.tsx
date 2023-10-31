@@ -1,16 +1,9 @@
 import { Flex, createStyles, Text } from '@mantine/core'
+import { BannerVariant, ShapeVariants } from 'types'
 
-type ShapeVariants =
-  | 'mediumRectangle'
-  | 'skyscraper'
-  | 'leaderboard'
-  | 'billboard'
-  | 'halfPage'
-  | 'mobileBanner'
-  | 'mobileLeaderboard'
-
-const variants = {
+export const variants: { [key: string]: BannerVariant } = {
   mediumRectangle: {
+    label: 'mediumRectangle',
     width: 32,
     height: 26,
     bannerSizes: '300x250',
@@ -18,6 +11,7 @@ const variants = {
     checked: false
   },
   skyscraper: {
+    label: 'skyscraper',
     width: 16,
     height: 60,
     bannerSizes: '160x600',
@@ -25,6 +19,7 @@ const variants = {
     checked: false
   },
   leaderboard: {
+    label: 'leaderboard',
     width: 88,
     height: 12,
     bannerSizes: '728x90',
@@ -32,6 +27,7 @@ const variants = {
     checked: false
   },
   billboard: {
+    label: 'billboard',
     width: 96,
     height: 27,
     bannerSizes: '970x250',
@@ -39,6 +35,7 @@ const variants = {
     checked: false
   },
   halfPage: {
+    label: 'halfPage',
     width: 32,
     height: 64,
     bannerSizes: '300x600',
@@ -46,6 +43,7 @@ const variants = {
     checked: false
   },
   mobileBanner: {
+    label: 'mobileBanner',
     width: 86,
     height: 14,
     bannerSizes: '300x50',
@@ -53,6 +51,7 @@ const variants = {
     checked: false
   },
   mobileLeaderboard: {
+    label: 'mobileLeaderboard',
     width: 90,
     height: 14,
     bannerSizes: '320x50',
@@ -61,29 +60,37 @@ const variants = {
   }
 }
 
-const useStyles = createStyles((theme, { variant }: { variant: ShapeVariants }) => ({
-  wrapper: {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    width: 112,
-    height: 96,
-    background: theme.colors.lightBackground[theme.fn.primaryShade()],
-    border: '1px solid',
-    borderColor: theme.colors.decorativeBorders[theme.fn.primaryShade()],
-    // boxShadow: theme.shadows.sm,
-    borderRadius: theme.radius.sm
-  },
-  inner: {
-    width: variants[variant].width,
-    height: variants[variant].height,
-    backgroundColor: theme.colors.decorativeBorders[theme.fn.primaryShade()],
-    borderRadius: theme.radius.xs
-  }
-}))
+const useStyles = createStyles(
+  (theme, { variant, active }: { variant: ShapeVariants; active: boolean }) => ({
+    wrapper: {
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      width: 112,
+      height: 96,
+      background: theme.colors.lightBackground[theme.fn.primaryShade()],
+      border: '1px solid',
+      borderColor: active ? 'blue' : theme.colors.decorativeBorders[theme.fn.primaryShade()],
+      // boxShadow: theme.shadows.sm,
+      borderRadius: theme.radius.sm
+    },
+    inner: {
+      width: variants[variant].width,
+      height: variants[variant].height,
+      backgroundColor: theme.colors.decorativeBorders[theme.fn.primaryShade()],
+      borderRadius: theme.radius.xs
+    }
+  })
+)
 
-const BannerSizeMock = ({ variant }: { variant: ShapeVariants }) => {
-  const { classes } = useStyles({ variant })
+const BannerSizeMock = ({
+  variant,
+  active
+}: {
+  variant: ShapeVariants
+  active: boolean | undefined
+}) => {
+  const { classes } = useStyles({ variant, active: !!active })
   return (
     <Flex direction="column" align="center">
       <div className={classes.wrapper}>

@@ -1,13 +1,15 @@
-import { useState } from 'react'
-import { Button, Flex, Grid, Group, Stepper, createStyles, Text } from '@mantine/core'
+import { useCallback, useState } from 'react'
+import { Button, Flex, Grid, Group, Stepper, createStyles, Text, Checkbox } from '@mantine/core'
 import CustomCard from 'components/common/CustomCard'
 import MobileIcon from 'resources/icons/Mobile'
 import DesktopIcon from 'resources/icons/Desktop'
-import { Devices } from 'types'
+import { BannerVariant, Devices, Banners, FileWithPath, ShapeVariants } from 'types'
 import { Dropzone, IMAGE_MIME_TYPE } from '@mantine/dropzone'
 import ImageIcon from 'resources/icons/Image'
 import HtmlIcon from 'resources/icons/Html'
+import { variants } from 'components/common/BannerSizeMock/BannerSizeMock'
 import BannerSizesList from './BannerSizesList'
+import ImageUrlInput from './ImageUrlInput'
 
 const useStyles = createStyles((theme) => {
   return {
@@ -50,36 +52,77 @@ const CreateCampaign = () => {
 
   // Mobile/Desktop tabs
   const [selectedTab, setSelectedTab] = useState<Devices | null>(null)
+  const [autoUTMChecked, setAutoUTMChecked] = useState(false)
 
-  const [imagesInfo, setImagesInfo] = useState<{ width: number; height: number }[]>([])
+  const [imagesInfo, setImagesInfo] = useState<Banners>({
+    mediumRectangle: { details: variants.mediumRectangle, fileDetails: [] },
+    skyscraper: { details: variants.skyscraper, fileDetails: [] },
+    leaderboard: { details: variants.leaderboard, fileDetails: [] },
+    billboard: { details: variants.billboard, fileDetails: [] },
+    halfPage: { details: variants.halfPage, fileDetails: [] },
+    mobileBanner: { details: variants.mobileBanner, fileDetails: [] },
+    mobileLeaderboard: { details: variants.mobileLeaderboard, fileDetails: [] },
+    others: { fileDetails: [] }
+  })
 
-  const onDrop = (files: any) => {
-    files.length &&
-      files.forEach((file: any) => {
-        const reader = new FileReader()
+  const updateBanners = useCallback((updatedValues: Banners) => {
+    setImagesInfo((prev) => ({ ...prev, ...updatedValues }))
+  }, [])
 
-        reader.onload = (e: any) => {
-          const img = new Image()
-          img.src = e.target.result
+  const onDrop = useCallback(
+    (files: FileWithPath[] | null) => {
+      if (files === null) return
+      const bannersDefaultValue: Banners = {
+        mediumRectangle: { details: variants.mediumRectangle, fileDetails: [] },
+        skyscraper: { details: variants.skyscraper, fileDetails: [] },
+        leaderboard: { details: variants.leaderboard, fileDetails: [] },
+        billboard: { details: variants.billboard, fileDetails: [] },
+        halfPage: { details: variants.halfPage, fileDetails: [] },
+        mobileBanner: { details: variants.mobileBanner, fileDetails: [] },
+        mobileLeaderboard: { details: variants.mobileLeaderboard, fileDetails: [] },
+        others: { fileDetails: [] }
+      }
+      const variantKeys = Object.keys(variants)
 
-          img.onload = () => {
-            const width = img.width
-            const height = img.height
-            console.log('size', width, height)
-            setImagesInfo((prev) => [...prev, { width, height }])
+      files &&
+        files.forEach((file: FileWithPath) => {
+          const reader = new FileReader()
+          let matchedVariant: BannerVariant | null = null
+          reader.onload = (e: any) => {
+            const img = new Image()
+            img.src = e.target.result
+
+            img.onload = () => {
+              const width = img.width
+              const height = img.height
+
+              for (let i = 0; i < variantKeys.length; i += 1) {
+                const variant = variants[variantKeys[i]]
+                matchedVariant = variant
+                if (variant.bannerSizes === `${width}x${height}`) {
+                  matchedVariant.checked = true
+                  bannersDefaultValue[matchedVariant!.label]!.fileDetails.push(file)
+                  break
+                }
+              }
+              if (!matchedVariant?.checked) bannersDefaultValue.others.fileDetails.push(file)
+
+              updateBanners(bannersDefaultValue)
+            }
           }
-        }
+          reader.readAsDataURL(file)
+        })
+    },
+    [updateBanners]
+  )
 
-        reader.readAsDataURL(file)
-      })
-  }
-  console.log('imageInfo', imagesInfo)
   return (
     <Grid mr="xl" ml="xl" mt="md">
       <Grid.Col span={8} className={classes.container}>
         <Grid p="md">
           <Grid.Col>
             <Stepper icon={' '} size="xs" active={active} onStepClick={setActive}>
+              <Stepper.Step />
               <Stepper.Step />
               <Stepper.Step />
               <Stepper.Step />
@@ -127,7 +170,8 @@ const CreateCampaign = () => {
                   Accepted banner sizes
                 </Text>
                 {/* TODO: FIX Styles of BannerSizesList, responsive! */}
-                <BannerSizesList selectedTab={selectedTab} />
+                <BannerSizesList selectedTab={selectedTab} imagesInfo={imagesInfo} />
+                {/* TODO: Fix the background color of the Dropzone */}
                 <Dropzone
                   mt="md"
                   onDrop={onDrop}
@@ -184,6 +228,28 @@ const CreateCampaign = () => {
                 </Dropzone>
               </>
             )}
+          </Grid.Col>
+          <Grid.Col>
+            <Grid>
+              <Grid.Col>
+                <Checkbox
+                  checked={autoUTMChecked}
+                  label="Auto UTM tracking"
+                  onChange={(event) => setAutoUTMChecked(event.currentTarget.checked)}
+                />
+              </Grid.Col>
+              {(Object.keys(imagesInfo) as ShapeVariants[]).map((key: ShapeVariants) => {
+                const images = imagesInfo[key]?.fileDetails || []
+                if (images.length === 0) return
+                const toRemove = key.toString() === 'others'
+
+                return images.map((image) => (
+                  <Grid.Col key={image.path}>
+                    <ImageUrlInput image={image} toRemove={toRemove} />
+                  </Grid.Col>
+                ))
+              })}
+            </Grid>
           </Grid.Col>
         </Grid>
       </Grid.Col>
