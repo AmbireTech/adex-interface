@@ -6,6 +6,7 @@ import { FileWithPath } from 'types'
 type ImageUrlInputProps = {
   image: FileWithPath
   toRemove: boolean
+  onDelete: (file: FileWithPath) => void
 }
 
 const useStyles = createStyles((theme) => ({
@@ -35,7 +36,7 @@ const useStyles = createStyles((theme) => ({
   }
 }))
 
-const ImageUrlInput = ({ image, toRemove }: ImageUrlInputProps) => {
+const ImageUrlInput = ({ image, toRemove, onDelete }: ImageUrlInputProps) => {
   const { classes } = useStyles()
 
   return (
@@ -61,7 +62,7 @@ const ImageUrlInput = ({ image, toRemove }: ImageUrlInputProps) => {
             title="Remove"
             color="secondaryText"
             variant="transparent"
-            onClick={() => console.log('Delete')}
+            onClick={() => onDelete(image)}
           >
             <DeleteIcon size="24px" />
           </ActionIcon>

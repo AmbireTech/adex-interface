@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { Button, Flex, Grid, Group, Stepper, createStyles, Text, Checkbox } from '@mantine/core'
 import CustomCard from 'components/common/CustomCard'
 import MobileIcon from 'resources/icons/Mobile'
@@ -52,7 +52,10 @@ const CreateCampaign = () => {
 
   // Mobile/Desktop tabs
   const [selectedTab, setSelectedTab] = useState<Devices | null>(null)
+
+  // Upload Files
   const [autoUTMChecked, setAutoUTMChecked] = useState(false)
+  const [uploadedFiles, setUploadedFiles] = useState<FileWithPath[] | null>(null)
 
   const [imagesInfo, setImagesInfo] = useState<Banners>({
     mediumRectangle: { details: variants.mediumRectangle, fileDetails: [] },
@@ -69,9 +72,12 @@ const CreateCampaign = () => {
     setImagesInfo((prev) => ({ ...prev, ...updatedValues }))
   }, [])
 
-  const onDrop = useCallback(
-    (files: FileWithPath[] | null) => {
-      if (files === null) return
+  const onDrop = useCallback((files: FileWithPath[] | null) => {
+    if (files === null) return
+    setUploadedFiles(files)
+  }, [])
+  const getBanners = useCallback(
+    (files: FileWithPath[]) => {
       const bannersDefaultValue: Banners = {
         mediumRectangle: { details: variants.mediumRectangle, fileDetails: [] },
         skyscraper: { details: variants.skyscraper, fileDetails: [] },
@@ -82,6 +88,12 @@ const CreateCampaign = () => {
         mobileLeaderboard: { details: variants.mobileLeaderboard, fileDetails: [] },
         others: { fileDetails: [] }
       }
+
+      if (files.length === 0) {
+        updateBanners(bannersDefaultValue)
+        return
+      }
+
       const variantKeys = Object.keys(variants)
 
       files &&
@@ -116,6 +128,17 @@ const CreateCampaign = () => {
     [updateBanners]
   )
 
+  useEffect(() => {
+    getBanners(uploadedFiles || [])
+  }, [uploadedFiles, getBanners])
+
+  const handleDeleteCreativeBtnClicked = useCallback(
+    (file: FileWithPath) => {
+      if (!uploadedFiles) return
+      setUploadedFiles(uploadedFiles.filter((item) => item.name !== file.name))
+    },
+    [uploadedFiles]
+  )
   return (
     <Grid mr="xl" ml="xl" mt="md">
       <Grid.Col span={8} className={classes.container}>
@@ -231,13 +254,15 @@ const CreateCampaign = () => {
           </Grid.Col>
           <Grid.Col>
             <Grid>
-              <Grid.Col>
-                <Checkbox
-                  checked={autoUTMChecked}
-                  label="Auto UTM tracking"
-                  onChange={(event) => setAutoUTMChecked(event.currentTarget.checked)}
-                />
-              </Grid.Col>
+              {uploadedFiles && uploadedFiles.length > 0 && (
+                <Grid.Col>
+                  <Checkbox
+                    checked={autoUTMChecked}
+                    label="Auto UTM tracking"
+                    onChange={(event) => setAutoUTMChecked(event.currentTarget.checked)}
+                  />
+                </Grid.Col>
+              )}
               {(Object.keys(imagesInfo) as ShapeVariants[]).map((key: ShapeVariants) => {
                 const images = imagesInfo[key]?.fileDetails || []
                 if (images.length === 0) return
@@ -245,7 +270,11 @@ const CreateCampaign = () => {
 
                 return images.map((image) => (
                   <Grid.Col key={image.path}>
-                    <ImageUrlInput image={image} toRemove={toRemove} />
+                    <ImageUrlInput
+                      image={image}
+                      toRemove={toRemove}
+                      onDelete={handleDeleteCreativeBtnClicked}
+                    />
                   </Grid.Col>
                 ))
               })}
