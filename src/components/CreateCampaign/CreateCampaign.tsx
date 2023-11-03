@@ -1,19 +1,18 @@
 import { useCallback, useEffect, useState } from 'react'
-import { Flex, Grid, Group, createStyles, Text, Checkbox } from '@mantine/core'
-import CustomCard from 'components/common/CustomCard'
-import MobileIcon from 'resources/icons/Mobile'
-import DesktopIcon from 'resources/icons/Desktop'
-import { BannerVariant, Devices, Banners, FileWithPath, ShapeVariants } from 'types'
+import { Grid, Group, createStyles, Text, Checkbox } from '@mantine/core'
+import { BannerVariant, Banners, FileWithPath, ShapeVariants } from 'types'
 import { Dropzone, IMAGE_MIME_TYPE } from '@mantine/dropzone'
 import ImageIcon from 'resources/icons/Image'
 import HtmlIcon from 'resources/icons/Html'
 import { BANNER_VARIANTS } from 'constants/banners'
 import { CREATE_CAMPAIGN_STEPS } from 'constants/createCampaign'
 import useCustomStepper from 'hooks/useCustomStepper'
+import useSelectedTab from 'hooks/useSelectedTab'
 import CustomStepper from './CampaignStepper'
 import BannerSizesList from './BannerSizesList'
 import ImageUrlInput from './ImageUrlInput'
 import CampaignSummary from './CampaignSummary'
+import SelectDevice from './SelectDevice'
 
 const useStyles = createStyles((theme) => {
   return {
@@ -52,9 +51,7 @@ const CreateCampaign = () => {
   const { activeStep, nextStep, previousStep } = useCustomStepper({
     stepsCount: CREATE_CAMPAIGN_STEPS
   })
-
-  // Mobile/Desktop tabs
-  const [selectedTab, setSelectedTab] = useState<Devices | null>(null)
+  const { selectedTab, selectTab } = useSelectedTab(null)
 
   // Upload Files
   const [autoUTMChecked, setAutoUTMChecked] = useState(false)
@@ -154,26 +151,7 @@ const CreateCampaign = () => {
             <Text color="secondaryText" size="sm" weight="bold" mb="xs">
               1. Select device
             </Text>
-            <Flex gap={20}>
-              <CustomCard
-                width={164}
-                height={164}
-                icon={<MobileIcon size="60px" />}
-                text="Mobile"
-                color="brand"
-                active={selectedTab === 'mobile'}
-                action={() => setSelectedTab('mobile')}
-              />
-              <CustomCard
-                width={164}
-                height={164}
-                icon={<DesktopIcon size="60px" />}
-                text="Desktop"
-                color="brand"
-                active={selectedTab === 'desktop'}
-                action={() => setSelectedTab('desktop')}
-              />
-            </Flex>
+            <SelectDevice selectedTab={selectedTab} selectTab={selectTab} />
           </Grid.Col>
           <Grid.Col>
             {selectedTab && (
