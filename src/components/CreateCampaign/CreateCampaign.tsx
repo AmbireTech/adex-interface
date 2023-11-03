@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { Flex, Grid, Group, Stepper, createStyles, Text, Checkbox } from '@mantine/core'
+import { Flex, Grid, Group, createStyles, Text, Checkbox } from '@mantine/core'
 import CustomCard from 'components/common/CustomCard'
 import MobileIcon from 'resources/icons/Mobile'
 import DesktopIcon from 'resources/icons/Desktop'
@@ -8,6 +8,9 @@ import { Dropzone, IMAGE_MIME_TYPE } from '@mantine/dropzone'
 import ImageIcon from 'resources/icons/Image'
 import HtmlIcon from 'resources/icons/Html'
 import { BANNER_VARIANTS } from 'constants/banners'
+import { CREATE_CAMPAIGN_STEPS } from 'constants/createCampaign'
+import useCustomStepper from 'hooks/useCustomStepper'
+import CustomStepper from './CampaignStepper'
 import BannerSizesList from './BannerSizesList'
 import ImageUrlInput from './ImageUrlInput'
 import CampaignSummary from './CampaignSummary'
@@ -43,21 +46,12 @@ const useStyles = createStyles((theme) => {
   }
 })
 
-const STEPS = 4
-
 const CreateCampaign = () => {
   const { classes } = useStyles()
 
-  // Stepper
-  const [active, setActive] = useState(1)
-  const nextStep = useCallback(
-    () => setActive((current) => (current < STEPS ? current + 1 : current)),
-    []
-  )
-  const prevStep = useCallback(
-    () => setActive((current) => (current > 0 ? current - 1 : current)),
-    []
-  )
+  const { activeStep, nextStep, previousStep } = useCustomStepper({
+    stepsCount: CREATE_CAMPAIGN_STEPS
+  })
 
   // Mobile/Desktop tabs
   const [selectedTab, setSelectedTab] = useState<Devices | null>(null)
@@ -154,12 +148,7 @@ const CreateCampaign = () => {
       <Grid.Col span={8} className={classes.container} p="lg">
         <Grid p="md">
           <Grid.Col>
-            <Stepper icon={' '} size="xs" active={active}>
-              <Stepper.Step />
-              <Stepper.Step />
-              <Stepper.Step />
-              <Stepper.Step />
-            </Stepper>
+            <CustomStepper active={activeStep} stepsCount={CREATE_CAMPAIGN_STEPS} />
           </Grid.Col>
           <Grid.Col>
             <Text color="secondaryText" size="sm" weight="bold" mb="xs">
@@ -288,7 +277,7 @@ const CreateCampaign = () => {
         className={classes.container}
         style={{ height: 689, padding: 0 }}
       >
-        <CampaignSummary onNextStep={nextStep} onBack={prevStep} />
+        <CampaignSummary onNextStep={nextStep} onBack={previousStep} />
       </Grid.Col>
     </Grid>
   )
