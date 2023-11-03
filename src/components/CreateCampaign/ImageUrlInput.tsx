@@ -1,6 +1,6 @@
 import { ActionIcon, Input, createStyles, Text, Group } from '@mantine/core'
 import DeleteIcon from 'resources/icons/Delete'
-import InfoIcon from 'resources/icons/Info'
+import InfoCurlyBorder from 'resources/icons/InfoCurlyBorder'
 import { FileWithPath } from 'types'
 
 type ImageUrlInputProps = {
@@ -15,7 +15,7 @@ const useStyles = createStyles((theme) => ({
     maxHeight: 40
   },
   errorWrapper: {
-    height: 60,
+    height: 50,
     border: '1px solid',
     borderColor: theme.colors.decorativeBorders[theme.fn.primaryShade()],
     boxShadow: theme.shadows.sm,
@@ -28,8 +28,8 @@ const useStyles = createStyles((theme) => ({
     justifyContent: 'center',
     background:
       theme.colors.warning[theme.fn.primaryShade()] + theme.other.shades.hexColorSuffix.lightest,
-    height: 60,
-    width: 60,
+    height: 50,
+    width: 50,
     borderTopLeftRadius: theme.radius.md,
     borderBottomLeftRadius: theme.radius.md,
     color: theme.colors.warning[theme.fn.primaryShade()]
@@ -44,7 +44,7 @@ const ImageUrlInput = ({ image, toRemove, onDelete }: ImageUrlInputProps) => {
       {toRemove && (
         <Group className={classes.errorWrapper}>
           <div className={classes.errorIcon}>
-            <InfoIcon size="24px" />
+            <InfoCurlyBorder size="24px" />
           </div>
           <Text size="sm"> The banner size does not meet the requirements.</Text>
         </Group>
@@ -55,7 +55,7 @@ const ImageUrlInput = ({ image, toRemove, onDelete }: ImageUrlInputProps) => {
         type="url"
         variant="default"
         placeholder="Paste URL"
-        size="xl"
+        size="lg"
         icon={<img src={URL.createObjectURL(image)} alt={image.name} className={classes.image} />}
         rightSection={
           <ActionIcon

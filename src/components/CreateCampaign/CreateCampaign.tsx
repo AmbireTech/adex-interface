@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { Button, Flex, Grid, Group, Stepper, createStyles, Text, Checkbox } from '@mantine/core'
+import { Flex, Grid, Group, Stepper, createStyles, Text, Checkbox } from '@mantine/core'
 import CustomCard from 'components/common/CustomCard'
 import MobileIcon from 'resources/icons/Mobile'
 import DesktopIcon from 'resources/icons/Desktop'
@@ -7,9 +7,10 @@ import { BannerVariant, Devices, Banners, FileWithPath, ShapeVariants } from 'ty
 import { Dropzone, IMAGE_MIME_TYPE } from '@mantine/dropzone'
 import ImageIcon from 'resources/icons/Image'
 import HtmlIcon from 'resources/icons/Html'
-import { variants } from 'components/common/BannerSizeMock/BannerSizeMock'
+import { BANNER_VARIANTS } from 'constants/banners'
 import BannerSizesList from './BannerSizesList'
 import ImageUrlInput from './ImageUrlInput'
+import CampaignSummary from './CampaignSummary'
 
 const useStyles = createStyles((theme) => {
   return {
@@ -17,8 +18,8 @@ const useStyles = createStyles((theme) => {
     container: {
       backgroundColor: theme.colors.mainBackground[theme.fn.primaryShade()],
       borderRadius: theme.radius.md,
-      boxShadow: theme.shadows.xs,
-      padding: theme.spacing.lg
+      boxShadow: theme.shadows.xs
+      // padding: theme.spacing.lg
     },
     lightGray: {
       color: theme.fn.lighten(
@@ -42,13 +43,21 @@ const useStyles = createStyles((theme) => {
   }
 })
 
+const STEPS = 4
+
 const CreateCampaign = () => {
   const { classes } = useStyles()
 
   // Stepper
   const [active, setActive] = useState(1)
-  const nextStep = () => setActive((current) => (current < 3 ? current + 1 : current))
-  const prevStep = () => setActive((current) => (current > 0 ? current - 1 : current))
+  const nextStep = useCallback(
+    () => setActive((current) => (current < STEPS ? current + 1 : current)),
+    []
+  )
+  const prevStep = useCallback(
+    () => setActive((current) => (current > 0 ? current - 1 : current)),
+    []
+  )
 
   // Mobile/Desktop tabs
   const [selectedTab, setSelectedTab] = useState<Devices | null>(null)
@@ -58,19 +67,20 @@ const CreateCampaign = () => {
   const [uploadedFiles, setUploadedFiles] = useState<FileWithPath[] | null>(null)
 
   const [imagesInfo, setImagesInfo] = useState<Banners>({
-    mediumRectangle: { details: variants.mediumRectangle, fileDetails: [] },
-    skyscraper: { details: variants.skyscraper, fileDetails: [] },
-    leaderboard: { details: variants.leaderboard, fileDetails: [] },
-    billboard: { details: variants.billboard, fileDetails: [] },
-    halfPage: { details: variants.halfPage, fileDetails: [] },
-    mobileBanner: { details: variants.mobileBanner, fileDetails: [] },
-    mobileLeaderboard: { details: variants.mobileLeaderboard, fileDetails: [] },
+    mediumRectangle: { details: BANNER_VARIANTS.mediumRectangle, fileDetails: [] },
+    skyscraper: { details: BANNER_VARIANTS.skyscraper, fileDetails: [] },
+    leaderboard: { details: BANNER_VARIANTS.leaderboard, fileDetails: [] },
+    billboard: { details: BANNER_VARIANTS.billboard, fileDetails: [] },
+    halfPage: { details: BANNER_VARIANTS.halfPage, fileDetails: [] },
+    mobileBanner: { details: BANNER_VARIANTS.mobileBanner, fileDetails: [] },
+    mobileLeaderboard: { details: BANNER_VARIANTS.mobileLeaderboard, fileDetails: [] },
     others: { fileDetails: [] }
   })
 
-  const updateBanners = useCallback((updatedValues: Banners) => {
-    setImagesInfo((prev) => ({ ...prev, ...updatedValues }))
-  }, [])
+  const updateBanners = useCallback(
+    (updatedValues: Banners) => setImagesInfo((prev) => ({ ...prev, ...updatedValues })),
+    []
+  )
 
   const onDrop = useCallback((files: FileWithPath[] | null) => {
     if (files === null) return
@@ -79,13 +89,13 @@ const CreateCampaign = () => {
   const getBanners = useCallback(
     (files: FileWithPath[]) => {
       const bannersDefaultValue: Banners = {
-        mediumRectangle: { details: variants.mediumRectangle, fileDetails: [] },
-        skyscraper: { details: variants.skyscraper, fileDetails: [] },
-        leaderboard: { details: variants.leaderboard, fileDetails: [] },
-        billboard: { details: variants.billboard, fileDetails: [] },
-        halfPage: { details: variants.halfPage, fileDetails: [] },
-        mobileBanner: { details: variants.mobileBanner, fileDetails: [] },
-        mobileLeaderboard: { details: variants.mobileLeaderboard, fileDetails: [] },
+        mediumRectangle: { details: BANNER_VARIANTS.mediumRectangle, fileDetails: [] },
+        skyscraper: { details: BANNER_VARIANTS.skyscraper, fileDetails: [] },
+        leaderboard: { details: BANNER_VARIANTS.leaderboard, fileDetails: [] },
+        billboard: { details: BANNER_VARIANTS.billboard, fileDetails: [] },
+        halfPage: { details: BANNER_VARIANTS.halfPage, fileDetails: [] },
+        mobileBanner: { details: BANNER_VARIANTS.mobileBanner, fileDetails: [] },
+        mobileLeaderboard: { details: BANNER_VARIANTS.mobileLeaderboard, fileDetails: [] },
         others: { fileDetails: [] }
       }
 
@@ -94,7 +104,7 @@ const CreateCampaign = () => {
         return
       }
 
-      const variantKeys = Object.keys(variants)
+      const variantKeys = Object.keys(BANNER_VARIANTS)
 
       files &&
         files.forEach((file: FileWithPath) => {
@@ -109,7 +119,7 @@ const CreateCampaign = () => {
               const height = img.height
 
               for (let i = 0; i < variantKeys.length; i += 1) {
-                const variant = variants[variantKeys[i]]
+                const variant = BANNER_VARIANTS[variantKeys[i]]
                 matchedVariant = variant
                 if (variant.bannerSizes === `${width}x${height}`) {
                   matchedVariant.checked = true
@@ -141,22 +151,15 @@ const CreateCampaign = () => {
   )
   return (
     <Grid mr="xl" ml="xl" mt="md">
-      <Grid.Col span={8} className={classes.container}>
+      <Grid.Col span={8} className={classes.container} p="lg">
         <Grid p="md">
           <Grid.Col>
-            <Stepper icon={' '} size="xs" active={active} onStepClick={setActive}>
+            <Stepper icon={' '} size="xs" active={active}>
               <Stepper.Step />
               <Stepper.Step />
               <Stepper.Step />
               <Stepper.Step />
             </Stepper>
-
-            <Group mt="xl">
-              <Button variant="default" onClick={prevStep}>
-                Back
-              </Button>
-              <Button onClick={nextStep}>Next step</Button>
-            </Group>
           </Grid.Col>
           <Grid.Col>
             <Text color="secondaryText" size="sm" weight="bold" mb="xs">
@@ -192,16 +195,13 @@ const CreateCampaign = () => {
                 <Text color="secondaryText" size="xs" weight="bold" mb="xs">
                   Accepted banner sizes
                 </Text>
-                {/* TODO: FIX Styles of BannerSizesList, responsive! */}
                 <BannerSizesList selectedTab={selectedTab} imagesInfo={imagesInfo} />
-                {/* TODO: Fix the background color of the Dropzone */}
                 <Dropzone
                   mt="md"
                   onDrop={onDrop}
                   onReject={(files: any) => console.log('rejected files', files)}
                   maxSize={3 * 1024 ** 2}
                   accept={IMAGE_MIME_TYPE}
-                  //   {...props}
                 >
                   <Group align="center" position="center" p="sm" style={{ pointerEvents: 'none' }}>
                     <Dropzone.Accept>
@@ -282,8 +282,13 @@ const CreateCampaign = () => {
           </Grid.Col>
         </Grid>
       </Grid.Col>
-      <Grid.Col span={3} offset={1} className={classes.container}>
-        Test
+      <Grid.Col
+        span={3}
+        offset={1}
+        className={classes.container}
+        style={{ height: 689, padding: 0 }}
+      >
+        <CampaignSummary onNextStep={nextStep} onBack={prevStep} />
       </Grid.Col>
     </Grid>
   )

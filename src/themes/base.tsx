@@ -30,6 +30,7 @@ type ExtendedCustomColors =
   | 'chartColorThree'
   | 'chartColorFour'
   | 'warning'
+  | 'nonDecorativeBorders'
   | DefaultMantineColor
 
 declare module '@mantine/core' {
@@ -210,34 +211,52 @@ export const baseTheme: MantineThemeOverride = {
       }
     },
     Modal: {
-      styles: (theme) => {
-        return {
-          root: {
-            [theme.other.media.print]: {
-              overflow: 'visible'
-            }
-          },
-          inner: {
-            [theme.other.media.print]: {
-              overflow: 'visible',
-              // Fixes double print, no idea why with fixed it prints twice
-              position: 'absolute',
-              // Fix if used with "centered" modal prop
-              alignItems: 'flex-start'
-            }
-          },
-          content: {
-            [theme.other.media.print]: {
-              overflow: 'visible'
-            }
+      styles: (theme) => ({
+        root: {
+          [theme.other.media.print]: {
+            overflow: 'visible'
+          }
+        },
+        inner: {
+          [theme.other.media.print]: {
+            overflow: 'visible',
+            // Fixes double print, no idea why with fixed it prints twice
+            position: 'absolute',
+            // Fix if used with "centered" modal prop
+            alignItems: 'flex-start'
+          }
+        },
+        content: {
+          [theme.other.media.print]: {
+            overflow: 'visible'
           }
         }
-      }
+      })
     },
     Navbar: {
       defaultProps: {
         width: { sm: SIDE_BAR_WIDTH }
       }
+    },
+    Input: {
+      styles: (theme) => ({
+        input: {
+          backgroundColor: theme.colors.lightBackground[theme.fn.primaryShade()],
+          borderColor: theme.colors.nonDecorativeBorders[theme.fn.primaryShade()],
+          borderRadius: theme.radius.md
+        },
+        icon: {
+          borderRight: '1px solid',
+          borderColor: theme.colors.nonDecorativeBorders[theme.fn.primaryShade()]
+        }
+      })
+    },
+    Dropzone: {
+      styles: (theme) => ({
+        root: {
+          backgroundColor: theme.colors.lightBackground[theme.fn.primaryShade()]
+        }
+      })
     }
   },
   primaryShade: { light: 3, dark: 4 }

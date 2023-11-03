@@ -232,6 +232,18 @@ export const lightTheme: MantineThemeOverride = {
       '#5D2731',
       '#4F282F',
       '#43272C'
+    ],
+    nonDecorativeBorders: [
+      '#DADCE1',
+      '#C3C6D0',
+      '#ACB2C3',
+      '#959EB8',
+      '#858EA6',
+      '#787F96',
+      '#6D7386',
+      '#646976',
+      '#5C5F69',
+      '#54565D'
     ]
     // NOTE: needs 10 shades to work https://mantine.dev/theming/colors/
     // attention: ['#FFBE4D', '#FFBE4D', '#FFBE4D'],
