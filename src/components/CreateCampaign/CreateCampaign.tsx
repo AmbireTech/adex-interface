@@ -1,17 +1,17 @@
-import { useCallback, useState } from 'react'
-import { Grid, createStyles, Text, Checkbox } from '@mantine/core'
-import { Banners, FileWithPath, ShapeVariants } from 'types'
-import { BANNER_VARIANTS } from 'constants/banners'
+import { Grid, createStyles, Text } from '@mantine/core'
 import { CREATE_CAMPAIGN_STEPS } from 'constants/createCampaign'
 import useCustomStepper from 'hooks/useCustomStepper'
 import useSelectedTab from 'hooks/useSelectedTab'
 import useDropzone from 'hooks/useDropzone'
+import { Banners, FileWithPath } from 'types'
+import { useCallback, useState } from 'react'
+import { BANNER_VARIANTS } from 'constants/banners'
 import CustomStepper from './CampaignStepper'
 import BannerSizesList from './BannerSizesList'
-import ImageUrlInput from './ImageUrlInput'
 import CampaignSummary from './CampaignSummary'
 import SelectDevice from './SelectDevice'
 import FilesDropzone from './FilesDropzone'
+import UploadedBanners from './UploadedBanners'
 
 const useStyles = createStyles((theme) => {
   return {
@@ -48,7 +48,7 @@ const CreateCampaign = () => {
   const { classes } = useStyles()
 
   const [autoUTMChecked, setAutoUTMChecked] = useState(false)
-
+  const updateAutoUTMChecked = useCallback((isChecked: boolean) => setAutoUTMChecked(isChecked), [])
   const { activeStep, nextStep, previousStep } = useCustomStepper({
     stepsCount: CREATE_CAMPAIGN_STEPS
   })
@@ -107,32 +107,13 @@ const CreateCampaign = () => {
             )}
           </Grid.Col>
           <Grid.Col>
-            <Grid>
-              {uploadedFiles && uploadedFiles.length > 0 && (
-                <Grid.Col>
-                  <Checkbox
-                    checked={autoUTMChecked}
-                    label="Auto UTM tracking"
-                    onChange={(event) => setAutoUTMChecked(event.currentTarget.checked)}
-                  />
-                </Grid.Col>
-              )}
-              {(Object.keys(imagesInfo) as ShapeVariants[]).map((key: ShapeVariants) => {
-                const images = imagesInfo[key]?.fileDetails || []
-                if (images.length === 0) return
-                const toRemove = key.toString() === 'others'
-
-                return images.map((image) => (
-                  <Grid.Col key={image.path}>
-                    <ImageUrlInput
-                      image={image}
-                      toRemove={toRemove}
-                      onDelete={handleDeleteCreativeBtnClicked}
-                    />
-                  </Grid.Col>
-                ))
-              })}
-            </Grid>
+            <UploadedBanners
+              autoUTMChecked={autoUTMChecked}
+              uploadedFiles={uploadedFiles}
+              updateAutoUTMChecked={updateAutoUTMChecked}
+              imagesInfo={imagesInfo}
+              handleDeleteCreativeBtnClicked={handleDeleteCreativeBtnClicked}
+            />
           </Grid.Col>
         </Grid>
       </Grid.Col>
