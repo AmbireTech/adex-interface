@@ -47,8 +47,8 @@ const useStyles = createStyles((theme) => {
 
 const CreateCampaign = () => {
   const { classes } = useStyles()
-  const { test } = useCreateCampaignContext()
-  console.log('context', test)
+  const { campaign } = useCreateCampaignContext()
+  console.log('context', campaign)
   const [autoUTMChecked, setAutoUTMChecked] = useState(false)
   const updateAutoUTMChecked = useCallback((isChecked: boolean) => setAutoUTMChecked(isChecked), [])
   const { activeStep, nextStep, previousStep } = useCustomStepper({

@@ -1,23 +1,24 @@
 import { FC, PropsWithChildren, createContext, useMemo, useState } from 'react'
+import { Campaign } from 'types'
 
 type CreateCampaign = {
-  test: string
-  setTest: React.Dispatch<React.SetStateAction<string>>
+  campaign: Campaign | null
+  setCampaign: React.Dispatch<React.SetStateAction<Campaign | null>>
 }
 
 const CreateCampaignContext = createContext<CreateCampaign | null>(null)
 
 const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
-  const [test, setTest] = useState('test')
+  const [campaign, setCampaign] = useState<Campaign | null>(null)
 
   return (
     <CreateCampaignContext.Provider
       value={useMemo(
         () => ({
-          test,
-          setTest
+          campaign,
+          setCampaign
         }),
-        [test]
+        [campaign]
       )}
     >
       {children}
