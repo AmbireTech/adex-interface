@@ -1,4 +1,12 @@
-import { createContext, FC, PropsWithChildren, useMemo, useCallback, useEffect } from 'react'
+import {
+  createContext,
+  FC,
+  PropsWithChildren,
+  useMemo,
+  useCallback,
+  useEffect,
+  useState
+} from 'react'
 import { IAdExAccount } from 'types'
 import { useLocalStorage } from '@mantine/hooks'
 // import { registerUser } from 'lib/backend'
@@ -16,10 +24,18 @@ const ambireLoginSDK = new AmbireLoginSDK({
 //   address: '0x70fC54B13FA83571006c289B9A6bbAE69dfD4e46'
 // }
 
+interface TestType {
+  propOne: string
+  propTwo?: number
+  propThree?: boolean
+}
+
 interface IAccountContext {
   adexAccount: IAdExAccount | null
   authenticated: boolean
   ambireSDK: AmbireLoginSDK
+  testItem: TestType | null
+  updateTestItem: (x: any, y: any) => void
   connectWallet: () => void
   disconnectWallet: () => void
 }
@@ -28,6 +44,7 @@ const AccountContext = createContext<IAccountContext | null>(null)
 
 // TODO: persist data
 const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
+  const [testItem, setTestItem] = useState<TestType>({ propOne: 'valueOne' })
   const ambireSDK = useMemo(() => ambireLoginSDK, [])
 
   const [adexAccount, setAdexAccount] = useLocalStorage<IAccountContext['adexAccount']>({
@@ -63,15 +80,37 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
 
   const authenticated = useMemo(() => !!adexAccount, [adexAccount])
 
+  const updateTestItem = useCallback(
+    <TestItemKey extends keyof TestType>(key: TestItemKey, value: TestType[TestItemKey]) => {
+      setTestItem((x) => {
+        const updated = { ...x }
+        updated[key] = value
+        return updated
+      })
+    },
+    []
+  )
+
   const contextValue = useMemo(
     () => ({
       adexAccount,
       authenticated,
       connectWallet,
       disconnectWallet,
-      ambireSDK
+      ambireSDK,
+      testItem,
+      setTestItem,
+      updateTestItem
     }),
-    [adexAccount, ambireSDK, authenticated, connectWallet, disconnectWallet]
+    [
+      adexAccount,
+      ambireSDK,
+      authenticated,
+      connectWallet,
+      disconnectWallet,
+      testItem,
+      updateTestItem
+    ]
   )
 
   return <AccountContext.Provider value={contextValue}>{children}</AccountContext.Provider>
