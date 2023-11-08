@@ -6,6 +6,7 @@ import useDropzone from 'hooks/useDropzone'
 import { Banners, FileWithPath } from 'types'
 import { useCallback, useState } from 'react'
 import { BANNER_VARIANTS } from 'constants/banners'
+import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import CustomStepper from './CampaignStepper'
 import BannerSizesList from './BannerSizesList'
 import CampaignSummary from './CampaignSummary'
@@ -46,7 +47,8 @@ const useStyles = createStyles((theme) => {
 
 const CreateCampaign = () => {
   const { classes } = useStyles()
-
+  const { test } = useCreateCampaignContext()
+  console.log('context', test)
   const [autoUTMChecked, setAutoUTMChecked] = useState(false)
   const updateAutoUTMChecked = useCallback((isChecked: boolean) => setAutoUTMChecked(isChecked), [])
   const { activeStep, nextStep, previousStep } = useCustomStepper({
@@ -121,7 +123,7 @@ const CreateCampaign = () => {
         span={3}
         offset={1}
         className={classes.container}
-        style={{ height: 689, padding: 0 }}
+        style={{ height: 'auto', padding: 0 }}
       >
         <CampaignSummary onNextStep={nextStep} onBack={previousStep} />
       </Grid.Col>
