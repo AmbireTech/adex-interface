@@ -39,13 +39,13 @@ const CampaignSummary = ({ onNextStep, onBack }: CampaignSummaryProps) => {
           title="Device"
           value={
             device && device === 'desktop' ? (
-              <span>
+              <Flex align="center" gap={5}>
                 <DesktopIcon size="16px" /> Desktop
-              </span>
+              </Flex>
             ) : (
-              <span>
+              <Flex align="center" gap={5}>
                 <MobileIcon size="16px" /> Mobile
-              </span>
+              </Flex>
             )
           }
         />
