@@ -6,7 +6,6 @@ import useDropzone from 'hooks/useDropzone'
 import { Banners, FileWithPath } from 'types'
 import { useCallback, useState } from 'react'
 import { BANNER_VARIANTS } from 'constants/banners'
-import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import CustomStepper from './CampaignStepper'
 import BannerSizesList from './BannerSizesList'
 import CampaignSummary from './CampaignSummary'
@@ -47,8 +46,6 @@ const useStyles = createStyles((theme) => {
 
 const CreateCampaign = () => {
   const { classes } = useStyles()
-  const { campaign } = useCreateCampaignContext()
-  console.log('context', campaign)
   const [autoUTMChecked, setAutoUTMChecked] = useState(false)
   const updateAutoUTMChecked = useCallback((isChecked: boolean) => setAutoUTMChecked(isChecked), [])
   const { activeStep, nextStep, previousStep } = useCustomStepper({
