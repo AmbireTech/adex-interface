@@ -1,3 +1,5 @@
+import { Devices } from './createCampaign'
+
 export type Format = {
   /** Width in device independent pixels (DIPS). */
   w?: number
@@ -111,6 +113,8 @@ export type TargetingInput = {
 export type Campaign = {
   id: string
   creator: string
+  step: number
+  device: Devices | null
   depositAssetAddr: string
   depositAmount: bigint
   network: number

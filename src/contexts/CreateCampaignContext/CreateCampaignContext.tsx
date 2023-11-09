@@ -1,5 +1,6 @@
 import { useLocalStorage } from '@mantine/hooks'
 import { FC, PropsWithChildren, createContext, useCallback, useMemo } from 'react'
+import { CREATE_CAMPAIGN_DEFAULT_VALUE } from 'constants/createCampaign'
 import { Campaign } from 'types'
 import superjson from 'superjson'
 
@@ -11,44 +12,13 @@ type CreateCampaign = {
 
 const CreateCampaignContext = createContext<CreateCampaign | null>(null)
 
-const defaultValue: Campaign = {
-  id: '',
-  creator: '',
-  depositAssetAddr: '',
-  depositAmount: BigInt(0),
-  network: 0,
-  created: BigInt(0),
-  nonce: BigInt(0),
-  title: '',
-  adUnits: [],
-  validators: [],
-  pricingBounds: {
-    IMPRESSION: {
-      min: BigInt(0),
-      max: BigInt(0)
-    },
-    CLICK: {
-      min: BigInt(0),
-      max: BigInt(0)
-    }
-  },
-  targetingRules: [],
-  targetingInput: {
-    version: '',
-    inputs: {
-      location: [],
-      categories: [],
-      publishers: []
-    }
-  }
-}
-
 const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
+  const defaultValue = CREATE_CAMPAIGN_DEFAULT_VALUE
   const [campaign, setCampaign] = useLocalStorage<Campaign>({
     key: 'createCampaign',
     defaultValue,
     serialize: superjson.stringify,
-    deserialize: (str) => (str === undefined ? defaultValue : superjson.parse(str))
+    deserialize: (str) => (typeof str === 'undefined' ? defaultValue : superjson.parse(str))
   })
 
   const updateCampaign = useCallback(

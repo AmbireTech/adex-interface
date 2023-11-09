@@ -1,11 +1,11 @@
 import { Grid, createStyles, Text } from '@mantine/core'
 import { CREATE_CAMPAIGN_STEPS } from 'constants/createCampaign'
 import useCustomStepper from 'hooks/useCustomStepper'
-import useSelectedTab from 'hooks/useSelectedTab'
 import useDropzone from 'hooks/useDropzone'
 import { Banners, FileWithPath } from 'types'
 import { useCallback, useState } from 'react'
 import { BANNER_VARIANTS } from 'constants/banners'
+import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import CustomStepper from './CampaignStepper'
 import BannerSizesList from './BannerSizesList'
 import CampaignSummary from './CampaignSummary'
@@ -51,7 +51,10 @@ const CreateCampaign = () => {
   const { activeStep, nextStep, previousStep } = useCustomStepper({
     stepsCount: CREATE_CAMPAIGN_STEPS
   })
-  const { selectedTab, selectTab } = useSelectedTab(null)
+
+  const {
+    campaign: { device }
+  } = useCreateCampaignContext()
 
   const [imagesInfo, setImagesInfo] = useState<Banners>({
     mediumRectangle: { details: BANNER_VARIANTS.mediumRectangle, fileDetails: [] },
@@ -89,10 +92,10 @@ const CreateCampaign = () => {
             <Text color="secondaryText" size="sm" weight="bold" mb="xs">
               1. Select device
             </Text>
-            <SelectDevice selectedTab={selectedTab} selectTab={selectTab} />
+            <SelectDevice />
           </Grid.Col>
           <Grid.Col>
-            {selectedTab && (
+            {device && (
               <>
                 <Text color="secondaryText" size="sm" weight="bold" mb="xs">
                   2. Upload creatives
@@ -100,7 +103,7 @@ const CreateCampaign = () => {
                 <Text color="secondaryText" size="xs" weight="bold" mb="xs">
                   Accepted banner sizes
                 </Text>
-                <BannerSizesList selectedTab={selectedTab} imagesInfo={imagesInfo} />
+                <BannerSizesList selectedTab={device} imagesInfo={imagesInfo} />
                 <FilesDropzone onDrop={onDrop} />
               </>
             )}

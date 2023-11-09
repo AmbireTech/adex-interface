@@ -1,6 +1,9 @@
 import { Button, Flex, Group, Text, UnstyledButton, createStyles } from '@mantine/core'
 import CampaignDetailsRow from 'components/common/Modals/CampaignDetailsModal/CampaignDetailsRow'
+import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
+import DesktopIcon from 'resources/icons/Desktop'
 import LeftArrowIcon from 'resources/icons/LeftArrow'
+import MobileIcon from 'resources/icons/Mobile'
 
 const useStyles = createStyles((theme) => ({
   bg: {
@@ -23,12 +26,29 @@ type CampaignSummaryProps = {
 
 const CampaignSummary = ({ onNextStep, onBack }: CampaignSummaryProps) => {
   const { classes } = useStyles()
+  const {
+    campaign: { device }
+  } = useCreateCampaignContext()
   return (
     <>
       <Flex direction="column" p="md">
         <CampaignDetailsRow lighterColor title="Budget" value="-" />
         <CampaignDetailsRow lighterColor title="CPM" value="-" />
-        <CampaignDetailsRow lighterColor title="Device" value="-" />
+        <CampaignDetailsRow
+          lighterColor
+          title="Device"
+          value={
+            device && device === 'desktop' ? (
+              <span>
+                <DesktopIcon size="16px" /> Desktop
+              </span>
+            ) : (
+              <span>
+                <MobileIcon size="16px" /> Mobile
+              </span>
+            )
+          }
+        />
         <CampaignDetailsRow lighterColor title="Ad Format" value="-" />
         <CampaignDetailsRow lighterColor title="Categories" value="-" />
         <CampaignDetailsRow lighterColor title="Countries" value="-" />
