@@ -1,5 +1,6 @@
 import { Button, Flex, Group, Text, UnstyledButton, createStyles } from '@mantine/core'
 import CampaignDetailsRow from 'components/common/Modals/CampaignDetailsModal/CampaignDetailsRow'
+import { CREATE_CAMPAIGN_STEPS } from 'constants/createCampaign'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import DesktopIcon from 'resources/icons/Desktop'
 import LeftArrowIcon from 'resources/icons/LeftArrow'
@@ -19,16 +20,13 @@ const useStyles = createStyles((theme) => ({
   }
 }))
 
-type CampaignSummaryProps = {
-  onNextStep: () => void
-  onBack: () => void
-}
-
-const CampaignSummary = ({ onNextStep, onBack }: CampaignSummaryProps) => {
+const CampaignSummary = () => {
   const { classes } = useStyles()
   const {
-    campaign: { device }
+    campaign: { device, step },
+    updateCampaign
   } = useCreateCampaignContext()
+
   return (
     <>
       <Flex direction="column" p="md">
@@ -60,14 +58,26 @@ const CampaignSummary = ({ onNextStep, onBack }: CampaignSummaryProps) => {
         <Text color="secondaryText">0</Text>
       </Flex>
       <Flex direction="column" justify="space-between" align="center">
-        <Button w="90%" size="lg" mt="md" variant="filled" onClick={onNextStep}>
+        <Button
+          w="90%"
+          size="lg"
+          mt="md"
+          variant="filled"
+          onClick={() => step < CREATE_CAMPAIGN_STEPS && updateCampaign('step', step + 1)}
+        >
           Next Step
         </Button>
         <Button w="90%" size="lg" mt="md" variant="outline">
           Save Draft
         </Button>
         <UnstyledButton variant="underlined" mt="sm">
-          <Group position="center" onClick={onBack} align="center" spacing="xs" h={50}>
+          <Group
+            position="center"
+            onClick={() => step > 0 && updateCampaign('step', step - 1)}
+            align="center"
+            spacing="xs"
+            h={50}
+          >
             <span className={classes.lightestBrandColor}>
               <LeftArrowIcon className={classes.icon} />
             </span>

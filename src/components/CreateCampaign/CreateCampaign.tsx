@@ -1,6 +1,4 @@
 import { Grid, createStyles, Text } from '@mantine/core'
-import { CREATE_CAMPAIGN_STEPS } from 'constants/createCampaign'
-import useCustomStepper from 'hooks/useCustomStepper'
 import useDropzone from 'hooks/useDropzone'
 import { Banners, FileWithPath } from 'types'
 import { useCallback, useState } from 'react'
@@ -48,9 +46,6 @@ const CreateCampaign = () => {
   const { classes } = useStyles()
   const [autoUTMChecked, setAutoUTMChecked] = useState(false)
   const updateAutoUTMChecked = useCallback((isChecked: boolean) => setAutoUTMChecked(isChecked), [])
-  const { activeStep, nextStep, previousStep } = useCustomStepper({
-    stepsCount: CREATE_CAMPAIGN_STEPS
-  })
 
   const {
     campaign: { device }
@@ -86,7 +81,7 @@ const CreateCampaign = () => {
       <Grid.Col span={8} className={classes.container} p="lg">
         <Grid p="md">
           <Grid.Col>
-            <CustomStepper active={activeStep} stepsCount={CREATE_CAMPAIGN_STEPS} />
+            <CustomStepper />
           </Grid.Col>
           <Grid.Col>
             <Text color="secondaryText" size="sm" weight="bold" mb="xs">
@@ -103,7 +98,7 @@ const CreateCampaign = () => {
                 <Text color="secondaryText" size="xs" weight="bold" mb="xs">
                   Accepted banner sizes
                 </Text>
-                <BannerSizesList selectedTab={device} imagesInfo={imagesInfo} />
+                <BannerSizesList imagesInfo={imagesInfo} />
                 <FilesDropzone onDrop={onDrop} />
               </>
             )}
@@ -125,7 +120,7 @@ const CreateCampaign = () => {
         className={classes.container}
         style={{ height: 'auto', padding: 0 }}
       >
-        <CampaignSummary onNextStep={nextStep} onBack={previousStep} />
+        <CampaignSummary />
       </Grid.Col>
     </Grid>
   )

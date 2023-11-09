@@ -19,7 +19,7 @@ const SelectDevice = () => {
         text="Mobile"
         color="brand"
         active={device === 'mobile'}
-        action={() => updateCampaign('device', 'mobile')}
+        action={() => device !== 'mobile' && updateCampaign('device', 'mobile')}
       />
       <CustomCard
         width={164}
@@ -28,7 +28,7 @@ const SelectDevice = () => {
         text="Desktop"
         color="brand"
         active={device === 'desktop'}
-        action={() => updateCampaign('device', 'desktop')}
+        action={() => device !== 'desktop' && updateCampaign('device', 'desktop')}
       />
     </Flex>
   )

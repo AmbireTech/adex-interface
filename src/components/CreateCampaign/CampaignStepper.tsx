@@ -1,13 +1,17 @@
 import { Stepper } from '@mantine/core'
-import { CustomStepperProps } from 'types'
+import { CREATE_CAMPAIGN_STEPS } from 'constants/createCampaign'
+import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 
-function CustomStepper({ active, stepsCount }: CustomStepperProps) {
-  const steps = Array.from({ length: stepsCount }, (_, index) => index + 1)
+function CustomStepper() {
+  const steps = Array.from({ length: CREATE_CAMPAIGN_STEPS }, (_, index) => index + 1)
+  const {
+    campaign: { step }
+  } = useCreateCampaignContext()
 
   return (
-    <Stepper icon=" " size="xs" active={active}>
-      {steps.map((step) => (
-        <Stepper.Step key={step} />
+    <Stepper icon=" " size="xs" active={step}>
+      {steps.map((x) => (
+        <Stepper.Step key={x} />
       ))}
     </Stepper>
   )

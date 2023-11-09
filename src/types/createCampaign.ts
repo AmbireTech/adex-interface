@@ -36,7 +36,6 @@ export type Banners = {
 }
 
 export type TabSwitchDevices = {
-  selectedTab: Devices | null
   imagesInfo: Banners | null
 }
 

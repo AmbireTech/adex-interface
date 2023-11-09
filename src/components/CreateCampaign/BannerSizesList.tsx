@@ -1,9 +1,14 @@
 import { Grid } from '@mantine/core'
 import BannerSizeMock from 'components/common/BannerSizeMock'
+import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import { TabSwitchDevices } from 'types'
 
-const BannerSizesList = ({ selectedTab, imagesInfo }: TabSwitchDevices) => {
-  return selectedTab === 'mobile' ? (
+const BannerSizesList = ({ imagesInfo }: TabSwitchDevices) => {
+  const {
+    campaign: { device }
+  } = useCreateCampaignContext()
+
+  return device === 'mobile' ? (
     <Grid>
       <Grid.Col span="content" offset={0.5}>
         <BannerSizeMock

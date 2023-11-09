@@ -13,7 +13,7 @@ type CreateCampaign = {
 const CreateCampaignContext = createContext<CreateCampaign | null>(null)
 
 const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
-  const defaultValue = CREATE_CAMPAIGN_DEFAULT_VALUE
+  const defaultValue = { ...CREATE_CAMPAIGN_DEFAULT_VALUE }
   const [campaign, setCampaign] = useLocalStorage<Campaign>({
     key: 'createCampaign',
     defaultValue,
