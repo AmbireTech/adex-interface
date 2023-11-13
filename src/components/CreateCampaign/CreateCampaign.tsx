@@ -1,15 +1,8 @@
-import { Grid, createStyles, Text } from '@mantine/core'
-import useDropzone from 'hooks/useDropzone'
-import { Banners, FileWithPath } from 'types'
-import { useCallback, useState } from 'react'
-import { BANNER_VARIANTS } from 'constants/banners'
-import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
+import { Grid, createStyles } from '@mantine/core'
 import CustomStepper from './CampaignStepper'
-import BannerSizesList from './BannerSizesList'
 import CampaignSummary from './CampaignSummary'
 import SelectDevice from './SelectDevice'
-import FilesDropzone from './FilesDropzone'
-import UploadedBanners from './UploadedBanners'
+import UploadCreative from './UploadCreative'
 
 const useStyles = createStyles((theme) => {
   return {
@@ -44,38 +37,7 @@ const useStyles = createStyles((theme) => {
 
 const CreateCampaign = () => {
   const { classes } = useStyles()
-  const [autoUTMChecked, setAutoUTMChecked] = useState(false)
-  const updateAutoUTMChecked = useCallback((isChecked: boolean) => setAutoUTMChecked(isChecked), [])
 
-  const {
-    campaign: { device }
-  } = useCreateCampaignContext()
-
-  const [imagesInfo, setImagesInfo] = useState<Banners>({
-    mediumRectangle: { details: BANNER_VARIANTS.mediumRectangle, fileDetails: [] },
-    skyscraper: { details: BANNER_VARIANTS.skyscraper, fileDetails: [] },
-    leaderboard: { details: BANNER_VARIANTS.leaderboard, fileDetails: [] },
-    billboard: { details: BANNER_VARIANTS.billboard, fileDetails: [] },
-    halfPage: { details: BANNER_VARIANTS.halfPage, fileDetails: [] },
-    mobileBanner: { details: BANNER_VARIANTS.mobileBanner, fileDetails: [] },
-    mobileLeaderboard: { details: BANNER_VARIANTS.mobileLeaderboard, fileDetails: [] },
-    others: { fileDetails: [] }
-  })
-
-  const updateBanners = useCallback(
-    (updatedValues: Banners) => setImagesInfo((prev) => ({ ...prev, ...updatedValues })),
-    []
-  )
-
-  const { onDrop, updateUploadedFiles, uploadedFiles } = useDropzone({ updateBanners })
-
-  const handleDeleteCreativeBtnClicked = useCallback(
-    (file: FileWithPath) => {
-      if (!uploadedFiles) return
-      updateUploadedFiles(uploadedFiles.filter((item) => item.name !== file.name))
-    },
-    [uploadedFiles, updateUploadedFiles]
-  )
   return (
     <Grid mr="xl" ml="xl" mt="md">
       <Grid.Col span={8} className={classes.container} p="lg">
@@ -84,33 +46,10 @@ const CreateCampaign = () => {
             <CustomStepper />
           </Grid.Col>
           <Grid.Col>
-            <Text color="secondaryText" size="sm" weight="bold" mb="xs">
-              1. Select device
-            </Text>
             <SelectDevice />
           </Grid.Col>
           <Grid.Col>
-            {device && (
-              <>
-                <Text color="secondaryText" size="sm" weight="bold" mb="xs">
-                  2. Upload creatives
-                </Text>
-                <Text color="secondaryText" size="xs" weight="bold" mb="xs">
-                  Accepted banner sizes
-                </Text>
-                <BannerSizesList imagesInfo={imagesInfo} />
-                <FilesDropzone onDrop={onDrop} />
-              </>
-            )}
-          </Grid.Col>
-          <Grid.Col>
-            <UploadedBanners
-              autoUTMChecked={autoUTMChecked}
-              uploadedFiles={uploadedFiles}
-              updateAutoUTMChecked={updateAutoUTMChecked}
-              imagesInfo={imagesInfo}
-              handleDeleteCreativeBtnClicked={handleDeleteCreativeBtnClicked}
-            />
+            <UploadCreative />
           </Grid.Col>
         </Grid>
       </Grid.Col>
