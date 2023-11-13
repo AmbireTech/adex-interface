@@ -1,8 +1,8 @@
 import { Grid, createStyles } from '@mantine/core'
 import CustomStepper from './CampaignStepper'
 import CampaignSummary from './CampaignSummary'
-import SelectDevice from './SelectDevice'
-import UploadCreative from './UploadCreative'
+import StepOne from './SpepOne/StepOne'
+import StepTwo from './StepTwo/StepTwo'
 
 const useStyles = createStyles((theme) => {
   return {
@@ -46,10 +46,10 @@ const CreateCampaign = () => {
             <CustomStepper />
           </Grid.Col>
           <Grid.Col>
-            <SelectDevice />
+            <StepOne />
           </Grid.Col>
           <Grid.Col>
-            <UploadCreative />
+            <StepTwo />
           </Grid.Col>
         </Grid>
       </Grid.Col>
