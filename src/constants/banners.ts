@@ -1,4 +1,4 @@
-import { BannerVariant } from 'types'
+import { Banner, BannerVariant } from 'types'
 
 export const BANNER_VARIANTS: { [key: string]: BannerVariant } = {
   mediumRectangle: {
@@ -57,4 +57,15 @@ export const BANNER_VARIANTS: { [key: string]: BannerVariant } = {
     bannerName: 'Mobile Leaderboard',
     checked: false
   }
+}
+
+export const BANNER_DEFAULT_VALUE: Banner = {
+  format: {
+    w: 0,
+    h: 0
+  },
+  mime: '',
+  mediaUrl: '',
+  targetUrl: '',
+  created: BigInt(new Date().getTime())
 }

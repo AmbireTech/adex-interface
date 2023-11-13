@@ -42,6 +42,14 @@ const UploadCreative = () => {
     [uploadedFiles, updateUploadedFiles]
   )
 
+  const handleOnInputChange = useCallback(
+    (inputText: string, file: FileWithPath) => {
+      if (!uploadedFiles) return
+      console.log('inputText, file', inputText, file)
+    },
+    [uploadedFiles]
+  )
+
   return (
     <Grid>
       <Grid.Col>
@@ -65,6 +73,7 @@ const UploadCreative = () => {
           updateAutoUTMChecked={updateAutoUTMChecked}
           imagesInfo={imagesInfo}
           handleDeleteCreativeBtnClicked={handleDeleteCreativeBtnClicked}
+          handleOnInputChange={handleOnInputChange}
         />
       </Grid.Col>
     </Grid>

@@ -1,4 +1,5 @@
 import { ActionIcon, Input, createStyles, Text, Group } from '@mantine/core'
+import { ChangeEventHandler } from 'react'
 import DeleteIcon from 'resources/icons/Delete'
 import InfoCurlyBorder from 'resources/icons/InfoCurlyBorder'
 import { FileWithPath } from 'types'
@@ -7,6 +8,7 @@ type ImageUrlInputProps = {
   image: FileWithPath
   toRemove: boolean
   onDelete: (file: FileWithPath) => void
+  onChange: ChangeEventHandler<HTMLInputElement> | undefined
 }
 
 const useStyles = createStyles((theme) => ({
@@ -36,7 +38,7 @@ const useStyles = createStyles((theme) => ({
   }
 }))
 
-const ImageUrlInput = ({ image, toRemove, onDelete }: ImageUrlInputProps) => {
+const ImageUrlInput = ({ image, toRemove, onDelete, onChange }: ImageUrlInputProps) => {
   const { classes } = useStyles()
 
   return (
@@ -50,6 +52,7 @@ const ImageUrlInput = ({ image, toRemove, onDelete }: ImageUrlInputProps) => {
         </Group>
       )}
       <Input
+        onChange={onChange}
         error={toRemove}
         disabled={toRemove}
         type="url"

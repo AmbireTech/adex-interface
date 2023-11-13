@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import { Checkbox, Grid } from '@mantine/core'
 import { Banners, FileWithPath, ShapeVariants } from 'types'
 import ImageUrlInput from './ImageUrlInput'
@@ -8,6 +9,7 @@ type UploadedBannersProps = {
   autoUTMChecked: boolean
   imagesInfo: Banners
   handleDeleteCreativeBtnClicked: (file: FileWithPath) => void
+  handleOnInputChange: (inputText: string, file: FileWithPath) => void
 }
 
 const UploadedBanners = ({
@@ -15,8 +17,30 @@ const UploadedBanners = ({
   updateAutoUTMChecked,
   autoUTMChecked,
   imagesInfo,
-  handleDeleteCreativeBtnClicked
+  handleDeleteCreativeBtnClicked,
+  handleOnInputChange
 }: UploadedBannersProps) => {
+  const inputBanners = useMemo(
+    () =>
+      (Object.keys(imagesInfo) as ShapeVariants[]).map((key: ShapeVariants) => {
+        const images = imagesInfo[key]?.fileDetails || []
+        if (images.length === 0) return
+        const toRemove = key.toString() === 'others'
+
+        return images.map((image) => (
+          <Grid.Col key={image.path}>
+            <ImageUrlInput
+              image={image}
+              toRemove={toRemove}
+              onDelete={handleDeleteCreativeBtnClicked}
+              onChange={(e) => handleOnInputChange(e.target.value, image)}
+            />
+          </Grid.Col>
+        ))
+      }),
+    [handleDeleteCreativeBtnClicked, imagesInfo, handleOnInputChange]
+  )
+
   return (
     <Grid>
       {uploadedFiles && uploadedFiles.length > 0 && (
@@ -28,22 +52,7 @@ const UploadedBanners = ({
           />
         </Grid.Col>
       )}
-      {(Object.keys(imagesInfo) as ShapeVariants[]).map((key: ShapeVariants) => {
-        const images = imagesInfo[key]?.fileDetails || []
-        if (images.length === 0) return
-        const toRemove = key.toString() === 'others'
-
-        return images.map((image) => (
-          <Grid.Col key={image.path}>
-            <ImageUrlInput
-              image={image}
-              toRemove={toRemove}
-              onDelete={handleDeleteCreativeBtnClicked}
-              // TODO: add onChange and store the input
-            />
-          </Grid.Col>
-        ))
-      })}
+      {inputBanners}
     </Grid>
   )
 }
