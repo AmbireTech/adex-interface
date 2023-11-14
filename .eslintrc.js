@@ -22,6 +22,7 @@ module.exports = {
       }
     ],
     'no-console': 'off', // TEMP
+    "no-nested-ternary": "off",
     'func-names': 0,
     'prefer-destructuring': 0,
     '@typescript-eslint/semi': 'off',
