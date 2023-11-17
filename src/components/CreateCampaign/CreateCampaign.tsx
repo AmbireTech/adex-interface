@@ -3,6 +3,7 @@ import CustomStepper from './CampaignStepper'
 import CampaignSummary from './CampaignSummary'
 import StepOne from './SpepOne/StepOne'
 import StepTwo from './StepTwo/StepTwo'
+import StepThree from './StepThree/StepThree'
 
 const useStyles = createStyles((theme) => {
   return {
@@ -50,6 +51,9 @@ const CreateCampaign = () => {
           </Grid.Col>
           <Grid.Col>
             <StepTwo />
+          </Grid.Col>
+          <Grid.Col>
+            <StepThree />
           </Grid.Col>
         </Grid>
       </Grid.Col>

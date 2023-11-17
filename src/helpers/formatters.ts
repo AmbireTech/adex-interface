@@ -12,6 +12,20 @@ export const formatDate = (date: Date) =>
     year: 'numeric'
   })
 
+export const formatDateShort = (date: Date) =>
+  date.toLocaleDateString(undefined, {
+    day: 'numeric',
+    month: 'numeric',
+    year: 'numeric'
+  })
+
+export const formatTimeShort = () => {
+  const date = new Date()
+
+  return date.toLocaleTimeString(undefined, {
+    timeStyle: 'medium'
+  })
+}
 export const maskAddress = (address: string) =>
   address.length
     ? `${address.substring(0, 8)}...${address.substring(address.length - 6, address.length)}`

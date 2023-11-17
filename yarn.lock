@@ -1681,6 +1681,13 @@
     react-remove-scroll "^2.5.5"
     react-textarea-autosize "8.3.4"
 
+"@mantine/dates@6.0.8":
+  version "6.0.8"
+  resolved "https://registry.yarnpkg.com/@mantine/dates/-/dates-6.0.8.tgz#b17717ff30be7ed0b9590ebbdf01fa48c63bbd95"
+  integrity sha512-hWMtkKyg5X8xfvEyFJrXHVJu4Vmq7gWnICUxtyP6xD1KUAP4tZdIIq7fQw0bCow+O99YFzZwv0j7wwGzdTqVlg==
+  dependencies:
+    "@mantine/utils" "6.0.8"
+
 "@mantine/dropzone@^6.0.8":
   version "6.0.21"
   resolved "https://registry.yarnpkg.com/@mantine/dropzone/-/dropzone-6.0.21.tgz#65867e5bbfe59094afc6751206cfc1466744f72b"
@@ -4432,6 +4439,11 @@ data-urls@^2.0.0:
     abab "^2.0.3"
     whatwg-mimetype "^2.3.0"
     whatwg-url "^8.0.0"
+
+dayjs@^1.11.10:
+  version "1.11.10"
+  resolved "https://registry.yarnpkg.com/dayjs/-/dayjs-1.11.10.tgz#68acea85317a6e164457d6d6947564029a6a16a0"
+  integrity sha512-vjAczensTgRcqDERK0SR2XMwsF/tSvnvlv6VcF2GIhg6Sx4yOIt/irsr1RDJsKiIyBzJDpCoXiWWq28MqH2cnQ==
 
 debounce@^1.2.1:
   version "1.2.1"
