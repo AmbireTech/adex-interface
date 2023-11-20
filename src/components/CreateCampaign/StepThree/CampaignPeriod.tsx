@@ -1,6 +1,6 @@
 import { ActionIcon, Flex, Text, createStyles } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
-import { CapmpaignPeriodModal } from 'components/common/Modals'
+import { CampaignPeriodModal } from 'components/common/Modals'
 import CalendarIcon from 'resources/icons/Calendar'
 
 const useStyles = createStyles((theme) => ({
@@ -41,7 +41,7 @@ const CampaignPeriod = () => {
       <ActionIcon size={24} onClick={() => open()}>
         <CalendarIcon color="mainText" />
       </ActionIcon>
-      <CapmpaignPeriodModal opened={opened} close={close} />
+      <CampaignPeriodModal opened={opened} close={close} />
     </Flex>
   )
 }

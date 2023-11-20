@@ -2,7 +2,7 @@ import { formatTimeShort } from 'helpers/formatters'
 import { useCallback, useEffect, useState } from 'react'
 
 const Clock = () => {
-  const [currentTime, setCurrentTime] = useState('')
+  const [currentTime, setCurrentTime] = useState(formatTimeShort())
 
   const updateTime = useCallback(() => setCurrentTime(() => formatTimeShort()), [])
 

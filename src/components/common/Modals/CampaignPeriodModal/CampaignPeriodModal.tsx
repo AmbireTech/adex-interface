@@ -7,7 +7,8 @@ import {
   createStyles,
   Flex,
   Button,
-  UnstyledButton
+  UnstyledButton,
+  Stack
 } from '@mantine/core'
 import { DatePicker } from '@mantine/dates'
 import { formatDateShort } from 'helpers/formatters'
@@ -16,6 +17,7 @@ import CalendarIcon from 'resources/icons/Calendar'
 import DownArrowIcon from 'resources/icons/DownArrow'
 import TimeIcon from 'resources/icons/Time'
 import Clock from './Clock'
+import CampaignTimePicker from './CampaignTimePicker'
 
 type DateOrTime = 'date' | 'time'
 
@@ -36,7 +38,7 @@ const useStyles = createStyles((theme) => ({
   }
 }))
 
-const CapmpaignPeriodModal = ({ opened, close }: { opened: boolean; close: () => void }) => {
+const CampaignPeriodModal = ({ opened, close }: { opened: boolean; close: () => void }) => {
   const { classes, cx } = useStyles()
   const [value, setValue] = useState<[Date | null, Date | null]>([null, null])
   const locale = useMemo(() => navigator && navigator.language.split('-')[0], [])
@@ -45,13 +47,20 @@ const CapmpaignPeriodModal = ({ opened, close }: { opened: boolean; close: () =>
   const dateNow = useMemo(() => new Date(), [])
   const currentDate = useMemo(() => formatDateShort(dateNow), [dateNow])
 
-  const startDateFormatted = useMemo(() => value[0] && formatDateShort(value[0]), [value])
-  const endDateFormatted = useMemo(() => value[1] && formatDateShort(value[1]), [value])
+  const startDateFormatted = useMemo(
+    () => (value[0] ? formatDateShort(value[0]) : currentDate),
+    [value, currentDate]
+  )
+  const endDateFormatted = useMemo(
+    () => (value[1] ? formatDateShort(value[1]) : currentDate),
+    [value, currentDate]
+  )
 
   const handleSelectDateOrTimeTabClicked = useCallback(
     (tabValue: DateOrTime) => setSelectDateOrTimeTab(tabValue),
     []
   )
+
   return (
     <Modal centered size={736} padding={0} opened={opened} withCloseButton={false} onClose={close}>
       <Grid grow m={0}>
@@ -99,26 +108,49 @@ const CapmpaignPeriodModal = ({ opened, close }: { opened: boolean; close: () =>
             </Grid.Col>
           </Grid>
         </Grid.Col>
-        <Grid.Col mt="xl" mb="xl">
-          <Flex justify="center">
-            <DatePicker
-              size="lg"
-              type="range"
-              locale={locale}
-              numberOfColumns={2}
-              value={value}
-              onChange={setValue}
-              styles={(theme) => ({
-                month: {
-                  background: theme.colors.lightBackground[theme.fn.primaryShade()],
-                  borderRadius: theme.radius.md
-                }
-              })}
-            />
-          </Flex>
+        <Grid.Col pt="lg" pb="lg">
+          {selectDateOrTimeTab === 'date' ? (
+            <Flex justify="center">
+              <DatePicker
+                size="lg"
+                type="range"
+                locale={locale}
+                numberOfColumns={2}
+                value={value}
+                onChange={setValue}
+                minDate={dateNow}
+                styles={(theme) => ({
+                  month: {
+                    background: theme.colors.lightBackground[theme.fn.primaryShade()],
+                    borderRadius: theme.radius.md
+                  }
+                })}
+              />
+            </Flex>
+          ) : (
+            <Grid grow>
+              <Grid.Col span={6}>
+                <Stack align="center">
+                  <Text color="secondaryText" size="md" p="xs">
+                    Start time
+                  </Text>
+                  <CampaignTimePicker
+                    onChange={(e) => console.log('Start Time:', e.target.value)}
+                  />
+                </Stack>
+              </Grid.Col>
+              <Grid.Col span={6}>
+                <Stack align="center">
+                  <Text color="secondaryText" size="md" p="xs">
+                    End time
+                  </Text>
+                  <CampaignTimePicker onChange={(e) => console.log('End Time:', e.target.value)} />
+                </Stack>
+              </Grid.Col>
+            </Grid>
+          )}
         </Grid.Col>
         <Grid.Col p={0}>
-          {/* <TimeInput label="Current time" withAsterisk /> */}
           <Flex
             wrap="wrap"
             direction="row"
@@ -141,11 +173,10 @@ const CapmpaignPeriodModal = ({ opened, close }: { opened: boolean; close: () =>
                 12:00
               </Text>
             </Flex>
-
             <Button variant="filled" size="lg">
               Apply
             </Button>
-            <UnstyledButton variant="">Cancel</UnstyledButton>
+            <UnstyledButton onClick={() => close()}>Cancel</UnstyledButton>
           </Flex>
         </Grid.Col>
       </Grid>
@@ -153,4 +184,4 @@ const CapmpaignPeriodModal = ({ opened, close }: { opened: boolean; close: () =>
   )
 }
 
-export default CapmpaignPeriodModal
+export default CampaignPeriodModal
