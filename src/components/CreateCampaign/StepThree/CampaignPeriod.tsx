@@ -1,6 +1,9 @@
 import { ActionIcon, Flex, Text, createStyles } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
 import { CampaignPeriodModal } from 'components/common/Modals'
+import { formatDateTime } from 'helpers/formatters'
+import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
+import { useMemo } from 'react'
 import CalendarIcon from 'resources/icons/Calendar'
 
 const useStyles = createStyles((theme) => ({
@@ -14,6 +17,12 @@ const useStyles = createStyles((theme) => ({
 }))
 
 const CampaignPeriod = () => {
+  const {
+    campaign: { startsAt, endsAt }
+  } = useCreateCampaignContext()
+
+  const startDateTime = useMemo(() => startsAt && formatDateTime(startsAt), [startsAt])
+  const endDateTime = useMemo(() => endsAt && formatDateTime(endsAt), [endsAt])
   const { classes } = useStyles()
 
   const [opened, { open, close }] = useDisclosure(false)
@@ -30,13 +39,13 @@ const CampaignPeriod = () => {
         <Text color="secondaryText" size="xs">
           Start Date
         </Text>
-        <Text size="md">DD/MM/YEAR 12:00</Text>
+        <Text size="md">{startDateTime}</Text>
       </Flex>
       <Flex direction="column">
         <Text color="secondaryText" size="xs">
           End Date
         </Text>
-        <Text size="md">DD/MM/YEAR 12:00</Text>
+        <Text size="md">{endDateTime}</Text>
       </Flex>
       <ActionIcon size={24} onClick={() => open()}>
         <CalendarIcon color="mainText" />

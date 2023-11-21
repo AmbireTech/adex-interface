@@ -121,6 +121,8 @@ export type Campaign = {
   /** Timestamp in ms */
   created: bigint
   nonce: bigint
+  startsAt: Date | null
+  endsAt: Date | null
 
   // Spec Props - mutable
   title: string

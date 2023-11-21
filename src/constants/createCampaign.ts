@@ -11,6 +11,8 @@ export const CREATE_CAMPAIGN_DEFAULT_VALUE: Campaign = {
   network: 0,
   created: BigInt(0),
   nonce: BigInt(0),
+  startsAt: null,
+  endsAt: null,
   title: '',
   adUnits: [],
   validators: [],

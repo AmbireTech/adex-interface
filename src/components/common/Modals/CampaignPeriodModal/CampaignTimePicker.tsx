@@ -29,8 +29,10 @@ const useStyles = createStyles((theme) => ({
 }))
 
 function CampaignTimePicker({
+  defaultValue,
   onChange
 }: {
+  defaultValue?: string | null
   onChange: React.ChangeEventHandler<HTMLInputElement> | undefined
 }) {
   const { classes } = useStyles()
@@ -39,11 +41,13 @@ function CampaignTimePicker({
   return (
     <Box className={classes.timeWrapper}>
       <TimeInput
+        aria-label="Time Input"
         variant="unstyled"
         ref={ref}
         mx="auto"
         onChange={onChange}
         classNames={{ input: classes.input }}
+        defaultValue={defaultValue || '--:--'}
       />
     </Box>
   )
