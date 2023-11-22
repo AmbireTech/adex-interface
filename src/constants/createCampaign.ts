@@ -13,6 +13,7 @@ export const CREATE_CAMPAIGN_DEFAULT_VALUE: Campaign = {
   nonce: BigInt(0),
   startsAt: null,
   endsAt: null,
+  paymentModel: 'cpm',
   title: '',
   adUnits: [],
   validators: [],

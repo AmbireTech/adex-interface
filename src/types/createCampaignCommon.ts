@@ -1,5 +1,7 @@
 import { Devices } from './createCampaign'
 
+export type PaymentModelType = 'cpm' | 'cpc'
+
 export type Format = {
   /** Width in device independent pixels (DIPS). */
   w?: number
@@ -123,6 +125,7 @@ export type Campaign = {
   nonce: bigint
   startsAt: Date | null
   endsAt: Date | null
+  paymentModel: PaymentModelType
 
   // Spec Props - mutable
   title: string
