@@ -60,6 +60,7 @@ const MultiSelectAndRadioButtons = ({
           : ''}
       </Text>
       <MultiSelect
+        searchable
         variant="filled"
         size="lg"
         radius="lg"
