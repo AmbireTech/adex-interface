@@ -1,7 +1,7 @@
-import { ActionIcon, Input, createStyles, Text, Group } from '@mantine/core'
+import { ActionIcon, Input, createStyles } from '@mantine/core'
+import InfoAlertMessage from 'components/common/InfoAlertMessage'
 import { ChangeEventHandler } from 'react'
 import DeleteIcon from 'resources/icons/Delete'
-import InfoCurlyBorder from 'resources/icons/InfoCurlyBorder'
 import { FileWithPath } from 'types'
 
 type ImageUrlInputProps = {
@@ -11,30 +11,10 @@ type ImageUrlInputProps = {
   onChange: ChangeEventHandler<HTMLInputElement> | undefined
 }
 
-const useStyles = createStyles((theme) => ({
+const useStyles = createStyles(() => ({
   image: {
     maxWidth: 40,
     maxHeight: 40
-  },
-  errorWrapper: {
-    height: 50,
-    border: '1px solid',
-    borderColor: theme.colors.decorativeBorders[theme.fn.primaryShade()],
-    boxShadow: theme.shadows.sm,
-    borderRadius: theme.radius.md,
-    marginBottom: theme.spacing.sm
-  },
-  errorIcon: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    background:
-      theme.colors.warning[theme.fn.primaryShade()] + theme.other.shades.hexColorSuffix.lightest,
-    height: 50,
-    width: 50,
-    borderTopLeftRadius: theme.radius.md,
-    borderBottomLeftRadius: theme.radius.md,
-    color: theme.colors.warning[theme.fn.primaryShade()]
   }
 }))
 
@@ -43,14 +23,7 @@ const ImageUrlInput = ({ image, toRemove, onDelete, onChange }: ImageUrlInputPro
 
   return (
     <>
-      {toRemove && (
-        <Group className={classes.errorWrapper}>
-          <div className={classes.errorIcon}>
-            <InfoCurlyBorder size="24px" />
-          </div>
-          <Text size="sm"> The banner size does not meet the requirements.</Text>
-        </Group>
-      )}
+      {toRemove && <InfoAlertMessage message="The banner size does not meet the requirements." />}
       <Input
         onChange={onChange}
         error={toRemove}

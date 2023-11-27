@@ -18,7 +18,8 @@ const PaymentModel = () => {
     <Radio.Group value={paymentModel} onChange={handleRadioChange}>
       <Group mt="xs">
         <Radio value="cpm" label="CPM" />
-        <Radio value="cpc" label="CPC" />
+        {/* Disabled at the moment */}
+        {/* <Radio value="cpc" label="CPC" /> */}
       </Group>
     </Radio.Group>
   )

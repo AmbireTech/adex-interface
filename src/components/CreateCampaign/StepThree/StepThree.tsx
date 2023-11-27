@@ -3,6 +3,9 @@ import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import CampaignPeriod from './CampaignPeriod'
 import PaymentModel from './PaymentModel'
 import SelectCurrency from './SelectCurrency'
+import CampaignBudget from './CampaignBudget'
+import CpmMinMax from './CpmMinMax'
+import CampaignName from './CampaignName'
 
 const StepThree = () => {
   const {
@@ -28,6 +31,24 @@ const StepThree = () => {
           3. Currency
         </Text>
         <SelectCurrency />
+      </Grid.Col>
+      <Grid.Col mb="md">
+        <Text color="secondaryText" size="sm" weight="bold" mb="xs">
+          4. Campaign Budget
+        </Text>
+        <CampaignBudget />
+      </Grid.Col>
+      <Grid.Col mb="md">
+        <Text color="secondaryText" size="sm" weight="bold" mb="xs">
+          5. CPM
+        </Text>
+        <CpmMinMax />
+      </Grid.Col>
+      <Grid.Col mb="md">
+        <Text color="secondaryText" size="sm" weight="bold" mb="xs">
+          6. Campaign Name
+        </Text>
+        <CampaignName />
       </Grid.Col>
     </Grid>
   ) : null
