@@ -1,9 +1,11 @@
 import { Grid, createStyles } from '@mantine/core'
+import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import CustomStepper from './CampaignStepper'
 import CampaignSummary from './CampaignSummary'
-import StepOne from './SpepOne/StepOne'
+import StepOne from './StepOne/StepOne'
 import StepTwo from './StepTwo/StepTwo'
 import StepThree from './StepThree/StepThree'
+import StepFour from './StepFour/StepFour'
 
 const useStyles = createStyles((theme) => {
   return {
@@ -36,24 +38,36 @@ const useStyles = createStyles((theme) => {
   }
 })
 
+const Wizard = ({ step }: { step: number }) => {
+  switch (step) {
+    case 0:
+      return <StepOne />
+    case 1:
+      return <StepTwo />
+    case 2:
+      return <StepThree />
+    case 3:
+      return <StepFour />
+    default:
+      return null
+  }
+}
+
 const CreateCampaign = () => {
   const { classes } = useStyles()
+  const {
+    campaign: { step }
+  } = useCreateCampaignContext()
 
   return (
-    <Grid mr="xl" ml="xl" mt="md">
+    <Grid align="flex-start" mr="xl" ml="xl" mt="md">
       <Grid.Col span={8} className={classes.container} p="lg">
         <Grid p="md">
           <Grid.Col>
             <CustomStepper />
           </Grid.Col>
           <Grid.Col>
-            <StepOne />
-          </Grid.Col>
-          <Grid.Col>
-            <StepTwo />
-          </Grid.Col>
-          <Grid.Col>
-            <StepThree />
+            <Wizard step={step} />
           </Grid.Col>
         </Grid>
       </Grid.Col>

@@ -29,12 +29,13 @@ const CampaignSummary = () => {
 
   return (
     <>
-      <Flex direction="column" p="md">
-        <CampaignDetailsRow lighterColor title="Budget" value="-" />
-        <CampaignDetailsRow lighterColor title="CPM" value="-" />
+      <Flex direction="column" pl="md" pr="md">
+        <CampaignDetailsRow lighterColor title="Budget" value="-" textSize="sm" />
+        <CampaignDetailsRow lighterColor title="CPM" value="-" textSize="sm" />
         <CampaignDetailsRow
           lighterColor
           title="Device"
+          textSize="sm"
           value={
             device && device === 'desktop' ? (
               <Flex align="center" gap={5}>
@@ -47,9 +48,9 @@ const CampaignSummary = () => {
             )
           }
         />
-        <CampaignDetailsRow lighterColor title="Ad Format" value="-" />
-        <CampaignDetailsRow lighterColor title="Categories" value="-" />
-        <CampaignDetailsRow lighterColor title="Countries" value="-" />
+        <CampaignDetailsRow lighterColor title="Ad Format" value="-" textSize="sm" />
+        <CampaignDetailsRow lighterColor title="Categories" value="-" textSize="sm" />
+        <CampaignDetailsRow lighterColor title="Countries" value="-" textSize="sm" noBorder />
       </Flex>
       <Flex justify="space-between" className={classes.bg} p="lg">
         <Text color="secondaryText" weight="bold">

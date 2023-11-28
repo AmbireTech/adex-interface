@@ -15,7 +15,6 @@ const SelectDevice = () => {
       <Text color="secondaryText" size="sm" weight="bold" mb="xs">
         1. Select device
       </Text>
-
       <Flex gap={20}>
         <CustomCard
           width={164}

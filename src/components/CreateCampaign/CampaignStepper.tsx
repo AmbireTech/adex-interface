@@ -1,19 +1,49 @@
-import { Stepper } from '@mantine/core'
+import { Stepper, StepperProps, rem } from '@mantine/core'
 import { CREATE_CAMPAIGN_STEPS } from 'constants/createCampaign'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 
-function CustomStepper() {
+function StyledStepper(props: StepperProps) {
+  return (
+    <Stepper
+      styles={{
+        stepBody: {
+          display: 'none'
+        },
+        step: {
+          padding: 0
+        },
+        stepIcon: {
+          borderWidth: rem(1),
+          height: rem(20),
+          minWidth: rem(20),
+          width: rem(20),
+          svg: {
+            width: rem(10)
+          }
+        },
+        separator: {
+          marginLeft: rem(-2),
+          marginRight: rem(-2),
+          height: rem(1)
+        }
+      }}
+      {...props}
+    />
+  )
+}
+
+const CustomStepper = () => {
   const steps = Array.from({ length: CREATE_CAMPAIGN_STEPS }, (_, index) => index + 1)
   const {
     campaign: { step }
   } = useCreateCampaignContext()
 
   return (
-    <Stepper icon=" " size="xs" active={step}>
+    <StyledStepper icon=" " size="xs" active={step}>
       {steps.map((x) => (
         <Stepper.Step key={x} />
       ))}
-    </Stepper>
+    </StyledStepper>
   )
 }
 
