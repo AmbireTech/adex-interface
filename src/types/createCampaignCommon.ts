@@ -116,7 +116,7 @@ export type Campaign = {
   id: string
   creator: string
   step: number
-  device: Devices | null
+  devices: Devices[]
   depositAssetAddr: string
   depositAmount: bigint
   network: number

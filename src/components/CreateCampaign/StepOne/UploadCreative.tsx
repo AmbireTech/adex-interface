@@ -10,7 +10,7 @@ import FilesDropzone from './FilesDropzone'
 
 const UploadCreative = () => {
   const {
-    campaign: { device }
+    campaign: { devices }
   } = useCreateCampaignContext()
 
   const [autoUTMChecked, setAutoUTMChecked] = useState(false)
@@ -53,7 +53,7 @@ const UploadCreative = () => {
   return (
     <Grid>
       <Grid.Col>
-        {device && (
+        {devices.length > 0 && (
           <>
             <Text color="secondaryText" size="sm" weight="bold" mb="xs">
               2. Upload creatives

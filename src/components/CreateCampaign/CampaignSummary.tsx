@@ -1,7 +1,9 @@
 import { Button, Flex, Group, Text, UnstyledButton, createStyles } from '@mantine/core'
 import CampaignDetailsRow from 'components/common/Modals/CampaignDetailsModal/CampaignDetailsRow'
 import { CREATE_CAMPAIGN_STEPS } from 'constants/createCampaign'
+import { checkSelectedDevices } from 'helpers/createCampaignHelpers'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
+import { useMemo } from 'react'
 import DesktopIcon from 'resources/icons/Desktop'
 import LeftArrowIcon from 'resources/icons/LeftArrow'
 import MobileIcon from 'resources/icons/Mobile'
@@ -23,9 +25,11 @@ const useStyles = createStyles((theme) => ({
 const CampaignSummary = () => {
   const { classes } = useStyles()
   const {
-    campaign: { device, step },
+    campaign: { devices, step },
     updateCampaign
   } = useCreateCampaignContext()
+
+  const selectedDevices = useMemo(() => checkSelectedDevices(devices), [devices])
 
   return (
     <>
@@ -37,15 +41,20 @@ const CampaignSummary = () => {
           title="Device"
           textSize="sm"
           value={
-            device && device === 'desktop' ? (
+            selectedDevices === 'desktop' ? (
               <Flex align="center" gap={5}>
                 <DesktopIcon size="16px" /> Desktop
               </Flex>
-            ) : (
+            ) : selectedDevices === 'mobile' ? (
               <Flex align="center" gap={5}>
                 <MobileIcon size="16px" /> Mobile
               </Flex>
-            )
+            ) : selectedDevices === 'both' ? (
+              <Flex align="center" gap={5}>
+                <MobileIcon size="16px" /> Mobile
+                <DesktopIcon size="16px" /> Desktop
+              </Flex>
+            ) : null
           }
         />
         <CampaignDetailsRow lighterColor title="Ad Format" value="-" textSize="sm" />

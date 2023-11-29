@@ -1,4 +1,6 @@
 import { Box, Flex, rem, Title, createStyles } from '@mantine/core'
+import CheckMarkIcon from 'resources/icons/CheckMark'
+import CheckMarkFilledIcon from 'resources/icons/CheckMarkFilled'
 import { ICustomCardProps, ICustomCardStyleProps } from 'types'
 
 const useStyles = createStyles(
@@ -71,6 +73,11 @@ const useStyles = createStyles(
       '#text': {
         color: border ? theme.colors.brand[theme.fn.primaryShade()] : undefined
       }
+    },
+    check: {
+      position: 'relative',
+      top: '3%',
+      left: '45%'
     }
   })
 )
@@ -88,7 +95,8 @@ const CustomCard = ({
   component,
   to,
   active,
-  variant
+  variant,
+  hasCheckMark
 }: ICustomCardProps) => {
   const { classes, cx } = useStyles({
     color,
@@ -105,9 +113,15 @@ const CustomCard = ({
       to={to}
       onClick={action}
     >
+      {hasCheckMark &&
+        (active ? (
+          <CheckMarkFilledIcon className={classes.check} size="20px" />
+        ) : (
+          <CheckMarkIcon className={classes.check} size="20px" />
+        ))}
       <Flex
         mih={50}
-        h="100%"
+        h={hasCheckMark ? 'auto' : '100%'}
         p="sm"
         justify="space-around"
         align="center"

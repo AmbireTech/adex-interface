@@ -15,6 +15,7 @@ export interface ICustomCardProps {
   component?: any
   to?: string
   active?: boolean
+  hasCheckMark?: boolean
   variant?: CustomCardType
 }
 

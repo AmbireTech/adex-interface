@@ -5,7 +5,7 @@ export const CREATE_CAMPAIGN_DEFAULT_VALUE: Campaign = {
   id: '',
   creator: '',
   step: 0,
-  device: null,
+  devices: [],
   depositAssetAddr: '',
   depositAmount: BigInt(0),
   network: 0,

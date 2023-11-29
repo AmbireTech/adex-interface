@@ -6,33 +6,46 @@ import MobileIcon from 'resources/icons/Mobile'
 
 const SelectDevice = () => {
   const {
-    campaign: { device },
+    campaign: { devices },
     updateCampaign
   } = useCreateCampaignContext()
+
+  const toggleDeviceSelection = (device: 'mobile' | 'desktop') => {
+    const isSelected = devices.includes(device)
+    const updatedDevices = isSelected
+      ? devices.filter((selectedDevice) => selectedDevice !== device)
+      : [...devices, device]
+
+    updateCampaign('devices', updatedDevices)
+  }
 
   return (
     <>
       <Text color="secondaryText" size="sm" weight="bold" mb="xs">
         1. Select device
       </Text>
-      <Flex gap={20}>
+      <Flex gap={20} justify="space-between">
         <CustomCard
-          width={164}
-          height={164}
-          icon={<MobileIcon size="60px" />}
+          width="48%"
+          height={100}
           text="Mobile"
+          iconLeft={<MobileIcon size="24px" />}
           color="brand"
-          active={device === 'mobile'}
-          action={() => device !== 'mobile' && updateCampaign('device', 'mobile')}
+          active={devices.includes('mobile')}
+          action={() => toggleDeviceSelection('mobile')}
+          variant="shadow"
+          hasCheckMark
         />
         <CustomCard
-          width={164}
-          height={164}
-          icon={<DesktopIcon size="60px" />}
+          width="48%"
+          height={100}
+          iconLeft={<DesktopIcon size="24px" />}
           text="Desktop"
           color="brand"
-          active={device === 'desktop'}
-          action={() => device !== 'desktop' && updateCampaign('device', 'desktop')}
+          active={devices.includes('desktop')}
+          action={() => toggleDeviceSelection('desktop')}
+          variant="shadow"
+          hasCheckMark
         />
       </Flex>
     </>
