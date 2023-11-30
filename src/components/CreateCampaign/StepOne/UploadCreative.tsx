@@ -1,5 +1,4 @@
 import { Grid, Text } from '@mantine/core'
-import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import { useCallback, useState } from 'react'
 import { BANNER_VARIANTS } from 'constants/banners'
 import { Banners, FileWithPath } from 'types'
@@ -9,10 +8,6 @@ import BannerSizesList from './BannerSizesList'
 import FilesDropzone from './FilesDropzone'
 
 const UploadCreative = () => {
-  const {
-    campaign: { devices }
-  } = useCreateCampaignContext()
-
   const [autoUTMChecked, setAutoUTMChecked] = useState(false)
   const updateAutoUTMChecked = useCallback((isChecked: boolean) => setAutoUTMChecked(isChecked), [])
 
@@ -53,29 +48,27 @@ const UploadCreative = () => {
   return (
     <Grid>
       <Grid.Col>
-        {devices.length > 0 && (
-          <>
-            <Text color="secondaryText" size="sm" weight="bold" mb="xs">
-              2. Upload creatives
-            </Text>
-            <Text color="secondaryText" size="xs" weight="bold" mb="xs">
-              Accepted banner sizes
-            </Text>
-            <BannerSizesList imagesInfo={imagesInfo} />
-            <FilesDropzone onDrop={onDrop} />
-          </>
-        )}
+        <Text color="secondaryText" size="sm" weight="bold" mb="xs">
+          2. Upload creatives
+        </Text>
+        <Text color="secondaryText" size="xs" weight="bold" mb="xs">
+          Accepted banner sizes
+        </Text>
+        <BannerSizesList imagesInfo={imagesInfo} />
+        <FilesDropzone onDrop={onDrop} />
       </Grid.Col>
-      <Grid.Col>
-        <UploadedBanners
-          autoUTMChecked={autoUTMChecked}
-          uploadedFiles={uploadedFiles}
-          updateAutoUTMChecked={updateAutoUTMChecked}
-          imagesInfo={imagesInfo}
-          handleDeleteCreativeBtnClicked={handleDeleteCreativeBtnClicked}
-          handleOnInputChange={handleOnInputChange}
-        />
-      </Grid.Col>
+
+      {uploadedFiles && uploadedFiles.length > 0 ? (
+        <Grid.Col>
+          <UploadedBanners
+            autoUTMChecked={autoUTMChecked}
+            updateAutoUTMChecked={updateAutoUTMChecked}
+            imagesInfo={imagesInfo}
+            handleDeleteCreativeBtnClicked={handleDeleteCreativeBtnClicked}
+            handleOnInputChange={handleOnInputChange}
+          />
+        </Grid.Col>
+      ) : null}
     </Grid>
   )
 }

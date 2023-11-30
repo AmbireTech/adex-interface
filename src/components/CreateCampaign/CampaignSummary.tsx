@@ -30,6 +30,8 @@ const CampaignSummary = () => {
   } = useCreateCampaignContext()
 
   const selectedDevices = useMemo(() => checkSelectedDevices(devices), [devices])
+  const isTheLastStep = useMemo(() => step === CREATE_CAMPAIGN_STEPS - 1, [step])
+  const launchCampaign = () => console.log('LAUNCH CAMPAIGN')
 
   return (
     <>
@@ -73,9 +75,13 @@ const CampaignSummary = () => {
           size="lg"
           mt="md"
           variant="filled"
-          onClick={() => step < CREATE_CAMPAIGN_STEPS && updateCampaign('step', step + 1)}
+          onClick={() =>
+            step < CREATE_CAMPAIGN_STEPS - 1
+              ? updateCampaign('step', step + 1)
+              : isTheLastStep && launchCampaign()
+          }
         >
-          Next Step
+          {isTheLastStep ? 'Launch Campaign' : 'Next Step'}
         </Button>
         <Button w="90%" size="lg" mt="md" variant="outline">
           Save Draft

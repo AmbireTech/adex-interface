@@ -257,6 +257,11 @@ export const baseTheme: MantineThemeOverride = {
           backgroundColor: theme.colors.lightBackground[theme.fn.primaryShade()]
         }
       })
+    },
+    Flex: {
+      defaultProps: {
+        wrap: 'wrap'
+      }
     }
   },
   primaryShade: { light: 3, dark: 4 }
