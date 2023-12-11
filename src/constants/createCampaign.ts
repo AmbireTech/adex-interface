@@ -1,4 +1,4 @@
-import { Campaign } from 'types'
+import { Campaign, SelectData } from 'types'
 
 export const CREATE_CAMPAIGN_STEPS = 4
 export const CREATE_CAMPAIGN_DEFAULT_VALUE: Campaign = {
@@ -31,14 +31,26 @@ export const CREATE_CAMPAIGN_DEFAULT_VALUE: Campaign = {
   targetingInput: {
     version: '',
     inputs: {
-      location: [],
-      categories: [],
-      publishers: []
+      location: {
+        in: [],
+        nin: [],
+        allIn: []
+      },
+      categories: {
+        in: [],
+        nin: [],
+        allIn: []
+      },
+      publishers: {
+        in: [],
+        nin: [],
+        allIn: []
+      }
     }
   }
 }
 
-export const CATEGORIES = [
+export const CATEGORIES: SelectData[] = [
   { value: 'IAB1', label: 'Arts & Entertainment' },
   { value: 'IAB1-1', label: 'Books & Literature' },
   { value: 'IAB1-2', label: 'Celebrity Fan/Gossip' },
@@ -454,7 +466,7 @@ export const CATEGORIES = [
   { value: 'IAB26-WS2', label: 'Phishing' }
 ]
 
-export const COUNTRIES = [
+export const COUNTRIES: SelectData[] = [
   { value: 'bg', label: 'Bulgaria' },
   { value: 'uk', label: 'United Kingdom' }
 ]

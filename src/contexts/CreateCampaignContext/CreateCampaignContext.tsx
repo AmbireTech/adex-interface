@@ -7,7 +7,11 @@ import superjson from 'superjson'
 type CreateCampaign = {
   campaign: Campaign
   setCampaign: (val: Campaign | ((prevState: Campaign) => Campaign)) => void
-  updateCampaign: (x: any, y: any) => void
+  updateCampaign: <CampaignItemKey extends keyof Campaign>(
+    key: CampaignItemKey,
+    value: Campaign[CampaignItemKey]
+  ) => void
+  updateCampaignWithPrevStateNested: (nestedKey: string, value: any) => void
 }
 
 const CreateCampaignContext = createContext<CreateCampaign | null>(null)
@@ -35,13 +39,35 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
     [setCampaign]
   )
 
+  const updateCampaignWithPrevStateNested = useCallback(
+    (nestedKey: string, value: any) => {
+      setCampaign((prevCampaign) => {
+        const updated = { ...prevCampaign }
+        const keys = nestedKey.split('.')
+        let currentLevel: any = updated
+
+        for (let i = 0; i < keys.length - 1; i++) {
+          if (!(keys[i] in currentLevel)) {
+            currentLevel[keys[i]] = {}
+          }
+          currentLevel = currentLevel[keys[i]]
+        }
+
+        currentLevel[keys[keys.length - 1]] = value
+        return updated
+      })
+    },
+    [setCampaign]
+  )
+
   const contextValue = useMemo(
     () => ({
       campaign,
       setCampaign,
-      updateCampaign
+      updateCampaign,
+      updateCampaignWithPrevStateNested
     }),
-    [campaign, setCampaign, updateCampaign]
+    [campaign, setCampaign, updateCampaign, updateCampaignWithPrevStateNested]
   )
 
   return (

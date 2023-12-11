@@ -1,12 +1,13 @@
 import { Button, Flex, Group, Text, UnstyledButton, createStyles } from '@mantine/core'
 import CampaignDetailsRow from 'components/common/Modals/CampaignDetailsModal/CampaignDetailsRow'
-import { CREATE_CAMPAIGN_STEPS } from 'constants/createCampaign'
-import { checkSelectedDevices } from 'helpers/createCampaignHelpers'
+import { CREATE_CAMPAIGN_STEPS, CATEGORIES, COUNTRIES } from 'constants/createCampaign'
+import { checkSelectedDevices, formatCatsAndLocsData } from 'helpers/createCampaignHelpers'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
-import { useMemo } from 'react'
+import { useCallback, useMemo } from 'react'
 import DesktopIcon from 'resources/icons/Desktop'
 import LeftArrowIcon from 'resources/icons/LeftArrow'
 import MobileIcon from 'resources/icons/Mobile'
+import { SelectData, TargetingInputSingle } from 'types'
 
 const useStyles = createStyles((theme) => ({
   bg: {
@@ -25,11 +26,64 @@ const useStyles = createStyles((theme) => ({
 const CampaignSummary = () => {
   const { classes } = useStyles()
   const {
-    campaign: { devices, step },
+    campaign: {
+      devices,
+      step,
+      targetingInput: {
+        inputs: { location, categories }
+      }
+    },
     updateCampaign
   } = useCreateCampaignContext()
 
   const selectedDevices = useMemo(() => checkSelectedDevices(devices), [devices])
+  const FormattedSelectedDevice = useMemo(
+    () =>
+      selectedDevices === 'desktop' ? (
+        <Flex align="center" gap={5}>
+          <DesktopIcon size="16px" /> Desktop
+        </Flex>
+      ) : selectedDevices === 'mobile' ? (
+        <Flex align="center" gap={5}>
+          <MobileIcon size="16px" /> Mobile
+        </Flex>
+      ) : selectedDevices === 'both' ? (
+        <Flex align="center" gap={5}>
+          <MobileIcon size="16px" /> Mobile
+          <DesktopIcon size="16px" /> Desktop
+        </Flex>
+      ) : null,
+    [selectedDevices]
+  )
+  const formatCatsAndLocs = useCallback((inputValues: TargetingInputSingle, lib: SelectData[]) => {
+    const [key, labels] = formatCatsAndLocsData(inputValues, lib)
+
+    if (!key) return
+    if (key === 'allIn') {
+      return <Text>All</Text>
+    }
+    if (key === 'in') return <Text>{labels}</Text>
+    if (key === 'nin') {
+      return (
+        <>
+          <Text align="end" color="warning">
+            All except:{' '}
+          </Text>
+          <Text align="end">{labels}</Text>
+        </>
+      )
+    }
+  }, [])
+
+  const formattedCats = useMemo(
+    () => formatCatsAndLocs(categories, CATEGORIES),
+    [formatCatsAndLocs, categories]
+  )
+  const formattedLocs = useMemo(
+    () => formatCatsAndLocs(location, COUNTRIES),
+    [formatCatsAndLocs, location]
+  )
+
   const isTheLastStep = useMemo(() => step === CREATE_CAMPAIGN_STEPS - 1, [step])
   const launchCampaign = () => console.log('LAUNCH CAMPAIGN')
 
@@ -42,26 +96,17 @@ const CampaignSummary = () => {
           lighterColor
           title="Device"
           textSize="sm"
-          value={
-            selectedDevices === 'desktop' ? (
-              <Flex align="center" gap={5}>
-                <DesktopIcon size="16px" /> Desktop
-              </Flex>
-            ) : selectedDevices === 'mobile' ? (
-              <Flex align="center" gap={5}>
-                <MobileIcon size="16px" /> Mobile
-              </Flex>
-            ) : selectedDevices === 'both' ? (
-              <Flex align="center" gap={5}>
-                <MobileIcon size="16px" /> Mobile
-                <DesktopIcon size="16px" /> Desktop
-              </Flex>
-            ) : null
-          }
+          value={FormattedSelectedDevice}
         />
         <CampaignDetailsRow lighterColor title="Ad Format" value="-" textSize="sm" />
-        <CampaignDetailsRow lighterColor title="Categories" value="-" textSize="sm" />
-        <CampaignDetailsRow lighterColor title="Countries" value="-" textSize="sm" noBorder />
+        <CampaignDetailsRow lighterColor title="Categories" value={formattedCats} textSize="sm" />
+        <CampaignDetailsRow
+          lighterColor
+          title="Countries"
+          value={formattedLocs}
+          textSize="sm"
+          noBorder
+        />
       </Flex>
       <Flex justify="space-between" className={classes.bg} p="lg">
         <Text color="secondaryText" weight="bold">

@@ -60,8 +60,8 @@ const CreateCampaign = () => {
   } = useCreateCampaignContext()
 
   return (
-    <Grid align="flex-start" mr="xl" ml="xl" mt="md">
-      <Grid.Col span={8} className={classes.container} p="lg">
+    <Grid columns={24} align="flex-start" mr="xl" ml="xl" mt="md">
+      <Grid.Col sm={24} md={15} lg={18} className={classes.container} p="lg">
         <Grid p="md">
           <Grid.Col>
             <CustomStepper />
@@ -72,7 +72,9 @@ const CreateCampaign = () => {
         </Grid>
       </Grid.Col>
       <Grid.Col
-        span={3}
+        sm={24}
+        md={8}
+        lg={5}
         offset={1}
         className={classes.container}
         style={{ height: 'auto', padding: 0 }}

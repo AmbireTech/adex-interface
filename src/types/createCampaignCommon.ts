@@ -106,9 +106,9 @@ export type TargetingInputSingle = {
 export type TargetingInput = {
   version: string
   inputs: {
-    location: TargetingInputSingle[]
-    categories: TargetingInputSingle[]
-    publishers: TargetingInputSingle[]
+    location: TargetingInputSingle
+    categories: TargetingInputSingle
+    publishers: TargetingInputSingle
   }
 }
 
@@ -137,3 +137,5 @@ export type Campaign = {
   // User inputs
   targetingInput: TargetingInput
 }
+
+export type SelectData = { value: string; label: string }

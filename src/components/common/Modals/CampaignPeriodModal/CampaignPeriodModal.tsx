@@ -121,8 +121,8 @@ const CampaignPeriodModal = ({ opened, close }: { opened: boolean; close: () => 
 
   const handleApplyBtnClicked = useCallback(() => {
     if (mergedEndDateTime && mergedStartDateTime) {
-      updateCampaign('startsAt', mergedStartDateTime)
-      updateCampaign('endsAt', mergedEndDateTime)
+      updateCampaign('startsAt', mergedStartDateTime.toDate())
+      updateCampaign('endsAt', mergedEndDateTime.toDate())
       close()
     }
   }, [updateCampaign, mergedEndDateTime, mergedStartDateTime, close])

@@ -1,61 +1,62 @@
 import { MultiSelect, Radio, Stack, Text } from '@mantine/core'
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import { TargetingInputProps } from 'types'
 
-type RadioBtnCategories = 'selectAll' | 'selectSome' | 'selectAllExcept'
+interface MultiSelectAndRadioButtonsProps {
+  multiSelectData: { value: string; label: string }[]
+  label: string
+  defaultSelectValue?: string[]
+  defaultRadioValue?: TargetingInputProps
+  onCategoriesChange: (selectedRadio: TargetingInputProps, categories: string[]) => void
+}
 
 const MultiSelectAndRadioButtons = ({
   multiSelectData,
-  label
-}: {
-  multiSelectData: { value: string; label: string }[]
-  label: string
-}) => {
+  label,
+  defaultSelectValue = [],
+  defaultRadioValue = 'allIn',
+  onCategoriesChange
+}: MultiSelectAndRadioButtonsProps) => {
   const data = useMemo(() => [...multiSelectData], [multiSelectData])
-  const [selectedRadio, setSelectedRadio] = useState<RadioBtnCategories>('selectAll')
+  const [selectedRadio, setSelectedRadio] = useState<TargetingInputProps>(defaultRadioValue)
   const [selectedCategories, setSelectedCategories] = useState<string[]>([])
+  const [selectedValue, setSelectedValue] = useState<string[]>(defaultSelectValue)
 
-  const handleRadioChange = useCallback(
-    (value: RadioBtnCategories) => {
-      setSelectedRadio(value)
+  const handleRadioChange = useCallback((value: TargetingInputProps) => {
+    setSelectedRadio(value)
 
-      if (value === 'selectAll') {
-        const allCatsSelected = data.map((i) => i.value)
-        setSelectedCategories(allCatsSelected)
-      } else {
-        setSelectedCategories([])
-      }
-    },
-    [data]
-  )
-
-  const handleMultiSelectChange = useCallback((selected: any) => {
-    setSelectedCategories(selected)
+    if (value === 'allIn') {
+      setSelectedCategories(['allIn'])
+    } else {
+      setSelectedCategories([])
+    }
+    setSelectedValue([])
   }, [])
 
   useEffect(() => {
-    if (selectedRadio === 'selectAllExcept') {
-      const allCatsSelectedExcept = data.filter(
-        (category) => !selectedCategories.includes(category.value)
-      )
-      console.log('allCatsSelectedExcept', allCatsSelectedExcept)
-    }
-  }, [data, selectedCategories, selectedRadio])
+    if (selectedRadio === 'allIn') setSelectedCategories(['allIn'])
+    else setSelectedCategories(selectedValue)
+  }, [selectedRadio, selectedValue])
 
-  console.log('selectedCategories', selectedCategories)
+  const memoizedOnCategoriesChange = useMemo(() => onCategoriesChange, [onCategoriesChange])
+
+  useEffect(() => {
+    memoizedOnCategoriesChange(selectedRadio, selectedCategories)
+  }, [memoizedOnCategoriesChange, selectedRadio, selectedCategories])
 
   return (
     <>
       <Radio.Group value={selectedRadio} onChange={handleRadioChange} mb="md">
         <Stack spacing="xs">
-          <Radio label="Select All" value="selectAll" />
-          <Radio label={`Select ${label}`} value="selectSome" />
-          <Radio label={`Select All ${label} Except`} value="selectAllExcept" />
+          <Radio label="Select All" value="allIn" />
+          <Radio label={`Select ${label}`} value="in" />
+          <Radio label={`Select All ${label} Except`} value="nin" />
         </Stack>
       </Radio.Group>
       <Text color="secondaryText" size="sm" weight="bold" mb="xs">
-        {selectedRadio === 'selectSome'
+        {selectedRadio === 'in'
           ? `Select ${label}`
-          : selectedRadio === 'selectAllExcept'
+          : selectedRadio === 'nin'
           ? `Select ${label} to exclude`
           : ''}
       </Text>
@@ -64,14 +65,15 @@ const MultiSelectAndRadioButtons = ({
         variant="filled"
         size="lg"
         radius="lg"
-        disabled={selectedRadio === 'selectAll'}
+        value={selectedValue}
+        disabled={selectedRadio === 'allIn'}
         data={data}
-        onChange={handleMultiSelectChange}
+        onChange={setSelectedValue}
         placeholder={`Select ${label}`}
         styles={(theme) => ({
           input: {
             borderColor:
-              selectedRadio === 'selectAllExcept'
+              selectedRadio === 'nin'
                 ? theme.colors.warning[theme.fn.primaryShade()]
                 : theme.colors.brand[theme.fn.primaryShade()],
             backgroundColor: theme.colors.mainBackground[theme.fn.primaryShade()],
@@ -80,11 +82,11 @@ const MultiSelectAndRadioButtons = ({
           value: {
             border: '1px solid',
             borderColor:
-              selectedRadio === 'selectAllExcept'
+              selectedRadio === 'nin'
                 ? theme.colors.warning[theme.fn.primaryShade()]
                 : theme.colors.brand[theme.fn.primaryShade()],
             color:
-              selectedRadio === 'selectAllExcept'
+              selectedRadio === 'nin'
                 ? theme.colors.warning[theme.fn.primaryShade()]
                 : theme.colors.brand[theme.fn.primaryShade()]
           }
