@@ -10,7 +10,8 @@ const data = [
     icon: ethLogo,
     amount: 10000,
     network: 'Ethereum',
-    value: 'ETH1'
+    value: 'ETH1',
+    label: 'ETH'
   },
   {
     id: 2,
@@ -18,7 +19,8 @@ const data = [
     icon: ethLogo,
     amount: 20000,
     network: 'Ethereum',
-    value: 'ETH2'
+    value: 'ETH2',
+    label: 'ETH'
   }
 ]
 
@@ -28,6 +30,7 @@ interface ItemProps extends React.ComponentPropsWithoutRef<'div'> {
   network: string
   amount: number
   value: string
+  label: string
 }
 
 const SelectItem = forwardRef<HTMLDivElement, ItemProps>(

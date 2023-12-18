@@ -1,40 +1,35 @@
 import { MultiSelect, Radio, Stack, Text } from '@mantine/core'
+import { TargetingInputApplyProp } from 'adex-common/dist/types'
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { TargetingInputProps } from 'types'
 
 interface MultiSelectAndRadioButtonsProps {
   multiSelectData: { value: string; label: string }[]
   label: string
   defaultSelectValue?: string[]
-  defaultRadioValue?: TargetingInputProps
-  onCategoriesChange: (selectedRadio: TargetingInputProps, categories: string[]) => void
+  defaultRadioValue?: TargetingInputApplyProp
+  onCategoriesChange: (selectedRadio: TargetingInputApplyProp, categories: string[]) => void
 }
 
 const MultiSelectAndRadioButtons = ({
   multiSelectData,
   label,
   defaultSelectValue = [],
-  defaultRadioValue = 'allIn',
+  defaultRadioValue = 'all',
   onCategoriesChange
 }: MultiSelectAndRadioButtonsProps) => {
   const data = useMemo(() => [...multiSelectData], [multiSelectData])
-  const [selectedRadio, setSelectedRadio] = useState<TargetingInputProps>(defaultRadioValue)
+  const [selectedRadio, setSelectedRadio] = useState<TargetingInputApplyProp>(defaultRadioValue)
   const [selectedCategories, setSelectedCategories] = useState<string[]>([])
   const [selectedValue, setSelectedValue] = useState<string[]>(defaultSelectValue)
 
-  const handleRadioChange = useCallback((value: TargetingInputProps) => {
+  const handleRadioChange = useCallback((value: TargetingInputApplyProp) => {
     setSelectedRadio(value)
-
-    if (value === 'allIn') {
-      setSelectedCategories(['allIn'])
-    } else {
-      setSelectedCategories([])
-    }
+    setSelectedCategories([])
     setSelectedValue([])
   }, [])
 
   useEffect(() => {
-    if (selectedRadio === 'allIn') setSelectedCategories(['allIn'])
+    if (selectedRadio === 'all') setSelectedCategories([])
     else setSelectedCategories(selectedValue)
   }, [selectedRadio, selectedValue])
 
@@ -48,7 +43,7 @@ const MultiSelectAndRadioButtons = ({
     <>
       <Radio.Group value={selectedRadio} onChange={handleRadioChange} mb="md">
         <Stack spacing="xs">
-          <Radio label="Select All" value="allIn" />
+          <Radio label="Select All" value="all" />
           <Radio label={`Select ${label}`} value="in" />
           <Radio label={`Select All ${label} Except`} value="nin" />
         </Stack>
@@ -66,7 +61,7 @@ const MultiSelectAndRadioButtons = ({
         size="lg"
         radius="lg"
         value={selectedValue}
-        disabled={selectedRadio === 'allIn'}
+        disabled={selectedRadio === 'all'}
         data={data}
         onChange={setSelectedValue}
         placeholder={`Select ${label}`}

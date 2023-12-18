@@ -1,4 +1,6 @@
-import { Devices, SelectData, TargetingInputSingle } from 'types'
+import { TargetingInputApplyProp, TargetingInputSingle } from 'adex-common/dist/types'
+import { DEFAULT_CATS_LOCS_VALUE } from 'constants/createCampaign'
+import { Devices, SelectData } from 'types'
 
 export const checkSelectedDevices = (devices: Devices[]) => {
   return devices.length === 1 && devices.includes('mobile')
@@ -25,3 +27,15 @@ export const formatCatsAndLocsData = (inputValues: TargetingInputSingle, lib: Se
 
   return [key, labels]
 }
+
+export const updateCatsLocsObject = (selectedRadio: TargetingInputApplyProp, values: string[]) => {
+  const updated = { ...DEFAULT_CATS_LOCS_VALUE }
+  if (selectedRadio !== 'all') {
+    updated[selectedRadio] = values
+    updated.apply = selectedRadio
+  }
+  return updated
+}
+
+export const findArrayWithLengthInObjectAsValue = (obj: object) =>
+  Object.entries(obj).find(([, value]) => Array.isArray(value) && value.length > 0)

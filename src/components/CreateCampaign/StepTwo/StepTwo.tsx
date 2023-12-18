@@ -1,15 +1,13 @@
 import { Grid, Text } from '@mantine/core'
 import { CATEGORIES, COUNTRIES } from 'constants/createCampaign'
 import { useCallback, useMemo } from 'react'
-import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
-import { TargetingInputProps, TargetingInputSingle } from 'types'
+import useCreateCampaignContext from 'hooks/useCreateCampaignContext' // import { TargetingInputProps, TargetingInputSingle } from 'types'
+import { TargetingInputApplyProp } from 'adex-common/dist/types'
+import {
+  findArrayWithLengthInObjectAsValue,
+  updateCatsLocsObject
+} from 'helpers/createCampaignHelpers'
 import MultiSelectAndRadioButtons from './MultiSelectAndRadioButtons'
-
-const DEFAULT_VALUE: TargetingInputSingle = {
-  allIn: [],
-  in: [],
-  nin: []
-}
 
 const StepTwo = () => {
   const {
@@ -22,32 +20,32 @@ const StepTwo = () => {
   } = useCreateCampaignContext()
 
   const handleCategories = useCallback(
-    (selectedRadio: TargetingInputProps, categoriesValue: string[]) => {
-      const updated = { ...DEFAULT_VALUE }
-      updated[selectedRadio] = categoriesValue
-
-      updateCampaignWithPrevStateNested('targetingInput.inputs.categories', updated)
+    (selectedRadio: TargetingInputApplyProp, categoriesValue: string[]) => {
+      updateCampaignWithPrevStateNested(
+        'targetingInput.inputs.categories',
+        updateCatsLocsObject(selectedRadio, categoriesValue)
+      )
     },
     [updateCampaignWithPrevStateNested]
   )
 
   const handleCountries = useCallback(
-    (selectedRadio: TargetingInputProps, locationsValue: string[]) => {
-      const updated = { ...DEFAULT_VALUE }
-      updated[selectedRadio] = locationsValue
-
-      updateCampaignWithPrevStateNested('targetingInput.inputs.location', updated)
+    (selectedRadio: TargetingInputApplyProp, locationsValue: string[]) => {
+      updateCampaignWithPrevStateNested(
+        'targetingInput.inputs.location',
+        updateCatsLocsObject(selectedRadio, locationsValue)
+      )
     },
     [updateCampaignWithPrevStateNested]
   )
 
   const catSelectedRadioAndValuesArray = useMemo(
-    () => Object.entries(categories).find(([, value]) => Array.isArray(value) && value.length > 0),
+    () => findArrayWithLengthInObjectAsValue(categories),
     [categories]
   )
 
   const locSelectedRadioAndValuesArray = useMemo(
-    () => Object.entries(location).find(([, value]) => Array.isArray(value) && value.length > 0),
+    () => findArrayWithLengthInObjectAsValue(location),
     [location]
   )
 
@@ -62,9 +60,11 @@ const StepTwo = () => {
           multiSelectData={CATEGORIES}
           defaultRadioValue={
             catSelectedRadioAndValuesArray &&
-            (catSelectedRadioAndValuesArray[0] as TargetingInputProps)
+            (catSelectedRadioAndValuesArray[0] as TargetingInputApplyProp)
           }
-          defaultSelectValue={catSelectedRadioAndValuesArray && catSelectedRadioAndValuesArray[1]}
+          defaultSelectValue={
+            catSelectedRadioAndValuesArray && (catSelectedRadioAndValuesArray[1] as string[])
+          }
           label="Categories"
         />
       </Grid.Col>
@@ -76,9 +76,11 @@ const StepTwo = () => {
           onCategoriesChange={handleCountries}
           defaultRadioValue={
             locSelectedRadioAndValuesArray &&
-            (locSelectedRadioAndValuesArray[0] as TargetingInputProps)
+            (locSelectedRadioAndValuesArray[0] as TargetingInputApplyProp)
           }
-          defaultSelectValue={locSelectedRadioAndValuesArray && locSelectedRadioAndValuesArray[1]}
+          defaultSelectValue={
+            locSelectedRadioAndValuesArray && (locSelectedRadioAndValuesArray[1] as string[])
+          }
           multiSelectData={COUNTRIES}
           label="Countries"
         />

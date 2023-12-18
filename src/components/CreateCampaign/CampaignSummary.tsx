@@ -7,7 +7,8 @@ import { useCallback, useMemo } from 'react'
 import DesktopIcon from 'resources/icons/Desktop'
 import LeftArrowIcon from 'resources/icons/LeftArrow'
 import MobileIcon from 'resources/icons/Mobile'
-import { SelectData, TargetingInputSingle } from 'types'
+import { TargetingInputSingle } from 'adex-common/dist/types'
+import { SelectData } from 'types'
 
 const useStyles = createStyles((theme) => ({
   bg: {
@@ -59,7 +60,7 @@ const CampaignSummary = () => {
     const [key, labels] = formatCatsAndLocsData(inputValues, lib)
 
     if (!key) return
-    if (key === 'allIn') {
+    if (key === 'all') {
       return <Text>All</Text>
     }
     if (key === 'in') return <Text>{labels}</Text>

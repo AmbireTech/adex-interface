@@ -1,4 +1,5 @@
-import { Banner, BannerVariant } from 'types'
+import { Banner } from 'adex-common/dist/types'
+import { BannerVariant } from 'types'
 
 export const BANNER_VARIANTS: { [key: string]: BannerVariant } = {
   mediumRectangle: {

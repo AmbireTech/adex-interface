@@ -1,19 +1,34 @@
-import { Campaign, SelectData } from 'types'
+import { CampaignUI, SelectData } from 'types'
+
+import {
+  CampaignStatus,
+  CampaignType,
+  ReviewStatus,
+  TargetingInputSingle
+} from 'adex-common/dist/types'
 
 export const CREATE_CAMPAIGN_STEPS = 4
-export const CREATE_CAMPAIGN_DEFAULT_VALUE: Campaign = {
+export const CREATE_CAMPAIGN_DEFAULT_VALUE: CampaignUI = {
   id: '',
-  creator: '',
+  type: CampaignType.DSP,
   step: 0,
   devices: [],
-  depositAssetAddr: '',
-  depositAmount: BigInt(0),
-  network: 0,
-  created: BigInt(0),
-  nonce: BigInt(0),
+  paymentModel: 'cpm',
   startsAt: null,
   endsAt: null,
-  paymentModel: 'cpm',
+  /* Props from Campaign type */
+  outpaceAssetAddr: '',
+  outpaceAssetDecimals: '',
+  outpaceAddr: '',
+  campaignBudget: BigInt(0),
+  outpaceChainId: 1,
+  /** Timestamp in ms */
+  created: BigInt(0),
+  nonce: BigInt(0),
+
+  // Spec Props - mutable
+  /* * wallet account address */
+  owner: '',
   title: '',
   adUnits: [],
   validators: [],
@@ -28,26 +43,49 @@ export const CREATE_CAMPAIGN_DEFAULT_VALUE: Campaign = {
     }
   },
   targetingRules: [],
+  // eventSubmission?: EventSubmission[]
+  //* * activeFrom - can not be before created */
+  activeFrom: BigInt(new Date().valueOf()),
+  activeTo: BigInt(new Date().valueOf()),
+
   targetingInput: {
     version: '',
     inputs: {
       location: {
         in: [],
         nin: [],
-        allIn: []
+        apply: 'all'
       },
       categories: {
         in: [],
         nin: [],
-        allIn: []
+        apply: 'all'
       },
       publishers: {
         in: [],
         nin: [],
-        allIn: []
+        apply: 'all'
+      },
+      advanced: {
+        includeIncentivized: true,
+        disableFrequencyCapping: false,
+        limitDailyAverageSpending: false
       }
     }
-  }
+  },
+  // Statuses
+  status: CampaignStatus.created,
+  reviewStatus: ReviewStatus.inQue,
+  // reviewMessage?: string
+
+  // other
+  /** Timestamp in ms */
+  modified: BigInt(new Date().valueOf()),
+  archived: false,
+  /** signer address - the address that signs wallet tx/msg */
+  createdBy: '',
+  /** user address */
+  lastModifiedBy: ''
 }
 
 export const CATEGORIES: SelectData[] = [
@@ -470,3 +508,9 @@ export const COUNTRIES: SelectData[] = [
   { value: 'bg', label: 'Bulgaria' },
   { value: 'uk', label: 'United Kingdom' }
 ]
+
+export const DEFAULT_CATS_LOCS_VALUE: TargetingInputSingle = {
+  in: [],
+  nin: [],
+  apply: 'all'
+}

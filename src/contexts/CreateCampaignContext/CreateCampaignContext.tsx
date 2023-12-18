@@ -1,15 +1,15 @@
 import { useLocalStorage } from '@mantine/hooks'
 import { FC, PropsWithChildren, createContext, useCallback, useMemo } from 'react'
 import { CREATE_CAMPAIGN_DEFAULT_VALUE } from 'constants/createCampaign'
-import { Campaign } from 'types'
 import superjson from 'superjson'
+import { CampaignUI } from 'types'
 
 type CreateCampaign = {
-  campaign: Campaign
-  setCampaign: (val: Campaign | ((prevState: Campaign) => Campaign)) => void
-  updateCampaign: <CampaignItemKey extends keyof Campaign>(
+  campaign: CampaignUI
+  setCampaign: (val: CampaignUI | ((prevState: CampaignUI) => CampaignUI)) => void
+  updateCampaign: <CampaignItemKey extends keyof CampaignUI>(
     key: CampaignItemKey,
-    value: Campaign[CampaignItemKey]
+    value: CampaignUI[CampaignItemKey]
   ) => void
   updateCampaignWithPrevStateNested: (nestedKey: string, value: any) => void
 }
@@ -18,7 +18,7 @@ const CreateCampaignContext = createContext<CreateCampaign | null>(null)
 
 const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
   const defaultValue = { ...CREATE_CAMPAIGN_DEFAULT_VALUE }
-  const [campaign, setCampaign] = useLocalStorage<Campaign>({
+  const [campaign, setCampaign] = useLocalStorage<CampaignUI>({
     key: 'createCampaign',
     defaultValue,
     serialize: superjson.stringify,
@@ -26,9 +26,9 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
   })
 
   const updateCampaign = useCallback(
-    <CampaignItemKey extends keyof Campaign>(
+    <CampaignItemKey extends keyof CampaignUI>(
       key: CampaignItemKey,
-      value: Campaign[CampaignItemKey]
+      value: CampaignUI[CampaignItemKey]
     ) => {
       setCampaign((x) => {
         const updated = { ...x }
