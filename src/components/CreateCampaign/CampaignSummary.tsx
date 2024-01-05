@@ -9,6 +9,7 @@ import LeftArrowIcon from 'resources/icons/LeftArrow'
 import MobileIcon from 'resources/icons/Mobile'
 import { TargetingInputSingle } from 'adex-common/dist/types'
 import { SelectData } from 'types'
+import { useCreateCampaignFormContext } from 'contexts/CreateCampaignFormContext'
 
 const useStyles = createStyles((theme) => ({
   bg: {
@@ -87,6 +88,25 @@ const CampaignSummary = () => {
 
   const isTheLastStep = useMemo(() => step === CREATE_CAMPAIGN_STEPS - 1, [step])
   const launchCampaign = () => console.log('LAUNCH CAMPAIGN')
+  const form = useCreateCampaignFormContext()
+  const handleNextStepBtnClicked = useCallback(() => {
+    if (step < CREATE_CAMPAIGN_STEPS - 1) {
+      if (step === 2) {
+        form.validate()
+        const isValidForm = form.isValid()
+        if (!isValidForm) return
+        const element = document.getElementById('createCampaignSubmitBtn')
+        element?.click()
+      }
+
+      updateCampaign('step', step + 1)
+      return
+    }
+
+    if (isTheLastStep) {
+      launchCampaign()
+    }
+  }, [isTheLastStep, step, updateCampaign, form])
 
   return (
     <>
@@ -118,14 +138,11 @@ const CampaignSummary = () => {
       <Flex direction="column" justify="space-between" align="center">
         <Button
           w="90%"
+          // type='button'
           size="lg"
           mt="md"
           variant="filled"
-          onClick={() =>
-            step < CREATE_CAMPAIGN_STEPS - 1
-              ? updateCampaign('step', step + 1)
-              : isTheLastStep && launchCampaign()
-          }
+          onClick={handleNextStepBtnClicked}
         >
           {isTheLastStep ? 'Launch Campaign' : 'Next Step'}
         </Button>

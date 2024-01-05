@@ -13,4 +13,8 @@ export type CampaignUI = Campaign & {
   paymentModel: PaymentModelType
   startsAt: Date | null
   endsAt: Date | null
+  currency: string
+  cpmMin: string
+  cpmMax: string
+  campaignName: string
 }

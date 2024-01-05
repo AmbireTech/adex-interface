@@ -1,7 +1,12 @@
 import { Grid, Text } from '@mantine/core'
-import { CATEGORIES, COUNTRIES } from 'constants/createCampaign'
+import {
+  CAMPAIGN_CATEGORIES_INPUT,
+  CAMPAIGN_LOCATION_INPUT,
+  CATEGORIES,
+  COUNTRIES
+} from 'constants/createCampaign'
 import { useCallback, useMemo } from 'react'
-import useCreateCampaignContext from 'hooks/useCreateCampaignContext' // import { TargetingInputProps, TargetingInputSingle } from 'types'
+import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import { TargetingInputApplyProp } from 'adex-common/dist/types'
 import {
   findArrayWithLengthInObjectAsValue,
@@ -22,7 +27,7 @@ const StepTwo = () => {
   const handleCategories = useCallback(
     (selectedRadio: TargetingInputApplyProp, categoriesValue: string[]) => {
       updateCampaignWithPrevStateNested(
-        'targetingInput.inputs.categories',
+        CAMPAIGN_CATEGORIES_INPUT,
         updateCatsLocsObject(selectedRadio, categoriesValue)
       )
     },
@@ -32,7 +37,7 @@ const StepTwo = () => {
   const handleCountries = useCallback(
     (selectedRadio: TargetingInputApplyProp, locationsValue: string[]) => {
       updateCampaignWithPrevStateNested(
-        'targetingInput.inputs.location',
+        CAMPAIGN_LOCATION_INPUT,
         updateCatsLocsObject(selectedRadio, locationsValue)
       )
     },

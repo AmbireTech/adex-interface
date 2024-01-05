@@ -1,21 +1,11 @@
-import { useCallback } from 'react'
 import { Group, Radio } from '@mantine/core'
-import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
-import { PaymentModelType } from 'types'
+import { useCreateCampaignFormContext } from 'contexts/CreateCampaignFormContext'
 
 const PaymentModel = () => {
-  const {
-    updateCampaign,
-    campaign: { paymentModel }
-  } = useCreateCampaignContext()
-
-  const handleRadioChange = useCallback(
-    (value: PaymentModelType) => updateCampaign('paymentModel', value),
-    [updateCampaign]
-  )
+  const form = useCreateCampaignFormContext()
 
   return (
-    <Radio.Group value={paymentModel} onChange={handleRadioChange}>
+    <Radio.Group {...form.getInputProps('paymentModel')}>
       <Group mt="xs">
         <Radio value="cpm" label="CPM" />
         {/* Disabled at the moment */}

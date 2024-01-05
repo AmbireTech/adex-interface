@@ -1,20 +1,10 @@
 import { TextInput } from '@mantine/core'
-import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
+import { useCreateCampaignFormContext } from 'contexts/CreateCampaignFormContext'
 
 const CampaignName = () => {
-  const {
-    campaign: { title },
-    updateCampaign
-  } = useCreateCampaignContext()
+  const form = useCreateCampaignFormContext()
 
-  return (
-    <TextInput
-      value={title}
-      onChange={(e) => updateCampaign('title', e.target.value)}
-      size="md"
-      w="50%"
-    />
-  )
+  return <TextInput size="md" w="50%" {...form.getInputProps('campaignName')} />
 }
 
 export default CampaignName

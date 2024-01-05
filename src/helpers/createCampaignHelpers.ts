@@ -29,7 +29,8 @@ export const formatCatsAndLocsData = (inputValues: TargetingInputSingle, lib: Se
 }
 
 export const updateCatsLocsObject = (selectedRadio: TargetingInputApplyProp, values: string[]) => {
-  const updated = { ...DEFAULT_CATS_LOCS_VALUE }
+  // const updated = { ...DEFAULT_CATS_LOCS_VALUE }
+  const updated = structuredClone(DEFAULT_CATS_LOCS_VALUE)
   if (selectedRadio !== 'all') {
     updated[selectedRadio] = values
     updated.apply = selectedRadio

@@ -12,12 +12,15 @@ type CreateCampaign = {
     value: CampaignUI[CampaignItemKey]
   ) => void
   updateCampaignWithPrevStateNested: (nestedKey: string, value: any) => void
+  updateAllCampaign: (camp: any) => void
 }
 
 const CreateCampaignContext = createContext<CreateCampaign | null>(null)
 
 const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
-  const defaultValue = { ...CREATE_CAMPAIGN_DEFAULT_VALUE }
+  // const defaultValue1 = { ...CREATE_CAMPAIGN_DEFAULT_VALUE }
+  const defaultValue = structuredClone(CREATE_CAMPAIGN_DEFAULT_VALUE)
+
   const [campaign, setCampaign] = useLocalStorage<CampaignUI>({
     key: 'createCampaign',
     defaultValue,
@@ -25,13 +28,21 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
     deserialize: (str) => (typeof str === 'undefined' ? defaultValue : superjson.parse(str))
   })
 
+  const updateAllCampaign = useCallback(
+    (value: any) => {
+      setCampaign(value)
+    },
+    [setCampaign]
+  )
+
   const updateCampaign = useCallback(
     <CampaignItemKey extends keyof CampaignUI>(
       key: CampaignItemKey,
       value: CampaignUI[CampaignItemKey]
     ) => {
       setCampaign((x) => {
-        const updated = { ...x }
+        // const updated = { ...x }
+        const updated = structuredClone(x)
         updated[key] = value
         return updated
       })
@@ -42,7 +53,8 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
   const updateCampaignWithPrevStateNested = useCallback(
     (nestedKey: string, value: any) => {
       setCampaign((prevCampaign) => {
-        const updated = { ...prevCampaign }
+        // const updated = { ...prevCampaign }
+        const updated = structuredClone(prevCampaign)
         const keys = nestedKey.split('.')
         let currentLevel: any = updated
 
@@ -64,10 +76,11 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
     () => ({
       campaign,
       setCampaign,
+      updateAllCampaign,
       updateCampaign,
       updateCampaignWithPrevStateNested
     }),
-    [campaign, setCampaign, updateCampaign, updateCampaignWithPrevStateNested]
+    [campaign, setCampaign, updateAllCampaign, updateCampaign, updateCampaignWithPrevStateNested]
   )
 
   return (

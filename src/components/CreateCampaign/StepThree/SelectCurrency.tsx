@@ -1,6 +1,7 @@
 import { Image, Select, Text, Flex } from '@mantine/core'
+import { useCreateCampaignFormContext } from 'contexts/CreateCampaignFormContext'
 import { formatCurrency } from 'helpers'
-import { forwardRef, useState } from 'react'
+import { forwardRef } from 'react'
 import ethLogo from 'resources/logos/ethereumIcon.png'
 
 const data = [
@@ -50,15 +51,13 @@ const SelectItem = forwardRef<HTMLDivElement, ItemProps>(
 )
 
 const SelectCurrency = () => {
-  const [selectedItem, setSelectedItem] = useState<string | null>(null)
-
+  const form = useCreateCampaignFormContext()
   return (
     <Select
       placeholder="Select currency"
       itemComponent={SelectItem}
       data={data}
-      value={selectedItem || ''}
-      onChange={(value) => setSelectedItem(value === null ? null : value)}
+      {...form.getInputProps('currency')}
       maw="50%"
       maxDropdownHeight={400}
     />

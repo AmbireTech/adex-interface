@@ -1,21 +1,22 @@
-import { Flex, NumberInput } from '@mantine/core'
+import { Flex, TextInput } from '@mantine/core'
 import InfoAlertMessage from 'components/common/InfoAlertMessage'
+import { useCreateCampaignFormContext } from 'contexts/CreateCampaignFormContext'
 import { useState } from 'react'
 
 const CampaignBudget = () => {
-  // TODO: Add checks and validations here
   const [errorToShow] = useState(false)
+  const form = useCreateCampaignFormContext()
 
   return (
     <Flex justify="space-between" align="flex-start">
-      <NumberInput
-        hideControls
+      <TextInput
         size="md"
         w="50%"
         error={errorToShow}
         placeholder="Campaign Budget"
         description="Estimated fee: 0.15 DAI"
         inputWrapperOrder={['input', 'description', 'error']}
+        {...form.getInputProps('campaignBudget')}
       />
       {errorToShow && (
         <InfoAlertMessage

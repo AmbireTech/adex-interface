@@ -10,6 +10,7 @@ import useAccount from 'hooks/useAccount'
 import Deposit from 'components/Deposit'
 import CreateCampaign from 'components/CreateCampaign'
 import { CreateCampaignContextProvider } from 'contexts/CreateCampaignContext/CreateCampaignContext'
+import { CreateCampaignFormProvider } from 'contexts/CreateCampaignFormContext'
 
 function RequireAuth({ children }: { children: JSX.Element }) {
   const { authenticated } = useAccount()
@@ -65,7 +66,9 @@ export const router = createBrowserRouter([
         path: 'create-campaign',
         element: (
           <CreateCampaignContextProvider>
-            <CreateCampaign />
+            <CreateCampaignFormProvider>
+              <CreateCampaign />
+            </CreateCampaignFormProvider>
           </CreateCampaignContextProvider>
         )
       }

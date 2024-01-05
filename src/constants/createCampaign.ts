@@ -8,6 +8,15 @@ import {
 } from 'adex-common/dist/types'
 
 export const CREATE_CAMPAIGN_STEPS = 4
+export const CAMPAIGN_CATEGORIES_INPUT = 'targetingInput.inputs.categories'
+export const CAMPAIGN_LOCATION_INPUT = 'targetingInput.inputs.location'
+
+export const DEFAULT_CATS_LOCS_VALUE: TargetingInputSingle = {
+  in: [],
+  nin: [],
+  apply: 'all'
+}
+
 export const CREATE_CAMPAIGN_DEFAULT_VALUE: CampaignUI = {
   id: '',
   type: CampaignType.DSP,
@@ -16,6 +25,10 @@ export const CREATE_CAMPAIGN_DEFAULT_VALUE: CampaignUI = {
   paymentModel: 'cpm',
   startsAt: null,
   endsAt: null,
+  currency: '',
+  cpmMin: '',
+  cpmMax: '',
+  campaignName: '',
   /* Props from Campaign type */
   outpaceAssetAddr: '',
   outpaceAssetDecimals: '',
@@ -51,21 +64,9 @@ export const CREATE_CAMPAIGN_DEFAULT_VALUE: CampaignUI = {
   targetingInput: {
     version: '',
     inputs: {
-      location: {
-        in: [],
-        nin: [],
-        apply: 'all'
-      },
-      categories: {
-        in: [],
-        nin: [],
-        apply: 'all'
-      },
-      publishers: {
-        in: [],
-        nin: [],
-        apply: 'all'
-      },
+      location: DEFAULT_CATS_LOCS_VALUE,
+      categories: DEFAULT_CATS_LOCS_VALUE,
+      publishers: DEFAULT_CATS_LOCS_VALUE,
       advanced: {
         includeIncentivized: true,
         disableFrequencyCapping: false,
@@ -508,9 +509,3 @@ export const COUNTRIES: SelectData[] = [
   { value: 'bg', label: 'Bulgaria' },
   { value: 'uk', label: 'United Kingdom' }
 ]
-
-export const DEFAULT_CATS_LOCS_VALUE: TargetingInputSingle = {
-  in: [],
-  nin: [],
-  apply: 'all'
-}
