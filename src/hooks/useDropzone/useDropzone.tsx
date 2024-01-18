@@ -1,14 +1,24 @@
 import { useCallback, useEffect, useState } from 'react'
 import { BannerVariant, Banners, FileWithPath } from 'types'
 import { BANNER_VARIANTS } from 'constants/banners'
+import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
+import { AdUnitType } from 'adex-common/dist/types'
 
 type UseDropzoneProps = {
-  updateBanners: (updatedValues: Banners) => void
+  defaultBannersValue: Banners
 }
 
-const useDropzone = ({ updateBanners }: UseDropzoneProps) => {
+const useDropzone = ({ defaultBannersValue }: UseDropzoneProps) => {
   const [uploadedFiles, setUploadedFiles] = useState<FileWithPath[] | null>(null)
   const updateUploadedFiles = useCallback((files: FileWithPath[]) => setUploadedFiles(files), [])
+  const { updateCampaignAdUnits } = useCreateCampaignContext()
+
+  const updateBanners = useCallback(
+    (updatedValues: Banners) => {
+      updateCampaignAdUnits(updatedValues)
+    },
+    [updateCampaignAdUnits]
+  )
 
   const onDrop = useCallback(
     (files: FileWithPath[] | null) => {
@@ -20,21 +30,7 @@ const useDropzone = ({ updateBanners }: UseDropzoneProps) => {
 
   const getBanners = useCallback(
     (files: FileWithPath[]) => {
-      const bannersDefaultValue: Banners = {
-        mediumRectangle: { details: BANNER_VARIANTS.mediumRectangle, fileDetails: [] },
-        skyscraper: { details: BANNER_VARIANTS.skyscraper, fileDetails: [] },
-        leaderboard: { details: BANNER_VARIANTS.leaderboard, fileDetails: [] },
-        billboard: { details: BANNER_VARIANTS.billboard, fileDetails: [] },
-        halfPage: { details: BANNER_VARIANTS.halfPage, fileDetails: [] },
-        mobileBanner: { details: BANNER_VARIANTS.mobileBanner, fileDetails: [] },
-        mobileLeaderboard: { details: BANNER_VARIANTS.mobileLeaderboard, fileDetails: [] },
-        others: { fileDetails: [] }
-      }
-
-      if (files.length === 0) {
-        updateBanners(bannersDefaultValue)
-        return
-      }
+      const bannersDefaultValue: Banners = defaultBannersValue
 
       const variantKeys = Object.keys(BANNER_VARIANTS)
 
@@ -42,32 +38,52 @@ const useDropzone = ({ updateBanners }: UseDropzoneProps) => {
         files.forEach((file: FileWithPath) => {
           const reader = new FileReader()
           let matchedVariant: BannerVariant | null = null
+
           reader.onload = (e: any) => {
             const img = new Image()
             img.src = e.target.result
+            const base64StringUS = e.target.result.replace('data:', '').replace(/^.+,/, '')
 
             img.onload = () => {
               const width = img.width
               const height = img.height
+              const adUnit = {
+                id: new Date().getTime().toString(),
+                title: file.name,
+                type: AdUnitType.Banner,
+                banner: {
+                  format: {
+                    w: width,
+                    h: height
+                  },
+                  mime: '',
+                  mediaUrl: base64StringUS,
+                  targetUrl: '',
+                  created: BigInt(new Date().getTime())
+                }
+              }
 
               for (let i = 0; i < variantKeys.length; i += 1) {
                 const variant = BANNER_VARIANTS[variantKeys[i]]
                 matchedVariant = variant
                 if (variant.bannerSizes === `${width}x${height}`) {
                   matchedVariant.checked = true
-                  bannersDefaultValue[matchedVariant!.label]!.fileDetails.push(file)
+                  bannersDefaultValue[matchedVariant!.label]!.adUnits.push(adUnit)
                   break
                 }
               }
-              if (!matchedVariant?.checked) bannersDefaultValue.others.fileDetails.push(file)
+              if (!matchedVariant?.checked) {
+                bannersDefaultValue.others?.adUnits.push(adUnit)
+              }
 
               updateBanners(bannersDefaultValue)
+              updateUploadedFiles([])
             }
           }
           reader.readAsDataURL(file)
         })
     },
-    [updateBanners]
+    [updateBanners, defaultBannersValue, updateUploadedFiles]
   )
 
   useEffect(() => {
@@ -75,9 +91,7 @@ const useDropzone = ({ updateBanners }: UseDropzoneProps) => {
   }, [uploadedFiles, getBanners])
 
   return {
-    onDrop,
-    updateUploadedFiles,
-    uploadedFiles
+    onDrop
   }
 }
 

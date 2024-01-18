@@ -6,6 +6,7 @@ import {
   ReviewStatus,
   TargetingInputSingle
 } from 'adex-common/dist/types'
+import { IMAGES_INFO_DEFAULT_VALUE } from './banners'
 
 export const CREATE_CAMPAIGN_STEPS = 4
 export const CAMPAIGN_CATEGORIES_INPUT = 'targetingInput.inputs.categories'
@@ -29,6 +30,7 @@ export const CREATE_CAMPAIGN_DEFAULT_VALUE: CampaignUI = {
   cpmMin: '',
   cpmMax: '',
   campaignName: '',
+  creativesDetails: IMAGES_INFO_DEFAULT_VALUE,
   /* Props from Campaign type */
   outpaceAssetAddr: '',
   outpaceAssetDecimals: '',

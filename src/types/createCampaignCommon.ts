@@ -1,5 +1,5 @@
 import { Campaign } from 'adex-common/dist/types/Dsp/Campaign'
-import { Devices } from './createCampaign'
+import { Banners, Devices } from './createCampaign'
 
 export type SelectData = { value: string; label: string }
 
@@ -17,4 +17,5 @@ export type CampaignUI = Campaign & {
   cpmMin: string
   cpmMax: string
   campaignName: string
+  creativesDetails: Banners
 }

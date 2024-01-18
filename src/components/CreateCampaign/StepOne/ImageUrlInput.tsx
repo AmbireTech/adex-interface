@@ -1,13 +1,13 @@
 import { ActionIcon, Input, createStyles } from '@mantine/core'
+import { AdUnit } from 'adex-common/dist/types'
 import InfoAlertMessage from 'components/common/InfoAlertMessage'
 import { ChangeEventHandler } from 'react'
 import DeleteIcon from 'resources/icons/Delete'
-import { FileWithPath } from 'types'
 
 type ImageUrlInputProps = {
-  image: FileWithPath
+  image: AdUnit
   toRemove: boolean
-  onDelete: (file: FileWithPath) => void
+  onDelete: (file: AdUnit) => void
   onChange: ChangeEventHandler<HTMLInputElement> | undefined
 }
 
@@ -32,7 +32,13 @@ const ImageUrlInput = ({ image, toRemove, onDelete, onChange }: ImageUrlInputPro
         variant="default"
         placeholder="Paste URL"
         size="lg"
-        icon={<img src={URL.createObjectURL(image)} alt={image.name} className={classes.image} />}
+        icon={
+          <img
+            src={`data:image/png;base64,${image.banner?.mediaUrl}`}
+            alt={image.title}
+            className={classes.image}
+          />
+        }
         rightSection={
           <ActionIcon
             title="Remove"

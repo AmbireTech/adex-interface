@@ -1,6 +1,6 @@
-import { TargetingInputApplyProp, TargetingInputSingle } from 'adex-common/dist/types'
+import { AdUnit, TargetingInputApplyProp, TargetingInputSingle } from 'adex-common/dist/types'
 import { DEFAULT_CATS_LOCS_VALUE } from 'constants/createCampaign'
-import { Devices, SelectData } from 'types'
+import { Banners, Devices, SelectData } from 'types'
 
 export const checkSelectedDevices = (devices: Devices[]) => {
   return devices.length === 1 && devices.includes('mobile')
@@ -40,3 +40,17 @@ export const updateCatsLocsObject = (selectedRadio: TargetingInputApplyProp, val
 
 export const findArrayWithLengthInObjectAsValue = (obj: object) =>
   Object.entries(obj).find(([, value]) => Array.isArray(value) && value.length > 0)
+
+export const removeAdUnitFromBanners = (adUnitToRemove: AdUnit, banners: Banners): Banners => {
+  const updatedBanners: Banners = { ...banners }
+
+  Object.keys(updatedBanners).forEach((bannerKey) => {
+    const banner = updatedBanners[bannerKey]
+
+    if (banner && banner.adUnits) {
+      banner.adUnits = banner.adUnits.filter((adUnit) => adUnit.id !== adUnitToRemove.id)
+    }
+  })
+
+  return updatedBanners
+}

@@ -2,7 +2,7 @@ import { useLocalStorage } from '@mantine/hooks'
 import { FC, PropsWithChildren, createContext, useCallback, useMemo } from 'react'
 import { CREATE_CAMPAIGN_DEFAULT_VALUE } from 'constants/createCampaign'
 import superjson from 'superjson'
-import { CampaignUI } from 'types'
+import { Banners, CampaignUI } from 'types'
 
 type CreateCampaign = {
   campaign: CampaignUI
@@ -13,6 +13,7 @@ type CreateCampaign = {
   ) => void
   updateCampaignWithPrevStateNested: (nestedKey: string, value: any) => void
   updateAllCampaign: (camp: any) => void
+  updateCampaignAdUnits: (value: Banners) => void
 }
 
 const CreateCampaignContext = createContext<CreateCampaign | null>(null)
@@ -50,13 +51,18 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
     [setCampaign]
   )
 
+  const updateCampaignAdUnits = useCallback(
+    (value: Banners) => {
+      setCampaign((x) => ({ ...x, creativesDetails: value }))
+    },
+    [setCampaign]
+  )
+
   const updateCampaignWithPrevStateNested = useCallback(
     (nestedKey: string, value: any) => {
       setCampaign((prevCampaign) => {
-        // const updated = { ...prevCampaign }
-        const updated = structuredClone(prevCampaign)
         const keys = nestedKey.split('.')
-        let currentLevel: any = updated
+        let currentLevel: any = structuredClone(prevCampaign)
 
         for (let i = 0; i < keys.length - 1; i++) {
           if (!(keys[i] in currentLevel)) {
@@ -66,7 +72,7 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
         }
 
         currentLevel[keys[keys.length - 1]] = value
-        return updated
+        return currentLevel
       })
     },
     [setCampaign]
@@ -78,9 +84,17 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
       setCampaign,
       updateAllCampaign,
       updateCampaign,
-      updateCampaignWithPrevStateNested
+      updateCampaignWithPrevStateNested,
+      updateCampaignAdUnits
     }),
-    [campaign, setCampaign, updateAllCampaign, updateCampaign, updateCampaignWithPrevStateNested]
+    [
+      campaign,
+      setCampaign,
+      updateAllCampaign,
+      updateCampaign,
+      updateCampaignWithPrevStateNested,
+      updateCampaignAdUnits
+    ]
   )
 
   return (

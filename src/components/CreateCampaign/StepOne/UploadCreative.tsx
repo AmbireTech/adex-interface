@@ -1,49 +1,43 @@
 import { Grid, Text } from '@mantine/core'
 import { useCallback, useState } from 'react'
-import { BANNER_VARIANTS } from 'constants/banners'
-import { Banners, FileWithPath } from 'types'
+import { AdUnit } from 'adex-common/dist/types'
+import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
+import { removeAdUnitFromBanners } from 'helpers/createCampaignHelpers'
 import useDropzone from 'hooks/useDropzone'
 import UploadedBanners from './UploadedBanners'
 import BannerSizesList from './BannerSizesList'
 import FilesDropzone from './FilesDropzone'
 
 const UploadCreative = () => {
+  const {
+    campaign: { creativesDetails: imagesInfo },
+    updateCampaignAdUnits
+  } = useCreateCampaignContext()
+
   const [autoUTMChecked, setAutoUTMChecked] = useState(false)
   const updateAutoUTMChecked = useCallback((isChecked: boolean) => setAutoUTMChecked(isChecked), [])
 
-  const [imagesInfo, setImagesInfo] = useState<Banners>({
-    mediumRectangle: { details: BANNER_VARIANTS.mediumRectangle, fileDetails: [] },
-    skyscraper: { details: BANNER_VARIANTS.skyscraper, fileDetails: [] },
-    leaderboard: { details: BANNER_VARIANTS.leaderboard, fileDetails: [] },
-    billboard: { details: BANNER_VARIANTS.billboard, fileDetails: [] },
-    halfPage: { details: BANNER_VARIANTS.halfPage, fileDetails: [] },
-    mobileBanner: { details: BANNER_VARIANTS.mobileBanner, fileDetails: [] },
-    mobileLeaderboard: { details: BANNER_VARIANTS.mobileLeaderboard, fileDetails: [] },
-    others: { fileDetails: [] }
+  const { onDrop } = useDropzone({
+    defaultBannersValue: imagesInfo
   })
-
-  const updateBanners = useCallback(
-    (updatedValues: Banners) => setImagesInfo((prev) => ({ ...prev, ...updatedValues })),
-    []
-  )
-
-  const { onDrop, updateUploadedFiles, uploadedFiles } = useDropzone({ updateBanners })
+  // TODO: add useMemo
+  const hasUploadedCreatives =
+    Object.entries(imagesInfo).filter(([, value]) => {
+      console.log('value', value)
+      return value?.adUnits && value.adUnits.length > 0
+    }).length > 0
 
   const handleDeleteCreativeBtnClicked = useCallback(
-    (file: FileWithPath) => {
-      if (!uploadedFiles) return
-      updateUploadedFiles(uploadedFiles.filter((item) => item.name !== file.name))
+    (file: AdUnit) => {
+      const updated = removeAdUnitFromBanners(file, imagesInfo)
+      updateCampaignAdUnits(updated)
     },
-    [uploadedFiles, updateUploadedFiles]
+    [imagesInfo, updateCampaignAdUnits]
   )
 
-  const handleOnInputChange = useCallback(
-    (inputText: string, file: FileWithPath) => {
-      if (!uploadedFiles) return
-      console.log('inputText, file', inputText, file)
-    },
-    [uploadedFiles]
-  )
+  const handleOnInputChange = useCallback((inputText: string, file: AdUnit) => {
+    console.log('inputText, file', inputText, file)
+  }, [])
 
   return (
     <Grid>
@@ -58,13 +52,13 @@ const UploadCreative = () => {
         <FilesDropzone onDrop={onDrop} />
       </Grid.Col>
 
-      {uploadedFiles && uploadedFiles.length > 0 ? (
+      {hasUploadedCreatives ? (
         <Grid.Col>
           <UploadedBanners
             autoUTMChecked={autoUTMChecked}
             updateAutoUTMChecked={updateAutoUTMChecked}
             imagesInfo={imagesInfo}
-            handleDeleteCreativeBtnClicked={handleDeleteCreativeBtnClicked}
+            onDeleteCreativeBtnClicked={handleDeleteCreativeBtnClicked}
             handleOnInputChange={handleOnInputChange}
           />
         </Grid.Col>

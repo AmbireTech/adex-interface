@@ -1,15 +1,15 @@
 import { useMemo } from 'react'
 import { Checkbox, Grid } from '@mantine/core'
-import { Banners, FileWithPath, ShapeVariants } from 'types'
+import { Banners, ShapeVariants } from 'types'
+import { AdUnit } from 'adex-common/dist/types'
 import ImageUrlInput from './ImageUrlInput'
 
 type UploadedBannersProps = {
-  // uploadedFiles: FileWithPath[] | null
   updateAutoUTMChecked: (isChecked: boolean) => void
   autoUTMChecked: boolean
   imagesInfo: Banners
-  handleDeleteCreativeBtnClicked: (file: FileWithPath) => void
-  handleOnInputChange: (inputText: string, file: FileWithPath) => void
+  onDeleteCreativeBtnClicked: (file: AdUnit) => void
+  handleOnInputChange: (inputText: string, file: AdUnit) => void
 }
 
 const UploadedBanners = ({
@@ -17,30 +17,29 @@ const UploadedBanners = ({
   updateAutoUTMChecked,
   autoUTMChecked,
   imagesInfo,
-  handleDeleteCreativeBtnClicked,
+  onDeleteCreativeBtnClicked,
   handleOnInputChange
 }: UploadedBannersProps) => {
   const inputBanners = useMemo(
     () =>
       (Object.keys(imagesInfo) as ShapeVariants[]).map((key: ShapeVariants) => {
-        const images = imagesInfo[key]?.fileDetails || []
-        if (images.length === 0) return
+        const images = imagesInfo[key]?.adUnits || []
         const toRemove = key.toString() === 'others'
 
         return images.length > 0
           ? images.map((image) => (
-              <Grid.Col key={image.path}>
+              <Grid.Col key={image.id}>
                 <ImageUrlInput
                   image={image}
                   toRemove={toRemove}
-                  onDelete={handleDeleteCreativeBtnClicked}
+                  onDelete={onDeleteCreativeBtnClicked}
                   onChange={(e) => handleOnInputChange(e.target.value, image)}
                 />
               </Grid.Col>
             ))
           : null
       }),
-    [handleDeleteCreativeBtnClicked, imagesInfo, handleOnInputChange]
+    [onDeleteCreativeBtnClicked, imagesInfo, handleOnInputChange]
   )
 
   return (

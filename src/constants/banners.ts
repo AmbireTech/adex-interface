@@ -70,3 +70,14 @@ export const BANNER_DEFAULT_VALUE: Banner = {
   targetUrl: '',
   created: BigInt(new Date().getTime())
 }
+
+export const IMAGES_INFO_DEFAULT_VALUE = {
+  mediumRectangle: { details: BANNER_VARIANTS.mediumRectangle, adUnits: [] },
+  skyscraper: { details: BANNER_VARIANTS.skyscraper, adUnits: [] },
+  leaderboard: { details: BANNER_VARIANTS.leaderboard, adUnits: [] },
+  billboard: { details: BANNER_VARIANTS.billboard, adUnits: [] },
+  halfPage: { details: BANNER_VARIANTS.halfPage, adUnits: [] },
+  mobileBanner: { details: BANNER_VARIANTS.mobileBanner, adUnits: [] },
+  mobileLeaderboard: { details: BANNER_VARIANTS.mobileLeaderboard, adUnits: [] },
+  others: { adUnits: [] }
+}

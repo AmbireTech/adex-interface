@@ -1,3 +1,5 @@
+import { AdUnit } from 'adex-common/dist/types'
+
 export type Devices = 'mobile' | 'desktop'
 export type ShapeVariants =
   | 'mediumRectangle'
@@ -25,14 +27,7 @@ export type ImagesInfo = {
 }
 
 export type Banners = {
-  mediumRectangle: BannerDetails | null
-  skyscraper: BannerDetails | null
-  leaderboard: BannerDetails | null
-  billboard: BannerDetails | null
-  halfPage: BannerDetails | null
-  mobileBanner: BannerDetails | null
-  mobileLeaderboard: BannerDetails | null
-  others: BannerDetails
+  [key: string]: BannerDetails | null
 }
 
 export type TabSwitchDevices = {
@@ -48,5 +43,5 @@ export type FileWithPath = Blob & {
 
 export type BannerDetails = {
   details?: BannerVariant
-  fileDetails: FileWithPath[]
+  adUnits: AdUnit[]
 }
