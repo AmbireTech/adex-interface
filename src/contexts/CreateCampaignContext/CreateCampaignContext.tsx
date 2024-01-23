@@ -2,7 +2,7 @@ import { useLocalStorage } from '@mantine/hooks'
 import { FC, PropsWithChildren, createContext, useCallback, useMemo } from 'react'
 import { CREATE_CAMPAIGN_DEFAULT_VALUE } from 'constants/createCampaign'
 import superjson from 'superjson'
-import { Banners, CampaignUI } from 'types'
+import { CampaignUI } from 'types'
 
 type CreateCampaign = {
   campaign: CampaignUI
@@ -13,7 +13,6 @@ type CreateCampaign = {
   ) => void
   updateCampaignWithPrevStateNested: (nestedKey: string, value: any) => void
   updateAllCampaign: (camp: any) => void
-  updateCampaignAdUnits: (value: Banners) => void
 }
 
 const CreateCampaignContext = createContext<CreateCampaign | null>(null)
@@ -42,18 +41,10 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
       value: CampaignUI[CampaignItemKey]
     ) => {
       setCampaign((x) => {
-        // const updated = { ...x }
         const updated = structuredClone(x)
         updated[key] = value
         return updated
       })
-    },
-    [setCampaign]
-  )
-
-  const updateCampaignAdUnits = useCallback(
-    (value: Banners) => {
-      setCampaign((x) => ({ ...x, creativesDetails: value }))
     },
     [setCampaign]
   )
@@ -84,17 +75,9 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
       setCampaign,
       updateAllCampaign,
       updateCampaign,
-      updateCampaignWithPrevStateNested,
-      updateCampaignAdUnits
+      updateCampaignWithPrevStateNested
     }),
-    [
-      campaign,
-      setCampaign,
-      updateAllCampaign,
-      updateCampaign,
-      updateCampaignWithPrevStateNested,
-      updateCampaignAdUnits
-    ]
+    [campaign, setCampaign, updateAllCampaign, updateCampaign, updateCampaignWithPrevStateNested]
   )
 
   return (

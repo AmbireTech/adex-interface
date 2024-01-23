@@ -1,24 +1,17 @@
-import { useCallback, useEffect, useState } from 'react'
-import { BannerVariant, Banners, FileWithPath } from 'types'
-import { BANNER_VARIANTS } from 'constants/banners'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { FileWithPath } from 'types'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import { AdUnitType } from 'adex-common/dist/types'
 
-type UseDropzoneProps = {
-  defaultBannersValue: Banners
-}
-
-const useDropzone = ({ defaultBannersValue }: UseDropzoneProps) => {
+const useDropzone = () => {
   const [uploadedFiles, setUploadedFiles] = useState<FileWithPath[] | null>(null)
   const updateUploadedFiles = useCallback((files: FileWithPath[]) => setUploadedFiles(files), [])
-  const { updateCampaignAdUnits } = useCreateCampaignContext()
+  const {
+    updateCampaign,
+    campaign: { adUnits }
+  } = useCreateCampaignContext()
 
-  const updateBanners = useCallback(
-    (updatedValues: Banners) => {
-      updateCampaignAdUnits(updatedValues)
-    },
-    [updateCampaignAdUnits]
-  )
+  const adUnitsCopy = useMemo(() => [...adUnits], [adUnits])
 
   const onDrop = useCallback(
     (files: FileWithPath[] | null) => {
@@ -30,14 +23,9 @@ const useDropzone = ({ defaultBannersValue }: UseDropzoneProps) => {
 
   const getBanners = useCallback(
     (files: FileWithPath[]) => {
-      const bannersDefaultValue: Banners = defaultBannersValue
-
-      const variantKeys = Object.keys(BANNER_VARIANTS)
-
       files &&
         files.forEach((file: FileWithPath) => {
           const reader = new FileReader()
-          let matchedVariant: BannerVariant | null = null
 
           reader.onload = (e: any) => {
             const img = new Image()
@@ -45,16 +33,15 @@ const useDropzone = ({ defaultBannersValue }: UseDropzoneProps) => {
             const base64StringUS = e.target.result.replace('data:', '').replace(/^.+,/, '')
 
             img.onload = () => {
-              const width = img.width
-              const height = img.height
               const adUnit = {
+                // TODO: Change the id because if drops more than one file it generate duplicate ids
                 id: new Date().getTime().toString(),
                 title: file.name,
                 type: AdUnitType.Banner,
                 banner: {
                   format: {
-                    w: width,
-                    h: height
+                    w: img.width,
+                    h: img.height
                   },
                   mime: '',
                   mediaUrl: base64StringUS,
@@ -63,27 +50,15 @@ const useDropzone = ({ defaultBannersValue }: UseDropzoneProps) => {
                 }
               }
 
-              for (let i = 0; i < variantKeys.length; i += 1) {
-                const variant = BANNER_VARIANTS[variantKeys[i]]
-                matchedVariant = variant
-                if (variant.bannerSizes === `${width}x${height}`) {
-                  matchedVariant.checked = true
-                  bannersDefaultValue[matchedVariant!.label]!.adUnits.push(adUnit)
-                  break
-                }
-              }
-              if (!matchedVariant?.checked) {
-                bannersDefaultValue.others?.adUnits.push(adUnit)
-              }
-
-              updateBanners(bannersDefaultValue)
+              adUnitsCopy.push(adUnit)
+              updateCampaign('adUnits', adUnitsCopy)
               updateUploadedFiles([])
             }
           }
           reader.readAsDataURL(file)
         })
     },
-    [updateBanners, defaultBannersValue, updateUploadedFiles]
+    [updateUploadedFiles, adUnitsCopy, updateCampaign]
   )
 
   useEffect(() => {

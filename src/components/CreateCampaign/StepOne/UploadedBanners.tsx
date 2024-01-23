@@ -1,46 +1,45 @@
-import { useMemo } from 'react'
 import { Checkbox, Grid } from '@mantine/core'
-import { Banners, ShapeVariants } from 'types'
+import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import { AdUnit } from 'adex-common/dist/types'
+import { ALLOWED_BANNER_SIZES } from 'constants/banners'
 import ImageUrlInput from './ImageUrlInput'
 
 type UploadedBannersProps = {
   updateAutoUTMChecked: (isChecked: boolean) => void
   autoUTMChecked: boolean
-  imagesInfo: Banners
   onDeleteCreativeBtnClicked: (file: AdUnit) => void
   handleOnInputChange: (inputText: string, file: AdUnit) => void
 }
 
 const UploadedBanners = ({
-  // uploadedFiles,
   updateAutoUTMChecked,
   autoUTMChecked,
-  imagesInfo,
   onDeleteCreativeBtnClicked,
   handleOnInputChange
 }: UploadedBannersProps) => {
-  const inputBanners = useMemo(
-    () =>
-      (Object.keys(imagesInfo) as ShapeVariants[]).map((key: ShapeVariants) => {
-        const images = imagesInfo[key]?.adUnits || []
-        const toRemove = key.toString() === 'others'
+  const {
+    campaign: { adUnits }
+  } = useCreateCampaignContext()
 
-        return images.length > 0
-          ? images.map((image) => (
-              <Grid.Col key={image.id}>
-                <ImageUrlInput
-                  image={image}
-                  toRemove={toRemove}
-                  onDelete={onDeleteCreativeBtnClicked}
-                  onChange={(e) => handleOnInputChange(e.target.value, image)}
-                />
-              </Grid.Col>
-            ))
-          : null
-      }),
-    [onDeleteCreativeBtnClicked, imagesInfo, handleOnInputChange]
-  )
+  const inputBanners =
+    adUnits.length > 0
+      ? adUnits.map((image: AdUnit) => {
+          const isMatchedTheSizes = ALLOWED_BANNER_SIZES.find(
+            (item) => item.w === image.banner?.format.w && item.h === image.banner?.format.h
+          )
+
+          return (
+            <Grid.Col key={image.id}>
+              <ImageUrlInput
+                image={image}
+                toRemove={!isMatchedTheSizes}
+                onDelete={onDeleteCreativeBtnClicked}
+                onChange={(e) => handleOnInputChange(e.target.value, image)}
+              />
+            </Grid.Col>
+          )
+        })
+      : null
 
   return (
     <Grid>
@@ -51,7 +50,6 @@ const UploadedBanners = ({
           onChange={(event) => updateAutoUTMChecked(event.currentTarget.checked)}
         />
       </Grid.Col>
-
       {inputBanners}
     </Grid>
   )

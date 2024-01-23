@@ -28,6 +28,7 @@ const ImageUrlInput = ({ image, toRemove, onDelete, onChange }: ImageUrlInputPro
         onChange={onChange}
         error={toRemove}
         disabled={toRemove}
+        defaultValue={image.banner?.targetUrl}
         type="url"
         variant="default"
         placeholder="Paste URL"

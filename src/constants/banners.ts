@@ -1,64 +1,57 @@
 import { Banner } from 'adex-common/dist/types'
-import { BannerVariant } from 'types'
+import { BannerVariantNew } from 'types'
 
-export const BANNER_VARIANTS: { [key: string]: BannerVariant } = {
-  mediumRectangle: {
-    label: 'mediumRectangle',
+export const BANNER_SIZES: BannerVariantNew[] = [
+  {
     width: 21,
     height: 17,
-    bannerSizes: '300x250',
-    bannerName: 'Medium rectangle',
+    bannerSizes: { w: 300, h: 250 },
+    device: 'mobile',
     checked: false
   },
-  skyscraper: {
-    label: 'skyscraper',
+  {
     width: 11,
     height: 39,
-    bannerSizes: '160x600',
-    bannerName: 'Skyscraper',
+    bannerSizes: { w: 160, h: 600 },
+    device: 'desktop',
     checked: false
   },
-  leaderboard: {
-    label: 'leaderboard',
+  {
     width: 57,
     height: 8,
-    bannerSizes: '728x90',
-    bannerName: 'Leaderboard',
+    bannerSizes: { w: 728, h: 90 },
+    device: 'desktop',
     checked: false
   },
-  billboard: {
-    label: 'billboard',
+  {
     width: 62,
     height: 17,
-    bannerSizes: '970x250',
-    bannerName: 'Billboard',
+    bannerSizes: { w: 970, h: 250 },
+    device: 'desktop',
     checked: false
   },
-  halfPage: {
-    label: 'halfPage',
+  {
     width: 21,
     height: 41,
-    bannerSizes: '300x600',
-    bannerName: 'Half Page',
+    bannerSizes: { w: 300, h: 600 },
+    device: 'desktop',
     checked: false
   },
-  mobileBanner: {
-    label: 'mobileBanner',
+  {
     width: 52,
     height: 8,
-    bannerSizes: '300x50',
-    bannerName: 'Mobile Banner',
+    bannerSizes: { w: 300, h: 50 },
+    device: 'mobile',
     checked: false
   },
-  mobileLeaderboard: {
-    label: 'mobileLeaderboard',
+  {
     width: 57,
     height: 8,
-    bannerSizes: '320x50',
-    bannerName: 'Mobile Leaderboard',
+    bannerSizes: { w: 320, h: 50 },
+    device: 'mobile',
     checked: false
   }
-}
+]
 
 export const BANNER_DEFAULT_VALUE: Banner = {
   format: {
@@ -71,13 +64,12 @@ export const BANNER_DEFAULT_VALUE: Banner = {
   created: BigInt(new Date().getTime())
 }
 
-export const IMAGES_INFO_DEFAULT_VALUE = {
-  mediumRectangle: { details: BANNER_VARIANTS.mediumRectangle, adUnits: [] },
-  skyscraper: { details: BANNER_VARIANTS.skyscraper, adUnits: [] },
-  leaderboard: { details: BANNER_VARIANTS.leaderboard, adUnits: [] },
-  billboard: { details: BANNER_VARIANTS.billboard, adUnits: [] },
-  halfPage: { details: BANNER_VARIANTS.halfPage, adUnits: [] },
-  mobileBanner: { details: BANNER_VARIANTS.mobileBanner, adUnits: [] },
-  mobileLeaderboard: { details: BANNER_VARIANTS.mobileLeaderboard, adUnits: [] },
-  others: { adUnits: [] }
-}
+export const ALLOWED_BANNER_SIZES = [
+  { w: 300, h: 250 },
+  { w: 160, h: 600 },
+  { w: 728, h: 90 },
+  { w: 970, h: 250 },
+  { w: 300, h: 600 },
+  { w: 300, h: 50 },
+  { w: 320, h: 50 }
+]

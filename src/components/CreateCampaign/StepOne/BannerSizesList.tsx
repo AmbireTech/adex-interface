@@ -1,91 +1,49 @@
 import { Grid } from '@mantine/core'
 import BannerSizeMock from 'components/common/BannerSizeMock'
-import { checkSelectedDevices } from 'helpers/createCampaignHelpers'
+import { checkBannerSizes, checkSelectedDevices } from 'helpers/createCampaignHelpers'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import { useMemo } from 'react'
-import { TabSwitchDevices } from 'types'
+import { AdUnit } from 'adex-common/dist/types'
 
-const BannerSizesList = ({ imagesInfo }: TabSwitchDevices) => {
+const BannerSizesList = ({ adUnits }: { adUnits: AdUnit[] }) => {
   const {
     campaign: { devices }
   } = useCreateCampaignContext()
-
   const selectedDevices = useMemo(() => checkSelectedDevices(devices), [devices])
+  const updatedBannerSizes = useMemo(() => checkBannerSizes(adUnits), [adUnits])
+
+  const mobileSizes = useMemo(
+    () => updatedBannerSizes.filter((item) => item.device === 'mobile'),
+    [updatedBannerSizes]
+  )
+  const desktopSizes = useMemo(
+    () => updatedBannerSizes.filter((item) => item.device === 'desktop'),
+    [updatedBannerSizes]
+  )
 
   return selectedDevices === 'mobile' ? (
     <Grid>
-      <Grid.Col span="content">
-        <BannerSizeMock
-          variant="mediumRectangle"
-          active={imagesInfo?.mediumRectangle?.details?.checked}
-        />
-      </Grid.Col>
-      <Grid.Col span="content" offset={0.5}>
-        <BannerSizeMock
-          variant="mobileBanner"
-          active={imagesInfo?.mobileBanner?.details?.checked}
-        />
-      </Grid.Col>
-      <Grid.Col span="content" offset={0.5}>
-        <BannerSizeMock
-          variant="mobileLeaderboard"
-          active={imagesInfo?.mobileLeaderboard?.details?.checked}
-        />
-      </Grid.Col>
+      {mobileSizes.map((item) => (
+        <Grid.Col span="content" key={`${item.bannerSizes.w}x${item.bannerSizes.h}`}>
+          <BannerSizeMock variant={item} />
+        </Grid.Col>
+      ))}
     </Grid>
   ) : selectedDevices === 'desktop' ? (
     <Grid>
-      <Grid.Col span="content">
-        <BannerSizeMock
-          variant="mediumRectangle"
-          active={imagesInfo?.mediumRectangle?.details?.checked}
-        />
-      </Grid.Col>
-      <Grid.Col span="content" offset={0.5}>
-        <BannerSizeMock variant="skyscraper" active={imagesInfo?.skyscraper?.details?.checked} />
-      </Grid.Col>
-      <Grid.Col span="content" offset={0.5}>
-        <BannerSizeMock variant="leaderboard" active={imagesInfo?.leaderboard?.details?.checked} />
-      </Grid.Col>
-      <Grid.Col span="content" offset={0.5}>
-        <BannerSizeMock variant="billboard" active={imagesInfo?.billboard?.details?.checked} />
-      </Grid.Col>
-      <Grid.Col span="content" offset={0.5}>
-        <BannerSizeMock variant="halfPage" active={imagesInfo?.halfPage?.details?.checked} />
-      </Grid.Col>
+      {desktopSizes.map((item) => (
+        <Grid.Col span="content" key={`${item.bannerSizes.w}x${item.bannerSizes.h}`}>
+          <BannerSizeMock variant={item} />
+        </Grid.Col>
+      ))}
     </Grid>
   ) : selectedDevices === 'both' ? (
-    <Grid grow>
-      <Grid.Col span="content">
-        <BannerSizeMock
-          variant="mediumRectangle"
-          active={imagesInfo?.mediumRectangle?.details?.checked}
-        />
-      </Grid.Col>
-      <Grid.Col span="content">
-        <BannerSizeMock variant="skyscraper" active={imagesInfo?.skyscraper?.details?.checked} />
-      </Grid.Col>
-      <Grid.Col span="content">
-        <BannerSizeMock variant="leaderboard" active={imagesInfo?.leaderboard?.details?.checked} />
-      </Grid.Col>
-      <Grid.Col span="content">
-        <BannerSizeMock variant="billboard" active={imagesInfo?.billboard?.details?.checked} />
-      </Grid.Col>
-      <Grid.Col span="content">
-        <BannerSizeMock variant="halfPage" active={imagesInfo?.halfPage?.details?.checked} />
-      </Grid.Col>
-      <Grid.Col span="content">
-        <BannerSizeMock
-          variant="mobileLeaderboard"
-          active={imagesInfo?.mobileLeaderboard?.details?.checked}
-        />
-      </Grid.Col>
-      <Grid.Col span="content">
-        <BannerSizeMock
-          variant="mobileBanner"
-          active={imagesInfo?.mobileBanner?.details?.checked}
-        />
-      </Grid.Col>
+    <Grid>
+      {updatedBannerSizes.map((item) => (
+        <Grid.Col span="content" key={`${item.bannerSizes.w}x${item.bannerSizes.h}`}>
+          <BannerSizeMock variant={item} />
+        </Grid.Col>
+      ))}
     </Grid>
   ) : null
 }

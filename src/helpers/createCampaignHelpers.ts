@@ -1,6 +1,7 @@
 import { AdUnit, TargetingInputApplyProp, TargetingInputSingle } from 'adex-common/dist/types'
+import { BANNER_SIZES } from 'constants/banners'
 import { DEFAULT_CATS_LOCS_VALUE } from 'constants/createCampaign'
-import { Banners, Devices, SelectData } from 'types'
+import { Devices, SelectData } from 'types'
 
 export const checkSelectedDevices = (devices: Devices[]) => {
   return devices.length === 1 && devices.includes('mobile')
@@ -41,16 +42,30 @@ export const updateCatsLocsObject = (selectedRadio: TargetingInputApplyProp, val
 export const findArrayWithLengthInObjectAsValue = (obj: object) =>
   Object.entries(obj).find(([, value]) => Array.isArray(value) && value.length > 0)
 
-export const removeAdUnitFromBanners = (adUnitToRemove: AdUnit, banners: Banners): Banners => {
-  const updatedBanners: Banners = { ...banners }
+// export const removeAdUnitFromBanners = (adUnitToRemove: AdUnit, banners: Banners): Banners => {
+//   const updatedBanners: Banners = { ...banners }
 
-  Object.keys(updatedBanners).forEach((bannerKey) => {
-    const banner = updatedBanners[bannerKey]
+//   Object.keys(updatedBanners).forEach((bannerKey) => {
+//     const banner = updatedBanners[bannerKey]
 
-    if (banner && banner.adUnits) {
-      banner.adUnits = banner.adUnits.filter((adUnit) => adUnit.id !== adUnitToRemove.id)
-    }
+//     if (banner && banner.adUnits) {
+//       banner.adUnits = banner.adUnits.filter((adUnit) => adUnit.id !== adUnitToRemove.id)
+//     }
+//   })
+
+//   return updatedBanners
+// }
+
+export const checkBannerSizes = (adUnits: AdUnit[]) =>
+  BANNER_SIZES.map((item) => {
+    const copy = { ...item }
+    adUnits.forEach((adUnit) => {
+      if (
+        adUnit.banner?.format.w === item.bannerSizes.w &&
+        adUnit.banner?.format.h === item.bannerSizes.h
+      )
+        copy.checked = true
+    })
+
+    return copy
   })
-
-  return updatedBanners
-}
