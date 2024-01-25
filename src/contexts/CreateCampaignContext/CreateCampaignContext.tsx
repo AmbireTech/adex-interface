@@ -52,8 +52,9 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
   const updateCampaignWithPrevStateNested = useCallback(
     (nestedKey: string, value: any) => {
       setCampaign((prevCampaign) => {
+        const updated = { ...prevCampaign }
         const keys = nestedKey.split('.')
-        let currentLevel: any = structuredClone(prevCampaign)
+        let currentLevel: any = updated
 
         for (let i = 0; i < keys.length - 1; i++) {
           if (!(keys[i] in currentLevel)) {
@@ -63,7 +64,7 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
         }
 
         currentLevel[keys[keys.length - 1]] = value
-        return currentLevel
+        return updated
       })
     },
     [setCampaign]

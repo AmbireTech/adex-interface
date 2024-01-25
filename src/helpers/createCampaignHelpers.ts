@@ -18,6 +18,8 @@ export const formatCatsAndLocsData = (inputValues: TargetingInputSingle, lib: Se
     ([, value]) => Array.isArray(value) && value.length > 0
   )
 
+  if (inputValues.apply === 'all' && typeof selectedCats === 'undefined') return ['all', null]
+
   if (!selectedCats) return [null, null]
   const [key, values] = selectedCats
 
@@ -41,20 +43,6 @@ export const updateCatsLocsObject = (selectedRadio: TargetingInputApplyProp, val
 
 export const findArrayWithLengthInObjectAsValue = (obj: object) =>
   Object.entries(obj).find(([, value]) => Array.isArray(value) && value.length > 0)
-
-// export const removeAdUnitFromBanners = (adUnitToRemove: AdUnit, banners: Banners): Banners => {
-//   const updatedBanners: Banners = { ...banners }
-
-//   Object.keys(updatedBanners).forEach((bannerKey) => {
-//     const banner = updatedBanners[bannerKey]
-
-//     if (banner && banner.adUnits) {
-//       banner.adUnits = banner.adUnits.filter((adUnit) => adUnit.id !== adUnitToRemove.id)
-//     }
-//   })
-
-//   return updatedBanners
-// }
 
 export const checkBannerSizes = (adUnits: AdUnit[]) =>
   BANNER_SIZES.map((item) => {

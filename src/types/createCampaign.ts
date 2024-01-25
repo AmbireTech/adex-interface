@@ -1,12 +1,14 @@
 export type Devices = 'mobile' | 'desktop'
 
+export type Sizes = {
+  w: number
+  h: number
+}
+
 export type BannerVariantNew = {
   width: number
   height: number
-  bannerSizes: {
-    w: number
-    h: number
-  }
+  bannerSizes: Sizes
   device: Devices
   checked: boolean
 }
@@ -16,4 +18,8 @@ export type FileWithPath = Blob & {
   name: string
   webkitRelativePath: string
   path?: string
+}
+
+export type AllowedBannerSizes = {
+  [key in Devices]: Sizes[]
 }

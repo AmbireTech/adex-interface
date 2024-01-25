@@ -8,7 +8,7 @@ type UploadedBannersProps = {
   updateAutoUTMChecked: (isChecked: boolean) => void
   autoUTMChecked: boolean
   onDeleteCreativeBtnClicked: (file: AdUnit) => void
-  handleOnInputChange: (inputText: string, file: AdUnit) => void
+  handleOnInputChange: (inputText: string, fileId: string) => void
 }
 
 const UploadedBanners = ({
@@ -18,13 +18,18 @@ const UploadedBanners = ({
   handleOnInputChange
 }: UploadedBannersProps) => {
   const {
-    campaign: { adUnits }
+    campaign: { adUnits, devices }
   } = useCreateCampaignContext()
 
   const inputBanners =
     adUnits.length > 0
       ? adUnits.map((image: AdUnit) => {
-          const isMatchedTheSizes = ALLOWED_BANNER_SIZES.find(
+          const allowedSizes =
+            devices.length > 0 && devices.length > 1
+              ? [...ALLOWED_BANNER_SIZES.desktop.flat(), ...ALLOWED_BANNER_SIZES.mobile.flat()]
+              : ALLOWED_BANNER_SIZES[devices[0]]
+
+          const isMatchedTheSizes = allowedSizes.find(
             (item) => item.w === image.banner?.format.w && item.h === image.banner?.format.h
           )
 
@@ -34,7 +39,7 @@ const UploadedBanners = ({
                 image={image}
                 toRemove={!isMatchedTheSizes}
                 onDelete={onDeleteCreativeBtnClicked}
-                onChange={(e) => handleOnInputChange(e.target.value, image)}
+                onChange={(e) => handleOnInputChange(e.target.value, image.id)}
               />
             </Grid.Col>
           )

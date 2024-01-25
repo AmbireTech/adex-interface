@@ -33,13 +33,14 @@ const CampaignSummary = () => {
       step,
       targetingInput: {
         inputs: { location, categories }
-      }
+      },
+      adUnits
     },
     updateCampaign
   } = useCreateCampaignContext()
 
   const selectedDevices = useMemo(() => checkSelectedDevices(devices), [devices])
-  const FormattedSelectedDevice = useMemo(
+  const formattedSelectedDevice = useMemo(
     () =>
       selectedDevices === 'desktop' ? (
         <Flex align="center" gap={5}>
@@ -59,12 +60,12 @@ const CampaignSummary = () => {
   )
   const formatCatsAndLocs = useCallback((inputValues: TargetingInputSingle, lib: SelectData[]) => {
     const [key, labels] = formatCatsAndLocsData(inputValues, lib)
-
+    console.log('key', key)
     if (!key) return
     if (key === 'all') {
-      return <Text>All</Text>
+      return <Text align="end">All</Text>
     }
-    if (key === 'in') return <Text>{labels}</Text>
+    if (key === 'in') return <Text align="end">{labels}</Text>
     if (key === 'nin') {
       return (
         <>
@@ -108,6 +109,13 @@ const CampaignSummary = () => {
     }
   }, [isTheLastStep, step, updateCampaign, form])
 
+  const adFormats = adUnits.map((adUnit) => (
+    <Text
+      align="end"
+      key={adUnit.id}
+    >{`${adUnit.banner?.format.w}x${adUnit.banner?.format.h}`}</Text>
+  ))
+  console.log('adFormats', adFormats)
   return (
     <>
       <Flex direction="column" pl="md" pr="md">
@@ -117,9 +125,9 @@ const CampaignSummary = () => {
           lighterColor
           title="Device"
           textSize="sm"
-          value={FormattedSelectedDevice}
+          value={formattedSelectedDevice}
         />
-        <CampaignDetailsRow lighterColor title="Ad Format" value="-" textSize="sm" />
+        <CampaignDetailsRow lighterColor title="Ad Format" value={adFormats} textSize="sm" />
         <CampaignDetailsRow lighterColor title="Categories" value={formattedCats} textSize="sm" />
         <CampaignDetailsRow
           lighterColor

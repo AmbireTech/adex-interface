@@ -1,5 +1,6 @@
 import { Group, Text } from '@mantine/core'
-import { Dropzone, IMAGE_MIME_TYPE } from '@mantine/dropzone'
+import { Dropzone } from '@mantine/dropzone'
+import { useCallback, useState } from 'react'
 import HtmlIcon from 'resources/icons/Html'
 import ImageIcon from 'resources/icons/Image'
 import { FileWithPath } from 'types'
@@ -9,13 +10,25 @@ type FilesDropzoneProps = {
 }
 
 const FilesDropzone = ({ onDrop }: FilesDropzoneProps) => {
+  const [rejectedFiles, setRejectedFiles] = useState<any[]>([])
+  const handleOnDrop = useCallback(
+    (files: FileWithPath[]) => {
+      setRejectedFiles([])
+      onDrop(files)
+    },
+    [onDrop]
+  )
   return (
     <Dropzone
       mt="md"
-      onDrop={onDrop}
-      onReject={(files: any) => console.log('rejected files', files)}
+      onDrop={handleOnDrop}
+      onReject={(files: any) => {
+        setRejectedFiles(files)
+        console.log('rejected files', files)
+      }}
       maxSize={3 * 1024 ** 2}
-      accept={IMAGE_MIME_TYPE}
+      // TODO: add html adUnits as well
+      accept={['image/png', 'image/jpeg']}
     >
       <Group align="center" position="center" p="sm" style={{ pointerEvents: 'none' }}>
         <Dropzone.Accept>
@@ -60,6 +73,11 @@ const FilesDropzone = ({ onDrop }: FilesDropzoneProps) => {
           <Text size="xs" c="dimmed" inline mt={7}>
             Accepted format: jpeg, png and for html banners zip file.
           </Text>
+          {rejectedFiles.length > 0 && (
+            <Text size="xs" color="red" inline mt={7}>
+              Rejected files: {rejectedFiles[0].errors[0].message}
+            </Text>
+          )}
         </div>
       </Group>
     </Dropzone>

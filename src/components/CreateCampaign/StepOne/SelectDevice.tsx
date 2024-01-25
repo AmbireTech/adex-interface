@@ -3,6 +3,7 @@ import CustomCard from 'components/common/CustomCard'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import DesktopIcon from 'resources/icons/Desktop'
 import MobileIcon from 'resources/icons/Mobile'
+import { Devices } from 'types'
 
 const SelectDevice = () => {
   const {
@@ -10,7 +11,7 @@ const SelectDevice = () => {
     updateCampaign
   } = useCreateCampaignContext()
 
-  const toggleDeviceSelection = (device: 'mobile' | 'desktop') => {
+  const toggleDeviceSelection = (device: Devices) => {
     const isSelected = devices.includes(device)
     const updatedDevices = isSelected
       ? devices.filter((selectedDevice) => selectedDevice !== device)

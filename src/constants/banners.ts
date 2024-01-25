@@ -1,5 +1,5 @@
 import { Banner } from 'adex-common/dist/types'
-import { BannerVariantNew } from 'types'
+import { AllowedBannerSizes, BannerVariantNew } from 'types'
 
 export const BANNER_SIZES: BannerVariantNew[] = [
   {
@@ -64,12 +64,16 @@ export const BANNER_DEFAULT_VALUE: Banner = {
   created: BigInt(new Date().getTime())
 }
 
-export const ALLOWED_BANNER_SIZES = [
-  { w: 300, h: 250 },
-  { w: 160, h: 600 },
-  { w: 728, h: 90 },
-  { w: 970, h: 250 },
-  { w: 300, h: 600 },
-  { w: 300, h: 50 },
-  { w: 320, h: 50 }
-]
+export const ALLOWED_BANNER_SIZES: AllowedBannerSizes = {
+  mobile: [
+    { w: 300, h: 250 },
+    { w: 300, h: 50 },
+    { w: 320, h: 50 }
+  ],
+  desktop: [
+    { w: 160, h: 600 },
+    { w: 728, h: 90 },
+    { w: 970, h: 250 },
+    { w: 300, h: 600 }
+  ]
+}

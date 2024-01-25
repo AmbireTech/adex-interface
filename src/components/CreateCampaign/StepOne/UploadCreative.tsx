@@ -3,6 +3,7 @@ import { useCallback, useRef, useState } from 'react'
 import { AdUnit } from 'adex-common/dist/types'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import useDropzone from 'hooks/useDropzone'
+import { isValidHttpUrl } from 'helpers/validators'
 import UploadedBanners from './UploadedBanners'
 import BannerSizesList from './BannerSizesList'
 import FilesDropzone from './FilesDropzone'
@@ -19,7 +20,6 @@ const UploadCreative = () => {
 
   const { onDrop } = useDropzone()
 
-  // TODO: add useMemo
   const hasUploadedCreatives = adUnits.length > 0
 
   const handleDeleteCreativeBtnClicked = useCallback(
@@ -32,10 +32,10 @@ const UploadCreative = () => {
     [updateCampaign, adUnits]
   )
 
-  // TODO: it's better to pass only the adUnit's id as a param, instead of the whole adUnit
   const handleOnInputChange = useCallback(
-    (inputText: string, adUnitToUpdate: AdUnit) => {
-      // TODO: Add validation here
+    (inputText: string, adUnitId: string) => {
+      const isValid = isValidHttpUrl(inputText)
+      if (!isValid) return
 
       if (debounceTimer.current) clearTimeout(debounceTimer.current)
 
@@ -43,7 +43,7 @@ const UploadCreative = () => {
         const updated = [...adUnits]
         updated.forEach((element) => {
           const elCopy = { ...element }
-          if (elCopy.id === adUnitToUpdate.id) elCopy.banner!.targetUrl = inputText
+          if (elCopy.id === adUnitId) elCopy.banner!.targetUrl = inputText
           return elCopy
         })
         updateCampaign('adUnits', updated)
