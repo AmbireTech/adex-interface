@@ -1,7 +1,8 @@
 import { AdUnit, TargetingInputApplyProp, TargetingInputSingle } from 'adex-common/dist/types'
 import { BANNER_SIZES } from 'constants/banners'
 import { DEFAULT_CATS_LOCS_VALUE } from 'constants/createCampaign'
-import { Devices, SelectData } from 'types'
+import { Devices, SelectData, ImageSizes, FileWithPath } from 'types'
+import JSZip from 'jszip'
 
 export const checkSelectedDevices = (devices: Devices[]) => {
   return devices.length === 1 && devices.includes('mobile')
@@ -57,3 +58,145 @@ export const checkBannerSizes = (adUnits: AdUnit[]) =>
 
     return copy
   })
+
+export const findDuplicates = (array: string[]) => {
+  const countMap: any = {}
+  const uniqueValues: string[] = []
+
+  array.forEach((value: string) => {
+    if (countMap[value]) {
+      countMap[value]++
+    } else {
+      countMap[value] = 1
+      uniqueValues.push(value)
+    }
+  })
+
+  const result = uniqueValues.map((value) => ({
+    value,
+    count: countMap[value]
+  }))
+
+  return result
+}
+
+export const readHTMLFile = (file: FileWithPath) => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+
+    reader.onload = (event: any) => {
+      const htmlContent = event.target.result
+      resolve(htmlContent)
+    }
+
+    reader.onerror = (error) => {
+      reject(error)
+    }
+
+    reader.readAsText(file, 'UTF-8')
+  })
+}
+// TODO: move to the types
+enum HtmlBannerType {
+  Image = 'img',
+  Video = 'video',
+  Iframe = 'iframe'
+  // Add more types as needed
+}
+
+const extractDimensionsPerHTMLBannerType = (
+  htmlElement: HTMLElement,
+  bannerType: HtmlBannerType
+) => {
+  const bannerElement = htmlElement.querySelector(bannerType)
+  if (bannerElement) {
+    const width = Number(bannerElement.width)
+    const height = Number(bannerElement.height)
+
+    return { width, height }
+  }
+
+  return null
+}
+
+export const extractBannerDimensions = (htmlContent: any): ImageSizes | null => {
+  const tempDiv = document.createElement('div')
+  tempDiv.innerHTML = htmlContent
+
+  const imgElement = extractDimensionsPerHTMLBannerType(tempDiv, HtmlBannerType.Image)
+  if (imgElement) return imgElement
+  const videoElement = extractDimensionsPerHTMLBannerType(tempDiv, HtmlBannerType.Video)
+  if (videoElement) return videoElement
+  const iframeElement = extractDimensionsPerHTMLBannerType(tempDiv, HtmlBannerType.Iframe)
+  if (iframeElement) return iframeElement
+
+  return null
+}
+
+export const getFileBlobURL = (file: FileWithPath) => {
+  const blob = new Blob([file], { type: file.type })
+  return URL.createObjectURL(blob)
+}
+
+export const handleZipFile = (zipFile: FileWithPath) => {
+  return new Promise((resolve, reject) => {
+    const zip = new JSZip()
+
+    zip.loadAsync(zipFile).then(
+      (zipData) => {
+        // Check contents or extract HTML files
+        zipData.forEach((relativePath, file) => {
+          if (file.dir) {
+            // It's a directory, handle accordingly
+            console.log('file.dir', file.dir)
+          } else {
+            // It's a file, check the content or process it
+            console.log('here')
+            if (relativePath.endsWith('.html')) {
+              file.async('string').then((htmlContent) => {
+                // Handle HTML content
+                resolve(htmlContent)
+              })
+            }
+          }
+        })
+      },
+      (error) => {
+        reject(error)
+        console.error('Error handling zip file:', error)
+      }
+    )
+  })
+}
+
+export const isVideoMedia = (mime: string = '') => mime.split('/')[0] === 'video'
+
+const getVideoSize = (src: string): Promise<ImageSizes> =>
+  new Promise((resolve, reject) => {
+    const video = document.createElement('video')
+    video.src = src
+
+    video.onloadedmetadata = (res: Event) => {
+      const target = res.target as HTMLVideoElement
+      if (target === null) return reject(console.log('invalid Video'))
+      return resolve({
+        width: target.videoWidth || 0,
+        height: target.videoHeight || 0
+      })
+    }
+  })
+
+const getImageSize = (src: string): Promise<ImageSizes> =>
+  new Promise((resolve) => {
+    const image = new Image()
+    image.src = src
+    image.onload = () => {
+      return resolve({
+        width: image.width,
+        height: image.height
+      })
+    }
+  })
+
+export const getMediaSize = (mime: string, src: string) =>
+  isVideoMedia(mime) ? getVideoSize(src) : getImageSize(src)

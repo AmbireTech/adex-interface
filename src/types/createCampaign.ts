@@ -23,3 +23,10 @@ export type FileWithPath = Blob & {
 export type AllowedBannerSizes = {
   [key in Devices]: Sizes[]
 }
+
+export type ValidationRegExBanner = {
+  [key in string]: {
+    htmlTag: string
+    regExp: RegExp
+  }
+}

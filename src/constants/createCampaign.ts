@@ -1,11 +1,6 @@
 import { CampaignUI, SelectData } from 'types'
 
-import {
-  CampaignStatus,
-  CampaignType,
-  ReviewStatus,
-  TargetingInputSingle
-} from 'adex-common/dist/types'
+import { TargetingInputSingle } from 'adex-common/dist/types'
 
 export const CREATE_CAMPAIGN_STEPS = 4
 export const CAMPAIGN_CATEGORIES_INPUT = 'targetingInput.inputs.categories'
@@ -19,7 +14,7 @@ export const DEFAULT_CATS_LOCS_VALUE: TargetingInputSingle = {
 
 export const CREATE_CAMPAIGN_DEFAULT_VALUE: CampaignUI = {
   id: '',
-  type: CampaignType.DSP,
+  type: 0,
   step: 0,
   devices: [],
   paymentModel: 'cpm',
@@ -75,8 +70,8 @@ export const CREATE_CAMPAIGN_DEFAULT_VALUE: CampaignUI = {
     }
   },
   // Statuses
-  status: CampaignStatus.created,
-  reviewStatus: ReviewStatus.inQue,
+  status: 0,
+  reviewStatus: 0,
   // reviewMessage?: string
 
   // other

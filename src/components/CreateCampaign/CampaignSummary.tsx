@@ -1,7 +1,11 @@
 import { Button, Flex, Group, Text, UnstyledButton, createStyles } from '@mantine/core'
 import CampaignDetailsRow from 'components/common/Modals/CampaignDetailsModal/CampaignDetailsRow'
 import { CREATE_CAMPAIGN_STEPS, CATEGORIES, COUNTRIES } from 'constants/createCampaign'
-import { checkSelectedDevices, formatCatsAndLocsData } from 'helpers/createCampaignHelpers'
+import {
+  checkSelectedDevices,
+  findDuplicates,
+  formatCatsAndLocsData
+} from 'helpers/createCampaignHelpers'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import { useCallback, useMemo } from 'react'
 import DesktopIcon from 'resources/icons/Desktop'
@@ -60,7 +64,6 @@ const CampaignSummary = () => {
   )
   const formatCatsAndLocs = useCallback((inputValues: TargetingInputSingle, lib: SelectData[]) => {
     const [key, labels] = formatCatsAndLocsData(inputValues, lib)
-    console.log('key', key)
     if (!key) return
     if (key === 'all') {
       return <Text align="end">All</Text>
@@ -88,7 +91,11 @@ const CampaignSummary = () => {
   )
 
   const isTheLastStep = useMemo(() => step === CREATE_CAMPAIGN_STEPS - 1, [step])
-  const launchCampaign = () => console.log('LAUNCH CAMPAIGN')
+  const launchCampaign = () => {
+    // TODO: REVOKE all the blob URLs
+    // URL.revokeObjectURL(storedImageURL);
+    console.log('LAUNCH CAMPAIGN')
+  }
   const form = useCreateCampaignFormContext()
   const handleNextStepBtnClicked = useCallback(() => {
     if (step < CREATE_CAMPAIGN_STEPS - 1) {
@@ -109,13 +116,19 @@ const CampaignSummary = () => {
     }
   }, [isTheLastStep, step, updateCampaign, form])
 
-  const adFormats = adUnits.map((adUnit) => (
-    <Text
-      align="end"
-      key={adUnit.id}
-    >{`${adUnit.banner?.format.w}x${adUnit.banner?.format.h}`}</Text>
-  ))
-  console.log('adFormats', adFormats)
+  const sizes = useMemo(
+    () => adUnits.map((adUnit) => `${adUnit.banner?.format.w}x${adUnit.banner?.format.h}`),
+    [adUnits]
+  )
+  const uniqueSizesWithCount = useMemo(() => findDuplicates(sizes), [sizes])
+  const adFormats = useMemo(
+    () =>
+      uniqueSizesWithCount.map((size: { count: number; value: string }) => (
+        <Text align="end" key={`${size.count}${size.value}`}>{`${size.count}x ${size.value}`}</Text>
+      )),
+    [uniqueSizesWithCount]
+  )
+
   return (
     <>
       <Flex direction="column" pl="md" pr="md">

@@ -28,6 +28,7 @@ const UploadCreative = () => {
         'adUnits',
         adUnits.filter((item) => item.id !== file.id)
       )
+      URL.revokeObjectURL(file.banner?.mediaUrl || '')
     },
     [updateCampaign, adUnits]
   )

@@ -26,9 +26,13 @@ const FilesDropzone = ({ onDrop }: FilesDropzoneProps) => {
         setRejectedFiles(files)
         console.log('rejected files', files)
       }}
-      maxSize={3 * 1024 ** 2}
-      // TODO: add html adUnits as well
-      accept={['image/png', 'image/jpeg']}
+      // TODO: Check the value of the maxSize
+      // maxSize={1042069}
+      accept={{
+        'image/*': ['.jpeg', '.jpg', '.png'],
+        'video/*': ['.mp4'],
+        'application/zip': ['.zip']
+      }}
     >
       <Group align="center" position="center" p="sm" style={{ pointerEvents: 'none' }}>
         <Dropzone.Accept>

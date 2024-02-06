@@ -1,6 +1,7 @@
-import { ActionIcon, Input, createStyles } from '@mantine/core'
+import { ActionIcon, Input, createStyles, Image } from '@mantine/core'
 import { AdUnit } from 'adex-common/dist/types'
 import InfoAlertMessage from 'components/common/InfoAlertMessage'
+import { isVideoMedia } from 'helpers/createCampaignHelpers'
 import { ChangeEventHandler } from 'react'
 import DeleteIcon from 'resources/icons/Delete'
 
@@ -15,12 +16,16 @@ const useStyles = createStyles(() => ({
   image: {
     maxWidth: 40,
     maxHeight: 40
+  },
+  imageContainer: {
+    maxWidth: 40,
+    maxHeight: 40,
+    overflow: 'hidden'
   }
 }))
 
 const ImageUrlInput = ({ image, toRemove, onDelete, onChange }: ImageUrlInputProps) => {
   const { classes } = useStyles()
-
   return (
     <>
       {toRemove && <InfoAlertMessage message="The banner size does not meet the requirements." />}
@@ -34,11 +39,25 @@ const ImageUrlInput = ({ image, toRemove, onDelete, onChange }: ImageUrlInputPro
         placeholder="Paste URL"
         size="lg"
         icon={
-          <img
-            src={`data:image/png;base64,${image.banner?.mediaUrl}`}
-            alt={image.title}
-            className={classes.image}
-          />
+          image.banner?.mime !== 'text/html' ? (
+            isVideoMedia(image.banner?.mime) ? (
+              <video width="40" height="40" autoPlay loop>
+                <source src={image.banner?.mediaUrl} type="video/mp4" />
+                <track src="captions_en.vtt" kind="captions" label="english_captions" />
+              </video>
+            ) : (
+              <Image src={image.banner?.mediaUrl} alt={image.title} className={classes.image} />
+            )
+          ) : (
+            <div className={classes.imageContainer}>
+              <iframe
+                title="kor"
+                width={40}
+                height={40}
+                src={`data:text/html;base64,${image.banner?.mediaUrl}`}
+              />
+            </div>
+          )
         }
         rightSection={
           <ActionIcon

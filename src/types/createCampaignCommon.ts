@@ -18,3 +18,8 @@ export type CampaignUI = Campaign & {
   cpmMax: string
   campaignName: string
 }
+
+export type ImageSizes = {
+  width: number
+  height: number
+}
