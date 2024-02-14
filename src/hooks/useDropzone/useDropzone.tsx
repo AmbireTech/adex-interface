@@ -1,15 +1,17 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { FileWithPath, ImageSizes } from 'types'
+import { ImageSizes } from 'types'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import { AdUnitType } from 'adex-common/dist/types'
 import {
   extractBannerDimensions,
-  getFileBlobURL,
+  getHTMLBannerDetails,
   getMediaSize,
   handleZipFile,
-  readHTMLFile
+  readHTMLFile,
+  uploadMedia
 } from 'helpers/createCampaignHelpers'
 import { validateHTMLBanner } from 'helpers/htmlBannerValidators'
+import { FileWithPath } from '@mantine/dropzone'
 
 const useDropzone = () => {
   const [uploadedFiles, setUploadedFiles] = useState<FileWithPath[] | null>(null)
@@ -35,10 +37,11 @@ const useDropzone = () => {
         files.forEach((file: FileWithPath) => {
           const reader = new FileReader()
 
-          reader.onload = (e: any) => {
-            let htmlBannerSizes: ImageSizes | null = null
-            const blobURL = getFileBlobURL(file)
+          reader.onload = async (e: any) => {
+            const blob = new Blob([file], { type: file.type })
+            const { ipfsUrl } = await uploadMedia(blob, file.name)
 
+            let htmlBannerSizes: ImageSizes | null = null
             const adUnit = {
               // TODO: Change the id because if drops more than one file it generate duplicate ids
               id: new Date().getTime().toString(),
@@ -50,7 +53,7 @@ const useDropzone = () => {
                   h: 0
                 },
                 mime: file.type,
-                mediaUrl: blobURL,
+                mediaUrl: ipfsUrl,
                 targetUrl: '',
                 created: BigInt(new Date().getTime())
               }
@@ -58,24 +61,22 @@ const useDropzone = () => {
 
             if (file.type === 'application/zip') {
               handleZipFile(file).then((res) => {
-                const isValid = validateHTMLBanner(res as string)
+                if (typeof res === 'string') {
+                  getHTMLBannerDetails(res).then((result) => {
+                    if (!result) return
 
-                if (!isValid) {
-                  console.log('Invalid HTML Banner')
-                  return
+                    adUnit.banner.format = {
+                      w: result.width,
+                      h: result.height
+                    }
+                    adUnit.banner.mime = 'text/html'
+                    adUnit.banner.mediaUrl = result.blobUrl
+
+                    adUnitsCopy.push(adUnit)
+                    updateCampaign('adUnits', adUnitsCopy)
+                    updateUploadedFiles([])
+                  })
                 }
-
-                htmlBannerSizes = extractBannerDimensions(res)
-                if (!htmlBannerSizes) return
-
-                adUnit.banner.format = {
-                  w: htmlBannerSizes?.width,
-                  h: htmlBannerSizes?.height
-                }
-
-                adUnitsCopy.push(adUnit)
-                updateCampaign('adUnits', adUnitsCopy)
-                updateUploadedFiles([])
               })
             } else if (file.type === 'text/html') {
               // TODO: 'text/html' should be removed because of the zip

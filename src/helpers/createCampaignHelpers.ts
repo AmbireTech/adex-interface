@@ -3,6 +3,7 @@ import { BANNER_SIZES } from 'constants/banners'
 import { DEFAULT_CATS_LOCS_VALUE } from 'constants/createCampaign'
 import { Devices, SelectData, ImageSizes, FileWithPath } from 'types'
 import JSZip from 'jszip'
+import { fetchService } from 'services'
 
 export const checkSelectedDevices = (devices: Devices[]) => {
   return devices.length === 1 && devices.includes('mobile')
@@ -133,9 +134,37 @@ export const extractBannerDimensions = (htmlContent: any): ImageSizes | null => 
   return null
 }
 
-export const getFileBlobURL = (file: FileWithPath) => {
-  const blob = new Blob([file], { type: file.type })
+export const getFileBlobURL = (file: FileWithPath | string, fileType: string) => {
+  const blob = new Blob([file], { type: fileType })
   return URL.createObjectURL(blob)
+}
+
+// TODO: move it to types
+export type HTMLBannerDetails = {
+  width: number
+  height: number
+  blobUrl: string
+}
+
+export const getHTMLBannerDetails = (htmlContent: any): Promise<HTMLBannerDetails | null> => {
+  return new Promise((resolve) => {
+    const tempIframe = document.createElement('iframe')
+    const blobUrl = getFileBlobURL(htmlContent, 'text/html')
+    tempIframe.src = blobUrl
+    tempIframe.style.visibility = 'hidden'
+    document.body.appendChild(tempIframe)
+    tempIframe.onload = () => {
+      if (!tempIframe.contentWindow?.innerWidth || !tempIframe.contentWindow?.innerHeight) {
+        return resolve(null)
+      }
+
+      return resolve({
+        width: tempIframe.contentWindow?.innerWidth,
+        height: tempIframe.contentWindow?.innerHeight,
+        blobUrl
+      })
+    }
+  })
 }
 
 export const handleZipFile = (zipFile: FileWithPath) => {
@@ -146,23 +175,24 @@ export const handleZipFile = (zipFile: FileWithPath) => {
       (zipData) => {
         // Check contents or extract HTML files
         zipData.forEach((relativePath, file) => {
-          if (file.dir) {
-            // It's a directory, handle accordingly
-            console.log('file.dir', file.dir)
-          } else {
-            // It's a file, check the content or process it
-            console.log('here')
-            if (relativePath.endsWith('.html')) {
-              file.async('string').then((htmlContent) => {
-                // Handle HTML content
-                resolve(htmlContent)
-              })
-            }
+          // if (file.dir) {
+          //   // It's a directory, handle accordingly
+          //   console.log('file.dir', file.dir)
+          //   // debugger // eslint-disable-line no-debugger
+          // } else {
+          // It's a file, check the content or process it
+
+          if (relativePath.endsWith('.html')) {
+            file.async('string').then((htmlContent) => {
+              // Handle HTML content
+              resolve(htmlContent)
+            })
           }
+          // }
         })
       },
       (error) => {
-        reject(error)
+        reject(error.message)
         console.error('Error handling zip file:', error)
       }
     )
@@ -200,3 +230,28 @@ const getImageSize = (src: string): Promise<ImageSizes> =>
 
 export const getMediaSize = (mime: string, src: string) =>
   isVideoMedia(mime) ? getVideoSize(src) : getImageSize(src)
+
+export const uploadMedia = async (media: Blob, mediaName: string, shouldPin: boolean = false) => {
+  const baseUrl = 'https://vhoda.adex.network'
+  const formData = new FormData()
+  formData.append('media', media, mediaName)
+  formData.append('shouldPin', shouldPin.toString())
+  const queryParams = {
+    apiKey: 'gubitapagdokatomuviashvhod6eteboli'
+  }
+
+  const req = {
+    url: `${baseUrl}/ipfs/upload`,
+    method: 'POST',
+    body: formData,
+    queryParams
+  }
+
+  return fetchService(req).then((res) => {
+    return res.json()
+  })
+}
+
+export const getMediaUrlWithProvider = (mediaUrl = 'ipfs://', provider = '') => {
+  return provider + mediaUrl.substring(7)
+}

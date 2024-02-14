@@ -1,7 +1,7 @@
 import { ActionIcon, Input, createStyles, Image } from '@mantine/core'
 import { AdUnit } from 'adex-common/dist/types'
 import InfoAlertMessage from 'components/common/InfoAlertMessage'
-import { isVideoMedia } from 'helpers/createCampaignHelpers'
+import { getMediaUrlWithProvider, isVideoMedia } from 'helpers/createCampaignHelpers'
 import { ChangeEventHandler } from 'react'
 import DeleteIcon from 'resources/icons/Delete'
 
@@ -26,6 +26,11 @@ const useStyles = createStyles(() => ({
 
 const ImageUrlInput = ({ image, toRemove, onDelete, onChange }: ImageUrlInputProps) => {
   const { classes } = useStyles()
+  const mediaUrl = getMediaUrlWithProvider(
+    image.banner?.mediaUrl,
+    'https://ipfs.adex.network/ipfs/'
+  )
+
   return (
     <>
       {toRemove && <InfoAlertMessage message="The banner size does not meet the requirements." />}
@@ -42,20 +47,15 @@ const ImageUrlInput = ({ image, toRemove, onDelete, onChange }: ImageUrlInputPro
           image.banner?.mime !== 'text/html' ? (
             isVideoMedia(image.banner?.mime) ? (
               <video width="40" height="40" autoPlay loop>
-                <source src={image.banner?.mediaUrl} type="video/mp4" />
+                <source src={mediaUrl} type="video/mp4" />
                 <track src="captions_en.vtt" kind="captions" label="english_captions" />
               </video>
             ) : (
-              <Image src={image.banner?.mediaUrl} alt={image.title} className={classes.image} />
+              <Image src={mediaUrl} alt={image.title} className={classes.image} />
             )
           ) : (
             <div className={classes.imageContainer}>
-              <iframe
-                title="kor"
-                width={40}
-                height={40}
-                src={`data:text/html;base64,${image.banner?.mediaUrl}`}
-              />
+              <iframe title="htmlBanner" width={40} height={40} src={mediaUrl} />
             </div>
           )
         }
