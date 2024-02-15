@@ -26,8 +26,7 @@ const FilesDropzone = ({ onDrop }: FilesDropzoneProps) => {
         setRejectedFiles(files)
         console.log('rejected files', files)
       }}
-      // TODO: Check the value of the maxSize
-      // maxSize={1042069}
+      maxSize={1042069}
       accept={{
         'image/*': ['.jpeg', '.jpg', '.png'],
         'video/*': ['.mp4'],
@@ -70,12 +69,11 @@ const FilesDropzone = ({ onDrop }: FilesDropzoneProps) => {
             <ImageIcon size="20px" />
             <HtmlIcon size="20px" />
           </Group>
-
           <Text size="sm" inline>
             Drop your file(s) here, or upload from your device.
           </Text>
           <Text size="xs" c="dimmed" inline mt={7}>
-            Accepted format: jpeg, png and for html banners zip file.
+            Accepted format: jpeg, png and for html banners zip file. Max size: 1MB.
           </Text>
           {rejectedFiles.length > 0 && (
             <Text size="xs" color="red" inline mt={7}>

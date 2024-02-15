@@ -58,7 +58,7 @@ const useDropzone = () => {
                 created: BigInt(new Date().getTime())
               }
             }
-
+            // TODO: this one should be removed
             if (file.type === 'application/zip') {
               handleZipFile(file).then((res) => {
                 if (typeof res === 'string') {
@@ -70,7 +70,6 @@ const useDropzone = () => {
                       h: result.height
                     }
                     adUnit.banner.mime = 'text/html'
-                    adUnit.banner.mediaUrl = result.blobUrl
 
                     adUnitsCopy.push(adUnit)
                     updateCampaign('adUnits', adUnitsCopy)
