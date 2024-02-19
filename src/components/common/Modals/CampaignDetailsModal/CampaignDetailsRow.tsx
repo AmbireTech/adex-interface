@@ -9,6 +9,12 @@ const useStyles = createStyles((theme, { lighterColor }: { lighterColor: boolean
       ? theme.colors.secondaryText[theme.fn.primaryShade()]
       : theme.colors.secondaryText[theme.fn.primaryShade()] +
         theme.other.shades.hexColorSuffix.lighter
+  },
+  fullWidth: {
+    width: '100%'
+  },
+  marginBottom: {
+    marginBottom: theme.spacing.sm
   }
 }))
 
@@ -18,6 +24,7 @@ type CampaignDetailsRowProps = FlexProps & {
   lighterColor?: boolean | undefined
   textSize?: MantineNumberSize
   noBorder?: boolean
+  column?: boolean
 }
 
 const CampaignDetailsRow = ({
@@ -25,22 +32,32 @@ const CampaignDetailsRow = ({
   value,
   lighterColor,
   textSize = 'md',
-  noBorder = false
+  noBorder = false,
+  column = false
 }: CampaignDetailsRowProps) => {
   const { classes, cx } = useStyles({ lighterColor: !!lighterColor })
   return (
     <Flex
       key={title}
-      justify="space-between"
+      justify={column ? 'flex-start' : 'space-between'}
+      direction={column ? 'column' : 'row'}
+      align="center"
       className={cx({ [classes.border]: !noBorder })}
       pt="lg"
       pb="lg"
     >
-      <Text className={classes.textColor} weight="bold" size={textSize}>
+      <Text
+        className={cx(classes.textColor, {
+          [classes.fullWidth]: column,
+          [classes.marginBottom]: column
+        })}
+        weight="bold"
+        size={textSize}
+      >
         {title}
       </Text>
       {/* <Text className={classes.textColor}>{value}</Text> */}
-      <Text>{value}</Text>
+      <Text className={cx({ [classes.fullWidth]: column })}>{value}</Text>
     </Flex>
   )
 }

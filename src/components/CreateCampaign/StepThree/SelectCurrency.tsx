@@ -1,4 +1,4 @@
-import { Image, Select, Text, Flex } from '@mantine/core'
+import { Image, Select, Text, Flex, MediaQuery } from '@mantine/core'
 import { useCreateCampaignFormContext } from 'contexts/CreateCampaignFormContext'
 import { formatCurrency } from 'helpers'
 import { forwardRef } from 'react'
@@ -53,14 +53,21 @@ const SelectItem = forwardRef<HTMLDivElement, ItemProps>(
 const SelectCurrency = () => {
   const form = useCreateCampaignFormContext()
   return (
-    <Select
-      placeholder="Select currency"
-      itemComponent={SelectItem}
-      data={data}
-      {...form.getInputProps('currency')}
-      maw="50%"
-      maxDropdownHeight={400}
-    />
+    <MediaQuery
+      smallerThan="lg"
+      styles={{
+        maxWidth: '100%'
+      }}
+    >
+      <Select
+        placeholder="Select currency"
+        itemComponent={SelectItem}
+        data={data}
+        {...form.getInputProps('currency')}
+        maw="50%"
+        maxDropdownHeight={400}
+      />
+    </MediaQuery>
   )
 }
 

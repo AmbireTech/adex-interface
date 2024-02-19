@@ -1,4 +1,4 @@
-import { Flex, TextInput } from '@mantine/core'
+import { Flex, MediaQuery, TextInput } from '@mantine/core'
 import InfoAlertMessage from 'components/common/InfoAlertMessage'
 import { useCreateCampaignFormContext } from 'contexts/CreateCampaignFormContext'
 import { useState } from 'react'
@@ -9,15 +9,22 @@ const CampaignBudget = () => {
 
   return (
     <Flex justify="space-between" align="flex-start">
-      <TextInput
-        size="md"
-        w="50%"
-        error={errorToShow}
-        placeholder="Campaign Budget"
-        description="Estimated fee: 0.15 DAI"
-        inputWrapperOrder={['input', 'description', 'error']}
-        {...form.getInputProps('campaignBudget')}
-      />
+      <MediaQuery
+        smallerThan="lg"
+        styles={{
+          maxWidth: '100%'
+        }}
+      >
+        <TextInput
+          size="md"
+          maw="50%"
+          error={errorToShow}
+          placeholder="Campaign Budget"
+          description="Estimated fee: 0.15 DAI"
+          inputWrapperOrder={['input', 'description', 'error']}
+          {...form.getInputProps('campaignBudget')}
+        />
+      </MediaQuery>
       {errorToShow && (
         <InfoAlertMessage
           w="40%"

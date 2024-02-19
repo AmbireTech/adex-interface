@@ -1,4 +1,5 @@
-import { Grid, Text } from '@mantine/core'
+import { ActionIcon, Grid, Group, Text, Tooltip } from '@mantine/core'
+import InfoFilledIcon from 'resources/icons/InfoFilled'
 import CampaignPeriod from './CampaignPeriod'
 import PaymentModel from './PaymentModel'
 import SelectCurrency from './SelectCurrency'
@@ -33,9 +34,16 @@ const StepThree = () => (
       <CampaignBudget />
     </Grid.Col>
     <Grid.Col mb="md">
-      <Text color="secondaryText" size="sm" weight="bold" mb="xs">
-        5. CPM
-      </Text>
+      <Group mb="xs" spacing="xs">
+        <Text color="secondaryText" size="sm" weight="bold">
+          5. CPM
+        </Text>
+        <Tooltip label="Recommended: Min - 0.10; Max - 0.5" ml="sm">
+          <ActionIcon color="secondaryText" size="xs">
+            <InfoFilledIcon />
+          </ActionIcon>
+        </Tooltip>
+      </Group>
       <CpmMinMax />
     </Grid.Col>
     <Grid.Col mb="md">

@@ -7,13 +7,15 @@ export const validateCreateCampaignFrom = {
       : parseFloat(value) <= 0
       ? 'Campaign budget should be greater than 0'
       : null,
-  cpmMin: (value: string) =>
+  // TODO: removed hardcoded IMPRESSION
+  'pricingBounds.IMPRESSION.min': (value: string) =>
     value === '' || Number.isNaN(Number(value))
       ? 'Enter CPM min value or a valid number'
       : parseFloat(value) <= 0
       ? 'CPM min should be greater than 0'
       : null,
-  cpmMax: (value: string) =>
+  // TODO: removed hardcoded IMPRESSION
+  'pricingBounds.IMPRESSION.max': (value: string) =>
     value === '' || Number.isNaN(Number(value))
       ? 'Enter CPM max value or a valid number'
       : parseFloat(value) <= 0

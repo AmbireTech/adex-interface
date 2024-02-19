@@ -1,19 +1,11 @@
 import { Button, Flex, Group, Text, UnstyledButton, createStyles } from '@mantine/core'
 import CampaignDetailsRow from 'components/common/Modals/CampaignDetailsModal/CampaignDetailsRow'
-import { CREATE_CAMPAIGN_STEPS, CATEGORIES, COUNTRIES } from 'constants/createCampaign'
-import {
-  checkSelectedDevices,
-  findDuplicates,
-  formatCatsAndLocsData
-} from 'helpers/createCampaignHelpers'
+import { CREATE_CAMPAIGN_STEPS } from 'constants/createCampaign'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import { useCallback, useMemo } from 'react'
-import DesktopIcon from 'resources/icons/Desktop'
 import LeftArrowIcon from 'resources/icons/LeftArrow'
-import MobileIcon from 'resources/icons/Mobile'
-import { TargetingInputSingle } from 'adex-common/dist/types'
-import { SelectData } from 'types'
 import { useCreateCampaignFormContext } from 'contexts/CreateCampaignFormContext'
+import useCreateCampaignData from 'hooks/useCreateCampaignData/useCreateCampaignData'
 
 const useStyles = createStyles((theme) => ({
   bg: {
@@ -32,63 +24,17 @@ const useStyles = createStyles((theme) => ({
 const CampaignSummary = () => {
   const { classes } = useStyles()
   const {
-    campaign: {
-      devices,
-      step,
-      targetingInput: {
-        inputs: { location, categories }
-      },
-      adUnits
-    },
+    campaign: { step },
     updateCampaign
   } = useCreateCampaignContext()
-
-  const selectedDevices = useMemo(() => checkSelectedDevices(devices), [devices])
-  const formattedSelectedDevice = useMemo(
-    () =>
-      selectedDevices === 'desktop' ? (
-        <Flex align="center" gap={5}>
-          <DesktopIcon size="16px" /> Desktop
-        </Flex>
-      ) : selectedDevices === 'mobile' ? (
-        <Flex align="center" gap={5}>
-          <MobileIcon size="16px" /> Mobile
-        </Flex>
-      ) : selectedDevices === 'both' ? (
-        <Flex align="center" gap={5}>
-          <MobileIcon size="16px" /> Mobile
-          <DesktopIcon size="16px" /> Desktop
-        </Flex>
-      ) : null,
-    [selectedDevices]
-  )
-  const formatCatsAndLocs = useCallback((inputValues: TargetingInputSingle, lib: SelectData[]) => {
-    const [key, labels] = formatCatsAndLocsData(inputValues, lib)
-    if (!key) return
-    if (key === 'all') {
-      return <Text align="end">All</Text>
-    }
-    if (key === 'in') return <Text align="end">{labels}</Text>
-    if (key === 'nin') {
-      return (
-        <>
-          <Text align="end" color="warning">
-            All except:{' '}
-          </Text>
-          <Text align="end">{labels}</Text>
-        </>
-      )
-    }
-  }, [])
-
-  const formattedCats = useMemo(
-    () => formatCatsAndLocs(categories, CATEGORIES),
-    [formatCatsAndLocs, categories]
-  )
-  const formattedLocs = useMemo(
-    () => formatCatsAndLocs(location, COUNTRIES),
-    [formatCatsAndLocs, location]
-  )
+  const {
+    formattedSelectedDevice,
+    priceBoundsFormatted,
+    formattedCats,
+    formattedLocs,
+    adFormats,
+    campaignBudgetFormatted
+  } = useCreateCampaignData()
 
   const isTheLastStep = useMemo(() => step === CREATE_CAMPAIGN_STEPS - 1, [step])
   const launchCampaign = () => {
@@ -116,24 +62,16 @@ const CampaignSummary = () => {
     }
   }, [isTheLastStep, step, updateCampaign, form])
 
-  const sizes = useMemo(
-    () => adUnits.map((adUnit) => `${adUnit.banner?.format.w}x${adUnit.banner?.format.h}`),
-    [adUnits]
-  )
-  const uniqueSizesWithCount = useMemo(() => findDuplicates(sizes), [sizes])
-  const adFormats = useMemo(
-    () =>
-      uniqueSizesWithCount.map((size: { count: number; value: string }) => (
-        <Text align="end" key={`${size.count}${size.value}`}>{`${size.count}x ${size.value}`}</Text>
-      )),
-    [uniqueSizesWithCount]
-  )
-
   return (
     <>
       <Flex direction="column" pl="md" pr="md">
-        <CampaignDetailsRow lighterColor title="Budget" value="-" textSize="sm" />
-        <CampaignDetailsRow lighterColor title="CPM" value="-" textSize="sm" />
+        <CampaignDetailsRow
+          lighterColor
+          title="Budget"
+          value={campaignBudgetFormatted}
+          textSize="sm"
+        />
+        <CampaignDetailsRow lighterColor title="CPM" value={priceBoundsFormatted} textSize="sm" />
         <CampaignDetailsRow
           lighterColor
           title="Device"

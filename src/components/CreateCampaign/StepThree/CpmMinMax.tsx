@@ -1,30 +1,45 @@
-import { Flex, TextInput } from '@mantine/core'
-import CustomBadge from 'components/common/CustomBadge'
+import { Flex, TextInput, Text, MediaQuery } from '@mantine/core'
 import { useCreateCampaignFormContext } from 'contexts/CreateCampaignFormContext'
 
 const CpmMinMax = () => {
   const form = useCreateCampaignFormContext()
+  console.log('form', form)
   return (
-    <Flex wrap="nowrap" justify="space-between" w="50%">
-      <TextInput
-        size="md"
-        w="45%"
-        description="Recommended: 0.10"
-        inputWrapperOrder={['input', 'description', 'error']}
-        rightSection={<CustomBadge color="attention" text="Min" mr="sm" size="md" />}
-        rightSectionWidth="auto"
-        {...form.getInputProps('cpmMin')}
-      />
-      <TextInput
-        size="md"
-        w="45%"
-        description="Recommended: 0.50"
-        inputWrapperOrder={['input', 'description', 'error']}
-        rightSection={<CustomBadge color="info" text="Max" mr="sm" size="md" />}
-        rightSectionWidth="md"
-        {...form.getInputProps('cpmMax')}
-      />
-    </Flex>
+    <MediaQuery
+      smallerThan="lg"
+      styles={{
+        maxWidth: '100%'
+      }}
+    >
+      <Flex wrap="nowrap" justify="space-between" maw="50%">
+        <TextInput
+          size="md"
+          w="45%"
+          description="Approx. ~ $0.10"
+          inputWrapperOrder={['input', 'description', 'error']}
+          rightSection={
+            <Text color="brand" mr="sm" size="sm">
+              Min
+            </Text>
+          }
+          rightSectionWidth="auto"
+          {...form.getInputProps('pricingBounds.IMPRESSION.min')}
+        />
+        <TextInput
+          size="md"
+          w="45%"
+          description="Approx. ~ $0.10"
+          inputWrapperOrder={['input', 'description', 'error']}
+          rightSection={
+            <Text color="brand" mr="sm" size="sm">
+              Max
+            </Text>
+          }
+          rightSectionWidth="md"
+          {...form.getInputProps('pricingBounds.IMPRESSION.max')}
+        />
+      </Flex>
+    </MediaQuery>
   )
 }
 

@@ -1,15 +1,23 @@
-import { ActionIcon, Input, createStyles, Image } from '@mantine/core'
+import {
+  ActionIcon,
+  Input,
+  createStyles,
+  Image,
+  MantineStyleSystemProps,
+  Text
+} from '@mantine/core'
 import { AdUnit } from 'adex-common/dist/types'
 import InfoAlertMessage from 'components/common/InfoAlertMessage'
 import { getMediaUrlWithProvider, isVideoMedia } from 'helpers/createCampaignHelpers'
 import { ChangeEventHandler } from 'react'
 import DeleteIcon from 'resources/icons/Delete'
 
-type ImageUrlInputProps = {
+type ImageUrlInputProps = MantineStyleSystemProps & {
   image: AdUnit
-  toRemove: boolean
-  onDelete: (file: AdUnit) => void
-  onChange: ChangeEventHandler<HTMLInputElement> | undefined
+  toRemove?: boolean
+  onDelete?: (file: AdUnit) => void
+  onChange?: ChangeEventHandler<HTMLInputElement> | undefined
+  preview?: boolean
 }
 
 const useStyles = createStyles(() => ({
@@ -24,7 +32,14 @@ const useStyles = createStyles(() => ({
   }
 }))
 
-const ImageUrlInput = ({ image, toRemove, onDelete, onChange }: ImageUrlInputProps) => {
+const ImageUrlInput = ({
+  image,
+  toRemove,
+  onDelete,
+  onChange,
+  preview,
+  ...rest
+}: ImageUrlInputProps) => {
   const { classes } = useStyles()
   const mediaUrl = getMediaUrlWithProvider(
     image.banner?.mediaUrl,
@@ -37,7 +52,7 @@ const ImageUrlInput = ({ image, toRemove, onDelete, onChange }: ImageUrlInputPro
       <Input
         onChange={onChange}
         error={toRemove}
-        disabled={toRemove}
+        disabled={toRemove || preview}
         defaultValue={image.banner?.targetUrl}
         type="url"
         variant="default"
@@ -66,15 +81,22 @@ const ImageUrlInput = ({ image, toRemove, onDelete, onChange }: ImageUrlInputPro
           )
         }
         rightSection={
-          <ActionIcon
-            title="Remove"
-            color="secondaryText"
-            variant="transparent"
-            onClick={() => onDelete(image)}
-          >
-            <DeleteIcon size="24px" />
-          </ActionIcon>
+          !preview ? (
+            <ActionIcon
+              title="Remove"
+              color="secondaryText"
+              variant="transparent"
+              onClick={() => onDelete && onDelete(image)}
+            >
+              <DeleteIcon size="24px" />
+            </ActionIcon>
+          ) : (
+            <Text size="xs" pr="xs">
+              {image.banner?.format.w}x{image.banner?.format.h}
+            </Text>
+          )
         }
+        {...rest}
       />
     </>
   )

@@ -1,10 +1,6 @@
-import { Container, Flex, createStyles } from '@mantine/core'
+import { Container, createStyles } from '@mantine/core'
 import CampaignDetailsRow from 'components/common/Modals/CampaignDetailsModal/CampaignDetailsRow'
-import { checkSelectedDevices } from 'helpers/createCampaignHelpers'
-import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
-import { useMemo } from 'react'
-import DesktopIcon from 'resources/icons/Desktop'
-import MobileIcon from 'resources/icons/Mobile'
+import useCreateCampaignData from 'hooks/useCreateCampaignData/useCreateCampaignData'
 
 const useStyles = createStyles((theme) => ({
   wrapper: {
@@ -19,41 +15,58 @@ const useStyles = createStyles((theme) => ({
 const StepFour = () => {
   const { classes } = useStyles()
   const {
-    campaign: { devices }
-  } = useCreateCampaignContext()
-  const selectedDevices = useMemo(() => checkSelectedDevices(devices), [devices])
+    formattedSelectedDevice,
+    priceBoundsFormatted,
+    formattedCats,
+    formattedLocs,
+    adFormats,
+    campaignBudgetFormatted,
+    campaignNameFormatted,
+    adUnitsFormatted
+  } = useCreateCampaignData()
 
   return (
     <Container className={classes.wrapper}>
-      <CampaignDetailsRow lighterColor title="1. Campaign Name" value="-" textSize="sm" />
-      <CampaignDetailsRow lighterColor title="2. Campaign Budget" value="-" textSize="sm" />
-      <CampaignDetailsRow lighterColor title="3. CPM" value="-" textSize="sm" />
+      <CampaignDetailsRow
+        lighterColor
+        title="1. Campaign Name"
+        value={campaignNameFormatted}
+        textSize="sm"
+      />
+      <CampaignDetailsRow
+        lighterColor
+        title="2. Campaign Budget"
+        value={campaignBudgetFormatted}
+        textSize="sm"
+      />
+      <CampaignDetailsRow lighterColor title="3. CPM" value={priceBoundsFormatted} textSize="sm" />
       <CampaignDetailsRow lighterColor title="4. Campaign Period" value="-" textSize="sm" />
       <CampaignDetailsRow
         lighterColor
         title="5. Device Type"
-        value={
-          selectedDevices === 'desktop' ? (
-            <Flex align="center" gap={5}>
-              <DesktopIcon size="16px" /> Desktop
-            </Flex>
-          ) : selectedDevices === 'mobile' ? (
-            <Flex align="center" gap={5}>
-              <MobileIcon size="16px" /> Mobile
-            </Flex>
-          ) : selectedDevices === 'both' ? (
-            <Flex align="center" gap={5}>
-              <MobileIcon size="16px" /> Mobile
-              <DesktopIcon size="16px" /> Desktop
-            </Flex>
-          ) : null
-        }
+        value={formattedSelectedDevice}
         textSize="sm"
       />
-      <CampaignDetailsRow lighterColor title="6. Ad Format" value="-" textSize="sm" />
-      <CampaignDetailsRow lighterColor title="7. Creatives" value="-" textSize="sm" />
-      <CampaignDetailsRow lighterColor title="8. Selected Categories" value="-" textSize="sm" />
-      <CampaignDetailsRow lighterColor title="9. Selected Countries" value="-" noBorder />
+      <CampaignDetailsRow lighterColor title="6. Ad Format" value={adFormats} textSize="sm" />
+      <CampaignDetailsRow
+        column
+        lighterColor
+        title="7. Creatives"
+        value={adUnitsFormatted}
+        textSize="sm"
+      />
+      <CampaignDetailsRow
+        lighterColor
+        title="8. Selected Categories"
+        value={formattedCats}
+        textSize="sm"
+      />
+      <CampaignDetailsRow
+        lighterColor
+        title="9. Selected Countries"
+        value={formattedLocs}
+        noBorder
+      />
     </Container>
   )
 }
