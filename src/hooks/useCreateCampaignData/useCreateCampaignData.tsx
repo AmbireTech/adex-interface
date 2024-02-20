@@ -1,5 +1,5 @@
 import { useMemo, useCallback } from 'react'
-import { Flex, Text, Group } from '@mantine/core' // Assuming the necessary components are imported
+import { Flex, Text } from '@mantine/core' // Assuming the necessary components are imported
 import {
   checkSelectedDevices,
   findDuplicates,
@@ -12,6 +12,8 @@ import { AdUnit, TargetingInputSingle } from 'adex-common/dist/types'
 import { SelectData } from 'types'
 import { CATEGORIES, COUNTRIES } from 'constants/createCampaign'
 import ImageUrlInput from 'components/CreateCampaign/StepOne/ImageUrlInput'
+import RangeText from 'components/common/RangeText'
+import dayjs from 'dayjs'
 
 const useCreateCampaignData = () => {
   const {
@@ -23,7 +25,9 @@ const useCreateCampaignData = () => {
       pricingBounds: { IMPRESSION: priceBounds },
       adUnits,
       campaignBudget,
-      campaignName
+      campaignName,
+      startsAt,
+      endsAt
     }
   } = useCreateCampaignContext()
 
@@ -58,22 +62,29 @@ const useCreateCampaignData = () => {
 
   const priceBoundsFormatted = useMemo(
     () => (
-      <Group spacing="xs">
-        <Group spacing="xs">
-          <Text color="brand" size="sm">
-            Min:
-          </Text>
-          <Text>{priceBounds?.min.toString()}</Text>
-        </Group>
-        <Group spacing="xs" style={{ borderLeft: '1px solid lightgray' }} pl="xs">
-          <Text color="brand" size="sm">
-            Max:
-          </Text>
-          <Text>{priceBounds?.max.toString()}</Text>
-        </Group>
-      </Group>
+      <RangeText
+        labelOne="Min"
+        valueOne={priceBounds?.min.toString() || ''}
+        labelTwo="Max"
+        valueTwo={priceBounds?.max.toString() || ''}
+      />
     ),
     [priceBounds?.min, priceBounds?.max]
+  )
+
+  const startsAtFormatted = useMemo(() => dayjs(startsAt).format('DD/MM/YYYY HH:mm'), [startsAt])
+  const endsAtFormatted = useMemo(() => dayjs(endsAt).format('DD/MM/YYYY HH:mm'), [endsAt])
+
+  const campaignPeriodFormatted = useMemo(
+    () => (
+      <RangeText
+        labelOne="Starts at"
+        valueOne={startsAtFormatted}
+        labelTwo="Ends at"
+        valueTwo={endsAtFormatted}
+      />
+    ),
+    [startsAtFormatted, endsAtFormatted]
   )
 
   const formatCatsAndLocs = useCallback((inputValues: TargetingInputSingle, lib: SelectData[]) => {
@@ -142,7 +153,8 @@ const useCreateCampaignData = () => {
     adFormats,
     campaignBudgetFormatted,
     campaignNameFormatted,
-    adUnitsFormatted
+    adUnitsFormatted,
+    campaignPeriodFormatted
   }
 }
 

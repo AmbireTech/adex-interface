@@ -22,7 +22,8 @@ const StepFour = () => {
     adFormats,
     campaignBudgetFormatted,
     campaignNameFormatted,
-    adUnitsFormatted
+    adUnitsFormatted,
+    campaignPeriodFormatted
   } = useCreateCampaignData()
 
   return (
@@ -40,7 +41,12 @@ const StepFour = () => {
         textSize="sm"
       />
       <CampaignDetailsRow lighterColor title="3. CPM" value={priceBoundsFormatted} textSize="sm" />
-      <CampaignDetailsRow lighterColor title="4. Campaign Period" value="-" textSize="sm" />
+      <CampaignDetailsRow
+        lighterColor
+        title="4. Campaign Period"
+        value={campaignPeriodFormatted}
+        textSize="sm"
+      />
       <CampaignDetailsRow
         lighterColor
         title="5. Device Type"
