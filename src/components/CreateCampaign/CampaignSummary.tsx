@@ -2,7 +2,7 @@ import { Button, Flex, Group, Text, UnstyledButton, createStyles } from '@mantin
 import CampaignDetailsRow from 'components/common/Modals/CampaignDetailsModal/CampaignDetailsRow'
 import { CREATE_CAMPAIGN_STEPS } from 'constants/createCampaign'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
-import { useCallback, useMemo } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import LeftArrowIcon from 'resources/icons/LeftArrow'
 import { useCreateCampaignFormContext } from 'contexts/CreateCampaignFormContext'
 import useCreateCampaignData from 'hooks/useCreateCampaignData/useCreateCampaignData'
@@ -24,7 +24,7 @@ const useStyles = createStyles((theme) => ({
 const CampaignSummary = () => {
   const { classes } = useStyles()
   const {
-    campaign: { step },
+    campaign: { step, adUnits },
     updateCampaign
   } = useCreateCampaignContext()
   const {
@@ -35,6 +35,20 @@ const CampaignSummary = () => {
     adFormats,
     campaignBudgetFormatted
   } = useCreateCampaignData()
+
+  const [isNextBtnDisabled, setIsNextBtnDisabled] = useState(false)
+  const noSelectedCatsOrLogs = useMemo(
+    () => !formattedCats || !formattedLocs,
+    [formattedCats, formattedLocs]
+  )
+
+  useEffect(() => {
+    if ((step === 0 && adUnits.length === 0) || (step === 1 && noSelectedCatsOrLogs)) {
+      setIsNextBtnDisabled(true)
+    } else {
+      setIsNextBtnDisabled(false)
+    }
+  }, [step, adUnits.length, noSelectedCatsOrLogs])
 
   const isTheLastStep = useMemo(() => step === CREATE_CAMPAIGN_STEPS - 1, [step])
   const launchCampaign = () => {
@@ -97,7 +111,7 @@ const CampaignSummary = () => {
       <Flex direction="column" justify="space-between" align="center">
         <Button
           w="90%"
-          // type='button'
+          disabled={isNextBtnDisabled}
           size="lg"
           mt="md"
           variant="filled"
