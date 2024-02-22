@@ -11,6 +11,7 @@ import Deposit from 'components/Deposit'
 import CreateCampaign from 'components/CreateCampaign'
 import { CreateCampaignContextProvider } from 'contexts/CreateCampaignContext/CreateCampaignContext'
 import { CreateCampaignFormProvider } from 'contexts/CreateCampaignFormContext'
+import NotFound404 from 'components/404/404'
 
 function RequireAuth({ children }: { children: JSX.Element }) {
   const { authenticated } = useAccount()
@@ -23,55 +24,64 @@ function RequireAuth({ children }: { children: JSX.Element }) {
   return children
 }
 
-export const router = createBrowserRouter([
+export const router = createBrowserRouter(
+  [
+    {
+      path: '/',
+      element: (
+        <RequireAuth>
+          <UserPanel />
+        </RequireAuth>
+      )
+    },
+    {
+      path: '/login',
+      element: <LogIn />
+    },
+    {
+      // TODO: rename the path
+      path: '/dashboard',
+      element: (
+        <RequireAuth>
+          <UserPanel />
+        </RequireAuth>
+      ),
+      children: [
+        {
+          path: 'dashboard',
+          element: <Dashboard />
+        },
+        { path: 'campaign-analytics/:id', element: <CampaignAnalytics /> },
+        {
+          path: 'billing',
+          element: <Billing />
+        },
+        {
+          path: 'get-started',
+          element: <GetStarted />
+        },
+        {
+          path: 'deposit',
+          element: <Deposit />
+        },
+        {
+          path: 'create-campaign',
+          element: (
+            <CreateCampaignContextProvider>
+              <CreateCampaignFormProvider>
+                <CreateCampaign />
+              </CreateCampaignFormProvider>
+            </CreateCampaignContextProvider>
+          )
+        }
+      ]
+    },
+    {
+      path: '*',
+      element: <NotFound404 />
+    }
+  ],
   {
-    path: '/',
-    element: (
-      <RequireAuth>
-        <UserPanel />
-      </RequireAuth>
-    )
-  },
-  {
-    path: '/login',
-    element: <LogIn />
-  },
-  {
-    // TODO: rename the path
-    path: '/dashboard',
-    element: (
-      <RequireAuth>
-        <UserPanel />
-      </RequireAuth>
-    ),
-    children: [
-      {
-        path: 'dashboard',
-        element: <Dashboard />
-      },
-      { path: 'campaign-analytics/:id', element: <CampaignAnalytics /> },
-      {
-        path: 'billing',
-        element: <Billing />
-      },
-      {
-        path: 'get-started',
-        element: <GetStarted />
-      },
-      {
-        path: 'deposit',
-        element: <Deposit />
-      },
-      {
-        path: 'create-campaign',
-        element: (
-          <CreateCampaignContextProvider>
-            <CreateCampaignFormProvider>
-              <CreateCampaign />
-            </CreateCampaignFormProvider>
-          </CreateCampaignContextProvider>
-        )
-      }
-    ]
+    basename: `/${process.env.REACT_APP_BASE_NAME || ''}`
   }
-])
+)
