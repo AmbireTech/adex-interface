@@ -2,14 +2,8 @@ import { Checkbox, Grid } from '@mantine/core'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import { AdUnit } from 'adex-common/dist/types'
 import { ALLOWED_BANNER_SIZES } from 'constants/banners'
+import { UploadedBannersProps } from 'types'
 import ImageUrlInput from './ImageUrlInput'
-
-type UploadedBannersProps = {
-  updateAutoUTMChecked: (isChecked: boolean) => void
-  autoUTMChecked: boolean
-  onDeleteCreativeBtnClicked: (file: AdUnit) => void
-  handleOnInputChange: (inputText: string, fileId: string) => void
-}
 
 const UploadedBanners = ({
   updateAutoUTMChecked,

@@ -2,20 +2,9 @@ import { useLocalStorage } from '@mantine/hooks'
 import { FC, PropsWithChildren, createContext, useCallback, useMemo } from 'react'
 import { CREATE_CAMPAIGN_DEFAULT_VALUE } from 'constants/createCampaign'
 import superjson from 'superjson'
-import { CampaignUI } from 'types'
+import { CampaignUI, CreateCampaignType } from 'types'
 
-type CreateCampaign = {
-  campaign: CampaignUI
-  setCampaign: (val: CampaignUI | ((prevState: CampaignUI) => CampaignUI)) => void
-  updateCampaign: <CampaignItemKey extends keyof CampaignUI>(
-    key: CampaignItemKey,
-    value: CampaignUI[CampaignItemKey]
-  ) => void
-  updateCampaignWithPrevStateNested: (nestedKey: string, value: any) => void
-  updateAllCampaign: (camp: any) => void
-}
-
-const CreateCampaignContext = createContext<CreateCampaign | null>(null)
+const CreateCampaignContext = createContext<CreateCampaignType | null>(null)
 
 const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
   // const defaultValue1 = { ...CREATE_CAMPAIGN_DEFAULT_VALUE }

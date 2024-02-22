@@ -38,7 +38,6 @@ const CampaignDetailsRow = ({
   const { classes, cx } = useStyles({ lighterColor: !!lighterColor })
   return (
     <Flex
-      key={title}
       justify={column ? 'flex-start' : 'space-between'}
       direction={column ? 'column' : 'row'}
       align="center"

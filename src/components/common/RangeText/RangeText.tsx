@@ -1,11 +1,5 @@
-import { Text, MantineStyleSystemProps, Group, createStyles } from '@mantine/core'
-
-type RangeTextProps = MantineStyleSystemProps & {
-  labelOne: string
-  valueOne: string
-  labelTwo: string
-  valueTwo: string
-}
+import { Text, Group, createStyles } from '@mantine/core'
+import { RangeTextProps } from 'types'
 
 const useStyles = createStyles((theme) => ({
   borderLeft: {

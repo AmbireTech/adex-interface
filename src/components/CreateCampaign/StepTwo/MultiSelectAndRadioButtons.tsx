@@ -1,14 +1,7 @@
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { MultiSelect, Radio, Stack, Text } from '@mantine/core'
 import { TargetingInputApplyProp } from 'adex-common/dist/types'
-import { useCallback, useEffect, useMemo, useState } from 'react'
-
-interface MultiSelectAndRadioButtonsProps {
-  multiSelectData: { value: string; label: string }[]
-  label: string
-  defaultSelectValue?: string[]
-  defaultRadioValue?: TargetingInputApplyProp
-  onCategoriesChange: (selectedRadio: TargetingInputApplyProp, categories: string[]) => void
-}
+import { MultiSelectAndRadioButtonsProps } from 'types'
 
 const MultiSelectAndRadioButtons = ({
   multiSelectData,

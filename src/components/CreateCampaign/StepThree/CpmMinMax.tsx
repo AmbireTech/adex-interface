@@ -3,7 +3,7 @@ import { useCreateCampaignFormContext } from 'contexts/CreateCampaignFormContext
 
 const CpmMinMax = () => {
   const form = useCreateCampaignFormContext()
-  console.log('form', form)
+
   return (
     <MediaQuery
       smallerThan="lg"

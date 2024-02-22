@@ -1,24 +1,8 @@
-import {
-  ActionIcon,
-  Input,
-  createStyles,
-  Image,
-  MantineStyleSystemProps,
-  Text
-} from '@mantine/core'
-import { AdUnit } from 'adex-common/dist/types'
+import { ActionIcon, Input, createStyles, Image, Text } from '@mantine/core'
 import InfoAlertMessage from 'components/common/InfoAlertMessage'
 import { getMediaUrlWithProvider, isVideoMedia } from 'helpers/createCampaignHelpers'
-import { ChangeEventHandler } from 'react'
 import DeleteIcon from 'resources/icons/Delete'
-
-type ImageUrlInputProps = MantineStyleSystemProps & {
-  image: AdUnit
-  toRemove?: boolean
-  onDelete?: (file: AdUnit) => void
-  onChange?: ChangeEventHandler<HTMLInputElement> | undefined
-  preview?: boolean
-}
+import { ImageUrlInputProps } from 'types'
 
 const useStyles = createStyles(() => ({
   image: {

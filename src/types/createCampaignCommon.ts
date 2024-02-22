@@ -23,3 +23,14 @@ export type ImageSizes = {
   width: number
   height: number
 }
+
+export type CreateCampaignType = {
+  campaign: CampaignUI
+  setCampaign: (val: CampaignUI | ((prevState: CampaignUI) => CampaignUI)) => void
+  updateCampaign: <CampaignItemKey extends keyof CampaignUI>(
+    key: CampaignItemKey,
+    value: CampaignUI[CampaignItemKey]
+  ) => void
+  updateCampaignWithPrevStateNested: (nestedKey: string, value: any) => void
+  updateAllCampaign: (camp: any) => void
+}

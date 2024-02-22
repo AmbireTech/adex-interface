@@ -1,5 +1,5 @@
 import { useMemo, useCallback } from 'react'
-import { Flex, Text } from '@mantine/core' // Assuming the necessary components are imported
+import { Flex, Text } from '@mantine/core'
 import {
   checkSelectedDevices,
   findDuplicates,

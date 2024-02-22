@@ -1,7 +1,6 @@
 import { MutableRefObject, useRef } from 'react'
 import { Box, createStyles } from '@mantine/core'
 import { TimeInput } from '@mantine/dates'
-// import TimeIcon from 'resources/icons/Time'
 
 const useStyles = createStyles((theme) => ({
   timeWrapper: {
