@@ -43,7 +43,7 @@ const useStyles = createStyles((theme) => ({
 
 function TopBar() {
   const { classes, cx } = useStyles()
-  const { adexAccount } = useAccount()
+  const { adexAccount, disconnectWallet } = useAccount()
   const location = useLocation()
   const splitPath = useMemo(() => location.pathname.split('/'), [location.pathname])
   const title = useMemo(
@@ -103,7 +103,12 @@ function TopBar() {
             <Menu.Item rightSection={<ValidatorsIcon className={classes.icon} />}>
               Validators
             </Menu.Item>
-            <Menu.Item rightSection={<LogoutIcon className={classes.icon} />}>Log out</Menu.Item>
+            <Menu.Item
+              onClick={disconnectWallet}
+              rightSection={<LogoutIcon className={classes.icon} />}
+            >
+              Log out
+            </Menu.Item>
           </Menu.Dropdown>
         </Menu>
       </Flex>

@@ -1,4 +1,4 @@
 export interface IAdExAccount {
-  email: string
+  chainId: number
   address: string
 }

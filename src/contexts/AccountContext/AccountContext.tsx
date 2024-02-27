@@ -1,7 +1,7 @@
 import { createContext, FC, PropsWithChildren, useMemo, useCallback, useEffect } from 'react'
 import { IAdExAccount } from 'types'
 import { useLocalStorage } from '@mantine/hooks'
-// import { registerUser } from 'lib/backend'
+import { getMessageToSign } from 'lib/backend'
 
 import { AmbireLoginSDK } from '@ambire/login-sdk-core'
 
@@ -34,20 +34,34 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
     key: 'adexAccount',
     defaultValue: {
       address: '0xkuramiqnko',
-      email: 'mai@il.com'
+      chainId: 1
     }
   })
   // const authenticated = !!adexAccount
-
+  // console.log('adexAccount', adexAccount)
   useEffect(() => {
-    ambireSDK.onLoginSuccess((data: any) => {
+    ambireSDK.onLoginSuccess(async (data: any) => {
       console.log({ data })
-      setAdexAccount({ address: data.address, email: 'testMail@yourmail.com' })
+      console.log('onLoginSuccess')
+      setAdexAccount({ address: data.address, chainId: data.chainId })
+      const messageToSign = await (
+        await getMessageToSign({ address: data.address, chainId: data.chainId })
+      ).data.authMsg
+
+      ambireSDK.openSignMessage('eth_signTypedData', JSON.stringify(messageToSign))
     })
 
     ambireSDK.onLogoutSuccess((data: any) => {
       console.log({ data })
+      console.log('onLogoutSuccess')
       setAdexAccount(null)
+    })
+
+    ambireSDK.onMsgSigned((data: any) => {
+      console.log('onMsgSigned', data)
+    })
+    ambireSDK.onMsgRejected((data: any) => {
+      console.log('onMsgRejected', data)
     })
   }, [ambireSDK, setAdexAccount])
 
@@ -57,9 +71,17 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
   }, [ambireSDK])
 
   const disconnectWallet = useCallback(async () => {
-    console.log('connectwallet', ambireSDK)
+    console.log('disconnectWallet', ambireSDK)
     ambireLoginSDK.openLogout()
   }, [ambireSDK])
+
+  const signMessage = useCallback(
+    async (type: string, message: string) => {
+      console.log('openSignMessage')
+      ambireSDK.openSignMessage(type, message)
+    },
+    [ambireSDK]
+  )
 
   const authenticated = useMemo(() => !!adexAccount, [adexAccount])
 
@@ -69,9 +91,10 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
       authenticated,
       connectWallet,
       disconnectWallet,
+      signMessage,
       ambireSDK
     }),
-    [adexAccount, ambireSDK, authenticated, connectWallet, disconnectWallet]
+    [adexAccount, ambireSDK, authenticated, connectWallet, disconnectWallet, signMessage]
   )
 
   return <AccountContext.Provider value={contextValue}>{children}</AccountContext.Provider>
