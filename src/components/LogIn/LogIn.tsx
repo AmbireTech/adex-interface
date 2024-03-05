@@ -15,9 +15,10 @@ import LogInBackground from 'resources/backgrounds/pattern.svg'
 import LowerShape from 'resources/backgrounds/lowerShape.svg'
 import UpperShape from 'resources/backgrounds/upperShape.svg'
 import AdExLogo from 'resources/logos/AdExLogo'
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import HelpIcon from 'resources/icons/Help'
 import CustomAnchor from 'components/common/customAnchor/CustomAnchor'
+import { useNavigate } from 'react-router-dom'
 
 const useStyles = createStyles(() => {
   return {
@@ -41,9 +42,14 @@ const useStyles = createStyles(() => {
 
 function LogIn() {
   const { classes } = useStyles()
-  const { connectWallet } = useAccount()
+  const { connectWallet, authenticated } = useAccount()
   const year = useMemo(() => new Date().getFullYear(), [])
   const theme = useMantineTheme()
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    if (authenticated) navigate('/get-started', { replace: true })
+  }, [authenticated, navigate])
 
   return (
     <Container fluid h="100vh" className={classes.container}>

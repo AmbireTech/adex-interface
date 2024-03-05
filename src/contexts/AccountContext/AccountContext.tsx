@@ -1,7 +1,15 @@
-import { createContext, FC, PropsWithChildren, useMemo, useCallback, useEffect } from 'react'
+import {
+  createContext,
+  FC,
+  PropsWithChildren,
+  useMemo,
+  useCallback,
+  useEffect,
+  useState
+} from 'react'
 import { IAdExAccount } from 'types'
 import { useLocalStorage } from '@mantine/hooks'
-import { getMessageToSign } from 'lib/backend'
+import { getMessageToSign, logout, verifyLogin } from 'lib/backend'
 
 import { AmbireLoginSDK } from '@ambire/login-sdk-core'
 
@@ -10,11 +18,6 @@ const ambireLoginSDK = new AmbireLoginSDK({
   dappIconPath:
     'https://raw.githubusercontent.com/AmbireTech/ambire-brand/main/adex-logos/Ambire_AdEx_Symbol_color.svg'
 })
-
-// const testAccount: IAdExAccount = {
-//   email: 'gosho@myyanko.com',
-//   address: '0x70fC54B13FA83571006c289B9A6bbAE69dfD4e46'
-// }
 
 interface IAccountContext {
   adexAccount: IAdExAccount | null
@@ -26,75 +29,139 @@ interface IAccountContext {
 
 const AccountContext = createContext<IAccountContext | null>(null)
 
-// TODO: persist data
 const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
   const ambireSDK = useMemo(() => ambireLoginSDK, [])
 
   const [adexAccount, setAdexAccount] = useLocalStorage<IAccountContext['adexAccount']>({
     key: 'adexAccount',
     defaultValue: {
-      address: '0xkuramiqnko',
-      chainId: 1
+      address: '',
+      chainId: 1,
+      accessToken: '',
+      refreshToken: '',
+      authenticated: false
     }
   })
-  // const authenticated = !!adexAccount
-  // console.log('adexAccount', adexAccount)
+
+  const [authMsgResp, setAuthMsgResp] = useState<any>(null)
+  const [messageToSign, setMessageToSign] = useState<string | null>(null)
+
+  // const updateAccount = useCallback(
+  //   (value: IAdExAccount | null) => setAdexAccount(value),
+  //   [setAdexAccount]
+  // )
+
+  const updateAuthMsgResp = useCallback((value: any) => setAuthMsgResp(value), [setAuthMsgResp])
+
   useEffect(() => {
-    ambireSDK.onLoginSuccess(async (data: any) => {
-      console.log({ data })
-      console.log('onLoginSuccess')
-      setAdexAccount({ address: data.address, chainId: data.chainId })
-      const messageToSign = await (
-        await getMessageToSign({ address: data.address, chainId: data.chainId })
-      ).data.authMsg
+    const handleLoginSuccess = (data: any) => {
+      console.count('handleLoginSuccess')
+      if (!data) return
+      const updatedAccount = { address: data.address, chainId: data.chainId }
+      const { address, chainId } = data
+      setAdexAccount((prevState) => ({ ...(prevState as IAdExAccount), address, chainId }))
+      getMessageToSign(updatedAccount).then((getMessage) => {
+        const messageToSignStringified = JSON.stringify(getMessage.authMsg)
+        setMessageToSign(messageToSignStringified)
+        updateAuthMsgResp(getMessage.authMsg)
+      })
+    }
 
-      ambireSDK.openSignMessage('eth_signTypedData', JSON.stringify(messageToSign))
-    })
+    ambireSDK.onLoginSuccess(handleLoginSuccess)
 
-    ambireSDK.onLogoutSuccess((data: any) => {
-      console.log({ data })
-      console.log('onLogoutSuccess')
-      setAdexAccount(null)
-    })
+    return () => {
+      // ambireSDK.offLoginSuccess(handleLoginSuccess)
+    }
+  }, [ambireSDK, setAdexAccount, updateAuthMsgResp])
 
-    ambireSDK.onMsgSigned((data: any) => {
-      console.log('onMsgSigned', data)
-    })
-    ambireSDK.onMsgRejected((data: any) => {
-      console.log('onMsgRejected', data)
-    })
-  }, [ambireSDK, setAdexAccount])
+  useEffect(() => {
+    const handleLogoutSuccess = () => {
+      console.count('handleLogoutSuccess')
+      if (adexAccount) {
+        logout(adexAccount)
+          .then((res) => {
+            console.log('logoutRes', res)
+            setAdexAccount(null)
+            updateAuthMsgResp(null)
+          })
+          .catch((e) => console.log('Logout failed: ', e))
+      }
+    }
+
+    ambireSDK.onLogoutSuccess(handleLogoutSuccess)
+
+    return () => {
+      // ambireSDK.offLogoutSuccess(handleLogoutSuccess)
+    }
+  }, [ambireSDK, adexAccount, setAdexAccount, updateAuthMsgResp])
+
+  useEffect(() => {
+    const handleMsgSigned = ({ signature }: any) => {
+      console.count('handleMsgSigned')
+      if (!authMsgResp) return
+      const body = {
+        authMsg: { ...authMsgResp },
+        signature
+      }
+
+      verifyLogin(body)
+        .then((authResp) => {
+          if (!authResp) return
+          setAdexAccount((prevState) => ({
+            ...(prevState as IAdExAccount),
+            accessToken: authResp.accessToken,
+            refreshToken: authResp.refreshToken,
+            authenticated: !!authResp.accessToken && !!authResp.refreshToken
+          }))
+        })
+        .catch((e) => console.error('Error verifying login:', e))
+    }
+
+    ambireSDK.onMsgSigned(handleMsgSigned)
+
+    return () => {
+      // ambireSDK.offMsgSigned(handleMsgSigned)
+    }
+  }, [ambireSDK, authMsgResp, setAdexAccount])
+
+  useEffect(() => {
+    if (authMsgResp && messageToSign) {
+      ambireSDK.openSignMessage('eth_signTypedData', messageToSign)
+    }
+  }, [ambireSDK, authMsgResp, messageToSign])
 
   const connectWallet = useCallback(async () => {
-    console.log('connectwallet', ambireSDK)
-    ambireLoginSDK.openLogin()
+    ambireSDK.openLogin()
   }, [ambireSDK])
 
   const disconnectWallet = useCallback(async () => {
-    console.log('disconnectWallet', ambireSDK)
-    ambireLoginSDK.openLogout()
+    ambireSDK.openLogout()
   }, [ambireSDK])
 
   const signMessage = useCallback(
     async (type: string, message: string) => {
-      console.log('openSignMessage')
       ambireSDK.openSignMessage(type, message)
     },
     [ambireSDK]
   )
 
-  const authenticated = useMemo(() => !!adexAccount, [adexAccount])
+  // const authenticated = useMemo(
+  //   () => !!adexAccount && !!adexAccount.accessToken && !!adexAccount.refreshToken,
+  //   [adexAccount]
+  // )
+  // const authenticated = true
 
   const contextValue = useMemo(
     () => ({
       adexAccount,
-      authenticated,
+      authenticated: !adexAccount ? false : adexAccount.authenticated,
+      // authenticated: true,
       connectWallet,
       disconnectWallet,
       signMessage,
       ambireSDK
     }),
-    [adexAccount, ambireSDK, authenticated, connectWallet, disconnectWallet, signMessage]
+    [adexAccount, connectWallet, disconnectWallet, signMessage, ambireSDK]
   )
 
   return <AccountContext.Provider value={contextValue}>{children}</AccountContext.Provider>

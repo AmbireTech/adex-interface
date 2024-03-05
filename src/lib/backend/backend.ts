@@ -1,6 +1,7 @@
 import { fetchService } from 'services'
 import { IAdExAccount, AppError, ErrorLevel } from 'types'
 
+const BASE_URL = 'http://localhost:3069'
 const processResponse = (res: any) => {
   if (res.status >= 200 && res.status < 400) {
     return res.json()
@@ -14,9 +15,10 @@ const processResponse = (res: any) => {
   })
 }
 
-export const getMessageToSign = async (user: IAdExAccount) => {
+export const getMessageToSign = async (user: any) => {
   // TODO: use process.env.basURL
-  const baseUrl = 'http://localhost:3069'
+  const url = `${BASE_URL}/dsp/login-msg`
+  const method = 'POST'
   const body = {
     wallet: user.address,
     chainId: user.chainId
@@ -26,8 +28,8 @@ export const getMessageToSign = async (user: IAdExAccount) => {
   }
 
   const req = {
-    url: `${baseUrl}/dsp/login-msg`,
-    method: 'POST',
+    url,
+    method,
     headers,
     body
   }
@@ -35,20 +37,43 @@ export const getMessageToSign = async (user: IAdExAccount) => {
   return fetchService(req).then(processResponse)
 }
 
-export const verifyLogin = async (user: IAdExAccount) => {
+type VerifyLoginProps = {
+  authMsg: any
+  signature: string
+}
+
+export const verifyLogin = async (body: VerifyLoginProps) => {
   // TODO: use process.env.basURL
-  const baseUrl = 'http://localhost:3069'
-  const body = {
-    wallet: user.address,
-    chainId: user.chainId
-  }
+  const url = `${BASE_URL}/dsp/login-verify`
+  const method = 'POST'
   const headers = {
     'Content-Type': 'application/json'
   }
 
   const req = {
-    url: `${baseUrl}/dsp/login-verify`,
-    method: 'POST',
+    url,
+    method,
+    headers,
+    body
+  }
+
+  return fetchService(req).then(processResponse)
+}
+
+export const logout = async (user: IAdExAccount) => {
+  const url = `${BASE_URL}/dsp/logout`
+  const method = 'POST'
+  const headers = {
+    'Content-Type': 'application/json',
+    'X-DSP-AUTH': `Bearer ${user.accessToken}`
+  }
+  const body = {
+    refreshToken: user.refreshToken
+  }
+
+  const req = {
+    url,
+    method,
     headers,
     body
   }
@@ -80,7 +105,10 @@ export async function getAdexAccountByAddress(
   const current: Array<IAdExAccount> = [
     {
       chainId: 1,
-      address: '69x70fC54B13FA83571006c289B9A6bbAE69dfD4eA4'
+      address: '69x70fC54B13FA83571006c289B9A6bbAE69dfD4eA4',
+      accessToken: '',
+      refreshToken: '',
+      authenticated: false
     }
   ]
 
