@@ -9,7 +9,7 @@ import {
 } from 'react'
 import { IAdExAccount } from 'types'
 import { useLocalStorage } from '@mantine/hooks'
-import { getMessageToSign, logout, verifyLogin } from 'lib/backend'
+import { getMessageToSign, verifyLogin } from 'lib/backend'
 
 import { AmbireLoginSDK } from '@ambire/login-sdk-core'
 
@@ -25,6 +25,10 @@ interface IAccountContext {
   ambireSDK: AmbireLoginSDK
   connectWallet: () => void
   disconnectWallet: () => void
+  setAdexAccount: (
+    val: IAdExAccount | ((prevState: IAdExAccount | null) => IAdExAccount | null) | null
+  ) => void
+  updateAuthMsgResp: (value: any) => void
 }
 
 const AccountContext = createContext<IAccountContext | null>(null)
@@ -46,16 +50,10 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
   const [authMsgResp, setAuthMsgResp] = useState<any>(null)
   const [messageToSign, setMessageToSign] = useState<string | null>(null)
 
-  // const updateAccount = useCallback(
-  //   (value: IAdExAccount | null) => setAdexAccount(value),
-  //   [setAdexAccount]
-  // )
-
   const updateAuthMsgResp = useCallback((value: any) => setAuthMsgResp(value), [setAuthMsgResp])
 
   useEffect(() => {
     const handleLoginSuccess = (data: any) => {
-      console.count('handleLoginSuccess')
       if (!data) return
       const updatedAccount = { address: data.address, chainId: data.chainId }
       const { address, chainId } = data
@@ -75,29 +73,7 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
   }, [ambireSDK, setAdexAccount, updateAuthMsgResp])
 
   useEffect(() => {
-    const handleLogoutSuccess = () => {
-      console.count('handleLogoutSuccess')
-      if (adexAccount) {
-        logout(adexAccount)
-          .then((res) => {
-            console.log('logoutRes', res)
-            setAdexAccount(null)
-            updateAuthMsgResp(null)
-          })
-          .catch((e) => console.log('Logout failed: ', e))
-      }
-    }
-
-    ambireSDK.onLogoutSuccess(handleLogoutSuccess)
-
-    return () => {
-      // ambireSDK.offLogoutSuccess(handleLogoutSuccess)
-    }
-  }, [ambireSDK, adexAccount, setAdexAccount, updateAuthMsgResp])
-
-  useEffect(() => {
     const handleMsgSigned = ({ signature }: any) => {
-      console.count('handleMsgSigned')
       if (!authMsgResp) return
       const body = {
         authMsg: { ...authMsgResp },
@@ -130,6 +106,27 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
     }
   }, [ambireSDK, authMsgResp, messageToSign])
 
+  useEffect(() => {
+    const handleLogoutSuccess = () => {
+      // if (adexAccount) {
+      //   logout(adexAccount)
+      //     .then((res) => {
+      //       console.log('logoutRes', res)
+      //       if (!res) return
+      //       setAdexAccount(null)
+      //       updateAuthMsgResp(null)
+      //     })
+      //     .catch((e) => console.log('Logout failed: ', e))
+      // }
+    }
+
+    ambireSDK.onLogoutSuccess(handleLogoutSuccess)
+
+    return () => {
+      // ambireSDK.offLogoutSuccess(handleLogoutSuccess)
+    }
+  }, [ambireSDK, adexAccount, setAdexAccount, updateAuthMsgResp])
+
   const connectWallet = useCallback(async () => {
     ambireSDK.openLogin()
   }, [ambireSDK])
@@ -145,12 +142,6 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
     [ambireSDK]
   )
 
-  // const authenticated = useMemo(
-  //   () => !!adexAccount && !!adexAccount.accessToken && !!adexAccount.refreshToken,
-  //   [adexAccount]
-  // )
-  // const authenticated = true
-
   const contextValue = useMemo(
     () => ({
       adexAccount,
@@ -159,9 +150,19 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
       connectWallet,
       disconnectWallet,
       signMessage,
-      ambireSDK
+      ambireSDK,
+      setAdexAccount,
+      updateAuthMsgResp
     }),
-    [adexAccount, connectWallet, disconnectWallet, signMessage, ambireSDK]
+    [
+      adexAccount,
+      connectWallet,
+      disconnectWallet,
+      signMessage,
+      ambireSDK,
+      setAdexAccount,
+      updateAuthMsgResp
+    ]
   )
 
   return <AccountContext.Provider value={contextValue}>{children}</AccountContext.Provider>

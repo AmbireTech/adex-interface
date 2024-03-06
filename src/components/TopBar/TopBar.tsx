@@ -12,7 +12,7 @@ import {
 } from '@mantine/core'
 import { capitalizeFirstLetter, formatDate, maskAddress } from 'helpers/formatters'
 import useAccount from 'hooks/useAccount'
-import { useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import BellIcon from 'resources/icons/Bell'
 import DownArrowIcon from 'resources/icons/DownArrow'
 import LogoutIcon from 'resources/icons/Logout'
@@ -21,6 +21,7 @@ import WithdrawIcon from 'resources/icons/Withdraw'
 import Blockies from 'components/common/Blockies'
 import { useLocation } from 'react-router-dom'
 import StakingIcon from 'resources/icons/Staking'
+import useFetch from 'hooks/useFetchRequest'
 
 const useStyles = createStyles((theme) => ({
   rotateUpsideDown: {
@@ -43,7 +44,7 @@ const useStyles = createStyles((theme) => ({
 
 function TopBar() {
   const { classes, cx } = useStyles()
-  const { adexAccount, disconnectWallet } = useAccount()
+  const { adexAccount, disconnectWallet, setAdexAccount, updateAuthMsgResp } = useAccount()
   const location = useLocation()
   const splitPath = useMemo(() => location.pathname.split('/'), [location.pathname])
   const title = useMemo(
@@ -52,6 +53,45 @@ function TopBar() {
   )
 
   const [opened, setOpened] = useState<boolean>(false)
+
+  const { fetchAuthRequest } = useFetch()
+
+  const handleLogutBtnClicked = useCallback(() => {
+    if (!adexAccount?.accessToken && !adexAccount?.refreshToken) return
+    // TODO: remove all req variables
+    const BASE_URL = 'http://localhost:3069'
+    const url = `${BASE_URL}/dsp/logout`
+    const method = 'POST'
+    const headers = {
+      'Content-Type': 'application/json',
+      'X-DSP-AUTH': `Bearer ${adexAccount.accessToken}`
+    }
+    const body = {
+      refreshToken: adexAccount.refreshToken
+    }
+
+    const req = {
+      url,
+      method,
+      headers,
+      body
+    }
+
+    fetchAuthRequest(req).then((res) => {
+      if (res) {
+        disconnectWallet()
+        setAdexAccount(null)
+        updateAuthMsgResp(null)
+      }
+    })
+  }, [
+    disconnectWallet,
+    fetchAuthRequest,
+    adexAccount?.accessToken,
+    adexAccount?.refreshToken,
+    setAdexAccount,
+    updateAuthMsgResp
+  ])
 
   return (
     <Flex direction="row" gap="md" justify="space-between" align="center" style={{ flexGrow: 1 }}>
@@ -104,7 +144,7 @@ function TopBar() {
               Validators
             </Menu.Item>
             <Menu.Item
-              onClick={disconnectWallet}
+              onClick={handleLogutBtnClicked}
               rightSection={<LogoutIcon className={classes.icon} />}
             >
               Log out
