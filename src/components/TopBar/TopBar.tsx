@@ -60,7 +60,7 @@ function TopBar() {
     disconnectWallet()
     if (!adexAccount?.accessToken && !adexAccount?.refreshToken) return
     // TODO: remove all req variables
-    const BASE_URL = 'http://localhost:3069'
+    const BASE_URL = process.env.REACT_APP_BASE_URL
     const url = `${BASE_URL}/dsp/logout`
     const method = 'POST'
     const headers = {
