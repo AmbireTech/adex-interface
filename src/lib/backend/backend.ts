@@ -15,6 +15,36 @@ const processResponse = (res: any) => {
   })
 }
 
+const parseJwt = (token: string) => {
+  const base64Url = token.split('.')[1]
+  const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/')
+
+  const jsonPayload = decodeURIComponent(
+    window
+      .atob(base64)
+      .split('')
+      // eslint-disable-next-line prefer-template
+      .map((c) => `%${('00' + c.charCodeAt(0).toString(16)).slice(-2)}`)
+      .join('')
+  )
+
+  return JSON.parse(jsonPayload)
+}
+
+export const isTokenExpired = (account: IAdExAccount) => {
+  if (!account || !account.accessToken) {
+    return true
+  }
+
+  const timeNowInSeconds = Math.floor(new Date().getTime() / 1000)
+  const decodeAccessToken = parseJwt(account.accessToken)
+  if (decodeAccessToken.exp < timeNowInSeconds) {
+    return true
+  }
+
+  return false
+}
+
 export const getMessageToSign = async (user: any) => {
   // TODO: use process.env.basURL
   const url = `${BASE_URL}/dsp/login-msg`
@@ -60,15 +90,14 @@ export const verifyLogin = async (body: VerifyLoginProps) => {
   return fetchService(req).then(processResponse)
 }
 
-export const logout = async (user: IAdExAccount) => {
-  const url = `${BASE_URL}/dsp/logout`
+export const refreshAccessToken = async (adexAccount: IAdExAccount) => {
+  const url = `${BASE_URL}/dsp/refresh-token`
   const method = 'POST'
-  const headers = {
-    'Content-Type': 'application/json',
-    'X-DSP-AUTH': `Bearer ${user.accessToken}`
-  }
   const body = {
-    refreshToken: user.refreshToken
+    refreshToken: adexAccount?.refreshToken
+  }
+  const headers = {
+    'Content-Type': 'application/json'
   }
 
   const req = {

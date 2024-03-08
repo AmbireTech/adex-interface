@@ -9,7 +9,7 @@ import {
 } from 'react'
 import { IAdExAccount } from 'types'
 import { useLocalStorage } from '@mantine/hooks'
-import { getMessageToSign, verifyLogin } from 'lib/backend'
+import { getMessageToSign, isTokenExpired, refreshAccessToken, verifyLogin } from 'lib/backend'
 
 import { AmbireLoginSDK } from '@ambire/login-sdk-core'
 
@@ -29,6 +29,7 @@ interface IAccountContext {
     val: IAdExAccount | ((prevState: IAdExAccount | null) => IAdExAccount | null) | null
   ) => void
   updateAuthMsgResp: (value: any) => void
+  updateAccessToken: () => Promise<any>
 }
 
 const AccountContext = createContext<IAccountContext | null>(null)
@@ -52,8 +53,44 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
 
   const updateAuthMsgResp = useCallback((value: any) => setAuthMsgResp(value), [setAuthMsgResp])
 
-  useEffect(() => {
-    const handleLoginSuccess = (data: any) => {
+  const connectWallet = useCallback(async () => {
+    ambireSDK.openLogin()
+  }, [ambireSDK])
+
+  const disconnectWallet = useCallback(async () => {
+    ambireSDK.openLogout()
+  }, [ambireSDK])
+
+  const signMessage = useCallback(
+    async (type: string, message: string) => {
+      ambireSDK.openSignMessage(type, message)
+    },
+    [ambireSDK]
+  )
+
+  const updateAccessToken = useCallback(async () => {
+    if (!adexAccount) return
+    if (isTokenExpired(adexAccount)) {
+      try {
+        const response = await refreshAccessToken(adexAccount)
+        if (response) {
+          setAdexAccount((prevState) => ({
+            ...prevState!,
+            accessToken: response.accessToken,
+            refreshToken: response.refreshToken
+          }))
+          return response
+        }
+      } catch (error) {
+        console.error('Error updating access token:', error)
+        // Handle error gracefully, e.g., display an error message or retry later.
+        throw error
+      }
+    }
+  }, [adexAccount, setAdexAccount])
+
+  const handleLoginSuccess = useCallback(
+    async (data: any) => {
       if (!data) return
       const updatedAccount = { address: data.address, chainId: data.chainId }
       const { address, chainId } = data
@@ -63,17 +100,20 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
         setMessageToSign(messageToSignStringified)
         updateAuthMsgResp(getMessage.authMsg)
       })
-    }
+    },
+    [setAdexAccount, updateAuthMsgResp]
+  )
 
+  useEffect(() => {
     ambireSDK.onLoginSuccess(handleLoginSuccess)
 
     return () => {
       // ambireSDK.offLoginSuccess(handleLoginSuccess)
     }
-  }, [ambireSDK, setAdexAccount, updateAuthMsgResp])
+  }, [ambireSDK, handleLoginSuccess])
 
-  useEffect(() => {
-    const handleMsgSigned = ({ signature }: any) => {
+  const handleMsgSigned = useCallback(
+    ({ signature }: any) => {
       if (!authMsgResp) return
       const body = {
         authMsg: { ...authMsgResp },
@@ -91,14 +131,30 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
           }))
         })
         .catch((e) => console.error('Error verifying login:', e))
-    }
+    },
+    [authMsgResp, setAdexAccount]
+  )
 
+  useEffect(() => {
     ambireSDK.onMsgSigned(handleMsgSigned)
 
     return () => {
       // ambireSDK.offMsgSigned(handleMsgSigned)
     }
-  }, [ambireSDK, authMsgResp, setAdexAccount])
+  }, [ambireSDK, handleMsgSigned])
+
+  useEffect(() => {
+    const handleMsgRejected = () => {
+      console.log('here')
+      disconnectWallet()
+    }
+
+    ambireSDK.onMsgRejected(handleMsgRejected)
+
+    return () => {
+      // ambireSDK.offLogoutSuccess(handleLogoutSuccess)
+    }
+  }, [ambireSDK, disconnectWallet])
 
   useEffect(() => {
     if (authMsgResp && messageToSign) {
@@ -108,6 +164,12 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
 
   useEffect(() => {
     const handleLogoutSuccess = () => {
+      // if tokenExpired
+      // updateAccessToken
+      // then
+      // logout
+      // else
+      // logout
       // if (adexAccount) {
       //   logout(adexAccount)
       //     .then((res) => {
@@ -127,21 +189,6 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
     }
   }, [ambireSDK, adexAccount, setAdexAccount, updateAuthMsgResp])
 
-  const connectWallet = useCallback(async () => {
-    ambireSDK.openLogin()
-  }, [ambireSDK])
-
-  const disconnectWallet = useCallback(async () => {
-    ambireSDK.openLogout()
-  }, [ambireSDK])
-
-  const signMessage = useCallback(
-    async (type: string, message: string) => {
-      ambireSDK.openSignMessage(type, message)
-    },
-    [ambireSDK]
-  )
-
   const contextValue = useMemo(
     () => ({
       adexAccount,
@@ -152,7 +199,8 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
       signMessage,
       ambireSDK,
       setAdexAccount,
-      updateAuthMsgResp
+      updateAuthMsgResp,
+      updateAccessToken
     }),
     [
       adexAccount,
@@ -161,7 +209,8 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
       signMessage,
       ambireSDK,
       setAdexAccount,
-      updateAuthMsgResp
+      updateAuthMsgResp,
+      updateAccessToken
     ]
   )
 

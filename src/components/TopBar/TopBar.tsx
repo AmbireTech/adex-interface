@@ -57,6 +57,7 @@ function TopBar() {
   const { fetchAuthRequest } = useFetch()
 
   const handleLogutBtnClicked = useCallback(() => {
+    disconnectWallet()
     if (!adexAccount?.accessToken && !adexAccount?.refreshToken) return
     // TODO: remove all req variables
     const BASE_URL = 'http://localhost:3069'
@@ -79,7 +80,6 @@ function TopBar() {
 
     fetchAuthRequest(req).then((res) => {
       if (res) {
-        disconnectWallet()
         setAdexAccount(null)
         updateAuthMsgResp(null)
       }
