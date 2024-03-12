@@ -20,19 +20,20 @@ const useFetch = () => {
 
   const fetchAuthRequest = useCallback(
     async (req: any) => {
-      try {
-        const response = await updateAccessToken()
-        if (response) {
-          const updatedReq = { ...req, 'X-DSP-AUTH': `Bearer ${response.accessToken}` }
+      // try {
+      const response = await updateAccessToken()
+      if (response) {
+        const updatedAccessToken = response.accessToken
+        const updatedReq = { ...req, 'X-DSP-AUTH': `Bearer ${updatedAccessToken}` }
 
-          return await fetchService(updatedReq).then(processResponse)
-        }
-      } catch (error) {
-        console.error('Error updating access token:', error)
-        // Handle error gracefully
+        return fetchService(updatedReq).then(processResponse)
       }
 
       return fetchService(req).then(processResponse)
+      // } catch (error) {
+      //   console.error('Error updating access token:', error)
+      //   // Handle error gracefully
+      // }
     },
     [updateAccessToken]
   )

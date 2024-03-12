@@ -9,8 +9,7 @@ const processResponse = (res: any) => {
   // TODO: fix that
   return res.text().then((text: any) => {
     if (res.status === 401 || res.status === 403) {
-      console.error('something went wrong', text)
-      // logOut(skipRedirect)
+      throw new Error('something went wrong', text)
     }
   })
 }
@@ -38,11 +37,7 @@ export const isTokenExpired = (account: IAdExAccount) => {
 
   const timeNowInSeconds = Math.floor(new Date().getTime() / 1000)
   const decodeAccessToken = parseJwt(account.accessToken)
-  if (decodeAccessToken.exp < timeNowInSeconds) {
-    return true
-  }
-
-  return false
+  return decodeAccessToken.exp < timeNowInSeconds
 }
 
 export const getMessageToSign = async (user: any) => {

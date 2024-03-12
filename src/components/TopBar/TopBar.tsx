@@ -19,7 +19,7 @@ import LogoutIcon from 'resources/icons/Logout'
 import ValidatorsIcon from 'resources/icons/Validators'
 import WithdrawIcon from 'resources/icons/Withdraw'
 import Blockies from 'components/common/Blockies'
-import { useLocation } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import StakingIcon from 'resources/icons/Staking'
 import useFetch from 'hooks/useFetchRequest'
 
@@ -44,7 +44,7 @@ const useStyles = createStyles((theme) => ({
 
 function TopBar() {
   const { classes, cx } = useStyles()
-  const { adexAccount, disconnectWallet, setAdexAccount, updateAuthMsgResp } = useAccount()
+  const { adexAccount, disconnectWallet, updateAdexAccount, updateAuthMsgResp } = useAccount()
   const location = useLocation()
   const splitPath = useMemo(() => location.pathname.split('/'), [location.pathname])
   const title = useMemo(
@@ -55,6 +55,7 @@ function TopBar() {
   const [opened, setOpened] = useState<boolean>(false)
 
   const { fetchAuthRequest } = useFetch()
+  const navigate = useNavigate()
 
   const handleLogutBtnClicked = useCallback(() => {
     disconnectWallet()
@@ -78,19 +79,25 @@ function TopBar() {
       body
     }
 
-    fetchAuthRequest(req).then((res) => {
-      if (res) {
-        setAdexAccount(null)
-        updateAuthMsgResp(null)
-      }
-    })
+    fetchAuthRequest(req)
+      .then((res) => {
+        if (res) {
+          updateAdexAccount(null)
+          updateAuthMsgResp(null)
+          navigate('/login', { replace: true })
+        }
+      })
+      .catch((e) => {
+        console.log('Something went wrong', e)
+      })
   }, [
     disconnectWallet,
     fetchAuthRequest,
     adexAccount?.accessToken,
     adexAccount?.refreshToken,
-    setAdexAccount,
-    updateAuthMsgResp
+    updateAdexAccount,
+    updateAuthMsgResp,
+    navigate
   ])
 
   return (
