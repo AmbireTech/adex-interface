@@ -41,7 +41,6 @@ export const isTokenExpired = (account: IAdExAccount) => {
 }
 
 export const getMessageToSign = async (user: any) => {
-  // TODO: use process.env.basURL
   const url = `${BASE_URL}/dsp/login-msg`
   const method = 'POST'
   const body = {
@@ -68,7 +67,6 @@ type VerifyLoginProps = {
 }
 
 export const verifyLogin = async (body: VerifyLoginProps) => {
-  // TODO: use process.env.basURL
   const url = `${BASE_URL}/dsp/login-verify`
   const method = 'POST'
   const headers = {

@@ -109,7 +109,10 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
           updateMessageToSign(messageToSignStringified)
           updateAuthMsgResp(getMessage.authMsg)
         })
-        .catch((e) => console.log('e', e))
+        .catch((e) => {
+          debugger // eslint-disable-line no-debugger
+          console.log('error', e)
+        })
     }
 
     ambireSDK.onLoginSuccess(handleLoginSuccess)
@@ -163,33 +166,6 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
     }
   }, [ambireSDK, authMsgResp, messageToSign])
 
-  useEffect(() => {
-    const handleLogoutSuccess = () => {
-      // if tokenExpired
-      // updateAccessToken
-      // then
-      // logout
-      // else
-      // logout
-      // if (adexAccount) {
-      //   logout(adexAccount)
-      //     .then((res) => {
-      //       console.log('logoutRes', res)
-      //       if (!res) return
-      //       setAdexAccount(null)
-      //       updateAuthMsgResp(null)
-      //     })
-      //     .catch((e) => console.log('Logout failed: ', e))
-      // }
-    }
-
-    ambireSDK.onLogoutSuccess(handleLogoutSuccess)
-
-    return () => {
-      // ambireSDK.offLogoutSuccess(handleLogoutSuccess)
-    }
-  }, [ambireSDK])
-
   const authenticated = useMemo(
     () => (!adexAccount ? false : adexAccount.authenticated),
     [adexAccount]
@@ -199,7 +175,6 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
     () => ({
       adexAccount,
       authenticated,
-      // authenticated: true,
       connectWallet,
       disconnectWallet,
       signMessage,

@@ -10,7 +10,6 @@ const processResponse = (res: any) => {
   return res.text().then((text: any) => {
     if (res.status === 401 || res.status === 403) {
       console.error('something went wrong', text)
-      // logOut(skipRedirect)
     }
   })
 }
@@ -20,8 +19,8 @@ const useFetch = () => {
 
   const fetchAuthRequest = useCallback(
     async (req: any) => {
-      // try {
       const response = await updateAccessToken()
+
       if (response) {
         const updatedAccessToken = response.accessToken
         const updatedReq = { ...req, 'X-DSP-AUTH': `Bearer ${updatedAccessToken}` }
@@ -30,10 +29,6 @@ const useFetch = () => {
       }
 
       return fetchService(req).then(processResponse)
-      // } catch (error) {
-      //   console.error('Error updating access token:', error)
-      //   // Handle error gracefully
-      // }
     },
     [updateAccessToken]
   )
