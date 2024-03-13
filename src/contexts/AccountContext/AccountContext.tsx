@@ -10,13 +10,12 @@ import {
 import { IAdExAccount } from 'types'
 import { useLocalStorage } from '@mantine/hooks'
 import { getMessageToSign, isTokenExpired, refreshAccessToken, verifyLogin } from 'lib/backend'
-
 import { AmbireLoginSDK } from '@ambire/login-sdk-core'
+import { DAPP_ICON_PATH, DAPP_NAME } from 'constants/login'
 
 const ambireLoginSDK = new AmbireLoginSDK({
-  dappName: 'AdEx Platform',
-  dappIconPath:
-    'https://raw.githubusercontent.com/AmbireTech/ambire-brand/main/adex-logos/Ambire_AdEx_Symbol_color.svg'
+  dappName: DAPP_NAME,
+  dappIconPath: DAPP_ICON_PATH
 })
 
 interface IAccountContext {
@@ -110,16 +109,11 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
           updateAuthMsgResp(getMessage.authMsg)
         })
         .catch((e) => {
-          debugger // eslint-disable-line no-debugger
           console.log('error', e)
         })
     }
 
     ambireSDK.onLoginSuccess(handleLoginSuccess)
-
-    return () => {
-      // ambireSDK.offLoginSuccess(handleLoginSuccess)
-    }
   }, [ambireSDK, updateAdexAccount, updateAuthMsgResp, updateMessageToSign])
 
   useEffect(() => {
@@ -141,11 +135,8 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
         })
         .catch((e) => console.error('Error verifying login:', e))
     }
-    ambireSDK.onMsgSigned(handleMsgSigned)
 
-    return () => {
-      // ambireSDK.offMsgSigned(handleMsgSigned)
-    }
+    ambireSDK.onMsgSigned(handleMsgSigned)
   }, [ambireSDK, authMsgResp, updateAdexAccount])
 
   useEffect(() => {
@@ -154,11 +145,15 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
     }
 
     ambireSDK.onMsgRejected(handleMsgRejected)
-
-    return () => {
-      // ambireSDK.offLogoutSuccess(handleLogoutSuccess)
-    }
   }, [ambireSDK, disconnectWallet])
+
+  useEffect(() => {
+    const handleLogoutSuccess = () => {
+      ambireSDK.hideIframe()
+    }
+
+    ambireSDK.onLogoutSuccess(handleLogoutSuccess)
+  }, [ambireSDK])
 
   useEffect(() => {
     if (authMsgResp && messageToSign) {

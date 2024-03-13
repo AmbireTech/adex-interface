@@ -1,7 +1,7 @@
+import { BASE_URL } from 'constants/login'
 import { fetchService } from 'services'
 import { IAdExAccount, AppError, ErrorLevel } from 'types'
 
-const BASE_URL = process.env.REACT_APP_BASE_URL
 const processResponse = (res: any) => {
   if (res.status >= 200 && res.status < 400) {
     return res.json()

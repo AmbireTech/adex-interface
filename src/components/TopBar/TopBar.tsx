@@ -22,6 +22,7 @@ import Blockies from 'components/common/Blockies'
 import { useLocation, useNavigate } from 'react-router-dom'
 import StakingIcon from 'resources/icons/Staking'
 import useFetch from 'hooks/useFetchRequest'
+import { BASE_URL } from 'constants/login'
 
 const useStyles = createStyles((theme) => ({
   rotateUpsideDown: {
@@ -60,26 +61,18 @@ function TopBar() {
   const handleLogutBtnClicked = useCallback(() => {
     disconnectWallet()
     if (!adexAccount?.accessToken && !adexAccount?.refreshToken) return
-    // TODO: remove all req variables
-    const BASE_URL = process.env.REACT_APP_BASE_URL
-    const url = `${BASE_URL}/dsp/logout`
-    const method = 'POST'
-    const headers = {
-      'Content-Type': 'application/json',
-      'X-DSP-AUTH': `Bearer ${adexAccount.accessToken}`
-    }
-    const body = {
-      refreshToken: adexAccount.refreshToken
-    }
 
-    const req = {
-      url,
-      method,
-      headers,
-      body
-    }
-
-    fetchAuthRequest(req)
+    fetchAuthRequest({
+      url: `${BASE_URL}/dsp/logout`,
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-DSP-AUTH': `Bearer ${adexAccount.accessToken}`
+      },
+      body: {
+        refreshToken: adexAccount.refreshToken
+      }
+    })
       .then((res) => {
         if (res) {
           updateAdexAccount(null)
