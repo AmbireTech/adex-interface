@@ -21,6 +21,12 @@ const MultiSelectAndRadioButtons = ({
     setSelectedValue([])
   }, [])
 
+  const labelText = useMemo(() => {
+    if (selectedRadio === 'in') return `Select ${label}`
+    if (selectedRadio === 'nin') return `Select ${label} to exclude`
+    return ''
+  }, [selectedRadio, label])
+
   useEffect(() => {
     if (selectedRadio === 'all') setSelectedCategories([])
     else setSelectedCategories(selectedValue)
@@ -42,11 +48,7 @@ const MultiSelectAndRadioButtons = ({
         </Stack>
       </Radio.Group>
       <Text color="secondaryText" size="sm" weight="bold" mb="xs">
-        {selectedRadio === 'in'
-          ? `Select ${label}`
-          : selectedRadio === 'nin'
-          ? `Select ${label} to exclude`
-          : ''}
+        {labelText}
       </Text>
       <MultiSelect
         searchable

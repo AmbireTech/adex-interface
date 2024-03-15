@@ -6,13 +6,12 @@ import JSZip from 'jszip'
 import { fetchService } from 'services'
 
 export const checkSelectedDevices = (devices: Devices[]) => {
-  return devices.length === 1 && devices.includes('mobile')
-    ? 'mobile'
-    : devices.length === 1 && devices.includes('desktop')
-    ? 'desktop'
-    : devices.length === 2
-    ? 'both'
-    : null
+  if (devices.length === 1) {
+    if (devices.includes('mobile')) return 'mobile'
+    if (devices.includes('desktop')) return 'desktop'
+  }
+  if (devices.length === 2) return 'both'
+  return null
 }
 
 export const formatCatsAndLocsData = (inputValues: TargetingInputSingle, lib: SelectData[]) => {

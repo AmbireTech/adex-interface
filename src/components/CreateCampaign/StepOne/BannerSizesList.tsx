@@ -21,31 +21,24 @@ const BannerSizesList = ({ adUnits }: { adUnits: AdUnit[] }) => {
     [updatedBannerSizes]
   )
 
-  return selectedDevices === 'mobile' ? (
+  const selectedBannerSizes = useMemo(() => {
+    if (selectedDevices === 'mobile') return mobileSizes
+    if (selectedDevices === 'desktop') return desktopSizes
+    if (selectedDevices === 'both') return updatedBannerSizes
+    return null
+  }, [selectedDevices, mobileSizes, desktopSizes, updatedBannerSizes])
+
+  const generateBanners = (sizes: any[]) => (
     <Grid>
-      {mobileSizes.map((item) => (
+      {sizes.map((item) => (
         <Grid.Col span="content" key={`${item.bannerSizes.w}x${item.bannerSizes.h}`}>
           <BannerSizeMock variant={item} />
         </Grid.Col>
       ))}
     </Grid>
-  ) : selectedDevices === 'desktop' ? (
-    <Grid>
-      {desktopSizes.map((item) => (
-        <Grid.Col span="content" key={`${item.bannerSizes.w}x${item.bannerSizes.h}`}>
-          <BannerSizeMock variant={item} />
-        </Grid.Col>
-      ))}
-    </Grid>
-  ) : selectedDevices === 'both' ? (
-    <Grid>
-      {updatedBannerSizes.map((item) => (
-        <Grid.Col span="content" key={`${item.bannerSizes.w}x${item.bannerSizes.h}`}>
-          <BannerSizeMock variant={item} />
-        </Grid.Col>
-      ))}
-    </Grid>
-  ) : null
+  )
+
+  return selectedBannerSizes ? generateBanners(selectedBannerSizes) : null
 }
 
 export default BannerSizesList

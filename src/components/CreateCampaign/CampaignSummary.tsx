@@ -51,7 +51,6 @@ const CampaignSummary = () => {
     )
   }, [step, adUnits.length, noSelectedCatsOrLogs])
 
-  console.log('step', step)
   const isTheLastStep = useMemo(() => step === CREATE_CAMPAIGN_STEPS - 1, [step])
   const isFirstStep = useMemo(() => step === 0, [step])
   const launchCampaign = () => {

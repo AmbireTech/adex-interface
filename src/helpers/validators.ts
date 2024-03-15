@@ -1,32 +1,48 @@
 export const validateCreateCampaignFrom = {
-  paymentModel: (value: string) => (value === '' ? 'Select payment method' : null),
-  currency: (value: string) => (value === '' ? 'Select currency' : null),
-  campaignBudget: (value: any) =>
-    value === '' || Number.isNaN(Number(value))
-      ? 'Enter campaign budget or a valid number'
-      : parseFloat(value) <= 0
-      ? 'Campaign budget should be greater than 0'
-      : null,
-  // TODO: removed hardcoded IMPRESSION
-  'pricingBounds.IMPRESSION.min': (value: string) =>
-    value === '' || Number.isNaN(Number(value))
-      ? 'Enter CPM min value or a valid number'
-      : parseFloat(value) <= 0
-      ? 'CPM min should be greater than 0'
-      : null,
-  // TODO: removed hardcoded IMPRESSION
-  'pricingBounds.IMPRESSION.max': (value: string) =>
-    value === '' || Number.isNaN(Number(value))
-      ? 'Enter CPM max value or a valid number'
-      : parseFloat(value) <= 0
-      ? 'CPM max should be greater than 0'
-      : null,
-  campaignName: (value: string) =>
-    value === ''
-      ? 'Enter Campaign name'
-      : value.length < 2
-      ? 'Campaign name must have at least 2 letters'
-      : null
+  paymentModel: (value: string) => {
+    if (value === '') return 'Select payment method'
+    return null
+  },
+  currency: (value: string) => {
+    if (value === '') return 'Select currency'
+    return null
+  },
+  campaignBudget: (value: any) => {
+    if (value === '' || Number.isNaN(Number(value))) {
+      return 'Enter campaign budget or a valid number'
+    }
+    if (parseFloat(value) <= 0) {
+      return 'Campaign budget should be greater than 0'
+    }
+    return null
+  },
+  'pricingBounds.IMPRESSION.min': (value: string) => {
+    if (value === '' || Number.isNaN(Number(value))) {
+      return 'Enter CPM min value or a valid number'
+    }
+    if (parseFloat(value) <= 0) {
+      return 'CPM min should be greater than 0'
+    }
+    return null
+  },
+  'pricingBounds.IMPRESSION.max': (value: string) => {
+    if (value === '' || Number.isNaN(Number(value))) {
+      return 'Enter CPM max value or a valid number'
+    }
+    if (parseFloat(value) <= 0) {
+      return 'CPM max should be greater than 0'
+    }
+    return null
+  },
+  campaignName: (value: string) => {
+    if (value === '') {
+      return 'Enter Campaign name'
+    }
+    if (value.length < 2) {
+      return 'Campaign name must have at least 2 letters'
+    }
+    return null
+  }
 }
 
 export const isValidHttpUrl = (inputURL: string) => {
