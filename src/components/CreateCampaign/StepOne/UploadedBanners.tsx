@@ -1,3 +1,4 @@
+import { useCallback, useMemo } from 'react'
 import { Checkbox, Grid } from '@mantine/core'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import { AdUnit } from 'adex-common/dist/types'
@@ -15,30 +16,40 @@ const UploadedBanners = ({
     campaign: { adUnits, devices }
   } = useCreateCampaignContext()
 
-  const inputBanners =
-    adUnits.length > 0
-      ? adUnits.map((image: AdUnit) => {
-          const allowedSizes =
-            devices.length > 0 && devices.length > 1
-              ? [...ALLOWED_BANNER_SIZES.desktop.flat(), ...ALLOWED_BANNER_SIZES.mobile.flat()]
-              : ALLOWED_BANNER_SIZES[devices[0]]
+  const allowedSizes = useMemo(
+    () =>
+      devices.length > 0 && devices.length > 1
+        ? [...ALLOWED_BANNER_SIZES.desktop.flat(), ...ALLOWED_BANNER_SIZES.mobile.flat()]
+        : ALLOWED_BANNER_SIZES[devices[0]],
+    [devices]
+  )
 
-          const isMatchedTheSizes = allowedSizes.find(
-            (item) => item.w === image.banner?.format.w && item.h === image.banner?.format.h
-          )
+  const isMatchedTheSizes = useCallback(
+    (img: AdUnit) =>
+      allowedSizes.find(
+        (item) => item.w === img.banner?.format.w && item.h === img.banner?.format.h
+      ),
+    [allowedSizes]
+  )
 
-          return (
-            <Grid.Col key={image.id}>
-              <ImageUrlInput
-                image={image}
-                toRemove={!isMatchedTheSizes}
-                onDelete={onDeleteCreativeBtnClicked}
-                onChange={(e) => handleOnInputChange(e.target.value, image.id)}
-              />
-            </Grid.Col>
-          )
-        })
-      : null
+  const inputBanners = useMemo(
+    () =>
+      adUnits.length > 0
+        ? adUnits.map((image: AdUnit) => {
+            return (
+              <Grid.Col key={image.id}>
+                <ImageUrlInput
+                  image={image}
+                  toRemove={!isMatchedTheSizes(image)}
+                  onDelete={onDeleteCreativeBtnClicked}
+                  onChange={(e) => handleOnInputChange(e.target.value, image.id)}
+                />
+              </Grid.Col>
+            )
+          })
+        : null,
+    [adUnits, handleOnInputChange, isMatchedTheSizes, onDeleteCreativeBtnClicked]
+  )
 
   return (
     <Grid>

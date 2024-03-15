@@ -140,7 +140,7 @@ const useCreateCampaignData = () => {
   const adUnitsFormatted = useMemo(
     () =>
       adUnits.map((image: AdUnit) => {
-        return <ImageUrlInput image={image} mb="sm" preview />
+        return <ImageUrlInput key={image.id} image={image} mb="sm" preview />
       }),
     [adUnits]
   )

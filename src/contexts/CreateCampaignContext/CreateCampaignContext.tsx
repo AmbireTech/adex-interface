@@ -7,8 +7,7 @@ import { CampaignUI, CreateCampaignType } from 'types'
 const CreateCampaignContext = createContext<CreateCampaignType | null>(null)
 
 const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
-  // const defaultValue1 = { ...CREATE_CAMPAIGN_DEFAULT_VALUE }
-  const defaultValue = structuredClone(CREATE_CAMPAIGN_DEFAULT_VALUE)
+  const defaultValue = { ...CREATE_CAMPAIGN_DEFAULT_VALUE }
 
   const [campaign, setCampaign] = useLocalStorage<CampaignUI>({
     key: 'createCampaign',
@@ -29,8 +28,8 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
       key: CampaignItemKey,
       value: CampaignUI[CampaignItemKey]
     ) => {
-      setCampaign((x) => {
-        const updated = structuredClone(x)
+      setCampaign((prevState) => {
+        const updated = { ...prevState }
         updated[key] = value
         return updated
       })
@@ -40,8 +39,8 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
 
   const updateCampaignWithPrevStateNested = useCallback(
     (nestedKey: string, value: any) => {
-      setCampaign((prevCampaign) => {
-        const updated = { ...prevCampaign }
+      setCampaign((prevState) => {
+        const updated = { ...prevState }
         const keys = nestedKey.split('.')
         let currentLevel: any = updated
 

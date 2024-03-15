@@ -11,8 +11,8 @@ export type CampaignUI = Campaign & {
   // devices: DeviceType[]
   devices: Devices[]
   paymentModel: PaymentModelType
-  startsAt: Date | null
-  endsAt: Date | null
+  startsAt: Date
+  endsAt: Date
   currency: string
   cpmMin: string
   cpmMax: string

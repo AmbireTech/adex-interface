@@ -18,6 +18,7 @@ import DownArrowIcon from 'resources/icons/DownArrow'
 import TimeIcon from 'resources/icons/Time'
 import dayjs from 'dayjs'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
+import { initAllLocales } from 'helpers/createCampaignHelpers'
 import Clock from './Clock'
 import CampaignTimePicker from './CampaignTimePicker'
 
@@ -45,16 +46,7 @@ const useStyles = createStyles((theme) => ({
 }))
 
 const CampaignPeriodModal = ({ opened, close }: { opened: boolean; close: () => void }) => {
-  // TODO: add it like helper func
-  const locales = (require as any).context('dayjs/locale', true, /\.js$/)
-
-  const allLocales: Record<string, any> = locales.keys().reduce((acc: any, fileName: any) => {
-    const localeName = fileName.replace(/^.\/(.*).js$/, '$1')
-    const localeModule = locales(fileName)
-    acc[localeName] = localeModule.default || localeModule
-    return acc
-  }, {})
-  // =================
+  const allLocales = useMemo(() => initAllLocales(), [])
   const {
     updateCampaign,
     campaign: { startsAt, endsAt }

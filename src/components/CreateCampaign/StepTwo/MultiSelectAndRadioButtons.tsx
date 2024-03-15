@@ -32,11 +32,9 @@ const MultiSelectAndRadioButtons = ({
     else setSelectedCategories(selectedValue)
   }, [selectedRadio, selectedValue])
 
-  const memoizedOnCategoriesChange = useMemo(() => onCategoriesChange, [onCategoriesChange])
-
   useEffect(() => {
-    memoizedOnCategoriesChange(selectedRadio, selectedCategories)
-  }, [memoizedOnCategoriesChange, selectedRadio, selectedCategories])
+    onCategoriesChange(selectedRadio, selectedCategories)
+  }, [onCategoriesChange, selectedRadio, selectedCategories])
 
   return (
     <>

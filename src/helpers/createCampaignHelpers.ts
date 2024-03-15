@@ -254,3 +254,14 @@ export const uploadMedia = async (media: Blob, mediaName: string, shouldPin: boo
 export const getMediaUrlWithProvider = (mediaUrl = 'ipfs://', provider = '') => {
   return provider + mediaUrl.substring(7)
 }
+
+export const initAllLocales = () => {
+  const locales = (require as any).context('dayjs/locale', true, /\.js$/)
+  const allLocales: Record<string, any> = locales.keys().reduce((acc: any, fileName: any) => {
+    const localeName = fileName.replace(/^.\/(.*).js$/, '$1')
+    const localeModule = locales(fileName)
+    acc[localeName] = localeModule.default || localeModule
+    return acc
+  }, {})
+  return allLocales
+}

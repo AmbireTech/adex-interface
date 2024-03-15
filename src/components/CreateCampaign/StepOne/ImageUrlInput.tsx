@@ -1,23 +1,9 @@
-import { ActionIcon, Input, createStyles, Image, Text } from '@mantine/core'
+import { ActionIcon, Input, Text } from '@mantine/core'
 import InfoAlertMessage from 'components/common/InfoAlertMessage'
-import { getMediaUrlWithProvider, isVideoMedia } from 'helpers/createCampaignHelpers'
+import MediaBanner from 'components/common/MediaBanner'
 import { useCallback } from 'react'
 import DeleteIcon from 'resources/icons/Delete'
 import { ImageUrlInputProps } from 'types'
-
-const IPFS_GATEWAY = process.env.REACT_APP_IPFS_GATEWAY
-
-const useStyles = createStyles(() => ({
-  image: {
-    maxWidth: 40,
-    maxHeight: 40
-  },
-  imageContainer: {
-    maxWidth: 40,
-    maxHeight: 40,
-    overflow: 'hidden'
-  }
-}))
 
 const ImageUrlInput = ({
   image,
@@ -27,38 +13,6 @@ const ImageUrlInput = ({
   preview,
   ...rest
 }: ImageUrlInputProps) => {
-  const { classes } = useStyles()
-  const mediaUrl = getMediaUrlWithProvider(image.banner?.mediaUrl, IPFS_GATEWAY)
-
-  const getImageIcon = useCallback(() => {
-    if (!image.banner) return null
-
-    if (image.banner.mime === 'text/html') {
-      return (
-        <div className={classes.imageContainer}>
-          <iframe
-            title="htmlBanner"
-            width={40}
-            height={40}
-            // src={mediaUrl}
-            src="https://gateway.pinata.cloud/ipfs/QmW7S5HRLkP4XtPNyT1vQSjP3eRdtZaVtF6FAPvUfduMjA"
-          />
-        </div>
-      )
-    }
-
-    if (isVideoMedia(image.banner.mime)) {
-      return (
-        <video width="40" height="40" autoPlay loop>
-          <source src={mediaUrl} type="video/mp4" />
-          <track src="captions_en.vtt" kind="captions" label="english_captions" />
-        </video>
-      )
-    }
-
-    return <Image src={mediaUrl} alt={image.title} className={classes.image} />
-  }, [classes.image, classes.imageContainer, image.banner, image.title, mediaUrl])
-
   const getRightSection = useCallback(() => {
     if (preview)
       return <Text size="xs" pr="xs">{`${image.banner?.format.w}x${image.banner?.format.h}`}</Text>
@@ -89,7 +43,7 @@ const ImageUrlInput = ({
         variant="default"
         placeholder="Paste URL"
         size="lg"
-        icon={getImageIcon()}
+        icon={<MediaBanner adUnit={image} />}
         rightSection={getRightSection()}
         {...rest}
       />

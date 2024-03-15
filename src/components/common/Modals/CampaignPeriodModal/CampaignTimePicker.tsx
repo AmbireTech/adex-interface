@@ -1,4 +1,3 @@
-import { MutableRefObject, useRef } from 'react'
 import { Box, createStyles } from '@mantine/core'
 import { TimeInput } from '@mantine/dates'
 
@@ -31,22 +30,20 @@ function CampaignTimePicker({
   defaultValue,
   onChange
 }: {
-  defaultValue?: string | null
+  defaultValue: string
   onChange: React.ChangeEventHandler<HTMLInputElement> | undefined
 }) {
   const { classes } = useStyles()
-  const ref: MutableRefObject<HTMLInputElement | null> = useRef<HTMLInputElement>(null)
 
   return (
     <Box className={classes.timeWrapper}>
       <TimeInput
         aria-label="Time Input"
         variant="unstyled"
-        ref={ref}
         mx="auto"
         onChange={onChange}
         classNames={{ input: classes.input }}
-        defaultValue={defaultValue || '--:--'}
+        defaultValue={defaultValue}
       />
     </Box>
   )
