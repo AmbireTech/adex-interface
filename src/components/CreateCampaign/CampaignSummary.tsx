@@ -18,11 +18,14 @@ const useStyles = createStyles((theme) => ({
   },
   lightestBrandColor: {
     color: theme.colors.brand[theme.fn.primaryShade()] + theme.other.shades.hexColorSuffix.lighter
+  },
+  brandColor: {
+    color: theme.colors.brand[theme.fn.primaryShade()]
   }
 }))
 
 const CampaignSummary = () => {
-  const { classes } = useStyles()
+  const { classes, cx } = useStyles()
   const {
     campaign: { step, adUnits },
     updateCampaign
@@ -43,14 +46,14 @@ const CampaignSummary = () => {
   )
 
   useEffect(() => {
-    if ((step === 0 && adUnits.length === 0) || (step === 1 && noSelectedCatsOrLogs)) {
-      setIsNextBtnDisabled(true)
-    } else {
-      setIsNextBtnDisabled(false)
-    }
+    setIsNextBtnDisabled(
+      (step === 0 && adUnits.length === 0) || (step === 1 && noSelectedCatsOrLogs)
+    )
   }, [step, adUnits.length, noSelectedCatsOrLogs])
 
+  console.log('step', step)
   const isTheLastStep = useMemo(() => step === CREATE_CAMPAIGN_STEPS - 1, [step])
+  const isFirstStep = useMemo(() => step === 0, [step])
   const launchCampaign = () => {
     // TODO: REVOKE all the blob URLs
     // URL.revokeObjectURL(storedImageURL);
@@ -122,18 +125,18 @@ const CampaignSummary = () => {
         <Button w="90%" size="lg" mt="md" variant="outline">
           Save Draft
         </Button>
-        <UnstyledButton variant="underlined" mt="sm">
-          <Group
-            position="center"
-            onClick={() => step > 0 && updateCampaign('step', step - 1)}
-            align="center"
-            spacing="xs"
-            h={50}
-          >
-            <span className={classes.lightestBrandColor}>
+        <UnstyledButton
+          variant="underlined"
+          mt="sm"
+          onClick={() => updateCampaign('step', step - 1)}
+          disabled={isFirstStep}
+          className={cx(classes.brandColor, { [classes.lightestBrandColor]: isFirstStep })}
+        >
+          <Group position="center" align="center" spacing="xs" h={50}>
+            <span>
               <LeftArrowIcon className={classes.icon} />
             </span>
-            <Text size="lg" weight="bold" underline className={classes.lightestBrandColor}>
+            <Text size="lg" weight="bold" underline>
               Go Back
             </Text>
           </Group>
