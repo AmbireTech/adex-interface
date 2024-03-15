@@ -1,17 +1,10 @@
-import {
-  createContext,
-  FC,
-  PropsWithChildren,
-  useMemo,
-  useCallback,
-  useEffect,
-  useState
-} from 'react'
+import { createContext, FC, PropsWithChildren, useMemo, useCallback, useEffect } from 'react'
 import { IAdExAccount } from 'types'
 import { useLocalStorage } from '@mantine/hooks'
 import { getMessageToSign, isTokenExpired, refreshAccessToken, verifyLogin } from 'lib/backend'
 import { AmbireLoginSDK } from '@ambire/login-sdk-core'
-import { DAPP_ICON_PATH, DAPP_NAME } from 'constants/login'
+import { DAPP_ICON_PATH, DAPP_NAME, DEFAULT_CHAIN_ID } from 'constants/login'
+import useCustomNotifications from 'hooks/useCustomNotifications'
 
 const ambireLoginSDK = new AmbireLoginSDK({
   dappName: DAPP_NAME,
@@ -25,15 +18,14 @@ interface IAccountContext {
   connectWallet: () => void
   disconnectWallet: () => void
   updateAdexAccount: (value: any) => void
-  updateAuthMsgResp: (value: any) => void
   updateAccessToken: () => Promise<any>
 }
 
 const AccountContext = createContext<IAccountContext | null>(null)
 
 const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
+  const { showDangerNotification, showInfoNotification } = useCustomNotifications()
   const ambireSDK = useMemo(() => ambireLoginSDK, [])
-
   const [adexAccount, setAdexAccount] = useLocalStorage<IAccountContext['adexAccount']>({
     key: 'adexAccount',
     defaultValue: {
@@ -41,12 +33,10 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
       chainId: 1,
       accessToken: '',
       refreshToken: '',
-      authenticated: false
+      authenticated: false,
+      authMsgResp: null
     }
   })
-
-  const [authMsgResp, setAuthMsgResp] = useState<any>(null)
-  const [messageToSign, setMessageToSign] = useState<string | null>(null)
 
   const updateAdexAccount = useCallback(
     (newValue: any | null) => {
@@ -54,29 +44,24 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
     },
     [setAdexAccount]
   )
-  const updateMessageToSign = useCallback(
-    (newValue: string) => setMessageToSign(newValue),
-    [setMessageToSign]
-  )
 
-  const updateAuthMsgResp = useCallback((value: any) => setAuthMsgResp(value), [setAuthMsgResp])
-
-  const connectWallet = useCallback(async () => {
-    ambireSDK.openLogin()
+  const connectWallet = useCallback(() => {
+    ambireSDK.openLogin({ chainId: DEFAULT_CHAIN_ID })
   }, [ambireSDK])
 
-  const disconnectWallet = useCallback(async () => {
+  const disconnectWallet = useCallback(() => {
     ambireSDK.openLogout()
   }, [ambireSDK])
 
   const signMessage = useCallback(
-    async (type: string, message: string) => {
+    (type: string, message: string) => {
       ambireSDK.openSignMessage(type, message)
     },
     [ambireSDK]
   )
 
   const updateAccessToken = useCallback(async () => {
+    console.count('updateAccessToken')
     if (!adexAccount) return
     if (isTokenExpired(adexAccount)) {
       try {
@@ -97,30 +82,31 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
     }
   }, [adexAccount, updateAdexAccount])
 
-  useEffect(() => {
-    const handleLoginSuccess = async (data: any) => {
+  const handleLoginSuccess = useCallback(
+    (data: any) => {
+      console.count('handleLoginSuccess')
       if (!data) return
       const updatedAccount = { address: data.address, chainId: data.chainId }
-      updateAdexAccount(updatedAccount)
       getMessageToSign(updatedAccount)
         .then((getMessage) => {
-          const messageToSignStringified = JSON.stringify(getMessage.authMsg)
-          updateMessageToSign(messageToSignStringified)
-          updateAuthMsgResp(getMessage.authMsg)
+          updateAdexAccount({ ...updatedAccount, authMsgResp: getMessage.authMsg })
         })
         .catch((e) => {
           console.log('error', e)
+          // ambireSDK.openLogout()
+          showDangerNotification(e.message, 'Get message to sign failed')
         })
-    }
+    },
+    [updateAdexAccount, showDangerNotification]
+  )
 
-    ambireSDK.onLoginSuccess(handleLoginSuccess)
-  }, [ambireSDK, updateAdexAccount, updateAuthMsgResp, updateMessageToSign])
+  const handleMsgSigned = useCallback(
+    ({ signature }: any) => {
+      console.count('handleMsgSigned')
+      if (!adexAccount?.authMsgResp) return
 
-  useEffect(() => {
-    const handleMsgSigned = ({ signature }: any) => {
-      if (!authMsgResp) return
       const body = {
-        authMsg: { ...authMsgResp },
+        authMsg: { ...adexAccount?.authMsgResp },
         signature
       }
 
@@ -133,33 +119,70 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
             authenticated: !!authResp.accessToken && !!authResp.refreshToken
           })
         })
-        .catch((e) => console.error('Error verifying login:', e))
-    }
+        .catch((e) => {
+          console.error('Error verifying login:', e)
+          showDangerNotification(e.message, 'Verifying login failed')
+          // ambireSDK.openLogout()
+        })
+    },
+    [adexAccount?.authMsgResp, updateAdexAccount, showDangerNotification]
+  )
 
-    ambireSDK.onMsgSigned(handleMsgSigned)
-  }, [ambireSDK, authMsgResp, updateAdexAccount])
+  const handleMsgRejected = useCallback(() => {
+    console.count('handleMsgRejected')
+    disconnectWallet()
+  }, [disconnectWallet])
 
-  useEffect(() => {
-    const handleMsgRejected = () => {
-      disconnectWallet()
-    }
+  const handleLogoutSuccess = useCallback(() => {
+    console.count('handleLogoutSuccess')
+    ambireSDK.hideIframe()
+    showInfoNotification('Successfully disconnected', 'Login SDK')
+  }, [ambireSDK, showInfoNotification])
 
-    ambireSDK.onMsgRejected(handleMsgRejected)
-  }, [ambireSDK, disconnectWallet])
-
-  useEffect(() => {
-    const handleLogoutSuccess = () => {
-      ambireSDK.hideIframe()
-    }
-
-    ambireSDK.onLogoutSuccess(handleLogoutSuccess)
+  const handleActionRejected = useCallback(() => {
+    console.log('handleActionRejected')
+    ambireSDK.openLogout()
   }, [ambireSDK])
 
   useEffect(() => {
-    if (authMsgResp && messageToSign) {
-      ambireSDK.openSignMessage('eth_signTypedData', messageToSign)
+    ambireSDK.onLoginSuccess(handleLoginSuccess)
+    ambireSDK.onMsgSigned(handleMsgSigned)
+    ambireSDK.onMsgRejected(handleMsgRejected)
+    ambireSDK.onLogoutSuccess(handleLogoutSuccess)
+    ambireSDK.onActionRejected(handleActionRejected)
+
+    return () => {
+      window.removeEventListener('loginSuccess', handleLoginSuccess)
+      window.removeEventListener('msgSigned', handleMsgSigned)
+      window.removeEventListener('msgRejected', handleMsgRejected)
+      window.removeEventListener('logoutSuccess', handleLogoutSuccess)
+      window.removeEventListener('actionRejected', handleActionRejected)
     }
-  }, [ambireSDK, authMsgResp, messageToSign])
+  }, [
+    ambireSDK,
+    handleLoginSuccess,
+    handleMsgSigned,
+    handleMsgRejected,
+    handleLogoutSuccess,
+    handleActionRejected
+  ])
+
+  useEffect(() => {
+    // TODO: Add more checks to prevent useless opening of the Sign Message
+    if (adexAccount?.authMsgResp) {
+      console.log('openSignMessage')
+      signMessage('eth_signTypedData', JSON.stringify(adexAccount.authMsgResp))
+    }
+  }, [adexAccount?.authMsgResp, signMessage])
+
+  // useEffect(() => {
+  //   ambireSDK.onAlreadyLoggedIn(() => {
+  //     console.log('onAlreadyLoggedIn')
+  //     // if (!adexAccount?.authenticated) {
+  //     //   ambireSDK.openLogout()
+  //     // }
+  //   })
+  // }, [ambireSDK, adexAccount])
 
   const authenticated = useMemo(
     () => (!adexAccount ? false : adexAccount.authenticated),
@@ -170,12 +193,12 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
     () => ({
       adexAccount,
       authenticated,
+      // authenticated: true,
       connectWallet,
       disconnectWallet,
       signMessage,
       ambireSDK,
       updateAdexAccount,
-      updateAuthMsgResp,
       updateAccessToken
     }),
     [
@@ -186,7 +209,6 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
       signMessage,
       ambireSDK,
       updateAdexAccount,
-      updateAuthMsgResp,
       updateAccessToken
     ]
   )

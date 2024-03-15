@@ -4,4 +4,5 @@ export interface IAdExAccount {
   accessToken?: string
   refreshToken?: string
   authenticated: boolean
+  authMsgResp?: any
 }

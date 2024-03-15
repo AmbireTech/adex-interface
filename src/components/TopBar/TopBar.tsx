@@ -45,7 +45,7 @@ const useStyles = createStyles((theme) => ({
 
 function TopBar() {
   const { classes, cx } = useStyles()
-  const { adexAccount, disconnectWallet, updateAdexAccount, updateAuthMsgResp } = useAccount()
+  const { adexAccount, disconnectWallet, updateAdexAccount } = useAccount()
   const location = useLocation()
   const splitPath = useMemo(() => location.pathname.split('/'), [location.pathname])
   const title = useMemo(
@@ -75,8 +75,8 @@ function TopBar() {
     })
       .then((res) => {
         if (res) {
+          // TODO:use resetAccount instead
           updateAdexAccount(null)
-          updateAuthMsgResp(null)
           navigate('/login', { replace: true })
         }
       })
@@ -89,7 +89,6 @@ function TopBar() {
     adexAccount?.accessToken,
     adexAccount?.refreshToken,
     updateAdexAccount,
-    updateAuthMsgResp,
     navigate
   ])
 
