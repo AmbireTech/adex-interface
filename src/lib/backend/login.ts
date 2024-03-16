@@ -30,13 +30,13 @@ const parseJwt = (token: string) => {
   return JSON.parse(jsonPayload)
 }
 
-export const isTokenExpired = (account: IAdExAccount) => {
-  if (!account || !account.accessToken) {
+export const isTokenExpired = (accessToken: string) => {
+  if (!accessToken) {
     return true
   }
 
   const timeNowInSeconds = Math.floor(new Date().getTime() / 1000)
-  const decodeAccessToken = parseJwt(account.accessToken)
+  const decodeAccessToken = parseJwt(accessToken)
   return decodeAccessToken.exp < timeNowInSeconds
 }
 
@@ -83,11 +83,11 @@ export const verifyLogin = async (body: VerifyLoginProps) => {
   return fetchService(req).then(processResponse)
 }
 
-export const refreshAccessToken = async (adexAccount: IAdExAccount) => {
+export const refreshAccessToken = async (refreshToken: string) => {
   const url = `${BASE_URL}/dsp/refresh-token`
   const method = 'POST'
   const body = {
-    refreshToken: adexAccount?.refreshToken
+    refreshToken
   }
   const headers = {
     'Content-Type': 'application/json'

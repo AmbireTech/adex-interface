@@ -24,13 +24,13 @@ interface IAccountContext {
 const AccountContext = createContext<IAccountContext | null>(null)
 
 const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
-  const { showDangerNotification, showInfoNotification } = useCustomNotifications()
+  const { showDangerNotification } = useCustomNotifications()
   const ambireSDK = useMemo(() => ambireLoginSDK, [])
   const [adexAccount, setAdexAccount] = useLocalStorage<IAccountContext['adexAccount']>({
     key: 'adexAccount',
     defaultValue: {
       address: '',
-      chainId: 1,
+      chainId: 0,
       accessToken: '',
       refreshToken: '',
       authenticated: false,
@@ -61,11 +61,10 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
   )
 
   const updateAccessToken = useCallback(async () => {
-    console.count('updateAccessToken')
-    if (!adexAccount) return
-    if (isTokenExpired(adexAccount)) {
+    if (!adexAccount?.accessToken || !adexAccount?.refreshToken) return
+    if (isTokenExpired(adexAccount.accessToken)) {
       try {
-        const response = await refreshAccessToken(adexAccount)
+        const response = await refreshAccessToken(adexAccount?.refreshToken)
         if (response) {
           updateAdexAccount({
             accessToken: response.accessToken,
@@ -80,12 +79,11 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
         throw error
       }
     }
-  }, [adexAccount, updateAdexAccount])
+  }, [adexAccount?.accessToken, adexAccount?.refreshToken, updateAdexAccount])
 
   const handleLoginSuccess = useCallback(
     (data: any) => {
-      console.count('handleLoginSuccess')
-      if (!data) return
+      if (!data || (adexAccount?.address !== '' && adexAccount?.chainId !== 0)) return
       const updatedAccount = { address: data.address, chainId: data.chainId }
       getMessageToSign(updatedAccount)
         .then((getMessage) => {
@@ -97,13 +95,12 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
           showDangerNotification(e.message, 'Get message to sign failed')
         })
     },
-    [updateAdexAccount, showDangerNotification]
+    [updateAdexAccount, showDangerNotification, adexAccount?.address, adexAccount?.chainId]
   )
 
   const handleMsgSigned = useCallback(
     ({ signature }: any) => {
-      console.count('handleMsgSigned')
-      if (!adexAccount?.authMsgResp) return
+      if (!adexAccount?.authMsgResp || adexAccount?.authenticated) return
 
       const body = {
         authMsg: { ...adexAccount?.authMsgResp },
@@ -125,22 +122,23 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
           // ambireSDK.openLogout()
         })
     },
-    [adexAccount?.authMsgResp, updateAdexAccount, showDangerNotification]
+    [
+      adexAccount?.authMsgResp,
+      adexAccount?.authenticated,
+      updateAdexAccount,
+      showDangerNotification
+    ]
   )
 
   const handleMsgRejected = useCallback(() => {
-    console.count('handleMsgRejected')
     disconnectWallet()
   }, [disconnectWallet])
 
   const handleLogoutSuccess = useCallback(() => {
-    console.count('handleLogoutSuccess')
     ambireSDK.hideIframe()
-    showInfoNotification('Successfully disconnected', 'Login SDK')
-  }, [ambireSDK, showInfoNotification])
+  }, [ambireSDK])
 
   const handleActionRejected = useCallback(() => {
-    console.log('handleActionRejected')
     ambireSDK.openLogout()
   }, [ambireSDK])
 
@@ -168,21 +166,10 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
   ])
 
   useEffect(() => {
-    // TODO: Add more checks to prevent useless opening of the Sign Message
-    if (adexAccount?.authMsgResp) {
-      console.log('openSignMessage')
+    if (adexAccount?.authMsgResp && !adexAccount?.authenticated) {
       signMessage('eth_signTypedData', JSON.stringify(adexAccount.authMsgResp))
     }
-  }, [adexAccount?.authMsgResp, signMessage])
-
-  // useEffect(() => {
-  //   ambireSDK.onAlreadyLoggedIn(() => {
-  //     console.log('onAlreadyLoggedIn')
-  //     // if (!adexAccount?.authenticated) {
-  //     //   ambireSDK.openLogout()
-  //     // }
-  //   })
-  // }, [ambireSDK, adexAccount])
+  }, [adexAccount?.authMsgResp, adexAccount?.authenticated, signMessage])
 
   const authenticated = useMemo(
     () => (!adexAccount ? false : adexAccount.authenticated),

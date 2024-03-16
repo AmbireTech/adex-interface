@@ -23,6 +23,7 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import StakingIcon from 'resources/icons/Staking'
 import useFetch from 'hooks/useFetchRequest'
 import { BASE_URL } from 'constants/login'
+import useCustomNotifications from 'hooks/useCustomNotifications'
 
 const useStyles = createStyles((theme) => ({
   rotateUpsideDown: {
@@ -46,6 +47,7 @@ const useStyles = createStyles((theme) => ({
 function TopBar() {
   const { classes, cx } = useStyles()
   const { adexAccount, disconnectWallet, updateAdexAccount } = useAccount()
+  const { showInfoNotification } = useCustomNotifications()
   const location = useLocation()
   const splitPath = useMemo(() => location.pathname.split('/'), [location.pathname])
   const title = useMemo(
@@ -75,8 +77,8 @@ function TopBar() {
     })
       .then((res) => {
         if (res) {
-          // TODO:use resetAccount instead
           updateAdexAccount(null)
+          showInfoNotification('Successfully logged out', 'Logged out')
           navigate('/login', { replace: true })
         }
       })
@@ -89,6 +91,7 @@ function TopBar() {
     adexAccount?.accessToken,
     adexAccount?.refreshToken,
     updateAdexAccount,
+    showInfoNotification,
     navigate
   ])
 
