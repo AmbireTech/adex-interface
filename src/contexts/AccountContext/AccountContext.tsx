@@ -73,13 +73,19 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
           return response
         }
         return null
-      } catch (error) {
-        console.error('Error updating access token:', error)
+      } catch (error: any) {
+        console.error('Updating access token failed:', error)
+        showDangerNotification(error, 'Updating access token failed')
         // Handle error gracefully, e.g., display an error message or retry later.
         throw error
       }
     }
-  }, [adexAccount?.accessToken, adexAccount?.refreshToken, updateAdexAccount])
+  }, [
+    adexAccount?.accessToken,
+    adexAccount?.refreshToken,
+    updateAdexAccount,
+    showDangerNotification
+  ])
 
   const handleLoginSuccess = useCallback(
     (data: any) => {
@@ -89,13 +95,19 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
         .then((getMessage) => {
           updateAdexAccount({ ...updatedAccount, authMsgResp: getMessage.authMsg })
         })
-        .catch((e) => {
-          console.log('error', e)
-          // ambireSDK.openLogout()
-          showDangerNotification(e.message, 'Get message to sign failed')
+        .catch((error) => {
+          console.error('Get message to sign failed', error)
+          disconnectWallet()
+          showDangerNotification(error.message, 'Get message to sign failed')
         })
     },
-    [updateAdexAccount, showDangerNotification, adexAccount?.address, adexAccount?.chainId]
+    [
+      adexAccount?.address,
+      adexAccount?.chainId,
+      updateAdexAccount,
+      showDangerNotification,
+      disconnectWallet
+    ]
   )
 
   const handleMsgSigned = useCallback(
@@ -116,17 +128,18 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
             authenticated: !!authResp.accessToken && !!authResp.refreshToken
           })
         })
-        .catch((e) => {
-          console.error('Error verifying login:', e)
-          showDangerNotification(e.message, 'Verifying login failed')
-          // ambireSDK.openLogout()
+        .catch((error) => {
+          console.error('Error verify login:', error)
+          disconnectWallet()
+          showDangerNotification(error.message, 'Verify login failed')
         })
     },
     [
       adexAccount?.authMsgResp,
       adexAccount?.authenticated,
       updateAdexAccount,
-      showDangerNotification
+      showDangerNotification,
+      disconnectWallet
     ]
   )
 

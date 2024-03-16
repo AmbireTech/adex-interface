@@ -36,7 +36,6 @@ const EnvBanner = () => (
 )
 
 function App() {
-  console.count('INIT')
   return (
     <AccountProvider>
       <MantineProvider withGlobalStyles withNormalizeCSS theme={lightTheme}>
