@@ -39,26 +39,21 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
   })
 
   const updateAdexAccount = useCallback(
-    (newValue: any | null) => {
-      setAdexAccount((prevState) => (newValue === null ? newValue : { ...prevState, ...newValue }))
-    },
+    (newValue: any | null) =>
+      setAdexAccount((prevState) => (newValue === null ? newValue : { ...prevState, ...newValue })),
     [setAdexAccount]
   )
 
-  const connectWallet = useCallback(() => {
-    ambireSDK.openLogin({ chainId: DEFAULT_CHAIN_ID })
-  }, [ambireSDK])
-
-  const disconnectWallet = useCallback(() => {
-    ambireSDK.openLogout()
-  }, [ambireSDK])
-
-  const signMessage = useCallback(
-    (type: string, message: string) => {
-      ambireSDK.openSignMessage(type, message)
-    },
+  const connectWallet = useCallback(
+    () => ambireSDK.openLogin({ chainId: DEFAULT_CHAIN_ID }),
     [ambireSDK]
   )
+  const disconnectWallet = useCallback(() => ambireSDK.openLogout(), [ambireSDK])
+  const signMessage = useCallback(
+    (type: string, message: string) => ambireSDK.openSignMessage(type, message),
+    [ambireSDK]
+  )
+  const hideAmbireSDKIframe = useCallback(() => ambireSDK.hideIframe(), [ambireSDK])
 
   const updateAccessToken = useCallback(async () => {
     if (!adexAccount?.accessToken || !adexAccount?.refreshToken) return
@@ -76,7 +71,6 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
       } catch (error: any) {
         console.error('Updating access token failed:', error)
         showDangerNotification(error, 'Updating access token failed')
-        // Handle error gracefully, e.g., display an error message or retry later.
         throw error
       }
     }
@@ -88,9 +82,17 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
   ])
 
   const handleLoginSuccess = useCallback(
-    (data: any) => {
-      if (!data || (adexAccount?.address !== '' && adexAccount?.chainId !== 0)) return
-      const updatedAccount = { address: data.address, chainId: data.chainId }
+    ({ address, chainId }: any) => {
+      if (
+        !address ||
+        !chainId ||
+        (adexAccount?.address !== '' &&
+          adexAccount?.chainId !== 0 &&
+          adexAccount?.authMsgResp !== null)
+      )
+        return
+
+      const updatedAccount = { address, chainId }
       getMessageToSign(updatedAccount)
         .then((getMessage) => {
           updateAdexAccount({ ...updatedAccount, authMsgResp: getMessage.authMsg })
@@ -104,6 +106,7 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
     [
       adexAccount?.address,
       adexAccount?.chainId,
+      adexAccount?.authMsgResp,
       updateAdexAccount,
       showDangerNotification,
       disconnectWallet
@@ -112,7 +115,7 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
 
   const handleMsgSigned = useCallback(
     ({ signature }: any) => {
-      if (!adexAccount?.authMsgResp || adexAccount?.authenticated) return
+      if (!signature || !adexAccount?.authMsgResp || adexAccount?.authenticated) return
 
       const body = {
         authMsg: { ...adexAccount?.authMsgResp },
@@ -148,12 +151,12 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
   }, [disconnectWallet])
 
   const handleLogoutSuccess = useCallback(() => {
-    ambireSDK.hideIframe()
-  }, [ambireSDK])
+    hideAmbireSDKIframe()
+  }, [hideAmbireSDKIframe])
 
   const handleActionRejected = useCallback(() => {
-    ambireSDK.openLogout()
-  }, [ambireSDK])
+    disconnectWallet()
+  }, [disconnectWallet])
 
   useEffect(() => {
     ambireSDK.onLoginSuccess(handleLoginSuccess)
@@ -161,14 +164,6 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
     ambireSDK.onMsgRejected(handleMsgRejected)
     ambireSDK.onLogoutSuccess(handleLogoutSuccess)
     ambireSDK.onActionRejected(handleActionRejected)
-
-    return () => {
-      window.removeEventListener('loginSuccess', handleLoginSuccess)
-      window.removeEventListener('msgSigned', handleMsgSigned)
-      window.removeEventListener('msgRejected', handleMsgRejected)
-      window.removeEventListener('logoutSuccess', handleLogoutSuccess)
-      window.removeEventListener('actionRejected', handleActionRejected)
-    }
   }, [
     ambireSDK,
     handleLoginSuccess,
@@ -185,15 +180,14 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
   }, [adexAccount?.authMsgResp, adexAccount?.authenticated, signMessage])
 
   const authenticated = useMemo(
-    () => (!adexAccount ? false : adexAccount.authenticated),
-    [adexAccount]
+    () => Boolean(adexAccount?.authenticated),
+    [adexAccount?.authenticated]
   )
 
   const contextValue = useMemo(
     () => ({
       adexAccount,
       authenticated,
-      // authenticated: true,
       connectWallet,
       disconnectWallet,
       signMessage,
