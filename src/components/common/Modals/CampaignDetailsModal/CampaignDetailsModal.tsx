@@ -1,6 +1,6 @@
 import { Modal, Image, createStyles } from '@mantine/core'
 import Banner from 'resources/banners/banner1.png'
-import { ICampaignData } from 'types'
+import { ICampaign } from 'types'
 import CampaignDetailsRow from './CampaignDetailsRow'
 
 const useStyles = createStyles((theme) => ({
@@ -21,7 +21,7 @@ const CampaignDetailsModal = ({
   opened,
   close
 }: {
-  item: ICampaignData | null
+  item: ICampaign | null
   opened: boolean
   close: () => void
 }) => {
@@ -40,19 +40,19 @@ const CampaignDetailsModal = ({
       }}
     >
       <Image src={Banner} pt="xl" pb="xl" />
-      <CampaignDetailsRow title="Title" value={item?.campaignName} />
+      <CampaignDetailsRow title="Title" value={item?.title} />
       <CampaignDetailsRow title="Id" value={item?.id} />
       <CampaignDetailsRow title="Status" value={item?.status} />
-      <CampaignDetailsRow title="Served" value={item?.served} />
-      <CampaignDetailsRow title="Budget" value={item?.budget} />
+      <CampaignDetailsRow title="Served" value={item?.nonce} />
+      <CampaignDetailsRow title="Budget" value={item?.pricingBounds} />
       {/* TODO: Add data for it */}
-      <CampaignDetailsRow title="Created" value={item?.period.from} />
+      <CampaignDetailsRow title="Created" value={item?.activeFrom} />
       {/* TODO: Add data for it */}
-      <CampaignDetailsRow title="Starts" value={item?.period.from} />
+      <CampaignDetailsRow title="Starts" value={item?.activeFrom} />
       {/* TODO: Add data for it */}
-      <CampaignDetailsRow title="Ends" value={item?.period.to} />
+      <CampaignDetailsRow title="Ends" value={item?.activeTo} />
       {/* TODO: Add data for it */}
-      <CampaignDetailsRow title="CPM/CPC min" value={item?.period.to} />
+      <CampaignDetailsRow title="CPM/CPC min" value={item?.activeTo} />
       {/* TODO: Add data for it */}
       <CampaignDetailsRow title="Limit average daily spending" value="No" />
       {/* TODO: Add data for it */}
