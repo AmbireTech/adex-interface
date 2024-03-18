@@ -5,17 +5,18 @@ import UnderReviewIcon from 'resources/icons/UnderReview'
 import { BadgeType, IBadgeConfig } from 'types'
 
 const conf: Record<BadgeType, IBadgeConfig> = {
-  draft: {
+  // TODO: Make enum to map statuses from DB (int) to string here, or replace string keys with number
+  0: {
     color: 'draft',
     text: 'Draft',
     icon: <DraftIcon size="13px" />
   },
-  underReview: {
+  1: {
     color: 'info',
     text: 'Under review',
     icon: <UnderReviewIcon size="13px" />
   },
-  completed: {
+  2: {
     color: 'success',
     text: 'Completed',
     icon: <CompletedIcon size="13px" />
