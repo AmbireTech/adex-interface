@@ -48,7 +48,7 @@ function LogIn() {
   const navigate = useNavigate()
 
   useEffect(() => {
-    if (authenticated) navigate('/get-started', { replace: true })
+    if (authenticated) navigate('/dashboard/get-started', { replace: true })
   }, [authenticated, navigate])
 
   const handleGetStartedBtnClicked = useCallback(() => connectWallet(), [connectWallet])
