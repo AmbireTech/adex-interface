@@ -4,11 +4,14 @@ import Dashboard from 'components/Dashboard'
 import Billing from 'components/Billing'
 import GetStarted from 'components/GetStarted'
 import CampaignAnalytics from 'components/CampaignAnalytics'
-import NotFound404 from 'components/404/404'
 import { createBrowserRouter, Navigate, useLocation } from 'react-router-dom'
 
 import useAccount from 'hooks/useAccount'
 import Deposit from 'components/Deposit'
+import CreateCampaign from 'components/CreateCampaign'
+import { CreateCampaignContextProvider } from 'contexts/CreateCampaignContext/CreateCampaignContext'
+import { CreateCampaignFormProvider } from 'contexts/CreateCampaignFormContext'
+import NotFound404 from 'components/404/404'
 
 function RequireAuth({ children }: { children: JSX.Element }) {
   const { authenticated } = useAccount()
@@ -24,8 +27,20 @@ function RequireAuth({ children }: { children: JSX.Element }) {
 export const router = createBrowserRouter(
   [
     {
-      // TODO: rename the path
       path: '/',
+      element: (
+        <RequireAuth>
+          <UserPanel />
+        </RequireAuth>
+      )
+    },
+    {
+      path: '/login',
+      element: <LogIn />
+    },
+    {
+      // TODO: rename the path
+      path: '/dashboard',
       element: (
         <RequireAuth>
           <UserPanel />
@@ -48,12 +63,18 @@ export const router = createBrowserRouter(
         {
           path: 'deposit',
           element: <Deposit />
+        },
+        {
+          path: 'create-campaign',
+          element: (
+            <CreateCampaignContextProvider>
+              <CreateCampaignFormProvider>
+                <CreateCampaign />
+              </CreateCampaignFormProvider>
+            </CreateCampaignContextProvider>
+          )
         }
       ]
-    },
-    {
-      path: '/login',
-      element: <LogIn />
     },
     {
       path: '*',
