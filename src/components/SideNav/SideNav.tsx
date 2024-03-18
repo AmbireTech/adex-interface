@@ -87,13 +87,13 @@ function SideNav() {
             active={useResolvedPath('dashboard').pathname === match?.pathname}
           />
           <NavLink
-            to="/deposit"
+            to="/dashboard/deposit"
             icon={<DepositIcon />}
             label="Top Up Account"
             active={useResolvedPath('deposit').pathname === match?.pathname}
           />
           <NavLink
-            to="/billing"
+            to="/dashboard/billing"
             icon={<BillingIcon />}
             label="Billing"
             active={useResolvedPath('billing').pathname === match?.pathname}
