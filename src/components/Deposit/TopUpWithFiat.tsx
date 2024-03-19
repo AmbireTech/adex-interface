@@ -1,26 +1,28 @@
 import { Alert, Grid } from '@mantine/core'
 import InfoIcon from 'resources/icons/Info'
 
-import GUARDARIAN_LOGO from 'resources/payment-providers/guardarian.svg'
+// import GUARDARIAN_LOGO from 'resources/payment-providers/guardarian.svg'
 import MOONPAY_LOGO from 'resources/payment-providers/moonpay.svg'
 import PAYTRIE_LOGO from 'resources/payment-providers/paytrie.svg'
 import RAMP_LOGO from 'resources/payment-providers/ramp.svg'
 import { IPaymentProviders } from 'types'
 import FiatProvider from './FiatProvieder'
+import useProviders from './useProviders'
 
 const TopUpWithFiat = () => {
+  const { openRampNetwork, openPayTrie, openMoonpay } = useProviders()
   const providers: IPaymentProviders[] = [
-    {
-      logo: GUARDARIAN_LOGO,
-      name: 'Guardarian',
-      type: 'Buy with Bank Transfer, Credit/Debit Card, Sell Crypto',
-      fees: 'from 2%',
-      limits: 'up to 15k EUR/monthly on and off ramp',
-      currencies: 'GBP, EUR, USD and many more',
-      networks: ['ethereum', 'polygon', 'binance-smart-chain', 'fantom'],
-      //   onClick: () => openGuardarian(initMode, selectedAsset)
-      onClick: () => console.log('open Guardarian')
-    },
+    // {
+    //   logo: GUARDARIAN_LOGO,
+    //   name: 'Guardarian',
+    //   type: 'Buy with Bank Transfer, Credit/Debit Card, Sell Crypto',
+    //   fees: 'from 2%',
+    //   limits: 'up to 15k EUR/monthly on and off ramp',
+    //   currencies: 'GBP, EUR, USD and many more',
+    //   networks: ['ethereum', 'polygon', 'binance-smart-chain', 'fantom'],
+    //   //   onClick: () => openGuardarian(initMode, selectedAsset)
+    //   onClick: () => console.log('open Guardarian')
+    // },
     {
       logo: MOONPAY_LOGO,
       name: 'MoonPay',
@@ -29,8 +31,7 @@ const TopUpWithFiat = () => {
       limits: '',
       currencies: 'EUR, USD, GBP and many more',
       networks: ['ethereum'],
-      //   onClick: () => openMoonpay(initMode, selectedAsset)
-      onClick: () => console.log('open Moonpay')
+      onClick: () => openMoonpay()
     },
     {
       logo: RAMP_LOGO,
@@ -40,8 +41,7 @@ const TopUpWithFiat = () => {
       limits: '10,000EUR/m',
       currencies: 'USD, EUR, GBP',
       networks: ['ethereum', 'polygon', 'avalanche', 'binance-smart-chain', 'gnosis'],
-      // onClick: () => openRampNetwork()
-      onClick: () => console.log('open Ramp')
+      onClick: () => openRampNetwork()
     },
     {
       logo: PAYTRIE_LOGO,
@@ -51,8 +51,7 @@ const TopUpWithFiat = () => {
       limits: '$2,000CAD/day',
       currencies: 'CAD',
       networks: ['ethereum', 'polygon', 'binance-smart-chain'],
-      //   onClick: () => openPayTrie()
-      onClick: () => console.log('open Paytrie')
+      onClick: () => openPayTrie()
     }
   ]
   return (
