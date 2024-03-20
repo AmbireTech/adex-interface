@@ -12,15 +12,18 @@ import {
 } from '@mantine/core'
 import { capitalizeFirstLetter, formatDate, maskAddress } from 'helpers/formatters'
 import useAccount from 'hooks/useAccount'
-import { useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import BellIcon from 'resources/icons/Bell'
 import DownArrowIcon from 'resources/icons/DownArrow'
 import LogoutIcon from 'resources/icons/Logout'
 import ValidatorsIcon from 'resources/icons/Validators'
 import WithdrawIcon from 'resources/icons/Withdraw'
 import Blockies from 'components/common/Blockies'
-import { useLocation } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import StakingIcon from 'resources/icons/Staking'
+import useFetch from 'hooks/useFetchRequest'
+import { BASE_URL } from 'constants/login'
+import useCustomNotifications from 'hooks/useCustomNotifications'
 
 const useStyles = createStyles((theme) => ({
   rotateUpsideDown: {
@@ -43,7 +46,8 @@ const useStyles = createStyles((theme) => ({
 
 function TopBar() {
   const { classes, cx } = useStyles()
-  const { adexAccount } = useAccount()
+  const { adexAccount, disconnectWallet, updateAdexAccount } = useAccount()
+  const { showInfoNotification, showDangerNotification } = useCustomNotifications()
   const location = useLocation()
   const splitPath = useMemo(() => location.pathname.split('/'), [location.pathname])
   const title = useMemo(
@@ -52,6 +56,46 @@ function TopBar() {
   )
 
   const [opened, setOpened] = useState<boolean>(false)
+
+  const { fetchAuthRequest } = useFetch()
+  const navigate = useNavigate()
+
+  const handleLogutBtnClicked = useCallback(() => {
+    disconnectWallet()
+    if (!adexAccount?.accessToken && !adexAccount?.refreshToken) return
+
+    fetchAuthRequest({
+      url: `${BASE_URL}/dsp/logout`,
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-DSP-AUTH': `Bearer ${adexAccount.accessToken}`
+      },
+      body: {
+        refreshToken: adexAccount.refreshToken
+      }
+    })
+      .then((res) => {
+        if (res) {
+          updateAdexAccount(null)
+          showInfoNotification('Successfully logged out', 'Logging out')
+          navigate('/login', { replace: true })
+        }
+      })
+      .catch((e) => {
+        console.error('Logging out failed', e)
+        showDangerNotification(e.message, 'Logging out failed')
+      })
+  }, [
+    adexAccount?.accessToken,
+    adexAccount?.refreshToken,
+    disconnectWallet,
+    fetchAuthRequest,
+    navigate,
+    updateAdexAccount,
+    showInfoNotification,
+    showDangerNotification
+  ])
 
   return (
     <Flex direction="row" gap="md" justify="space-between" align="center" style={{ flexGrow: 1 }}>
@@ -103,7 +147,12 @@ function TopBar() {
             <Menu.Item rightSection={<ValidatorsIcon className={classes.icon} />}>
               Validators
             </Menu.Item>
-            <Menu.Item rightSection={<LogoutIcon className={classes.icon} />}>Log out</Menu.Item>
+            <Menu.Item
+              onClick={handleLogutBtnClicked}
+              rightSection={<LogoutIcon className={classes.icon} />}
+            >
+              Log out
+            </Menu.Item>
           </Menu.Dropdown>
         </Menu>
       </Flex>

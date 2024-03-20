@@ -4,6 +4,7 @@ import { BillingDetailsProvider } from 'contexts/BillingDetailsContext'
 import { RouterProvider } from 'react-router-dom'
 import { router } from 'Router'
 import { lightTheme } from 'themes'
+import { Notifications } from '@mantine/notifications'
 
 const ENV = process.env.REACT_APP_ENV
 
@@ -39,6 +40,7 @@ function App() {
     <AccountProvider>
       <MantineProvider withGlobalStyles withNormalizeCSS theme={lightTheme}>
         <GlobalStyles />
+        <Notifications />
         <BillingDetailsProvider>
           {ENV && <EnvBanner />}
           <RouterProvider router={router} />
