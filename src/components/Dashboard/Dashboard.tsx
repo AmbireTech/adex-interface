@@ -53,7 +53,7 @@ const Dashboard = () => {
 
   const handleAnalytics = useCallback(
     (item: ICampaignData) => {
-      navigate(`/campaign-analytics/${item.id}`)
+      navigate(`/dashboard/campaign-analytics/${item.id}`)
     },
     [navigate]
   )
