@@ -21,7 +21,6 @@ const Dashboard = () => {
     // in case of endpoint change we can modify only in one place and affect all dependent files
     endpoint: '/dsp/campaigns/by-owner'
   })
-  console.log(campaignData, error)
   const elements = useMemo(
     () =>
       campaignData && !error
@@ -40,7 +39,7 @@ const Dashboard = () => {
             }
           })
         : [],
-    [campaignData]
+    [campaignData, error]
   )
 
   const handlePreview = useCallback(
