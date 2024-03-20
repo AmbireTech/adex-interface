@@ -19,6 +19,7 @@ interface IAccountContext {
   disconnectWallet: () => void
   updateAdexAccount: (value: any) => void
   updateAccessToken: () => Promise<any>
+  resetAdexAccount: () => void
 }
 
 const AccountContext = createContext<IAccountContext | null>(null)
@@ -43,6 +44,7 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
       setAdexAccount((prevState) => (newValue === null ? newValue : { ...prevState, ...newValue })),
     [setAdexAccount]
   )
+  const resetAdexAccount = useCallback(() => updateAdexAccount(null), [updateAdexAccount])
 
   const connectWallet = useCallback(
     () => ambireSDK.openLogin({ chainId: DEFAULT_CHAIN_ID }),
@@ -53,7 +55,6 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
     (type: string, message: string) => ambireSDK.openSignMessage(type, message),
     [ambireSDK]
   )
-  const hideAmbireSDKIframe = useCallback(() => ambireSDK.hideIframe(), [ambireSDK])
 
   const updateAccessToken = useCallback(async () => {
     if (!adexAccount?.accessToken || !adexAccount?.refreshToken) return
@@ -81,7 +82,7 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
     showDangerNotification
   ])
 
-  const handleLoginSuccess = useCallback(
+  const handleRegistrationOrLoginSuccess = useCallback(
     ({ address, chainId }: any) => {
       if (
         !address ||
@@ -151,22 +152,23 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
   }, [disconnectWallet])
 
   const handleLogoutSuccess = useCallback(() => {
-    hideAmbireSDKIframe()
-  }, [hideAmbireSDKIframe])
+    resetAdexAccount()
+  }, [resetAdexAccount])
 
   const handleActionRejected = useCallback(() => {
     disconnectWallet()
   }, [disconnectWallet])
 
   useEffect(() => {
-    ambireSDK.onLoginSuccess(handleLoginSuccess)
+    ambireSDK.onRegistrationSuccess(handleRegistrationOrLoginSuccess)
+    ambireSDK.onLoginSuccess(handleRegistrationOrLoginSuccess)
     ambireSDK.onMsgSigned(handleMsgSigned)
     ambireSDK.onMsgRejected(handleMsgRejected)
     ambireSDK.onLogoutSuccess(handleLogoutSuccess)
     ambireSDK.onActionRejected(handleActionRejected)
   }, [
     ambireSDK,
-    handleLoginSuccess,
+    handleRegistrationOrLoginSuccess,
     handleMsgSigned,
     handleMsgRejected,
     handleLogoutSuccess,
@@ -188,12 +190,14 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
     () => ({
       adexAccount,
       authenticated,
+      // authenticated: true,
       connectWallet,
       disconnectWallet,
       signMessage,
       ambireSDK,
       updateAdexAccount,
-      updateAccessToken
+      updateAccessToken,
+      resetAdexAccount
     }),
     [
       adexAccount,
@@ -203,7 +207,8 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
       signMessage,
       ambireSDK,
       updateAdexAccount,
-      updateAccessToken
+      updateAccessToken,
+      resetAdexAccount
     ]
   )
 
