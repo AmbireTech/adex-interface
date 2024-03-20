@@ -1,9 +1,10 @@
+import { Campaign } from 'adex-common'
 import { Container, Flex, Text } from '@mantine/core'
 import { useCallback, useMemo, useState } from 'react'
 import { useDisclosure } from '@mantine/hooks'
 import { useApi } from 'lib/api'
 import CustomTable from 'components/common/CustomTable'
-import { BadgeType, ICampaign } from 'types'
+import { BadgeType } from 'types'
 import { campaignPeriodParser } from 'utils'
 import { campaignHeaders } from 'constant'
 import { CampaignDetailsModal } from 'components/common/Modals'
@@ -12,19 +13,19 @@ import BadgeStatusCampaign from './BadgeStatusCampaign'
 
 const Dashboard = () => {
   const [opened, { open, close }] = useDisclosure(false)
-  const [selectedItem, setSelectedItem] = useState<ICampaign | null>(null)
+  const [selectedItem, setSelectedItem] = useState<Campaign | null>(null)
   const navigate = useNavigate()
-  const [campaignData, isResolved, error] = useApi<ICampaign[]>({
+  const [campaignData, isResolved, error] = useApi<Campaign[]>({
     // we can also make an independent file handling all the endpoints and calling a function
     // ex. const [selectedItem, setSelectedItem] = getCampaignsByOwner() and hold all the requests there
     // in case of endpoint change we can modify only in one place and affect all dependent files
     endpoint: '/dsp/campaigns/by-owner'
   })
-
+  console.log(campaignData, error)
   const elements = useMemo(
     () =>
-      campaignData
-        ? campaignData?.map((el: ICampaign) => {
+      campaignData && !error
+        ? campaignData?.map((el: Campaign) => {
             return {
               id: el.id,
               title: el.title,
@@ -43,7 +44,7 @@ const Dashboard = () => {
   )
 
   const handlePreview = useCallback(
-    (item: ICampaign) => {
+    (item: Campaign) => {
       setSelectedItem(item)
       open()
     },
@@ -51,17 +52,17 @@ const Dashboard = () => {
   )
 
   const handleAnalytics = useCallback(
-    (item: ICampaign) => {
+    (item: Campaign) => {
       navigate(`/dashboard/campaign-analytics/${item.id}`)
     },
     [navigate]
   )
 
-  const handleDuplicate = useCallback((item: ICampaign) => {
+  const handleDuplicate = useCallback((item: Campaign) => {
     console.log('item', item)
   }, [])
 
-  const handleDelete = useCallback((item: ICampaign) => {
+  const handleDelete = useCallback((item: Campaign) => {
     console.log('item', item)
   }, [])
 

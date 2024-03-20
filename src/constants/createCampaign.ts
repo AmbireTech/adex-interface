@@ -1,5 +1,5 @@
-import { CampaignUI, SelectData } from 'types'
 import { TargetingInputSingle, IabTaxonomyV3 } from 'adex-common/dist/types'
+import { CampaignUI, SelectData } from 'types'
 
 export const CREATE_CAMPAIGN_STEPS = 4
 export const CAMPAIGN_CATEGORIES_INPUT = 'targetingInput.inputs.categories'

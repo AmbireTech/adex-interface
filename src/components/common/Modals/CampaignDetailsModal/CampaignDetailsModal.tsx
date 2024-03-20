@@ -1,6 +1,6 @@
 import { Modal, Image, createStyles } from '@mantine/core'
+import { Campaign } from 'adex-common'
 import Banner from 'resources/banners/banner1.png'
-import { ICampaign } from 'types'
 import CampaignDetailsRow from './CampaignDetailsRow'
 
 const useStyles = createStyles((theme) => ({
@@ -21,7 +21,7 @@ const CampaignDetailsModal = ({
   opened,
   close
 }: {
-  item: ICampaign | null
+  item: Campaign | null
   opened: boolean
   close: () => void
 }) => {
