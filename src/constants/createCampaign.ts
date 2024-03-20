@@ -34,7 +34,7 @@ export const CREATE_CAMPAIGN_DEFAULT_VALUE: CampaignUI = {
   cpmMax: '',
   campaignName: '',
   outpaceAssetAddr: '',
-  outpaceAssetDecimals: '',
+  outpaceAssetDecimals: 0,
   outpaceAddr: '',
   campaignBudget: BigInt(0),
   outpaceChainId: 1,
