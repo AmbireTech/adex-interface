@@ -31,6 +31,7 @@ const CustomTable = ({
   onDuplicate,
   onDelete
 }: ICustomTableProps) => {
+  if (!elements.length) return null
   const { classes, cx } = useStyles()
   const columns: string[] = useMemo(
     () => Object.keys(elements[0]).filter((e: string) => e !== 'id'),
@@ -59,15 +60,7 @@ const CustomTable = ({
         return (
           <tr key={e.id}>
             {columns.map((column: string) => {
-              return (
-                <td key={column}>
-                  {typeof e[column] === 'object' &&
-                  typeof e[column].from === 'string' &&
-                  typeof e[column].to === 'string'
-                    ? `${e[column].from} - ${e[column].to}`
-                    : e[column]}
-                </td>
-              )
+              return <td key={column}>{e[column]}</td>
             })}
             {hasAction && (
               <td>
