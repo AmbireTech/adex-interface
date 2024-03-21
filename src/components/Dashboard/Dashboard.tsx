@@ -1,9 +1,9 @@
 import { Container, Flex, Text } from '@mantine/core'
-import { useCallback, useMemo, useState } from 'react'
-import { useDisclosure } from '@mantine/hooks'
+import React, { useCallback, useMemo } from 'react'
+// import { useDisclosure } from '@mantine/hooks'
 import CustomTable from 'components/common/CustomTable'
 import { BadgeType, ICampaignData } from 'types'
-import { CampaignDetailsModal } from 'components/common/Modals'
+// import { CampaignDetailsModal } from 'components/common/Modals'
 import { useNavigate } from 'react-router-dom'
 import BadgeStatusCampaign from './BadgeStatusCampaign'
 import { dashboardTableElements } from './mockData'
@@ -21,8 +21,8 @@ const headings = [
 ]
 
 const Dashboard = () => {
-  const [opened, { open, close }] = useDisclosure(false)
-  const [selectedItem, setSelectedItem] = useState<ICampaignData | null>(null)
+  // const [opened, { open, close }] = useDisclosure(false)
+  // const [selectedItem, setSelectedItem] = useState<ICampaignData | null>(null)
   const navigate = useNavigate()
   const elements = useMemo(
     () =>
@@ -45,15 +45,16 @@ const Dashboard = () => {
 
   const handlePreview = useCallback(
     (item: ICampaignData) => {
-      setSelectedItem(item)
-      open()
+      navigate(`/dashboard/campaign-details/${item.id}`)
+      // setSelectedItem(item)
+      // open()
     },
-    [open]
+    [navigate]
   )
 
   const handleAnalytics = useCallback(
     (item: ICampaignData) => {
-      navigate(`/campaign-analytics/${item.id}`)
+      navigate(`/dashboard/campaign-analytics/${item.id}`)
     },
     [navigate]
   )
@@ -82,7 +83,7 @@ const Dashboard = () => {
           onDelete={handleDelete}
         />
       </Flex>
-      <CampaignDetailsModal item={selectedItem} opened={opened} close={close} />
+      {/* <CampaignDetailsModal item={selectedItem} opened={opened} close={close} /> */}
     </Container>
   )
 }

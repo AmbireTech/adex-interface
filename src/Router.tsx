@@ -12,6 +12,7 @@ import CreateCampaign from 'components/CreateCampaign'
 import { CreateCampaignContextProvider } from 'contexts/CreateCampaignContext/CreateCampaignContext'
 import { CreateCampaignFormProvider } from 'contexts/CreateCampaignFormContext'
 import NotFound404 from 'components/404/404'
+import CampaignDetails from './components/CampaignDetails'
 
 function RequireAuth({ children }: { children: JSX.Element }) {
   const { authenticated } = useAccount()
@@ -52,6 +53,7 @@ export const router = createBrowserRouter(
           element: <Dashboard />
         },
         { path: 'campaign-analytics/:id', element: <CampaignAnalytics /> },
+        { path: 'campaign-details/:id', element: <CampaignDetails /> },
         {
           path: 'billing',
           element: <Billing />

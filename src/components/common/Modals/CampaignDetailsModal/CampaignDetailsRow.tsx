@@ -1,3 +1,4 @@
+import React from 'react'
 import { Flex, FlexProps, MantineNumberSize, Text, createStyles } from '@mantine/core'
 
 const useStyles = createStyles((theme, { lighterColor }: { lighterColor: boolean }) => ({
@@ -25,6 +26,7 @@ type CampaignDetailsRowProps = FlexProps & {
   textSize?: MantineNumberSize
   noBorder?: boolean
   column?: boolean
+  lineHeight?: MantineNumberSize
 }
 
 const CampaignDetailsRow = ({
@@ -33,7 +35,8 @@ const CampaignDetailsRow = ({
   lighterColor,
   textSize = 'md',
   noBorder = false,
-  column = false
+  column = false,
+  lineHeight = 'lg'
 }: CampaignDetailsRowProps) => {
   const { classes, cx } = useStyles({ lighterColor: !!lighterColor })
   return (
@@ -42,8 +45,8 @@ const CampaignDetailsRow = ({
       direction={column ? 'column' : 'row'}
       align="center"
       className={cx({ [classes.border]: !noBorder })}
-      pt="lg"
-      pb="lg"
+      pt={lineHeight}
+      pb={lineHeight}
     >
       <Text
         className={cx(classes.textColor, {
