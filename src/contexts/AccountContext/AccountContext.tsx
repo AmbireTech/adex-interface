@@ -100,7 +100,6 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
         })
         .catch((error) => {
           console.error('Get message to sign failed', error)
-          disconnectWallet()
           showDangerNotification(error.message, 'Get message to sign failed')
         })
     },
@@ -109,8 +108,7 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
       adexAccount?.chainId,
       adexAccount?.authMsgResp,
       updateAdexAccount,
-      showDangerNotification,
-      disconnectWallet
+      showDangerNotification
     ]
   )
 
@@ -134,7 +132,6 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
         })
         .catch((error) => {
           console.error('Error verify login:', error)
-          disconnectWallet()
           showDangerNotification(error.message, 'Verify login failed')
         })
     },
@@ -142,8 +139,7 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
       adexAccount?.authMsgResp,
       adexAccount?.authenticated,
       updateAdexAccount,
-      showDangerNotification,
-      disconnectWallet
+      showDangerNotification
     ]
   )
 
@@ -162,6 +158,7 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
   useEffect(() => {
     ambireSDK.onRegistrationSuccess(handleRegistrationOrLoginSuccess)
     ambireSDK.onLoginSuccess(handleRegistrationOrLoginSuccess)
+    ambireSDK.onAlreadyLoggedIn(handleRegistrationOrLoginSuccess)
     ambireSDK.onMsgSigned(handleMsgSigned)
     ambireSDK.onMsgRejected(handleMsgRejected)
     ambireSDK.onLogoutSuccess(handleLogoutSuccess)
