@@ -49,7 +49,7 @@ export const router = createBrowserRouter(
       ),
       children: [
         {
-          path: 'dashboard',
+          path: '',
           element: <Dashboard />
         },
         { path: 'campaign-analytics/:id', element: <CampaignAnalytics /> },
