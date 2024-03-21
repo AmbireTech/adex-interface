@@ -1,5 +1,5 @@
-import { CampaignUI, SelectData } from 'types'
 import { TargetingInputSingle, IabTaxonomyV3 } from 'adex-common/dist/types'
+import { CampaignUI, SelectData } from 'types'
 
 export const CREATE_CAMPAIGN_STEPS = 4
 export const CAMPAIGN_CATEGORIES_INPUT = 'targetingInput.inputs.categories'
@@ -34,7 +34,7 @@ export const CREATE_CAMPAIGN_DEFAULT_VALUE: CampaignUI = {
   cpmMax: '',
   campaignName: '',
   outpaceAssetAddr: '',
-  outpaceAssetDecimals: '',
+  outpaceAssetDecimals: 0,
   outpaceAddr: '',
   campaignBudget: BigInt(0),
   outpaceChainId: 1,

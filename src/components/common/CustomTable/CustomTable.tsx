@@ -31,6 +31,7 @@ const CustomTable = ({
   onDuplicate,
   onDelete
 }: ICustomTableProps) => {
+  if (!elements.length) return null
   const { classes, cx } = useStyles()
   const columns: string[] = useMemo(
     () => Object.keys(elements[0]).filter((e: string) => e !== 'id'),
