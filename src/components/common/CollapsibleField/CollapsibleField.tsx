@@ -1,13 +1,10 @@
-import React, { useState } from 'react'
-import { Collapse, Button, Text, Flex, createStyles } from '@mantine/core'
-import DownArrowIcon from '../../../resources/icons/DownArrow'
+import { useMemo, useState } from 'react'
+import { countNestedElements } from 'helpers'
+import { Button, Text, Flex, createStyles } from '@mantine/core'
+import DownArrowIcon from 'resources/icons/DownArrow'
+import { CollapsibleFieldProps, CollapsibleFieldStylesProps } from 'types'
 
-type CollapsibleFieldProps = {
-  label: string
-  children: React.ReactNode
-}
-
-const useStyles = createStyles((theme) => ({
+const useStyles = createStyles((theme, { collapsed }: CollapsibleFieldStylesProps) => ({
   lighterColor: {
     color:
       theme.colors.secondaryText[theme.fn.primaryShade()] +
@@ -17,12 +14,19 @@ const useStyles = createStyles((theme) => ({
     width: theme.fontSizes.sm,
     height: theme.fontSizes.sm
   },
-  rotateIcon: { transform: 'rotate(-180deg)' }
+  rotateIcon: { transform: 'rotate(-180deg)' },
+  collapsibleWrapper: {
+    transition: 'max-height 0.8s ease',
+    overflow: 'hidden',
+    maxHeight: collapsed ? 30 : undefined
+  }
 }))
 
-function CollapsibleField({ label, children }: CollapsibleFieldProps) {
-  const { classes, cx } = useStyles()
+const CollapsibleField = ({ label, children }: CollapsibleFieldProps) => {
   const [collapsed, setCollapsed] = useState(true)
+  const { classes, cx } = useStyles({ collapsed })
+
+  const nestedElementsCount = useMemo(() => countNestedElements(children), [children])
 
   return (
     <>
@@ -30,19 +34,21 @@ function CollapsibleField({ label, children }: CollapsibleFieldProps) {
         <Text size="sm" className={classes.lighterColor}>
           {label}
         </Text>
-        <Button
-          variant="link"
-          color="gray"
-          onClick={() => setCollapsed((prevCollapsed) => !prevCollapsed)}
-        >
-          <DownArrowIcon
-            className={cx(classes.icon, classes.lighterColor, { [classes.rotateIcon]: !collapsed })}
-          />
-        </Button>
+        {nestedElementsCount > 2 && (
+          <Button
+            variant="link"
+            color="gray"
+            onClick={() => setCollapsed((prevCollapsed) => !prevCollapsed)}
+          >
+            <DownArrowIcon
+              className={cx(classes.icon, classes.lighterColor, {
+                [classes.rotateIcon]: !collapsed
+              })}
+            />
+          </Button>
+        )}
       </Flex>
-      <Collapse in={!collapsed}>
-        <div>{children}</div>
-      </Collapse>
+      <div className={classes.collapsibleWrapper}>{children}</div>
     </>
   )
 }

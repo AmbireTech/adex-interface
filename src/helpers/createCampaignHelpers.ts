@@ -252,7 +252,8 @@ export const uploadMedia = async (media: Blob, mediaName: string, shouldPin: boo
 }
 
 export const getMediaUrlWithProvider = (mediaUrl = 'ipfs://', provider = '') => {
-  return provider + mediaUrl.substring(7)
+  if (mediaUrl.startsWith('ipfs://')) return provider + mediaUrl.substring(7)
+  return mediaUrl
 }
 
 export const initAllLocales = () => {
