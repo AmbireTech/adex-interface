@@ -12,9 +12,6 @@ const useMediaUpload = () => {
       const formData = new FormData()
       formData.append('media', media, mediaName)
       formData.append('shouldPin', shouldPin.toString())
-      // const queryParams = {
-      //   apiKey: 'gubitapagdokatomuviashvhod6eteboli'
-      // }
 
       const req = {
         url: `${BASE_URL}/dsp/ipfs/upload`,
