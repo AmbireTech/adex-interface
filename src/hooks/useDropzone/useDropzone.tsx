@@ -7,11 +7,11 @@ import {
   getHTMLBannerDetails,
   getMediaSize,
   handleZipFile,
-  readHTMLFile,
-  uploadMedia
+  readHTMLFile
 } from 'helpers/createCampaignHelpers'
 import { validateHTMLBanner } from 'helpers/htmlBannerValidators'
 import { FileWithPath } from '@mantine/dropzone'
+import useMediaUpload from 'hooks/useMediaUpload'
 
 const useDropzone = () => {
   const [uploadedFiles, setUploadedFiles] = useState<FileWithPath[] | null>(null)
@@ -20,6 +20,7 @@ const useDropzone = () => {
     updateCampaign,
     campaign: { adUnits }
   } = useCreateCampaignContext()
+  const { uploadMedia } = useMediaUpload()
 
   const adUnitsCopy = useMemo(() => [...adUnits], [adUnits])
 
@@ -39,7 +40,9 @@ const useDropzone = () => {
 
           reader.onload = async (e: any) => {
             const blob = new Blob([file], { type: file.type })
-            const { ipfsUrl } = await uploadMedia(blob, file.name)
+            const { ipfsUrl } = await uploadMedia(blob, file.name).catch((error) =>
+              console.error('ERROR: ', error)
+            )
 
             let htmlBannerSizes: ImageSizes | null = null
             const adUnit = {
@@ -113,7 +116,7 @@ const useDropzone = () => {
           reader.readAsDataURL(file)
         })
     },
-    [updateUploadedFiles, adUnitsCopy, updateCampaign]
+    [updateUploadedFiles, adUnitsCopy, updateCampaign, uploadMedia]
   )
 
   useEffect(() => {

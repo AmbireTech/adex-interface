@@ -3,7 +3,6 @@ import { BANNER_SIZES } from 'constants/banners'
 import { DEFAULT_CATS_LOCS_VALUE } from 'constants/createCampaign'
 import { Devices, SelectData, ImageSizes, FileWithPath } from 'types'
 import JSZip from 'jszip'
-import { fetchService } from 'services'
 
 export const checkSelectedDevices = (devices: Devices[]) => {
   if (devices.length === 1) {
@@ -229,27 +228,6 @@ const getImageSize = (src: string): Promise<ImageSizes> =>
 
 export const getMediaSize = (mime: string, src: string) =>
   isVideoMedia(mime) ? getVideoSize(src) : getImageSize(src)
-
-export const uploadMedia = async (media: Blob, mediaName: string, shouldPin: boolean = false) => {
-  const baseUrl = 'https://vhoda.adex.network'
-  const formData = new FormData()
-  formData.append('media', media, mediaName)
-  formData.append('shouldPin', shouldPin.toString())
-  const queryParams = {
-    apiKey: 'gubitapagdokatomuviashvhod6eteboli'
-  }
-
-  const req = {
-    url: `${baseUrl}/ipfs/upload`,
-    method: 'POST',
-    body: formData,
-    queryParams
-  }
-
-  return fetchService(req).then((res) => {
-    return res.json()
-  })
-}
 
 export const getMediaUrlWithProvider = (mediaUrl = 'ipfs://', provider = '') => {
   return provider + mediaUrl.substring(7)
