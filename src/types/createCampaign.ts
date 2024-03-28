@@ -70,3 +70,8 @@ export type RangeTextProps = MantineStyleSystemProps & {
   labelTwo: string
   valueTwo: string
 }
+
+export type HTMLBannerDimensions = {
+  width: number
+  height: number
+}
