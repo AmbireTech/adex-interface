@@ -1,8 +1,13 @@
+import { Campaign } from 'adex-common'
 import { createContext, FC, PropsWithChildren, useMemo, useState, useCallback } from 'react'
 // import useFetch from 'hooks/useFetchRequest'
 
+// NOTE: Will put here all the campaigns data and analytics for ease of use
+// Laater we can separate the analytics in different context
+
 type CampaignData = {
   campaignId: string
+  campaign: Campaign
   status: 'loading' | 'updating' | 'done'
   impressions: Number
   clicks: Number
@@ -11,22 +16,28 @@ type CampaignData = {
   // payed / impressions * 1000
   avgCpm: Number
   payed: Number
-  // TODO: by timeframe etc...
+  // TODO: analyticsData type
+  analyticsData: any
 }
 
-interface IAnalyticsContext {
+interface ICampaignsDataContext {
   campaignsData: Map<string, CampaignData>
+  // TODO: all campaigns event aggregations by account
+  eventAggregates: any
   updateCampaignDataById: (params: string) => void
   updateAllCampaignsData: () => void
 }
 
-const AnalyticsContext = createContext<IAnalyticsContext | null>(null)
+const CampaignsDataContext = createContext<ICampaignsDataContext | null>(null)
 
-const AnalyticsProvider: FC<PropsWithChildren> = ({ children }) => {
+const CampaignsDataProvider: FC<PropsWithChildren> = ({ children }) => {
   // eslint-disable-next-line
   const [campaignsData, setCampaignData] = useState<Map<string, CampaignData>>(
     new Map<string, CampaignData>()
   )
+
+  // eslint-disable-next-line
+  const [eventAggregates, setEventAggregates] = useState<any>({})
 
   const updateCampaignDataById = useCallback((campaignId: string) => {
     console.log({ campaignId })
@@ -41,12 +52,15 @@ const AnalyticsProvider: FC<PropsWithChildren> = ({ children }) => {
     () => ({
       campaignsData,
       updateCampaignDataById,
-      updateAllCampaignsData
+      updateAllCampaignsData,
+      eventAggregates
     }),
-    [campaignsData, updateCampaignDataById, updateAllCampaignsData]
+    [campaignsData, updateCampaignDataById, updateAllCampaignsData, eventAggregates]
   )
 
-  return <AnalyticsContext.Provider value={contextValue}>{children}</AnalyticsContext.Provider>
+  return (
+    <CampaignsDataContext.Provider value={contextValue}>{children}</CampaignsDataContext.Provider>
+  )
 }
 
-export { AnalyticsContext, AnalyticsProvider }
+export { CampaignsDataContext, CampaignsDataProvider }
