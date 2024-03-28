@@ -1,4 +1,5 @@
-import { Flex, FlexProps, MantineNumberSize, Text, createStyles } from '@mantine/core'
+import { Flex, Text, createStyles } from '@mantine/core'
+import { CampaignDetailsRowProps } from 'types'
 
 const useStyles = createStyles((theme, { lighterColor }: { lighterColor: boolean }) => ({
   border: {
@@ -18,22 +19,14 @@ const useStyles = createStyles((theme, { lighterColor }: { lighterColor: boolean
   }
 }))
 
-type CampaignDetailsRowProps = FlexProps & {
-  title: string
-  value: any | undefined
-  lighterColor?: boolean | undefined
-  textSize?: MantineNumberSize
-  noBorder?: boolean
-  column?: boolean
-}
-
 const CampaignDetailsRow = ({
   title,
   value,
   lighterColor,
   textSize = 'md',
   noBorder = false,
-  column = false
+  column = false,
+  lineHeight = 'lg'
 }: CampaignDetailsRowProps) => {
   const { classes, cx } = useStyles({ lighterColor: !!lighterColor })
   return (
@@ -42,8 +35,8 @@ const CampaignDetailsRow = ({
       direction={column ? 'column' : 'row'}
       align="center"
       className={cx({ [classes.border]: !noBorder })}
-      pt="lg"
-      pb="lg"
+      pt={lineHeight}
+      pb={lineHeight}
     >
       <Text
         className={cx(classes.textColor, {
@@ -55,7 +48,6 @@ const CampaignDetailsRow = ({
       >
         {title}
       </Text>
-      {/* <Text className={classes.textColor}>{value}</Text> */}
       <Text className={cx({ [classes.fullWidth]: column })}>{value}</Text>
     </Flex>
   )

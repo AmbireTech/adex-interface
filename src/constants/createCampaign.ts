@@ -80,7 +80,9 @@ export const CREATE_CAMPAIGN_DEFAULT_VALUE: CampaignUI = {
 
 export const CATEGORIES: SelectData[] = parseCats()
 
+// TODO: Add/get more Countries
 export const COUNTRIES: SelectData[] = [
-  { value: 'bg', label: 'Bulgaria' },
-  { value: 'uk', label: 'United Kingdom' }
+  { value: 'BG', label: 'Bulgaria' },
+  { value: 'UK', label: 'United Kingdom' },
+  { value: 'USA', label: 'United States of America' }
 ]

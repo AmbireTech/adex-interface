@@ -1,11 +1,11 @@
 import { Button, Flex, Group, Text, UnstyledButton, createStyles } from '@mantine/core'
-import CampaignDetailsRow from 'components/common/Modals/CampaignDetailsModal/CampaignDetailsRow'
 import { CREATE_CAMPAIGN_STEPS } from 'constants/createCampaign'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import LeftArrowIcon from 'resources/icons/LeftArrow'
 import { useCreateCampaignFormContext } from 'contexts/CreateCampaignFormContext'
 import useCreateCampaignData from 'hooks/useCreateCampaignData/useCreateCampaignData'
+import CampaignDetailsRow from 'components/common/CampainDetailsRow'
 
 const useStyles = createStyles((theme) => ({
   bg: {
