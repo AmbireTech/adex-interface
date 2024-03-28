@@ -1,4 +1,5 @@
-import { createContext, FC, PropsWithChildren, useMemo, useState } from 'react'
+import { createContext, FC, PropsWithChildren, useMemo, useState, useCallback } from 'react'
+// import useFetch from 'hooks/useFetchRequest'
 
 type CampaignData = {
   campaignId: string
@@ -15,6 +16,8 @@ type CampaignData = {
 
 interface IAnalyticsContext {
   campaignsData: Map<string, CampaignData>
+  updateCampaignDataById: (params: string) => void
+  updateAllCampaignsData: () => void
 }
 
 const AnalyticsContext = createContext<IAnalyticsContext | null>(null)
@@ -25,11 +28,22 @@ const AnalyticsProvider: FC<PropsWithChildren> = ({ children }) => {
     new Map<string, CampaignData>()
   )
 
+  const updateCampaignDataById = useCallback((campaignId: string) => {
+    console.log({ campaignId })
+    // TODO
+  }, [])
+
+  const updateAllCampaignsData = useCallback(() => {
+    // TODO
+  }, [])
+
   const contextValue = useMemo(
     () => ({
-      campaignsData
+      campaignsData,
+      updateCampaignDataById,
+      updateAllCampaignsData
     }),
-    [campaignsData]
+    [campaignsData, updateCampaignDataById, updateAllCampaignsData]
   )
 
   return <AnalyticsContext.Provider value={contextValue}>{children}</AnalyticsContext.Provider>
