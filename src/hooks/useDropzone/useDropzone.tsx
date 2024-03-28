@@ -1,17 +1,17 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { ImageSizes } from 'types'
+import { HTMLBannerDimensions, ImageSizes } from 'types'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import { AdUnitType } from 'adex-common/dist/types'
 import {
-  extractBannerDimensions,
-  getHTMLBannerDetails,
+  getHTMLBannerDimensions,
   getMediaSize,
-  handleZipFile,
-  readHTMLFile
+  getMediaUrlWithProvider
 } from 'helpers/createCampaignHelpers'
-import { validateHTMLBanner } from 'helpers/htmlBannerValidators'
+// import { validateHTMLBanner } from 'helpers/htmlBannerValidators'
 import { FileWithPath } from '@mantine/dropzone'
 import useMediaUpload from 'hooks/useMediaUpload'
+
+const IPFS_GATEWAY = process.env.REACT_APP_IPFS_GATEWAY
 
 const useDropzone = () => {
   const [uploadedFiles, setUploadedFiles] = useState<FileWithPath[] | null>(null)
@@ -20,7 +20,7 @@ const useDropzone = () => {
     updateCampaign,
     campaign: { adUnits }
   } = useCreateCampaignContext()
-  const { uploadMedia } = useMediaUpload()
+  const { uploadMedia, uploadZipMedia } = useMediaUpload()
 
   const adUnitsCopy = useMemo(() => [...adUnits], [adUnits])
 
@@ -40,9 +40,21 @@ const useDropzone = () => {
 
           reader.onload = async (e: any) => {
             const blob = new Blob([file], { type: file.type })
-            const { ipfsUrl } = await uploadMedia(blob, file.name).catch((error) =>
-              console.error('ERROR: ', error)
-            )
+            let response
+            if (file.type === 'application/zip') {
+              response = await uploadZipMedia(blob, file.name).catch((error) =>
+                console.error('ERROR: ', error)
+              )
+            } else {
+              response = await uploadMedia(blob, file.name).catch((error) =>
+                console.error('ERROR: ', error)
+              )
+            }
+            if (!response) {
+              console.error(response.error)
+              return
+            }
+            const ipfsUrl = response?.root ? response.root.ipfsUrl : response.ipfsUrl
 
             let htmlBannerSizes: ImageSizes | null = null
             const adUnit = {
@@ -55,47 +67,24 @@ const useDropzone = () => {
                   w: 0,
                   h: 0
                 },
-                mime: file.type,
+                mime: file.type === 'application/zip' ? 'text/html' : file.type,
                 mediaUrl: ipfsUrl,
                 targetUrl: '',
                 created: BigInt(new Date().getTime())
               }
             }
-            // TODO: this one should be removed
+
             if (file.type === 'application/zip') {
-              handleZipFile(file).then((res) => {
-                if (typeof res === 'string') {
-                  getHTMLBannerDetails(res).then((result) => {
-                    if (!result) return
+              const mdeiaUrlWithProv = getMediaUrlWithProvider(ipfsUrl, IPFS_GATEWAY)
 
-                    adUnit.banner.format = {
-                      w: result.width,
-                      h: result.height
-                    }
-                    adUnit.banner.mime = 'text/html'
-
-                    adUnitsCopy.push(adUnit)
-                    updateCampaign('adUnits', adUnitsCopy)
-                    updateUploadedFiles([])
-                  })
+              getHTMLBannerDimensions(mdeiaUrlWithProv).then((res: HTMLBannerDimensions | null) => {
+                if (!res) {
+                  return console.error('Failed getting dimensions')
                 }
-              })
-            } else if (file.type === 'text/html') {
-              // TODO: 'text/html' should be removed because of the zip
-              readHTMLFile(file).then((res) => {
-                const isValid = validateHTMLBanner(res as string)
-
-                if (!isValid) {
-                  console.log('Invalid HTML Banner')
-                  return
-                }
-
-                htmlBannerSizes = extractBannerDimensions(res)
-                if (!htmlBannerSizes) return
 
                 adUnit.banner.format = {
-                  w: htmlBannerSizes?.width,
-                  h: htmlBannerSizes?.height
+                  w: Number(res.width),
+                  h: Number(res.height)
                 }
 
                 adUnitsCopy.push(adUnit)
@@ -116,7 +105,7 @@ const useDropzone = () => {
           reader.readAsDataURL(file)
         })
     },
-    [updateUploadedFiles, adUnitsCopy, updateCampaign, uploadMedia]
+    [updateUploadedFiles, adUnitsCopy, updateCampaign, uploadMedia, uploadZipMedia]
   )
 
   useEffect(() => {

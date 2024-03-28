@@ -23,10 +23,29 @@ const useMediaUpload = () => {
       }
       return fetchAuthRequest(req)
     },
-    [adexAccount?.accessToken, fetchAuthRequest]
+    [adexAccount, fetchAuthRequest]
   )
 
-  return { uploadMedia }
+  const uploadZipMedia = useCallback(
+    async (media: Blob, mediaName: string, shouldPin: boolean = false) => {
+      const formData = new FormData()
+      formData.append('zip', media, mediaName)
+      formData.append('shouldPin', shouldPin.toString())
+
+      const req = {
+        url: `${BASE_URL}/dsp/ipfs/upload-zip`,
+        method: 'POST',
+        headers: {
+          'X-DSP-AUTH': `Bearer ${adexAccount?.accessToken}`
+        },
+        body: formData
+      }
+      return fetchAuthRequest(req)
+    },
+    [adexAccount, fetchAuthRequest]
+  )
+
+  return { uploadMedia, uploadZipMedia }
 }
 
 export default useMediaUpload

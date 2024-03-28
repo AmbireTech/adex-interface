@@ -41,13 +41,7 @@ const MediaBanner = ({ adUnit }: { adUnit: AdUnit }) => {
   if (mime === 'text/html') {
     return (
       <div className={classes.imageContainer}>
-        <iframe
-          title="htmlBanner"
-          width={40}
-          height={40}
-          // src={mediaUrl}
-          src="https://gateway.pinata.cloud/ipfs/QmW7S5HRLkP4XtPNyT1vQSjP3eRdtZaVtF6FAPvUfduMjA"
-        />
+        <iframe id={title} title={title} src={mediaUrlWithProvider} width={40} height={40} />
       </div>
     )
   }

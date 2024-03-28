@@ -1,8 +1,7 @@
 import { AdUnit, TargetingInputApplyProp, TargetingInputSingle } from 'adex-common/dist/types'
 import { BANNER_SIZES } from 'constants/banners'
 import { DEFAULT_CATS_LOCS_VALUE } from 'constants/createCampaign'
-import { Devices, SelectData, ImageSizes, FileWithPath } from 'types'
-import JSZip from 'jszip'
+import { Devices, SelectData, ImageSizes, FileWithPath, HTMLBannerDimensions } from 'types'
 
 export const checkSelectedDevices = (devices: Devices[]) => {
   if (devices.length === 1) {
@@ -79,122 +78,56 @@ export const findDuplicates = (array: string[]) => {
   return result
 }
 
-export const readHTMLFile = (file: FileWithPath) => {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader()
-
-    reader.onload = (event: any) => {
-      const htmlContent = event.target.result
-      resolve(htmlContent)
-    }
-
-    reader.onerror = (error) => {
-      reject(error)
-    }
-
-    reader.readAsText(file, 'UTF-8')
-  })
-}
-// TODO: move to the types
-enum HtmlBannerType {
-  Image = 'img',
-  Video = 'video',
-  Iframe = 'iframe'
-  // Add more types as needed
-}
-
-const extractDimensionsPerHTMLBannerType = (
-  htmlElement: HTMLElement,
-  bannerType: HtmlBannerType
-) => {
-  const bannerElement = htmlElement.querySelector(bannerType)
-  if (bannerElement) {
-    const width = Number(bannerElement.width)
-    const height = Number(bannerElement.height)
-
-    return { width, height }
-  }
-
-  return null
-}
-
-export const extractBannerDimensions = (htmlContent: any): ImageSizes | null => {
-  const tempDiv = document.createElement('div')
-  tempDiv.innerHTML = htmlContent
-
-  const imgElement = extractDimensionsPerHTMLBannerType(tempDiv, HtmlBannerType.Image)
-  if (imgElement) return imgElement
-  const videoElement = extractDimensionsPerHTMLBannerType(tempDiv, HtmlBannerType.Video)
-  if (videoElement) return videoElement
-  const iframeElement = extractDimensionsPerHTMLBannerType(tempDiv, HtmlBannerType.Iframe)
-  if (iframeElement) return iframeElement
-
-  return null
-}
-
 export const getFileBlobURL = (file: FileWithPath | string, fileType: string) => {
   const blob = new Blob([file], { type: fileType })
   return URL.createObjectURL(blob)
 }
 
-// TODO: move it to types
-export type HTMLBannerDetails = {
-  width: number
-  height: number
-  blobUrl: string
-}
+export const getHTMLBannerDimensions = async (
+  ipfsUrl: string
+): Promise<HTMLBannerDimensions | null> => {
+  try {
+    const response = await fetch(ipfsUrl)
+    if (!response.ok) {
+      throw new Error(`Failed to fetch HTML content (status ${response.status})`)
+    }
 
-export const getHTMLBannerDetails = (htmlContent: any): Promise<HTMLBannerDetails | null> => {
-  return new Promise((resolve) => {
+    const html = await response.text()
+    const blobUrl = getFileBlobURL(html, 'text/html')
     const tempIframe = document.createElement('iframe')
-    const blobUrl = getFileBlobURL(htmlContent, 'text/html')
     tempIframe.src = blobUrl
     tempIframe.style.visibility = 'hidden'
+    tempIframe.style.position = 'absolute' // Ensure iframe is not affecting layout
+    tempIframe.style.top = '-9999px' // Move iframe off-screen
     document.body.appendChild(tempIframe)
-    tempIframe.onload = () => {
-      if (!tempIframe.contentWindow?.innerWidth || !tempIframe.contentWindow?.innerHeight) {
-        return resolve(null)
+
+    return await new Promise<HTMLBannerDimensions>((resolve, reject) => {
+      tempIframe.onload = () => {
+        const iframeDocument = tempIframe.contentDocument || tempIframe.contentWindow?.document
+        if (!iframeDocument) {
+          reject(new Error('Failed to get iframe document'))
+          return
+        }
+
+        const dimensions = {
+          width: iframeDocument.body.scrollWidth,
+          height: iframeDocument.body.scrollHeight
+        }
+
+        document.body.removeChild(tempIframe)
+
+        resolve(dimensions)
       }
+      tempIframe.onerror = (error) => {
+        document.body.removeChild(tempIframe)
 
-      return resolve({
-        width: tempIframe.contentWindow?.innerWidth,
-        height: tempIframe.contentWindow?.innerHeight,
-        blobUrl
-      })
-    }
-  })
-}
-
-export const handleZipFile = (zipFile: FileWithPath) => {
-  return new Promise((resolve, reject) => {
-    const zip = new JSZip()
-
-    zip.loadAsync(zipFile).then(
-      (zipData) => {
-        // Check contents or extract HTML files
-        zipData.forEach((relativePath, file) => {
-          // if (file.dir) {
-          //   // It's a directory, handle accordingly
-          //   console.log('file.dir', file.dir)
-          //   // debugger // eslint-disable-line no-debugger
-          // } else {
-          // It's a file, check the content or process it
-
-          if (relativePath.endsWith('.html')) {
-            file.async('string').then((htmlContent) => {
-              // Handle HTML content
-              resolve(htmlContent)
-            })
-          }
-          // }
-        })
-      },
-      (error) => {
-        reject(error.message)
-        console.error('Error handling zip file:', error)
+        reject(error)
       }
-    )
-  })
+    })
+  } catch (error) {
+    console.error('Error fetching HTML banner dimensions:', error)
+    return null
+  }
 }
 
 export const isVideoMedia = (mime: string = '') => mime.split('/')[0] === 'video'
