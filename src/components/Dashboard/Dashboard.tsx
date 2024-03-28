@@ -1,26 +1,35 @@
 import { Campaign } from 'adex-common'
 import { Container, Flex, Text } from '@mantine/core'
-import { useCallback, useMemo, useState } from 'react'
-import { useDisclosure } from '@mantine/hooks'
-import { useApi } from 'lib/api'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import CustomTable from 'components/common/CustomTable'
-import { BadgeType } from 'types'
 import { campaignPeriodParser } from 'utils'
 import { campaignHeaders } from 'constant'
-import { CampaignDetailsModal } from 'components/common/Modals'
 import { useNavigate } from 'react-router-dom'
+import useAccount from 'hooks/useAccount'
+import useCampaignsData from 'hooks/useCampaignsData'
 import BadgeStatusCampaign from './BadgeStatusCampaign'
 
 const Dashboard = () => {
-  const [opened, { open, close }] = useDisclosure(false)
-  const [selectedItem, setSelectedItem] = useState<Campaign | null>(null)
   const navigate = useNavigate()
-  const [campaignData, isResolved, error] = useApi<Campaign[]>({
-    // we can also make an independent file handling all the endpoints and calling a function
-    // ex. const [selectedItem, setSelectedItem] = getCampaignsByOwner() and hold all the requests there
-    // in case of endpoint change we can modify only in one place and affect all dependent files
-    endpoint: '/dsp/campaigns/by-owner'
-  })
+  const { getAllCampaigns } = useCampaignsData()
+  const { adexAccount } = useAccount()
+  const [campaignData, setCampaingData] = useState<Campaign[]>([])
+  const [error, setError] = useState(false)
+
+  useEffect(() => {
+    getAllCampaigns()
+      .then((res) => {
+        if (res) {
+          setCampaingData(res)
+        }
+      })
+      .catch((e) => {
+        console.error('Error getting data:', e)
+        setError((prev) => !prev)
+        // showDangerNotification(e.message, 'Error getting data')
+      })
+  }, [getAllCampaigns, adexAccount?.accessToken])
+
   const elements = useMemo(
     () =>
       campaignData && !error
@@ -29,7 +38,7 @@ const Dashboard = () => {
               id: el.id,
               title: el.title,
               model: el.type,
-              status: <BadgeStatusCampaign type={el.status as BadgeType} />,
+              status: <BadgeStatusCampaign type={el.status} />,
               served: 'No data',
               budget: 'No data',
               impressions: 'No data',
@@ -44,10 +53,9 @@ const Dashboard = () => {
 
   const handlePreview = useCallback(
     (item: Campaign) => {
-      setSelectedItem(item)
-      open()
+      navigate(`/dashboard/campaign-details/${item.id}`)
     },
-    [open]
+    [navigate]
   )
 
   const handleAnalytics = useCallback(
@@ -71,7 +79,7 @@ const Dashboard = () => {
         <Text size="sm" color="secondaryText" weight="bold" mb="md">
           All Campaigns
         </Text>
-        {!isResolved && 'Loading'}
+        {/* {!isResolved && 'Loading'} */}
         {error ? (
           'Error getting data'
         ) : (
@@ -86,7 +94,6 @@ const Dashboard = () => {
           />
         )}
       </Flex>
-      <CampaignDetailsModal item={selectedItem} opened={opened} close={close} />
     </Container>
   )
 }

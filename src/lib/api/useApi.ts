@@ -42,7 +42,7 @@ function useApi<T>(options: RequestOptions): UseApi<T> {
       })
       .catch(() => setError(true))
       .finally(() => setFulfilled(true))
-  })
+  }, [])
 
   return [data, fulfilled, error]
 }

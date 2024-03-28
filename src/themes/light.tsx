@@ -137,6 +137,18 @@ export const lightTheme: MantineThemeOverride = {
       '#7E4D40',
       '#6C483F'
     ],
+    completed: [
+      '#7EB6D5',
+      '#5AACDB',
+      '#30A5E8',
+      '#00A2FF',
+      '#178CCF',
+      '#2579A9',
+      '#2D6A8D',
+      '#315D76',
+      '#335264',
+      '#324956'
+    ],
     alternativeBackground: [
       '#FFFFFF',
       '#FFFFFF',

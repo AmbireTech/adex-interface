@@ -1,5 +1,5 @@
 import { Container, createStyles } from '@mantine/core'
-import CampaignDetailsRow from 'components/common/Modals/CampaignDetailsModal/CampaignDetailsRow'
+import CampaignDetailsRow from 'components/common/CampainDetailsRow/CampaignDetailsRow'
 import useCreateCampaignData from 'hooks/useCreateCampaignData/useCreateCampaignData'
 import { useMemo } from 'react'
 import { CreateCampaignOverview } from 'types'

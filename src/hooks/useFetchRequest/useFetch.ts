@@ -15,6 +15,7 @@ const processResponse = (res: any) => {
 }
 
 const useFetch = () => {
+  // TODO: get adexAccount here
   const { updateAccessToken } = useAccount()
 
   const fetchAuthRequest = useCallback(

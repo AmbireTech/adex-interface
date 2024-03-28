@@ -6,10 +6,6 @@ import { useMemo } from 'react'
 const IPFS_GATEWAY = process.env.REACT_APP_IPFS_GATEWAY
 
 const useStyles = createStyles(() => ({
-  image: {
-    maxWidth: 40,
-    maxHeight: 40
-  },
   imageContainer: {
     maxWidth: 40,
     maxHeight: 40,
@@ -61,7 +57,7 @@ const MediaBanner = ({ adUnit }: { adUnit: AdUnit }) => {
     )
   }
 
-  return <Image src={mediaUrlWithProvider} alt={title} className={classes.image} />
+  return <Image src={mediaUrlWithProvider} alt={title} height={40} />
 }
 
 export default MediaBanner

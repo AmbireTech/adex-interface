@@ -21,6 +21,7 @@ type ExtendedCustomColors =
   | 'success'
   | 'info'
   | 'draft'
+  | 'completed'
   | 'alternativeBackground'
   | 'attention'
   | 'secondaryAccent'
