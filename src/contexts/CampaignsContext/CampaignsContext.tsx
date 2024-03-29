@@ -1,6 +1,14 @@
 import { Campaign } from 'adex-common'
-import { createContext, FC, PropsWithChildren, useMemo, useState, useCallback } from 'react'
-// import useFetch from 'hooks/useFetchRequest'
+import {
+  createContext,
+  FC,
+  PropsWithChildren,
+  useMemo,
+  useState,
+  useCallback,
+  useEffect
+} from 'react'
+import { useAdExApi } from 'hooks/useAdexServices'
 
 // NOTE: Will put here all the campaigns data and analytics for ease of use
 // Laater we can separate the analytics in different context
@@ -8,7 +16,6 @@ import { createContext, FC, PropsWithChildren, useMemo, useState, useCallback } 
 type CampaignData = {
   campaignId: string
   campaign: Campaign
-  status: 'loading' | 'updating' | 'done'
   impressions: Number
   clicks: Number
   // clicks / impressions * 100
@@ -20,17 +27,29 @@ type CampaignData = {
   analyticsData: any
 }
 
+const defaultcampaignData = {
+  campaignId: '',
+  campaign: {},
+  impressions: 0,
+  clicks: 0,
+  crt: 0,
+  avgCpm: 0,
+  payed: 0,
+  analyticsData: {}
+}
+
 interface ICampaignsDataContext {
   campaignsData: Map<string, CampaignData>
   // TODO: all campaigns event aggregations by account
   eventAggregates: any
-  updateCampaignDataById: (params: string) => void
+  updateCampaignDataById: (params: string, updateAnalytics: boolean) => void
   updateAllCampaignsData: () => void
 }
 
 const CampaignsDataContext = createContext<ICampaignsDataContext | null>(null)
 
 const CampaignsDataProvider: FC<PropsWithChildren> = ({ children }) => {
+  const { adexServicesRequest } = useAdExApi()
   // eslint-disable-next-line
   const [campaignsData, setCampaignData] = useState<Map<string, CampaignData>>(
     new Map<string, CampaignData>()
@@ -39,14 +58,70 @@ const CampaignsDataProvider: FC<PropsWithChildren> = ({ children }) => {
   // eslint-disable-next-line
   const [eventAggregates, setEventAggregates] = useState<any>({})
 
-  const updateCampaignDataById = useCallback((campaignId: string) => {
-    console.log({ campaignId })
+  const updateCampaignDataById = useCallback(
+    async (campaignId: string, updateAnalytics: boolean = true) => {
+      console.log({ campaignId })
+      console.log({ updateAnalytics })
+      try {
+        const campaignDetailsRes = await adexServicesRequest<Campaign>('backend', {
+          route: `/dsp/campaigns/by-id/${campaignId}`,
+          method: 'GET'
+        })
+
+        const updatedCmp = campaignsData.get(campaignId) || {
+          ...defaultcampaignData,
+          campaignId,
+          campaign: campaignDetailsRes
+        }
+
+        updatedCmp.campaign = campaignDetailsRes
+
+        const updatedData = campaignsData.set(campaignId, updatedCmp)
+        setCampaignData(updatedData)
+      } catch (err) {
+        // TODO: call toast service ot whatever
+        console.log(err)
+      }
+    },
+    [adexServicesRequest, campaignsData]
+  )
+
+  const updateAllCampaignsData = useCallback(async () => {
+    try {
+      const dataRes = await adexServicesRequest<Array<Campaign>>('backend', {
+        route: '/dsp/campaigns/by-owner',
+        method: 'GET'
+      })
+
+      const updated = { ...campaignsData }
+
+      dataRes.forEach((cmp: Campaign) => {
+        const currentCMP = {
+          ...(updated.get(cmp.id) || {
+            ...defaultcampaignData,
+            campaignId: cmp.id,
+            campaign: cmp
+          })
+        }
+
+        updated.set(cmp.id, currentCMP)
+      })
+
+      setCampaignData(updated)
+    } catch (err) {
+      // TODO: call toast service ot whatever
+      console.log(err)
+    }
+  }, [adexServicesRequest, campaignsData])
+
+  const updateEventAggregates = useCallback(() => {
     // TODO
   }, [])
 
-  const updateAllCampaignsData = useCallback(() => {
-    // TODO
-  }, [])
+  useEffect(() => {
+    updateAllCampaignsData()
+    updateEventAggregates()
+  }, [updateAllCampaignsData, updateEventAggregates])
 
   const contextValue = useMemo(
     () => ({
