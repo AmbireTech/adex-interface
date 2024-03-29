@@ -3,7 +3,7 @@ import { BANNER_SIZES } from 'constants/banners'
 import { DEFAULT_CATS_LOCS_VALUE } from 'constants/createCampaign'
 import { Devices, SelectData, ImageSizes, FileWithPath } from 'types'
 import JSZip from 'jszip'
-import { fetchService } from 'services'
+import { fetchService, RequestOptions } from 'services'
 
 export const checkSelectedDevices = (devices: Devices[]) => {
   if (devices.length === 1) {
@@ -239,7 +239,7 @@ export const uploadMedia = async (media: Blob, mediaName: string, shouldPin: boo
     apiKey: 'gubitapagdokatomuviashvhod6eteboli'
   }
 
-  const req = {
+  const req: RequestOptions<any> = {
     url: `${baseUrl}/ipfs/upload`,
     method: 'POST',
     body: formData,

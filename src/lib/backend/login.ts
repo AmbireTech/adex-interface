@@ -1,5 +1,5 @@
 import { BASE_URL } from 'constants/login'
-import { fetchService } from 'services'
+import { fetchService, RequestOptions } from 'services'
 import { IAdExAccount, AppError, ErrorLevel } from 'types'
 
 const processResponse = (res: any) => {
@@ -51,7 +51,7 @@ export const getMessageToSign = async (user: any) => {
     'Content-Type': 'application/json'
   }
 
-  const req = {
+  const req: RequestOptions<any> = {
     url,
     method,
     headers,
@@ -73,7 +73,7 @@ export const verifyLogin = async (body: VerifyLoginProps) => {
     'Content-Type': 'application/json'
   }
 
-  const req = {
+  const req: RequestOptions<any> = {
     url,
     method,
     headers,
@@ -84,20 +84,15 @@ export const verifyLogin = async (body: VerifyLoginProps) => {
 }
 
 export const refreshAccessToken = async (refreshToken: string) => {
-  const url = `${BASE_URL}/dsp/refresh-token`
-  const method = 'POST'
-  const body = {
-    refreshToken
-  }
-  const headers = {
-    'Content-Type': 'application/json'
-  }
-
-  const req = {
-    url,
-    method,
-    headers,
-    body
+  const req: RequestOptions<any> = {
+    url: `${BASE_URL}/dsp/refresh-token`,
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: {
+      refreshToken
+    }
   }
 
   return fetchService(req).then(processResponse)
