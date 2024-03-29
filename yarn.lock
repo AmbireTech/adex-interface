@@ -3143,9 +3143,9 @@ address@^1.0.1, address@^1.1.2:
   resolved "https://registry.yarnpkg.com/address/-/address-1.2.2.tgz#2b5248dac5485a6390532c6a517fda2e3faac89e"
   integrity sha512-4B/qKCfeE/ODUaAUpSwfzazo5x29WD4r3vXiWsB7I2mSDAihwEqKO+g8GELZUQSSAo5e1XTYh3ZVfLyxBc12nA==
 
-"adex-common@github:AmbireTech/adex-common#136f6e65148daf5843b3a3e3d15a8cc96c6534ee":
+"adex-common@github:AmbireTech/adex-common#9b6c27b32ee94805583a3bb95786ebb8ebcd5856":
   version "1.0.1"
-  resolved "https://codeload.github.com/AmbireTech/adex-common/tar.gz/136f6e65148daf5843b3a3e3d15a8cc96c6534ee"
+  resolved "https://codeload.github.com/AmbireTech/adex-common/tar.gz/9b6c27b32ee94805583a3bb95786ebb8ebcd5856"
 
 adjust-sourcemap-loader@^4.0.0:
   version "4.0.0"
