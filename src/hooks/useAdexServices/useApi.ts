@@ -1,26 +1,31 @@
 import useAccount from 'hooks/useAccount'
 import { useCallback } from 'react'
-import { fetchService, RequestOptions } from 'services'
+import { fetchService, getReqErr, RequestOptions } from 'services'
 
-export const BACKEND_BASE_URL = process.env.REACT_BACKEND_BASE_URL
-export const VALIDATOR_BASE_URL = process.env.REACT_VALIDATOR_BASE_URL
+export const BACKEND_BASE_URL = process.env.REACT_APP_BACKEND_BASE_URL
+export const VALIDATOR_BASE_URL = process.env.REACT_APP_VALIDATOR_BASE_URL
 
-// TODO: move it to helper
 const processResponse = (res: any) => {
+  // console.log('res', res)
   if (res.status >= 200 && res.status < 400) {
     return res.json()
   }
   // TODO: fix that
   return res.text().then((text: any) => {
     if (res.status === 401 || res.status === 403) {
-      console.error('something went wrong', text)
+      console.error('unauthorized', text)
     }
+
+    getReqErr(res, text)
   })
 }
 
 type AdExService = 'backend' | 'validator'
 
-type ApiRequestOptions<T> = Omit<RequestOptions<T>, 'url'> & { route: string }
+type ApiRequestOptions<T> = Omit<RequestOptions<T>, 'url'> & {
+  route: string
+  noAuth?: boolean
+}
 
 export const useAdExApi = () => {
   // TODO: get adexAccount here
@@ -43,6 +48,8 @@ export const useAdExApi = () => {
         queryParams: reqOptions.queryParams
       }
 
+      // console.log('adexAccount', adexAccount)
+
       const authHeader = {
         [authHeaderProp]: `Bearer ${adexAccount?.accessToken}`
       }
@@ -62,6 +69,8 @@ export const useAdExApi = () => {
         ...authHeader,
         ...req.headers
       }
+
+      // console.log('req', req)
 
       return fetchService(req).then(processResponse)
     },
