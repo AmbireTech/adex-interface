@@ -70,7 +70,7 @@ export const useAdExApi = () => {
         ...req.headers
       }
 
-      // console.log('req', req)
+      console.log('req', req)
 
       return fetchService(req).then(processResponse)
     },

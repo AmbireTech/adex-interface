@@ -76,8 +76,8 @@ const CampaignsDataProvider: FC<PropsWithChildren> = ({ children }) => {
 
         updatedCmp.campaign = campaignDetailsRes
 
-        const updatedData = campaignsData.set(campaignId, updatedCmp)
-        setCampaignData(updatedData)
+        campaignsData.set(campaignId, updatedCmp)
+        setCampaignData(campaignsData)
       } catch (err) {
         // TODO: call toast service ot whatever
         console.log(err)
@@ -93,21 +93,24 @@ const CampaignsDataProvider: FC<PropsWithChildren> = ({ children }) => {
         method: 'GET'
       })
 
-      const updated = { ...campaignsData }
+      if (Array.isArray(dataRes)) {
+        dataRes.forEach((cmp: Campaign) => {
+          const currentCMP = {
+            ...(campaignsData.get(cmp.id) || {
+              ...defaultcampaignData,
+              campaignId: cmp.id,
+              campaign: cmp
+            })
+          }
 
-      dataRes.forEach((cmp: Campaign) => {
-        const currentCMP = {
-          ...(updated.get(cmp.id) || {
-            ...defaultcampaignData,
-            campaignId: cmp.id,
-            campaign: cmp
-          })
-        }
+          campaignsData.set(cmp.id, currentCMP)
+        })
 
-        updated.set(cmp.id, currentCMP)
-      })
-
-      setCampaignData(updated)
+        setCampaignData(campaignsData)
+      } else {
+        // TODO: handle error
+        console.log({ dataRes })
+      }
     } catch (err) {
       // TODO: call toast service ot whatever
       console.log(err)

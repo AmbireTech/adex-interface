@@ -1,6 +1,8 @@
 import { BASE_URL } from 'constants/login'
-import { fetchService, RequestOptions } from 'services'
+import { fetchService, RequestOptions, getReqErr } from 'services'
 import { IAdExAccount, AppError, ErrorLevel } from 'types'
+
+// TODO: fix this to use useAdExApi (adexServicesRequest)
 
 const processResponse = (res: any) => {
   if (res.status >= 200 && res.status < 400) {
@@ -9,8 +11,10 @@ const processResponse = (res: any) => {
   // TODO: fix that
   return res.text().then((text: any) => {
     if (res.status === 401 || res.status === 403) {
-      throw new Error('something went wrong', text)
+      console.error('unauthorized', text)
     }
+
+    getReqErr(res, text)
   })
 }
 
