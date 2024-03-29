@@ -1,6 +1,6 @@
-interface RequestOptions<T> {
+export interface RequestOptions<T> {
   url: string
-  method?: string
+  method?: 'GET' | 'POST' | 'OPTIONS' | 'PUT'
   headers?: Record<string, string>
   queryParams?: Record<string, string>
   body?: T | FormData
