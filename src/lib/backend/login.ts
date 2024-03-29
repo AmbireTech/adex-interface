@@ -1,6 +1,8 @@
 import { BASE_URL } from 'constants/login'
-import { fetchService } from 'services'
+import { fetchService, RequestOptions, getReqErr } from 'services'
 import { IAdExAccount, AppError, ErrorLevel } from 'types'
+
+// TODO: fix this to use useAdExApi (adexServicesRequest)
 
 const processResponse = (res: any) => {
   if (res.status >= 200 && res.status < 400) {
@@ -9,8 +11,10 @@ const processResponse = (res: any) => {
   // TODO: fix that
   return res.text().then((text: any) => {
     if (res.status === 401 || res.status === 403) {
-      throw new Error('something went wrong', text)
+      console.error('unauthorized', text)
     }
+
+    getReqErr(res, text)
   })
 }
 
@@ -51,7 +55,7 @@ export const getMessageToSign = async (user: any) => {
     'Content-Type': 'application/json'
   }
 
-  const req = {
+  const req: RequestOptions<any> = {
     url,
     method,
     headers,
@@ -73,7 +77,7 @@ export const verifyLogin = async (body: VerifyLoginProps) => {
     'Content-Type': 'application/json'
   }
 
-  const req = {
+  const req: RequestOptions<any> = {
     url,
     method,
     headers,
@@ -84,20 +88,15 @@ export const verifyLogin = async (body: VerifyLoginProps) => {
 }
 
 export const refreshAccessToken = async (refreshToken: string) => {
-  const url = `${BASE_URL}/dsp/refresh-token`
-  const method = 'POST'
-  const body = {
-    refreshToken
-  }
-  const headers = {
-    'Content-Type': 'application/json'
-  }
-
-  const req = {
-    url,
-    method,
-    headers,
-    body
+  const req: RequestOptions<any> = {
+    url: `${BASE_URL}/dsp/refresh-token`,
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: {
+      refreshToken
+    }
   }
 
   return fetchService(req).then(processResponse)
