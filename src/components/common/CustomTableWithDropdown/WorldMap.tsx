@@ -68,8 +68,8 @@ const useStyles = createStyles(() => ({
 export default function GeoCustom({ width, height, regions }: GeoCustomProps) {
   const { classes } = useStyles()
   const centerX = useMemo(() => width / 2, [width])
-  const centerY = useMemo(() => height / 2, [height])
-  const initialScale = useMemo(() => (width / 1000) * 100, [width])
+  const centerY = useMemo(() => height / 2.5, [height])
+  const initialScale = useMemo(() => width / 6, [width])
 
   return width < 10 ? null : (
     <Zoom<SVGSVGElement>
