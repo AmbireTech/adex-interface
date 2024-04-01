@@ -35,7 +35,7 @@ export const useAdExApi = () => {
   const { showNotification } = useCustomNotifications()
 
   const adexServicesRequest = useCallback(
-    async <T>(service: AdExService, reqOptions: ApiRequestOptions<T>) => {
+    async <T>(service: AdExService, reqOptions: ApiRequestOptions<T>): Promise<T> => {
       // temp hax for using the same token fot validator auth
       const authHeaderProp = service === 'backend' ? 'X-DSP-AUTH' : 'Authentication'
 
