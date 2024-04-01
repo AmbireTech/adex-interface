@@ -32,6 +32,8 @@ type ExtendedCustomColors =
   | 'chartColorFour'
   | 'warning'
   | 'nonDecorativeBorders'
+  | 'stopped'
+  | 'paused'
   | DefaultMantineColor
 
 declare module '@mantine/core' {
