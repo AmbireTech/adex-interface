@@ -14,6 +14,10 @@ import CollapsibleField from 'components/common/CollapsibleField'
 import GoBack from 'components/common/GoBack'
 import CampaignDetailsRow from 'components/common/CampainDetailsRow/CampaignDetailsRow'
 import useCampaignsData from 'hooks/useCampaignsData'
+import ActiveIcon from 'resources/icons/Active'
+import CampaignActionBtn from 'components/CampaignAnalytics/CampaignActionBtn'
+import StopIcon from 'resources/icons/Stop'
+import ArchivedIcon from 'resources/icons/Archived'
 
 const useStyles = createStyles((theme) => ({
   wrapper: {
@@ -235,6 +239,30 @@ const CampaignDetails = () => {
                         )
                       })}
                   </div>
+                </Grid.Col>
+              </Grid>
+              <Grid>
+                <Grid.Col>
+                  <Flex justify="flex-end" align="center" gap="xs" mt="xl">
+                    <CampaignActionBtn
+                      text="Activate"
+                      icon={<ActiveIcon size="13px" />}
+                      color="success"
+                      onBtnClicked={() => console.log('Activate btn clicked')}
+                    />
+                    <CampaignActionBtn
+                      text="Stop"
+                      icon={<StopIcon size="13px" />}
+                      color="stopped"
+                      onBtnClicked={() => console.log('Stop btn clicked')}
+                    />
+                    <CampaignActionBtn
+                      text="Archive"
+                      icon={<ArchivedIcon size="13px" />}
+                      color="secondaryText"
+                      onBtnClicked={() => console.log('Archive btn clicked')}
+                    />
+                  </Flex>
                 </Grid.Col>
               </Grid>
             </Grid.Col>

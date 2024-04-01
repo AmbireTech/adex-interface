@@ -81,11 +81,9 @@ const Dashboard = () => {
             All Campaigns
           </Text>
           <UnstyledButton onClick={toggleShowArchived}>
-            <Flex align="center">
-              <Text size="sm" underline color="secondaryText">
-                {showArchived ? 'Hide Archived' : 'Show Archived'}
-              </Text>
-            </Flex>
+            <Text size="sm" underline color="secondaryText">
+              {showArchived ? 'Hide Archived' : 'Show Archived'}
+            </Text>
           </UnstyledButton>
         </Flex>
         <CustomTable
