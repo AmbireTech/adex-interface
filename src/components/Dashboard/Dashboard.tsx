@@ -1,5 +1,5 @@
-import { Campaign } from 'adex-common'
-import { Container, Flex, Text } from '@mantine/core'
+import { Campaign, CampaignStatus } from 'adex-common'
+import { Container, Flex, Text, UnstyledButton } from '@mantine/core'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import CustomTable from 'components/common/CustomTable'
 import { campaignPeriodParser } from 'utils'
@@ -15,6 +15,7 @@ const Dashboard = () => {
   const { adexAccount } = useAccount()
   const [campaignData, setCampaingData] = useState<Campaign[]>([])
   const [error, setError] = useState(false)
+  const [showArchived, setShowArchived] = useState(false)
 
   useEffect(() => {
     getAllCampaigns()
@@ -25,30 +26,37 @@ const Dashboard = () => {
       })
       .catch((e) => {
         console.error('Error getting data:', e)
-        setError((prev) => !prev)
-        // showDangerNotification(e.message, 'Error getting data')
+        setError(true)
       })
   }, [getAllCampaigns, adexAccount?.accessToken])
 
+  const filteredCampaignData = useMemo(() => {
+    if (!showArchived) {
+      // TODO: change 'CampaignStatus.expired' to 'CampaignStatus.archived' when has been added to the model
+      return campaignData && !error
+        ? campaignData.filter((campaign) => campaign.status !== CampaignStatus.expired)
+        : []
+    }
+    return campaignData
+  }, [campaignData, showArchived, error])
+
   const elements = useMemo(
     () =>
-      campaignData && !error
-        ? campaignData?.map((el: Campaign) => {
-            return {
-              id: el.id,
-              title: el.title,
-              model: el.type,
-              status: <BadgeStatusCampaign type={el.status} />,
-              served: 'No data',
-              budget: 'No data',
-              impressions: 'No data',
-              clicks: 'No data',
-              ctr: 'No data',
-              period: campaignPeriodParser([el.activeFrom, el.activeTo])
-            }
-          })
+      filteredCampaignData.length
+        ? filteredCampaignData.map((el: Campaign) => ({
+            id: el.id,
+            title: el.title,
+            model: el.type,
+            status: <BadgeStatusCampaign type={el.status} />,
+            served: 'No data',
+            budget: 'No data',
+            impressions: 'No data',
+            clicks: 'No data',
+            ctr: 'No data',
+            period: campaignPeriodParser([el.activeFrom, el.activeTo])
+          }))
         : [],
-    [campaignData, error]
+    [filteredCampaignData]
   )
 
   const handlePreview = useCallback(
@@ -66,20 +74,34 @@ const Dashboard = () => {
   )
 
   const handleDuplicate = useCallback((item: Campaign) => {
+    // TODO: Implement duplication logic
     console.log('item', item)
   }, [])
 
   const handleDelete = useCallback((item: Campaign) => {
+    // TODO: Implement deletion logic
     console.log('item', item)
+  }, [])
+
+  const toggleShowArchived = useCallback(() => {
+    setShowArchived((prevShowArchived) => !prevShowArchived)
   }, [])
 
   return (
     <Container fluid>
       <Flex direction="column" justify="start">
-        <Text size="sm" color="secondaryText" weight="bold" mb="md">
-          All Campaigns
-        </Text>
-        {/* {!isResolved && 'Loading'} */}
+        <Flex justify="space-between" align="center">
+          <Text size="sm" color="secondaryText" weight="bold" mb="md">
+            All Campaigns
+          </Text>
+          <UnstyledButton onClick={toggleShowArchived}>
+            <Flex align="center">
+              <Text size="sm" underline color="secondaryText">
+                {showArchived ? 'Hide Archived' : 'Show Archived'}
+              </Text>
+            </Flex>
+          </UnstyledButton>
+        </Flex>
         {error ? (
           'Error getting data'
         ) : (
