@@ -25,7 +25,7 @@ interface IAccountContext {
 const AccountContext = createContext<IAccountContext | null>(null)
 
 const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
-  const { showDangerNotification } = useCustomNotifications()
+  const { showNotification } = useCustomNotifications()
   const ambireSDK = useMemo(() => ambireLoginSDK, [])
   const [adexAccount, setAdexAccount] = useLocalStorage<IAccountContext['adexAccount']>({
     key: 'adexAccount',
@@ -71,16 +71,11 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
         return null
       } catch (error: any) {
         console.error('Updating access token failed:', error)
-        showDangerNotification(error, 'Updating access token failed')
+        showNotification('error', error?.message, 'Updating access token failed')
         throw error
       }
     }
-  }, [
-    adexAccount?.accessToken,
-    adexAccount?.refreshToken,
-    updateAdexAccount,
-    showDangerNotification
-  ])
+  }, [adexAccount?.accessToken, adexAccount?.refreshToken, updateAdexAccount, showNotification])
 
   const handleRegistrationOrLoginSuccess = useCallback(
     ({ address, chainId }: any) => {
@@ -100,7 +95,7 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
         })
         .catch((error) => {
           console.error('Get message to sign failed', error)
-          showDangerNotification(error.message, 'Get message to sign failed')
+          showNotification('error', error?.message, 'Get message to sign failed')
         })
     },
     [
@@ -108,7 +103,7 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
       adexAccount?.chainId,
       adexAccount?.authMsgResp,
       updateAdexAccount,
-      showDangerNotification
+      showNotification
     ]
   )
 
@@ -132,15 +127,10 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
         })
         .catch((error) => {
           console.error('Error verify login:', error)
-          showDangerNotification(error.message, 'Verify login failed')
+          showNotification('error', error?.message, 'Verify login failed')
         })
     },
-    [
-      adexAccount?.authMsgResp,
-      adexAccount?.authenticated,
-      updateAdexAccount,
-      showDangerNotification
-    ]
+    [adexAccount?.authMsgResp, adexAccount?.authenticated, updateAdexAccount, showNotification]
   )
 
   const handleMsgRejected = useCallback(() => {

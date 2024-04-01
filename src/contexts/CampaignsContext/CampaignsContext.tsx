@@ -9,6 +9,7 @@ import {
   useEffect
 } from 'react'
 import { useAdExApi } from 'hooks/useAdexServices'
+import useCustomNotifications from 'hooks/useCustomNotifications'
 
 // NOTE: Will put here all the campaigns data and analytics for ease of use
 // Laater we can separate the analytics in different context
@@ -49,6 +50,7 @@ interface ICampaignsDataContext {
 const CampaignsDataContext = createContext<ICampaignsDataContext | null>(null)
 
 const CampaignsDataProvider: FC<PropsWithChildren> = ({ children }) => {
+  const { showNotification } = useCustomNotifications()
   const { adexServicesRequest } = useAdExApi()
   // eslint-disable-next-line
   const [campaignsData, setCampaignData] = useState<Map<string, CampaignData>>(
@@ -68,22 +70,28 @@ const CampaignsDataProvider: FC<PropsWithChildren> = ({ children }) => {
           method: 'GET'
         })
 
-        const updatedCmp = campaignsData.get(campaignId) || {
-          ...defaultcampaignData,
-          campaignId,
-          campaign: campaignDetailsRes
-        }
+        setCampaignData((prev) => {
+          const updatedCmp = prev.get(campaignId) || {
+            ...defaultcampaignData,
+            campaignId,
+            campaign: campaignDetailsRes
+          }
 
-        updatedCmp.campaign = campaignDetailsRes
+          if (campaignId === campaignDetailsRes?.id) {
+            updatedCmp.campaign = campaignDetailsRes
+            return new Map(prev.set(campaignId, updatedCmp))
+          }
+          showNotification('warning', `campaign with id ${campaignId} not found`, 'Data warning')
 
-        campaignsData.set(campaignId, updatedCmp)
-        setCampaignData(campaignsData)
+          // NOTE: skip state update
+          return prev
+        })
       } catch (err) {
-        // TODO: call toast service ot whatever
         console.log(err)
+        showNotification('error', `getting campaign with id ${campaignId}`, 'Data error')
       }
     },
-    [adexServicesRequest, campaignsData]
+    [adexServicesRequest, showNotification]
   )
 
   const updateAllCampaignsData = useCallback(async () => {
@@ -93,29 +101,33 @@ const CampaignsDataProvider: FC<PropsWithChildren> = ({ children }) => {
         method: 'GET'
       })
 
+      console.log({ dataRes })
       if (Array.isArray(dataRes)) {
-        dataRes.forEach((cmp: Campaign) => {
-          const currentCMP = {
-            ...(campaignsData.get(cmp.id) || {
-              ...defaultcampaignData,
-              campaignId: cmp.id,
-              campaign: cmp
-            })
-          }
+        setCampaignData((prev) => {
+          const next = new Map(prev)
+          dataRes.forEach((cmp: Campaign) => {
+            const currentCMP = {
+              ...(prev.get(cmp.id) || {
+                ...defaultcampaignData,
+                campaignId: cmp.id,
+                campaign: cmp
+              })
+            }
 
-          campaignsData.set(cmp.id, currentCMP)
+            next.set(cmp.id, currentCMP)
+          })
+
+          return next
         })
-
-        setCampaignData(campaignsData)
       } else {
-        // TODO: handle error
+        showNotification('warning', 'invalid campaigns data response', 'Data error')
         console.log({ dataRes })
       }
     } catch (err) {
-      // TODO: call toast service ot whatever
       console.log(err)
+      showNotification('error', 'getting campaigns data', 'Data error')
     }
-  }, [adexServicesRequest, campaignsData])
+  }, [adexServicesRequest, showNotification])
 
   const updateEventAggregates = useCallback(() => {
     // TODO
