@@ -46,7 +46,7 @@ const useStyles = createStyles((theme) => ({
 function TopBar() {
   const { classes, cx } = useStyles()
   const { adexAccount, disconnectWallet, resetAdexAccount } = useAccount()
-  const { showInfoNotification, showDangerNotification } = useCustomNotifications()
+  const { showNotification } = useCustomNotifications()
   const location = useLocation()
   const splitPath = useMemo(() => location.pathname.split('/'), [location.pathname])
   const title = useMemo(
@@ -76,23 +76,22 @@ function TopBar() {
       .then((res) => {
         if (res) {
           resetAdexAccount()
-          showInfoNotification('Successfully logged out', 'Logging out')
+          showNotification('info', 'Successfully logged out', 'Logging out')
           navigate('/login', { replace: true })
         }
       })
       .catch((e) => {
         console.error('Logging out failed', e)
-        showDangerNotification(e.message, 'Logging out failed')
+        showNotification('error', e.message, 'Logging out failed')
       })
   }, [
+    disconnectWallet,
     adexAccount?.accessToken,
     adexAccount?.refreshToken,
-    disconnectWallet,
     adexServicesRequest,
-    navigate,
     resetAdexAccount,
-    showInfoNotification,
-    showDangerNotification
+    showNotification,
+    navigate
   ])
 
   return (
