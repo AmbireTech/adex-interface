@@ -28,6 +28,52 @@ type CampaignData = {
   analyticsData: any
 }
 
+type Timeframe = 'year' | 'month' | 'week' | 'day' | 'hour'
+type Metric = 'count' | 'payed'
+type EventType = 'IMPRESSION' | 'CLICK'
+
+type AnalyticsDataKeys = {
+  campaignId: string
+  adUnit: string
+  adSlot: string
+  adSlotType: string
+  advertiser: string
+  publisher: string
+  ssp: string
+  sspPublisher: string
+  hostname: string
+  country: string
+  osName: string
+}
+
+type AnalyticsDataQuery = {
+  eventType: EventType
+  metric: Metric
+  timeframe: Timeframe
+  start: Date
+  end: Date
+  limit: number
+  segmentBy: keyof AnalyticsDataKeys
+  timezone: 'UTC'
+}
+
+const getAnalyticsKeyFromQuery = (queryParams: AnalyticsDataQuery): string => {
+  // TODO: hex or hash
+  const key = `${queryParams.eventType}_${queryParams.metric}_${queryParams.timeframe}_${queryParams.start}_${queryParams.end}_${queryParams.limit}_${queryParams.segmentBy}_${queryParams.timezone}`
+  return key
+}
+
+type AnalyticsData = {
+  value: string | Number
+  time: number
+  segment?: string
+}
+
+type AnalyticsDataRes = {
+  limit?: Number
+  aggr: AnalyticsData[]
+}
+
 const defaultcampaignData = {
   campaignId: '',
   campaign: {},
@@ -41,6 +87,7 @@ const defaultcampaignData = {
 
 interface ICampaignsDataContext {
   campaignsData: Map<string, CampaignData>
+  analyticsData: Map<string, AnalyticsData[]>
   // TODO: all campaigns event aggregations by account
   eventAggregates: any
   updateCampaignDataById: (params: string, updateAnalytics: boolean) => void
@@ -52,9 +99,13 @@ const CampaignsDataContext = createContext<ICampaignsDataContext | null>(null)
 const CampaignsDataProvider: FC<PropsWithChildren> = ({ children }) => {
   const { showNotification } = useCustomNotifications()
   const { adexServicesRequest } = useAdExApi()
-  // eslint-disable-next-line
+
   const [campaignsData, setCampaignData] = useState<Map<string, CampaignData>>(
     new Map<string, CampaignData>()
+  )
+
+  const [analyticsData, setAnalyticsData] = useState<Map<string, AnalyticsData[]>>(
+    new Map<string, AnalyticsData[]>()
   )
 
   // eslint-disable-next-line
@@ -129,13 +180,42 @@ const CampaignsDataProvider: FC<PropsWithChildren> = ({ children }) => {
     }
   }, [adexServicesRequest, showNotification])
 
-  const updateEventAggregates = useCallback(() => {
-    // TODO
-  }, [])
+  const updateEventAggregates = useCallback(
+    async (params: AnalyticsDataQuery) => {
+      try {
+        const analyticsDataRes = await adexServicesRequest<AnalyticsDataRes>('validator', {
+          route: '/v5_a/analytics',
+          method: 'GET',
+          queryParams: Object.entries(params).reduce(
+            (query: Record<string, string>, [key, value]) => {
+              const updated = { ...query }
+              updated[key] = value.toString()
+              return updated
+            },
+            {}
+          )
+        })
+
+        if (!analyticsDataRes.aggr?.length) {
+          // TODO do something
+          return
+        }
+        setAnalyticsData((prev) => {
+          const dataKey = getAnalyticsKeyFromQuery(params)
+
+          return new Map(prev.set(dataKey, analyticsDataRes.aggr))
+        })
+      } catch (err) {
+        console.log(err)
+        // TODO: see how to use campaignId out of segment
+        showNotification('error', `getting analytics ${params.timeframe}`, 'Data error')
+      }
+    },
+    [adexServicesRequest, showNotification]
+  )
 
   useEffect(() => {
     updateAllCampaignsData()
-    updateEventAggregates()
   }, [updateAllCampaignsData, updateEventAggregates])
 
   const contextValue = useMemo(
@@ -143,9 +223,10 @@ const CampaignsDataProvider: FC<PropsWithChildren> = ({ children }) => {
       campaignsData,
       updateCampaignDataById,
       updateAllCampaignsData,
-      eventAggregates
+      eventAggregates,
+      analyticsData
     }),
-    [campaignsData, updateCampaignDataById, updateAllCampaignsData, eventAggregates]
+    [campaignsData, updateCampaignDataById, updateAllCampaignsData, eventAggregates, analyticsData]
   )
 
   return (
