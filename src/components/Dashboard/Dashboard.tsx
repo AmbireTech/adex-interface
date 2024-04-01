@@ -1,60 +1,46 @@
 import { Campaign, CampaignStatus } from 'adex-common'
 import { Container, Flex, Text, UnstyledButton } from '@mantine/core'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import CustomTable from 'components/common/CustomTable'
 import { campaignPeriodParser } from 'utils'
 import { campaignHeaders } from 'constant'
 import { useNavigate } from 'react-router-dom'
-import useAccount from 'hooks/useAccount'
 import useCampaignsData from 'hooks/useCampaignsData'
 import BadgeStatusCampaign from './BadgeStatusCampaign'
 
 const Dashboard = () => {
   const navigate = useNavigate()
-  const { getAllCampaigns } = useCampaignsData()
-  const { adexAccount } = useAccount()
-  const [campaignData, setCampaingData] = useState<Campaign[]>([])
-  const [error, setError] = useState(false)
+  const { campaignsData } = useCampaignsData()
   const [showArchived, setShowArchived] = useState(false)
-
-  useEffect(() => {
-    getAllCampaigns()
-      .then((res) => {
-        if (res) {
-          setCampaingData(res)
-        }
-      })
-      .catch((e) => {
-        console.error('Error getting data:', e)
-        setError(true)
-      })
-  }, [getAllCampaigns, adexAccount?.accessToken])
-
   const filteredCampaignData = useMemo(() => {
     if (!showArchived) {
       // TODO: change 'CampaignStatus.expired' to 'CampaignStatus.archived' when has been added to the model
-      return campaignData && !error
-        ? campaignData.filter((campaign) => campaign.status !== CampaignStatus.expired)
+      return campaignsData && Array.from(campaignsData.values()).length > 0
+        ? Array.from(campaignsData.values()).filter(
+            (campaign) => campaign.campaign.status !== CampaignStatus.expired
+          )
         : []
     }
-    return campaignData
-  }, [campaignData, showArchived, error])
+    return Array.from(campaignsData.values())
+  }, [campaignsData, showArchived])
 
   const elements = useMemo(
     () =>
       filteredCampaignData.length
-        ? filteredCampaignData.map((el: Campaign) => ({
-            id: el.id,
-            title: el.title,
-            model: el.type,
-            status: <BadgeStatusCampaign type={el.status} />,
-            served: 'No data',
-            budget: 'No data',
-            impressions: 'No data',
-            clicks: 'No data',
-            ctr: 'No data',
-            period: campaignPeriodParser([el.activeFrom, el.activeTo])
-          }))
+        ? filteredCampaignData.map((cmpData) => {
+            return {
+              id: cmpData.campaignId,
+              title: cmpData.campaign.title,
+              model: cmpData.campaign.type,
+              status: <BadgeStatusCampaign type={cmpData.campaign.status} />,
+              served: 'No data',
+              budget: 'No data',
+              impressions: 'No data',
+              clicks: 'No data',
+              ctr: 'No data',
+              period: campaignPeriodParser([cmpData.campaign.activeFrom, cmpData.campaign.activeTo])
+            }
+          })
         : [],
     [filteredCampaignData]
   )
@@ -102,19 +88,15 @@ const Dashboard = () => {
             </Flex>
           </UnstyledButton>
         </Flex>
-        {error ? (
-          'Error getting data'
-        ) : (
-          <CustomTable
-            background
-            headings={campaignHeaders}
-            elements={elements}
-            onPreview={handlePreview}
-            onAnalytics={handleAnalytics}
-            onDuplicate={handleDuplicate}
-            onDelete={handleDelete}
-          />
-        )}
+        <CustomTable
+          background
+          headings={campaignHeaders}
+          elements={elements}
+          onPreview={handlePreview}
+          onAnalytics={handleAnalytics}
+          onDuplicate={handleDuplicate}
+          onDelete={handleDelete}
+        />
       </Flex>
     </Container>
   )

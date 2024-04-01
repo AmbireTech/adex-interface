@@ -1,3 +1,1 @@
-import { fetchService } from './fetch'
-
-export { fetchService }
+export * from './fetch'

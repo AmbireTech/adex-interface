@@ -21,8 +21,7 @@ import WithdrawIcon from 'resources/icons/Withdraw'
 import Blockies from 'components/common/Blockies'
 import { useLocation, useNavigate } from 'react-router-dom'
 import StakingIcon from 'resources/icons/Staking'
-import useFetch from 'hooks/useFetchRequest'
-import { BASE_URL } from 'constants/login'
+import { useAdExApi } from 'hooks/useAdexServices'
 import useCustomNotifications from 'hooks/useCustomNotifications'
 
 const useStyles = createStyles((theme) => ({
@@ -57,19 +56,18 @@ function TopBar() {
 
   const [opened, setOpened] = useState<boolean>(false)
 
-  const { fetchAuthRequest } = useFetch()
+  const { adexServicesRequest } = useAdExApi()
   const navigate = useNavigate()
 
   const handleLogutBtnClicked = useCallback(() => {
     disconnectWallet()
     if (!adexAccount?.accessToken && !adexAccount?.refreshToken) return
 
-    fetchAuthRequest({
-      url: `${BASE_URL}/dsp/logout`,
+    adexServicesRequest('backend', {
+      route: '/dsp/logout',
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
-        'X-DSP-AUTH': `Bearer ${adexAccount.accessToken}`
+        'Content-Type': 'application/json'
       },
       body: {
         refreshToken: adexAccount.refreshToken
@@ -90,7 +88,7 @@ function TopBar() {
     adexAccount?.accessToken,
     adexAccount?.refreshToken,
     disconnectWallet,
-    fetchAuthRequest,
+    adexServicesRequest,
     navigate,
     resetAdexAccount,
     showInfoNotification,

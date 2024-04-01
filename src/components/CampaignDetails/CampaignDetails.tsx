@@ -1,7 +1,7 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useMemo } from 'react'
 import { useParams } from 'react-router-dom'
 import { Container, Grid, createStyles, Text, Flex } from '@mantine/core'
-import { Campaign } from 'adex-common'
+
 import BadgeStatusCampaign from 'components/Dashboard/BadgeStatusCampaign'
 import { formatCatsAndLocsData } from 'helpers/createCampaignHelpers'
 import { SelectData } from 'types/createCampaignCommon'
@@ -52,13 +52,17 @@ const useStyles = createStyles((theme) => ({
 
 const CampaignDetails = () => {
   const { classes, cx } = useStyles()
-  const { getCampaignById } = useCampaignsData()
+  const { campaignsData } = useCampaignsData()
   const { id } = useParams()
   if (!id) {
     return <div>Missing ID</div>
   }
 
-  const [campaignDetails, setCampaignDetails] = useState<Campaign | null>(null)
+  const campaignDetails = useMemo(
+    () => campaignsData.get(id)?.campaign,
+
+    [id, campaignsData]
+  )
 
   const formatCatsAndLocs = useCallback(
     (inputValues: TargetingInputSingle, lib: SelectData[]) => {
@@ -83,19 +87,6 @@ const CampaignDetails = () => {
     },
     [classes.warningColor]
   )
-
-  useEffect(() => {
-    getCampaignById(id)
-      .then((res) => {
-        if (res) {
-          setCampaignDetails(res)
-        }
-      })
-      .catch((e) => {
-        console.error('Error getting data:', e)
-        // showDangerNotification(e.message, 'Error getting data')
-      })
-  }, [getCampaignById, id])
 
   return (
     <>
