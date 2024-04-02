@@ -1,4 +1,4 @@
-import { Flex, Group, Pagination, Table, createStyles } from '@mantine/core'
+import { Flex, Group, Pagination, Table, createStyles, Text } from '@mantine/core'
 import VisibilityIcon from 'resources/icons/Visibility'
 import { ICustomTableProps } from 'types'
 import usePagination from 'hooks/usePagination'
@@ -31,7 +31,7 @@ const CustomTable = ({
   onDuplicate,
   onDelete
 }: ICustomTableProps) => {
-  if (!elements.length) return null
+  if (!elements.length) return <Text>No data found</Text>
   const { classes, cx } = useStyles()
   const columns: string[] = useMemo(
     () => Object.keys(elements[0]).filter((e: string) => e !== 'id'),

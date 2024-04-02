@@ -23,7 +23,7 @@ const SelectDevice = () => {
   return (
     <>
       <Text color="secondaryText" size="sm" weight="bold" mb="xs">
-        1. Select device
+        2. Select device
       </Text>
       <Flex gap={20} justify="space-between">
         <CustomCard

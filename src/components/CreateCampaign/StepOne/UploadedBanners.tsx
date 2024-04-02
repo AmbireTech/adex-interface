@@ -26,6 +26,8 @@ const UploadedBanners = ({
 
   const isMatchedTheSizes = useCallback(
     (img: AdUnit) =>
+      allowedSizes &&
+      allowedSizes.length > 0 &&
       allowedSizes.find(
         (item) => item.w === img.banner?.format.w && item.h === img.banner?.format.h
       ),
