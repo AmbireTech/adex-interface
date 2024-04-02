@@ -145,14 +145,22 @@ const CampaignDetails = () => {
                   lineHeight="sm"
                   textSize="sm"
                   title="Limit average daily spending"
-                  value="No"
+                  value={
+                    campaignDetails?.targetingInput.inputs.advanced.limitDailyAverageSpending
+                      ? 'Yes'
+                      : 'No'
+                  }
                 />
                 {/* TODO: Add data for it */}
                 <CampaignDetailsRow
                   lineHeight="sm"
                   textSize="sm"
                   title="Disable frequency capping"
-                  value="No"
+                  value={
+                    campaignDetails?.targetingInput.inputs.advanced.disableFrequencyCapping
+                      ? 'Yes'
+                      : 'No'
+                  }
                   noBorder
                 />
               </div>
