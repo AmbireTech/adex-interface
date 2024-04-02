@@ -21,7 +21,7 @@ const AdminPanel = () => {
     })
       .then(setCampaignData)
       .catch((err) => console.log(err))
-  }, [opened])
+  }, [opened]) // eslint-disable-line
   const elements = useMemo(
     () =>
       campaignData
