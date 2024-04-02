@@ -45,12 +45,17 @@ const AdminCampaignModal = ({
       route: `/dsp/admin/campaigns/${item.id}`,
       method: 'PUT',
       body: {
-        reviewStatus: 3,
+        reviewStatus: action,
         reviewMessage: reason
+      },
+      headers: {
+        'content-type': 'application/json'
       }
     })
+      .then(close)
+      .catch(console.log)
+    setFormed(false)
   }
-
   return (
     <Modal
       size="lg"
@@ -83,6 +88,7 @@ const AdminCampaignModal = ({
           <CampaignDetailsRow title="Limit average daily spending" value="No" />
           {/* TODO: Add data for it */}
           <CampaignDetailsRow title="Disable frequency capping" value="No" />
+          {}
           <Textarea
             defaultValue={reason}
             onChange={(e) => setReason(e.target.value)}

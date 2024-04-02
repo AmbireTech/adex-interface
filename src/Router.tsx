@@ -6,13 +6,13 @@ import GetStarted from 'components/GetStarted'
 import CampaignAnalytics from 'components/CampaignAnalytics'
 import { createBrowserRouter, Navigate, useLocation } from 'react-router-dom'
 
-import { AdminPanel } from 'admin'
 import useAccount from 'hooks/useAccount'
 import Deposit from 'components/Deposit'
 import CreateCampaign from 'components/CreateCampaign'
 import { CreateCampaignContextProvider } from 'contexts/CreateCampaignContext/CreateCampaignContext'
 import { CreateCampaignFormProvider } from 'contexts/CreateCampaignFormContext'
 import NotFound404 from 'components/404/404'
+import AdminPanel from './admin/Admin'
 import CampaignDetails from './components/CampaignDetails'
 
 function RequireAuth({ children, admin }: { children: JSX.Element; admin?: boolean }) {
