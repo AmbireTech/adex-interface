@@ -33,20 +33,20 @@ type Metric = 'count' | 'payed'
 type EventType = 'IMPRESSION' | 'CLICK'
 
 type AnalyticsDataKeys = {
-  campaignId: string
-  adUnit: string
-  adSlot: string
-  adSlotType: string
-  advertiser: string
-  publisher: string
-  ssp: string
-  sspPublisher: string
-  hostname: string
-  country: string
-  osName: string
+  campaignId?: string
+  adUnit?: string
+  adSlot?: string
+  adSlotType?: string
+  advertiser?: string
+  publisher?: string
+  ssp?: string
+  sspPublisher?: string
+  hostname?: string
+  country?: string
+  osName?: string
 }
 
-type AnalyticsDataQuery = {
+type AnalyticsDataQuery = AnalyticsDataKeys & {
   eventType: EventType
   metric: Metric
   timeframe: Timeframe
@@ -54,13 +54,22 @@ type AnalyticsDataQuery = {
   end: Date
   limit: number
   segmentBy: keyof AnalyticsDataKeys
+  // TODO: validation and test timezones - need tests on validator ad well
   timezone: 'UTC'
 }
 
 const getAnalyticsKeyFromQuery = (queryParams: AnalyticsDataQuery): string => {
   // TODO: hex or hash
-  const key = `${queryParams.eventType}_${queryParams.metric}_${queryParams.timeframe}_${queryParams.start}_${queryParams.end}_${queryParams.limit}_${queryParams.segmentBy}_${queryParams.timezone}`
-  return key
+  const mapKey = Object.keys(queryParams)
+    .sort()
+    .reduce((result: string, key: string) => {
+      if (queryParams[key as keyof AnalyticsDataQuery] !== undefined) {
+        return `${result}_${queryParams[key as keyof AnalyticsDataQuery]?.toString()}`
+      }
+
+      return result
+    }, '')
+  return mapKey
 }
 
 type AnalyticsData = {
