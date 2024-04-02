@@ -9,6 +9,7 @@ import {
   useEffect
 } from 'react'
 import { useAdExApi } from 'hooks/useAdexServices'
+import useCustomNotifications from 'hooks/useCustomNotifications'
 
 // NOTE: Will put here all the campaigns data and analytics for ease of use
 // Laater we can separate the analytics in different context
@@ -27,6 +28,52 @@ type CampaignData = {
   analyticsData: any
 }
 
+type Timeframe = 'year' | 'month' | 'week' | 'day' | 'hour'
+type Metric = 'count' | 'payed'
+type EventType = 'IMPRESSION' | 'CLICK'
+
+type AnalyticsDataKeys = {
+  campaignId: string
+  adUnit: string
+  adSlot: string
+  adSlotType: string
+  advertiser: string
+  publisher: string
+  ssp: string
+  sspPublisher: string
+  hostname: string
+  country: string
+  osName: string
+}
+
+type AnalyticsDataQuery = {
+  eventType: EventType
+  metric: Metric
+  timeframe: Timeframe
+  start: Date
+  end: Date
+  limit: number
+  segmentBy: keyof AnalyticsDataKeys
+  timezone: 'UTC'
+}
+
+const getAnalyticsKeyFromQuery = (queryParams: AnalyticsDataQuery): string => {
+  // TODO: hex or hash
+  const key = `${queryParams.eventType}_${queryParams.metric}_${queryParams.timeframe}_${queryParams.start}_${queryParams.end}_${queryParams.limit}_${queryParams.segmentBy}_${queryParams.timezone}`
+  return key
+}
+
+type AnalyticsData = {
+  value: string | Number
+  time: number
+  segment?: string
+}
+
+type AnalyticsDataRes = {
+  limit?: Number
+  aggr: AnalyticsData[]
+}
+
 const defaultcampaignData = {
   campaignId: '',
   campaign: {},
@@ -40,6 +87,7 @@ const defaultcampaignData = {
 
 interface ICampaignsDataContext {
   campaignsData: Map<string, CampaignData>
+  analyticsData: Map<string, AnalyticsData[]>
   // TODO: all campaigns event aggregations by account
   eventAggregates: any
   updateCampaignDataById: (params: string, updateAnalytics: boolean) => void
@@ -49,10 +97,15 @@ interface ICampaignsDataContext {
 const CampaignsDataContext = createContext<ICampaignsDataContext | null>(null)
 
 const CampaignsDataProvider: FC<PropsWithChildren> = ({ children }) => {
+  const { showNotification } = useCustomNotifications()
   const { adexServicesRequest } = useAdExApi()
-  // eslint-disable-next-line
+
   const [campaignsData, setCampaignData] = useState<Map<string, CampaignData>>(
     new Map<string, CampaignData>()
+  )
+
+  const [analyticsData, setAnalyticsData] = useState<Map<string, AnalyticsData[]>>(
+    new Map<string, AnalyticsData[]>()
   )
 
   // eslint-disable-next-line
@@ -68,22 +121,28 @@ const CampaignsDataProvider: FC<PropsWithChildren> = ({ children }) => {
           method: 'GET'
         })
 
-        const updatedCmp = campaignsData.get(campaignId) || {
-          ...defaultcampaignData,
-          campaignId,
-          campaign: campaignDetailsRes
-        }
+        setCampaignData((prev) => {
+          const updatedCmp = prev.get(campaignId) || {
+            ...defaultcampaignData,
+            campaignId,
+            campaign: campaignDetailsRes
+          }
 
-        updatedCmp.campaign = campaignDetailsRes
+          if (campaignId === campaignDetailsRes?.id) {
+            updatedCmp.campaign = campaignDetailsRes
+            return new Map(prev.set(campaignId, updatedCmp))
+          }
+          showNotification('warning', `campaign with id ${campaignId} not found`, 'Data warning')
 
-        campaignsData.set(campaignId, updatedCmp)
-        setCampaignData(campaignsData)
+          // NOTE: skip state update
+          return prev
+        })
       } catch (err) {
-        // TODO: call toast service ot whatever
         console.log(err)
+        showNotification('error', `getting campaign with id ${campaignId}`, 'Data error')
       }
     },
-    [adexServicesRequest, campaignsData]
+    [adexServicesRequest, showNotification]
   )
 
   const updateAllCampaignsData = useCallback(async () => {
@@ -93,37 +152,70 @@ const CampaignsDataProvider: FC<PropsWithChildren> = ({ children }) => {
         method: 'GET'
       })
 
+      console.log({ dataRes })
       if (Array.isArray(dataRes)) {
-        dataRes.forEach((cmp: Campaign) => {
-          const currentCMP = {
-            ...(campaignsData.get(cmp.id) || {
-              ...defaultcampaignData,
-              campaignId: cmp.id,
-              campaign: cmp
-            })
-          }
+        setCampaignData((prev) => {
+          const next = new Map(prev)
+          dataRes.forEach((cmp: Campaign) => {
+            const currentCMP = {
+              ...(prev.get(cmp.id) || {
+                ...defaultcampaignData,
+                campaignId: cmp.id,
+                campaign: cmp
+              })
+            }
 
-          campaignsData.set(cmp.id, currentCMP)
+            next.set(cmp.id, currentCMP)
+          })
+
+          return next
         })
-
-        setCampaignData(campaignsData)
       } else {
-        // TODO: handle error
+        showNotification('warning', 'invalid campaigns data response', 'Data error')
         console.log({ dataRes })
       }
     } catch (err) {
-      // TODO: call toast service ot whatever
       console.log(err)
+      showNotification('error', 'getting campaigns data', 'Data error')
     }
-  }, [adexServicesRequest, campaignsData])
+  }, [adexServicesRequest, showNotification])
 
-  const updateEventAggregates = useCallback(() => {
-    // TODO
-  }, [])
+  const updateEventAggregates = useCallback(
+    async (params: AnalyticsDataQuery) => {
+      try {
+        const analyticsDataRes = await adexServicesRequest<AnalyticsDataRes>('validator', {
+          route: '/v5_a/analytics',
+          method: 'GET',
+          queryParams: Object.entries(params).reduce(
+            (query: Record<string, string>, [key, value]) => {
+              const updated = { ...query }
+              updated[key] = value.toString()
+              return updated
+            },
+            {}
+          )
+        })
+
+        if (!analyticsDataRes.aggr?.length) {
+          // TODO do something
+          return
+        }
+        setAnalyticsData((prev) => {
+          const dataKey = getAnalyticsKeyFromQuery(params)
+
+          return new Map(prev.set(dataKey, analyticsDataRes.aggr))
+        })
+      } catch (err) {
+        console.log(err)
+        // TODO: see how to use campaignId out of segment
+        showNotification('error', `getting analytics ${params.timeframe}`, 'Data error')
+      }
+    },
+    [adexServicesRequest, showNotification]
+  )
 
   useEffect(() => {
     updateAllCampaignsData()
-    updateEventAggregates()
   }, [updateAllCampaignsData, updateEventAggregates])
 
   const contextValue = useMemo(
@@ -131,9 +223,10 @@ const CampaignsDataProvider: FC<PropsWithChildren> = ({ children }) => {
       campaignsData,
       updateCampaignDataById,
       updateAllCampaignsData,
-      eventAggregates
+      eventAggregates,
+      analyticsData
     }),
-    [campaignsData, updateCampaignDataById, updateAllCampaignsData, eventAggregates]
+    [campaignsData, updateCampaignDataById, updateAllCampaignsData, eventAggregates, analyticsData]
   )
 
   return (
