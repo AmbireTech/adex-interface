@@ -1,6 +1,7 @@
 import useAccount from 'hooks/useAccount'
 import { useCallback } from 'react'
 import { fetchService, getReqErr, RequestOptions } from 'services'
+import useCustomNotifications from 'hooks/useCustomNotifications'
 
 export const BACKEND_BASE_URL = process.env.REACT_APP_BACKEND_BASE_URL
 export const VALIDATOR_BASE_URL = process.env.REACT_APP_VALIDATOR_BASE_URL
@@ -16,7 +17,8 @@ const processResponse = (res: any) => {
       console.error('unauthorized', text)
     }
 
-    getReqErr(res, text)
+    const err = getReqErr(res, text)
+    throw new Error(err)
   })
 }
 
@@ -30,9 +32,10 @@ type ApiRequestOptions<T> = Omit<RequestOptions<T>, 'url'> & {
 export const useAdExApi = () => {
   // TODO: get adexAccount here
   const { updateAccessToken, adexAccount } = useAccount()
+  const { showNotification } = useCustomNotifications()
 
   const adexServicesRequest = useCallback(
-    async <T>(service: AdExService, reqOptions: ApiRequestOptions<T>) => {
+    async <T>(service: AdExService, reqOptions: ApiRequestOptions<T>): Promise<T> => {
       // temp hax for using the same token fot validator auth
       const authHeaderProp = service === 'backend' ? 'X-DSP-AUTH' : 'Authentication'
 
@@ -72,9 +75,11 @@ export const useAdExApi = () => {
 
       console.log('req', req)
 
-      return fetchService(req).then(processResponse)
+      return fetchService(req)
+        .then(processResponse)
+        .catch((err) => showNotification('error', err.message, 'Data error'))
     },
-    [updateAccessToken, adexAccount]
+    [adexAccount?.accessToken, updateAccessToken, showNotification]
   )
 
   return {

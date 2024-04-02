@@ -41,20 +41,22 @@ const useDropzone = () => {
           reader.onload = async (e: any) => {
             const blob = new Blob([file], { type: file.type })
             let response
-            if (file.type === 'application/zip') {
-              response = await uploadZipMedia(blob, file.name).catch((error) =>
-                console.error('ERROR: ', error)
-              )
-            } else {
-              response = await uploadMedia(blob, file.name).catch((error) =>
-                console.error('ERROR: ', error)
-              )
+            let ipfsUrl: string = ''
+            try {
+              if (file.type === 'application/zip') {
+                response = await uploadZipMedia(blob, file.name)
+                ipfsUrl = response.root.ipfsUrl
+              } else {
+                response = await uploadMedia(blob, file.name)
+                ipfsUrl = response.ipfsUrl
+              }
+              if (!response) {
+                console.error('No Response')
+                return
+              }
+            } catch (err) {
+              console.error('ERROR: ', err)
             }
-            if (!response) {
-              console.error(response.error)
-              return
-            }
-            const ipfsUrl = response?.root ? response.root.ipfsUrl : response.ipfsUrl
 
             let htmlBannerSizes: ImageSizes | null = null
             const adUnit = {
