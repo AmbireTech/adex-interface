@@ -15,7 +15,7 @@ const AdminPanel = () => {
   const [selectedItem, setSelectedItem] = useState<Campaign | null>(null)
   const [campaignData, setCampaignData] = useState<Campaign[] | null>(null)
   useEffect(() => {
-    adexServicesRequest('backend', {
+    adexServicesRequest<Campaign[]>('backend', {
       route: '/dsp/admin/campaigns',
       queryParams: { all: 'true' }
     })
