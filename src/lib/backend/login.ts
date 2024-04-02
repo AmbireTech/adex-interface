@@ -34,6 +34,19 @@ const parseJwt = (token: string) => {
   return JSON.parse(jsonPayload)
 }
 
+export const isAdminToken = (accessToken: string | undefined) => {
+  console.log(accessToken)
+
+  if (!accessToken) {
+    return false
+  }
+
+  const decodeAccessToken = parseJwt(accessToken)
+  console.log(decodeAccessToken.data.is_admin)
+
+  return decodeAccessToken.data.is_admin
+}
+
 export const isTokenExpired = (accessToken: string) => {
   if (!accessToken) {
     return true

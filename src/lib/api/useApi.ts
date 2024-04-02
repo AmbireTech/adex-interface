@@ -1,5 +1,6 @@
 import useAccount from 'hooks/useAccount'
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 // TODO: add link to actual deploy. Check if in dev env to use localhost
 const BASE_URL = 'http://localhost:3069'
@@ -18,7 +19,8 @@ function useApi<T>(options: RequestOptions): UseApi<T> {
   const [data, setData] = useState<T | null>(null)
   const [fulfilled, setFulfilled] = useState(false)
   const [error, setError] = useState(false)
-  const { adexAccount } = useAccount()
+  const { adexAccount, updateAccessToken } = useAccount()
+  const navigate = useNavigate()
 
   useEffect(() => {
     const { endpoint, method = 'GET', headers = {}, queryParams, body } = options
@@ -37,12 +39,17 @@ function useApi<T>(options: RequestOptions): UseApi<T> {
     })
       .then((resp) => {
         setError(!resp.ok)
-        if (resp.status === 401) console.log('Check Auth')
+        if (resp.status === 401) {
+          updateAccessToken()
+            .then()
+            .catch(() => navigate('/login', { replace: true }))
+        }
+
         resp.json().then(setData)
       })
       .catch(() => setError(true))
       .finally(() => setFulfilled(true))
-  }, [])
+  }, []) // eslint-disable-line
 
   return [data, fulfilled, error]
 }
