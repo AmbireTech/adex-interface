@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react'
-import { Button, Container, Flex, Tabs } from '@mantine/core'
+import { Container, Flex, Tabs } from '@mantine/core'
 import { useParams } from 'react-router-dom'
 import { TabType } from 'types'
 import GoBack from 'components/common/GoBack/GoBack'
@@ -10,6 +10,7 @@ import Creatives from './Creatives'
 import Regions from './Regions'
 import TimeFrame from './TimeFrame'
 import { generateCVSData } from './CvsDownloadConfigurations'
+import SeeOnMapBtn from './SeeOnMapBtn'
 
 const CampaignAnalytics = () => {
   const { id } = useParams()
@@ -51,12 +52,8 @@ const CampaignAnalytics = () => {
             <Tabs.Tab value="regions">REGIONS</Tabs.Tab>
             <Tabs.Tab value="creatives">CREATIVES</Tabs.Tab>
           </Tabs.List>
-          <Flex align="center">
-            {isMapBtnShown && (
-              <Button mr="md" onClick={() => setIsMapVisible((prev) => !prev)}>
-                {isMapVisible ? 'Hide World Map' : 'Show World Map'}
-              </Button>
-            )}
+          <Flex align="center" justify="space-between">
+            {isMapBtnShown && <SeeOnMapBtn onBtnClicked={() => setIsMapVisible((prev) => !prev)} />}
             {activeTab !== 'timeframe' && (
               <DownloadCSV
                 data={csvData.tabData}
@@ -73,7 +70,11 @@ const CampaignAnalytics = () => {
           <Placements placements={campaignDetails?.placements} />
         </Tabs.Panel>
         <Tabs.Panel value="regions" pt="xs">
-          <Regions regions={campaignDetails?.regions} isMapVisible={isMapVisible} />
+          <Regions
+            regions={campaignDetails?.regions}
+            isMapVisible={isMapVisible}
+            onClose={() => setIsMapVisible(false)}
+          />
         </Tabs.Panel>
         <Tabs.Panel value="creatives" pt="xs">
           <Creatives creatives={campaignDetails?.creatives} />

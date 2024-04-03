@@ -69,7 +69,7 @@ function LogIn() {
             Welcome to AdEx
           </Title>
           <Title className={classes.subTitle} align="center" color="secondaryText" order={2}>
-            Open-source, transparent & fraud-proof display advertising
+            Reach Beyond Web3
           </Title>
         </div>
         <Button variant="filled" size="xl" onClick={handleGetStartedBtnClicked}>

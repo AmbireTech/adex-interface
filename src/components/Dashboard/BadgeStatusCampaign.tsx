@@ -1,17 +1,21 @@
-import CustomBadge from 'components/common/CustomBadge'
 import { useCallback, useMemo } from 'react'
+import { BadgeType, IBadgeConfig } from 'types'
+import { CampaignStatus } from 'adex-common'
+import CustomBadge from 'components/common/CustomBadge'
 import CompletedIcon from 'resources/icons/CompletedIcon'
 import DraftIcon from 'resources/icons/Draft'
 import UnderReviewIcon from 'resources/icons/UnderReview'
-import { BadgeType, IBadgeConfig } from 'types'
-import { CampaignStatus } from 'adex-common'
+import StopIcon from 'resources/icons/Stop'
+// import ActiveIcon from 'resources/icons/Active'
+// import PausedIcon from 'resources/icons/Paused'
+// import ArchivedIcon from 'resources/icons/Archived'
 
 const BadgeStatusCampaign = ({ type }: BadgeType) => {
   const getStatusLabel = useCallback((status: number): IBadgeConfig => {
     switch (status) {
       case CampaignStatus.created:
         return {
-          color: 'success',
+          color: 'draft',
           text: 'Created',
           icon: <DraftIcon size="13px" />
         }
@@ -30,32 +34,67 @@ const BadgeStatusCampaign = ({ type }: BadgeType) => {
           icon: <CompletedIcon size="13px" />
         }
 
-      case CampaignStatus.active:
-        return {
-          color: 'success',
-          text: 'Active',
-          icon: <CompletedIcon size="13px" />
-        }
-
       case CampaignStatus.closedByUser:
         return {
-          color: 'success',
-          text: 'Closed by user',
-          icon: <CompletedIcon size="13px" />
+          color: 'stopped',
+          text: 'Stopped',
+          icon: <StopIcon size="13px" />
         }
 
       case CampaignStatus.expired:
         return {
-          color: 'success',
-          text: 'Expired',
+          color: 'completed',
+          text: 'Completed',
           icon: <CompletedIcon size="13px" />
         }
+      // TODO: uncomment when CampaignStatus.active is added
+      // case CampaignStatus.active:
+      //   return {
+      //     color: 'success',
+      //     text: 'Active',
+      //     icon: <ActiveIcon size="13px" />
+      //   }
+      // TODO: uncomment when CampaignStatus.stopped is added
+      // case CampaignStatus.stopped:
+      //   return {
+      //     color: 'stopped',
+      //     text: 'Stopped',
+      //     icon: <StopIcon size="13px" />
+      //   }
+      // TODO: uncomment when CampaignStatus.paused is added
+      // case CampaignStatus.paused:
+      //   return {
+      //     color: 'paused',
+      //     text: 'Paused',
+      //     icon: <PausedIcon size="13px" />
+      //   }
+      // TODO: uncomment when CampaignStatus.archived is added
+      // case CampaignStatus.archived:
+      //   return {
+      //     color: 'secondaryText',
+      //     text: 'Archived',
+      //     icon: <ArchivedIcon size="13px" />
+      //   }
+      // TODO: uncomment when CampaignStatus.rejected is added
+      // case CampaignStatus.rejected:
+      //   return {
+      //     color: 'warning',
+      //     text: 'Rejected',
+      //     icon: <UnderReviewIcon size="13px" />
+      //   }
+      // TODO: uncomment when CampaignStatus.draft is added
+      // case CampaignStatus.draft:
+      //   return {
+      //     color: 'draft',
+      //     text: 'Created',
+      //     icon: <DraftIcon size="13px" />
+      //   }
 
       default:
         return {
-          color: 'draft',
+          color: 'secondaryText',
           text: 'Unknown',
-          icon: <DraftIcon size="13px" />
+          icon: undefined
         }
     }
   }, [])

@@ -12,14 +12,19 @@ import CreateCampaign from 'components/CreateCampaign'
 import { CreateCampaignContextProvider } from 'contexts/CreateCampaignContext/CreateCampaignContext'
 import { CreateCampaignFormProvider } from 'contexts/CreateCampaignFormContext'
 import NotFound404 from 'components/404/404'
+import AdminPanel from './admin/Admin'
 import CampaignDetails from './components/CampaignDetails'
 
-function RequireAuth({ children }: { children: JSX.Element }) {
-  const { authenticated } = useAccount()
+function RequireAuth({ children, admin }: { children: JSX.Element; admin?: boolean }) {
+  const { authenticated, isAdmin } = useAccount()
   const location = useLocation()
 
   if (!authenticated) {
     return <Navigate to="/login" state={{ from: location }} replace />
+  }
+
+  if (admin && isAdmin) {
+    return <Navigate to="/404" state={{ from: location }} replace />
   }
 
   return children
@@ -74,6 +79,14 @@ export const router = createBrowserRouter(
                 <CreateCampaign />
               </CreateCampaignFormProvider>
             </CreateCampaignContextProvider>
+          )
+        },
+        {
+          path: 'admin',
+          element: (
+            <RequireAuth>
+              <AdminPanel />
+            </RequireAuth>
           )
         }
       ]

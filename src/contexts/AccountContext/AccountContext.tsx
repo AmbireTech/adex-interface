@@ -1,7 +1,13 @@
 import { createContext, FC, PropsWithChildren, useMemo, useCallback, useEffect } from 'react'
 import { IAdExAccount } from 'types'
 import { useLocalStorage } from '@mantine/hooks'
-import { getMessageToSign, isTokenExpired, refreshAccessToken, verifyLogin } from 'lib/backend'
+import {
+  getMessageToSign,
+  isAdminToken,
+  isTokenExpired,
+  refreshAccessToken,
+  verifyLogin
+} from 'lib/backend'
 import { AmbireLoginSDK } from '@ambire/login-sdk-core'
 import { DAPP_ICON_PATH, DAPP_NAME, DEFAULT_CHAIN_ID } from 'constants/login'
 import useCustomNotifications from 'hooks/useCustomNotifications'
@@ -15,6 +21,7 @@ interface IAccountContext {
   adexAccount: IAdExAccount | null
   authenticated: boolean
   ambireSDK: AmbireLoginSDK
+  isAdmin: boolean
   connectWallet: () => void
   disconnectWallet: () => void
   updateAdexAccount: (value: any) => void
@@ -58,6 +65,7 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
 
   const updateAccessToken = useCallback(async () => {
     if (!adexAccount?.accessToken || !adexAccount?.refreshToken) return
+
     if (isTokenExpired(adexAccount.accessToken)) {
       try {
         const response = await refreshAccessToken(adexAccount?.refreshToken)
@@ -173,11 +181,17 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
     [adexAccount?.authenticated]
   )
 
+  const isAdmin = useMemo(
+    () => Boolean(isAdminToken(adexAccount?.accessToken)),
+    [adexAccount?.accessToken]
+  )
+
   const contextValue = useMemo(
     () => ({
       adexAccount,
       authenticated,
       // authenticated: true,
+      isAdmin,
       connectWallet,
       disconnectWallet,
       signMessage,
@@ -189,6 +203,7 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
     [
       adexAccount,
       authenticated,
+      isAdmin,
       connectWallet,
       disconnectWallet,
       signMessage,
