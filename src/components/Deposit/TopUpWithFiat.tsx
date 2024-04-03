@@ -1,4 +1,4 @@
-import { Alert, Grid } from '@mantine/core'
+import { Alert, Grid, Text } from '@mantine/core'
 import InfoIcon from 'resources/icons/Info'
 
 import GUARDARIAN_LOGO from 'resources/payment-providers/guardarian.svg'
@@ -58,10 +58,20 @@ const TopUpWithFiat = () => {
   return (
     <Grid align="center">
       <Grid.Col>
-        <Alert icon={<InfoIcon size="1rem" />} color="red">
+        <Alert icon={<InfoIcon />} color="attention" variant="outline">
           AdEx operates only with ADX, USDC, USDT or DAI. Please make sure you deposit only these
           coins.
         </Alert>
+      </Grid.Col>
+      <Grid.Col>
+        <Alert icon={<InfoIcon size="1rem" />} color="attention" variant="outline">
+          Note that invoices are generated in the currency in which the campaign was initiated.
+        </Alert>
+      </Grid.Col>
+      <Grid.Col>
+        <Text size="sm" color="secondaryText" fw="bold">
+          Deposit with credit card to your account directly using one of our partners
+        </Text>
       </Grid.Col>
       {providers.map(({ logo, name, type, fees, limits, currencies, onClick }) => (
         <Grid.Col p="md" key={name}>

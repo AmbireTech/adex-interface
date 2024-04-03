@@ -11,6 +11,7 @@ import {
 } from '@mantine/core'
 // import useAccount from 'hooks/useAccount'
 import { useMatch, useLocation, useResolvedPath, Link } from 'react-router-dom'
+import useAccount from 'hooks/useAccount'
 import DashboardIcon from 'resources/icons/Dashboard'
 import DepositIcon from 'resources/icons/Deposit'
 import BillingIcon from 'resources/icons/Billing'
@@ -45,6 +46,9 @@ const useStyles = createStyles((theme) => ({
 
 function SideNav() {
   // const { connectWallet, disconnectWallet, adexAccount } = useAccount()
+  const { isAdmin } = useAccount()
+  console.log(isAdmin)
+
   const location = useLocation()
   const match = useMatch(location.pathname)
   const year = useMemo(() => new Date().getFullYear(), [])
@@ -84,7 +88,7 @@ function SideNav() {
             to="/dashboard"
             icon={<DashboardIcon />}
             label="Dashboard"
-            active={useResolvedPath('dashboard').pathname === match?.pathname}
+            active={useResolvedPath('').pathname === match?.pathname}
           />
           <NavLink
             to="/dashboard/deposit"
@@ -99,6 +103,14 @@ function SideNav() {
             active={useResolvedPath('billing').pathname === match?.pathname}
           />
           <NavLink icon={<HelpIcon />} label="Help Center" />
+          {isAdmin && (
+            <NavLink
+              to="/dashboard/admin"
+              // icon={<BillingIcon />}
+              label="Admin Panel"
+              active={useResolvedPath('admin').pathname === match?.pathname}
+            />
+          )}
         </Box>
       </Navbar.Section>
       <Navbar.Section mx="xs" mt="xl">

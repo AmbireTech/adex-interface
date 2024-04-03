@@ -2,6 +2,7 @@ import { Container, Grid, Flex, Title, Button } from '@mantine/core'
 import DepositIcon from 'resources/icons/Deposit'
 import CampaignIcon from 'resources/icons/Campaign'
 import CustomCard from 'components/common/CustomCard'
+import AddSignerIcon from 'resources/icons/AddSigner'
 
 const GetStarted = () => {
   return (
@@ -16,6 +17,26 @@ const GetStarted = () => {
               width={294}
               height={330}
               title="Step 1"
+              text="Fill in company details"
+              icon={<AddSignerIcon strokeWidth="1" size="60px" />}
+              color="secondary"
+            >
+              <Button
+                w="70%"
+                size="lg"
+                variant="filled"
+                color="secondary"
+                onClick={() => console.log('Add details clicked')}
+              >
+                Add details
+              </Button>
+            </CustomCard>
+          </Grid.Col>
+          <Grid.Col md={4} order={2} xs={12}>
+            <CustomCard
+              width={294}
+              height={330}
+              title="Step 2"
               text="Add funds to your account"
               icon={<DepositIcon size="60px" />}
               color="secondary"
@@ -31,7 +52,7 @@ const GetStarted = () => {
               </Button>
             </CustomCard>
           </Grid.Col>
-          <Grid.Col md={4} order={2} xs={12}>
+          <Grid.Col md={4} order={3} xs={12}>
             <CustomCard
               width={294}
               height={330}
@@ -51,16 +72,6 @@ const GetStarted = () => {
                 Create a campaign
               </Button>
             </CustomCard>
-          </Grid.Col>
-          <Grid.Col md={4} order={4} xs={12}>
-            <CustomCard
-              width={164}
-              height={164}
-              icon={<CampaignIcon size="60px" />}
-              text="Desktop"
-              color="brand"
-              action={() => console.log('Desktop clicked')}
-            />
           </Grid.Col>
         </Grid>
       </Flex>

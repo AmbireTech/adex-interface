@@ -1,5 +1,5 @@
 import { Grid, Text } from '@mantine/core'
-import { useCallback, useRef, useState } from 'react'
+import { useCallback, useMemo, useRef, useState } from 'react'
 import { AdUnit } from 'adex-common/dist/types'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import useDropzone from 'hooks/useDropzone'
@@ -20,7 +20,7 @@ const UploadCreative = () => {
 
   const { onDrop } = useDropzone()
 
-  const hasUploadedCreatives = adUnits.length > 0
+  const hasUploadedCreatives = useMemo(() => adUnits.length > 0, [adUnits.length])
 
   const handleDeleteCreativeBtnClicked = useCallback(
     (file: AdUnit) => {
@@ -57,7 +57,7 @@ const UploadCreative = () => {
     <Grid>
       <Grid.Col>
         <Text color="secondaryText" size="sm" weight="bold" mb="xs">
-          2. Upload creatives
+          3. Upload creatives
         </Text>
         <Text color="secondaryText" size="xs" weight="bold" mb="xs">
           Accepted banner sizes
