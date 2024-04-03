@@ -30,6 +30,7 @@ type CampaignData = {
 
 type Timeframe = 'year' | 'month' | 'week' | 'day' | 'hour'
 type Metric = 'count' | 'payed'
+type Placement = 'app' | 'site'
 type EventType = 'IMPRESSION' | 'CLICK'
 
 type AnalyticsDataKeys = {
@@ -42,6 +43,7 @@ type AnalyticsDataKeys = {
   ssp?: string
   sspPublisher?: string
   hostname?: string
+  placement?: Placement
   country?: string
   osName?: string
 }
