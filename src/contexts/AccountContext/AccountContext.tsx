@@ -1,10 +1,19 @@
-import { createContext, FC, PropsWithChildren, useMemo, useCallback, useEffect } from 'react'
+import {
+  createContext,
+  FC,
+  PropsWithChildren,
+  useMemo,
+  useCallback,
+  useEffect,
+  useState
+} from 'react'
 import { IAdExAccount } from 'types'
 import { useLocalStorage } from '@mantine/hooks'
 import { getMessageToSign, isTokenExpired, refreshAccessToken, verifyLogin } from 'lib/backend'
 import { AmbireLoginSDK } from '@ambire/login-sdk-core'
 import { DAPP_ICON_PATH, DAPP_NAME, DEFAULT_CHAIN_ID } from 'constants/login'
 import useCustomNotifications from 'hooks/useCustomNotifications'
+import superjson from 'superjson'
 
 const ambireLoginSDK = new AmbireLoginSDK({
   dappName: DAPP_NAME,
@@ -12,7 +21,7 @@ const ambireLoginSDK = new AmbireLoginSDK({
 })
 
 interface IAccountContext {
-  adexAccount: IAdExAccount | null
+  adexAccount: IAdExAccount
   authenticated: boolean
   ambireSDK: AmbireLoginSDK
   connectWallet: () => void
@@ -23,28 +32,43 @@ interface IAccountContext {
 }
 
 const AccountContext = createContext<IAccountContext | null>(null)
+const defaultValue = {
+  address: '',
+  chainId: 0,
+  accessToken: null,
+  refreshToken: null,
+  authenticated: false,
+  authMsgResp: null
+}
 
 const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
   const { showNotification } = useCustomNotifications()
   const ambireSDK = useMemo(() => ambireLoginSDK, [])
   const [adexAccount, setAdexAccount] = useLocalStorage<IAccountContext['adexAccount']>({
     key: 'adexAccount',
-    defaultValue: {
-      address: '',
-      chainId: 0,
-      accessToken: '',
-      refreshToken: '',
-      authenticated: false,
-      authMsgResp: null
-    }
+    defaultValue,
+    serialize: superjson.stringify,
+    deserialize: (str) => (typeof str === 'undefined' ? defaultValue : superjson.parse(str))
   })
 
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    setLoading(true)
+    const storedAccount = superjson.parse(localStorage.getItem('adexAccount') || 'null')
+    setAdexAccount(storedAccount as IAdExAccount)
+    setLoading(false)
+    // eslint-disable-next-line
+  }, [])
+
   const updateAdexAccount = useCallback(
-    (newValue: any | null) =>
-      setAdexAccount((prevState) => (newValue === null ? newValue : { ...prevState, ...newValue })),
+    (newValue: IAdExAccount) => setAdexAccount((prevState) => ({ ...prevState, ...newValue })),
     [setAdexAccount]
   )
-  const resetAdexAccount = useCallback(() => updateAdexAccount(null), [updateAdexAccount])
+  const resetAdexAccount = useCallback(
+    () => updateAdexAccount({ ...defaultValue }),
+    [updateAdexAccount]
+  )
 
   const connectWallet = useCallback(
     () => ambireSDK.openLogin({ chainId: DEFAULT_CHAIN_ID }),
@@ -57,12 +81,13 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
   )
 
   const updateAccessToken = useCallback(async () => {
-    if (!adexAccount?.accessToken || !adexAccount?.refreshToken) return
+    if (!adexAccount.accessToken || !adexAccount.refreshToken) return
     if (isTokenExpired(adexAccount.accessToken)) {
       try {
-        const response = await refreshAccessToken(adexAccount?.refreshToken)
+        const response = await refreshAccessToken(adexAccount.refreshToken)
         if (response) {
           updateAdexAccount({
+            ...adexAccount,
             accessToken: response.accessToken,
             refreshToken: response.refreshToken
           })
@@ -75,44 +100,38 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
         throw error
       }
     }
-  }, [adexAccount?.accessToken, adexAccount?.refreshToken, updateAdexAccount, showNotification])
+  }, [adexAccount, updateAdexAccount, showNotification])
 
   const handleRegistrationOrLoginSuccess = useCallback(
     ({ address, chainId }: any) => {
       if (
         !address ||
         !chainId ||
-        (adexAccount?.address !== '' &&
-          adexAccount?.chainId !== 0 &&
-          adexAccount?.authMsgResp !== null)
+        (adexAccount.address !== '' &&
+          adexAccount.chainId !== 0 &&
+          adexAccount.authMsgResp !== null)
       )
         return
 
       const updatedAccount = { address, chainId }
       getMessageToSign(updatedAccount)
         .then((getMessage) => {
-          updateAdexAccount({ ...updatedAccount, authMsgResp: getMessage.authMsg })
+          updateAdexAccount({ ...adexAccount, ...updatedAccount, authMsgResp: getMessage.authMsg })
         })
         .catch((error) => {
           console.error('Get message to sign failed', error)
           showNotification('error', error?.message, 'Get message to sign failed')
         })
     },
-    [
-      adexAccount?.address,
-      adexAccount?.chainId,
-      adexAccount?.authMsgResp,
-      updateAdexAccount,
-      showNotification
-    ]
+    [adexAccount, updateAdexAccount, showNotification]
   )
 
   const handleMsgSigned = useCallback(
     ({ signature }: any) => {
-      if (!signature || !adexAccount?.authMsgResp || adexAccount?.authenticated) return
+      if (!signature || !adexAccount.authMsgResp || adexAccount.authenticated) return
 
       const body = {
-        authMsg: { ...adexAccount?.authMsgResp },
+        authMsg: { ...adexAccount.authMsgResp },
         signature
       }
 
@@ -120,6 +139,7 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
         .then((authResp) => {
           if (!authResp) return
           updateAdexAccount({
+            ...adexAccount,
             accessToken: authResp.accessToken,
             refreshToken: authResp.refreshToken,
             authenticated: !!authResp.accessToken && !!authResp.refreshToken
@@ -130,7 +150,7 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
           showNotification('error', error?.message, 'Verify login failed')
         })
     },
-    [adexAccount?.authMsgResp, adexAccount?.authenticated, updateAdexAccount, showNotification]
+    [adexAccount, updateAdexAccount, showNotification]
   )
 
   const handleMsgRejected = useCallback(() => {
@@ -163,14 +183,14 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
   ])
 
   useEffect(() => {
-    if (adexAccount?.authMsgResp && !adexAccount?.authenticated) {
+    if (adexAccount.authMsgResp && !adexAccount.authenticated) {
       signMessage('eth_signTypedData', JSON.stringify(adexAccount.authMsgResp))
     }
-  }, [adexAccount?.authMsgResp, adexAccount?.authenticated, signMessage])
+  }, [adexAccount.authMsgResp, adexAccount.authenticated, signMessage])
 
   const authenticated = useMemo(
-    () => Boolean(adexAccount?.authenticated),
-    [adexAccount?.authenticated]
+    () => Boolean(adexAccount.authenticated),
+    [adexAccount.authenticated]
   )
 
   const contextValue = useMemo(
@@ -198,6 +218,10 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
       resetAdexAccount
     ]
   )
+
+  if (loading) {
+    return null // Or a loading spinner
+  }
 
   return <AccountContext.Provider value={contextValue}>{children}</AccountContext.Provider>
 }

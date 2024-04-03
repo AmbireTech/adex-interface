@@ -30,7 +30,7 @@ function useApi<T>(options: RequestOptions): UseApi<T> {
     fetch(fullUrl, {
       method,
       headers: {
-        'X-DSP-Auth': `Bearer ${adexAccount?.accessToken}`,
+        'X-DSP-Auth': `Bearer ${adexAccount.accessToken}`,
         ...headers
       },
       body: JSON.stringify(body)

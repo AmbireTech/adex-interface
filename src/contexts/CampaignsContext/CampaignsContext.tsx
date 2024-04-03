@@ -10,6 +10,7 @@ import {
 } from 'react'
 import { useAdExApi } from 'hooks/useAdexServices'
 import useCustomNotifications from 'hooks/useCustomNotifications'
+import useAccount from 'hooks/useAccount'
 
 // NOTE: Will put here all the campaigns data and analytics for ease of use
 // Laater we can separate the analytics in different context
@@ -99,6 +100,9 @@ const CampaignsDataContext = createContext<ICampaignsDataContext | null>(null)
 const CampaignsDataProvider: FC<PropsWithChildren> = ({ children }) => {
   const { showNotification } = useCustomNotifications()
   const { adexServicesRequest } = useAdExApi()
+  const {
+    adexAccount: { authenticated }
+  } = useAccount()
 
   const [campaignsData, setCampaignData] = useState<Map<string, CampaignData>>(
     new Map<string, CampaignData>()
@@ -215,8 +219,8 @@ const CampaignsDataProvider: FC<PropsWithChildren> = ({ children }) => {
   )
 
   useEffect(() => {
-    updateAllCampaignsData()
-  }, [updateAllCampaignsData, updateEventAggregates])
+    if (authenticated) updateAllCampaignsData()
+  }, [updateAllCampaignsData, updateEventAggregates, authenticated])
 
   const contextValue = useMemo(
     () => ({
