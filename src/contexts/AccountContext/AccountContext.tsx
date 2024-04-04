@@ -1,12 +1,4 @@
-import {
-  createContext,
-  FC,
-  PropsWithChildren,
-  useMemo,
-  useCallback,
-  useEffect,
-  useState
-} from 'react'
+import { createContext, FC, PropsWithChildren, useMemo, useCallback, useEffect } from 'react'
 import { IAdExAccount } from 'types'
 import { useLocalStorage } from '@mantine/hooks'
 import {
@@ -19,7 +11,6 @@ import {
 import { AmbireLoginSDK } from '@ambire/login-sdk-core'
 import { DAPP_ICON_PATH, DAPP_NAME, DEFAULT_CHAIN_ID } from 'constants/login'
 import useCustomNotifications from 'hooks/useCustomNotifications'
-import superjson from 'superjson'
 
 const ambireLoginSDK = new AmbireLoginSDK({
   dappName: DAPP_NAME,
@@ -40,7 +31,7 @@ interface IAccountContext {
 
 const AccountContext = createContext<IAccountContext | null>(null)
 const defaultValue = {
-  address: '',
+  address: 'default',
   chainId: 0,
   accessToken: null,
   refreshToken: null,
@@ -51,22 +42,12 @@ const defaultValue = {
 const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
   const { showNotification } = useCustomNotifications()
   const ambireSDK = useMemo(() => ambireLoginSDK, [])
-  const [adexAccount, setAdexAccount] = useLocalStorage<IAccountContext['adexAccount']>({
-    key: 'adexAccount',
-    defaultValue,
-    serialize: superjson.stringify,
-    deserialize: (str) => (typeof str === 'undefined' ? defaultValue : superjson.parse(str))
+  const [adexAccountStorage, setAdexAccount] = useLocalStorage<IAccountContext['adexAccount']>({
+    key: 'adexAccount'
   })
 
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    setLoading(true)
-    const storedAccount = superjson.parse(localStorage.getItem('adexAccount') || 'null')
-    setAdexAccount(storedAccount as IAdExAccount)
-    setLoading(false)
-    // eslint-disable-next-line
-  }, [])
+  const adexAccount = useMemo(() => adexAccountStorage || defaultValue, [adexAccountStorage])
+  const loading = useMemo(() => !adexAccountStorage, [adexAccountStorage])
 
   const updateAdexAccount = useCallback(
     (newValue: IAdExAccount) => setAdexAccount((prevState) => ({ ...prevState, ...newValue })),
