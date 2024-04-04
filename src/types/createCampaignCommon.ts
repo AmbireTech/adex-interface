@@ -14,9 +14,9 @@ export type CampaignUI = Campaign & {
   startsAt: Date
   endsAt: Date
   currency: string
-  cpmMin: string
-  cpmMax: string
-  campaignName: string
+  // cpmMin: string
+  // cpmMax: string
+  // campaignName: string
 }
 
 export type ImageSizes = {

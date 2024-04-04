@@ -27,6 +27,7 @@ const useStyles = createStyles((theme) => ({
 const CampaignSummary = () => {
   const { classes, cx } = useStyles()
   const {
+    campaign,
     campaign: { step, adUnits },
     updateCampaign
   } = useCreateCampaignContext()
@@ -53,11 +54,12 @@ const CampaignSummary = () => {
 
   const isTheLastStep = useMemo(() => step === CREATE_CAMPAIGN_STEPS - 1, [step])
   const isFirstStep = useMemo(() => step === 0, [step])
-  const launchCampaign = () => {
+  const launchCampaign = useCallback(() => {
+    console.log('campaign', campaign)
     // TODO: REVOKE all the blob URLs
     // URL.revokeObjectURL(storedImageURL);
     console.log('LAUNCH CAMPAIGN')
-  }
+  }, [campaign])
   const form = useCreateCampaignFormContext()
   const handleNextStepBtnClicked = useCallback(() => {
     if (step < CREATE_CAMPAIGN_STEPS - 1) {
@@ -76,7 +78,7 @@ const CampaignSummary = () => {
     if (isTheLastStep) {
       launchCampaign()
     }
-  }, [isTheLastStep, step, updateCampaign, form])
+  }, [isTheLastStep, step, updateCampaign, form, launchCampaign])
 
   return (
     <>

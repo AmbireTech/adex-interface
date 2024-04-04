@@ -11,7 +11,7 @@ const CampaignName = () => {
         maxWidth: '100%'
       }}
     >
-      <TextInput size="md" maw="50%" {...form.getInputProps('campaignName')} />
+      <TextInput size="md" maw="50%" {...form.getInputProps('title')} />
     </MediaQuery>
   )
 }

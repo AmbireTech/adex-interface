@@ -34,9 +34,9 @@ export const validateCreateCampaignFrom = {
     }
     return null
   },
-  campaignName: (value: string) => {
+  title: (value: string) => {
     if (value === '') {
-      return 'Enter Campaign name'
+      return 'Enter Title'
     }
     if (value.length < 2) {
       return 'Campaign name must have at least 2 letters'
