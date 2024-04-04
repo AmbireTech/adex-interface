@@ -9,6 +9,7 @@ import {
   useEffect
 } from 'react'
 import { useAdExApi } from 'hooks/useAdexServices'
+import useAccount from 'hooks/useAccount'
 import useCustomNotifications from 'hooks/useCustomNotifications'
 
 // NOTE: Will put here all the campaigns data and analytics for ease of use
@@ -29,7 +30,7 @@ type CampaignData = {
 }
 
 type Timeframe = 'year' | 'month' | 'week' | 'day' | 'hour'
-type Metric = 'count' | 'payed'
+type Metric = 'count' | 'paid'
 type Placement = 'app' | 'site'
 type EventType = 'IMPRESSION' | 'CLICK'
 
@@ -55,7 +56,7 @@ type AnalyticsDataQuery = AnalyticsDataKeys & {
   start: Date
   end: Date
   limit: number
-  segmentBy: keyof AnalyticsDataKeys
+  segmentBy?: keyof AnalyticsDataKeys
   // TODO: validation and test timezones - need tests on validator ad well
   timezone: 'UTC'
 }
@@ -103,6 +104,7 @@ interface ICampaignsDataContext {
   eventAggregates: any
   updateCampaignDataById: (params: string, updateAnalytics: boolean) => void
   updateAllCampaignsData: () => void
+  updateCampaignAnalyticsById: (campaignId: string) => void
 }
 
 const CampaignsDataContext = createContext<ICampaignsDataContext | null>(null)
@@ -110,6 +112,8 @@ const CampaignsDataContext = createContext<ICampaignsDataContext | null>(null)
 const CampaignsDataProvider: FC<PropsWithChildren> = ({ children }) => {
   const { showNotification } = useCustomNotifications()
   const { adexServicesRequest } = useAdExApi()
+  // TEMP: until account auth is fixed
+  const { authenticated } = useAccount()
 
   const [campaignsData, setCampaignData] = useState<Map<string, CampaignData>>(
     new Map<string, CampaignData>()
@@ -195,7 +199,7 @@ const CampaignsDataProvider: FC<PropsWithChildren> = ({ children }) => {
     async (params: AnalyticsDataQuery) => {
       try {
         const analyticsDataRes = await adexServicesRequest<AnalyticsDataRes>('validator', {
-          route: '/v5_a/analytics',
+          route: '/v5_a/analytics/for-advertiser',
           method: 'GET',
           queryParams: Object.entries(params).reduce(
             (query: Record<string, string>, [key, value]) => {
@@ -206,6 +210,8 @@ const CampaignsDataProvider: FC<PropsWithChildren> = ({ children }) => {
             {}
           )
         })
+
+        console.log({ analyticsDataRes })
 
         if (!analyticsDataRes.aggr?.length) {
           // TODO do something
@@ -225,19 +231,57 @@ const CampaignsDataProvider: FC<PropsWithChildren> = ({ children }) => {
     [adexServicesRequest, showNotification]
   )
 
+  const updateCampaignAnalyticsById = useCallback(
+    (campaignId: string) => {
+      const campaign = campaignsData.get(campaignId)?.campaign
+
+      if (!campaign) {
+        return
+      }
+
+      const query: AnalyticsDataQuery = {
+        campaignId,
+        start: new Date(Number(campaign.activeFrom)),
+        end: new Date(Date.now()),
+        metric: 'paid',
+        eventType: 'CLICK',
+        limit: 10000000,
+        timezone: 'UTC',
+        timeframe: 'year',
+        segmentBy: 'campaignId'
+      }
+
+      updateEventAggregates(query)
+    },
+    [campaignsData, updateEventAggregates]
+  )
+
   useEffect(() => {
-    updateAllCampaignsData()
-  }, [updateAllCampaignsData, updateEventAggregates])
+    if (authenticated) {
+      updateAllCampaignsData()
+    } else {
+      setCampaignData(new Map<string, CampaignData>())
+      setAnalyticsData(new Map<string, AnalyticsData[]>())
+    }
+  }, [updateAllCampaignsData, updateEventAggregates, authenticated])
 
   const contextValue = useMemo(
     () => ({
       campaignsData,
       updateCampaignDataById,
       updateAllCampaignsData,
+      updateCampaignAnalyticsById,
       eventAggregates,
       analyticsData
     }),
-    [campaignsData, updateCampaignDataById, updateAllCampaignsData, eventAggregates, analyticsData]
+    [
+      campaignsData,
+      updateCampaignDataById,
+      updateAllCampaignsData,
+      updateCampaignAnalyticsById,
+      eventAggregates,
+      analyticsData
+    ]
   )
 
   return (
