@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import { useParams } from 'react-router-dom'
 import { Container, Grid, createStyles, Text, Flex } from '@mantine/core'
 import BadgeStatusCampaign from 'components/Dashboard/BadgeStatusCampaign'
@@ -50,7 +50,7 @@ const useStyles = createStyles((theme) => ({
 
 const CampaignDetails = () => {
   const { classes, cx } = useStyles()
-  const { campaignsData } = useCampaignsData()
+  const { campaignsData, updateCampaignAnalyticsById } = useCampaignsData()
   const { id } = useParams()
   if (!id) {
     return <div>Missing ID</div>
@@ -61,6 +61,12 @@ const CampaignDetails = () => {
 
     [id, campaignsData]
   )
+
+  useEffect(() => {
+    if (id) {
+      updateCampaignAnalyticsById(id)
+    }
+  }, [id, updateCampaignAnalyticsById])
 
   return (
     <>
