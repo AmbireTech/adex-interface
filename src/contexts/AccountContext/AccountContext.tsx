@@ -1,6 +1,6 @@
+import { useLocalStorage } from '@mantine/hooks'
 import { createContext, FC, PropsWithChildren, useMemo, useCallback, useEffect } from 'react'
 import { IAdExAccount } from 'types'
-import { useLocalStorage } from '@mantine/hooks'
 import {
   getMessageToSign,
   isAdminToken,
@@ -67,33 +67,27 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
     key: 'adexAccount',
     defaultValue: { ...defaultValue },
     deserialize: (str) => {
-      console.log({ str })
+      // console.log({ str })
       const res = !str
         ? { ...defaultValue, updated: true }
         : { ...deserializeJSON(str), loaded: true }
 
-      console.log({ res })
+      // console.log({ res })
 
       return res
     },
     serialize: (acc) => {
       const ser = serializeJSON({ ...acc, loaded: true })
-      console.log({ ser })
+      // console.log({ ser })
 
       return ser
     }
   })
 
-  // const loading = useMemo(() => adexAccountStorage === undefined, [adexAccountStorage])
-
-  useEffect(() => {
-    console.log({ adexAccount })
-  }, [adexAccount])
-
   // NOTE: hax to ensure there is storage value as there is no way to differentiate the default value from storage value using useLocalStorage
   useEffect(() => {
     const lsAcc = deserializeJSON(localStorage.getItem('adexAccount') || '')
-    console.log({ lsAcc })
+    // console.log({ lsAcc })
 
     if (!lsAcc) {
       setAdexAccount({ ...defaultValue, initialLoad: true })
@@ -265,10 +259,6 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
       resetAdexAccount
     ]
   )
-
-  if (!adexAccount.loaded && !adexAccount.initialLoad) {
-    return null // Or a loading spinner
-  }
 
   return <AccountContext.Provider value={contextValue}>{children}</AccountContext.Provider>
 }
