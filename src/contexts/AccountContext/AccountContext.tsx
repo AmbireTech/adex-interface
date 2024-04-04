@@ -18,7 +18,7 @@ const ambireLoginSDK = new AmbireLoginSDK({
 })
 
 interface IAccountContext {
-  adexAccount: IAdExAccount
+  adexAccount: IAdExAccount & { loaded: boolean; initialLoad: boolean }
   authenticated: boolean
   ambireSDK: AmbireLoginSDK
   isAdmin: boolean
@@ -30,31 +30,83 @@ interface IAccountContext {
 }
 
 const AccountContext = createContext<IAccountContext | null>(null)
-const defaultValue = {
+
+const defaultValue: IAccountContext['adexAccount'] = {
   address: 'default',
   chainId: 0,
   accessToken: null,
   refreshToken: null,
   authenticated: false,
-  authMsgResp: null
+  authMsgResp: null,
+  loaded: false,
+  // This ensures there is some obj in the ls
+  initialLoad: false
+}
+
+function serializeJSON<T>(value: T) {
+  try {
+    return JSON.stringify(value)
+  } catch (error) {
+    throw new Error('Failed to serialize the value')
+  }
+}
+
+function deserializeJSON(value: string) {
+  try {
+    return JSON.parse(value)
+  } catch {
+    return null
+  }
 }
 
 const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
   const { showNotification } = useCustomNotifications()
   const ambireSDK = useMemo(() => ambireLoginSDK, [])
-  const [adexAccountStorage, setAdexAccount] = useLocalStorage<IAccountContext['adexAccount']>({
-    key: 'adexAccount'
+
+  const [adexAccount, setAdexAccount] = useLocalStorage<IAccountContext['adexAccount']>({
+    key: 'adexAccount',
+    defaultValue: { ...defaultValue },
+    deserialize: (str) => {
+      console.log({ str })
+      const res = !str
+        ? { ...defaultValue, updated: true }
+        : { ...deserializeJSON(str), loaded: true }
+
+      console.log({ res })
+
+      return res
+    },
+    serialize: (acc) => {
+      const ser = serializeJSON({ ...acc, loaded: true })
+      console.log({ ser })
+
+      return ser
+    }
   })
 
-  const adexAccount = useMemo(() => adexAccountStorage || defaultValue, [adexAccountStorage])
-  const loading = useMemo(() => !adexAccountStorage, [adexAccountStorage])
+  // const loading = useMemo(() => adexAccountStorage === undefined, [adexAccountStorage])
+
+  useEffect(() => {
+    console.log({ adexAccount })
+  }, [adexAccount])
+
+  // NOTE: hax to ensure there is storage value as there is no way to differentiate the default value from storage value using useLocalStorage
+  useEffect(() => {
+    const lsAcc = deserializeJSON(localStorage.getItem('adexAccount') || '')
+    console.log({ lsAcc })
+
+    if (!lsAcc) {
+      setAdexAccount({ ...defaultValue, initialLoad: true })
+    }
+  }, [setAdexAccount])
 
   const updateAdexAccount = useCallback(
-    (newValue: IAdExAccount) => setAdexAccount((prevState) => ({ ...prevState, ...newValue })),
+    (newValue: IAccountContext['adexAccount']) =>
+      setAdexAccount((prevState) => ({ ...prevState, ...newValue })),
     [setAdexAccount]
   )
   const resetAdexAccount = useCallback(
-    () => updateAdexAccount({ ...defaultValue }),
+    () => updateAdexAccount({ ...defaultValue, initialLoad: true }),
     [updateAdexAccount]
   )
 
@@ -214,7 +266,7 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
     ]
   )
 
-  if (loading) {
+  if (!adexAccount.loaded && !adexAccount.initialLoad) {
     return null // Or a loading spinner
   }
 
