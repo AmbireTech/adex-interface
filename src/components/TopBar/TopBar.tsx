@@ -60,7 +60,6 @@ function TopBar() {
   const navigate = useNavigate()
 
   const handleLogutBtnClicked = useCallback(() => {
-    disconnectWallet()
     if (!adexAccount.accessToken && !adexAccount.refreshToken) return
 
     adexServicesRequest('backend', {
@@ -74,7 +73,9 @@ function TopBar() {
       }
     })
       .then((res) => {
-        if (res) {
+        if (!res) throw new Error('Logout failed')
+        if (Object.keys(res).length === 0 && res.constructor === Object) {
+          disconnectWallet()
           resetAdexAccount()
           showNotification('info', 'Successfully logged out', 'Logging out')
           navigate('/login', { replace: true })
