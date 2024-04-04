@@ -23,6 +23,7 @@ function RequireAuth({ children, admin }: { children: JSX.Element; admin?: boole
   } = useAccount()
   const location = useLocation()
 
+  // In case if the adexAccount still didn't get the value from the local storage
   if (!loaded && !initialLoad) {
     return null // Or a loading spinner
   }
