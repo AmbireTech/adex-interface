@@ -112,7 +112,7 @@ const CampaignsDataContext = createContext<ICampaignsDataContext | null>(null)
 const CampaignsDataProvider: FC<PropsWithChildren> = ({ children }) => {
   const { showNotification } = useCustomNotifications()
   const { adexServicesRequest } = useAdExApi()
-  // TEMP: until account auth is fixed
+
   const { authenticated } = useAccount()
 
   const [campaignsData, setCampaignData] = useState<Map<string, CampaignData>>(

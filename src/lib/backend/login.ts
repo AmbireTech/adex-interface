@@ -34,7 +34,7 @@ const parseJwt = (token: string) => {
   return JSON.parse(jsonPayload)
 }
 
-export const isAdminToken = (accessToken: string | undefined) => {
+export const isAdminToken = (accessToken: string | null) => {
   console.log(accessToken)
 
   if (!accessToken) {
