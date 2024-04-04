@@ -102,7 +102,7 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
 
   const updateAdexAccount = useCallback(
     (newValue: IAccountContext['adexAccount']) =>
-      setAdexAccount((prevState) => ({ ...prevState, ...newValue })),
+      setAdexAccount((prevState) => ({ ...prevState, ...newValue, loaded: true })),
     [setAdexAccount]
   )
   const resetAdexAccount = useCallback(
