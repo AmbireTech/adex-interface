@@ -1,6 +1,6 @@
 {
   "files": {
-    "main.js": "https://v5.adex.network/staging/static/js/main.9e6ef8ce.js",
+    "main.js": "https://v5.adex.network/staging/static/js/main.62af679c.js",
     "static/js/787.353397ad.chunk.js": "https://v5.adex.network/staging/static/js/787.353397ad.chunk.js",
     "static/media/banner1.png": "https://v5.adex.network/staging/static/media/banner1.7de871a1293d1b8f9209.png",
     "static/media/moonpay.svg": "https://v5.adex.network/staging/static/media/moonpay.08a193d43c7ffa13cc2a23702d82be84.svg",
@@ -11,10 +11,10 @@
     "index.html": "https://v5.adex.network/staging/index.html",
     "static/media/upperShape.svg": "https://v5.adex.network/staging/static/media/upperShape.a56b648850d4e4e6115307acf1da8b5c.svg",
     "static/media/lowerShape.svg": "https://v5.adex.network/staging/static/media/lowerShape.0bcd4cdd6e7898a6cfb9978b2faa135c.svg",
-    "main.9e6ef8ce.js.map": "https://v5.adex.network/staging/static/js/main.9e6ef8ce.js.map",
+    "main.62af679c.js.map": "https://v5.adex.network/staging/static/js/main.62af679c.js.map",
     "787.353397ad.chunk.js.map": "https://v5.adex.network/staging/static/js/787.353397ad.chunk.js.map"
   },
   "entrypoints": [
-    "static/js/main.9e6ef8ce.js"
+    "static/js/main.62af679c.js"
   ]
 }
