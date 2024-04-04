@@ -26,6 +26,7 @@ export type ImageSizes = {
 
 export type CreateCampaignType = {
   campaign: CampaignUI
+  publishCampaign: () => void
   setCampaign: (val: CampaignUI | ((prevState: CampaignUI) => CampaignUI)) => void
   updateCampaign: <CampaignItemKey extends keyof CampaignUI>(
     key: CampaignItemKey,

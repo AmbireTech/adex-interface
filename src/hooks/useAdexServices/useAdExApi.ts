@@ -48,7 +48,8 @@ export const useAdExApi = () => {
         url: `${baseUrl}/${urlCheck}`,
         method: reqOptions.method,
         body: reqOptions.body,
-        queryParams: reqOptions.queryParams
+        queryParams: reqOptions.queryParams,
+        headers: reqOptions.headers
       }
 
       // console.log('adexAccount', adexAccount)
