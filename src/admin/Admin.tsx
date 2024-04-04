@@ -45,10 +45,10 @@ const AdminPanel = () => {
 
   const handlePreview = useCallback(
     (item: Campaign) => {
-      setSelectedItem(item)
+      setSelectedItem(campaignData?.filter((campaign) => campaign.id === item.id)[0] || null)
       open()
     },
-    [open]
+    [open, campaignData]
   )
 
   const handleDelete = useCallback((item: Campaign) => {
