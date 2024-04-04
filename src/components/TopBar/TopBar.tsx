@@ -60,8 +60,7 @@ function TopBar() {
   const navigate = useNavigate()
 
   const handleLogutBtnClicked = useCallback(() => {
-    disconnectWallet()
-    if (!adexAccount?.accessToken && !adexAccount?.refreshToken) return
+    if (!adexAccount.accessToken && !adexAccount.refreshToken) return
 
     adexServicesRequest('backend', {
       route: '/dsp/logout',
@@ -74,7 +73,9 @@ function TopBar() {
       }
     })
       .then((res) => {
-        if (res) {
+        if (!res) throw new Error('Logout failed')
+        if (Object.keys(res).length === 0 && res.constructor === Object) {
+          disconnectWallet()
           resetAdexAccount()
           showNotification('info', 'Successfully logged out', 'Logging out')
           navigate('/login', { replace: true })
@@ -86,8 +87,8 @@ function TopBar() {
       })
   }, [
     disconnectWallet,
-    adexAccount?.accessToken,
-    adexAccount?.refreshToken,
+    adexAccount.accessToken,
+    adexAccount.refreshToken,
     adexServicesRequest,
     resetAdexAccount,
     showNotification,
@@ -120,13 +121,13 @@ function TopBar() {
           <Menu.Target>
             <UnstyledButton>
               <Group>
-                <Blockies seedString={adexAccount?.address || ''} />
+                <Blockies seedString={adexAccount.address} />
                 <div>
                   <Text weight="bold" size="xs">
                     John Doe
                   </Text>
                   <Text color="secondaryText" size="xs">
-                    {maskAddress(adexAccount?.address || '')}
+                    {maskAddress(adexAccount.address)}
                   </Text>
                 </div>
                 <DownArrowIcon
