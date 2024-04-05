@@ -27,9 +27,9 @@ const useStyles = createStyles((theme) => ({
 const CampaignSummary = () => {
   const { classes, cx } = useStyles()
   const {
-    campaign,
     campaign: { step, adUnits },
-    updateCampaign
+    updateCampaign,
+    publishCampaign
   } = useCreateCampaignContext()
   const {
     formattedSelectedDevice,
@@ -55,11 +55,19 @@ const CampaignSummary = () => {
   const isTheLastStep = useMemo(() => step === CREATE_CAMPAIGN_STEPS - 1, [step])
   const isFirstStep = useMemo(() => step === 0, [step])
   const launchCampaign = useCallback(() => {
-    console.log('campaign', campaign)
+    publishCampaign()
+      .then((res) => {
+        // TODO: Add Congrats modal here
+        console.log('response', res)
+      })
+      .catch((error) => {
+        // TOOD: handle the error
+        console.log('error', error.message)
+      })
     // TODO: REVOKE all the blob URLs
     // URL.revokeObjectURL(storedImageURL);
     console.log('LAUNCH CAMPAIGN')
-  }, [campaign])
+  }, [publishCampaign])
   const form = useCreateCampaignFormContext()
   const handleNextStepBtnClicked = useCallback(() => {
     if (step < CREATE_CAMPAIGN_STEPS - 1) {

@@ -32,7 +32,7 @@ export const DEFAULT_PLACEMENTS_VALUE: TargetingPlacementInput = {
 }
 
 export const CREATE_CAMPAIGN_DEFAULT_VALUE: CampaignUI = {
-  id: '',
+  id: `adex-campaign-${Date.now().toString(16)}`,
   type: 0,
   step: 0,
   devices: [],
@@ -68,7 +68,7 @@ export const CREATE_CAMPAIGN_DEFAULT_VALUE: CampaignUI = {
   activeFrom: BigInt(Date.now()),
   activeTo: BigInt(Date.now()),
   targetingInput: {
-    version: '',
+    version: '1',
     inputs: {
       location: DEFAULT_CATS_LOCS_VALUE,
       categories: DEFAULT_CATS_LOCS_VALUE,

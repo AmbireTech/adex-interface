@@ -1,7 +1,15 @@
 import { AdUnit, TargetingInputApplyProp, TargetingInputSingle } from 'adex-common/dist/types'
 import { BANNER_SIZES } from 'constants/banners'
 import { DEFAULT_CATS_LOCS_VALUE } from 'constants/createCampaign'
-import { Devices, SelectData, ImageSizes, FileWithPath, HTMLBannerDimensions } from 'types'
+import { Campaign } from 'adex-common'
+import {
+  Devices,
+  SelectData,
+  ImageSizes,
+  FileWithPath,
+  HTMLBannerDimensions,
+  CampaignUI
+} from 'types'
 
 export const checkSelectedDevices = (devices: Devices[]) => {
   if (devices.length === 1) {
@@ -176,4 +184,46 @@ export const initAllLocales = () => {
     return acc
   }, {})
   return allLocales
+}
+
+type ReducedCampaign = Omit<
+  Campaign,
+  | 'campaignBudget'
+  | 'created'
+  | 'owner'
+  | 'validators'
+  | 'targetingRules'
+  | 'status'
+  | 'reviewStatus'
+  | 'modified'
+  | 'archived'
+  | 'createdBy'
+  | 'lastModifiedBy'
+>
+
+export const mapCampaignUItoCampaign = (campaignUI: CampaignUI): ReducedCampaign => {
+  const {
+    step,
+    devices,
+    paymentModel,
+    startsAt,
+    endsAt,
+    currency,
+    campaignBudget,
+    created,
+    owner,
+    validators,
+    targetingRules,
+    status,
+    reviewStatus,
+    modified,
+    archived,
+    createdBy,
+    lastModifiedBy,
+    ...campaign
+  } = campaignUI
+
+  return {
+    ...campaign
+  }
 }
