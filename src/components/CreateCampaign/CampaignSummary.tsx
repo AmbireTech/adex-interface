@@ -1,4 +1,5 @@
 import { Button, Flex, Group, Text, UnstyledButton, createStyles } from '@mantine/core'
+import { useDisclosure } from '@mantine/hooks'
 import { CREATE_CAMPAIGN_STEPS } from 'constants/createCampaign'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import { useCallback, useEffect, useMemo, useState } from 'react'
@@ -6,7 +7,7 @@ import LeftArrowIcon from 'resources/icons/LeftArrow'
 import { useCreateCampaignFormContext } from 'contexts/CreateCampaignFormContext'
 import useCreateCampaignData from 'hooks/useCreateCampaignData/useCreateCampaignData'
 import CampaignDetailsRow from 'components/common/CampainDetailsRow'
-import ConfirmModal from 'components/common/Modals/ConfirmModal'
+import { ConfirmModal, SuccessModal } from 'components/common/Modals'
 import AttentionIcon from 'resources/icons/Attention'
 
 const useStyles = createStyles((theme) => ({
@@ -50,10 +51,12 @@ const useStyles = createStyles((theme) => ({
 
 const CampaignSummary = () => {
   const { classes, cx } = useStyles()
+  const [opened, { open, close }] = useDisclosure(false)
   const {
     campaign: { step, adUnits },
     updateCampaign,
-    publishCampaign
+    publishCampaign,
+    resetCampaign
   } = useCreateCampaignContext()
   const {
     formattedSelectedDevice,
@@ -79,20 +82,18 @@ const CampaignSummary = () => {
   const isTheLastStep = useMemo(() => step === CREATE_CAMPAIGN_STEPS - 1, [step])
   const isFirstStep = useMemo(() => step === 0, [step])
   const launchCampaign = useCallback(() => {
-    // TODO:
-    // Open Confirm modal here. On confirm publish Campaign
     publishCampaign()
       .then((res) => {
-        // Congrats modal here
-        // Clear the Campaign object
-        console.log('response', res)
+        if (res && res.success) {
+          open()
+          resetCampaign()
+        }
       })
       .catch((error) => {
         // TOOD: handle the error
-        console.log('error', error.message)
+        console.error('error', error.message)
       })
-    console.log('LAUNCH CAMPAIGN')
-  }, [publishCampaign])
+  }, [publishCampaign, resetCampaign, open])
 
   const form = useCreateCampaignFormContext()
 
@@ -198,6 +199,7 @@ const CampaignSummary = () => {
           </Group>
         </UnstyledButton>
       </Flex>
+      <SuccessModal text="Campaign launched successfully!" opened={opened} close={close} />
     </>
   )
 }

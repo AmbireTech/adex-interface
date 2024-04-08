@@ -29,4 +29,5 @@ export type CreateCampaignType = {
   updateCampaignWithPrevStateNested: (nestedKey: string, value: any) => void
   updateAllCampaign: (camp: any) => void
   publishCampaign: () => Promise<any>
+  resetCampaign: () => void
 }

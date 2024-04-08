@@ -77,6 +77,11 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
     [setCampaign]
   )
 
+  const resetCampaign = useCallback(
+    () => setCampaign({ ...defaultValue }),
+    [setCampaign, defaultValue]
+  )
+
   const publishCampaign = useCallback(() => {
     const body = serialize(mapCampaignUItoCampaign(campaign)).json
 
@@ -97,7 +102,8 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
       updateAllCampaign,
       updateCampaign,
       updateCampaignWithPrevStateNested,
-      publishCampaign
+      publishCampaign,
+      resetCampaign
     }),
     [
       campaign,
@@ -105,7 +111,8 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
       updateAllCampaign,
       updateCampaign,
       updateCampaignWithPrevStateNested,
-      publishCampaign
+      publishCampaign,
+      resetCampaign
     ]
   )
 
