@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { Container, Grid, createStyles, Text, Flex } from '@mantine/core'
 import BadgeStatusCampaign from 'components/Dashboard/BadgeStatusCampaign'
@@ -50,8 +50,16 @@ const useStyles = createStyles((theme) => ({
 
 const CampaignDetails = () => {
   const { classes, cx } = useStyles()
-  const { campaignsData, updateCampaignAnalyticsById } = useCampaignsData()
+  const {
+    campaignsData,
+    eventAggregates,
+    analyticsData,
+    updateCampaignAnalyticsById,
+    updateCampaignDataById,
+    updateEventAggregates
+  } = useCampaignsData()
   const { id } = useParams()
+  const [analyticsKey, setAnalyticsKey] = useState('')
   if (!id) {
     return <div>Missing ID</div>
   }
@@ -62,11 +70,39 @@ const CampaignDetails = () => {
     [id, campaignsData]
   )
 
+  const campaignAggregates = useMemo(
+    () => eventAggregates.get(id),
+
+    [id, eventAggregates]
+  )
+
+  const campaignAnalytics = useMemo(
+    () => analyticsData.get(analyticsKey),
+
+    [analyticsKey, analyticsData]
+  )
+
   useEffect(() => {
     if (id) {
-      updateCampaignAnalyticsById(id)
+      console.log({ id })
+      const key = updateCampaignAnalyticsById(id)
+      updateCampaignDataById(id)
+      updateEventAggregates(id)
+      setAnalyticsKey(key)
     }
-  }, [id, updateCampaignAnalyticsById])
+  }, [id, updateCampaignAnalyticsById, updateCampaignDataById, updateEventAggregates])
+
+  useEffect(() => {
+    console.log({ campaignDetails })
+    console.log({ campaignAggregates })
+    console.log({ campaignAnalytics })
+  }, [campaignAggregates, campaignAnalytics, campaignDetails])
+
+  useEffect(() => {
+    console.log({ campaignsData })
+    console.log({ eventAggregates })
+    console.log({ analyticsData })
+  }, [analyticsData, campaignsData, eventAggregates])
 
   return (
     <>
