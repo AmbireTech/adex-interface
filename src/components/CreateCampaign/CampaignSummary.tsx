@@ -9,6 +9,8 @@ import useCreateCampaignData from 'hooks/useCreateCampaignData/useCreateCampaign
 import CampaignDetailsRow from 'components/common/CampainDetailsRow'
 import { ConfirmModal, SuccessModal } from 'components/common/Modals'
 import AttentionIcon from 'resources/icons/Attention'
+import useCampaignsData from 'hooks/useCampaignsData'
+import useCustomNotifications from 'hooks/useCustomNotifications'
 
 const useStyles = createStyles((theme) => ({
   bg: {
@@ -66,6 +68,8 @@ const CampaignSummary = () => {
     adFormats,
     campaignBudgetFormatted
   } = useCreateCampaignData()
+  const { updateAllCampaignsData } = useCampaignsData()
+  const { showNotification } = useCustomNotifications()
 
   const [isNextBtnDisabled, setIsNextBtnDisabled] = useState(false)
   const noSelectedCatsOrLogs = useMemo(
@@ -84,19 +88,22 @@ const CampaignSummary = () => {
 
   const isTheLastStep = useMemo(() => step === CREATE_CAMPAIGN_STEPS - 1, [step])
   const isFirstStep = useMemo(() => step === 0, [step])
-  const launchCampaign = useCallback(() => {
-    publishCampaign().then((res) => {
+  const launchCampaign = useCallback(async () => {
+    try {
+      const res = await publishCampaign()
+
       if (res && res.success) {
+        await updateAllCampaignsData()
         open()
         resetCampaign()
+      } else {
+        showNotification('warning', 'invalid campaign data response', 'Data error')
       }
-    })
-    // TODO: Probably It's better to handle the error here instead of adexServiceRequest
-    // .catch((error) => {
-    //   // TOOD: handle the error
-    //   console.error('error', error.message)
-    // })
-  }, [publishCampaign, resetCampaign, open])
+    } catch (err) {
+      console.error(err)
+      showNotification('error', 'Creating campaign failed', 'Data error')
+    }
+  }, [publishCampaign, resetCampaign, open, updateAllCampaignsData, showNotification])
 
   const form = useCreateCampaignFormContext()
 
