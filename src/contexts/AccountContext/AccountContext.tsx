@@ -1,6 +1,6 @@
+import { useLocalStorage } from '@mantine/hooks'
 import { createContext, FC, PropsWithChildren, useMemo, useCallback, useEffect } from 'react'
 import { IAdExAccount } from 'types'
-import { useLocalStorage } from '@mantine/hooks'
 import {
   getMessageToSign,
   isAdminToken,
@@ -18,7 +18,7 @@ const ambireLoginSDK = new AmbireLoginSDK({
 })
 
 interface IAccountContext {
-  adexAccount: IAdExAccount | null
+  adexAccount: IAdExAccount & { loaded: boolean; initialLoad: boolean }
   authenticated: boolean
   ambireSDK: AmbireLoginSDK
   isAdmin: boolean
@@ -31,27 +31,78 @@ interface IAccountContext {
 
 const AccountContext = createContext<IAccountContext | null>(null)
 
+const defaultValue: IAccountContext['adexAccount'] = {
+  address: 'default',
+  chainId: 0,
+  accessToken: null,
+  refreshToken: null,
+  authenticated: false,
+  authMsgResp: null,
+  loaded: false,
+  // This ensures there is some obj in the ls
+  initialLoad: false
+}
+
+function serializeJSON<T>(value: T) {
+  try {
+    return JSON.stringify(value)
+  } catch (error) {
+    throw new Error('Failed to serialize the value')
+  }
+}
+
+function deserializeJSON(value: string) {
+  try {
+    return JSON.parse(value)
+  } catch {
+    return null
+  }
+}
+
 const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
   const { showNotification } = useCustomNotifications()
   const ambireSDK = useMemo(() => ambireLoginSDK, [])
+
   const [adexAccount, setAdexAccount] = useLocalStorage<IAccountContext['adexAccount']>({
     key: 'adexAccount',
-    defaultValue: {
-      address: '',
-      chainId: 0,
-      accessToken: '',
-      refreshToken: '',
-      authenticated: false,
-      authMsgResp: null
+    defaultValue: { ...defaultValue },
+    deserialize: (str) => {
+      // console.log({ str })
+      const res = !str
+        ? { ...defaultValue, updated: true }
+        : { ...deserializeJSON(str), loaded: true }
+
+      // console.log({ res })
+
+      return res
+    },
+    serialize: (acc) => {
+      const ser = serializeJSON({ ...acc, loaded: true })
+      // console.log({ ser })
+
+      return ser
     }
   })
 
+  // NOTE: hax to ensure there is storage value as there is no way to differentiate the default value from storage value using useLocalStorage
+  useEffect(() => {
+    const lsAcc = deserializeJSON(localStorage.getItem('adexAccount') || '')
+    // console.log({ lsAcc })
+
+    if (!lsAcc) {
+      setAdexAccount({ ...defaultValue, initialLoad: true })
+    }
+  }, [setAdexAccount])
+
   const updateAdexAccount = useCallback(
-    (newValue: any | null) =>
-      setAdexAccount((prevState) => (newValue === null ? newValue : { ...prevState, ...newValue })),
+    (newValue: IAccountContext['adexAccount']) =>
+      setAdexAccount((prevState) => ({ ...prevState, ...newValue, loaded: true })),
     [setAdexAccount]
   )
-  const resetAdexAccount = useCallback(() => updateAdexAccount(null), [updateAdexAccount])
+  const resetAdexAccount = useCallback(
+    () => updateAdexAccount({ ...defaultValue, initialLoad: true }),
+    [updateAdexAccount]
+  )
 
   const connectWallet = useCallback(
     () => ambireSDK.openLogin({ chainId: DEFAULT_CHAIN_ID }),
@@ -64,7 +115,7 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
   )
 
   const updateAccessToken = useCallback(async () => {
-    if (!adexAccount?.accessToken || !adexAccount?.refreshToken) return
+    if (!adexAccount.accessToken || !adexAccount.refreshToken) return
 
     if (isTokenExpired(adexAccount.refreshToken)) {
       resetAdexAccount()
@@ -74,9 +125,10 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
 
     if (isTokenExpired(adexAccount.accessToken)) {
       try {
-        const response = await refreshAccessToken(adexAccount?.refreshToken)
+        const response = await refreshAccessToken(adexAccount.refreshToken)
         if (response) {
           updateAdexAccount({
+            ...adexAccount,
             accessToken: response.accessToken,
             refreshToken: response.refreshToken
           })
@@ -89,50 +141,38 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
         throw error
       }
     }
-  }, [
-    adexAccount?.accessToken,
-    adexAccount?.refreshToken,
-    updateAdexAccount,
-    showNotification,
-    resetAdexAccount
-  ])
+  }, [adexAccount, updateAdexAccount, showNotification, resetAdexAccount])
 
   const handleRegistrationOrLoginSuccess = useCallback(
     ({ address, chainId }: any) => {
       if (
         !address ||
         !chainId ||
-        (adexAccount?.address !== '' &&
-          adexAccount?.chainId !== 0 &&
-          adexAccount?.authMsgResp !== null)
+        (adexAccount.address !== '' &&
+          adexAccount.chainId !== 0 &&
+          adexAccount.authMsgResp !== null)
       )
         return
 
       const updatedAccount = { address, chainId }
       getMessageToSign(updatedAccount)
         .then((getMessage) => {
-          updateAdexAccount({ ...updatedAccount, authMsgResp: getMessage.authMsg })
+          updateAdexAccount({ ...adexAccount, ...updatedAccount, authMsgResp: getMessage.authMsg })
         })
         .catch((error) => {
           console.error('Get message to sign failed', error)
           showNotification('error', error?.message, 'Get message to sign failed')
         })
     },
-    [
-      adexAccount?.address,
-      adexAccount?.chainId,
-      adexAccount?.authMsgResp,
-      updateAdexAccount,
-      showNotification
-    ]
+    [adexAccount, updateAdexAccount, showNotification]
   )
 
   const handleMsgSigned = useCallback(
     ({ signature }: any) => {
-      if (!signature || !adexAccount?.authMsgResp || adexAccount?.authenticated) return
+      if (!signature || !adexAccount.authMsgResp || adexAccount.authenticated) return
 
       const body = {
-        authMsg: { ...adexAccount?.authMsgResp },
+        authMsg: { ...adexAccount.authMsgResp },
         signature
       }
 
@@ -140,6 +180,7 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
         .then((authResp) => {
           if (!authResp) return
           updateAdexAccount({
+            ...adexAccount,
             accessToken: authResp.accessToken,
             refreshToken: authResp.refreshToken,
             authenticated: !!authResp.accessToken && !!authResp.refreshToken
@@ -150,7 +191,7 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
           showNotification('error', error?.message, 'Verify login failed')
         })
     },
-    [adexAccount?.authMsgResp, adexAccount?.authenticated, updateAdexAccount, showNotification]
+    [adexAccount, updateAdexAccount, showNotification]
   )
 
   const handleMsgRejected = useCallback(() => {
@@ -183,19 +224,19 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
   ])
 
   useEffect(() => {
-    if (adexAccount?.authMsgResp && !adexAccount?.authenticated) {
+    if (adexAccount.authMsgResp && !adexAccount.authenticated) {
       signMessage('eth_signTypedData', JSON.stringify(adexAccount.authMsgResp))
     }
-  }, [adexAccount?.authMsgResp, adexAccount?.authenticated, signMessage])
+  }, [adexAccount.authMsgResp, adexAccount.authenticated, signMessage])
 
   const authenticated = useMemo(
-    () => Boolean(adexAccount?.authenticated),
-    [adexAccount?.authenticated]
+    () => Boolean(adexAccount.authenticated),
+    [adexAccount.authenticated]
   )
 
   const isAdmin = useMemo(
-    () => Boolean(isAdminToken(adexAccount?.accessToken)),
-    [adexAccount?.accessToken]
+    () => Boolean(isAdminToken(adexAccount.accessToken)),
+    [adexAccount.accessToken]
   )
 
   const contextValue = useMemo(

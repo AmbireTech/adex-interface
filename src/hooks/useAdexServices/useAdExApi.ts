@@ -53,9 +53,10 @@ export const useAdExApi = () => {
       }
 
       // console.log('adexAccount', adexAccount)
+      if (!adexAccount.accessToken) throw new Error('Access token is missing')
 
       const authHeader = {
-        [authHeaderProp]: `Bearer ${adexAccount?.accessToken}`
+        [authHeaderProp]: `Bearer ${adexAccount.accessToken}`
       }
 
       // TODO: log-out if no access token
@@ -80,7 +81,7 @@ export const useAdExApi = () => {
         .then(processResponse)
         .catch((err) => showNotification('error', err.message, 'Data error'))
     },
-    [adexAccount?.accessToken, updateAccessToken, showNotification]
+    [adexAccount.accessToken, updateAccessToken, showNotification]
   )
 
   return {

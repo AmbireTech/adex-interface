@@ -28,7 +28,7 @@ const useStyles = createStyles((theme) => ({
 const SendCryptocurrency = () => {
   const { classes } = useStyles()
   const { adexAccount } = useAccount()
-  const accountAddress = adexAccount?.address || ''
+  const accountAddress = adexAccount.address
 
   return (
     <Grid gutter="xl" align="center">
