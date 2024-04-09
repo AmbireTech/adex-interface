@@ -40,9 +40,9 @@ export const CREATE_CAMPAIGN_DEFAULT_VALUE: CampaignUI = {
   startsAt: new Date(),
   endsAt: new Date(),
   currency: '',
-  cpmMin: '',
-  cpmMax: '',
-  campaignName: '',
+  // cpmMin: '',
+  // cpmMax: '',
+  // campaignName: '',
   outpaceAssetAddr: '',
   outpaceAssetDecimals: 0,
   outpaceAddr: '',
@@ -68,7 +68,7 @@ export const CREATE_CAMPAIGN_DEFAULT_VALUE: CampaignUI = {
   activeFrom: BigInt(Date.now()),
   activeTo: BigInt(Date.now()),
   targetingInput: {
-    version: '',
+    version: '1',
     inputs: {
       location: DEFAULT_CATS_LOCS_VALUE,
       categories: DEFAULT_CATS_LOCS_VALUE,

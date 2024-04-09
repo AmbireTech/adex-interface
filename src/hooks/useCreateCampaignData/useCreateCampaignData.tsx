@@ -25,7 +25,7 @@ const useCreateCampaignData = () => {
       pricingBounds: { IMPRESSION: priceBounds },
       adUnits,
       campaignBudget,
-      campaignName,
+      title,
       startsAt,
       endsAt
     }
@@ -133,10 +133,7 @@ const useCreateCampaignData = () => {
     () => <Text align="end">{campaignBudget.toString()}</Text>,
     [campaignBudget]
   )
-  const campaignNameFormatted = useMemo(
-    () => <Text align="end">{campaignName.toString()}</Text>,
-    [campaignName]
-  )
+  const campaignNameFormatted = useMemo(() => <Text align="end">{title}</Text>, [title])
   const adUnitsFormatted = useMemo(
     () =>
       adUnits.map((image: AdUnit) => {
