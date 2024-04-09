@@ -1,4 +1,4 @@
-import { Campaign, EventType, Placement } from 'adex-common'
+import { Campaign } from 'adex-common'
 import {
   createContext,
   FC,
@@ -11,55 +11,19 @@ import {
 import { useAdExApi } from 'hooks/useAdexServices'
 import useAccount from 'hooks/useAccount'
 import useCustomNotifications from 'hooks/useCustomNotifications'
+import {
+  CampaignData,
+  AnalyticsDataQuery,
+  AnalyticsData,
+  AnalyticsDataRes,
+  EventAggregatesDataRes,
+  EvAggrData
+} from 'types/campaignsData'
 
 // NOTE: Will put here all the campaigns data and analytics for ease of use
 // Later we can separate the analytics in different context
 
-type CampaignData = {
-  campaignId: string
-  campaign: Campaign
-  impressions: Number
-  clicks: Number
-  // clicks / impressions * 100
-  crt: Number
-  // payed / impressions * 1000
-  avgCpm: Number
-  payed: Number
-  // TODO: analyticsData type
-  analyticsData: any
-}
-
-type Timeframe = 'year' | 'month' | 'week' | 'day' | 'hour'
-type Metric = 'count' | 'paid'
-
-type AnalyticsDataKeys = {
-  campaignId?: string
-  adUnit?: string
-  adSlot?: string
-  adSlotType?: string
-  advertiser?: string
-  publisher?: string
-  ssp?: string
-  sspPublisher?: string
-  hostname?: string
-  placement?: Placement
-  country?: string
-  osName?: string
-}
-
-type AnalyticsDataQuery = AnalyticsDataKeys & {
-  eventType: keyof typeof EventType
-  metric: Metric
-  timeframe: Timeframe
-  start: Date
-  end: Date
-  limit: number
-  segmentBy?: keyof AnalyticsDataKeys
-  // TODO: validation and test timezones - need tests on validator ad well
-  timezone: 'UTC'
-}
-
-export const getAnalyticsKeyFromQuery = (queryParams: AnalyticsDataQuery): string => {
+const getAnalyticsKeyFromQuery = (queryParams: AnalyticsDataQuery): string => {
   // TODO: hex or hash
   const mapKey = Object.keys(queryParams)
     .sort()
@@ -73,49 +37,16 @@ export const getAnalyticsKeyFromQuery = (queryParams: AnalyticsDataQuery): strin
   return mapKey
 }
 
-type AnalyticsData = {
-  value: string | Number
-  time: number
-  segment?: string
-}
-
-type AnalyticsDataRes = {
-  limit?: Number
-  aggr: AnalyticsData[]
-}
-
-type AggrEvent = {
-  channel: string //  DATE STRING - TODO parse
-  events: {
-    [x in keyof typeof EventType]: {
-      eventCounts: {
-        [x: string]: Number
-      }
-      eventPayouts: {
-        [x: string]: string // currently big num string - TODO number
-      }
-    }
+const eventAggregatestResToAdvData = (dataRes: EventAggregatesDataRes): EvAggrData => {
+  const newData: EvAggrData = {
+    clicks: dataRes.events[0].totals.CLICK.eventCounts,
+    impressions: dataRes.events[0].totals.IMPRESSION.eventCounts,
+    payouts:
+      BigInt(dataRes.events[0].totals.CLICK.eventPayouts) +
+      BigInt(dataRes.events[0].totals.IMPRESSION.eventPayouts)
   }
-  totals: {
-    [x in keyof typeof EventType]: {
-      eventCounts: Number
-      eventPayouts: string
-    }
-  }
-}
 
-type EventAggregatesDataRes = {
-  channel: {
-    id: string
-    // NOTE: skip the rest props
-  }
-  events: AggrEvent[] // NOTE - use only [0] atm
-}
-
-type EvAggrData = {
-  clicks: Number
-  impressions: Number
-  payouts: BigInt
+  return newData
 }
 
 const defaultCampaignData = {
@@ -136,9 +67,10 @@ interface ICampaignsDataContext {
   // TODO: all campaigns event aggregations by account
   eventAggregates: Map<Campaign['id'], EvAggrData>
   updateCampaignDataById: (params: Campaign['id']) => void
-  updateAllCampaignsData: () => void
-  updateCampaignAnalyticsById: (campaignId: string) => string
+  updateAllCampaignsData: (updateAdvanced?: boolean) => void
+  updateCampaignAnalyticsByQuery: (queryParams: AnalyticsDataQuery) => string
   updateEventAggregates: (params: Campaign['id']) => void
+  getAnalyticsKeyFromQuery: (queryParams: AnalyticsDataQuery) => string
 }
 
 const CampaignsDataContext = createContext<ICampaignsDataContext | null>(null)
@@ -209,40 +141,77 @@ const CampaignsDataProvider: FC<PropsWithChildren> = ({ children }) => {
   //   console.log({ showNotification })
   // }, [showNotification])
 
-  const updateAllCampaignsData = useCallback(async () => {
-    try {
-      const dataRes = await adexServicesRequest<Array<Campaign>>('backend', {
-        route: '/dsp/campaigns/by-owner',
-        method: 'GET'
-      })
-
-      console.log({ dataRes })
-      if (Array.isArray(dataRes)) {
-        setCampaignData((prev) => {
-          const next = new Map(prev)
-          dataRes.forEach((cmp: Campaign) => {
-            const currentCMP = {
-              ...(prev.get(cmp.id) || {
-                ...defaultCampaignData,
-                campaignId: cmp.id,
-                campaign: cmp
-              })
-            }
-
-            next.set(cmp.id, currentCMP)
-          })
-
-          return next
+  const getCampaignAdvancedData = useCallback(
+    async (campaignId: string): Promise<EvAggrData> => {
+      try {
+        const eventAggregatesRes = await adexServicesRequest<EventAggregatesDataRes>('validator', {
+          route: `/v5_a/channel/${campaignId}/events-aggregates`,
+          method: 'GET'
         })
-      } else {
-        showNotification('warning', 'invalid campaigns data response', 'Data error')
-        console.log({ dataRes })
+
+        return eventAggregatestResToAdvData(eventAggregatesRes)
+      } catch (err) {
+        return {
+          clicks: 0,
+          impressions: 0,
+          payouts: BigInt(0)
+        }
       }
-    } catch (err) {
-      console.log(err)
-      showNotification('error', 'getting campaigns data', 'Data error')
-    }
-  }, [adexServicesRequest, showNotification])
+    },
+    [adexServicesRequest]
+  )
+
+  const updateAllCampaignsData = useCallback(
+    async (updateAdvanced?: boolean) => {
+      try {
+        const dataRes = await adexServicesRequest<Array<Campaign>>('backend', {
+          route: '/dsp/campaigns/by-owner',
+          method: 'GET'
+        })
+
+        let advData: EvAggrData[]
+
+        if (updateAdvanced) {
+          const calls = [...dataRes].map(({ id }) => getCampaignAdvancedData(id))
+
+          advData = await Promise.all(calls)
+        }
+
+        console.log({ dataRes })
+        if (Array.isArray(dataRes)) {
+          setCampaignData((prev) => {
+            const next = new Map(prev)
+            dataRes.forEach((cmp: Campaign, index: number) => {
+              const currentCMP = {
+                ...(prev.get(cmp.id) || defaultCampaignData),
+                campaignId: cmp.id,
+                campaign: cmp,
+                ...(advData && advData[index]
+                  ? {
+                      clicks: advData[index].clicks,
+                      impressions: advData[index].impressions,
+                      // TODO: payouts decimals calc
+                      payed: Number(advData[index].payouts)
+                    }
+                  : {})
+              }
+
+              next.set(cmp.id, currentCMP)
+            })
+
+            return next
+          })
+        } else {
+          showNotification('warning', 'invalid campaigns data response', 'Data error')
+          console.log({ dataRes })
+        }
+      } catch (err) {
+        console.log(err)
+        showNotification('error', 'getting campaigns data', 'Data error')
+      }
+    },
+    [adexServicesRequest, getCampaignAdvancedData, showNotification]
+  )
 
   const updateAnalytics = useCallback(
     async (params: AnalyticsDataQuery, dataKey: string) => {
@@ -328,8 +297,8 @@ const CampaignsDataProvider: FC<PropsWithChildren> = ({ children }) => {
     [adexServicesRequest, showNotification]
   )
 
-  const updateCampaignAnalyticsById = useCallback(
-    (campaignId: string): string => {
+  const updateCampaignAnalyticsByQuery = useCallback(
+    (query: AnalyticsDataQuery): string => {
       // const campaign = campaignsData.get(campaignId)?.campaign
 
       // if (!campaign) {
@@ -337,18 +306,6 @@ const CampaignsDataProvider: FC<PropsWithChildren> = ({ children }) => {
       // }
 
       // TODO: update analytics another way, because having campaignsData here can trigger infinite loop
-      const query: AnalyticsDataQuery = {
-        campaignId,
-        // start: new Date(Number(campaign.activeFrom)),
-        start: new Date(Date.now()),
-        end: new Date(Date.now()),
-        metric: 'paid',
-        eventType: 'CLICK',
-        limit: 10000000,
-        timezone: 'UTC',
-        timeframe: 'year',
-        segmentBy: 'campaignId'
-      }
 
       const dataKey = getAnalyticsKeyFromQuery(query)
 
@@ -373,16 +330,17 @@ const CampaignsDataProvider: FC<PropsWithChildren> = ({ children }) => {
       campaignsData,
       updateCampaignDataById,
       updateAllCampaignsData,
-      updateCampaignAnalyticsById,
+      updateCampaignAnalyticsByQuery,
       eventAggregates,
       analyticsData,
-      updateEventAggregates
+      updateEventAggregates,
+      getAnalyticsKeyFromQuery
     }),
     [
       campaignsData,
       updateCampaignDataById,
       updateAllCampaignsData,
-      updateCampaignAnalyticsById,
+      updateCampaignAnalyticsByQuery,
       eventAggregates,
       analyticsData,
       updateEventAggregates
