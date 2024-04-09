@@ -47,14 +47,14 @@ export const isAdminToken = (accessToken: string | undefined) => {
   return decodeAccessToken.data.is_admin
 }
 
-export const isTokenExpired = (accessToken: string) => {
-  if (!accessToken) {
+export const isTokenExpired = (token: string) => {
+  if (!token) {
     return true
   }
 
   const timeNowInSeconds = Math.floor(new Date().getTime() / 1000)
-  const decodeAccessToken = parseJwt(accessToken)
-  return decodeAccessToken.exp < timeNowInSeconds
+  const decodeToken = parseJwt(token)
+  return decodeToken.exp < timeNowInSeconds
 }
 
 export const getMessageToSign = async (user: any) => {

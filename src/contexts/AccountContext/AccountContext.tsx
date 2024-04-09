@@ -66,6 +66,12 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
   const updateAccessToken = useCallback(async () => {
     if (!adexAccount?.accessToken || !adexAccount?.refreshToken) return
 
+    if (isTokenExpired(adexAccount.refreshToken)) {
+      resetAdexAccount()
+      showNotification('error', 'Refresh token has been expired', 'Refresh token')
+      return
+    }
+
     if (isTokenExpired(adexAccount.accessToken)) {
       try {
         const response = await refreshAccessToken(adexAccount?.refreshToken)
@@ -83,7 +89,13 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
         throw error
       }
     }
-  }, [adexAccount?.accessToken, adexAccount?.refreshToken, updateAdexAccount, showNotification])
+  }, [
+    adexAccount?.accessToken,
+    adexAccount?.refreshToken,
+    updateAdexAccount,
+    showNotification,
+    resetAdexAccount
+  ])
 
   const handleRegistrationOrLoginSuccess = useCallback(
     ({ address, chainId }: any) => {
