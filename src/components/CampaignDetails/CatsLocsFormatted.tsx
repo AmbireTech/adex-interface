@@ -46,6 +46,14 @@ const CatsLocsFormatted = ({ title, arr }: CatsLocsFormattedProps) => {
 
   return (
     <div>
+      {!values && (
+        <Flex direction="column" p="md">
+          <Text size="sm" className={classes.lighterColor}>
+            {title}
+          </Text>
+          <Text className={classes.firstLineLabels}>{formatPrefix(itemKey!)}</Text>
+        </Flex>
+      )}
       {!!values &&
         (values.length <= 3 ? (
           <Flex direction="column" p="md">
