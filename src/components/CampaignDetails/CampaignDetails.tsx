@@ -54,12 +54,15 @@ const CampaignDetails = () => {
     campaignsData,
     eventAggregates,
     analyticsData,
-    updateCampaignAnalyticsById,
+    // updateCampaignAnalyticsById,
     updateCampaignDataById,
     updateEventAggregates
   } = useCampaignsData()
   const { id } = useParams()
-  const [analyticsKey, setAnalyticsKey] = useState('')
+  const [
+    analyticsKey
+    // setAnalyticsKey
+  ] = useState('')
   if (!id) {
     return <div>Missing ID</div>
   }
@@ -85,12 +88,17 @@ const CampaignDetails = () => {
   useEffect(() => {
     if (id) {
       console.log({ id })
-      const key = updateCampaignAnalyticsById(id)
+      // const key = updateCampaignAnalyticsById(id)
       updateCampaignDataById(id)
       updateEventAggregates(id)
-      setAnalyticsKey(key)
+      // setAnalyticsKey(key)
     }
-  }, [id, updateCampaignAnalyticsById, updateCampaignDataById, updateEventAggregates])
+  }, [
+    id,
+    // updateCampaignAnalyticsById,
+    updateCampaignDataById,
+    updateEventAggregates
+  ])
 
   useEffect(() => {
     console.log({ campaignDetails })
