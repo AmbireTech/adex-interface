@@ -73,26 +73,29 @@ const CampaignSummary = () => {
     [formattedCats, formattedLocs]
   )
 
+  const hasEmptyTargetUrl = useMemo(
+    () => adUnits && adUnits.length && adUnits.some((adUnit) => adUnit.banner?.targetUrl === ''),
+    [adUnits]
+  )
+
   useEffect(() => {
-    setIsNextBtnDisabled(
-      (step === 0 && adUnits.length === 0) || (step === 1 && noSelectedCatsOrLogs)
-    )
-  }, [step, adUnits.length, noSelectedCatsOrLogs])
+    setIsNextBtnDisabled((step === 0 && hasEmptyTargetUrl) || (step === 1 && noSelectedCatsOrLogs))
+  }, [step, noSelectedCatsOrLogs, hasEmptyTargetUrl])
 
   const isTheLastStep = useMemo(() => step === CREATE_CAMPAIGN_STEPS - 1, [step])
   const isFirstStep = useMemo(() => step === 0, [step])
   const launchCampaign = useCallback(() => {
-    publishCampaign()
-      .then((res) => {
-        if (res && res.success) {
-          open()
-          resetCampaign()
-        }
-      })
-      .catch((error) => {
-        // TOOD: handle the error
-        console.error('error', error.message)
-      })
+    publishCampaign().then((res) => {
+      if (res && res.success) {
+        open()
+        resetCampaign()
+      }
+    })
+    // TODO: Probably It's better to handle the error here instead of adexServiceRequest
+    // .catch((error) => {
+    //   // TOOD: handle the error
+    //   console.error('error', error.message)
+    // })
   }, [publishCampaign, resetCampaign, open])
 
   const form = useCreateCampaignFormContext()

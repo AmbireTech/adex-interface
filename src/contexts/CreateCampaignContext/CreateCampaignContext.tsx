@@ -83,7 +83,10 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
   )
 
   const publishCampaign = useCallback(() => {
-    const body = serialize(mapCampaignUItoCampaign(campaign)).json
+    const mappedCampaign = mapCampaignUItoCampaign(campaign)
+    mappedCampaign.id = `${campaign.title}-${Date.now().toString(16)}`
+
+    const body = serialize(mappedCampaign).json
 
     return adexServicesRequest('backend', {
       route: '/dsp/campaigns',
