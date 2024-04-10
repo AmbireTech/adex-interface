@@ -173,13 +173,21 @@ const CustomTable = ({
   }, [isMobile, columns, list, hasAction, onPreview, onAnalytics, onDuplicate, onDelete])
 
   return (
-    <Flex h="100%" justify="space-between" direction="column" align="center">
+    <Flex
+      h="100%"
+      w="100%"
+      style={{ overflow: 'hidden', overflowX: 'auto' }}
+      justify="space-between"
+      direction="column"
+      align="center"
+    >
       {isMobile ? (
         <Grid mt="xs" style={{ borderBottom: '1px solid #33333330', textAlign: 'center' }}>
           {rows.map((row) => row)}
         </Grid>
       ) : (
         <Table
+          w="1500px"
           highlightOnHover
           verticalSpacing={15}
           className={cx(classes.border, { [classes.background]: background })}
