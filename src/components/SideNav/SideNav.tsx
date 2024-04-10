@@ -4,12 +4,10 @@ import {
   Box,
   UnstyledButton,
   Text,
-  Button,
   useMantineTheme,
   createStyles,
   rem
 } from '@mantine/core'
-// import useAccount from 'hooks/useAccount'
 import { useMatch, useLocation, useResolvedPath, Link } from 'react-router-dom'
 import useAccount from 'hooks/useAccount'
 import DashboardIcon from 'resources/icons/Dashboard'
@@ -21,6 +19,9 @@ import { useMemo } from 'react'
 import { appVersion } from 'helpers'
 import NavLink from './NavLink'
 import Balance from './Balance'
+import CreateCampaignBtn from './CreateCampaignBtn'
+
+const IS_MANUAL_DEPOSITING = process.env.REACT_APP_IS_MANUAL_DEPOSITING
 
 const useStyles = createStyles((theme) => ({
   logo: {
@@ -72,15 +73,7 @@ function SideNav() {
         <Balance />
       </Navbar.Section>
       <Navbar.Section className={classes.newCampaign}>
-        <Button
-          variant="filled"
-          color="secondaryAccent"
-          size="md"
-          component={Link}
-          to="/dashboard/create-campaign"
-        >
-          New Campaign
-        </Button>
+        <CreateCampaignBtn hasPopover={Boolean(IS_MANUAL_DEPOSITING)} />
       </Navbar.Section>
       <Navbar.Section mx="-xs" grow component={ScrollArea}>
         <Box>
@@ -95,6 +88,13 @@ function SideNav() {
             icon={<DepositIcon />}
             label="Top Up Account"
             active={useResolvedPath('deposit').pathname === match?.pathname}
+            hasPopover={Boolean(IS_MANUAL_DEPOSITING)}
+            popoverContent={
+              <Text size="sm">
+                Contact us on <a href="mailto: dsp@adex.network"> dsp@adex.network</a> to &quot;add
+                money&quot; / &quot;launch campaign&quot;
+              </Text>
+            }
           />
           <NavLink
             to="/dashboard/billing"

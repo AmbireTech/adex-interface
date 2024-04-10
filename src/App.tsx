@@ -1,4 +1,5 @@
 import { Global, MantineProvider, Progress } from '@mantine/core'
+import { ModalsProvider } from '@mantine/modals'
 import { AccountProvider } from 'contexts/AccountContext'
 import { CampaignsDataProvider } from 'contexts/CampaignsContext'
 import { BillingDetailsProvider } from 'contexts/BillingDetailsContext'
@@ -41,12 +42,14 @@ function App() {
     <AccountProvider>
       <CampaignsDataProvider>
         <MantineProvider withGlobalStyles withNormalizeCSS theme={lightTheme}>
-          <GlobalStyles />
-          <Notifications />
-          <BillingDetailsProvider>
-            {ENV && <EnvBanner />}
-            <RouterProvider router={router} />
-          </BillingDetailsProvider>
+          <ModalsProvider>
+            <GlobalStyles />
+            <Notifications />
+            <BillingDetailsProvider>
+              {ENV && <EnvBanner />}
+              <RouterProvider router={router} />
+            </BillingDetailsProvider>
+          </ModalsProvider>
         </MantineProvider>
       </CampaignsDataProvider>
     </AccountProvider>
