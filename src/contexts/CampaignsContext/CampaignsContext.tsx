@@ -54,9 +54,9 @@ const defaultCampaignData = {
   campaign: {},
   impressions: 0,
   clicks: 0,
-  crt: 0,
-  avgCpm: 0,
-  payed: 0,
+  ctr: 'N/A',
+  avgCpm: 'N/A',
+  paid: 0,
   analyticsData: {}
 }
 
@@ -71,6 +71,7 @@ interface ICampaignsDataContext {
   updateCampaignAnalyticsByQuery: (queryParams: AnalyticsDataQuery) => string
   updateEventAggregates: (params: Campaign['id']) => void
   getAnalyticsKeyFromQuery: (queryParams: AnalyticsDataQuery) => string
+  initialDataLoading: boolean
 }
 
 const CampaignsDataContext = createContext<ICampaignsDataContext | null>(null)
@@ -80,6 +81,7 @@ const CampaignsDataProvider: FC<PropsWithChildren> = ({ children }) => {
   const { adexServicesRequest } = useAdExApi()
 
   const { authenticated } = useAccount()
+  const [initialDataLoading, setInitialDataLoading] = useState(true)
 
   const [campaignsData, setCampaignData] = useState<ICampaignsDataContext['campaignsData']>(
     new Map<Campaign['id'], CampaignData>()
@@ -182,18 +184,35 @@ const CampaignsDataProvider: FC<PropsWithChildren> = ({ children }) => {
           setCampaignData((prev) => {
             const next = new Map(prev)
             dataRes.forEach((cmp: Campaign, index: number) => {
+              const adv: {
+                impressions: number
+                clicks: number
+                ctr: number | string
+                avgCpm: number | string
+                paid: number
+              } = {
+                ...(advData[index] || {
+                  clicks: 0,
+                  impressions: 0
+                }),
+                ...{
+                  // TODO: Decimals to umber fn
+                  paid: Number(advData[index]?.payouts || 0) * 10 ** -8,
+                  ctr: 'N/A',
+                  avgCpm: 'N/A'
+                }
+              }
+
+              if (adv.impressions > 0) {
+                adv.ctr = (adv.clicks / adv.impressions) * 100
+                adv.avgCpm = (adv.paid / adv.impressions) * 1000
+              }
+
               const currentCMP = {
                 ...(prev.get(cmp.id) || defaultCampaignData),
                 campaignId: cmp.id,
                 campaign: cmp,
-                ...(advData && advData[index]
-                  ? {
-                      clicks: advData[index].clicks,
-                      impressions: advData[index].impressions,
-                      // TODO: payouts decimals calc
-                      payed: Number(advData[index].payouts)
-                    }
-                  : {})
+                ...adv
               }
 
               next.set(cmp.id, currentCMP)
@@ -317,11 +336,17 @@ const CampaignsDataProvider: FC<PropsWithChildren> = ({ children }) => {
 
   useEffect(() => {
     if (authenticated) {
-      updateAllCampaignsData()
+      const updateCampaigns = async () => {
+        await updateAllCampaignsData(true)
+        setInitialDataLoading(false)
+      }
+
+      updateCampaigns()
     } else {
       setCampaignData(new Map<string, CampaignData>())
       setAnalyticsData(new Map<string, AnalyticsData[]>())
       setEventAggregates(new Map<Campaign['id'], EvAggrData>())
+      setInitialDataLoading(false)
     }
   }, [updateAllCampaignsData, authenticated])
 
@@ -334,7 +359,8 @@ const CampaignsDataProvider: FC<PropsWithChildren> = ({ children }) => {
       eventAggregates,
       analyticsData,
       updateEventAggregates,
-      getAnalyticsKeyFromQuery
+      getAnalyticsKeyFromQuery,
+      initialDataLoading
     }),
     [
       campaignsData,
@@ -343,7 +369,8 @@ const CampaignsDataProvider: FC<PropsWithChildren> = ({ children }) => {
       updateCampaignAnalyticsByQuery,
       eventAggregates,
       analyticsData,
-      updateEventAggregates
+      updateEventAggregates,
+      initialDataLoading
     ]
   )
 

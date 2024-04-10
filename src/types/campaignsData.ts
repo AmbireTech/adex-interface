@@ -3,13 +3,13 @@ import { Campaign, EventType, Placement } from 'adex-common'
 export type CampaignData = {
   campaignId: string
   campaign: Campaign
-  impressions: Number
-  clicks: Number
+  impressions: number
+  clicks: number
   // clicks / impressions * 100
-  crt: Number
-  // payed / impressions * 1000
-  avgCpm: Number
-  payed: Number
+  ctr: number | string
+  // paid / impressions * 1000
+  avgCpm: number | string
+  paid: number
   // TODO: analyticsData type
   analyticsData: any
 }
@@ -45,13 +45,13 @@ export type AnalyticsDataQuery = AnalyticsDataKeys & {
 }
 
 export type AnalyticsData = {
-  value: string | Number
+  value: string | number
   time: number
   segment?: string
 }
 
 export type AnalyticsDataRes = {
-  limit?: Number
+  limit?: number
   aggr: AnalyticsData[]
 }
 
@@ -60,7 +60,7 @@ export type AggrEvent = {
   events: {
     [x in keyof typeof EventType]: {
       eventCounts: {
-        [x: string]: Number
+        [x: string]: number
       }
       eventPayouts: {
         [x: string]: string // currently big num string - TODO number
@@ -69,7 +69,7 @@ export type AggrEvent = {
   }
   totals: {
     [x in keyof typeof EventType]: {
-      eventCounts: Number
+      eventCounts: number
       eventPayouts: string
     }
   }
@@ -84,7 +84,7 @@ export type EventAggregatesDataRes = {
 }
 
 export type EvAggrData = {
-  clicks: Number
-  impressions: Number
+  clicks: number
+  impressions: number
   payouts: BigInt
 }
