@@ -1,4 +1,4 @@
-import { Campaign, CampaignStatus } from 'adex-common'
+import { Campaign, CampaignStatus, CampaignType } from 'adex-common'
 import { Container, Flex, Text, UnstyledButton } from '@mantine/core'
 import { useCallback, useMemo, useState } from 'react'
 import CustomTable from 'components/common/CustomTable'
@@ -31,7 +31,7 @@ const Dashboard = () => {
             return {
               id: cmpData.campaignId,
               title: cmpData.campaign.title,
-              model: cmpData.campaign.type,
+              model: CampaignType[cmpData.campaign.type],
               status: <BadgeStatusCampaign type={cmpData.campaign.status} />,
               served: 'No data',
               budget: 'No data',
