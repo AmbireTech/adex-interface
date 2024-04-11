@@ -25,7 +25,9 @@ const useStyles = createStyles((theme) => ({
     width: '100%',
     overflow: 'hidden',
     overflowX: 'auto'
-  }
+  },
+  mobileTableWrapper: { borderBottom: '1px solid #33333333', textAlign: 'center' },
+  gridRow: { borderBottom: '1px solid #33333333' }
 }))
 
 const CustomTable = ({
@@ -39,6 +41,7 @@ const CustomTable = ({
 }: ICustomTableProps) => {
   if (!elements.length) return <Text>No data found</Text>
   const isMobile = useMediaQuery('(max-width: 75rem)')
+
   const { classes, cx } = useStyles()
   const columns: string[] = useMemo(
     () => Object.keys(elements[0]).filter((e: string) => e !== 'id'),
@@ -77,7 +80,7 @@ const CustomTable = ({
           <Divider bg="#EBEEFA" m="1px 0" w="100%" p="15px" />
           {columns.map((column, i) => {
             return (
-              <Grid style={{ borderBottom: '1px solid #33333333' }} m="1px 0" w="100%" key={column}>
+              <Grid className={classes.gridRow} m="1px 0" w="100%" key={column}>
                 {head[i]}
 
                 <Grid.Col span={6}>
@@ -180,13 +183,14 @@ const CustomTable = ({
   return (
     <Flex h="100%" w="100%" justify="space-between" direction="column" align="center">
       {isMobile ? (
-        <Grid mt="xs" style={{ borderBottom: '1px solid #33333330', textAlign: 'center' }}>
+        <Grid mt="xs" className={classes.mobileTableWrapper}>
           {rows.map((row) => row)}
         </Grid>
       ) : (
         <div className={classes.tableWrapper}>
           <Table
-            w="1300px"
+            miw="max-content"
+            w="100%"
             highlightOnHover
             verticalSpacing={15}
             className={cx(classes.border, { [classes.background]: background })}
