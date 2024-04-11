@@ -1,42 +1,16 @@
-import { useCallback } from 'react'
+import { useContext } from 'react'
+import { CampaignsAnalyticsContext } from 'contexts/CampaignsContext'
 
-import { Campaign } from 'adex-common'
-import useCampaignsData from 'hooks/useCampaignsData'
-import { AnalyticsDataQuery } from 'types/campaignsData'
-
-type AnalyticsType = 'timeframe' | 'placements' | 'country'
-
-const useCampaignAnalytics = () => {
-  const { updateCampaignAnalyticsByQuery } = useCampaignsData()
-
-  const getAnalyticsKeyAndUpdate = useCallback(
-    (campaign: Campaign, analyticsType: AnalyticsType): string => {
-      console.log({ campaign })
-
-      if (!campaign.id || !analyticsType) {
-        return ''
-      }
-
-      const query: AnalyticsDataQuery = {
-        campaignId: campaign.id,
-        start: new Date(Number(campaign.activeFrom)),
-        end: new Date(Date.now()),
-        metric: 'paid',
-        eventType: 'CLICK',
-        limit: 10000000,
-        timezone: 'UTC',
-        timeframe: 'year',
-        segmentBy: 'campaignId'
-      }
-
-      return updateCampaignAnalyticsByQuery(query)
-    },
-    [updateCampaignAnalyticsByQuery]
-  )
-
-  return {
-    getAnalyticsKeyAndUpdate
-  }
+function useCampaignsAnalytics() {
+  const context = useContext(CampaignsAnalyticsContext)
+  // NOTE: as there is no way to detect if the context is used with provider
+  // and with ts forcing default values for createContext there is always context
+  // we can declare contexts as follows:
+  // `const CampaignsAnalyticsProvider = createContext<ICampaignsAnalyticsContext | null>(null)`
+  // this way we can use the context as hook and be sure there is provider for it
+  // with the next check we guarantee the type of the context (ICampaignsAnalyticsContext)
+  // NOTE CampaignsAnalyticsProvider should be inside AccountProvider ans inside CampaignsDataProvider
+  if (!context) throw new Error('useCampaignsData should be used with CampaignsDataProvider')
+  return context
 }
-
-export default useCampaignAnalytics
+export default useCampaignsAnalytics

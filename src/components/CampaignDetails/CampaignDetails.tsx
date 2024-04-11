@@ -10,6 +10,7 @@ import { formatDateTime } from 'helpers/formatters'
 import GoBack from 'components/common/GoBack'
 import CampaignDetailsRow from 'components/common/CampainDetailsRow/CampaignDetailsRow'
 import useCampaignsData from 'hooks/useCampaignsData'
+import useCampaignAnalytics from 'hooks/useCampaignAnalytics'
 import ActiveIcon from 'resources/icons/Active'
 import CampaignActionBtn from 'components/CampaignAnalytics/CampaignActionBtn'
 import StopIcon from 'resources/icons/Stop'
@@ -52,12 +53,14 @@ const CampaignDetails = () => {
   const { classes, cx } = useStyles()
   const {
     campaignsData,
-    eventAggregates,
-    analyticsData,
+    // eventAggregates,
+    // analyticsData,
     // updateCampaignAnalyticsById,
-    updateCampaignDataById,
-    updateEventAggregates
+    // updateEventAggregates,
+    updateCampaignDataById
   } = useCampaignsData()
+
+  const { analyticsData } = useCampaignAnalytics()
   const { id } = useParams()
   const [
     analyticsKey
@@ -73,11 +76,11 @@ const CampaignDetails = () => {
     [id, campaignsData]
   )
 
-  const campaignAggregates = useMemo(
-    () => eventAggregates.get(id),
+  // const campaignAggregates = useMemo(
+  //   () => eventAggregates.get(id),
 
-    [id, eventAggregates]
-  )
+  //   [id, eventAggregates]
+  // )
 
   const campaignAnalytics = useMemo(
     () => analyticsData.get(analyticsKey),
@@ -90,27 +93,35 @@ const CampaignDetails = () => {
       console.log({ id })
       // const key = updateCampaignAnalyticsById(id)
       updateCampaignDataById(id)
-      updateEventAggregates(id)
+      // updateEventAggregates(id)
       // setAnalyticsKey(key)
     }
   }, [
     id,
     // updateCampaignAnalyticsById,
-    updateCampaignDataById,
-    updateEventAggregates
+    // updateEventAggregates,
+    updateCampaignDataById
   ])
 
   useEffect(() => {
     console.log({ campaignDetails })
-    console.log({ campaignAggregates })
+    // console.log({ campaignAggregates })
     console.log({ campaignAnalytics })
-  }, [campaignAggregates, campaignAnalytics, campaignDetails])
+  }, [
+    // campaignAggregates,
+    campaignAnalytics,
+    campaignDetails
+  ])
 
   useEffect(() => {
     console.log({ campaignsData })
-    console.log({ eventAggregates })
+    // console.log({ eventAggregates })
     console.log({ analyticsData })
-  }, [analyticsData, campaignsData, eventAggregates])
+  }, [
+    analyticsData,
+    campaignsData
+    //  eventAggregates
+  ])
 
   return (
     <>
