@@ -16,7 +16,7 @@ import { timeout } from 'utils'
 
 const keySeparator = '👩🏼‍🏫'
 
-type AnalyticsType = 'timeframe' | 'hostname' | 'country'
+type AnalyticsType = 'timeframe' | 'hostname' | 'country' | ''
 type DataStatus = 'loading' | 'processed'
 
 const min = 60 * 1000
@@ -198,29 +198,38 @@ const CampaignsAnalyticsProvider: FC<PropsWithChildren> = ({ children }) => {
   useEffect(() => {
     setDataToMapStatus((prev) => {
       let update = false
+      const nextMappedData = new Map<string, any>()
+      const nextMapStatuses = new Map(prev)
 
-      prev.forEach((statusKey, status) => {
+      prev.forEach((status, statusKey) => {
         const analyticsKeys = statusKey.split(keySeparator)
 
         if (status === 'loading') {
           const isLoaded = analyticsKeys.every((aKey) => !!analyticsData.get(aKey))
           if (isLoaded) {
-            prev.set(statusKey, 'processed')
+            // TODO: map data
+            nextMappedData.set(statusKey, { processed: true })
+
+            nextMapStatuses.set(statusKey, 'processed')
             update = true
-
-            // TODO: process data - map to dev friendly format
-            setMappedAnalytics((prevMapped) => {
-              const nextMapped = new Map(prevMapped)
-
-              return nextMapped
-            })
           }
         }
       })
 
       if (update) {
-        return new Map(prev)
+        // TODO: process data - map to dev friendly format
+        setMappedAnalytics((prevMapped) => {
+          const nextMapped = new Map(prevMapped)
+          nextMappedData.forEach((value, key) => {
+            nextMapped.set(key, value)
+          })
+
+          return nextMapped
+        })
+
+        return new Map(nextMapStatuses)
       }
+
       return prev
     })
   }, [analyticsData, dataToMapStatus])
