@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo } from 'react'
 import { useParams } from 'react-router-dom'
 import { Container, Grid, createStyles, Text, Flex } from '@mantine/core'
 import BadgeStatusCampaign from 'components/Dashboard/BadgeStatusCampaign'
@@ -10,7 +10,6 @@ import { formatDateTime } from 'helpers/formatters'
 import GoBack from 'components/common/GoBack'
 import CampaignDetailsRow from 'components/common/CampainDetailsRow/CampaignDetailsRow'
 import useCampaignsData from 'hooks/useCampaignsData'
-import useCampaignAnalytics from 'hooks/useCampaignAnalytics'
 import ActiveIcon from 'resources/icons/Active'
 import CampaignActionBtn from 'components/CampaignAnalytics/CampaignActionBtn'
 import StopIcon from 'resources/icons/Stop'
@@ -51,87 +50,36 @@ const useStyles = createStyles((theme) => ({
 
 const CampaignDetails = () => {
   const { classes, cx } = useStyles()
-  const {
-    campaignsData,
-    // eventAggregates,
-    // analyticsData,
-    // updateCampaignAnalyticsById,
-    // updateEventAggregates,
-    updateCampaignDataById
-  } = useCampaignsData()
+  const { campaignsData, updateCampaignDataById } = useCampaignsData()
 
-  const { analyticsData, getAnalyticsKeyAndUpdate } = useCampaignAnalytics()
   const { id } = useParams()
-  const [
-    analyticsKey
-    // setAnalyticsKey
-  ] = useState('')
+
   if (!id) {
     return <div>Missing ID</div>
   }
 
-  const campaignDetails = useMemo(
-    () => campaignsData.get(id)?.campaign,
+  const campaignDeta = useMemo(
+    () => campaignsData.get(id),
 
     [id, campaignsData]
   )
 
-  // const campaignAggregates = useMemo(
-  //   () => eventAggregates.get(id),
-
-  //   [id, eventAggregates]
-  // )
-
-  const campaignAnalytics = useMemo(
-    () => analyticsData.get(analyticsKey),
-
-    [analyticsKey, analyticsData]
-  )
+  const campaign = useMemo(() => campaignDeta?.campaign, [campaignDeta])
 
   useEffect(() => {
     if (id) {
-      console.log({ id })
-      // const key = updateCampaignAnalyticsById(id)
       updateCampaignDataById(id)
-      // updateEventAggregates(id)
-      // setAnalyticsKey(key)
     }
-  }, [
-    id,
-    // updateCampaignAnalyticsById,
-    // updateEventAggregates,
-    updateCampaignDataById
-  ])
-
-  useEffect(() => {
-    console.log({ campaignDetails })
-    // console.log({ campaignAggregates })
-    console.log({ campaignAnalytics })
-
-    const checkDetsils = async () => {
-      if (campaignDetails) {
-        const key = await getAnalyticsKeyAndUpdate(campaignDetails, 'country')
-        console.log('key', key)
-      }
-    }
-
-    checkDetsils()
-  }, [campaignAnalytics, campaignDetails, getAnalyticsKeyAndUpdate])
+  }, [id, updateCampaignDataById])
 
   useEffect(() => {
     console.log({ campaignsData })
-    // console.log({ eventAggregates })
-    console.log({ analyticsData })
-  }, [
-    analyticsData,
-    campaignsData
-    //  eventAggregates
-  ])
+  }, [campaignsData])
 
   return (
     <>
       <GoBack title="Dashboard" />
-      {campaignDetails && (
+      {campaign && (
         <Container fluid className={classes.wrapper}>
           <Grid>
             <Grid.Col span={6}>
@@ -143,19 +91,14 @@ const CampaignDetails = () => {
                   lineHeight="sm"
                   textSize="sm"
                   title="Title"
-                  value={campaignDetails?.title}
+                  value={campaign?.title}
                 />
-                <CampaignDetailsRow
-                  lineHeight="sm"
-                  textSize="sm"
-                  title="Id"
-                  value={campaignDetails?.id}
-                />
+                <CampaignDetailsRow lineHeight="sm" textSize="sm" title="Id" value={campaign?.id} />
                 <CampaignDetailsRow
                   lineHeight="sm"
                   textSize="sm"
                   title="Status"
-                  value={<BadgeStatusCampaign type={campaignDetails?.status as number} />}
+                  value={<BadgeStatusCampaign type={campaign?.status as number} />}
                 />
                 {/* TODO: Add data for it */}
                 <CampaignDetailsRow
@@ -176,35 +119,29 @@ const CampaignDetails = () => {
                 <CampaignDetailsRow
                   lineHeight="sm"
                   title="Created"
-                  value={
-                    campaignDetails && formatDateTime(new Date(Number(campaignDetails.created)))
-                  }
+                  value={formatDateTime(new Date(Number(campaign.created)))}
                 />
                 <CampaignDetailsRow
                   lineHeight="sm"
                   textSize="sm"
                   title="Starts"
-                  value={
-                    campaignDetails && formatDateTime(new Date(Number(campaignDetails.activeFrom)))
-                  }
+                  value={formatDateTime(new Date(Number(campaign.activeFrom)))}
                 />
                 <CampaignDetailsRow
                   lineHeight="sm"
                   textSize="sm"
                   title="Ends"
-                  value={
-                    campaignDetails && formatDateTime(new Date(Number(campaignDetails.activeTo)))
-                  }
+                  value={formatDateTime(new Date(Number(campaign.activeTo)))}
                 />
                 <CampaignDetailsRow
                   lineHeight="sm"
                   title="CPC min"
-                  value={campaignDetails?.pricingBounds.CLICK?.min}
+                  value={campaign.pricingBounds.CLICK?.min}
                 />
                 <CampaignDetailsRow
                   lineHeight="sm"
                   title="CPC max"
-                  value={campaignDetails?.pricingBounds.CLICK?.max}
+                  value={campaign.pricingBounds.CLICK?.max}
                 />
                 {/* TODO: Add data for it */}
                 <CampaignDetailsRow
@@ -212,9 +149,7 @@ const CampaignDetails = () => {
                   textSize="sm"
                   title="Limit average daily spending"
                   value={
-                    campaignDetails?.targetingInput.inputs.advanced.limitDailyAverageSpending
-                      ? 'Yes'
-                      : 'No'
+                    campaign.targetingInput.inputs.advanced.limitDailyAverageSpending ? 'Yes' : 'No'
                   }
                 />
                 {/* TODO: Add data for it */}
@@ -223,9 +158,7 @@ const CampaignDetails = () => {
                   textSize="sm"
                   title="Disable frequency capping"
                   value={
-                    campaignDetails?.targetingInput.inputs.advanced.disableFrequencyCapping
-                      ? 'Yes'
-                      : 'No'
+                    campaign.targetingInput.inputs.advanced.disableFrequencyCapping ? 'Yes' : 'No'
                   }
                   noBorder
                 />
@@ -241,14 +174,14 @@ const CampaignDetails = () => {
                     <CatsLocsFormatted
                       title="Selected Categories"
                       arr={formatCatsAndLocsData(
-                        campaignDetails.targetingInput.inputs.categories,
+                        campaign.targetingInput.inputs.categories,
                         CATEGORIES
                       )}
                     />
                     <CatsLocsFormatted
                       title="Selected Countries"
                       arr={formatCatsAndLocsData(
-                        campaignDetails.targetingInput.inputs.location,
+                        campaign.targetingInput.inputs.location,
                         COUNTRIES
                       )}
                     />
@@ -265,20 +198,19 @@ const CampaignDetails = () => {
               <Grid>
                 <Grid.Col span={12}>
                   <div className={cx(classes.innerWrapper, classes.scrollableContainer)}>
-                    {campaignDetails &&
-                      campaignDetails.adUnits.map((item: AdUnit, index) => {
-                        const isLast = index === campaignDetails.adUnits.length - 1
-                        return (
-                          <CampaignDetailsRow
-                            key={item.id}
-                            lineHeight="sm"
-                            textSize="sm"
-                            title={`${item.banner?.format.w}x${item.banner?.format.h}`}
-                            value={<MediaBanner adUnit={item} />}
-                            noBorder={isLast}
-                          />
-                        )
-                      })}
+                    {campaign.adUnits.map((item: AdUnit, index) => {
+                      const isLast = index === campaign.adUnits.length - 1
+                      return (
+                        <CampaignDetailsRow
+                          key={item.id}
+                          lineHeight="sm"
+                          textSize="sm"
+                          title={`${item.banner?.format.w}x${item.banner?.format.h}`}
+                          value={<MediaBanner adUnit={item} />}
+                          noBorder={isLast}
+                        />
+                      )
+                    })}
                   </div>
                 </Grid.Col>
               </Grid>
