@@ -53,7 +53,7 @@ function SideNav() {
   const {
     isAdmin,
     adexAccount,
-    adexAccount: { balance },
+    adexAccount: { availableBalance },
     updateAdexAccount
   } = useAccount()
   const { adexServicesRequest } = useAdExApi()
@@ -73,9 +73,15 @@ function SideNav() {
           route: '/dsp/accounts/my-account',
           method: 'GET'
         })
-        console.log('getBalance', getBalance)
+
         if (getBalance) {
           updateAdexAccount({ ...adexAccount, ...getBalance })
+        } else {
+          showNotification(
+            'error',
+            'Updating account balance failed',
+            'Updating account balance failed'
+          )
         }
       } catch (err: any) {
         console.error('Updating account balance failed:', err)
@@ -88,8 +94,8 @@ function SideNav() {
   }, [])
 
   const hasAvailableBalance = useMemo(
-    () => balance?.availableBalance && balance?.availableBalance > 0,
-    [balance?.availableBalance]
+    () => availableBalance && availableBalance > 0,
+    [availableBalance]
   )
 
   return (
