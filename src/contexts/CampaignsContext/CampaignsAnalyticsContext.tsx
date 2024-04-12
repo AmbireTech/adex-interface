@@ -11,12 +11,11 @@ import {
 import { useAdExApi } from 'hooks/useAdexServices'
 import useAccount from 'hooks/useAccount'
 import useCustomNotifications from 'hooks/useCustomNotifications'
-import { AnalyticsDataQuery, AnalyticsData, AnalyticsDataRes } from 'types/campaignsData'
+import { AnalyticsDataQuery, AnalyticsData, AnalyticsDataRes, AnalyticsType } from 'types'
 import { timeout } from 'utils'
 
 const keySeparator = '👩🏼‍🏫'
 
-type AnalyticsType = 'timeframe' | 'hostname' | 'country' | ''
 type DataStatus = 'loading' | 'processed'
 
 const min = 60 * 1000

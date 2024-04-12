@@ -88,3 +88,5 @@ export type EvAggrData = {
   impressions: number
   payouts: BigInt
 }
+
+export type AnalyticsType = 'timeframe' | 'hostname' | 'country' | 'adUnit'
