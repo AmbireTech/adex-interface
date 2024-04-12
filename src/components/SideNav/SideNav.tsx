@@ -15,8 +15,11 @@ import DepositIcon from 'resources/icons/Deposit'
 import BillingIcon from 'resources/icons/Billing'
 import HelpIcon from 'resources/icons/Help'
 import AdExLogo from 'resources/logos/AdExLogo'
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import { appVersion } from 'helpers'
+import { useAdExApi } from 'hooks/useAdexServices'
+import { Account } from 'types'
+import useCustomNotifications from 'hooks/useCustomNotifications'
 import NavLink from './NavLink'
 import Balance from './Balance'
 import CreateCampaignBtn from './CreateCampaignBtn'
@@ -47,14 +50,47 @@ const useStyles = createStyles((theme) => ({
 
 function SideNav() {
   // const { connectWallet, disconnectWallet, adexAccount } = useAccount()
-  const { isAdmin } = useAccount()
-  console.log(isAdmin)
+  const {
+    isAdmin,
+    adexAccount,
+    adexAccount: { balance },
+    updateAdexAccount
+  } = useAccount()
+  const { adexServicesRequest } = useAdExApi()
+  const { showNotification } = useCustomNotifications()
 
   const location = useLocation()
   const match = useMatch(location.pathname)
   const year = useMemo(() => new Date().getFullYear(), [])
   const theme = useMantineTheme()
   const { classes } = useStyles()
+
+  useEffect(() => {
+    console.count('updating balance')
+    const updateBalance = async () => {
+      try {
+        const getBalance = await adexServicesRequest<Account>('backend', {
+          route: '/dsp/accounts/my-account',
+          method: 'GET'
+        })
+        console.log('getBalance', getBalance)
+        if (getBalance) {
+          updateAdexAccount({ ...adexAccount, ...getBalance })
+        }
+      } catch (err: any) {
+        console.error('Updating account balance failed:', err)
+        showNotification('error', err, 'Updating account balance failed')
+      }
+    }
+
+    updateBalance()
+    // eslint-disable-next-line
+  }, [])
+
+  const hasAvailableBalance = useMemo(
+    () => balance?.availableBalance && balance?.availableBalance > 0,
+    [balance?.availableBalance]
+  )
 
   return (
     <>
@@ -73,7 +109,7 @@ function SideNav() {
         <Balance />
       </Navbar.Section>
       <Navbar.Section className={classes.newCampaign}>
-        <CreateCampaignBtn hasPopover={Boolean(IS_MANUAL_DEPOSITING)} />
+        <CreateCampaignBtn hasPopover={Boolean(IS_MANUAL_DEPOSITING) && !hasAvailableBalance} />
       </Navbar.Section>
       <Navbar.Section mx="-xs" grow component={ScrollArea}>
         <Box>
@@ -88,7 +124,7 @@ function SideNav() {
             icon={<DepositIcon />}
             label="Top Up Account"
             active={useResolvedPath('deposit').pathname === match?.pathname}
-            hasPopover={Boolean(IS_MANUAL_DEPOSITING)}
+            hasPopover={Boolean(IS_MANUAL_DEPOSITING) && !hasAvailableBalance}
             popoverContent={
               <Text size="sm">
                 Contact us on <a href="mailto: dsp@adex.network"> dsp@adex.network</a> to &quot;add

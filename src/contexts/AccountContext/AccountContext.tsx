@@ -1,6 +1,6 @@
 import { useLocalStorage } from '@mantine/hooks'
 import { createContext, FC, PropsWithChildren, useMemo, useCallback, useEffect } from 'react'
-import { IAdExAccount } from 'types'
+import { Account, IAdExAccount } from 'types'
 import {
   getMessageToSign,
   isAdminToken,
@@ -18,7 +18,7 @@ const ambireLoginSDK = new AmbireLoginSDK({
 })
 
 interface IAccountContext {
-  adexAccount: IAdExAccount & { loaded: boolean; initialLoad: boolean }
+  adexAccount: IAdExAccount & Account & { loaded: boolean; initialLoad: boolean }
   authenticated: boolean
   ambireSDK: AmbireLoginSDK
   isAdmin: boolean
@@ -40,7 +40,31 @@ const defaultValue: IAccountContext['adexAccount'] = {
   authMsgResp: null,
   loaded: false,
   // This ensures there is some obj in the ls
-  initialLoad: false
+  initialLoad: false,
+  id: '',
+  name: '',
+  active: false,
+  availableBalance: BigInt(0),
+  balanceToken: {
+    name: '',
+    address: '',
+    decimals: 0,
+    chainId: 0
+  },
+  fundsDeposited: {
+    total: BigInt(0),
+    deposits: []
+  },
+  fundsOnCampaigns: {
+    total: BigInt(0),
+    perCampaign: []
+  },
+  refundsFromCampaigns: {
+    total: BigInt(0),
+    perCampaign: []
+  },
+  created: new Date(),
+  updated: new Date()
 }
 
 function serializeJSON<T>(value: T) {

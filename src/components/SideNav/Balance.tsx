@@ -1,8 +1,9 @@
 import { Flex, createStyles, rem, Image, Text } from '@mantine/core'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 
 import DownArrowIcon from 'resources/icons/DownArrow'
 import { formatCurrency } from 'helpers'
+import useAccount from 'hooks/useAccount'
 import { accountBalance } from './mockedData'
 
 const DIGITS_AFTER_FLOATING_POINT: number = 2
@@ -20,14 +21,18 @@ const useStyles = createStyles((theme) => ({
 }))
 
 const FormattedBalance = ({ balance }: { balance: number }) => {
-  const formattedBalance = formatCurrency(balance, DIGITS_AFTER_FLOATING_POINT)
-
-  const integerPart = formattedBalance.substring(
-    0,
-    formattedBalance.length - DIGITS_AFTER_FLOATING_POINT
+  const formattedBalance = useMemo(
+    () => formatCurrency(balance, DIGITS_AFTER_FLOATING_POINT),
+    [balance]
   )
-  const decimalPart = formattedBalance.substring(
-    formattedBalance.length - DIGITS_AFTER_FLOATING_POINT
+
+  const integerPart = useMemo(
+    () => formattedBalance.substring(0, formattedBalance.length - DIGITS_AFTER_FLOATING_POINT),
+    [formattedBalance]
+  )
+  const decimalPart = useMemo(
+    () => formattedBalance.substring(formattedBalance.length - DIGITS_AFTER_FLOATING_POINT),
+    [formattedBalance]
   )
 
   return (
@@ -43,15 +48,18 @@ const FormattedBalance = ({ balance }: { balance: number }) => {
 }
 
 const Balance = () => {
+  const {
+    adexAccount: { availableBalance }
+  } = useAccount()
   const { classes, cx } = useStyles()
-  const [opened, setOpened] = useState<boolean>(false)
+  const [opened, setOpened] = useState(false)
   return (
     <>
       <Text size="sm" color="mainText" weight="bold">
         Balance
       </Text>
       <Flex direction="row" align="center" justify="space-between">
-        <FormattedBalance balance={accountBalance.totalInUSD} />
+        <FormattedBalance balance={Number(availableBalance) || 0} />
         {!!accountBalance.balanceByTokens.length && (
           <DownArrowIcon
             size={rem(10)}
