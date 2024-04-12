@@ -60,7 +60,7 @@ const CampaignDetails = () => {
     updateCampaignDataById
   } = useCampaignsData()
 
-  const { analyticsData } = useCampaignAnalytics()
+  const { analyticsData, getAnalyticsKeyAndUpdate } = useCampaignAnalytics()
   const { id } = useParams()
   const [
     analyticsKey
@@ -107,11 +107,16 @@ const CampaignDetails = () => {
     console.log({ campaignDetails })
     // console.log({ campaignAggregates })
     console.log({ campaignAnalytics })
-  }, [
-    // campaignAggregates,
-    campaignAnalytics,
-    campaignDetails
-  ])
+
+    const checkDetsils = async () => {
+      if (campaignDetails) {
+        const key = await getAnalyticsKeyAndUpdate(campaignDetails, 'country')
+        console.log('key', key)
+      }
+    }
+
+    checkDetsils()
+  }, [campaignAnalytics, campaignDetails, getAnalyticsKeyAndUpdate])
 
   useEffect(() => {
     console.log({ campaignsData })

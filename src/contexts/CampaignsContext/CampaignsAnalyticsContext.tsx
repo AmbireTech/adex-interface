@@ -12,11 +12,19 @@ import { useAdExApi } from 'hooks/useAdexServices'
 import useAccount from 'hooks/useAccount'
 import useCustomNotifications from 'hooks/useCustomNotifications'
 import { AnalyticsDataQuery, AnalyticsData, AnalyticsDataRes } from 'types/campaignsData'
+import { timeout } from 'utils'
 
 const keySeparator = '👩🏼‍🏫'
 
 type AnalyticsType = 'timeframe' | 'hostname' | 'country'
 type DataStatus = 'loading' | 'processed'
+
+const min = 60 * 1000
+const defaultRefreshQuery = 60 * min
+
+function getDefaultEpoch(timestamp: number) {
+  return Math.floor(timestamp / defaultRefreshQuery) * defaultRefreshQuery
+}
 
 const getAnalyticsKeyFromQuery = (queryParams: AnalyticsDataQuery): string => {
   // TODO: hex or hash
@@ -24,11 +32,13 @@ const getAnalyticsKeyFromQuery = (queryParams: AnalyticsDataQuery): string => {
     .sort()
     .reduce((result: string, key: string) => {
       if (queryParams[key as keyof AnalyticsDataQuery] !== undefined) {
-        return `${result}_${queryParams[key as keyof AnalyticsDataQuery]?.toString()}`
+        const val = queryParams[key as keyof AnalyticsDataQuery]
+        return `${result}_${val instanceof Date ? getDefaultEpoch(val.getTime()) : val?.toString()}`
       }
 
       return result
     }, '')
+    .toString()
   return mapKey
 }
 
@@ -38,7 +48,7 @@ interface ICampaignsAnalyticsContext {
   // TODO: all campaigns event aggregations by account
   updateCampaignAnalyticsByQuery: (queryParams: AnalyticsDataQuery) => string
   getAnalyticsKeyFromQuery: (queryParams: AnalyticsDataQuery) => string
-  getAnalyticsKeyAndUpdate: (campaign: Campaign, analyticsType: AnalyticsType) => string
+  getAnalyticsKeyAndUpdate: (campaign: Campaign, analyticsType: AnalyticsType) => Promise<string>
   initialAnalyticsLoading: boolean
   mappedAnalytics: Map<string, any>
 }
@@ -122,7 +132,7 @@ const CampaignsAnalyticsProvider: FC<PropsWithChildren> = ({ children }) => {
   )
 
   const getAnalyticsKeyAndUpdate = useCallback(
-    (campaign: Campaign, analyticsType: AnalyticsType): string => {
+    async (campaign: Campaign, analyticsType: AnalyticsType): Promise<string> => {
       console.log({ campaign })
 
       if (!campaign.id || !analyticsType) {
@@ -150,10 +160,14 @@ const CampaignsAnalyticsProvider: FC<PropsWithChildren> = ({ children }) => {
 
       const keys: string[] = []
 
-      queries.forEach((q) => {
+      // NOTE: ust in case to call the queries in some intervals
+      // eslint-disable-next-line no-restricted-syntax
+      for (const q of queries) {
+        // eslint-disable-next-line no-await-in-loop
+        await timeout(69)
         const k = updateCampaignAnalyticsByQuery(q)
         keys.push(k)
-      })
+      }
 
       const key = keys.join(keySeparator)
 
