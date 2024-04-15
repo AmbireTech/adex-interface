@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState, useMemo } from 'react'
 import { Container, Flex, Tabs } from '@mantine/core'
 import { useParams } from 'react-router-dom'
-import { AnalyticsType, TabType, ICampaignData } from 'types'
+import { AnalyticsType, TabType, BaseAnalyticsData, AnalyticsPeriod } from 'types'
 import GoBack from 'components/common/GoBack/GoBack'
 import DownloadCSV from 'components/common/DownloadCSV'
 import useCampaignAnalytics from 'hooks/useCampaignAnalytics'
@@ -10,7 +10,7 @@ import Placements from './Placements'
 // import { dashboardTableElements } from '../Dashboard/mockData'
 import Creatives from './Creatives'
 import Regions from './Regions'
-import TimeFrame from './TimeFrame'
+import { TimeFrame } from './TimeFrame'
 import { generateCVSData } from './CvsDownloadConfigurations'
 import SeeOnMapBtn from './SeeOnMapBtn'
 
@@ -39,7 +39,13 @@ const CampaignAnalytics = () => {
   const [isMapVisible, setIsMapVisible] = useState<boolean>(false)
   // const campaignDetails = dashboardTableElements.find((item) => item.id === parseInt(id, 10))
   const [csvData, setCsvData] = useState<any | undefined>()
-  const [analyticsKey, setAnalyticsKey] = useState('')
+  const [analyticsKey, setAnalyticsKey] = useState<
+    | {
+        key: string
+        period: AnalyticsPeriod
+      }
+    | undefined
+  >()
 
   const { analyticsData, getAnalyticsKeyAndUpdate, mappedAnalytics } = useCampaignAnalytics()
   const { campaignsData, updateCampaignDataById } = useCampaignsData()
@@ -47,12 +53,12 @@ const CampaignAnalytics = () => {
   const campaign = useMemo(() => campaignsData.get(id)?.campaign, [id, campaignsData])
 
   const campaignAnalytics = useMemo(
-    () => analyticsData.get(analyticsKey),
+    () => analyticsData.get(analyticsKey?.key || ''),
     [analyticsData, analyticsKey]
   )
 
-  const campaignMappedAnalytics: ICampaignData | undefined = useMemo(
-    () => mappedAnalytics.get(analyticsKey) as ICampaignData,
+  const campaignMappedAnalytics: BaseAnalyticsData[] | undefined = useMemo(
+    () => mappedAnalytics.get(analyticsKey?.key || ''),
     [analyticsKey, mappedAnalytics]
   )
 
@@ -85,12 +91,7 @@ const CampaignAnalytics = () => {
       setIsMapBtnShown(activeTab === 'country')
 
       // TODO: fix csf Data types an add the type to useState
-      setCsvData(
-        generateCVSData(
-          analyticTypeToHeader(activeTab),
-          campaignMappedAnalytics[analyticTypeToHeader(activeTab)]
-        )
-      )
+      setCsvData(generateCVSData(analyticTypeToHeader(activeTab), campaignMappedAnalytics))
     }
   }, [activeTab, campaignMappedAnalytics])
 
@@ -127,24 +128,22 @@ const CampaignAnalytics = () => {
             )}
           </Flex>
         </Flex>
+        {/** TODO: show loading, no data etc when no campaignMappedAnalytics/ analyticsKey */}
         <Tabs.Panel value="timeframe" pt="xs">
-          <TimeFrame
-            timeFrames={campaignMappedAnalytics?.timeframe}
-            period={campaignMappedAnalytics?.period}
-          />
+          <TimeFrame timeFrames={campaignMappedAnalytics} period={analyticsKey?.period} />
         </Tabs.Panel>
         <Tabs.Panel value="hostname" pt="xs">
-          <Placements placements={campaignMappedAnalytics?.placements} />
+          <Placements placements={campaignMappedAnalytics} />
         </Tabs.Panel>
         <Tabs.Panel value="countries" pt="xs">
           <Regions
-            regions={campaignMappedAnalytics?.regions}
+            regions={campaignMappedAnalytics}
             isMapVisible={isMapVisible}
             onClose={() => setIsMapVisible(false)}
           />
         </Tabs.Panel>
         <Tabs.Panel value="adUnits" pt="xs">
-          <Creatives creatives={campaignMappedAnalytics?.creatives} />
+          <Creatives creatives={campaignMappedAnalytics} />
         </Tabs.Panel>
       </Tabs>
     </Container>
