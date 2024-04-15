@@ -16,7 +16,8 @@ import {
   AnalyticsData,
   AnalyticsDataRes,
   AnalyticsType,
-  BaseAnalyticsData
+  BaseAnalyticsData,
+  AnalyticsPeriod
 } from 'types'
 import { timeout } from 'utils'
 
@@ -112,7 +113,10 @@ interface ICampaignsAnalyticsContext {
   // TODO: all campaigns event aggregations by account
   updateCampaignAnalyticsByQuery: (queryParams: AnalyticsDataQuery) => string
   getAnalyticsKeyFromQuery: (queryParams: AnalyticsDataQuery) => string
-  getAnalyticsKeyAndUpdate: (campaign: Campaign, analyticsType: AnalyticsType) => Promise<string>
+  getAnalyticsKeyAndUpdate: (
+    campaign: Campaign,
+    analyticsType: AnalyticsType
+  ) => Promise<{ key: string; period: AnalyticsPeriod } | undefined>
   initialAnalyticsLoading: boolean
   mappedAnalytics: Map<string, BaseAnalyticsData[]>
 }
@@ -196,17 +200,24 @@ const CampaignsAnalyticsProvider: FC<PropsWithChildren> = ({ children }) => {
   )
 
   const getAnalyticsKeyAndUpdate = useCallback(
-    async (campaign: Campaign, analyticsType: AnalyticsType): Promise<string> => {
+    async (
+      campaign: Campaign,
+      analyticsType: AnalyticsType
+    ): Promise<{ key: string; period: AnalyticsPeriod } | undefined> => {
       console.log({ campaign })
 
       if (!campaign.id || !analyticsType) {
-        return ''
+        return
+      }
+
+      const period = {
+        start: new Date(Number(campaign.activeFrom)),
+        end: new Date(Date.now())
       }
 
       const baseQuery: AnalyticsDataQuery = {
         campaignId: campaign.id,
-        start: new Date(Number(campaign.activeFrom)),
-        end: new Date(Date.now()),
+        ...period,
         metric: 'paid',
         eventType: 'CLICK',
         limit: 10000000,
@@ -241,7 +252,7 @@ const CampaignsAnalyticsProvider: FC<PropsWithChildren> = ({ children }) => {
         return next
       })
 
-      return key
+      return { key, period }
     },
     [updateCampaignAnalyticsByQuery]
   )
