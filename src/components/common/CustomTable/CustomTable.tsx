@@ -3,7 +3,7 @@ import { useMediaQuery } from '@mantine/hooks'
 import VisibilityIcon from 'resources/icons/Visibility'
 import { ICustomTableProps } from 'types'
 import usePagination from 'hooks/usePagination'
-import { useMemo } from 'react'
+import { Fragment, useMemo } from 'react'
 import AnalyticsIcon from 'resources/icons/Analytics'
 import DuplicateIcon from 'resources/icons/Duplicate'
 import DeleteIcon from 'resources/icons/Delete'
@@ -184,7 +184,10 @@ const CustomTable = ({
     <Flex h="100%" w="100%" justify="space-between" direction="column" align="center">
       {isMobile ? (
         <Grid mt="xs" className={classes.mobileTableWrapper}>
-          {rows.map((row) => row)}
+          {rows.map((row, idx) => (
+            // eslint-disable-next-line react/no-array-index-key
+            <Fragment key={idx}>{row}</Fragment>
+          ))}
         </Grid>
       ) : (
         <div className={classes.tableWrapper}>
