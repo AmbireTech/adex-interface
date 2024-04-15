@@ -6,9 +6,9 @@ export type CampaignData = {
   impressions: number
   clicks: number
   // clicks / impressions * 100
-  ctr: number | string
+  ctr?: number | string
   // paid / impressions * 1000
-  avgCpm: number | string
+  avgCpm?: number | string
   paid: number
   // TODO: analyticsData type
   analyticsData: any
@@ -32,17 +32,21 @@ export type AnalyticsDataKeys = {
   osName?: string
 }
 
-export type AnalyticsDataQuery = AnalyticsDataKeys & {
-  eventType: keyof typeof EventType
-  metric: Metric
-  timeframe: Timeframe
+export type AnalyticsPeriod = {
   start: Date
   end: Date
-  limit: number
-  segmentBy?: keyof AnalyticsDataKeys
-  // TODO: validation and test timezones - need tests on validator ad well
-  timezone: 'UTC'
 }
+
+export type AnalyticsDataQuery = AnalyticsDataKeys &
+  AnalyticsPeriod & {
+    eventType: keyof typeof EventType
+    metric: Metric
+    timeframe: Timeframe
+    limit: number
+    segmentBy?: keyof AnalyticsDataKeys
+    // TODO: validation and test timezones - need tests on validator ad well
+    timezone: 'UTC'
+  }
 
 export type AnalyticsData = {
   value: string | number
