@@ -4,8 +4,7 @@ import DownArrowIcon from 'resources/icons/DownArrow'
 import { formatCurrency } from 'helpers'
 import { formatUnits } from 'helpers/balances'
 import useAccount from 'hooks/useAccount'
-import { getTokenIcon } from 'lib/Icons'
-import { accountBalance } from './mockedData'
+import { getTokenIcon, networks } from 'lib/Icons'
 
 const DIGITS_AFTER_FLOATING_POINT: number = 2
 
@@ -53,7 +52,11 @@ const FormattedBalance = ({ balance, iconUrl }: { balance: number; iconUrl: stri
 
 const Balance = () => {
   const {
-    adexAccount: { availableBalance, balanceToken }
+    adexAccount: {
+      availableBalance,
+      balanceToken,
+      fundsDeposited: { deposits }
+    }
   } = useAccount()
 
   const { classes, cx } = useStyles()
@@ -75,8 +78,8 @@ const Balance = () => {
       <Flex direction="row" align="center" justify="space-between">
         <FormattedBalance balance={formattedToken} iconUrl={iconUrl} />
         {/* TODO: temporary disabled */}
-        {/* {!!accountBalance.balanceByTokens.length && ( */}
-        {false && (
+        {!!deposits.length && (
+          // {false && (
           <DownArrowIcon
             size={rem(10)}
             className={cx(classes.pointer, { [classes.rotateUpsideDown]: opened })}
@@ -87,15 +90,25 @@ const Balance = () => {
 
       {opened && (
         <Flex direction="column">
-          {accountBalance.balanceByTokens.map((item) => (
-            <Flex justify="space-between" key={item.id} className={classes.secondaryColor}>
+          {deposits.map((item) => (
+            <Flex
+              justify="space-between"
+              key={item.created.toString()}
+              className={classes.secondaryColor}
+            >
               <Flex align="center">
-                <Image maw={15} mx="auto" radius="md" src={item.icon} alt={item.symbol} />
-                <Text size="xs">
-                  {formatCurrency(item.amount, DIGITS_AFTER_FLOATING_POINT)} {item.symbol}
+                <Image
+                  maw={15}
+                  mx="auto"
+                  radius="md"
+                  src={getTokenIcon(item.token.chainId, item.token.address)}
+                  alt={item.token.name}
+                />
+                <Text size="xs" ml="xs">
+                  {Number(formatUnits(item.amount, item.token.decimals))} {item.token.name}
                 </Text>
               </Flex>
-              <Text size="xs">on {item.network}</Text>
+              <Text size="xs">on {networks[item.token.chainId]}</Text>
             </Flex>
           ))}
         </Flex>

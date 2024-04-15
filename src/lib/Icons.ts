@@ -6,7 +6,7 @@ type Networks = {
   [x: number]: string
 }
 
-const networks: Networks = {
+export const networks: Networks = {
   1: 'ethereum',
   137: 'polygon'
 }
