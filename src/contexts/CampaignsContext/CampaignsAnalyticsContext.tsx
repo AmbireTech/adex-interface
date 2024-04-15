@@ -11,12 +11,23 @@ import {
 import { useAdExApi } from 'hooks/useAdexServices'
 import useAccount from 'hooks/useAccount'
 import useCustomNotifications from 'hooks/useCustomNotifications'
-import { AnalyticsDataQuery, AnalyticsData, AnalyticsDataRes, AnalyticsType } from 'types'
+import {
+  AnalyticsDataQuery,
+  AnalyticsData,
+  AnalyticsDataRes,
+  AnalyticsType,
+  BaseAnalyticsData
+} from 'types'
 import { timeout } from 'utils'
 
 const keySeparator = '👩🏼‍🏫'
 
 type DataStatus = 'loading' | 'processed'
+
+type QueryStatusAndType = {
+  dataStatus: DataStatus
+  analyticsType: AnalyticsType
+}
 
 const min = 60 * 1000
 const defaultRefreshQuery = 60 * min
@@ -41,6 +52,60 @@ const getAnalyticsKeyFromQuery = (queryParams: AnalyticsDataQuery): string => {
   return mapKey
 }
 
+const analyticsDataToMappedAnalytics = (
+  analyticsResp: AnalyticsDataRes[],
+  analyticsType: AnalyticsType
+): BaseAnalyticsData[] | undefined => {
+  const impCounts = analyticsResp[0].aggr
+  const impPaid = analyticsResp[1].aggr
+  const clickCounts = analyticsResp[2].aggr
+  const clickPaid = analyticsResp[3].aggr
+
+  const mapped = impCounts.reduce((aggr, el) => {
+    const next = new Map(aggr)
+
+    const segment = (el.segment || el.time).toString()
+    const nexSegment = aggr.get(segment) || {
+      segment,
+      clicks: 0,
+      impressions: 0,
+      paid: 0
+    }
+
+    // TODO: optimize the mapping
+    nexSegment.impressions += Number(el.value)
+    nexSegment.clicks += Number(
+      clickCounts.find(
+        (x) => (x.segment && el.segment && x.segment === el.segment) || x.time === el.time
+      )?.value || 0
+    )
+    // TODO: calc here BIGINT to num
+    nexSegment.paid +=
+      Number(
+        impPaid.find(
+          (x) => (x.segment && el.segment && x.segment === el.segment) || x.time === el.time
+        )?.value || 0
+      ) +
+      Number(
+        clickPaid.find(
+          (x) => (x.segment && el.segment && x.segment === el.segment) || x.time === el.time
+        )?.value || 0
+      )
+
+    return next
+  }, new Map<string, BaseAnalyticsData>())
+
+  const resMap = Array.from(mapped, ([segment, value]) => ({
+    ...value,
+    segment,
+    analyticsType,
+    ctr: value.clicks && value.impressions ? (value.clicks / value.impressions) * 100 : 0,
+    avgCpm: value.paid && value.impressions ? (value.paid / value.impressions) * 1000 : 0
+  }))
+
+  return resMap
+}
+
 interface ICampaignsAnalyticsContext {
   // analyticsData: AnalyticsData[]
   analyticsData: Map<string, AnalyticsData[]>
@@ -49,7 +114,7 @@ interface ICampaignsAnalyticsContext {
   getAnalyticsKeyFromQuery: (queryParams: AnalyticsDataQuery) => string
   getAnalyticsKeyAndUpdate: (campaign: Campaign, analyticsType: AnalyticsType) => Promise<string>
   initialAnalyticsLoading: boolean
-  mappedAnalytics: Map<string, any>
+  mappedAnalytics: Map<string, BaseAnalyticsData[]>
 }
 
 const CampaignsAnalyticsContext = createContext<ICampaignsAnalyticsContext | null>(null)
@@ -62,9 +127,9 @@ const CampaignsAnalyticsProvider: FC<PropsWithChildren> = ({ children }) => {
   const [initialAnalyticsLoading, setInitialAnalyticsLoading] = useState(true)
   const [mappedAnalytics, setMappedAnalytics] = useState<
     ICampaignsAnalyticsContext['mappedAnalytics']
-  >(new Map<string, any>())
-  const [dataToMapStatus, setDataToMapStatus] = useState<Map<string, DataStatus>>(
-    new Map<string, DataStatus>()
+  >(new Map<string, BaseAnalyticsData[]>())
+  const [dataToMapStatus, setDataToMapStatus] = useState<Map<string, QueryStatusAndType>>(
+    new Map<string, QueryStatusAndType>()
   )
 
   const [analyticsData, setAnalyticsData] = useState<ICampaignsAnalyticsContext['analyticsData']>(
@@ -172,7 +237,7 @@ const CampaignsAnalyticsProvider: FC<PropsWithChildren> = ({ children }) => {
 
       setDataToMapStatus((prev) => {
         const next = new Map(prev)
-        next.set(key, 'loading')
+        next.set(key, { dataStatus: 'loading', analyticsType })
         return next
       })
 
@@ -197,20 +262,28 @@ const CampaignsAnalyticsProvider: FC<PropsWithChildren> = ({ children }) => {
   useEffect(() => {
     setDataToMapStatus((prev) => {
       let update = false
-      const nextMappedData = new Map<string, any>()
+      const nextMappedData = new Map<string, BaseAnalyticsData[]>()
       const nextMapStatuses = new Map(prev)
 
       prev.forEach((status, statusKey) => {
         const analyticsKeys = statusKey.split(keySeparator)
 
-        if (status === 'loading') {
+        if (status.dataStatus === 'loading') {
           const isLoaded = analyticsKeys.every((aKey) => !!analyticsData.get(aKey))
           if (isLoaded) {
-            // TODO: map data
-            nextMappedData.set(statusKey, { processed: true })
+            const dataRes = analyticsKeys.map(
+              (key) => analyticsData.get(key) as unknown as AnalyticsDataRes
+            )
 
-            nextMapStatuses.set(statusKey, 'processed')
-            update = true
+            const mapped = analyticsDataToMappedAnalytics(dataRes, status.analyticsType)
+
+            if (mapped) {
+              // TODO: map data
+              nextMappedData.set(statusKey, mapped)
+
+              nextMapStatuses.set(statusKey, { ...status, dataStatus: 'processed' })
+              update = true
+            }
           }
         }
       })
