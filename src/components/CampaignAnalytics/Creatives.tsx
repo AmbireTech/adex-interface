@@ -4,7 +4,7 @@ import UrlIcon from 'resources/icons/Url'
 import { CreativePreviewModal } from 'components/common/Modals'
 import { useCallback, useState } from 'react'
 import { useDisclosure } from '@mantine/hooks'
-import { ICreative } from 'types'
+import { BaseAnalyticsData } from 'types'
 import { formatCurrency } from 'helpers'
 
 const useStyles = createStyles((theme) => ({
@@ -16,7 +16,7 @@ const useStyles = createStyles((theme) => ({
   }
 }))
 
-const Creatives = ({ creatives }: { creatives: ICreative[] | undefined }) => {
+const Creatives = ({ creatives }: { creatives: BaseAnalyticsData[] | undefined }) => {
   const [opened, { open, close }] = useDisclosure(false)
   const { classes } = useStyles()
   if (!creatives?.length) {
@@ -40,16 +40,16 @@ const Creatives = ({ creatives }: { creatives: ICreative[] | undefined }) => {
           <UrlIcon size="25px" className={classes.icon} />
           <Image
             ml="sm"
-            src={item.media}
+            src={item.mediaUri}
             maw="300px"
-            onClick={() => handleMediaClick(item.media)}
+            onClick={() => handleMediaClick(item.mediaUri || '')}
             className={classes.image}
           />
         </Flex>
       ),
       impressions: formatCurrency(item.impressions, 0),
       clicks: formatCurrency(item.clicks, 0),
-      ctrPercents: `${item.ctrPercents} %`
+      ctrPercents: `${item.ctr} %`
     }
   })
   return (
