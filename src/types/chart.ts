@@ -1,11 +1,11 @@
 import { AnimationTrajectory } from '@visx/react-spring/lib/types'
-import { BaseAnalyticsData } from 'types'
+import { FilteredAnalytics } from 'types'
 import { curveLinear, curveStep, curveCardinal } from '@visx/curve'
 import { GlyphProps, XYChartTheme } from '@visx/xychart'
 import { RenderTooltipGlyphProps } from '@visx/xychart/lib/components/Tooltip'
 import getAnimatedOrUnanimatedComponents from 'components/common/Chart/getAnimatedOrUnanimatedComponents'
 
-type Accessor = (d: BaseAnalyticsData) => number | string
+type Accessor = (d: FilteredAnalytics) => number | string
 
 interface Accessors {
   Impressions: Accessor
@@ -18,6 +18,8 @@ export type DataKey = keyof Accessors
 
 type SimpleScaleConfig = { type: 'band' | 'linear'; paddingInner?: number }
 
+export type MetricsToShow = { [k in keyof Omit<FilteredAnalytics, 'segment'>]: boolean }
+
 export type ProvidedProps = {
   accessors: {
     x: Accessors
@@ -26,16 +28,16 @@ export type ProvidedProps = {
   }
   animationTrajectory?: AnimationTrajectory
   annotationDataKey?: DataKey | null
-  annotationDatum?: BaseAnalyticsData
+  annotationDatum?: FilteredAnalytics
   annotationLabelPosition?: { dx: number; dy: number }
   annotationType?: 'line' | 'circle'
-  colorAccessorFactory: (key: DataKey) => (d: BaseAnalyticsData) => string | null
+  colorAccessorFactory: (key: DataKey) => (d: FilteredAnalytics) => string | null
   config: {
     x: SimpleScaleConfig
     y: SimpleScaleConfig
   }
   curve: typeof curveLinear | typeof curveCardinal | typeof curveStep
-  data: BaseAnalyticsData[]
+  data: FilteredAnalytics[]
   editAnnotationLabelPosition: boolean
   numTicks: number
   setAnnotationDataIndex?: (index: number) => void
@@ -46,9 +48,9 @@ export type ProvidedProps = {
   renderBarGroup: boolean
   renderBarSeries: boolean
   renderBarStack: boolean
-  renderGlyph: React.FC<GlyphProps<BaseAnalyticsData>>
+  renderGlyph: React.FC<GlyphProps<FilteredAnalytics>>
   enableTooltipGlyph: boolean
-  renderTooltipGlyph: React.FC<RenderTooltipGlyphProps<BaseAnalyticsData>>
+  renderTooltipGlyph: React.FC<RenderTooltipGlyphProps<FilteredAnalytics>>
   renderHorizontally: boolean
   renderLineSeries: boolean
   sharedTooltip: boolean
@@ -67,7 +69,7 @@ export type ProvidedProps = {
 
 export type ControlsProps = {
   children: (props: ProvidedProps) => React.ReactNode
-  data: BaseAnalyticsData[]
+  data: FilteredAnalytics[]
   // TODO add a type for it
-  metricsToShow: any
+  metricsToShow: MetricsToShow
 }
