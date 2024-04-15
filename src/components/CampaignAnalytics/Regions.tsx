@@ -1,4 +1,4 @@
-import { IRegion } from 'types'
+import { BaseAnalyticsData } from 'types'
 import { useMemo } from 'react'
 import { Grid, Modal } from '@mantine/core'
 import { useViewportSize } from '@mantine/hooks'
@@ -12,7 +12,7 @@ const Regions = ({
   isMapVisible,
   onClose
 }: {
-  regions: IRegion[] | undefined
+  regions: BaseAnalyticsData[] | undefined
   isMapVisible: boolean
   onClose: () => void
 }) => {
@@ -21,13 +21,14 @@ const Regions = ({
     return <div>No regions found</div>
   }
 
+  // TODO: add elements types, fix custom table data
   const elements = useMemo(
     () =>
       regions?.map((item) => ({
         ...item,
         impressions: item.impressions.toLocaleString(),
         clicks: item.clicks.toLocaleString(),
-        ctrPercents: `${item.ctrPercents} %`
+        ctr: `${item.ctr} %`
       })),
     [regions]
   )
