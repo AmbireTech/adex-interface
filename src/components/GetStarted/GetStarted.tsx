@@ -6,7 +6,7 @@ import AddSignerIcon from 'resources/icons/AddSigner'
 
 const GetStarted = () => {
   return (
-    <Container>
+    <Container m={0}>
       <Flex mih={50} gap="sm" justify="space-around" align="center" direction="column" wrap="wrap">
         <Grid grow justify="center" align="center">
           <Grid.Col>
