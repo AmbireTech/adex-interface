@@ -90,3 +90,21 @@ export type EvAggrData = {
 }
 
 export type AnalyticsType = 'timeframe' | 'hostname' | 'country' | 'adUnit'
+
+export type TabType = 'placements' | 'regions' | 'creatives' | 'timeframe'
+
+export type BaseAnalyticsData = {
+  impressions: number
+  clicks: number
+  // clicks / impressions * 100
+  ctr?: number | string
+  // paid / impressions * 1000
+  avgCpm?: number | string
+  paid: number
+  analyticsType: AnalyticsType
+  // time for timeframe analytics,  country name, host name, creative name
+  segment: string
+  // Only for creatives
+  // TODO: need additional map to get the url from adUnit id
+  mediaUri?: string
+}
