@@ -1,9 +1,9 @@
-import { ITimeFrameData } from 'types'
+import { BaseAnalyticsData } from 'types'
 
 export type XYChartProps = {
   width: number
   height: number
-  timeFrameData: ITimeFrameData[]
+  timeFrameData: BaseAnalyticsData[]
   // TODO: Add type for it
   metricsToShow: any
 }

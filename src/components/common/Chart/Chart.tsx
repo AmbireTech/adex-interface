@@ -2,7 +2,7 @@ import { useMantineTheme } from '@mantine/core'
 import { useCallback, useMemo, useState } from 'react'
 import { XYChartTheme, buildChartTheme } from '@visx/xychart'
 import { GlyphProps } from '@visx/xychart/lib/types'
-import { ControlsProps, DataKey, ITimeFrameData, ProvidedProps } from 'types'
+import { ControlsProps, DataKey, BaseAnalyticsData, ProvidedProps } from 'types'
 import { GlyphStar } from '@visx/glyph'
 import { curveLinear } from '@visx/curve'
 import { RenderTooltipGlyphProps } from '@visx/xychart/lib/components/Tooltip'
@@ -12,19 +12,19 @@ const dateScaleConfig = { type: 'band', paddingInner: 0.3 } as const
 const temperatureScaleConfig = { type: 'linear' } as const
 const numTicks = 4
 
-const getDate = (d: ITimeFrameData) => d.date
-const getImpressions = (d: ITimeFrameData) => Number(d.impressions)
-const getClickAndCRT = (d: ITimeFrameData) => Number(d.clickAndCRT)
-const getAverageCPM = (d: ITimeFrameData) => Number(d.averageCPM)
-const getSpent = (d: ITimeFrameData) => Number(d.spent)
+const getDate = (d: BaseAnalyticsData) => d.segment
+const getImpressions = (d: BaseAnalyticsData) => Number(d.impressions)
+const getClickAndCRT = (d: BaseAnalyticsData) => Number(d.ctr)
+const getAverageCPM = (d: BaseAnalyticsData) => Number(d.avgCpm)
+const getSpent = (d: BaseAnalyticsData) => Number(d.paid)
 const defaultAnnotationDataIndex = 13
 const selectedDatumPatternId = 'xychart-selected-datum'
 
 const ChartControls = ({ children, data, metricsToShow }: ControlsProps) => {
   const maxImpressions = useMemo(() => Math.max(...data.map((i) => i.impressions)), [data])
-  const maxClickAndCRT = useMemo(() => Math.max(...data.map((i) => i.clickAndCRT)), [data])
-  const maxAverageCPM = useMemo(() => Math.max(...data.map((i) => i.averageCPM)), [data])
-  const maxSpent = useMemo(() => Math.max(...data.map((i) => i.spent)), [data])
+  const maxClickAndCRT = useMemo(() => Math.max(...data.map((i) => Number(i.ctr) || 0)), [data])
+  const maxAverageCPM = useMemo(() => Math.max(...data.map((i) => Number(i.avgCpm) || 0)), [data])
+  const maxSpent = useMemo(() => Math.max(...data.map((i) => i.paid)), [data])
 
   const scaledData = useMemo(
     () =>
@@ -32,9 +32,9 @@ const ChartControls = ({ children, data, metricsToShow }: ControlsProps) => {
         return {
           ...item,
           impressions: Math.log(1 + item.impressions) / Math.log(1 + maxImpressions),
-          clickAndCRT: Math.log(1 + item.clickAndCRT) / Math.log(1 + maxClickAndCRT),
-          averageCPM: Math.log(1 + item.averageCPM) / Math.log(1 + maxAverageCPM),
-          spent: Math.log(1 + item.spent) / Math.log(1 + maxSpent)
+          clickAndCRT: Math.log(1 + (Number(item.ctr) || 0)) / Math.log(1 + maxClickAndCRT),
+          averageCPM: Math.log(1 + (Number(item.avgCpm) || 0)) / Math.log(1 + maxAverageCPM),
+          spent: Math.log(1 + item.paid) / Math.log(1 + maxSpent)
         }
       }),
     [data, maxAverageCPM, maxClickAndCRT, maxImpressions, maxSpent]
@@ -93,7 +93,7 @@ const ChartControls = ({ children, data, metricsToShow }: ControlsProps) => {
       onPointerMove,
       onPointerOut,
       onPointerUp
-    }: GlyphProps<ITimeFrameData>) => {
+    }: GlyphProps<BaseAnalyticsData>) => {
       const handlers = { onPointerMove, onPointerOut, onPointerUp }
 
       return (
@@ -118,7 +118,7 @@ const ChartControls = ({ children, data, metricsToShow }: ControlsProps) => {
       onPointerMove,
       onPointerOut,
       onPointerUp
-    }: RenderTooltipGlyphProps<ITimeFrameData>) => {
+    }: RenderTooltipGlyphProps<BaseAnalyticsData>) => {
       const handlers = { onPointerMove, onPointerOut, onPointerUp }
 
       return (
@@ -136,7 +136,7 @@ const ChartControls = ({ children, data, metricsToShow }: ControlsProps) => {
   )
   // for series that support it, return a colorAccessor which returns a custom color if the datum is selected
   const colorAccessorFactory = useCallback(
-    (dataKey: DataKey) => (d: ITimeFrameData) =>
+    (dataKey: DataKey) => (d: BaseAnalyticsData) =>
       annotationDataKey === dataKey && d === data[annotationDataIndex]
         ? `url(#${selectedDatumPatternId})`
         : null,

@@ -1,11 +1,11 @@
 import { AnimationTrajectory } from '@visx/react-spring/lib/types'
-import { ITimeFrameData } from 'types'
+import { BaseAnalyticsData } from 'types'
 import { curveLinear, curveStep, curveCardinal } from '@visx/curve'
 import { GlyphProps, XYChartTheme } from '@visx/xychart'
 import { RenderTooltipGlyphProps } from '@visx/xychart/lib/components/Tooltip'
 import getAnimatedOrUnanimatedComponents from 'components/common/Chart/getAnimatedOrUnanimatedComponents'
 
-type Accessor = (d: ITimeFrameData) => number | string
+type Accessor = (d: BaseAnalyticsData) => number | string
 
 interface Accessors {
   Impressions: Accessor
@@ -26,16 +26,16 @@ export type ProvidedProps = {
   }
   animationTrajectory?: AnimationTrajectory
   annotationDataKey?: DataKey | null
-  annotationDatum?: ITimeFrameData
+  annotationDatum?: BaseAnalyticsData
   annotationLabelPosition?: { dx: number; dy: number }
   annotationType?: 'line' | 'circle'
-  colorAccessorFactory: (key: DataKey) => (d: ITimeFrameData) => string | null
+  colorAccessorFactory: (key: DataKey) => (d: BaseAnalyticsData) => string | null
   config: {
     x: SimpleScaleConfig
     y: SimpleScaleConfig
   }
   curve: typeof curveLinear | typeof curveCardinal | typeof curveStep
-  data: ITimeFrameData[]
+  data: BaseAnalyticsData[]
   editAnnotationLabelPosition: boolean
   numTicks: number
   setAnnotationDataIndex?: (index: number) => void
@@ -46,9 +46,9 @@ export type ProvidedProps = {
   renderBarGroup: boolean
   renderBarSeries: boolean
   renderBarStack: boolean
-  renderGlyph: React.FC<GlyphProps<ITimeFrameData>>
+  renderGlyph: React.FC<GlyphProps<BaseAnalyticsData>>
   enableTooltipGlyph: boolean
-  renderTooltipGlyph: React.FC<RenderTooltipGlyphProps<ITimeFrameData>>
+  renderTooltipGlyph: React.FC<RenderTooltipGlyphProps<BaseAnalyticsData>>
   renderHorizontally: boolean
   renderLineSeries: boolean
   sharedTooltip: boolean
@@ -67,7 +67,7 @@ export type ProvidedProps = {
 
 export type ControlsProps = {
   children: (props: ProvidedProps) => React.ReactNode
-  data: ITimeFrameData[]
+  data: BaseAnalyticsData[]
   // TODO add a type for it
   metricsToShow: any
 }
