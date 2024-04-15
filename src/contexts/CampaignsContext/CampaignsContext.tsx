@@ -117,7 +117,6 @@ const CampaignsDataProvider: FC<PropsWithChildren> = ({ children }) => {
 
   const updateCampaignDataById = useCallback(
     async (campaignId: string, updateAnalytics: boolean = true) => {
-      console.log({ campaignId })
       console.log({ updateAnalytics })
       try {
         const campaignDetailsRes = await adexServicesRequest<Campaign>('backend', {
