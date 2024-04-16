@@ -66,9 +66,7 @@ const analyticsDataToMappedAnalytics = (
 
   // TODO: remove when no testing
   if (!impCounts.length) {
-    return {
-      ...dashboardTableElements[0][analyticsType]
-    }
+    return [...dashboardTableElements[0][analyticsType]]
   }
 
   const mapped = impCounts.reduce((aggr, el) => {

@@ -269,7 +269,7 @@ const dashboardTableElements: (CampaignData & {
     timeframe: [
       {
         analyticsType: 'timeframe',
-        segment: '16/04/2024',
+        segment: '07/04/2024',
         impressions: 9146,
         clicks: 5,
         ctr: 96,
@@ -279,7 +279,7 @@ const dashboardTableElements: (CampaignData & {
       {
         analyticsType: 'timeframe',
 
-        segment: '16/04/2024',
+        segment: '08/04/2024',
         impressions: 300,
         clicks: 5,
 
@@ -289,7 +289,7 @@ const dashboardTableElements: (CampaignData & {
       },
       {
         analyticsType: 'timeframe',
-        segment: '16/04/2024',
+        segment: '09/04/2024',
         impressions: 30568,
         clicks: 5,
 
@@ -299,7 +299,7 @@ const dashboardTableElements: (CampaignData & {
       },
       {
         analyticsType: 'timeframe',
-        segment: '16/04/2024',
+        segment: '10/04/2024',
         impressions: 21000,
         ctr: 232,
         clicks: 5,
@@ -309,7 +309,7 @@ const dashboardTableElements: (CampaignData & {
       },
       {
         analyticsType: 'timeframe',
-        segment: '16/04/2024',
+        segment: '11/04/2024',
         impressions: 16000,
         ctr: 55,
         clicks: 5,
@@ -318,7 +318,7 @@ const dashboardTableElements: (CampaignData & {
       },
       {
         analyticsType: 'timeframe',
-        segment: '16/04/2024',
+        segment: '12/04/2024',
         impressions: 9146,
         clicks: 5,
         ctr: 96,
@@ -327,7 +327,7 @@ const dashboardTableElements: (CampaignData & {
       },
       {
         analyticsType: 'timeframe',
-        segment: '16/04/2024',
+        segment: '13/04/2024',
         clicks: 5,
         impressions: 300,
         ctr: 3,
@@ -336,7 +336,7 @@ const dashboardTableElements: (CampaignData & {
       },
       {
         analyticsType: 'timeframe',
-        segment: '16/04/2024',
+        segment: '14/04/2024',
         impressions: 30568,
         clicks: 5,
         ctr: 21,
@@ -345,7 +345,7 @@ const dashboardTableElements: (CampaignData & {
       },
       {
         analyticsType: 'timeframe',
-        segment: '16/04/2024',
+        segment: '15/04/2024',
         impressions: 21000,
         clicks: 5,
         ctr: 232,
