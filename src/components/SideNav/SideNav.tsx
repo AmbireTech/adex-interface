@@ -66,7 +66,6 @@ function SideNav() {
   const { classes } = useStyles()
 
   useEffect(() => {
-    console.count('updating balance')
     const updateBalance = async () => {
       try {
         const getBalance = await adexServicesRequest<Account>('backend', {

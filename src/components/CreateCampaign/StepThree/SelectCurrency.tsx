@@ -4,7 +4,7 @@ import { formatCurrency } from 'helpers'
 import { formatUnits } from 'helpers/balances'
 import useAccount from 'hooks/useAccount'
 import { getTokenIcon, networks } from 'lib/Icons'
-import { forwardRef } from 'react'
+import { forwardRef, useMemo } from 'react'
 import { Token } from 'types'
 
 type ItemProps = Token &
@@ -41,17 +41,20 @@ const SelectCurrency = () => {
   const {
     adexAccount: {
       availableBalance,
-      balanceToken,
-      fundsDeposited: { deposits }
+      balanceToken
+      // fundsDeposited: { deposits }
     }
   } = useAccount()
-  console.log('deposits', deposits)
 
-  const mappedDeposits: ItemProps[] = Array({ availableBalance, ...balanceToken }).map((item) => ({
-    ...item,
-    value: item.name,
-    label: item.name
-  }))
+  const mappedDeposits: ItemProps[] = useMemo(
+    () =>
+      Array({ availableBalance, ...balanceToken }).map((item) => ({
+        ...item,
+        value: item.name,
+        label: item.name
+      })),
+    [availableBalance, balanceToken]
+  )
   return (
     <MediaQuery
       smallerThan="lg"

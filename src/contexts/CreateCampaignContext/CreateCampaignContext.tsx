@@ -6,12 +6,16 @@ import { CampaignUI, CreateCampaignType } from 'types'
 import useAccount from 'hooks/useAccount'
 import { useAdExApi } from 'hooks/useAdexServices'
 import { mapCampaignUItoCampaign } from 'helpers/createCampaignHelpers'
+import { parseUnits } from 'helpers/balances'
 
 const CreateCampaignContext = createContext<CreateCampaignType | null>(null)
 
 const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
   // TODO: the address will be fixed and will always has a default value
-  const { adexAccount } = useAccount()
+  const {
+    adexAccount,
+    adexAccount: { balanceToken }
+  } = useAccount()
 
   const defaultValue = useMemo(
     () => ({
@@ -19,11 +23,12 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
       owner: adexAccount?.address || '',
       createdBy: adexAccount?.address || '',
       // TODO: fix outpaceAssetAddr
-      outpaceAssetAddr: adexAccount?.address || '',
-      outpaceAddr: adexAccount?.address || '',
-      outpaceAssetDecimals: 18
+      outpaceAssetAddr: balanceToken?.address || '',
+      outpaceAddr: adexAccount?.address || '0x',
+      outpaceAssetDecimals: balanceToken.decimals,
+      outpaceChainId: balanceToken.chainId
     }),
-    [adexAccount?.address]
+    [adexAccount?.address, balanceToken?.address, balanceToken?.decimals, balanceToken?.chainId]
   )
 
   const [campaign, setCampaign] = useLocalStorage<CampaignUI>({
@@ -86,6 +91,11 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
     const mappedCampaign = mapCampaignUItoCampaign(campaign)
     mappedCampaign.id = `${campaign.title}-${Date.now().toString(16)}`
 
+    mappedCampaign.campaignBudget = parseUnits(
+      mappedCampaign.campaignBudget.toString(),
+      balanceToken.decimals
+    ).toBigInt()
+
     const body = serialize(mappedCampaign).json
 
     return adexServicesRequest('backend', {
@@ -96,7 +106,7 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
         'Content-Type': 'application/json'
       }
     })
-  }, [campaign, adexServicesRequest])
+  }, [campaign, adexServicesRequest, balanceToken.decimals])
 
   const contextValue = useMemo(
     () => ({

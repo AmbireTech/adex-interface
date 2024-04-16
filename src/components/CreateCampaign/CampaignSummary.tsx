@@ -11,6 +11,9 @@ import { ConfirmModal, SuccessModal } from 'components/common/Modals'
 import AttentionIcon from 'resources/icons/Attention'
 import useCampaignsData from 'hooks/useCampaignsData'
 import useCustomNotifications from 'hooks/useCustomNotifications'
+import { Account } from 'types'
+import useAccount from 'hooks/useAccount'
+import { useAdExApi } from 'hooks/useAdexServices'
 
 const useStyles = createStyles((theme) => ({
   bg: {
@@ -54,6 +57,8 @@ const useStyles = createStyles((theme) => ({
 const CampaignSummary = () => {
   const { classes, cx } = useStyles()
   const [opened, { open, close }] = useDisclosure(false)
+  const { adexAccount, updateAdexAccount } = useAccount()
+  const { adexServicesRequest } = useAdExApi()
   const {
     campaign: { step, adUnits },
     updateCampaign,
@@ -88,12 +93,35 @@ const CampaignSummary = () => {
 
   const isTheLastStep = useMemo(() => step === CREATE_CAMPAIGN_STEPS - 1, [step])
   const isFirstStep = useMemo(() => step === 0, [step])
+  const updateBalance = useCallback(async () => {
+    try {
+      const getBalance = await adexServicesRequest<Account>('backend', {
+        route: '/dsp/accounts/my-account',
+        method: 'GET'
+      })
+
+      if (getBalance) {
+        updateAdexAccount({ ...adexAccount, ...getBalance })
+      } else {
+        showNotification(
+          'error',
+          'Updating account balance failed',
+          'Updating account balance failed'
+        )
+      }
+    } catch (err: any) {
+      console.error('Updating account balance failed:', err)
+      showNotification('error', err, 'Updating account balance failed')
+    }
+  }, [adexAccount, adexServicesRequest, showNotification, updateAdexAccount])
+
   const launchCampaign = useCallback(async () => {
     try {
       const res = await publishCampaign()
 
       if (res && res.success) {
         await updateAllCampaignsData()
+        await updateBalance()
         open()
         resetCampaign()
       } else {
@@ -103,7 +131,14 @@ const CampaignSummary = () => {
       console.error(err)
       showNotification('error', 'Creating campaign failed', 'Data error')
     }
-  }, [publishCampaign, resetCampaign, open, updateAllCampaignsData, showNotification])
+  }, [
+    publishCampaign,
+    resetCampaign,
+    open,
+    updateAllCampaignsData,
+    showNotification,
+    updateBalance
+  ])
 
   const form = useCreateCampaignFormContext()
 
@@ -213,5 +248,4 @@ const CampaignSummary = () => {
     </>
   )
 }
-
 export default CampaignSummary
