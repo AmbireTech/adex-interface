@@ -8,7 +8,6 @@ import useCampaignAnalytics from 'hooks/useCampaignAnalytics'
 import useCampaignsData from 'hooks/useCampaignsData'
 import { Campaign } from 'adex-common'
 import Placements from './Placements'
-// import { dashboardTableElements } from '../Dashboard/mockData'
 import Creatives from './Creatives'
 import Regions from './Regions'
 import { TimeFrame } from './TimeFrame'
@@ -32,11 +31,9 @@ const analyticTypeToHeader = (aType: AnalyticsType): TabType => {
 const CampaignAnalytics = () => {
   const { id } = useParams()
 
-  // TODO: state management for elements
   const [activeTab, setActiveTab] = useState<AnalyticsType>('timeframe')
   const [isMapBtnShown, setIsMapBtnShown] = useState<boolean>(false)
   const [isMapVisible, setIsMapVisible] = useState<boolean>(false)
-  // const campaignDetails = dashboardTableElements.find((item) => item.id === parseInt(id, 10))
   const [csvData, setCsvData] = useState<any | undefined>()
   const [analyticsKey, setAnalyticsKey] = useState<
     | {
@@ -98,8 +95,11 @@ const CampaignAnalytics = () => {
   }, [activeTab, campaignMappedAnalytics])
 
   const handleTabChange = useCallback((value: AnalyticsType) => {
+    // TODO: validate value if it is in AnalyticsType
     setActiveTab(value)
   }, [])
+
+  // TODO: there is delay when updated analytics table is displayed after the tab is switched - add loading bars or something
 
   if (!id) {
     return <div>Invalid campaign ID</div>
@@ -120,8 +120,8 @@ const CampaignAnalytics = () => {
           <Tabs.List>
             <Tabs.Tab value="timeframe">TIME FRAME</Tabs.Tab>
             <Tabs.Tab value="hostname">PLACEMENTS</Tabs.Tab>
-            <Tabs.Tab value="countries">REGIONS</Tabs.Tab>
-            <Tabs.Tab value="adUnits">CREATIVES</Tabs.Tab>
+            <Tabs.Tab value="country">REGIONS</Tabs.Tab>
+            <Tabs.Tab value="adUnit">CREATIVES</Tabs.Tab>
           </Tabs.List>
           <Flex align="center" justify="space-between">
             {isMapBtnShown && <SeeOnMapBtn onBtnClicked={() => setIsMapVisible((prev) => !prev)} />}
@@ -141,14 +141,14 @@ const CampaignAnalytics = () => {
         <Tabs.Panel value="hostname" pt="xs">
           <Placements placements={campaignMappedAnalytics} />
         </Tabs.Panel>
-        <Tabs.Panel value="countries" pt="xs">
+        <Tabs.Panel value="country" pt="xs">
           <Regions
             regions={campaignMappedAnalytics}
             isMapVisible={isMapVisible}
             onClose={() => setIsMapVisible(false)}
           />
         </Tabs.Panel>
-        <Tabs.Panel value="adUnits" pt="xs">
+        <Tabs.Panel value="adUnit" pt="xs">
           <Creatives creatives={campaignMappedAnalytics} />
         </Tabs.Panel>
       </Tabs>

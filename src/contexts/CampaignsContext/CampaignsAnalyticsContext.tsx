@@ -66,7 +66,9 @@ const analyticsDataToMappedAnalytics = (
 
   // TODO: remove when no testing
   if (!impCounts.length) {
-    return [...dashboardTableElements[0][analyticsType]]
+    const mockedData = dashboardTableElements[0][analyticsType]
+
+    return [...mockedData]
   }
 
   const mapped = impCounts.reduce((aggr, el) => {
@@ -165,15 +167,16 @@ const CampaignsAnalyticsProvider: FC<PropsWithChildren> = ({ children }) => {
 
         console.log({ analyticsDataRes })
 
-        if (!analyticsDataRes?.aggr) {
-          throw new Error('invalid analytics data response')
-        }
+        // if (!analyticsDataRes?.aggr) {
+        //   throw new Error('invalid analytics data response')
+        // }
 
         setAnalyticsData((prev) => {
           console.log({ dataKey })
           console.log({ prev })
           const next = new Map(prev)
-          next.set(dataKey, analyticsDataRes.aggr)
+          const nextAggr = analyticsDataRes?.aggr || prev.get(dataKey) || []
+          next.set(dataKey, nextAggr)
           console.log({ next })
           return next
         })
@@ -222,6 +225,7 @@ const CampaignsAnalyticsProvider: FC<PropsWithChildren> = ({ children }) => {
         end: new Date(Date.now())
       }
 
+      // TODO: alg to set the timeframe depending on campaign start/end and current date
       const baseQuery: AnalyticsDataQuery = {
         campaignId: campaign.id,
         ...period,
