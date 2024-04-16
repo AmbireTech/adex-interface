@@ -58,6 +58,7 @@ interface IAccountContext {
     service: AdExService,
     reqOptions: ApiRequestOptions<T>
   ) => Promise<T>
+  updateBalance: () => Promise<void>
 }
 
 const AccountContext = createContext<IAccountContext | null>(null)
@@ -345,6 +346,28 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
     [adexAccount.accessToken, showNotification, updateAccessToken]
   )
 
+  const updateBalance = useCallback(async () => {
+    try {
+      const getBalance = await adexServicesRequest<Account>('backend', {
+        route: '/dsp/accounts/my-account',
+        method: 'GET'
+      })
+
+      if (getBalance) {
+        updateAdexAccount({ ...adexAccount, ...getBalance })
+      } else {
+        showNotification(
+          'error',
+          'Updating account balance failed',
+          'Updating account balance failed'
+        )
+      }
+    } catch (err: any) {
+      console.error('Updating account balance failed:', err)
+      showNotification('error', err, 'Updating account balance failed')
+    }
+  }, [adexAccount, adexServicesRequest, showNotification, updateAdexAccount])
+
   const contextValue = useMemo(
     () => ({
       adexAccount,
@@ -358,7 +381,8 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
       updateAdexAccount,
       updateAccessToken,
       resetAdexAccount,
-      adexServicesRequest
+      adexServicesRequest,
+      updateBalance
     }),
     [
       adexAccount,
@@ -371,7 +395,8 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
       updateAdexAccount,
       updateAccessToken,
       resetAdexAccount,
-      adexServicesRequest
+      adexServicesRequest,
+      updateBalance
     ]
   )
 

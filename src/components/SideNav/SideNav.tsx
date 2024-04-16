@@ -17,9 +17,6 @@ import HelpIcon from 'resources/icons/Help'
 import AdExLogo from 'resources/logos/AdExLogo'
 import { useEffect, useMemo } from 'react'
 import { appVersion } from 'helpers'
-import { useAdExApi } from 'hooks/useAdexServices'
-import { Account } from 'types'
-import useCustomNotifications from 'hooks/useCustomNotifications'
 import NavLink from './NavLink'
 import Balance from './Balance'
 import CreateCampaignBtn from './CreateCampaignBtn'
@@ -49,15 +46,11 @@ const useStyles = createStyles((theme) => ({
 }))
 
 function SideNav() {
-  // const { connectWallet, disconnectWallet, adexAccount } = useAccount()
   const {
     isAdmin,
-    adexAccount,
     adexAccount: { availableBalance },
-    updateAdexAccount
+    updateBalance
   } = useAccount()
-  const { adexServicesRequest } = useAdExApi()
-  const { showNotification } = useCustomNotifications()
 
   const location = useLocation()
   const match = useMatch(location.pathname)
@@ -66,28 +59,6 @@ function SideNav() {
   const { classes } = useStyles()
 
   useEffect(() => {
-    const updateBalance = async () => {
-      try {
-        const getBalance = await adexServicesRequest<Account>('backend', {
-          route: '/dsp/accounts/my-account',
-          method: 'GET'
-        })
-
-        if (getBalance) {
-          updateAdexAccount({ ...adexAccount, ...getBalance })
-        } else {
-          showNotification(
-            'error',
-            'Updating account balance failed',
-            'Updating account balance failed'
-          )
-        }
-      } catch (err: any) {
-        console.error('Updating account balance failed:', err)
-        showNotification('error', err, 'Updating account balance failed')
-      }
-    }
-
     updateBalance()
     // eslint-disable-next-line
   }, [])
