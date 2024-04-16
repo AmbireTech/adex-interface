@@ -20,7 +20,7 @@ const AdminPanel = () => {
       queryParams: { all: 'true' }
     })
       .then(setCampaignData)
-      .catch((err) => console.log(err))
+      .catch((err) => console.error(err))
   }, [opened]) // eslint-disable-line
   const elements = useMemo(
     () =>

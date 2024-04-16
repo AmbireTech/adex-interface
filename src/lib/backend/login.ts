@@ -35,14 +35,11 @@ const parseJwt = (token: string) => {
 }
 
 export const isAdminToken = (accessToken: string | null) => {
-  console.log(accessToken)
-
   if (!accessToken) {
     return false
   }
 
   const decodeAccessToken = parseJwt(accessToken)
-  console.log(decodeAccessToken.data.is_admin)
 
   return decodeAccessToken.data.is_admin
 }

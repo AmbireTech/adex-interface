@@ -75,8 +75,6 @@ export const useAdExApi = () => {
         ...req.headers
       }
 
-      console.log('req', req)
-
       return fetchService(req)
         .then(processResponse)
         .catch((err) => showNotification('error', err.message, 'Data error'))

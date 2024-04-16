@@ -18,7 +18,8 @@ module.exports = {
     'prettier/prettier': [
       'error',
       {
-        useTabs: false
+        useTabs: false,
+        endOfLine: 'auto'
       }
     ],
     'no-console': 'off', // TEMP
