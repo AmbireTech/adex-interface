@@ -168,6 +168,7 @@ const CampaignsAnalyticsProvider: FC<PropsWithChildren> = ({ children }) => {
         if (!analyticsDataRes?.aggr) {
           throw new Error('invalid analytics data response')
         }
+
         setAnalyticsData((prev) => {
           console.log({ dataKey })
           console.log({ prev })
