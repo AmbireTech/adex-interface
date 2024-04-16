@@ -26,7 +26,7 @@ export const getReqErr = (res: any, text: any) => {
   let message = text
   try {
     const textObj = JSON.parse(text)
-    message = textObj.message || textObj.msg || textObj.errMsg || textObj.error || text
+    message = textObj?.message || textObj?.msg || textObj?.errMsg || textObj?.error || text
   } catch (err) {
     console.error(err)
   }
