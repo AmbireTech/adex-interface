@@ -1,1 +1,2 @@
-export { CampaignsDataProvider, CampaignsDataContext } from './CampaignsContext'
+export { CampaignsDataProvider, CampaignsDataContext } from './CampaignsDataContext'
+export { CampaignsAnalyticsContext, CampaignsAnalyticsProvider } from './CampaignsAnalyticsContext'

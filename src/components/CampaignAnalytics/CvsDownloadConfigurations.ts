@@ -1,36 +1,34 @@
-import { ICreative, IHeadersToDataProps, IPlacement, IRegion, ITimeFrameData, TabType } from 'types'
+import { IHeadersToDataProps, BaseAnalyticsData, TabType } from 'types'
 
 const headersToDataProperties: IHeadersToDataProps = {
   placements: {
-    Website: 'website',
+    Website: 'segment',
     Impressions: 'impressions',
     Clicks: 'clicks',
-    'CRT%': 'ctrPercents',
-    Spent: 'spent',
-    'Average CPM': 'averageCPM'
+    'CRT%': 'crt',
+    Spent: 'paid',
+    'Average CPM': 'avgCpm'
   },
   regions: {
-    Country: 'country',
+    Country: 'segment',
     Share: 'share',
     Impressions: 'impressions',
     Clicks: 'clicks',
-    'CTR%': 'ctrPercents',
-    'Average CPM': 'averageCPM',
-    Spent: 'spent'
+    'CTR%': 'ctr',
+    'Average CPM': 'avgCpm',
+    Spent: 'paid'
   },
   creatives: {
     Impressions: 'impressions',
     Clicks: 'clicks',
-    'CTR%': 'ctrPercents',
-    Spent: 'spent'
+    'CTR%': 'crt',
+    Spent: 'paid'
   },
   timeframe: {}
 }
 
-const generateCVSData = (
-  tabName: TabType,
-  tabData: IPlacement[] | IRegion[] | ICreative[] | ITimeFrameData[] | undefined
-) => ({
+// TODO: remove TabType use AnalyticsType
+const generateCVSData = (tabName: TabType, tabData: BaseAnalyticsData[] | undefined) => ({
   mapHeadersToDataProperties: headersToDataProperties[tabName],
   tabData,
   filename: `${tabName}.csv`

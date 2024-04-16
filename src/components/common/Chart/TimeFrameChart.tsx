@@ -1,5 +1,5 @@
 import { createStyles } from '@mantine/core'
-import { ITimeFrameData, Metrics, XYChartProps } from 'types'
+import { Metrics, XYChartProps, BaseAnalyticsData } from 'types'
 import ChartControls from './Chart'
 
 const updateTooltipData = (obj: any, values: any) => {
@@ -140,7 +140,7 @@ const TimeFrameChart = ({ height, width, timeFrameData, metricsToShow }: XYChart
             animationTrajectory={animationTrajectory}
           />
           {showTooltip && (
-            <Tooltip<ITimeFrameData>
+            <Tooltip<BaseAnalyticsData>
               showHorizontalCrosshair={showHorizontalCrosshair}
               showVerticalCrosshair={showVerticalCrosshair}
               snapTooltipToDatumX={snapTooltipToDatumX}
@@ -151,7 +151,7 @@ const TimeFrameChart = ({ height, width, timeFrameData, metricsToShow }: XYChart
               renderTooltip={({ tooltipData, colorScale }) => {
                 const copiedData = JSON.parse(JSON.stringify(tooltipData)) as typeof tooltipData
                 const foundTimeFrameItem = timeFrameData.find(
-                  (i) => i.date === copiedData?.datumByKey.Impressions.datum.date
+                  (i) => i.segment === copiedData?.datumByKey.Impressions.datum.segment
                 )
                 updateTooltipData(copiedData, foundTimeFrameItem)
 

@@ -1,4 +1,4 @@
-import { IRegion } from 'types'
+import { BaseAnalyticsData } from 'types'
 import { useMemo } from 'react'
 import { Grid, Modal } from '@mantine/core'
 import { useViewportSize } from '@mantine/hooks'
@@ -12,25 +12,25 @@ const Regions = ({
   isMapVisible,
   onClose
 }: {
-  regions: IRegion[] | undefined
+  regions: BaseAnalyticsData[] | undefined
   isMapVisible: boolean
   onClose: () => void
 }) => {
   const { width: windowWidth, height: windowHeight } = useViewportSize()
-  if (!regions?.length) {
-    return <div>No regions found</div>
-  }
 
-  const elements = useMemo(
+  // TODO: add elements types, fix custom table data
+  const elements: BaseAnalyticsData[] | [] = useMemo(
     () =>
       regions?.map((item) => ({
         ...item,
-        impressions: item.impressions.toLocaleString(),
-        clicks: item.clicks.toLocaleString(),
-        ctrPercents: `${item.ctrPercents} %`
-      })),
+        ctr: `${item.ctr} %`
+      })) || [],
     [regions]
   )
+
+  if (!regions?.length) {
+    return <div>No regions found</div>
+  }
 
   return (
     <Grid grow>
