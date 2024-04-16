@@ -54,9 +54,8 @@ export const TimeFrame = ({
   const { width: windowWidth } = useViewportSize()
   const [filteredData, setFilteredData] = useState<FilteredAnalytics[]>([])
 
-  if (!timeFrames?.length) {
-    return <div>No time frames found</div>
-  }
+  console.log({ kors: Array.isArray(timeFrames) })
+
   const [metricsToShow, setMetricsToShow] = useState<MetricsToShow>({
     // segment: true,
     impressions: true,
@@ -67,28 +66,41 @@ export const TimeFrame = ({
   })
 
   useEffect(() => {
-    const result = timeFrames.map((obj) => {
-      const filteredObj: FilteredAnalytics = { segment: obj.segment }
+    if (timeFrames) {
+      const result = timeFrames.map((obj) => {
+        const filteredObj: FilteredAnalytics = { segment: obj.segment }
 
-      Object.entries(metricsToShow).forEach(([metricKey, show]) => {
-        if (show) {
-          // TODO: fix it
-          // @ts-ignore
-          filteredObj[metricKey as keyof BaseAnalyticsData] =
-            obj[metricKey as keyof BaseAnalyticsData]
-        }
+        Object.entries(metricsToShow).forEach(([metricKey, show]) => {
+          if (show) {
+            // TODO: fix it
+            // @ts-ignore
+            filteredObj[metricKey as keyof BaseAnalyticsData] =
+              obj[metricKey as keyof BaseAnalyticsData]
+          }
+        })
+
+        return filteredObj
       })
-
-      return filteredObj
-    })
-    setFilteredData(result)
+      setFilteredData(result)
+    }
   }, [timeFrames, metricsToShow])
 
-  const totalSum = useMemo(() => sumArrayProperties(timeFrames), [timeFrames])
+  const totalSum = useMemo(
+    () =>
+      timeFrames
+        ? sumArrayProperties(timeFrames)
+        : // TODO: default
+          { clicks: 0, impressions: 0, avgCpm: 0, ctr: 0, paid: 0 },
+    [timeFrames]
+  )
 
   const handleMetricClick = useCallback((value: boolean, propNameToRemove: string) => {
     setMetricsToShow((prev) => ({ ...prev, [propNameToRemove]: value }))
   }, [])
+
+  if (!timeFrames?.length) {
+    return <div>No time frames found</div>
+  }
 
   return (
     <Grid grow>

@@ -6,6 +6,7 @@ import GoBack from 'components/common/GoBack/GoBack'
 import DownloadCSV from 'components/common/DownloadCSV'
 import useCampaignAnalytics from 'hooks/useCampaignAnalytics'
 import useCampaignsData from 'hooks/useCampaignsData'
+import { Campaign } from 'adex-common'
 import Placements from './Placements'
 // import { dashboardTableElements } from '../Dashboard/mockData'
 import Creatives from './Creatives'
@@ -30,9 +31,7 @@ const analyticTypeToHeader = (aType: AnalyticsType): TabType => {
 
 const CampaignAnalytics = () => {
   const { id } = useParams()
-  if (!id) {
-    return <div>Invalid campaign ID</div>
-  }
+
   // TODO: state management for elements
   const [activeTab, setActiveTab] = useState<AnalyticsType>('timeframe')
   const [isMapBtnShown, setIsMapBtnShown] = useState<boolean>(false)
@@ -50,7 +49,10 @@ const CampaignAnalytics = () => {
   const { analyticsData, getAnalyticsKeyAndUpdate, mappedAnalytics } = useCampaignAnalytics()
   const { campaignsData, updateCampaignDataById } = useCampaignsData()
 
-  const campaign = useMemo(() => campaignsData.get(id)?.campaign, [id, campaignsData])
+  const campaign: Campaign | undefined = useMemo(
+    () => (id ? campaignsData.get(id)?.campaign : undefined),
+    [id, campaignsData]
+  )
 
   const campaignAnalytics = useMemo(
     () => analyticsData.get(analyticsKey?.key || ''),
@@ -78,13 +80,13 @@ const CampaignAnalytics = () => {
     if (!campaign) return
 
     const checkAnalytics = async () => {
-      const key = await getAnalyticsKeyAndUpdate(campaign, 'country')
+      const key = await getAnalyticsKeyAndUpdate(campaign, activeTab)
       setAnalyticsKey(key)
       console.log('key', key)
     }
 
     checkAnalytics()
-  }, [campaign, getAnalyticsKeyAndUpdate])
+  }, [activeTab, campaign, getAnalyticsKeyAndUpdate])
 
   useEffect(() => {
     if (campaignMappedAnalytics) {
@@ -98,6 +100,10 @@ const CampaignAnalytics = () => {
   const handleTabChange = useCallback((value: AnalyticsType) => {
     setActiveTab(value)
   }, [])
+
+  if (!id) {
+    return <div>Invalid campaign ID</div>
+  }
 
   return (
     <Container fluid>

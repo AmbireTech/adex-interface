@@ -19,9 +19,7 @@ const useStyles = createStyles((theme) => ({
 const Creatives = ({ creatives }: { creatives: BaseAnalyticsData[] | undefined }) => {
   const [opened, { open, close }] = useDisclosure(false)
   const { classes } = useStyles()
-  if (!creatives?.length) {
-    return <div>No creatives found</div>
-  }
+
   const headings = ['Media', 'Impressions', 'Clicks', 'CTR%', 'Spent']
   const [selectedMedia, setSelectedMedia] = useState('')
   const handleMediaClick = useCallback(
@@ -31,6 +29,10 @@ const Creatives = ({ creatives }: { creatives: BaseAnalyticsData[] | undefined }
     },
     [open]
   )
+
+  if (!creatives?.length) {
+    return <div>No creatives found</div>
+  }
 
   const elements = creatives?.map((item) => {
     return {

@@ -17,21 +17,20 @@ const Regions = ({
   onClose: () => void
 }) => {
   const { width: windowWidth, height: windowHeight } = useViewportSize()
-  if (!regions?.length) {
-    return <div>No regions found</div>
-  }
 
   // TODO: add elements types, fix custom table data
-  const elements = useMemo(
+  const elements: BaseAnalyticsData[] | [] = useMemo(
     () =>
       regions?.map((item) => ({
         ...item,
-        impressions: item.impressions.toLocaleString(),
-        clicks: item.clicks.toLocaleString(),
         ctr: `${item.ctr} %`
-      })),
+      })) || [],
     [regions]
   )
+
+  if (!regions?.length) {
+    return <div>No regions found</div>
+  }
 
   return (
     <Grid grow>
