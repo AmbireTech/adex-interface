@@ -1,4 +1,5 @@
 import { Image, Select, Text, Flex, MediaQuery } from '@mantine/core'
+import { DIGITS_AFTER_FLOATING_POINT } from 'constants/balances'
 import { useCreateCampaignFormContext } from 'contexts/CreateCampaignFormContext'
 import { formatCurrency } from 'helpers'
 import { formatUnits } from 'helpers/balances'
@@ -13,8 +14,6 @@ type ItemProps = Token &
     label: string
     value: string
   }
-
-const DIGITS_AFTER_FLOATING_POINT: number = 2
 
 const SelectItem = forwardRef<HTMLDivElement, ItemProps>(
   ({ address, chainId, name, availableBalance, decimals, ...others }: ItemProps, ref) => (

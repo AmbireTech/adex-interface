@@ -16,6 +16,7 @@ import StopIcon from 'resources/icons/Stop'
 import ArchivedIcon from 'resources/icons/Archived'
 import { formatUnits } from 'helpers/balances'
 import { getTokenIcon } from 'lib/Icons'
+import { DIGITS_AFTER_FLOATING_POINT } from 'constants/balances'
 import CatsLocsFormatted from './CatsLocsFormatted'
 
 const useStyles = createStyles((theme) => ({
@@ -50,8 +51,6 @@ const useStyles = createStyles((theme) => ({
   }
 }))
 
-const DIGITS_AFTER_FLOATING_POINT = 2
-
 const CampaignDetails = () => {
   const { classes, cx } = useStyles()
   const { campaignsData } = useCampaignsData()
@@ -65,7 +64,7 @@ const CampaignDetails = () => {
 
     [id, campaignsData]
   )
-  console.log('campaignDetails', campaignDetails)
+
   const budget = useMemo(
     () => (
       <Flex align="center">

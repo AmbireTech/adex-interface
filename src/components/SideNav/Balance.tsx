@@ -5,8 +5,7 @@ import { formatCurrency } from 'helpers'
 import { formatUnits } from 'helpers/balances'
 import useAccount from 'hooks/useAccount'
 import { getTokenIcon, networks } from 'lib/Icons'
-
-const DIGITS_AFTER_FLOATING_POINT: number = 2
+import { DIGITS_AFTER_FLOATING_POINT } from 'constants/balances'
 
 const useStyles = createStyles((theme) => ({
   rotateUpsideDown: {

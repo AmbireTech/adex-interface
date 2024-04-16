@@ -1,0 +1,1 @@
+export const DIGITS_AFTER_FLOATING_POINT = 2
