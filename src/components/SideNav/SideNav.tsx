@@ -48,7 +48,6 @@ const useStyles = createStyles((theme) => ({
 function SideNav() {
   // const { connectWallet, disconnectWallet, adexAccount } = useAccount()
   const { isAdmin } = useAccount()
-  console.log(isAdmin)
 
   const location = useLocation()
   const match = useMatch(location.pathname)

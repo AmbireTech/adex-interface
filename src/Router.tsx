@@ -42,11 +42,7 @@ export const router = createBrowserRouter(
   [
     {
       path: '/',
-      element: (
-        <RequireAuth>
-          <UserPanel />
-        </RequireAuth>
-      )
+      element: <Navigate to="/dashboard" />
     },
     {
       path: '/login',
