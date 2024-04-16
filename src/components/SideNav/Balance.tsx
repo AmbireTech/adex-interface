@@ -78,8 +78,8 @@ const Balance = () => {
       <Flex direction="row" align="center" justify="space-between">
         <FormattedBalance balance={formattedToken} iconUrl={iconUrl} />
         {/* TODO: temporary disabled */}
-        {!!deposits.length && (
-          // {false && (
+        {/* {!!deposits.length && ( */}
+        {false && (
           <DownArrowIcon
             size={rem(10)}
             className={cx(classes.pointer, { [classes.rotateUpsideDown]: opened })}
