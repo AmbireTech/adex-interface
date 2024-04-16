@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Grid, Title, createStyles, Flex, Text } from '@mantine/core'
 import TimeFrameChart from 'components/common/Chart/TimeFrameChart'
-import { IPeriod, ITimeFrameData } from 'types'
+import { BaseAnalyticsData, AnalyticsPeriod, FilteredAnalytics, MetricsToShow } from 'types'
 import { formatCurrency } from 'helpers'
 import { useViewportSize } from '@mantine/hooks'
 import ChartControlBtn from './ChartControlBtn'
@@ -23,61 +23,84 @@ const useStyles = createStyles((theme) => ({
   }
 }))
 
-function sumArrayProperties(array: ITimeFrameData[]) {
-  const result = {} as ITimeFrameData
-  array.forEach((obj) => {
-    Object.keys(obj).forEach((key) => {
-      if (Object.prototype.hasOwnProperty.call(obj, key) && typeof obj[key] === 'number' && key) {
-        result[key] = (result[key] || 0) + obj[key]
-      }
-    })
-  })
+function sumArrayProperties(analytics: BaseAnalyticsData[]) {
+  const sums = analytics.reduce(
+    (sum, x) => {
+      const next = { ...sum }
+      next.clicks += x.clicks
+      next.impressions += x.impressions
+      next.paid += x.paid
 
-  return result
+      return next
+    },
+    { clicks: 0, impressions: 0, paid: 0 }
+  )
+
+  return {
+    ...sums,
+    ctr: (sums.clicks / sums.impressions) * 100,
+    avgCpm: (sums.paid / sums.impressions) * 1000
+  }
 }
 
-const TimeFrame = ({
+export const TimeFrame = ({
   timeFrames,
   period
 }: {
-  timeFrames: ITimeFrameData[] | undefined
-  period: IPeriod | undefined
+  timeFrames: BaseAnalyticsData[] | undefined
+  period: AnalyticsPeriod | undefined
 }) => {
   const { classes } = useStyles()
   const { width: windowWidth } = useViewportSize()
-  const [filteredData, setFilteredData] = useState<any[]>([])
+  const [filteredData, setFilteredData] = useState<FilteredAnalytics[]>([])
+
+  console.log({ kors: Array.isArray(timeFrames) })
+
+  const [metricsToShow, setMetricsToShow] = useState<MetricsToShow>({
+    // segment: true,
+    impressions: true,
+    clicks: true,
+    ctr: true,
+    avgCpm: true,
+    paid: true
+  })
+
+  useEffect(() => {
+    if (timeFrames) {
+      const result = timeFrames.map((obj) => {
+        const filteredObj: FilteredAnalytics = { segment: obj.segment }
+
+        Object.entries(metricsToShow).forEach(([metricKey, show]) => {
+          if (show) {
+            // TODO: fix it
+            // @ts-ignore
+            filteredObj[metricKey as keyof BaseAnalyticsData] =
+              obj[metricKey as keyof BaseAnalyticsData]
+          }
+        })
+
+        return filteredObj
+      })
+      setFilteredData(result)
+    }
+  }, [timeFrames, metricsToShow])
+
+  const totalSum = useMemo(
+    () =>
+      timeFrames
+        ? sumArrayProperties(timeFrames)
+        : // TODO: default
+          { clicks: 0, impressions: 0, avgCpm: 0, ctr: 0, paid: 0 },
+    [timeFrames]
+  )
+
+  const handleMetricClick = useCallback((value: boolean, propNameToRemove: string) => {
+    setMetricsToShow((prev) => ({ ...prev, [propNameToRemove]: value }))
+  }, [])
 
   if (!timeFrames?.length) {
     return <div>No time frames found</div>
   }
-  const [metricsToShow, setMetricsToShow] = useState({
-    date: true,
-    impressions: true,
-    clickAndCRT: true,
-    averageCPM: true,
-    spent: true
-  })
-
-  useEffect(() => {
-    const result = timeFrames.map((obj) => {
-      const filteredObj = {} as any
-
-      Object.keys(obj).forEach((prop) => {
-        if ((metricsToShow as Record<string, boolean>)[prop]) {
-          filteredObj[prop] = obj[prop]
-        }
-      })
-
-      return filteredObj
-    })
-    setFilteredData(result)
-  }, [timeFrames, metricsToShow])
-
-  const totalSum = useMemo(() => sumArrayProperties(timeFrames), [timeFrames])
-
-  const handleImpressionsClick = useCallback((value: boolean, propNameToRemove: string) => {
-    setMetricsToShow((prev) => ({ ...prev, [propNameToRemove]: value }))
-  }, [])
 
   return (
     <Grid grow>
@@ -88,38 +111,38 @@ const TimeFrame = ({
               value={formatCurrency(totalSum.impressions, 0)}
               text="Total impressions"
               bgColor="chartColorOne"
-              onClick={(v: boolean) => handleImpressionsClick(v, 'impressions')}
+              onClick={(v: boolean) => handleMetricClick(v, 'impressions')}
               whiteFontColor
             />
           </Grid.Col>
           <Grid.Col span="content">
             <ChartControlBtn
-              value={`${formatCurrency(totalSum.clickAndCRT, 0)} (${formatCurrency(
-                (totalSum.clickAndCRT / totalSum.impressions) * 100,
+              value={`${formatCurrency(totalSum.clicks, 0)} (${formatCurrency(
+                totalSum.ctr,
                 2
               )} % CTR)`}
               text="Total clicks & CTR"
               bgColor="chartColorTwo"
-              onClick={(v: boolean) => handleImpressionsClick(v, 'clickAndCRT')}
+              onClick={(v: boolean) => handleMetricClick(v, 'clickAndCRT')}
               whiteFontColor
             />
           </Grid.Col>
           <Grid.Col span="content">
             <ChartControlBtn
               // TODO: calculate average DAI/CPM
-              value={`~ ${formatCurrency(totalSum.averageCPM, 3)} DAI / CPM`}
+              value={`~ ${formatCurrency(totalSum.avgCpm, 3)} DAI / CPM`}
               text="Average CPM"
               bgColor="chartColorThree"
-              onClick={(v: boolean) => handleImpressionsClick(v, 'averageCPM')}
+              onClick={(v: boolean) => handleMetricClick(v, 'averageCPM')}
               whiteFontColor
             />
           </Grid.Col>
           <Grid.Col span="content">
             <ChartControlBtn
-              value={`~ ${formatCurrency(totalSum.spent, 2)} DAI`}
+              value={`~ ${formatCurrency(totalSum.paid, 2)} DAI`}
               text="Total spent"
               bgColor="chartColorFour"
-              onClick={(v: boolean) => handleImpressionsClick(v, 'spent')}
+              onClick={(v: boolean) => handleMetricClick(v, 'spent')}
             />
           </Grid.Col>
         </Grid>
@@ -134,13 +157,11 @@ const TimeFrame = ({
         />
         {period && (
           <Flex align="center" justify="space-between" ml="xl" mr="xl">
-            <Text className={classes.lighterGray}>Starts: {period.from}</Text>
-            <Text className={classes.lighterGray}>Ends: {period.to}</Text>
+            <Text className={classes.lighterGray}>Starts: {period.start.toString()}</Text>
+            <Text className={classes.lighterGray}>Ends: {period.end.toString()}</Text>
           </Flex>
         )}
       </Grid.Col>
     </Grid>
   )
 }
-
-export default TimeFrame
