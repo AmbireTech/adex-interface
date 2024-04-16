@@ -1,4 +1,4 @@
-import { Flex, Group, Pagination, Table, createStyles, Grid, Text, Divider } from '@mantine/core'
+import { Flex, Group, Pagination, Table, createStyles, Grid, Divider } from '@mantine/core'
 import { useMediaQuery } from '@mantine/hooks'
 import VisibilityIcon from 'resources/icons/Visibility'
 import { ICustomTableProps } from 'types'
@@ -39,12 +39,15 @@ const CustomTable = ({
   onDuplicate,
   onDelete
 }: ICustomTableProps) => {
-  if (!elements.length) return <Text>No data found</Text>
+  // if (!elements.length) return <Text>No data found</Text>
   const isMobile = useMediaQuery('(max-width: 75rem)')
 
   const { classes, cx } = useStyles()
   const columns: string[] = useMemo(
-    () => Object.keys(elements[0]).filter((e: string) => e !== 'id'),
+    () =>
+      typeof elements[0] === 'object'
+        ? Object.keys(elements[0]).filter((e: string) => e !== 'id')
+        : [],
     [elements]
   )
   const maxItemsPerPage = 10
