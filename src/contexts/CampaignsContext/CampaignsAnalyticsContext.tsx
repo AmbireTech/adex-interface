@@ -21,6 +21,8 @@ import {
 } from 'types'
 import { timeout } from 'utils'
 
+import { dashboardTableElements } from 'components/Dashboard/mockData'
+
 const keySeparator = '👩🏼‍🏫'
 
 type DataStatus = 'loading' | 'processed'
@@ -61,6 +63,13 @@ const analyticsDataToMappedAnalytics = (
   const impPaid = analyticsData[1]
   const clickCounts = analyticsData[2]
   const clickPaid = analyticsData[3]
+
+  // TODO: remove when no testing
+  if (!impCounts.length) {
+    return {
+      ...dashboardTableElements[0][analyticsType]
+    }
+  }
 
   const mapped = impCounts.reduce((aggr, el) => {
     const next = new Map(aggr)
