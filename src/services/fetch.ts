@@ -23,10 +23,16 @@ export async function fetchService<T>(options: RequestOptions<T>) {
 }
 
 export const getReqErr = (res: any, text: any) => {
-  let message = text
+  let message = res.statusText
   try {
     const textObj = JSON.parse(text)
-    message = textObj.message || textObj.msg || textObj.errMsg || textObj.error || text
+    message =
+      textObj?.message ||
+      textObj?.msg ||
+      textObj?.errMsg ||
+      textObj?.error ||
+      res.statusText ||
+      text
   } catch (err) {
     console.error(err)
   }

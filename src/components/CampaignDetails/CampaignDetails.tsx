@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import { useParams } from 'react-router-dom'
 import { Container, Grid, createStyles, Text, Flex, Image } from '@mantine/core'
 import BadgeStatusCampaign from 'components/Dashboard/BadgeStatusCampaign'
@@ -53,17 +53,21 @@ const useStyles = createStyles((theme) => ({
 
 const CampaignDetails = () => {
   const { classes, cx } = useStyles()
-  const { campaignsData } = useCampaignsData()
+  const { campaignsData, updateCampaignDataById } = useCampaignsData()
+
   const { id } = useParams()
+
   if (!id) {
     return <div>Missing ID</div>
   }
 
-  const campaignDetails = useMemo(
-    () => campaignsData.get(id)?.campaign,
+  const campaignDeta = useMemo(
+    () => campaignsData.get(id),
 
     [id, campaignsData]
   )
+
+  const campaign = useMemo(() => campaignDeta?.campaign, [campaignDeta])
 
   const budget = useMemo(
     () => (
@@ -72,15 +76,15 @@ const CampaignDetails = () => {
           maw={15}
           mx="auto"
           radius="md"
-          src={getTokenIcon(campaignDetails?.outpaceChainId, campaignDetails?.outpaceAssetAddr)}
-          alt={campaignDetails?.outpaceAssetAddr}
+          src={getTokenIcon(campaign?.outpaceChainId, campaign?.outpaceAssetAddr)}
+          alt={campaign?.outpaceAssetAddr}
         />
         <Text ml="xs">
           {formatCurrency(
             Number(
               formatUnits(
-                campaignDetails ? campaignDetails.campaignBudget : BigInt(0),
-                campaignDetails ? campaignDetails.outpaceAssetDecimals : 0
+                campaign ? campaign.campaignBudget : BigInt(0),
+                campaign ? campaign.outpaceAssetDecimals : 0
               )
             ),
             DIGITS_AFTER_FLOATING_POINT
@@ -88,12 +92,23 @@ const CampaignDetails = () => {
         </Text>
       </Flex>
     ),
-    [campaignDetails]
+    [campaign]
   )
+
+  useEffect(() => {
+    if (id) {
+      updateCampaignDataById(id)
+    }
+  }, [id, updateCampaignDataById])
+
+  useEffect(() => {
+    console.log({ campaignsData })
+  }, [campaignsData])
+
   return (
     <>
       <GoBack title="Dashboard" />
-      {campaignDetails && (
+      {campaign && (
         <Container fluid className={classes.wrapper}>
           <Grid>
             <Grid.Col span={6}>
@@ -105,19 +120,14 @@ const CampaignDetails = () => {
                   lineHeight="sm"
                   textSize="sm"
                   title="Title"
-                  value={campaignDetails?.title}
+                  value={campaign?.title}
                 />
-                <CampaignDetailsRow
-                  lineHeight="sm"
-                  textSize="sm"
-                  title="Id"
-                  value={campaignDetails?.id}
-                />
+                <CampaignDetailsRow lineHeight="sm" textSize="sm" title="Id" value={campaign?.id} />
                 <CampaignDetailsRow
                   lineHeight="sm"
                   textSize="sm"
                   title="Status"
-                  value={<BadgeStatusCampaign type={campaignDetails?.status as number} />}
+                  value={<BadgeStatusCampaign type={campaign?.status as number} />}
                 />
                 {/* TODO: Add data for it */}
                 <CampaignDetailsRow
@@ -132,35 +142,29 @@ const CampaignDetails = () => {
                 <CampaignDetailsRow
                   lineHeight="sm"
                   title="Created"
-                  value={
-                    campaignDetails && formatDateTime(new Date(Number(campaignDetails.created)))
-                  }
+                  value={formatDateTime(new Date(Number(campaign.created)))}
                 />
                 <CampaignDetailsRow
                   lineHeight="sm"
                   textSize="sm"
                   title="Starts"
-                  value={
-                    campaignDetails && formatDateTime(new Date(Number(campaignDetails.activeFrom)))
-                  }
+                  value={formatDateTime(new Date(Number(campaign.activeFrom)))}
                 />
                 <CampaignDetailsRow
                   lineHeight="sm"
                   textSize="sm"
                   title="Ends"
-                  value={
-                    campaignDetails && formatDateTime(new Date(Number(campaignDetails.activeTo)))
-                  }
+                  value={formatDateTime(new Date(Number(campaign.activeTo)))}
                 />
                 <CampaignDetailsRow
                   lineHeight="sm"
                   title="CPC min"
-                  value={campaignDetails?.pricingBounds.CLICK?.min}
+                  value={campaign.pricingBounds.CLICK?.min}
                 />
                 <CampaignDetailsRow
                   lineHeight="sm"
                   title="CPC max"
-                  value={campaignDetails?.pricingBounds.CLICK?.max}
+                  value={campaign.pricingBounds.CLICK?.max}
                 />
                 {/* TODO: Add data for it */}
                 <CampaignDetailsRow
@@ -168,9 +172,7 @@ const CampaignDetails = () => {
                   textSize="sm"
                   title="Limit average daily spending"
                   value={
-                    campaignDetails?.targetingInput.inputs.advanced.limitDailyAverageSpending
-                      ? 'Yes'
-                      : 'No'
+                    campaign.targetingInput.inputs.advanced.limitDailyAverageSpending ? 'Yes' : 'No'
                   }
                 />
                 {/* TODO: Add data for it */}
@@ -179,9 +181,7 @@ const CampaignDetails = () => {
                   textSize="sm"
                   title="Disable frequency capping"
                   value={
-                    campaignDetails?.targetingInput.inputs.advanced.disableFrequencyCapping
-                      ? 'Yes'
-                      : 'No'
+                    campaign.targetingInput.inputs.advanced.disableFrequencyCapping ? 'Yes' : 'No'
                   }
                   noBorder
                 />
@@ -197,14 +197,14 @@ const CampaignDetails = () => {
                     <CatsLocsFormatted
                       title="Selected Categories"
                       arr={formatCatsAndLocsData(
-                        campaignDetails.targetingInput.inputs.categories,
+                        campaign.targetingInput.inputs.categories,
                         CATEGORIES
                       )}
                     />
                     <CatsLocsFormatted
                       title="Selected Countries"
                       arr={formatCatsAndLocsData(
-                        campaignDetails.targetingInput.inputs.location,
+                        campaign.targetingInput.inputs.location,
                         COUNTRIES
                       )}
                     />
@@ -221,20 +221,19 @@ const CampaignDetails = () => {
               <Grid>
                 <Grid.Col span={12}>
                   <div className={cx(classes.innerWrapper, classes.scrollableContainer)}>
-                    {campaignDetails &&
-                      campaignDetails.adUnits.map((item: AdUnit, index) => {
-                        const isLast = index === campaignDetails.adUnits.length - 1
-                        return (
-                          <CampaignDetailsRow
-                            key={item.id}
-                            lineHeight="sm"
-                            textSize="sm"
-                            title={`${item.banner?.format.w}x${item.banner?.format.h}`}
-                            value={<MediaBanner adUnit={item} />}
-                            noBorder={isLast}
-                          />
-                        )
-                      })}
+                    {campaign.adUnits.map((item: AdUnit, index) => {
+                      const isLast = index === campaign.adUnits.length - 1
+                      return (
+                        <CampaignDetailsRow
+                          key={item.id}
+                          lineHeight="sm"
+                          textSize="sm"
+                          title={`${item.banner?.format.w}x${item.banner?.format.h}`}
+                          value={<MediaBanner adUnit={item} />}
+                          noBorder={isLast}
+                        />
+                      )
+                    })}
                   </div>
                 </Grid.Col>
               </Grid>
