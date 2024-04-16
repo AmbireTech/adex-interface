@@ -1,4 +1,5 @@
-import { Container, Grid, Stack, createStyles } from '@mantine/core'
+import { Container, Flex, Grid, Stack, createStyles } from '@mantine/core'
+import { useMediaQuery } from '@mantine/hooks'
 import CustomCard from 'components/common/CustomCard'
 import { useState } from 'react'
 import BillingDetailsIcon from 'resources/icons/BillingDetails'
@@ -40,52 +41,51 @@ const TabSwitch = ({ selectedTab }: { selectedTab: TabType }) => {
 }
 
 function Billing() {
+  const isMobile = useMediaQuery('(max-width: 75rem)')
   const { classes } = useStyles()
   const [selectedTab, setSelectedTab] = useState<TabType>(TabType.BillingTab)
   const handleTabClicked = (value: TabType) => setSelectedTab(value)
 
   return (
-    <Grid gutter="xl">
-      <Grid.Col span="content">
-        <Stack>
-          <CustomCard
-            width={300}
-            height={100}
-            text="Billing details"
-            iconLeft={<BillingDetailsIcon size="24px" />}
-            color="secondary"
-            active={selectedTab === TabType.BillingTab}
-            action={() => handleTabClicked(TabType.BillingTab)}
-            variant="shadow"
-          />
-          <CustomCard
-            width={300}
-            height={100}
-            text="Invoices"
-            iconLeft={<InvoiceIcon size="24px" />}
-            color="secondary"
-            active={selectedTab === TabType.InvoicesTab}
-            action={() => handleTabClicked(TabType.InvoicesTab)}
-            variant="shadow"
-          />
-          <CustomCard
-            width={300}
-            height={100}
-            text="Account Statements"
-            iconLeft={<StatementsIcon size="24px" />}
-            color="secondary"
-            active={selectedTab === TabType.StatementsTab}
-            action={() => handleTabClicked(TabType.StatementsTab)}
-            variant="shadow"
-          />
-        </Stack>
-      </Grid.Col>
-      <Grid.Col span={5}>
+    <Flex gap="xl" direction={isMobile ? 'column' : 'row'}>
+      <Stack w={isMobile ? '100%' : '300px'}>
+        <CustomCard
+          width="100%"
+          height={100}
+          text="Billing details"
+          iconLeft={<BillingDetailsIcon size="24px" />}
+          color="secondary"
+          active={selectedTab === TabType.BillingTab}
+          action={() => handleTabClicked(TabType.BillingTab)}
+          variant="shadow"
+        />
+        <CustomCard
+          width="100%"
+          height={100}
+          text="Invoices"
+          iconLeft={<InvoiceIcon size="24px" />}
+          color="secondary"
+          active={selectedTab === TabType.InvoicesTab}
+          action={() => handleTabClicked(TabType.InvoicesTab)}
+          variant="shadow"
+        />
+        <CustomCard
+          width="100%"
+          height={100}
+          text="Account Statements"
+          iconLeft={<StatementsIcon size="24px" />}
+          color="secondary"
+          active={selectedTab === TabType.StatementsTab}
+          action={() => handleTabClicked(TabType.StatementsTab)}
+          variant="shadow"
+        />
+      </Stack>
+      <Grid>
         <Container className={classes.container}>
           <TabSwitch selectedTab={selectedTab} />
         </Container>
-      </Grid.Col>
-    </Grid>
+      </Grid>
+    </Flex>
   )
 }
 
