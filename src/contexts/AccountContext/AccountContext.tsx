@@ -76,7 +76,7 @@ const defaultValue: IAccountContext['adexAccount'] = {
   id: '',
   name: '',
   active: false,
-  availableBalance: BigInt(0),
+  availableBalance: 0n,
   balanceToken: {
     name: '',
     address: '',
@@ -84,24 +84,27 @@ const defaultValue: IAccountContext['adexAccount'] = {
     chainId: 0
   },
   fundsDeposited: {
-    total: BigInt(0),
+    total: 0n,
     deposits: []
   },
   fundsOnCampaigns: {
-    total: BigInt(0),
+    total: 0n,
     perCampaign: []
   },
   refundsFromCampaigns: {
-    total: BigInt(0),
+    total: 0n,
     perCampaign: []
   },
   created: new Date(),
   updated: new Date()
 }
 
-function serializeJSON<T>(value: T) {
+function serializeJSON<T>(v: T) {
   try {
-    return JSON.stringify(value)
+    return JSON.stringify(
+      v,
+      (_, value) => (typeof value === 'bigint' ? value.toString() : value) // return everything else unchanged
+    )
   } catch (error) {
     throw new Error('Failed to serialize the value')
   }

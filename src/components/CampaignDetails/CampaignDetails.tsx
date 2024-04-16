@@ -68,30 +68,31 @@ const CampaignDetails = () => {
   )
 
   const campaign = useMemo(() => campaignDeta?.campaign, [campaignDeta])
+  console.log('campaign', campaign)
 
   const budget = useMemo(
-    () => (
-      <Flex align="center">
-        <Image
-          maw={15}
-          mx="auto"
-          radius="md"
-          src={getTokenIcon(campaign?.outpaceChainId, campaign?.outpaceAssetAddr)}
-          alt={campaign?.outpaceAssetAddr}
-        />
-        <Text ml="xs">
-          {formatCurrency(
-            Number(
-              formatUnits(
-                campaign ? campaign.campaignBudget : BigInt(0),
-                campaign ? campaign.outpaceAssetDecimals : 0
-              )
-            ),
-            DIGITS_AFTER_FLOATING_POINT
-          )}
-        </Text>
-      </Flex>
-    ),
+    () =>
+      campaign &&
+      !!campaign?.outpaceAssetAddr &&
+      !!campaign.outpaceChainId &&
+      !!campaign.campaignBudget &&
+      !!campaign.outpaceAssetDecimals && (
+        <Flex align="center">
+          <Image
+            maw={15}
+            mx="auto"
+            radius="md"
+            src={getTokenIcon(campaign.outpaceChainId, campaign?.outpaceAssetAddr)}
+            alt={campaign?.outpaceAssetAddr}
+          />
+          <Text ml="xs">
+            {formatCurrency(
+              Number(formatUnits(campaign.campaignBudget, campaign.outpaceAssetDecimals)),
+              DIGITS_AFTER_FLOATING_POINT
+            )}
+          </Text>
+        </Flex>
+      ),
     [campaign]
   )
 
