@@ -67,7 +67,7 @@ export const useAdExApi = () => {
 
       if (response) {
         const updatedAccessToken = response.accessToken
-        authHeader[authHeaderProp] = updatedAccessToken
+        authHeader[authHeaderProp] = `Bearer ${updatedAccessToken}`
       }
 
       req.headers = {
