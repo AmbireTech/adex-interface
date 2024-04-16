@@ -54,13 +54,13 @@ const getAnalyticsKeyFromQuery = (queryParams: AnalyticsDataQuery): string => {
 }
 
 const analyticsDataToMappedAnalytics = (
-  analyticsResp: AnalyticsDataRes[],
+  analyticsData: AnalyticsData[][],
   analyticsType: AnalyticsType
 ): BaseAnalyticsData[] | undefined => {
-  const impCounts = analyticsResp[0].aggr
-  const impPaid = analyticsResp[1].aggr
-  const clickCounts = analyticsResp[2].aggr
-  const clickPaid = analyticsResp[3].aggr
+  const impCounts = analyticsData[0]
+  const impPaid = analyticsData[1]
+  const clickCounts = analyticsData[2]
+  const clickPaid = analyticsData[3]
 
   const mapped = impCounts.reduce((aggr, el) => {
     const next = new Map(aggr)
@@ -282,11 +282,14 @@ const CampaignsAnalyticsProvider: FC<PropsWithChildren> = ({ children }) => {
         if (status.dataStatus === 'loading') {
           const isLoaded = analyticsKeys.every((aKey) => !!analyticsData.get(aKey))
           if (isLoaded) {
-            const dataRes = analyticsKeys.map(
-              (key) => analyticsData.get(key) as unknown as AnalyticsDataRes
+            const analyticsDataAggregates = analyticsKeys.map(
+              (key) => analyticsData.get(key) as unknown as AnalyticsData[]
             )
 
-            const mapped = analyticsDataToMappedAnalytics(dataRes, status.analyticsType)
+            const mapped = analyticsDataToMappedAnalytics(
+              analyticsDataAggregates,
+              status.analyticsType
+            )
 
             if (mapped) {
               // TODO: map data
