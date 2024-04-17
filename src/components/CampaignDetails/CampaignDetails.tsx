@@ -68,15 +68,10 @@ const CampaignDetails = () => {
   )
 
   const campaign = useMemo(() => campaignDeta?.campaign, [campaignDeta])
-  console.log('campaign', campaign)
 
   const budget = useMemo(
     () =>
-      campaign &&
-      !!campaign?.outpaceAssetAddr &&
-      !!campaign.outpaceChainId &&
-      !!campaign.campaignBudget &&
-      !!campaign.outpaceAssetDecimals && (
+      campaign && (
         <Flex align="center">
           <Image
             maw={15}
