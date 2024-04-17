@@ -129,7 +129,7 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
       // console.log({ str })
       const res = !str
         ? { ...defaultValue, updated: true }
-        : { ...deserializeJSON(str), loaded: true }
+        : { ...defaultValue, ...deserializeJSON(str), loaded: true }
 
       // console.log({ res })
 
@@ -355,6 +355,8 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
         route: '/dsp/accounts/my-account',
         method: 'GET'
       })
+
+      console.log({ getBalance })
 
       if (getBalance) {
         updateAdexAccount({ ...adexAccount, ...getBalance })
