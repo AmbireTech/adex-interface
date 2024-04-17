@@ -1,15 +1,12 @@
 import { FC, PropsWithChildren } from 'react'
-import { initBillingDetails } from 'components/Billing/mockedData'
-// import { BillingDetailsFormProvider, useBillingDetailsForm } from './CompanyDetailsContext'
 import { createFormContext } from '@mantine/form'
-import { IBillingDetails } from 'types'
+import { BillingDetails } from 'types'
 
 const [BillingDetailsFormProvider, useBillingDetailsFormContext, useBillingDetailsForm] =
-  createFormContext<IBillingDetails>()
+  createFormContext<BillingDetails>()
 
 const BillingDetailsProvider: FC<PropsWithChildren> = ({ children }) => {
   const billingDetailsForm = useBillingDetailsForm({
-    initialValues: initBillingDetails,
     validate: {
       firstName: (value: string) =>
         value.length < 2 ? 'First name must have at least 2 letters' : null,

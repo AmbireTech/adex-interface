@@ -1,4 +1,17 @@
 // TODO: These types should get from adex-common
+
+export interface BillingDetails {
+  firstName: string
+  lastName: string
+  companyName: string
+  companyNumber: number
+  companyNumberPrim: number
+  companyAddress: string
+  companyCountry: string
+  companyCity: string
+  companyZipCode: number
+}
+
 export interface Token {
   name: string
   address: string
@@ -45,6 +58,7 @@ export interface Account {
     total: bigint
     perCampaign: CampaignRefunds[]
   }
+  billingDetails: BillingDetails
   created: Date
   updated: Date
   [x: string]: any
