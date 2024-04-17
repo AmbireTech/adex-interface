@@ -1,6 +1,6 @@
 import { useLocalStorage } from '@mantine/hooks'
 import { createContext, FC, PropsWithChildren, useMemo, useCallback, useEffect } from 'react'
-import { Account, IAdExAccount } from 'types'
+import { Account, BillingDetails, IAdExAccount } from 'types'
 import {
   getMessageToSign,
   isAdminToken,
@@ -51,7 +51,6 @@ interface IAccountContext {
   isAdmin: boolean
   connectWallet: () => void
   disconnectWallet: () => void
-  updateAdexAccount: (value: any) => void
   updateAccessToken: () => Promise<any>
   resetAdexAccount: () => void
   adexServicesRequest: <T extends any>(
@@ -59,6 +58,7 @@ interface IAccountContext {
     reqOptions: ApiRequestOptions<T>
   ) => Promise<T>
   updateBalance: () => Promise<void>
+  updateBillingDetails: (billingDetails: BillingDetails) => Promise<void>
 }
 
 const AccountContext = createContext<IAccountContext | null>(null)
@@ -94,6 +94,17 @@ const defaultValue: IAccountContext['adexAccount'] = {
   refundsFromCampaigns: {
     total: 0n,
     perCampaign: []
+  },
+  billingDetails: {
+    firstName: '',
+    lastName: '',
+    companyName: '',
+    companyNumber: 1,
+    companyNumberPrim: 2,
+    companyAddress: '',
+    companyCountry: '',
+    companyCity: '',
+    companyZipCode: 0
   },
   created: new Date(),
   updated: new Date()
@@ -159,8 +170,8 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
     [setAdexAccount]
   )
   const resetAdexAccount = useCallback(
-    () => updateAdexAccount({ ...defaultValue, initialLoad: true }),
-    [updateAdexAccount]
+    () => setAdexAccount({ ...defaultValue, initialLoad: true }),
+    [setAdexAccount]
   )
 
   const connectWallet = useCallback(
@@ -373,21 +384,48 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
     }
   }, [adexAccount, adexServicesRequest, showNotification, updateAdexAccount])
 
+  const updateBillingDetails = useCallback(
+    async (billingDetails: BillingDetails) => {
+      try {
+        const updated = await adexServicesRequest<unknown>('backend', {
+          route: '/dsp/accounts/billing-details',
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: billingDetails
+        })
+
+        if (updated) {
+          updateAdexAccount({ ...adexAccount, billingDetails })
+          showNotification('info', 'Billing details updated', 'Successfully')
+        } else {
+          showNotification(
+            'error',
+            'Updating billing details failed',
+            'Updating billing details failed'
+          )
+        }
+      } catch (err: any) {
+        console.error('Updating billing details failed:', err)
+        showNotification('error', err, 'Updating billing details failed')
+      }
+    },
+    [adexServicesRequest, showNotification, updateAdexAccount, adexAccount]
+  )
+
   const contextValue = useMemo(
     () => ({
       adexAccount,
       authenticated,
-      // authenticated: true,
       isAdmin,
       connectWallet,
       disconnectWallet,
       signMessage,
       ambireSDK,
-      updateAdexAccount,
       updateAccessToken,
       resetAdexAccount,
       adexServicesRequest,
-      updateBalance
+      updateBalance,
+      updateBillingDetails
     }),
     [
       adexAccount,
@@ -397,11 +435,11 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
       disconnectWallet,
       signMessage,
       ambireSDK,
-      updateAdexAccount,
       updateAccessToken,
       resetAdexAccount,
       adexServicesRequest,
-      updateBalance
+      updateBalance,
+      updateBillingDetails
     ]
   )
 

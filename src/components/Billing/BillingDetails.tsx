@@ -1,10 +1,38 @@
 import { Button, Flex, Grid, NumberInput, Select, TextInput } from '@mantine/core'
-import { useBillingDetailsFormContext } from 'contexts/BillingDetailsContext'
+import { useForm } from '@mantine/form'
+import useAccount from 'hooks/useAccount'
 
 const BillingDetails = () => {
-  const form = useBillingDetailsFormContext()
+  const {
+    updateBillingDetails,
+    adexAccount: { billingDetails }
+  } = useAccount()
+
+  const form = useForm({
+    initialValues: billingDetails,
+
+    validate: {
+      firstName: (value: string) =>
+        value.length < 2 ? 'First name must have at least 2 letters' : null,
+      lastName: (value: string) =>
+        value.length < 2 ? 'Last name must have at least 2 letters' : null,
+      companyName: (value: string) =>
+        value.length < 2 ? 'Company name must have at least 2 characters' : null,
+      companyNumber: (value: number) =>
+        Number.isNaN(value) ? 'Company number must be a valid number' : null,
+      companyNumberPrim: (value: number) =>
+        Number.isNaN(value) ? 'Company number 2 must be a valid number' : null,
+      companyAddress: (value: string) =>
+        value.length === 0 ? 'Company address is required' : null,
+      companyCountry: (value: string) => (value.length === 0 ? 'Please select a country' : null),
+      companyCity: (value: string) => (value.length === 0 ? 'Please select a city' : null),
+      companyZipCode: (value: number) =>
+        Number.isNaN(value) ? 'Zip code must be a valid number' : null
+    }
+  })
+
   return (
-    <form onSubmit={form.onSubmit((values) => console.log(values))}>
+    <form onSubmit={form.onSubmit((values) => updateBillingDetails(values))}>
       <Grid gutter="xs">
         <Grid.Col>
           <span>Company details</span>
