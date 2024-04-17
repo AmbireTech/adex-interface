@@ -1,5 +1,5 @@
 import { Button, Flex, Grid, NumberInput, Select, TextInput } from '@mantine/core'
-import { useBillingDetailsFormContext } from 'contexts/BillingDetailsContext'
+import { useForm } from '@mantine/form'
 import useAccount from 'hooks/useAccount'
 
 const BillingDetails = () => {
@@ -8,7 +8,17 @@ const BillingDetails = () => {
     adexAccount: { billingDetails }
   } = useAccount()
 
-  const form = useBillingDetailsFormContext()
+  const form = useForm({
+    initialValues: billingDetails,
+
+    validate: {
+      firstName: (value: string) =>
+        value.length < 2 ? 'First name must have at least 2 letters' : null,
+      lastName: (value: string) =>
+        value.length < 2 ? 'Last name must have at least 2 letters' : null
+      // TODO: add validations for all the input fields
+    }
+  })
 
   return (
     <form onSubmit={form.onSubmit((values) => updateBillingDetails(values))}>
@@ -18,7 +28,6 @@ const BillingDetails = () => {
         </Grid.Col>
         <Grid.Col>
           <TextInput
-            defaultValue={billingDetails.firstName}
             radius="sm"
             size="lg"
             required
@@ -28,7 +37,6 @@ const BillingDetails = () => {
         </Grid.Col>
         <Grid.Col>
           <TextInput
-            defaultValue={billingDetails.lastName}
             radius="sm"
             size="lg"
             required
@@ -38,7 +46,6 @@ const BillingDetails = () => {
         </Grid.Col>
         <Grid.Col>
           <TextInput
-            defaultValue={billingDetails.companyName}
             radius="sm"
             size="lg"
             required
@@ -48,7 +55,6 @@ const BillingDetails = () => {
         </Grid.Col>
         <Grid.Col span={6}>
           <NumberInput
-            defaultValue={billingDetails.companyNumber}
             radius="sm"
             size="lg"
             required
@@ -60,7 +66,6 @@ const BillingDetails = () => {
         </Grid.Col>
         <Grid.Col span={6}>
           <NumberInput
-            defaultValue={billingDetails.companyNumberPrim}
             radius="sm"
             size="lg"
             required
@@ -75,7 +80,6 @@ const BillingDetails = () => {
         </Grid.Col>
         <Grid.Col>
           <TextInput
-            defaultValue={billingDetails.companyAddress}
             radius="sm"
             size="lg"
             required
@@ -89,7 +93,6 @@ const BillingDetails = () => {
             required
             data={['Country 1', 'Country 2', 'Country 3']}
             placeholder="Select Country"
-            defaultValue={billingDetails.companyCountry}
             {...form.getInputProps('companyCountry')}
           />
         </Grid.Col>
@@ -99,7 +102,6 @@ const BillingDetails = () => {
             required
             data={['City 1', 'City 2', 'City 3']}
             placeholder="Select City"
-            defaultValue={billingDetails.companyCity}
             {...form.getInputProps('companyCity')}
           />
         </Grid.Col>
@@ -112,7 +114,6 @@ const BillingDetails = () => {
             // TODO: change the placeholder
             // Check if the input should be Number
             placeholder="Zip Code"
-            defaultValue={billingDetails.companyZipCode}
             {...form.getInputProps('companyZipCode')}
           />
         </Grid.Col>

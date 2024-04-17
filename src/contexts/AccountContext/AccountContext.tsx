@@ -386,7 +386,6 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
 
   const updateBillingDetails = useCallback(
     async (billingDetails: BillingDetails) => {
-      console.log('billingDetails', billingDetails)
       try {
         const updated = await adexServicesRequest<unknown>('backend', {
           route: '/dsp/accounts/billing-details',
@@ -394,9 +393,9 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
           headers: { 'Content-Type': 'application/json' },
           body: billingDetails
         })
-        console.log('RES', updated)
+
         if (updated) {
-          await updateBalance()
+          updateAdexAccount({ ...adexAccount, billingDetails })
           showNotification('info', 'Billing details updated', 'Successfully')
         } else {
           showNotification(
@@ -410,7 +409,7 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
         showNotification('error', err, 'Updating billing details failed')
       }
     },
-    [adexServicesRequest, showNotification, updateBalance]
+    [adexServicesRequest, showNotification, updateAdexAccount, adexAccount]
   )
 
   const contextValue = useMemo(

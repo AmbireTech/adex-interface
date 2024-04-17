@@ -2,7 +2,6 @@ import { Global, MantineProvider, Progress } from '@mantine/core'
 import { ModalsProvider } from '@mantine/modals'
 import { AccountProvider } from 'contexts/AccountContext'
 import { CampaignsDataProvider, CampaignsAnalyticsProvider } from 'contexts/CampaignsContext'
-import { BillingDetailsProvider } from 'contexts/BillingDetailsContext'
 import { RouterProvider } from 'react-router-dom'
 import { router } from 'Router'
 import { lightTheme } from 'themes'
@@ -46,10 +45,8 @@ function App() {
             <ModalsProvider>
               <GlobalStyles />
               <Notifications />
-              <BillingDetailsProvider>
-                {ENV && <EnvBanner />}
-                <RouterProvider router={router} />
-              </BillingDetailsProvider>
+              {ENV && <EnvBanner />}
+              <RouterProvider router={router} />
             </ModalsProvider>
           </MantineProvider>
         </CampaignsAnalyticsProvider>
