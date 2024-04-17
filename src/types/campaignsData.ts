@@ -10,8 +10,6 @@ export type CampaignData = {
   // paid / impressions * 1000
   avgCpm?: number | string
   paid: number
-  // TODO: analyticsData type
-  analyticsData: any
 }
 
 export type Timeframe = 'year' | 'month' | 'week' | 'day' | 'hour'

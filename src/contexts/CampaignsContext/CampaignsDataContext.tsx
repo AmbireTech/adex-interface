@@ -14,6 +14,16 @@ import useCustomNotifications from 'hooks/useCustomNotifications'
 import { CampaignData, EventAggregatesDataRes, EvAggrData } from 'types/campaignsData'
 import { CREATE_CAMPAIGN_DEFAULT_VALUE } from 'constants/createCampaign'
 
+const defaultCampaignData: CampaignData = {
+  campaignId: '',
+  campaign: { ...CREATE_CAMPAIGN_DEFAULT_VALUE },
+  impressions: 0,
+  clicks: 0,
+  ctr: 'N/A',
+  avgCpm: 'N/A',
+  paid: 0
+}
+
 const eventAggregatestResToAdvData = (dataRes: EventAggregatesDataRes): EvAggrData => {
   const newData: EvAggrData = {
     clicks: dataRes.events[0].totals.CLICK.eventCounts,
@@ -26,15 +36,43 @@ const eventAggregatestResToAdvData = (dataRes: EventAggregatesDataRes): EvAggrDa
   return newData
 }
 
-const defaultCampaignData: CampaignData = {
-  campaignId: '',
-  campaign: { ...CREATE_CAMPAIGN_DEFAULT_VALUE },
-  impressions: 0,
-  clicks: 0,
-  ctr: 'N/A',
-  avgCpm: 'N/A',
-  paid: 0,
-  analyticsData: {}
+const campaignResToCampaignData = (
+  cmpRes: Campaign,
+  advData: EvAggrData,
+  prevCmp?: CampaignData
+): CampaignData => {
+  const adv: {
+    impressions: number
+    clicks: number
+    ctr: number | string
+    avgCpm: number | string
+    paid: number
+  } = {
+    ...(advData || {
+      clicks: 0,
+      impressions: 0
+    }),
+    ...{
+      // TODO: Decimals to umber fn
+      paid: Number(advData?.payouts || 0) * 10 ** -8,
+      ctr: 'N/A',
+      avgCpm: 'N/A'
+    }
+  }
+
+  if (adv.impressions > 0) {
+    adv.ctr = (adv.clicks / adv.impressions) * 100
+    adv.avgCpm = (adv.paid / adv.impressions) * 1000
+  }
+
+  const currentCMP = {
+    ...(prevCmp || defaultCampaignData),
+    campaignId: cmpRes.id,
+    campaign: { ...defaultCampaignData.campaign, ...cmpRes },
+    ...adv
+  }
+
+  return currentCMP
 }
 
 interface ICampaignsDataContext {
@@ -60,58 +98,6 @@ const CampaignsDataProvider: FC<PropsWithChildren> = ({ children }) => {
     new Map<Campaign['id'], CampaignData>()
   )
 
-  // eslint-disable-next-line
-  // const [eventAggregates, setEventAggregates] = useState<ICampaignsDataContext['eventAggregates']>(
-  //   new Map<Campaign['id'], EvAggrData>()
-  // )
-
-  const updateCampaignDataById = useCallback(
-    async (campaignId: string) => {
-      console.log({ campaignId })
-      try {
-        const campaignDetailsRes = await adexServicesRequest<Campaign>('backend', {
-          route: `/dsp/campaigns/by-id/${campaignId}`,
-          method: 'GET'
-        })
-
-        if (campaignId !== campaignDetailsRes?.id) {
-          // NOTE: skip state update
-          showNotification('error', `getting campaign with id ${campaignId}`, 'Data error')
-          return
-        }
-
-        setCampaignData((prev) => {
-          const updatedCmp = {
-            ...(prev.get(campaignId) || {
-              ...defaultCampaignData,
-              campaignId
-            }),
-            campaign: { ...defaultCampaignData.campaign, ...campaignDetailsRes }
-          }
-
-          const next = new Map(prev)
-
-          console.log({ next })
-          next.set(campaignId, updatedCmp)
-
-          return next
-        })
-      } catch (err) {
-        console.log(err)
-        showNotification('error', `getting campaign with id ${campaignId}`, 'Data error')
-      }
-    },
-    [adexServicesRequest, showNotification]
-  )
-
-  // useEffect(() => {
-  //   console.log({ adexServicesRequest })
-  // }, [adexServicesRequest])
-
-  // useEffect(() => {
-  //   console.log({ showNotification })
-  // }, [showNotification])
-
   const getCampaignAdvancedData = useCallback(
     async (campaignId: string): Promise<EvAggrData> => {
       try {
@@ -131,6 +117,41 @@ const CampaignsDataProvider: FC<PropsWithChildren> = ({ children }) => {
       }
     },
     [adexServicesRequest]
+  )
+
+  const updateCampaignDataById = useCallback(
+    async (campaignId: string) => {
+      console.log({ campaignId })
+      try {
+        const campaignDetailsRes = await adexServicesRequest<Campaign>('backend', {
+          route: `/dsp/campaigns/by-id/${campaignId}`,
+          method: 'GET'
+        })
+
+        if (campaignId !== campaignDetailsRes?.id) {
+          // NOTE: skip state update
+          showNotification('error', `getting campaign with id ${campaignId}`, 'Data error')
+          return
+        }
+
+        const advData = await getCampaignAdvancedData(campaignId)
+
+        setCampaignData((prev) => {
+          const updatedCmp = campaignResToCampaignData(
+            campaignDetailsRes,
+            advData,
+            prev.get(campaignId)
+          )
+          const next = new Map(prev)
+          next.set(campaignId, updatedCmp)
+          return next
+        })
+      } catch (err) {
+        console.log(err)
+        showNotification('error', `getting campaign with id ${campaignId}`, 'Data error')
+      }
+    },
+    [adexServicesRequest, getCampaignAdvancedData, showNotification]
   )
 
   const updateAllCampaignsData = useCallback(
@@ -153,38 +174,9 @@ const CampaignsDataProvider: FC<PropsWithChildren> = ({ children }) => {
         if (Array.isArray(dataRes)) {
           setCampaignData((prev) => {
             const next = new Map(prev)
+
             dataRes.forEach((cmp: Campaign, index: number) => {
-              const adv: {
-                impressions: number
-                clicks: number
-                ctr: number | string
-                avgCpm: number | string
-                paid: number
-              } = {
-                ...(advData[index] || {
-                  clicks: 0,
-                  impressions: 0
-                }),
-                ...{
-                  // TODO: Decimals to umber fn
-                  paid: Number(advData[index]?.payouts || 0) * 10 ** -8,
-                  ctr: 'N/A',
-                  avgCpm: 'N/A'
-                }
-              }
-
-              if (adv.impressions > 0) {
-                adv.ctr = (adv.clicks / adv.impressions) * 100
-                adv.avgCpm = (adv.paid / adv.impressions) * 1000
-              }
-
-              const currentCMP = {
-                ...(prev.get(cmp.id) || defaultCampaignData),
-                campaignId: cmp.id,
-                campaign: { ...defaultCampaignData.campaign, ...cmp },
-                ...adv
-              }
-
+              const currentCMP = campaignResToCampaignData(cmp, advData[index], prev.get(cmp.id))
               next.set(cmp.id, currentCMP)
             })
 
@@ -202,49 +194,6 @@ const CampaignsDataProvider: FC<PropsWithChildren> = ({ children }) => {
     [adexServicesRequest, getCampaignAdvancedData, showNotification]
   )
 
-  // const updateEventAggregates = useCallback(
-  //   async (campaignId: Campaign['id']) => {
-  //     try {
-  //       // TODO: dataRes type
-  //       const eventAggregatesRes = await adexServicesRequest<EventAggregatesDataRes>('validator', {
-  //         route: `/v5_a/channel/${campaignId}/events-aggregates`,
-  //         method: 'GET'
-  //       })
-
-  //       console.log({ eventAggregatesRes })
-
-  //       if (!eventAggregatesRes?.events?.length) {
-  //         // TODO do something
-  //         return
-  //       }
-
-  //       setEventAggregates((prev) => {
-  //         const newData: EvAggrData = {
-  //           clicks: eventAggregatesRes.events[0].totals.CLICK.eventCounts,
-  //           impressions: eventAggregatesRes.events[0].totals.IMPRESSION.eventCounts,
-  //           payouts:
-  //             BigInt(eventAggregatesRes.events[0].totals.CLICK.eventPayouts) +
-  //             BigInt(eventAggregatesRes.events[0].totals.IMPRESSION.eventPayouts)
-  //         }
-
-  //         const next = new Map(prev)
-  //         next.set(campaignId, newData)
-
-  //         return next
-  //       })
-  //     } catch (err) {
-  //       console.log(err)
-  //       // TODO: see how to use campaignId out of segment
-  //       showNotification(
-  //         'error',
-  //         `getting event aggregates for campaign ${campaignId}`,
-  //         'Data error'
-  //       )
-  //     }
-  //   },
-  //   [adexServicesRequest, showNotification]
-  // )
-
   useEffect(() => {
     if (authenticated) {
       const updateCampaigns = async () => {
@@ -255,7 +204,6 @@ const CampaignsDataProvider: FC<PropsWithChildren> = ({ children }) => {
       updateCampaigns()
     } else {
       setCampaignData(new Map<string, CampaignData>())
-      // setEventAggregates(new Map<Campaign['id'], EvAggrData>())
       setInitialDataLoading(false)
     }
   }, [updateAllCampaignsData, authenticated])
@@ -265,8 +213,6 @@ const CampaignsDataProvider: FC<PropsWithChildren> = ({ children }) => {
       campaignsData,
       updateCampaignDataById,
       updateAllCampaignsData,
-      // eventAggregates,
-      // updateEventAggregates,
       initialDataLoading
     }),
     [campaignsData, updateCampaignDataById, updateAllCampaignsData, initialDataLoading]
