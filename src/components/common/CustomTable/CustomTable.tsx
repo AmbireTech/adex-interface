@@ -181,7 +181,18 @@ const CustomTable = ({
         )}
       </tr>
     ))
-  }, [isMobile, columns, list, hasAction, onPreview, onAnalytics, onDuplicate, onDelete])
+  }, [
+    isMobile,
+    list,
+    columns,
+    hasAction,
+    onPreview,
+    onAnalytics,
+    onDuplicate,
+    onDelete,
+    classes.gridRow,
+    head
+  ])
 
   return (
     <Flex h="100%" w="100%" justify="space-between" direction="column" align="center">
