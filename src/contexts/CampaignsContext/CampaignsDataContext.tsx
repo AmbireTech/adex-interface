@@ -12,6 +12,7 @@ import { useAdExApi } from 'hooks/useAdexServices'
 import useAccount from 'hooks/useAccount'
 import useCustomNotifications from 'hooks/useCustomNotifications'
 import { CampaignData, EventAggregatesDataRes, EvAggrData } from 'types/campaignsData'
+import { CREATE_CAMPAIGN_DEFAULT_VALUE } from 'constants/createCampaign'
 
 const eventAggregatestResToAdvData = (dataRes: EventAggregatesDataRes): EvAggrData => {
   const newData: EvAggrData = {
@@ -25,9 +26,9 @@ const eventAggregatestResToAdvData = (dataRes: EventAggregatesDataRes): EvAggrDa
   return newData
 }
 
-const defaultCampaignData = {
+const defaultCampaignData: CampaignData = {
   campaignId: '',
-  campaign: {},
+  campaign: { ...CREATE_CAMPAIGN_DEFAULT_VALUE },
   impressions: 0,
   clicks: 0,
   ctr: 'N/A',
@@ -83,9 +84,9 @@ const CampaignsDataProvider: FC<PropsWithChildren> = ({ children }) => {
           const updatedCmp = {
             ...(prev.get(campaignId) || {
               ...defaultCampaignData,
-              campaignId,
-              campaign: campaignDetailsRes
-            })
+              campaignId
+            }),
+            campaign: { ...defaultCampaignData.campaign, ...campaignDetailsRes }
           }
 
           const next = new Map(prev)
@@ -180,7 +181,7 @@ const CampaignsDataProvider: FC<PropsWithChildren> = ({ children }) => {
               const currentCMP = {
                 ...(prev.get(cmp.id) || defaultCampaignData),
                 campaignId: cmp.id,
-                campaign: cmp,
+                campaign: { ...defaultCampaignData.campaign, ...cmp },
                 ...adv
               }
 

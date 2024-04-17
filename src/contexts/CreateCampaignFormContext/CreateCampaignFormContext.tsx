@@ -1,6 +1,7 @@
 import { Button } from '@mantine/core'
 import { createFormContext } from '@mantine/form'
 import { validateCreateCampaignFrom } from 'helpers/validators'
+import useAccount from 'hooks/useAccount'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import { FC, PropsWithChildren, useEffect } from 'react'
 import { CampaignUI } from 'types'
@@ -10,10 +11,13 @@ const [CrCampaignFormProvider, useCreateCampaignFormContext, useCreateCampaignFo
 
 const CreateCampaignFormProvider: FC<PropsWithChildren> = ({ children }) => {
   const { campaign, updateAllCampaign } = useCreateCampaignContext()
+  const {
+    adexAccount: { availableBalance, balanceToken }
+  } = useAccount()
 
   const form = useCreateCampaignForm({
     initialValues: campaign,
-    validate: validateCreateCampaignFrom
+    validate: validateCreateCampaignFrom(availableBalance, balanceToken)
   })
 
   const handleSubmit = (event: any) => {

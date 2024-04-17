@@ -46,22 +46,22 @@ export const CREATE_CAMPAIGN_DEFAULT_VALUE: CampaignUI = {
   outpaceAssetAddr: '',
   outpaceAssetDecimals: 0,
   outpaceAddr: '',
-  campaignBudget: BigInt(0),
+  campaignBudget: 0n,
   outpaceChainId: 1,
   created: BigInt(Date.now()),
-  nonce: BigInt(0),
+  nonce: 0n,
   owner: '',
   title: '',
   adUnits: [],
   validators: [],
   pricingBounds: {
     IMPRESSION: {
-      min: BigInt(0),
-      max: BigInt(0)
+      min: 0n,
+      max: 0n
     },
     CLICK: {
-      min: BigInt(0),
-      max: BigInt(0)
+      min: 0n,
+      max: 0n
     }
   },
   targetingRules: [],

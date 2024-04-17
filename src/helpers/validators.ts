@@ -1,47 +1,61 @@
-export const validateCreateCampaignFrom = {
-  paymentModel: (value: string) => {
-    if (value === '') return 'Select payment method'
-    return null
-  },
-  currency: (value: string) => {
-    if (value === '') return 'Select currency'
-    return null
-  },
-  campaignBudget: (value: any) => {
-    if (value === '' || Number.isNaN(Number(value))) {
-      return 'Enter campaign budget or a valid number'
+import { Token } from 'types'
+import { formatUnits } from './balances'
+
+export const validateCreateCampaignFrom = (availableBalance: BigInt, balanceToken: Token) => {
+  const validateBudget = (value: string) => {
+    const formattedToken = Number(formatUnits(availableBalance, balanceToken.decimals))
+    return formattedToken < Number(value)
+  }
+
+  return {
+    paymentModel: (value: string) => {
+      if (value === '') return 'Select payment method'
+      return null
+    },
+    currency: (value: string) => {
+      if (value === '') return 'Select currency'
+      return null
+    },
+    campaignBudget: (value: any) => {
+      if (value === '' || Number.isNaN(Number(value))) {
+        return 'Enter campaign budget or a valid number'
+      }
+      if (parseFloat(value) <= 0) {
+        return 'Campaign budget should be greater than 0'
+      }
+
+      if (validateBudget(value)) {
+        return 'Available balance is lower than the campaign budget'
+      }
+      return null
+    },
+    'pricingBounds.IMPRESSION.min': (value: string) => {
+      if (value === '' || Number.isNaN(Number(value))) {
+        return 'Enter CPM min value or a valid number'
+      }
+      if (parseFloat(value) <= 0) {
+        return 'CPM min should be greater than 0'
+      }
+      return null
+    },
+    'pricingBounds.IMPRESSION.max': (value: string) => {
+      if (value === '' || Number.isNaN(Number(value))) {
+        return 'Enter CPM max value or a valid number'
+      }
+      if (parseFloat(value) <= 0) {
+        return 'CPM max should be greater than 0'
+      }
+      return null
+    },
+    title: (value: string) => {
+      if (value === '') {
+        return 'Enter Title'
+      }
+      if (value.length < 2) {
+        return 'Campaign name must have at least 2 letters'
+      }
+      return null
     }
-    if (parseFloat(value) <= 0) {
-      return 'Campaign budget should be greater than 0'
-    }
-    return null
-  },
-  'pricingBounds.IMPRESSION.min': (value: string) => {
-    if (value === '' || Number.isNaN(Number(value))) {
-      return 'Enter CPM min value or a valid number'
-    }
-    if (parseFloat(value) <= 0) {
-      return 'CPM min should be greater than 0'
-    }
-    return null
-  },
-  'pricingBounds.IMPRESSION.max': (value: string) => {
-    if (value === '' || Number.isNaN(Number(value))) {
-      return 'Enter CPM max value or a valid number'
-    }
-    if (parseFloat(value) <= 0) {
-      return 'CPM max should be greater than 0'
-    }
-    return null
-  },
-  title: (value: string) => {
-    if (value === '') {
-      return 'Enter Title'
-    }
-    if (value.length < 2) {
-      return 'Campaign name must have at least 2 letters'
-    }
-    return null
   }
 }
 

@@ -188,7 +188,6 @@ export const initAllLocales = () => {
 
 type ReducedCampaign = Omit<
   Campaign,
-  | 'campaignBudget'
   | 'created'
   | 'owner'
   | 'validators'
@@ -209,7 +208,6 @@ export const mapCampaignUItoCampaign = (campaignUI: CampaignUI): ReducedCampaign
     startsAt,
     endsAt,
     currency,
-    campaignBudget,
     created,
     owner,
     validators,

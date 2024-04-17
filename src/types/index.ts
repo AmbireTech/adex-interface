@@ -1,6 +1,5 @@
 export * from './account'
 export * from './actionButton'
-export * from './accountBalance'
 export * from './badgeStatusCampaign'
 export * from './billingDetails'
 export * from './customTable'

@@ -15,7 +15,7 @@ import DepositIcon from 'resources/icons/Deposit'
 import BillingIcon from 'resources/icons/Billing'
 import HelpIcon from 'resources/icons/Help'
 import AdExLogo from 'resources/logos/AdExLogo'
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import { appVersion } from 'helpers'
 import NavLink from './NavLink'
 import Balance from './Balance'
@@ -46,14 +46,27 @@ const useStyles = createStyles((theme) => ({
 }))
 
 function SideNav() {
-  // const { connectWallet, disconnectWallet, adexAccount } = useAccount()
-  const { isAdmin } = useAccount()
+  const {
+    isAdmin,
+    adexAccount: { availableBalance },
+    updateBalance
+  } = useAccount()
 
   const location = useLocation()
   const match = useMatch(location.pathname)
   const year = useMemo(() => new Date().getFullYear(), [])
   const theme = useMantineTheme()
   const { classes } = useStyles()
+
+  useEffect(() => {
+    updateBalance()
+    // eslint-disable-next-line
+  }, [])
+
+  const hasAvailableBalance = useMemo(
+    () => availableBalance && availableBalance > 0,
+    [availableBalance]
+  )
 
   return (
     <>
@@ -72,7 +85,7 @@ function SideNav() {
         <Balance />
       </Navbar.Section>
       <Navbar.Section className={classes.newCampaign}>
-        <CreateCampaignBtn hasPopover={Boolean(IS_MANUAL_DEPOSITING)} />
+        <CreateCampaignBtn hasPopover={Boolean(IS_MANUAL_DEPOSITING) && !hasAvailableBalance} />
       </Navbar.Section>
       <Navbar.Section mx="-xs" grow component={ScrollArea}>
         <Box>
@@ -87,7 +100,7 @@ function SideNav() {
             icon={<DepositIcon />}
             label="Top Up Account"
             active={useResolvedPath('deposit').pathname === match?.pathname}
-            hasPopover={Boolean(IS_MANUAL_DEPOSITING)}
+            hasPopover={Boolean(IS_MANUAL_DEPOSITING) && !hasAvailableBalance}
             popoverContent={
               <Text size="sm">
                 Contact us on <a href="mailto: dsp@adex.network"> dsp@adex.network</a> to &quot;add
