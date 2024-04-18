@@ -1,9 +1,11 @@
 import { Token } from 'types'
-import { formatUnits } from './balances'
+import { parseBigNumTokenAmountToDecimal } from './balances'
 
-export const validateCreateCampaignFrom = (availableBalance: BigInt, balanceToken: Token) => {
+export const validateCreateCampaignFrom = (availableBalance: bigint, balanceToken: Token) => {
   const validateBudget = (value: string) => {
-    const formattedToken = Number(formatUnits(availableBalance, balanceToken.decimals))
+    const formattedToken = Number(
+      parseBigNumTokenAmountToDecimal(availableBalance, balanceToken.decimals)
+    )
     return formattedToken < Number(value)
   }
 
