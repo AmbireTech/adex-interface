@@ -75,6 +75,7 @@ const CampaignAnalytics = () => {
 
   useEffect(() => {
     if (!campaign) return
+    setAnalyticsKey(undefined)
 
     const checkAnalytics = async () => {
       const key = await getAnalyticsKeyAndUpdate(campaign, activeTab)
