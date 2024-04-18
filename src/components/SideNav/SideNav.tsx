@@ -17,11 +17,10 @@ import HelpIcon from 'resources/icons/Help'
 import AdExLogo from 'resources/logos/AdExLogo'
 import { useEffect, useMemo } from 'react'
 import { appVersion } from 'helpers'
+import { IS_MANUAL_DEPOSITING } from 'constants/balances'
 import NavLink from './NavLink'
 import Balance from './Balance'
 import CreateCampaignBtn from './CreateCampaignBtn'
-
-const IS_MANUAL_DEPOSITING = process.env.REACT_APP_IS_MANUAL_DEPOSITING
 
 const useStyles = createStyles((theme) => ({
   logo: {
