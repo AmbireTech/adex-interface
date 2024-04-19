@@ -6,7 +6,7 @@ import { CampaignUI, CreateCampaignType } from 'types'
 import useAccount from 'hooks/useAccount'
 import { useAdExApi } from 'hooks/useAdexServices'
 import { mapCampaignUItoCampaign } from 'helpers/createCampaignHelpers'
-import { parseUnits } from 'helpers/balances'
+import { parseToBigNumPrecision } from 'helpers/balances'
 
 const CreateCampaignContext = createContext<CreateCampaignType | null>(null)
 
@@ -91,10 +91,10 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
     const mappedCampaign = mapCampaignUItoCampaign(campaign)
     mappedCampaign.id = `${campaign.title}-${Date.now().toString(16)}`
 
-    mappedCampaign.campaignBudget = parseUnits(
-      mappedCampaign.campaignBudget.toString(),
+    mappedCampaign.campaignBudget = parseToBigNumPrecision(
+      Number(mappedCampaign.campaignBudget),
       balanceToken.decimals
-    ).toBigInt()
+    )
 
     const body = serialize(mappedCampaign).json
 

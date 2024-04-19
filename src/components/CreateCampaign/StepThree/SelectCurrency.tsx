@@ -2,7 +2,7 @@ import { Image, Select, Text, Flex, MediaQuery } from '@mantine/core'
 import { DIGITS_AFTER_FLOATING_POINT } from 'constants/balances'
 import { useCreateCampaignFormContext } from 'contexts/CreateCampaignFormContext'
 import { formatCurrency } from 'helpers'
-import { formatUnits } from 'helpers/balances'
+import { parseBigNumTokenAmountToDecimal } from 'helpers/balances'
 import useAccount from 'hooks/useAccount'
 import { getTokenIcon, networks } from 'lib/Icons'
 import { forwardRef, useMemo } from 'react'
@@ -23,7 +23,7 @@ const SelectItem = forwardRef<HTMLDivElement, ItemProps>(
           <Image maw={20} mx="auto" radius="md" src={getTokenIcon(chainId, address)} alt={name} />
           <Text size="sm">
             {formatCurrency(
-              Number(formatUnits(availableBalance, decimals)),
+              Number(parseBigNumTokenAmountToDecimal(availableBalance, decimals)),
               DIGITS_AFTER_FLOATING_POINT
             )}{' '}
             {name}

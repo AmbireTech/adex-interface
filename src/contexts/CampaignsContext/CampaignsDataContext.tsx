@@ -38,7 +38,7 @@ const eventAggregatestResToAdvData = (dataRes: EventAggregatesDataRes): EvAggrDa
 
 const campaignResToCampaignData = (
   cmpRes: Campaign,
-  advData: EvAggrData,
+  advData?: EvAggrData,
   prevCmp?: CampaignData
 ): CampaignData => {
   const adv: {
@@ -168,6 +168,7 @@ const CampaignsDataProvider: FC<PropsWithChildren> = ({ children }) => {
           const calls = [...dataRes].map(({ id }) => getCampaignAdvancedData(id))
 
           advData = await Promise.all(calls)
+          console.log({ advData })
         }
 
         console.log({ dataRes })
@@ -176,7 +177,7 @@ const CampaignsDataProvider: FC<PropsWithChildren> = ({ children }) => {
             const next = new Map(prev)
 
             dataRes.forEach((cmp: Campaign, index: number) => {
-              const currentCMP = campaignResToCampaignData(cmp, advData[index], prev.get(cmp.id))
+              const currentCMP = campaignResToCampaignData(cmp, advData?.[index], prev.get(cmp.id))
               next.set(cmp.id, currentCMP)
             })
 

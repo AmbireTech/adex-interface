@@ -19,7 +19,7 @@ import {
   BaseAnalyticsData,
   AnalyticsPeriod
 } from 'types'
-import { timeout } from 'utils'
+import { timeout } from 'helpers'
 
 import { dashboardTableElements } from 'components/Dashboard/mockData'
 
