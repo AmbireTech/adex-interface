@@ -55,8 +55,8 @@ const CampaignAnalytics = () => {
   const currencyName = useMemo(
     () =>
       id && !!perCampaign.length
-        ? perCampaign.find((item) => item.id === id)?.token.name
-        : undefined,
+        ? perCampaign.find((item) => item.id === id)?.token.name || ''
+        : '',
     [id, perCampaign]
   )
 
@@ -158,20 +158,29 @@ const CampaignAnalytics = () => {
         ) : (
           <>
             <Tabs.Panel value="timeframe" pt="xs">
-              <TimeFrame timeFrames={campaignMappedAnalytics} period={analyticsKey?.period} />
+              <TimeFrame
+                timeFrames={campaignMappedAnalytics}
+                period={analyticsKey?.period}
+                currencyName={currencyName}
+              />
             </Tabs.Panel>
             <Tabs.Panel value="hostname" pt="xs">
-              <Placements placements={campaignMappedAnalytics} />
+              <Placements placements={campaignMappedAnalytics} currencyName={currencyName} />
             </Tabs.Panel>
             <Tabs.Panel value="country" pt="xs">
               <Regions
                 regions={campaignMappedAnalytics}
                 isMapVisible={isMapVisible}
+                currencyName={currencyName}
                 onClose={() => setIsMapVisible(false)}
               />
             </Tabs.Panel>
             <Tabs.Panel value="adUnit" pt="xs">
-              <Creatives creatives={campaignMappedAnalytics} units={campaign?.adUnits} />
+              <Creatives
+                creatives={campaignMappedAnalytics}
+                units={campaign?.adUnits}
+                currencyName={currencyName}
+              />
             </Tabs.Panel>
           </>
         )}

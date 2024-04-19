@@ -29,7 +29,7 @@ const dashboardTableElements: (CampaignData & {
         clicks: 10048,
         ctr: 0.712,
         paid: 69,
-        avgCpm: '0.15 DAI'
+        avgCpm: 0.15
       },
       {
         analyticsType: 'hostname',
@@ -38,7 +38,7 @@ const dashboardTableElements: (CampaignData & {
         clicks: 10048,
         ctr: 0.712,
         paid: 69,
-        avgCpm: '0.15 DAI'
+        avgCpm: 0.15
       },
       {
         analyticsType: 'hostname',
@@ -47,7 +47,7 @@ const dashboardTableElements: (CampaignData & {
         clicks: 10048,
         ctr: 0.712,
         paid: 69,
-        avgCpm: '0.15 DAI'
+        avgCpm: 0.15
       },
       {
         analyticsType: 'hostname',
@@ -56,7 +56,7 @@ const dashboardTableElements: (CampaignData & {
         clicks: 10048,
         ctr: 0.712,
         paid: 69,
-        avgCpm: '0.15 DAI'
+        avgCpm: 0.15
       },
       {
         analyticsType: 'hostname',
@@ -65,7 +65,7 @@ const dashboardTableElements: (CampaignData & {
         clicks: 10048,
         ctr: 0.712,
         paid: 69,
-        avgCpm: '0.15 DAI'
+        avgCpm: 0.15
       },
       {
         analyticsType: 'hostname',
@@ -74,7 +74,7 @@ const dashboardTableElements: (CampaignData & {
         clicks: 10048,
         ctr: 0.712,
         paid: 69,
-        avgCpm: '0.15 DAI'
+        avgCpm: 0.15
       },
       {
         analyticsType: 'hostname',
@@ -83,7 +83,7 @@ const dashboardTableElements: (CampaignData & {
         clicks: 10048,
         ctr: 0.712,
         paid: 69,
-        avgCpm: '0.15 DAI'
+        avgCpm: 0.15
       },
       {
         analyticsType: 'hostname',
@@ -92,7 +92,7 @@ const dashboardTableElements: (CampaignData & {
         clicks: 10048,
         ctr: 0.712,
         paid: 69,
-        avgCpm: '0.15 DAI'
+        avgCpm: 0.15
       },
       {
         analyticsType: 'hostname',
@@ -101,7 +101,7 @@ const dashboardTableElements: (CampaignData & {
         clicks: 10048,
         ctr: 0.712,
         paid: 69,
-        avgCpm: '0.15 DAI'
+        avgCpm: 0.15
       },
       {
         analyticsType: 'hostname',
@@ -110,7 +110,7 @@ const dashboardTableElements: (CampaignData & {
         clicks: 10048,
         ctr: 0.712,
         paid: 69,
-        avgCpm: '0.15 DAI'
+        avgCpm: 0.15
       },
       {
         analyticsType: 'hostname',
@@ -119,7 +119,7 @@ const dashboardTableElements: (CampaignData & {
         clicks: 10048,
         ctr: 0.712,
         paid: 69,
-        avgCpm: '0.15 DAI'
+        avgCpm: 0.15
       },
       {
         analyticsType: 'hostname',
@@ -128,7 +128,7 @@ const dashboardTableElements: (CampaignData & {
         clicks: 10048,
         ctr: 0.712,
         paid: 69,
-        avgCpm: '0.15 DAI'
+        avgCpm: 0.15
       }
     ],
     adUnit: [
@@ -151,7 +151,7 @@ const dashboardTableElements: (CampaignData & {
         impressions: 123456789,
         clicks: 10048,
         ctr: 0.712,
-        avgCpm: '0.15 DAI',
+        avgCpm: 0.15,
         paid: 69
       },
       {
@@ -162,7 +162,7 @@ const dashboardTableElements: (CampaignData & {
         impressions: 12345678,
         clicks: 10048,
         ctr: 0.712,
-        avgCpm: '0.15 DAI',
+        avgCpm: 0.15,
         paid: 69
       },
       {
@@ -172,7 +172,7 @@ const dashboardTableElements: (CampaignData & {
         impressions: 1234567,
         clicks: 10048,
         ctr: 0.712,
-        avgCpm: '0.15 DAI',
+        avgCpm: 0.15,
         paid: 69
       },
       {
@@ -182,7 +182,7 @@ const dashboardTableElements: (CampaignData & {
         impressions: 123456,
         clicks: 10048,
         ctr: 0.712,
-        avgCpm: '0.15 DAI',
+        avgCpm: 0.15,
         paid: 69
       },
       {
@@ -192,7 +192,7 @@ const dashboardTableElements: (CampaignData & {
         impressions: 12345,
         clicks: 10048,
         ctr: 0.712,
-        avgCpm: '0.15 DAI',
+        avgCpm: 0.15,
         paid: 69
       },
       {
@@ -202,7 +202,7 @@ const dashboardTableElements: (CampaignData & {
         impressions: 1234,
         clicks: 10048,
         ctr: 0.712,
-        avgCpm: '0.15 DAI',
+        avgCpm: 0.15,
         paid: 69
       },
       {
@@ -212,7 +212,7 @@ const dashboardTableElements: (CampaignData & {
         impressions: 123,
         clicks: 10048,
         ctr: 0.712,
-        avgCpm: '0.15 DAI',
+        avgCpm: 0.15,
         paid: 69
       },
       {
@@ -222,7 +222,7 @@ const dashboardTableElements: (CampaignData & {
         impressions: 12,
         clicks: 10048,
         ctr: 0.712,
-        avgCpm: '0.15 DAI',
+        avgCpm: 0.15,
         paid: 69
       },
       {
@@ -232,7 +232,7 @@ const dashboardTableElements: (CampaignData & {
         impressions: 1,
         clicks: 10048,
         ctr: 0.712,
-        avgCpm: '0.15 DAI',
+        avgCpm: 0.15,
         paid: 69
       },
       {
@@ -242,7 +242,7 @@ const dashboardTableElements: (CampaignData & {
         impressions: 12343421,
         clicks: 10048,
         ctr: 0.712,
-        avgCpm: '0.15 DAI',
+        avgCpm: 0.15,
         paid: 69
       },
       {
@@ -252,7 +252,7 @@ const dashboardTableElements: (CampaignData & {
         impressions: 132,
         clicks: 10048,
         ctr: 0.712,
-        avgCpm: '0.15 DAI',
+        avgCpm: 0.15,
         paid: 69
       },
       {
@@ -262,7 +262,7 @@ const dashboardTableElements: (CampaignData & {
         impressions: 12,
         clicks: 10048,
         ctr: 0.712,
-        avgCpm: '0.15 DAI',
+        avgCpm: 0.15,
         paid: 69
       }
     ],
