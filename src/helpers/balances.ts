@@ -8,14 +8,6 @@ export function parseToBigNumPrecision(amount: number, decimals: number): bigint
   return BigInt(amountIntScaled)
 }
 
-export function parseBigNumWithPrecisionToUSD(amount: bigint): number {
-  return Number(amount) / 10 ** 8
-}
-
 export function parseBigNumTokenAmountToDecimal(amount: bigint, decimals: number): number {
   return Number(amount) / 10 ** decimals
-}
-
-export function convertUSDBigNumPrecisionToBigNumToken(amount: bigint, decimals: number): bigint {
-  return amount / BigInt(10 ** (8 - decimals))
 }
