@@ -2,27 +2,29 @@ import {
   Title,
   Text,
   Flex,
-  ActionIcon,
+  // ActionIcon,
+  // Indicator,
   Group,
-  Indicator,
   Menu,
   rem,
   createStyles,
-  UnstyledButton
+  UnstyledButton,
+  CopyButton
 } from '@mantine/core'
 import { capitalizeFirstLetter, formatDate, maskAddress } from 'helpers/formatters'
 import useAccount from 'hooks/useAccount'
 import { useCallback, useMemo, useState } from 'react'
-import BellIcon from 'resources/icons/Bell'
 import DownArrowIcon from 'resources/icons/DownArrow'
 import LogoutIcon from 'resources/icons/Logout'
-import ValidatorsIcon from 'resources/icons/Validators'
-import WithdrawIcon from 'resources/icons/Withdraw'
+// import BellIcon from 'resources/icons/Bell'
 import Blockies from 'components/common/Blockies'
+// import ValidatorsIcon from 'resources/icons/Validators'
+// import WithdrawIcon from 'resources/icons/Withdraw'
 import { useLocation, useNavigate } from 'react-router-dom'
 import StakingIcon from 'resources/icons/Staking'
 import { useAdExApi } from 'hooks/useAdexServices'
 import useCustomNotifications from 'hooks/useCustomNotifications'
+import CopyIcon from 'resources/icons/Copy'
 
 const useStyles = createStyles((theme) => ({
   rotateUpsideDown: {
@@ -105,11 +107,21 @@ function TopBar() {
       </Flex>
       <Flex direction="row" justify="end" gap="md" align="center">
         <Group position="center">
-          <Indicator>
+          {/* <Indicator>
             <ActionIcon>
               <BellIcon size={rem(24)} />
             </ActionIcon>
-          </Indicator>
+          </Indicator> */}
+          <CopyButton value={adexAccount.address}>
+            {({ copied, copy }) => (
+              <CopyIcon
+                className={classes.menu}
+                color={copied ? 'green' : undefined}
+                size={rem(24)}
+                onClick={copy}
+              />
+            )}
+          </CopyButton>
         </Group>
 
         <Menu
@@ -123,9 +135,9 @@ function TopBar() {
               <Group>
                 <Blockies seedString={adexAccount.address} />
                 <div>
-                  <Text weight="bold" size="xs">
+                  {/* <Text weight="bold" size="xs">
                     John Doe
-                  </Text>
+                  </Text> */}
                   <Text color="secondaryText" size="xs">
                     {maskAddress(adexAccount.address)}
                   </Text>
@@ -138,13 +150,20 @@ function TopBar() {
             </UnstyledButton>
           </Menu.Target>
           <Menu.Dropdown>
-            <Menu.Item rightSection={<WithdrawIcon className={classes.icon} />}>
+            {/* <Menu.Item rightSection={<WithdrawIcon className={classes.icon} />}>
               Withdraw funds
+            </Menu.Item> */}
+            <Menu.Item
+              component="a"
+              href="https://staking.adex.network/#/"
+              target="_blank"
+              rightSection={<StakingIcon className={classes.icon} />}
+            >
+              Staking
             </Menu.Item>
-            <Menu.Item rightSection={<StakingIcon className={classes.icon} />}>Staking</Menu.Item>
-            <Menu.Item rightSection={<ValidatorsIcon className={classes.icon} />}>
+            {/* <Menu.Item rightSection={<ValidatorsIcon className={classes.icon} />}>
               Validators
-            </Menu.Item>
+            </Menu.Item> */}
             <Menu.Item
               onClick={handleLogutBtnClicked}
               rightSection={<LogoutIcon className={classes.icon} />}
