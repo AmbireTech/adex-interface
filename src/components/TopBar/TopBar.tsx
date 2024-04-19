@@ -2,9 +2,7 @@ import {
   Title,
   Text,
   Flex,
-  ActionIcon,
   Group,
-  Indicator,
   Menu,
   rem,
   createStyles,
@@ -14,11 +12,8 @@ import {
 import { capitalizeFirstLetter, formatDate, maskAddress } from 'helpers/formatters'
 import useAccount from 'hooks/useAccount'
 import { useCallback, useMemo, useState } from 'react'
-import BellIcon from 'resources/icons/Bell'
 import DownArrowIcon from 'resources/icons/DownArrow'
 import LogoutIcon from 'resources/icons/Logout'
-import ValidatorsIcon from 'resources/icons/Validators'
-import WithdrawIcon from 'resources/icons/Withdraw'
 import Blockies from 'components/common/Blockies'
 import { useLocation, useNavigate } from 'react-router-dom'
 import StakingIcon from 'resources/icons/Staking'
@@ -107,11 +102,11 @@ function TopBar() {
       </Flex>
       <Flex direction="row" justify="end" gap="md" align="center">
         <Group position="center">
-          <Indicator>
+          {/* <Indicator>
             <ActionIcon>
               <BellIcon size={rem(24)} />
             </ActionIcon>
-          </Indicator>
+          </Indicator> */}
           <CopyButton value={adexAccount.address}>
             {({ copied, copy }) => (
               <CopyIcon
@@ -150,9 +145,9 @@ function TopBar() {
             </UnstyledButton>
           </Menu.Target>
           <Menu.Dropdown>
-            <Menu.Item rightSection={<WithdrawIcon className={classes.icon} />}>
+            {/* <Menu.Item rightSection={<WithdrawIcon className={classes.icon} />}>
               Withdraw funds
-            </Menu.Item>
+            </Menu.Item> */}
             <Menu.Item
               component="a"
               href="https://staking.adex.network/#/"
@@ -161,9 +156,9 @@ function TopBar() {
             >
               Staking
             </Menu.Item>
-            <Menu.Item rightSection={<ValidatorsIcon className={classes.icon} />}>
+            {/* <Menu.Item rightSection={<ValidatorsIcon className={classes.icon} />}>
               Validators
-            </Menu.Item>
+            </Menu.Item> */}
             <Menu.Item
               onClick={handleLogutBtnClicked}
               rightSection={<LogoutIcon className={classes.icon} />}
