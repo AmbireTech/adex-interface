@@ -1,4 +1,4 @@
-import { Button, Flex, Grid, NumberInput, Select, TextInput } from '@mantine/core'
+import { Button, Flex, Grid, TextInput } from '@mantine/core'
 import { useForm } from '@mantine/form'
 import useAccount from 'hooks/useAccount'
 
@@ -18,16 +18,14 @@ const BillingDetails = () => {
         value.length < 2 ? 'Last name must have at least 2 letters' : null,
       companyName: (value: string) =>
         value.length < 2 ? 'Company name must have at least 2 characters' : null,
-      companyNumber: (value: number) =>
-        Number.isNaN(value) ? 'Company number must be a valid number' : null,
-      companyNumberPrim: (value: number) =>
-        Number.isNaN(value) ? 'Company number 2 must be a valid number' : null,
+      companyNumber: (value: string) =>
+        value.length === 0 ? 'Registration number is required' : null,
+      companyNumberPrim: () => null, // No validation for VAT number
       companyAddress: (value: string) =>
         value.length === 0 ? 'Company address is required' : null,
-      companyCountry: (value: string) => (value.length === 0 ? 'Please select a country' : null),
-      companyCity: (value: string) => (value.length === 0 ? 'Please select a city' : null),
-      companyZipCode: (value: number) =>
-        Number.isNaN(value) ? 'Zip code must be a valid number' : null
+      companyCountry: (value: string) => (value.length === 0 ? 'Country is required' : null),
+      companyCity: (value: string) => (value.length === 0 ? 'City is required' : null),
+      companyZipCode: (value: string) => (value.length === 0 ? 'Zip code is required' : null) // Zip code can be alphanumeric
     }
   })
 
@@ -65,24 +63,19 @@ const BillingDetails = () => {
           />
         </Grid.Col>
         <Grid.Col span={6}>
-          <NumberInput
+          <TextInput
             radius="sm"
             size="lg"
             required
-            hideControls
-            // TODO: change the placeholder
-            placeholder="Company number"
+            placeholder="Registration number"
             {...form.getInputProps('companyNumber')}
           />
         </Grid.Col>
         <Grid.Col span={6}>
-          <NumberInput
+          <TextInput
             radius="sm"
             size="lg"
-            required
-            hideControls
-            // TODO: change the placeholder
-            placeholder="Company number 2"
+            placeholder="VAT number"
             {...form.getInputProps('companyNumberPrim')}
           />
         </Grid.Col>
@@ -99,29 +92,43 @@ const BillingDetails = () => {
           />
         </Grid.Col>
         <Grid.Col>
-          <Select
+          {/* <Select
             size="lg"
             required
             data={['Country 1', 'Country 2', 'Country 3']}
             placeholder="Select Country"
             {...form.getInputProps('companyCountry')}
+          /> */}
+          <TextInput
+            radius="sm"
+            size="lg"
+            required
+            placeholder="Country"
+            {...form.getInputProps('companyCountry')}
           />
         </Grid.Col>
         <Grid.Col span={6}>
-          <Select
+          {/* <Select
             size="lg"
             required
             data={['City 1', 'City 2', 'City 3']}
             placeholder="Select City"
             {...form.getInputProps('companyCity')}
-          />
-        </Grid.Col>
-        <Grid.Col span={6}>
-          <NumberInput
+          /> */}
+          <TextInput
             radius="sm"
             size="lg"
             required
-            hideControls
+            placeholder="City"
+            {...form.getInputProps('companyCity')}
+          />
+        </Grid.Col>
+        <Grid.Col span={6}>
+          <TextInput
+            radius="sm"
+            size="lg"
+            required
+            // hideControls
             // TODO: change the placeholder
             // Check if the input should be Number
             placeholder="Zip Code"

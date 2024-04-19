@@ -99,12 +99,12 @@ const defaultValue: IAccountContext['adexAccount'] = {
     firstName: '',
     lastName: '',
     companyName: '',
-    companyNumber: 1,
-    companyNumberPrim: 2,
+    companyNumber: '',
+    companyNumberPrim: '',
     companyAddress: '',
     companyCountry: '',
     companyCity: '',
-    companyZipCode: 0
+    companyZipCode: ''
   },
   created: new Date(),
   updated: new Date()
