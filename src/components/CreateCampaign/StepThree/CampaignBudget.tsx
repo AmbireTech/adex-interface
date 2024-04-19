@@ -1,7 +1,7 @@
 import { Flex, MediaQuery, TextInput } from '@mantine/core'
 import InfoAlertMessage from 'components/common/InfoAlertMessage'
 import { useCreateCampaignFormContext } from 'contexts/CreateCampaignFormContext'
-import { formatUnits } from 'ethers/lib/utils'
+import { parseBigNumTokenAmountToDecimal } from 'helpers/balances'
 import useAccount from 'hooks/useAccount'
 import { useMemo } from 'react'
 
@@ -12,7 +12,7 @@ const CampaignBudget = () => {
   } = useAccount()
 
   const formattedToken = useMemo(
-    () => Number(formatUnits(availableBalance, balanceToken.decimals)),
+    () => Number(parseBigNumTokenAmountToDecimal(availableBalance, balanceToken.decimals)),
     [availableBalance, balanceToken.decimals]
   )
   const budgetInput = useMemo(() => form.getInputProps('campaignBudget').value, [form])
