@@ -55,6 +55,7 @@ const Creatives = ({
           <Image
             ml="sm"
             src={media}
+            mah="100px"
             maw="50px"
             onClick={() => handleMediaClick(media || '')}
             className={classes.image}
