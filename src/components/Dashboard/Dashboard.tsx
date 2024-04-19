@@ -2,7 +2,7 @@ import { Campaign, CampaignStatus, CampaignType } from 'adex-common'
 import { Container, Flex, Text, UnstyledButton } from '@mantine/core'
 import { useCallback, useMemo, useState } from 'react'
 import CustomTable from 'components/common/CustomTable'
-import { campaignPeriodParser } from 'utils'
+import { parsePeriodForCampaign } from 'helpers'
 import { campaignHeaders } from 'constant'
 import { useNavigate } from 'react-router-dom'
 import useCampaignsData from 'hooks/useCampaignsData'
@@ -38,7 +38,10 @@ const Dashboard = () => {
               impressions: 'No data',
               clicks: 'No data',
               ctr: 'No data',
-              period: campaignPeriodParser([cmpData.campaign.activeFrom, cmpData.campaign.activeTo])
+              period: parsePeriodForCampaign([
+                cmpData.campaign.activeFrom,
+                cmpData.campaign.activeTo
+              ])
             }
           })
         : [],

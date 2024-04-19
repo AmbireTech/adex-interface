@@ -1,3 +1,3 @@
 import packageJson from '../../package.json'
 
-export default packageJson.version
+export const appVersion = packageJson.version

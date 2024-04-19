@@ -2,7 +2,7 @@ import { Container, Flex, Text } from '@mantine/core'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useDisclosure } from '@mantine/hooks'
 import CustomTable from 'components/common/CustomTable'
-import { campaignPeriodParser } from 'utils'
+import { parsePeriodForCampaign } from 'helpers'
 import { campaignHeaders } from 'constant'
 import { AdminCampaignModal } from 'components/common/Modals'
 import BadgeStatusCampaign from 'components/Dashboard/BadgeStatusCampaign'
@@ -36,7 +36,7 @@ const AdminPanel = () => {
               impressions: 'No data',
               clicks: 'No data',
               ctr: 'No data',
-              period: campaignPeriodParser([el.activeFrom, el.activeTo])
+              period: parsePeriodForCampaign([el.activeFrom, el.activeTo])
             }
           })
         : [],
