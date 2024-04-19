@@ -149,7 +149,7 @@ const CampaignAnalytics = () => {
           />
         </Tabs.Panel>
         <Tabs.Panel value="adUnit" pt="xs">
-          <Creatives creatives={campaignMappedAnalytics} />
+          <Creatives creatives={campaignMappedAnalytics} units={campaign?.adUnits} />
         </Tabs.Panel>
       </Tabs>
     </Container>
