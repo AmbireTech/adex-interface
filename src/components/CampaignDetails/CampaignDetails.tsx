@@ -14,7 +14,7 @@ import ActiveIcon from 'resources/icons/Active'
 import CampaignActionBtn from 'components/CampaignAnalytics/CampaignActionBtn'
 import StopIcon from 'resources/icons/Stop'
 import ArchivedIcon from 'resources/icons/Archived'
-import { formatUnits } from 'helpers/balances'
+import { parseBigNumTokenAmountToDecimal } from 'helpers/balances'
 import { getTokenIcon } from 'lib/Icons'
 import { DIGITS_AFTER_FLOATING_POINT } from 'constants/balances'
 import CatsLocsFormatted from './CatsLocsFormatted'
@@ -82,7 +82,12 @@ const CampaignDetails = () => {
           />
           <Text ml="xs">
             {formatCurrency(
-              Number(formatUnits(campaign.campaignBudget, campaign.outpaceAssetDecimals)),
+              Number(
+                parseBigNumTokenAmountToDecimal(
+                  campaign.campaignBudget,
+                  campaign.outpaceAssetDecimals
+                )
+              ),
               DIGITS_AFTER_FLOATING_POINT
             )}
           </Text>

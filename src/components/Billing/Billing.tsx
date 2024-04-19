@@ -1,4 +1,4 @@
-import { Container, Flex, Grid, Stack, createStyles } from '@mantine/core'
+import { Container, Flex, Grid, Popover, Stack, createStyles, Text } from '@mantine/core'
 import { useMediaQuery } from '@mantine/hooks'
 import CustomCard from 'components/common/CustomCard'
 import { useState } from 'react'
@@ -46,6 +46,10 @@ function Billing() {
   const [selectedTab, setSelectedTab] = useState<TabType>(TabType.BillingTab)
   const handleTabClicked = (value: TabType) => setSelectedTab(value)
 
+  /* Temporary added, should be removed */
+  const [openedInvoicesPopOver, setOpenedInvoicesPopOver] = useState(false)
+  const [openedStatements, setOpenedStatements] = useState(false)
+
   return (
     <Flex gap="xl" direction={isMobile ? 'column' : 'row'}>
       <Stack w={isMobile ? '100%' : '300px'}>
@@ -59,26 +63,52 @@ function Billing() {
           action={() => handleTabClicked(TabType.BillingTab)}
           variant="shadow"
         />
-        <CustomCard
-          width="100%"
-          height={100}
-          text="Invoices"
-          iconLeft={<InvoiceIcon size="24px" />}
-          color="secondary"
-          active={selectedTab === TabType.InvoicesTab}
-          action={() => handleTabClicked(TabType.InvoicesTab)}
-          variant="shadow"
-        />
-        <CustomCard
-          width="100%"
-          height={100}
-          text="Account Statements"
-          iconLeft={<StatementsIcon size="24px" />}
-          color="secondary"
-          active={selectedTab === TabType.StatementsTab}
-          action={() => handleTabClicked(TabType.StatementsTab)}
-          variant="shadow"
-        />
+        {/* Temporary added popover, should be removed */}
+        <Popover
+          opened={openedInvoicesPopOver}
+          onChange={setOpenedInvoicesPopOver}
+          closeOnClickOutside
+        >
+          <Popover.Target>
+            <div>
+              <CustomCard
+                width="100%"
+                height={100}
+                text="Invoices"
+                iconLeft={<InvoiceIcon size="24px" />}
+                color="secondary"
+                active={selectedTab === TabType.InvoicesTab}
+                // action={() => handleTabClicked(TabType.InvoicesTab)}
+                action={() => setOpenedInvoicesPopOver((o) => !o)}
+                variant="shadow"
+              />
+            </div>
+          </Popover.Target>
+          <Popover.Dropdown>
+            <Text>Coming Soon...</Text>
+          </Popover.Dropdown>
+        </Popover>
+        {/* Temporary added popover, should be removed */}
+        <Popover opened={openedStatements} onChange={setOpenedStatements} closeOnClickOutside>
+          <Popover.Target>
+            <div>
+              <CustomCard
+                width="100%"
+                height={100}
+                text="Account Statements"
+                iconLeft={<StatementsIcon size="24px" />}
+                color="secondary"
+                active={selectedTab === TabType.StatementsTab}
+                // action={() => handleTabClicked(TabType.StatementsTab)}
+                action={() => setOpenedStatements((o) => !o)}
+                variant="shadow"
+              />
+            </div>
+          </Popover.Target>
+          <Popover.Dropdown>
+            <Text>Coming Soon...</Text>
+          </Popover.Dropdown>
+        </Popover>
       </Stack>
       <Grid>
         <Container className={classes.container}>

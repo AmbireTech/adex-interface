@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState, useMemo } from 'react'
-import { Container, Flex, Tabs } from '@mantine/core'
+import { Container, Flex, Loader, Tabs } from '@mantine/core'
 import { useParams } from 'react-router-dom'
 import { AnalyticsType, TabType, BaseAnalyticsData, AnalyticsPeriod } from 'types'
 import GoBack from 'components/common/GoBack/GoBack'
@@ -91,6 +91,7 @@ const CampaignAnalytics = () => {
 
   useEffect(() => {
     if (!campaign) return
+    setAnalyticsKey(undefined)
 
     const checkAnalytics = async () => {
       const key = await getAnalyticsKeyAndUpdate(campaign, activeTab)
@@ -150,23 +151,30 @@ const CampaignAnalytics = () => {
             )}
           </Flex>
         </Flex>
-        {/** TODO: show loading, no data etc when no campaignMappedAnalytics/ analyticsKey */}
-        <Tabs.Panel value="timeframe" pt="xs">
-          <TimeFrame timeFrames={campaignMappedAnalytics} period={analyticsKey?.period} />
-        </Tabs.Panel>
-        <Tabs.Panel value="hostname" pt="xs">
-          <Placements placements={campaignMappedAnalytics} />
-        </Tabs.Panel>
-        <Tabs.Panel value="country" pt="xs">
-          <Regions
-            regions={campaignMappedAnalytics}
-            isMapVisible={isMapVisible}
-            onClose={() => setIsMapVisible(false)}
-          />
-        </Tabs.Panel>
-        <Tabs.Panel value="adUnit" pt="xs">
-          <Creatives creatives={campaignMappedAnalytics} />
-        </Tabs.Panel>
+        {!analyticsKey || !campaignMappedAnalytics ? (
+          <Flex justify="center" align="center" h="60vh">
+            <Loader size="xl" />
+          </Flex>
+        ) : (
+          <>
+            <Tabs.Panel value="timeframe" pt="xs">
+              <TimeFrame timeFrames={campaignMappedAnalytics} period={analyticsKey?.period} />
+            </Tabs.Panel>
+            <Tabs.Panel value="hostname" pt="xs">
+              <Placements placements={campaignMappedAnalytics} />
+            </Tabs.Panel>
+            <Tabs.Panel value="country" pt="xs">
+              <Regions
+                regions={campaignMappedAnalytics}
+                isMapVisible={isMapVisible}
+                onClose={() => setIsMapVisible(false)}
+              />
+            </Tabs.Panel>
+            <Tabs.Panel value="adUnit" pt="xs">
+              <Creatives creatives={campaignMappedAnalytics} units={campaign?.adUnits} />
+            </Tabs.Panel>
+          </>
+        )}
       </Tabs>
     </Container>
   )

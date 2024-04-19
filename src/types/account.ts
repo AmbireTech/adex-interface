@@ -4,12 +4,12 @@ export interface BillingDetails {
   firstName: string
   lastName: string
   companyName: string
-  companyNumber: number
-  companyNumberPrim: number
+  companyNumber: string
+  companyNumberPrim: string
   companyAddress: string
   companyCountry: string
   companyCity: string
-  companyZipCode: number
+  companyZipCode: string
 }
 
 export interface Token {

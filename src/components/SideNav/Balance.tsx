@@ -2,7 +2,7 @@ import { Flex, createStyles, rem, Image, Text } from '@mantine/core'
 import { useMemo, useState } from 'react'
 import DownArrowIcon from 'resources/icons/DownArrow'
 import { formatCurrency } from 'helpers'
-import { formatUnits } from 'helpers/balances'
+import { parseBigNumTokenAmountToDecimal } from 'helpers/balances'
 import useAccount from 'hooks/useAccount'
 import { getTokenIcon, networks } from 'lib/Icons'
 import { DIGITS_AFTER_FLOATING_POINT } from 'constants/balances'
@@ -66,7 +66,7 @@ const Balance = () => {
   )
 
   const formattedToken = useMemo(
-    () => Number(formatUnits(availableBalance, balanceToken.decimals)),
+    () => Number(parseBigNumTokenAmountToDecimal(availableBalance, balanceToken.decimals)),
     [availableBalance, balanceToken.decimals]
   )
   return (
@@ -104,7 +104,8 @@ const Balance = () => {
                   alt={item.token.name}
                 />
                 <Text size="xs" ml="xs">
-                  {Number(formatUnits(item.amount, item.token.decimals))} {item.token.name}
+                  {Number(parseBigNumTokenAmountToDecimal(item.amount, item.token.decimals))}{' '}
+                  {item.token.name}
                 </Text>
               </Flex>
               <Text size="xs">on {networks[item.token.chainId]}</Text>

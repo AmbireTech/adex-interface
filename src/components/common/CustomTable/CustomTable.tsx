@@ -1,4 +1,4 @@
-import { Flex, Group, Pagination, Table, createStyles, Grid, Divider } from '@mantine/core'
+import { Flex, Group, Pagination, Table, createStyles, Grid, Divider, Text } from '@mantine/core'
 import { useMediaQuery } from '@mantine/hooks'
 import VisibilityIcon from 'resources/icons/Visibility'
 import { ICustomTableProps } from 'types'
@@ -39,7 +39,6 @@ const CustomTable = ({
   onDuplicate,
   onDelete
 }: ICustomTableProps) => {
-  // if (!elements.length) return <Text>No data found</Text>
   const isMobile = useMediaQuery('(max-width: 75rem)')
 
   const { classes, cx } = useStyles()
@@ -194,6 +193,7 @@ const CustomTable = ({
     head
   ])
 
+  if (!elements.length) return <Text>No data found</Text>
   return (
     <Flex h="100%" w="100%" justify="space-between" direction="column" align="center">
       {isMobile ? (
