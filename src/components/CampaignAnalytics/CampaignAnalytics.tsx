@@ -135,7 +135,6 @@ const CampaignAnalytics = () => {
             )}
           </Flex>
         </Flex>
-        {/** TODO: show loading, no data etc when no campaignMappedAnalytics/ analyticsKey */}
         {!analyticsKey || !campaignMappedAnalytics ? (
           <Flex justify="center" align="center" h="60vh">
             <Loader size="xl" />
@@ -156,7 +155,7 @@ const CampaignAnalytics = () => {
               />
             </Tabs.Panel>
             <Tabs.Panel value="adUnit" pt="xs">
-              <Creatives creatives={campaignMappedAnalytics} />
+              <Creatives creatives={campaignMappedAnalytics} units={campaign?.adUnits} />
             </Tabs.Panel>
           </>
         )}

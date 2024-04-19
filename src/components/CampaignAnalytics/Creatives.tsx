@@ -6,6 +6,7 @@ import { useCallback, useState } from 'react'
 import { useDisclosure } from '@mantine/hooks'
 import { BaseAnalyticsData } from 'types'
 import { formatCurrency } from 'helpers'
+import { AdUnit } from 'adex-common'
 
 const useStyles = createStyles((theme) => ({
   icon: {
@@ -16,11 +17,17 @@ const useStyles = createStyles((theme) => ({
   }
 }))
 
-const Creatives = ({ creatives }: { creatives: BaseAnalyticsData[] | undefined }) => {
+const Creatives = ({
+  creatives,
+  units
+}: {
+  creatives: BaseAnalyticsData[] | undefined
+  units: AdUnit[] | undefined
+}) => {
   const [opened, { open, close }] = useDisclosure(false)
   const { classes } = useStyles()
 
-  const headings = ['Media', 'Impressions', 'Clicks', 'CTR%', 'Spent']
+  const headings = ['Media', 'Segment', 'Impressions', 'Clicks', 'CTR%', 'Spent', 'Links']
   const [selectedMedia, setSelectedMedia] = useState('')
   const handleMediaClick = useCallback(
     (media: string) => {
@@ -30,11 +37,14 @@ const Creatives = ({ creatives }: { creatives: BaseAnalyticsData[] | undefined }
     [open]
   )
 
-  if (!creatives?.length) {
+  if (!creatives?.length || !units?.length) {
     return <div>No creatives found</div>
   }
 
   const elements = creatives?.map((item) => {
+    const unitsForId = units.find((x) => x.id === item.segment)
+    const media = unitsForId?.banner?.mediaUrl || ''
+
     return {
       ...item,
       media: (
@@ -42,16 +52,16 @@ const Creatives = ({ creatives }: { creatives: BaseAnalyticsData[] | undefined }
           <UrlIcon size="25px" className={classes.icon} />
           <Image
             ml="sm"
-            src={item.mediaUri}
-            maw="300px"
-            onClick={() => handleMediaClick(item.mediaUri || '')}
+            src={media}
+            maw="50px"
+            onClick={() => handleMediaClick(media || '')}
             className={classes.image}
           />
         </Flex>
       ),
       impressions: formatCurrency(item.impressions, 0),
       clicks: formatCurrency(item.clicks, 0),
-      ctrPercents: `${item.ctr} %`
+      ctr: `${item.ctr} %`
     }
   })
   return (

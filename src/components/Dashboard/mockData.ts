@@ -134,7 +134,7 @@ const dashboardTableElements: (CampaignData & {
     adUnit: [
       {
         analyticsType: 'adUnit',
-        segment: 'adunit id',
+        segment: 'adunit-1',
         // media: Banner,
         impressions: 1204527,
         clicks: 10048,
