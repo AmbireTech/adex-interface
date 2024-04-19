@@ -42,8 +42,8 @@ const Creatives = ({
   }
 
   const elements = creatives?.map((item) => {
-    const unitsForId = units.filter((x) => x.id === item.segment)[0]
-    const media = unitsForId ? unitsForId.banner?.mediaUrl : ''
+    const unitsForId = units.find((x) => x.id === item.segment)
+    const media = unitsForId?.banner?.mediaUrl || ''
 
     return {
       ...item,
