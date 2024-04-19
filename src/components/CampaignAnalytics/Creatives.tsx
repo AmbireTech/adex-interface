@@ -20,7 +20,7 @@ const Creatives = ({ creatives }: { creatives: BaseAnalyticsData[] | undefined }
   const [opened, { open, close }] = useDisclosure(false)
   const { classes } = useStyles()
 
-  const headings = ['Media', 'Impressions', 'Clicks', 'CTR%', 'Spent']
+  const headings = ['Media', 'Segment', 'Impressions', 'Clicks', 'CTR%', 'Spent', 'Links']
   const [selectedMedia, setSelectedMedia] = useState('')
   const handleMediaClick = useCallback(
     (media: string) => {
@@ -51,7 +51,7 @@ const Creatives = ({ creatives }: { creatives: BaseAnalyticsData[] | undefined }
       ),
       impressions: formatCurrency(item.impressions, 0),
       clicks: formatCurrency(item.clicks, 0),
-      ctrPercents: `${item.ctr} %`
+      ctr: `${item.ctr} %`
     }
   })
   return (
