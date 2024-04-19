@@ -45,10 +45,12 @@ function sumArrayProperties(analytics: BaseAnalyticsData[]) {
 
 export const TimeFrame = ({
   timeFrames,
-  period
+  period,
+  currencyName
 }: {
   timeFrames: BaseAnalyticsData[] | undefined
   period: AnalyticsPeriod | undefined
+  currencyName: string
 }) => {
   const { classes } = useStyles()
   const { width: windowWidth } = useViewportSize()
@@ -129,8 +131,7 @@ export const TimeFrame = ({
           </Grid.Col>
           <Grid.Col span="content">
             <ChartControlBtn
-              // TODO: calculate average DAI/CPM
-              value={`~ ${formatCurrency(totalSum.avgCpm, 3)} DAI / CPM`}
+              value={`~ ${formatCurrency(totalSum.avgCpm, 3)} ${currencyName} / CPM`}
               text="Average CPM"
               bgColor="chartColorThree"
               onClick={(v: boolean) => handleMetricClick(v, 'averageCPM')}
@@ -139,7 +140,7 @@ export const TimeFrame = ({
           </Grid.Col>
           <Grid.Col span="content">
             <ChartControlBtn
-              value={`~ ${formatCurrency(totalSum.paid, 2)} DAI`}
+              value={`~ ${formatCurrency(totalSum.paid, 2)} ${currencyName}`}
               text="Total spent"
               bgColor="chartColorFour"
               onClick={(v: boolean) => handleMetricClick(v, 'spent')}

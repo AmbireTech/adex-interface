@@ -19,10 +19,12 @@ const useStyles = createStyles((theme) => ({
 
 const Creatives = ({
   creatives,
-  units
+  units,
+  currencyName
 }: {
   creatives: BaseAnalyticsData[] | undefined
   units: AdUnit[] | undefined
+  currencyName: string
 }) => {
   const [opened, { open, close }] = useDisclosure(false)
   const { classes } = useStyles()
@@ -62,7 +64,8 @@ const Creatives = ({
       ),
       impressions: formatCurrency(item.impressions, 0),
       clicks: formatCurrency(item.clicks, 0),
-      ctr: `${item.ctr} %`
+      ctr: `${item.ctr} %`,
+      paid: `${item.paid} ${currencyName}`
     }
   })
   return (

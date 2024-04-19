@@ -10,22 +10,26 @@ const headings = ['Country', 'Share', 'Impressions', 'Clicks', 'CTR%', 'Average 
 const Regions = ({
   regions,
   isMapVisible,
+  currencyName,
   onClose
 }: {
   regions: BaseAnalyticsData[] | undefined
   isMapVisible: boolean
+  currencyName: string
   onClose: () => void
 }) => {
   const { width: windowWidth, height: windowHeight } = useViewportSize()
 
   // TODO: add elements types, fix custom table data
-  const elements: BaseAnalyticsData[] | [] = useMemo(
+  const elements = useMemo(
     () =>
       regions?.map((item) => ({
         ...item,
+        avgCpm: `${item.avgCpm} ${currencyName}`,
+        paid: `${item.paid} ${currencyName}`,
         ctr: `${item.ctr} %`
       })) || [],
-    [regions]
+    [regions, currencyName]
   )
 
   if (!regions?.length) {

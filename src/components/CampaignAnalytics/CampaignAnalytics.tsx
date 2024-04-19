@@ -7,6 +7,7 @@ import DownloadCSV from 'components/common/DownloadCSV'
 import useCampaignAnalytics from 'hooks/useCampaignAnalytics'
 import useCampaignsData from 'hooks/useCampaignsData'
 import { Campaign } from 'adex-common'
+import useAccount from 'hooks/useAccount'
 import Placements from './Placements'
 import Creatives from './Creatives'
 import Regions from './Regions'
@@ -45,6 +46,21 @@ const CampaignAnalytics = () => {
 
   const { analyticsData, getAnalyticsKeyAndUpdate, mappedAnalytics } = useCampaignAnalytics()
   const { campaignsData, updateCampaignDataById } = useCampaignsData()
+  const {
+    adexAccount: {
+      fundsOnCampaigns: { perCampaign }
+    }
+  } = useAccount()
+
+  const currencyName = useMemo(
+    () =>
+      id && !!perCampaign.length
+        ? perCampaign.find((item) => item.id === id)?.token.name || ''
+        : '',
+    [id, perCampaign]
+  )
+
+  console.log('currencyName', currencyName)
 
   const campaign: Campaign | undefined = useMemo(
     () => (id ? campaignsData.get(id)?.campaign : undefined),
@@ -142,20 +158,29 @@ const CampaignAnalytics = () => {
         ) : (
           <>
             <Tabs.Panel value="timeframe" pt="xs">
-              <TimeFrame timeFrames={campaignMappedAnalytics} period={analyticsKey?.period} />
+              <TimeFrame
+                timeFrames={campaignMappedAnalytics}
+                period={analyticsKey?.period}
+                currencyName={currencyName}
+              />
             </Tabs.Panel>
             <Tabs.Panel value="hostname" pt="xs">
-              <Placements placements={campaignMappedAnalytics} />
+              <Placements placements={campaignMappedAnalytics} currencyName={currencyName} />
             </Tabs.Panel>
             <Tabs.Panel value="country" pt="xs">
               <Regions
                 regions={campaignMappedAnalytics}
                 isMapVisible={isMapVisible}
+                currencyName={currencyName}
                 onClose={() => setIsMapVisible(false)}
               />
             </Tabs.Panel>
             <Tabs.Panel value="adUnit" pt="xs">
-              <Creatives creatives={campaignMappedAnalytics} units={campaign?.adUnits} />
+              <Creatives
+                creatives={campaignMappedAnalytics}
+                units={campaign?.adUnits}
+                currencyName={currencyName}
+              />
             </Tabs.Panel>
           </>
         )}
