@@ -123,9 +123,9 @@ function TopBar() {
               <Group>
                 <Blockies seedString={adexAccount.address} />
                 <div>
-                  <Text weight="bold" size="xs">
+                  {/* <Text weight="bold" size="xs">
                     John Doe
-                  </Text>
+                  </Text> */}
                   <Text color="secondaryText" size="xs">
                     {maskAddress(adexAccount.address)}
                   </Text>
