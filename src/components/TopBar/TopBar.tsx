@@ -2,6 +2,8 @@ import {
   Title,
   Text,
   Flex,
+  // ActionIcon,
+  // Indicator,
   Group,
   Menu,
   rem,
@@ -14,7 +16,10 @@ import useAccount from 'hooks/useAccount'
 import { useCallback, useMemo, useState } from 'react'
 import DownArrowIcon from 'resources/icons/DownArrow'
 import LogoutIcon from 'resources/icons/Logout'
+// import BellIcon from 'resources/icons/Bell'
 import Blockies from 'components/common/Blockies'
+// import ValidatorsIcon from 'resources/icons/Validators'
+// import WithdrawIcon from 'resources/icons/Withdraw'
 import { useLocation, useNavigate } from 'react-router-dom'
 import StakingIcon from 'resources/icons/Staking'
 import { useAdExApi } from 'hooks/useAdexServices'
