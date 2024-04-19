@@ -7,6 +7,7 @@ import DownloadCSV from 'components/common/DownloadCSV'
 import useCampaignAnalytics from 'hooks/useCampaignAnalytics'
 import useCampaignsData from 'hooks/useCampaignsData'
 import { Campaign } from 'adex-common'
+import useAccount from 'hooks/useAccount'
 import Placements from './Placements'
 import Creatives from './Creatives'
 import Regions from './Regions'
@@ -45,6 +46,21 @@ const CampaignAnalytics = () => {
 
   const { analyticsData, getAnalyticsKeyAndUpdate, mappedAnalytics } = useCampaignAnalytics()
   const { campaignsData, updateCampaignDataById } = useCampaignsData()
+  const {
+    adexAccount: {
+      fundsOnCampaigns: { perCampaign }
+    }
+  } = useAccount()
+
+  const currencyName = useMemo(
+    () =>
+      id && !!perCampaign.length
+        ? perCampaign.find((item) => item.id === id)?.token.name
+        : undefined,
+    [id, perCampaign]
+  )
+
+  console.log('currencyName', currencyName)
 
   const campaign: Campaign | undefined = useMemo(
     () => (id ? campaignsData.get(id)?.campaign : undefined),
