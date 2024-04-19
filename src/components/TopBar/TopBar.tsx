@@ -8,7 +8,8 @@ import {
   Menu,
   rem,
   createStyles,
-  UnstyledButton
+  UnstyledButton,
+  CopyButton
 } from '@mantine/core'
 import { capitalizeFirstLetter, formatDate, maskAddress } from 'helpers/formatters'
 import useAccount from 'hooks/useAccount'
@@ -23,6 +24,7 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import StakingIcon from 'resources/icons/Staking'
 import { useAdExApi } from 'hooks/useAdexServices'
 import useCustomNotifications from 'hooks/useCustomNotifications'
+import CopyIcon from 'resources/icons/Copy'
 
 const useStyles = createStyles((theme) => ({
   rotateUpsideDown: {
@@ -110,6 +112,16 @@ function TopBar() {
               <BellIcon size={rem(24)} />
             </ActionIcon>
           </Indicator>
+          <CopyButton value={adexAccount.address}>
+            {({ copied, copy }) => (
+              <CopyIcon
+                className={classes.menu}
+                color={copied ? 'green' : undefined}
+                size={rem(24)}
+                onClick={copy}
+              />
+            )}
+          </CopyButton>
         </Group>
 
         <Menu
@@ -141,7 +153,14 @@ function TopBar() {
             <Menu.Item rightSection={<WithdrawIcon className={classes.icon} />}>
               Withdraw funds
             </Menu.Item>
-            <Menu.Item rightSection={<StakingIcon className={classes.icon} />}>Staking</Menu.Item>
+            <Menu.Item
+              component="a"
+              href="https://staking.adex.network/#/"
+              target="_blank"
+              rightSection={<StakingIcon className={classes.icon} />}
+            >
+              Staking
+            </Menu.Item>
             <Menu.Item rightSection={<ValidatorsIcon className={classes.icon} />}>
               Validators
             </Menu.Item>
