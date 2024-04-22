@@ -80,7 +80,8 @@ const CampaignSummary = () => {
   )
 
   const hasEmptyTargetUrl = useMemo(
-    () => adUnits && adUnits.length && adUnits.some((adUnit) => adUnit.banner?.targetUrl === ''),
+    () =>
+      adUnits && adUnits.length ? adUnits.some((adUnit) => adUnit.banner?.targetUrl === '') : true,
     [adUnits]
   )
 

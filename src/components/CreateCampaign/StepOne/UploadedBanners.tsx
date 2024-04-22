@@ -34,25 +34,6 @@ const UploadedBanners = ({
     [allowedSizes]
   )
 
-  const inputBanners = useMemo(
-    () =>
-      adUnits.length > 0
-        ? adUnits.map((image: AdUnit) => {
-            return (
-              <Grid.Col key={image.id}>
-                <ImageUrlInput
-                  image={image}
-                  toRemove={!isMatchedTheSizes(image)}
-                  onDelete={onDeleteCreativeBtnClicked}
-                  onChange={(e) => handleOnInputChange(e.target.value, image.id)}
-                />
-              </Grid.Col>
-            )
-          })
-        : null,
-    [adUnits, handleOnInputChange, isMatchedTheSizes, onDeleteCreativeBtnClicked]
-  )
-
   return (
     <Grid>
       <Grid.Col>
@@ -62,7 +43,19 @@ const UploadedBanners = ({
           onChange={(event) => updateAutoUTMChecked(event.currentTarget.checked)}
         />
       </Grid.Col>
-      {inputBanners}
+      {adUnits.length > 0 &&
+        adUnits.map((image: AdUnit) => {
+          return (
+            <Grid.Col key={image.id}>
+              <ImageUrlInput
+                image={image}
+                toRemove={!isMatchedTheSizes(image)}
+                onDelete={onDeleteCreativeBtnClicked}
+                onChange={(e) => handleOnInputChange(e.target.value, image.id)}
+              />
+            </Grid.Col>
+          )
+        })}
     </Grid>
   )
 }

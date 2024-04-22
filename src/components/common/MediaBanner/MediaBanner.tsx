@@ -51,7 +51,7 @@ const MediaBanner = ({ adUnit }: { adUnit: AdUnit }) => {
     )
   }
 
-  return <Image src={mediaUrlWithProvider} alt={title} height={40} />
+  return <Image src={mediaUrlWithProvider} alt={title} height={40} width={40} />
 }
 
 export default MediaBanner

@@ -3,7 +3,7 @@ import { useCallback, useMemo, useRef, useState } from 'react'
 import { AdUnit } from 'adex-common/dist/types'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import useDropzone from 'hooks/useDropzone'
-import { isValidHttpUrl } from 'helpers/validators'
+// import { isValidHttpUrl } from 'helpers/validators'
 import UploadedBanners from './UploadedBanners'
 import BannerSizesList from './BannerSizesList'
 import FilesDropzone from './FilesDropzone'
@@ -35,8 +35,8 @@ const UploadCreative = () => {
 
   const handleOnInputChange = useCallback(
     (inputText: string, adUnitId: string) => {
-      const isValid = isValidHttpUrl(inputText)
-      if (!isValid) return
+      // const isValid = isValidHttpUrl(inputText)
+      // if (!isValid) return
 
       if (debounceTimer.current) clearTimeout(debounceTimer.current)
 

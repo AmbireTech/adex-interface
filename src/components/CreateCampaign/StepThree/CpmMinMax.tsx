@@ -15,6 +15,7 @@ const CpmMinMax = () => {
         <TextInput
           size="md"
           w="45%"
+          placeholder="CPM min"
           // Temporary disabled until we are ready to get real data
           // description="Approx. ~ $0.10"
           inputWrapperOrder={['input', 'description', 'error']}
@@ -29,6 +30,7 @@ const CpmMinMax = () => {
         <TextInput
           size="md"
           w="45%"
+          placeholder="CPM max"
           // Temporary disabled until we are ready to get real data
           // description="Approx. ~ $0.50"
           inputWrapperOrder={['input', 'description', 'error']}
