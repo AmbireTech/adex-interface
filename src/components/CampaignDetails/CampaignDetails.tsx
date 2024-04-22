@@ -159,13 +159,35 @@ const CampaignDetails = () => {
                 />
                 <CampaignDetailsRow
                   lineHeight="sm"
-                  title="CPC min"
-                  value={campaign.pricingBounds.CLICK?.min}
+                  title="CPM min"
+                  value={
+                    campaign.pricingBounds.IMPRESSION?.min &&
+                    formatCurrency(
+                      Number(
+                        parseBigNumTokenAmountToDecimal(
+                          campaign.pricingBounds.IMPRESSION.min,
+                          campaign.outpaceAssetDecimals
+                        )
+                      ),
+                      DIGITS_AFTER_FLOATING_POINT
+                    )
+                  }
                 />
                 <CampaignDetailsRow
                   lineHeight="sm"
-                  title="CPC max"
-                  value={campaign.pricingBounds.CLICK?.max}
+                  title="CPM max"
+                  value={
+                    campaign.pricingBounds.IMPRESSION?.max &&
+                    formatCurrency(
+                      Number(
+                        parseBigNumTokenAmountToDecimal(
+                          campaign.pricingBounds.IMPRESSION.max,
+                          campaign.outpaceAssetDecimals
+                        )
+                      ),
+                      DIGITS_AFTER_FLOATING_POINT
+                    )
+                  }
                 />
                 {/* TODO: Add data for it */}
                 <CampaignDetailsRow
