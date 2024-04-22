@@ -33,7 +33,7 @@ const CampaignBudget = () => {
           maw="50%"
           placeholder="Campaign Budget"
           // TODO: Should get/calculate estimated fee
-          description={`Estimated fee: 0.15 ${balanceToken.name}`}
+          // description={`Estimated fee: 0.15 ${balanceToken.name}`}
           inputWrapperOrder={['input', 'description', 'error']}
           {...form.getInputProps('campaignBudget')}
         />

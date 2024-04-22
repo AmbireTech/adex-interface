@@ -15,7 +15,8 @@ const CpmMinMax = () => {
         <TextInput
           size="md"
           w="45%"
-          description="Approx. ~ $0.10"
+          // Temporary disabled until we are ready to get real data
+          // description="Approx. ~ $0.10"
           inputWrapperOrder={['input', 'description', 'error']}
           rightSection={
             <Text color="brand" mr="sm" size="sm">
@@ -28,7 +29,8 @@ const CpmMinMax = () => {
         <TextInput
           size="md"
           w="45%"
-          description="Approx. ~ $0.50"
+          // Temporary disabled until we are ready to get real data
+          // description="Approx. ~ $0.50"
           inputWrapperOrder={['input', 'description', 'error']}
           rightSection={
             <Text color="brand" mr="sm" size="sm">
