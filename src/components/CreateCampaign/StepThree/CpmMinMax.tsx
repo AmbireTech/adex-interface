@@ -28,7 +28,7 @@ const CpmMinMax = () => {
         <TextInput
           size="md"
           w="45%"
-          description="Approx. ~ $0.10"
+          description="Approx. ~ $0.50"
           inputWrapperOrder={['input', 'description', 'error']}
           rightSection={
             <Text color="brand" mr="sm" size="sm">

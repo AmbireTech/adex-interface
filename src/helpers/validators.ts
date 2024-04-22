@@ -1,6 +1,9 @@
 import { Token } from 'types'
 import { parseBigNumTokenAmountToDecimal } from './balances'
 
+const MIN_CAMPAIGN_BUDGET_VALUE = 500
+const MIN_CPM_VALUE = 0.1
+
 export const validateCreateCampaignFrom = (availableBalance: bigint, balanceToken: Token) => {
   const validateBudget = (value: string) => {
     const formattedToken = Number(
@@ -22,8 +25,8 @@ export const validateCreateCampaignFrom = (availableBalance: bigint, balanceToke
       if (value === '' || Number.isNaN(Number(value))) {
         return 'Enter campaign budget or a valid number'
       }
-      if (parseFloat(value) <= 0) {
-        return 'Campaign budget should be greater than 0'
+      if (parseFloat(value) <= MIN_CAMPAIGN_BUDGET_VALUE) {
+        return `Campaign budget should be greater than ${MIN_CAMPAIGN_BUDGET_VALUE}`
       }
 
       if (validateBudget(value)) {
@@ -35,8 +38,8 @@ export const validateCreateCampaignFrom = (availableBalance: bigint, balanceToke
       if (value === '' || Number.isNaN(Number(value))) {
         return 'Enter CPM min value or a valid number'
       }
-      if (parseFloat(value) <= 0) {
-        return 'CPM min should be greater than 0'
+      if (parseFloat(value) <= MIN_CPM_VALUE) {
+        return `CPM min should be greater than ${MIN_CPM_VALUE}`
       }
       return null
     },
