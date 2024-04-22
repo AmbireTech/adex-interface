@@ -1,5 +1,5 @@
 import { UnstyledButton, Group, Text, createStyles } from '@mantine/core'
-import { Link } from 'react-router-dom'
+import { Link, LinkProps } from 'react-router-dom'
 import CustomPopover from 'components/common/CustomPopover'
 
 const useStyles = createStyles((theme) => {
@@ -44,15 +44,7 @@ const useStyles = createStyles((theme) => {
   }
 })
 
-function NavLink({
-  to = '',
-  icon,
-  label,
-  action,
-  active,
-  hasPopover,
-  popoverContent = ''
-}: {
+type NavLinkProps = LinkProps & {
   to?: string
   icon?: React.ReactNode
   label: string
@@ -60,7 +52,18 @@ function NavLink({
   active?: boolean
   hasPopover?: boolean
   popoverContent?: JSX.Element | string
-}) {
+}
+
+function NavLink({
+  to = '',
+  icon,
+  label,
+  action,
+  active,
+  hasPopover,
+  popoverContent = '',
+  ...rest
+}: NavLinkProps) {
   const { classes, cx } = useStyles()
   return hasPopover ? (
     <CustomPopover popoverContent={popoverContent}>
@@ -79,6 +82,7 @@ function NavLink({
       onClick={action}
       className={cx(classes.button, { [classes.active]: active })}
       px="xl"
+      {...rest}
     >
       <Group>
         <span className={classes.icon}>{icon}</span>
