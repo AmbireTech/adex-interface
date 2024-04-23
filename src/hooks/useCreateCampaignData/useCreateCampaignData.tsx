@@ -22,7 +22,7 @@ const useCreateCampaignData = () => {
       targetingInput: {
         inputs: { location, categories }
       },
-      pricingBounds: { IMPRESSION: priceBounds },
+      cpmPricingBounds,
       adUnits,
       campaignBudget,
       title,
@@ -64,12 +64,12 @@ const useCreateCampaignData = () => {
     () => (
       <RangeText
         labelOne="Min"
-        valueOne={priceBounds?.min.toString() || ''}
+        valueOne={cpmPricingBounds.min.toString() || ''}
         labelTwo="Max"
-        valueTwo={priceBounds?.max.toString() || ''}
+        valueTwo={cpmPricingBounds.max.toString() || ''}
       />
     ),
-    [priceBounds?.min, priceBounds?.max]
+    [cpmPricingBounds]
   )
 
   const startsAtFormatted = useMemo(() => dayjs(startsAt).format('DD/MM/YYYY HH:mm'), [startsAt])
