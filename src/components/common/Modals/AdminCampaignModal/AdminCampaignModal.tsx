@@ -211,6 +211,8 @@ const AdminCampaignModal = ({
             column
           />
           <Textarea
+            label="Required"
+            required
             defaultValue={reason}
             onChange={(e) => setReason(e.target.value)}
             placeholder="Reason..."

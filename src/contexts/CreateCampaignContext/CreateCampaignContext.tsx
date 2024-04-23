@@ -89,8 +89,8 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
 
   const publishCampaign = useCallback(() => {
     const mappedCampaign = mapCampaignUItoCampaign(campaign)
-    mappedCampaign.id = `${campaign.title}-${Date.now().toString(16)}`
 
+    mappedCampaign.id = `${campaign.title}-${Date.now().toString(16)}`
     mappedCampaign.campaignBudget = parseToBigNumPrecision(
       Number(mappedCampaign.campaignBudget),
       balanceToken.decimals
@@ -99,12 +99,12 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
       Number(campaign.cpmPricingBounds.min) / 1000,
       balanceToken.decimals
     )
-
     mappedCampaign.pricingBounds.IMPRESSION!.max = parseToBigNumPrecision(
       Number(campaign.cpmPricingBounds.max) / 1000,
       balanceToken.decimals
     )
-    debugger // eslint-disable-line no-debugger
+    mappedCampaign.activeFrom = BigInt(campaign.startsAt.getTime())
+    mappedCampaign.activeTo = BigInt(campaign.endsAt.getTime())
 
     const body = serialize(mappedCampaign).json
 
