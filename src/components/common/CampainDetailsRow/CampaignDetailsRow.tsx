@@ -16,7 +16,8 @@ const useStyles = createStyles((theme, { lighterColor }: { lighterColor: boolean
   },
   marginBottom: {
     marginBottom: theme.spacing.sm
-  }
+  },
+  text: { whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }
 }))
 
 const CampaignDetailsRow = ({
@@ -48,7 +49,7 @@ const CampaignDetailsRow = ({
       >
         {title}
       </Text>
-      <Text className={cx({ [classes.fullWidth]: column })}>{value}</Text>
+      <Text className={cx(classes.text, { [classes.fullWidth]: column })}>{value}</Text>
     </Flex>
   )
 }
