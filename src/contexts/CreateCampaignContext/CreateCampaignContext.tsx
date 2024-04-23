@@ -96,16 +96,15 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
       balanceToken.decimals
     )
     mappedCampaign.pricingBounds.IMPRESSION!.min = parseToBigNumPrecision(
-      // Number(mappedCampaign.pricingBounds.IMPRESSION!.min) / 1000,
-      Number(mappedCampaign.pricingBounds.IMPRESSION!.min),
+      Number(campaign.cpmPricingBounds.min) / 1000,
       balanceToken.decimals
     )
 
     mappedCampaign.pricingBounds.IMPRESSION!.max = parseToBigNumPrecision(
-      // Number(mappedCampaign.pricingBounds.IMPRESSION!.max) / 1000,
-      Number(mappedCampaign.pricingBounds.IMPRESSION!.max),
+      Number(campaign.cpmPricingBounds.max) / 1000,
       balanceToken.decimals
     )
+    debugger // eslint-disable-line no-debugger
 
     const body = serialize(mappedCampaign).json
 

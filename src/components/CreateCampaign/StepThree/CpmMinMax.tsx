@@ -25,7 +25,7 @@ const CpmMinMax = () => {
             </Text>
           }
           rightSectionWidth="auto"
-          {...form.getInputProps('pricingBounds.IMPRESSION.min')}
+          {...form.getInputProps('cpmPricingBounds.min')}
         />
         <TextInput
           size="md"
@@ -40,7 +40,7 @@ const CpmMinMax = () => {
             </Text>
           }
           rightSectionWidth="md"
-          {...form.getInputProps('pricingBounds.IMPRESSION.max')}
+          {...form.getInputProps('cpmPricingBounds.max')}
         />
       </Flex>
     </MediaQuery>

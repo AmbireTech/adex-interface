@@ -64,6 +64,10 @@ export const CREATE_CAMPAIGN_DEFAULT_VALUE: CampaignUI = {
       max: 0n
     }
   },
+  cpmPricingBounds: {
+    min: 0n,
+    max: 0n
+  },
   targetingRules: [],
   activeFrom: BigInt(Date.now()),
   activeTo: BigInt(Date.now()),

@@ -56,13 +56,15 @@ type FormattedAmountProps = {
   tokenAddress: string
   amount: bigint
   tokenDecimals: number
+  isCPMAmount?: boolean
 }
 
 const FormattedAmount = ({
   chainId,
   tokenAddress,
   amount,
-  tokenDecimals
+  tokenDecimals,
+  isCPMAmount = false
 }: FormattedAmountProps) => (
   <Flex align="center">
     <Image
@@ -74,7 +76,9 @@ const FormattedAmount = ({
     />
     <Text ml="xs">
       {formatCurrency(
-        Number(parseBigNumTokenAmountToDecimal(amount, tokenDecimals)),
+        isCPMAmount
+          ? Number(parseBigNumTokenAmountToDecimal(amount, tokenDecimals)) * 1000
+          : Number(parseBigNumTokenAmountToDecimal(amount, tokenDecimals)),
         DIGITS_AFTER_FLOATING_POINT
       )}
     </Text>
@@ -182,6 +186,7 @@ const CampaignDetails = () => {
                         tokenAddress={campaign.outpaceAssetAddr}
                         amount={campaign.pricingBounds.IMPRESSION.min}
                         tokenDecimals={campaign.outpaceAssetDecimals}
+                        isCPMAmount
                       />
                     )
                   }
@@ -196,6 +201,7 @@ const CampaignDetails = () => {
                         tokenAddress={campaign.outpaceAssetAddr}
                         amount={campaign.pricingBounds.IMPRESSION.max}
                         tokenDecimals={campaign.outpaceAssetDecimals}
+                        isCPMAmount
                       />
                     )
                   }
