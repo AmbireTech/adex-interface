@@ -9,6 +9,12 @@ export const CREATE_CAMPAIGN_STEPS = 4
 export const CAMPAIGN_CATEGORIES_INPUT = 'targetingInput.inputs.categories'
 export const CAMPAIGN_LOCATION_INPUT = 'targetingInput.inputs.location'
 export const CAMPAIGN_PLACEMENTS_INPUT = 'targetingInput.inputs.placements.in'
+const THIRTY_DAYS_IN_MILLISECONDS = 2592000000
+
+const dateNowPlusThirtyDays = () => {
+  const currentDate = new Date()
+  return new Date(currentDate.getTime() + THIRTY_DAYS_IN_MILLISECONDS)
+}
 
 const parseCats = () => {
   const arr: SelectData[] = []
@@ -38,7 +44,7 @@ export const CREATE_CAMPAIGN_DEFAULT_VALUE: CampaignUI = {
   devices: [],
   paymentModel: 'cpm',
   startsAt: new Date(),
-  endsAt: new Date(),
+  endsAt: dateNowPlusThirtyDays(),
   currency: '',
   // cpmMin: '',
   // cpmMax: '',
