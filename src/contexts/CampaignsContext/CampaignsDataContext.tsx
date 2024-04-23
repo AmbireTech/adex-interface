@@ -13,6 +13,7 @@ import useAccount from 'hooks/useAccount'
 import useCustomNotifications from 'hooks/useCustomNotifications'
 import { CampaignData, EventAggregatesDataRes, EvAggrData } from 'types/campaignsData'
 import { CREATE_CAMPAIGN_DEFAULT_VALUE } from 'constants/createCampaign'
+import { parseBigNumTokenAmountToDecimal } from 'helpers/balances'
 
 const defaultCampaignData: CampaignData = {
   campaignId: '',
@@ -48,7 +49,7 @@ const campaignDataResToAdvData = (dataRes: CamapignBackendDataRes): EvAggrData =
   const newData: EvAggrData = {
     clicks: dataRes.clicks || 0,
     impressions: dataRes.impressions || 0,
-    payouts: Number(dataRes.totalSpent || 0n) / 10 ** -dataRes.outpaceAssetDecimals
+    payouts: dataRes.totalSpent
   }
 
   return newData
@@ -71,8 +72,10 @@ const campaignResToCampaignData = (
       impressions: 0
     }),
     ...{
-      // TODO: Decimals to umber fn
-      paid: Number(advData?.payouts || 0) * 10 ** -8,
+      paid: parseBigNumTokenAmountToDecimal(
+        BigInt(advData?.payouts || 0n),
+        cmpRes.outpaceAssetDecimals
+      ),
       ctr: 'N/A',
       avgCpm: 'N/A'
     }
