@@ -61,13 +61,13 @@ const CampaignDetails = () => {
     return <div>Missing ID</div>
   }
 
-  const campaignDeta = useMemo(
+  const campaignData = useMemo(
     () => campaignsData.get(id),
 
     [id, campaignsData]
   )
 
-  const campaign = useMemo(() => campaignDeta?.campaign, [campaignDeta])
+  const campaign = useMemo(() => campaignData?.campaign, [campaignData])
 
   const budget = useMemo(
     () =>

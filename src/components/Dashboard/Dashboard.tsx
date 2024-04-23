@@ -33,11 +33,13 @@ const Dashboard = () => {
               title: cmpData.campaign.title,
               model: CampaignType[cmpData.campaign.type],
               status: <BadgeStatusCampaign type={cmpData.campaign.status} />,
-              served: 'No data',
-              budget: 'No data',
-              impressions: 'No data',
-              clicks: 'No data',
-              ctr: 'No data',
+              served: cmpData.paid
+                ? (Number(cmpData.campaign.campaignBudget) / cmpData.paid) * 100
+                : 0,
+              budget: cmpData.campaign.campaignBudget,
+              impressions: cmpData.impressions,
+              clicks: cmpData.clicks,
+              ctr: cmpData.ctr,
               period: parsePeriodForCampaign([
                 cmpData.campaign.activeFrom,
                 cmpData.campaign.activeTo

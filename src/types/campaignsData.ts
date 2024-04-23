@@ -88,7 +88,7 @@ export type EventAggregatesDataRes = {
 export type EvAggrData = {
   clicks: number
   impressions: number
-  payouts: BigInt
+  payouts: number
 }
 
 export type AnalyticsType = 'timeframe' | 'hostname' | 'country' | 'adUnit'
