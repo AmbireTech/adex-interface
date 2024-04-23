@@ -1,10 +1,13 @@
 import { Button, Flex, Image, Modal, Text, Textarea, createStyles } from '@mantine/core'
 import { Campaign, EventType } from 'adex-common'
 import CampaignDetailsRow from 'components/common/CampainDetailsRow'
+import { getMediaUrlWithProvider } from 'helpers/createCampaignHelpers'
 import { useAdExApi } from 'hooks/useAdexServices'
 import { FormEvent, useState } from 'react'
 import LeftArrowIcon from 'resources/icons/LeftArrow'
 import RightArrowIcon from 'resources/icons/RightArrow'
+
+const IPFS_GATEWAY = process.env.REACT_APP_IPFS_GATEWAY
 
 const timeIntToDateString = (n: bigint | number | undefined) =>
   n ? new Date(Number(n)).toLocaleDateString().slice(0, 9) : ''
@@ -134,7 +137,14 @@ const AdminCampaignModal = ({
           />
           <CampaignDetailsRow
             title="Image:"
-            value={<Image src={item?.adUnits[currBanner].banner?.mediaUrl} />}
+            value={
+              <Image
+                src={getMediaUrlWithProvider(
+                  item?.adUnits[currBanner].banner?.mediaUrl,
+                  IPFS_GATEWAY
+                )}
+              />
+            }
             column
           />
           <Textarea
