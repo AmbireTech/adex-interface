@@ -30,7 +30,14 @@ const BadgeStatusCampaign = ({ type }: BadgeType) => {
       case CampaignStatus.ready:
         return {
           color: 'completed',
-          text: 'Completed',
+          text: 'Ready',
+          icon: <CompletedIcon size="13px" />
+        }
+
+      case CampaignStatus.active:
+        return {
+          color: 'active',
+          text: 'Active',
           icon: <CompletedIcon size="13px" />
         }
 
