@@ -7,6 +7,9 @@ import { useDisclosure } from '@mantine/hooks'
 import { BaseAnalyticsData } from 'types'
 import { formatCurrency } from 'helpers'
 import { AdUnit } from 'adex-common'
+import { getMediaUrlWithProvider } from 'helpers/createCampaignHelpers'
+
+const IPFS_GATEWAY = process.env.REACT_APP_IPFS_GATEWAY
 
 const useStyles = createStyles((theme) => ({
   icon: {
@@ -29,7 +32,7 @@ const Creatives = ({
   const [opened, { open, close }] = useDisclosure(false)
   const { classes } = useStyles()
 
-  const headings = ['Media', 'Segment', 'Impressions', 'Clicks', 'CTR%', 'Spent', 'Links']
+  const headings = ['Media', 'Size', 'Impressions', 'Clicks', 'CTR%', 'Spent', 'Link']
   const [selectedMedia, setSelectedMedia] = useState('')
   const handleMediaClick = useCallback(
     (media: string) => {
@@ -44,17 +47,16 @@ const Creatives = ({
   }
 
   const elements = creatives?.map((item) => {
-    const unitsForId = units.find((x) => x.id === item.segment)
-    const media = unitsForId?.banner?.mediaUrl || ''
+    const unitForId = units.find((x) => x.id === item.segment)
+    const media = unitForId?.banner?.mediaUrl || ''
 
     return {
-      ...item,
       media: (
         <Flex align="center">
           <UrlIcon size="25px" className={classes.icon} />
           <Image
             ml="sm"
-            src={media}
+            src={getMediaUrlWithProvider(media, IPFS_GATEWAY)}
             mah="100px"
             maw="50px"
             onClick={() => handleMediaClick(media || '')}
@@ -62,10 +64,12 @@ const Creatives = ({
           />
         </Flex>
       ),
+      size: `${unitForId?.banner?.format.w}x${unitForId?.banner?.format.w}`,
       impressions: formatCurrency(item.impressions, 0),
       clicks: formatCurrency(item.clicks, 0),
       ctr: `${item.ctr} %`,
-      paid: `${item.paid} ${currencyName}`
+      paid: `${item.paid} ${currencyName}`,
+      link: unitForId?.banner?.targetUrl
     }
   })
   return (
