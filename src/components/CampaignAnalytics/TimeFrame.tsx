@@ -56,7 +56,7 @@ export const TimeFrame = ({
   const { width: windowWidth } = useViewportSize()
   const [filteredData, setFilteredData] = useState<FilteredAnalytics[]>([])
 
-  console.log({ kors: Array.isArray(timeFrames) })
+  // console.log({ kors: Array.isArray(timeFrames) })
 
   const [metricsToShow, setMetricsToShow] = useState<MetricsToShow>({
     // segment: true,
@@ -70,7 +70,10 @@ export const TimeFrame = ({
   useEffect(() => {
     if (timeFrames) {
       const result = timeFrames.map((obj) => {
-        const filteredObj: FilteredAnalytics = { segment: obj.segment }
+        console.log({ obj })
+        const filteredObj: FilteredAnalytics = {
+          segment: new Date(Number(obj.segment)).toLocaleDateString()
+        }
 
         Object.entries(metricsToShow).forEach(([metricKey, show]) => {
           if (show) {
