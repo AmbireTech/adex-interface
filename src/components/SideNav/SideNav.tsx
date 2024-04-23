@@ -113,7 +113,13 @@ function SideNav() {
             label="Billing"
             active={useResolvedPath('billing').pathname === match?.pathname}
           />
-          <NavLink icon={<HelpIcon />} label="Help Center" />
+
+          <NavLink
+            to="https://help.adex.network/hc/en-us"
+            target="_blank"
+            icon={<HelpIcon />}
+            label="Help Center"
+          />
           {isAdmin && (
             <NavLink
               to="/dashboard/admin"

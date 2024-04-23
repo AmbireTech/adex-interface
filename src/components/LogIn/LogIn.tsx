@@ -19,6 +19,7 @@ import HelpIcon from 'resources/icons/Help'
 import CustomAnchor from 'components/common/customAnchor/CustomAnchor'
 import { useNavigate } from 'react-router-dom'
 import useAccount from 'hooks/useAccount'
+import { appVersion } from 'helpers'
 
 const useStyles = createStyles(() => {
   return {
@@ -80,7 +81,7 @@ function LogIn() {
             <ThemeIcon variant="outline" size="sm" color="secondaryText" className={classes.icon}>
               <HelpIcon />
             </ThemeIcon>
-            <CustomAnchor external href="https://mantine.dev/" color="dimmed">
+            <CustomAnchor external href="https://help.adex.network/hc/en-us" color="dimmed">
               Help Center
             </CustomAnchor>
           </Group>
@@ -88,7 +89,7 @@ function LogIn() {
             ©{year} AdEx. All Rights Reserved.
           </Text>
           <Text size="sm" color="secondaryText">
-            V.0.00.01
+            V.{appVersion}
           </Text>
         </Flex>
       </Flex>

@@ -34,7 +34,7 @@ export const validateCreateCampaignFrom = (availableBalance: bigint, balanceToke
       }
       return null
     },
-    'pricingBounds.IMPRESSION.min': (value: string) => {
+    'cpmPricingBounds.min': (value: string) => {
       if (value === '' || Number.isNaN(Number(value))) {
         return 'Enter CPM min value or a valid number'
       }
@@ -43,7 +43,7 @@ export const validateCreateCampaignFrom = (availableBalance: bigint, balanceToke
       }
       return null
     },
-    'pricingBounds.IMPRESSION.max': (value: string) => {
+    'cpmPricingBounds.max': (value: string) => {
       if (value === '' || Number.isNaN(Number(value))) {
         return 'Enter CPM max value or a valid number'
       }

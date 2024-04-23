@@ -218,6 +218,7 @@ export const mapCampaignUItoCampaign = (campaignUI: CampaignUI): ReducedCampaign
     archived,
     createdBy,
     lastModifiedBy,
+    cpmPricingBounds,
     ...campaign
   } = campaignUI
 

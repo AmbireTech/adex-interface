@@ -15,7 +15,10 @@ const IPFS_GATEWAY = process.env.REACT_APP_IPFS_GATEWAY
 
 const useDropzone = () => {
   const [uploadedFiles, setUploadedFiles] = useState<FileWithPath[] | null>(null)
-  const updateUploadedFiles = useCallback((files: FileWithPath[]) => setUploadedFiles(files), [])
+  const updateUploadedFiles = useCallback(
+    (files: FileWithPath[] | null) => setUploadedFiles(files),
+    []
+  )
   const {
     updateCampaign,
     campaign: { adUnits }
@@ -60,8 +63,7 @@ const useDropzone = () => {
 
             let htmlBannerSizes: ImageSizes | null = null
             const adUnit = {
-              // TODO: Change the id because if drops more than one file it generate duplicate ids
-              id: new Date().getTime().toString(),
+              id: `${file.name.replace(/\s+/g, '')}-${Date.now().toString(16)}`,
               title: file.name,
               type: AdUnitType.Banner,
               banner: {
@@ -91,7 +93,7 @@ const useDropzone = () => {
 
                 adUnitsCopy.push(adUnit)
                 updateCampaign('adUnits', adUnitsCopy)
-                updateUploadedFiles([])
+                updateUploadedFiles(null)
               })
             } else {
               getMediaSize(file.type, e.target.result).then((sizes) => {
@@ -100,7 +102,7 @@ const useDropzone = () => {
 
                 adUnitsCopy.push(adUnit)
                 updateCampaign('adUnits', adUnitsCopy)
-                updateUploadedFiles([])
+                updateUploadedFiles(null)
               })
             }
           }

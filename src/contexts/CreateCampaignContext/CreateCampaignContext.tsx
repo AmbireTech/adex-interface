@@ -95,6 +95,16 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
       Number(mappedCampaign.campaignBudget),
       balanceToken.decimals
     )
+    mappedCampaign.pricingBounds.IMPRESSION!.min = parseToBigNumPrecision(
+      Number(campaign.cpmPricingBounds.min) / 1000,
+      balanceToken.decimals
+    )
+
+    mappedCampaign.pricingBounds.IMPRESSION!.max = parseToBigNumPrecision(
+      Number(campaign.cpmPricingBounds.max) / 1000,
+      balanceToken.decimals
+    )
+    debugger // eslint-disable-line no-debugger
 
     const body = serialize(mappedCampaign).json
 

@@ -15,7 +15,9 @@ const CpmMinMax = () => {
         <TextInput
           size="md"
           w="45%"
-          description="Approx. ~ $0.10"
+          placeholder="CPM min"
+          // Temporary disabled until we are ready to get real data
+          // description="Approx. ~ $0.10"
           inputWrapperOrder={['input', 'description', 'error']}
           rightSection={
             <Text color="brand" mr="sm" size="sm">
@@ -23,12 +25,14 @@ const CpmMinMax = () => {
             </Text>
           }
           rightSectionWidth="auto"
-          {...form.getInputProps('pricingBounds.IMPRESSION.min')}
+          {...form.getInputProps('cpmPricingBounds.min')}
         />
         <TextInput
           size="md"
           w="45%"
-          description="Approx. ~ $0.50"
+          placeholder="CPM max"
+          // Temporary disabled until we are ready to get real data
+          // description="Approx. ~ $0.50"
           inputWrapperOrder={['input', 'description', 'error']}
           rightSection={
             <Text color="brand" mr="sm" size="sm">
@@ -36,7 +40,7 @@ const CpmMinMax = () => {
             </Text>
           }
           rightSectionWidth="md"
-          {...form.getInputProps('pricingBounds.IMPRESSION.max')}
+          {...form.getInputProps('cpmPricingBounds.max')}
         />
       </Flex>
     </MediaQuery>

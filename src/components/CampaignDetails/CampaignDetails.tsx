@@ -51,6 +51,40 @@ const useStyles = createStyles((theme) => ({
   }
 }))
 
+type FormattedAmountProps = {
+  chainId: number
+  tokenAddress: string
+  amount: bigint
+  tokenDecimals: number
+  isCPMAmount?: boolean
+}
+
+const FormattedAmount = ({
+  chainId,
+  tokenAddress,
+  amount,
+  tokenDecimals,
+  isCPMAmount = false
+}: FormattedAmountProps) => (
+  <Flex align="center">
+    <Image
+      maw={15}
+      mx="auto"
+      radius="md"
+      src={getTokenIcon(chainId, tokenAddress)}
+      alt={tokenAddress}
+    />
+    <Text ml="xs">
+      {formatCurrency(
+        isCPMAmount
+          ? Number(parseBigNumTokenAmountToDecimal(amount, tokenDecimals)) * 1000
+          : Number(parseBigNumTokenAmountToDecimal(amount, tokenDecimals)),
+        DIGITS_AFTER_FLOATING_POINT
+      )}
+    </Text>
+  </Flex>
+)
+
 const CampaignDetails = () => {
   const { classes, cx } = useStyles()
   const { campaignsData, updateCampaignDataById } = useCampaignsData()
@@ -68,33 +102,6 @@ const CampaignDetails = () => {
   )
 
   const campaign = useMemo(() => campaignData?.campaign, [campaignData])
-
-  const budget = useMemo(
-    () =>
-      campaign && (
-        <Flex align="center">
-          <Image
-            maw={15}
-            mx="auto"
-            radius="md"
-            src={getTokenIcon(campaign.outpaceChainId, campaign?.outpaceAssetAddr)}
-            alt={campaign?.outpaceAssetAddr}
-          />
-          <Text ml="xs">
-            {formatCurrency(
-              Number(
-                parseBigNumTokenAmountToDecimal(
-                  campaign.campaignBudget,
-                  campaign.outpaceAssetDecimals
-                )
-              ),
-              DIGITS_AFTER_FLOATING_POINT
-            )}
-          </Text>
-        </Flex>
-      ),
-    [campaign]
-  )
 
   useEffect(() => {
     if (id) {
@@ -139,7 +146,19 @@ const CampaignDetails = () => {
                   value=""
                 />
                 {/* TODO: Add data for it */}
-                <CampaignDetailsRow lineHeight="sm" textSize="sm" title="Budget" value={budget} />
+                <CampaignDetailsRow
+                  lineHeight="sm"
+                  textSize="sm"
+                  title="Budget"
+                  value={
+                    <FormattedAmount
+                      chainId={campaign.outpaceChainId}
+                      tokenAddress={campaign.outpaceAssetAddr}
+                      amount={campaign.campaignBudget}
+                      tokenDecimals={campaign.outpaceAssetDecimals}
+                    />
+                  }
+                />
                 <CampaignDetailsRow
                   lineHeight="sm"
                   title="Created"
@@ -159,13 +178,33 @@ const CampaignDetails = () => {
                 />
                 <CampaignDetailsRow
                   lineHeight="sm"
-                  title="CPC min"
-                  value={campaign.pricingBounds.CLICK?.min}
+                  title="CPM min"
+                  value={
+                    campaign.pricingBounds.IMPRESSION?.min && (
+                      <FormattedAmount
+                        chainId={campaign.outpaceChainId}
+                        tokenAddress={campaign.outpaceAssetAddr}
+                        amount={campaign.pricingBounds.IMPRESSION.min}
+                        tokenDecimals={campaign.outpaceAssetDecimals}
+                        isCPMAmount
+                      />
+                    )
+                  }
                 />
                 <CampaignDetailsRow
                   lineHeight="sm"
-                  title="CPC max"
-                  value={campaign.pricingBounds.CLICK?.max}
+                  title="CPM max"
+                  value={
+                    campaign.pricingBounds.IMPRESSION?.max && (
+                      <FormattedAmount
+                        chainId={campaign.outpaceChainId}
+                        tokenAddress={campaign.outpaceAssetAddr}
+                        amount={campaign.pricingBounds.IMPRESSION.max}
+                        tokenDecimals={campaign.outpaceAssetDecimals}
+                        isCPMAmount
+                      />
+                    )
+                  }
                 />
                 {/* TODO: Add data for it */}
                 <CampaignDetailsRow
