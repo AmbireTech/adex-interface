@@ -39,5 +39,4 @@ jobs:
         with:
           branch: gh-pages
           folder: ./build
-          target-folder: ./staging
           cname: v5.adex.network

@@ -39,6 +39,4 @@ jobs:
         with:
           branch: gh-pages
           folder: ./build
-          cname: v5.adex.network
-          clean-exclude: |
-            staging
+          cname: dsp.adex.network
