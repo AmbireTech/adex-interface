@@ -36,7 +36,10 @@ const Dashboard = () => {
               served: cmpData.paid
                 ? (Number(cmpData.campaign.campaignBudget) / cmpData.paid) * 100
                 : 0,
-              budget: cmpData.campaign.campaignBudget,
+              budget:
+                // TODO: use fn
+                Number(cmpData.campaign.campaignBudget) *
+                10 ** -cmpData.campaign.outpaceAssetDecimals,
               impressions: cmpData.impressions,
               clicks: cmpData.clicks,
               ctr: cmpData.ctr,
