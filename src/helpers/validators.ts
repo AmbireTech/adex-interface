@@ -25,8 +25,9 @@ export const validateCreateCampaignFrom = (availableBalance: bigint, balanceToke
       if (value === '' || Number.isNaN(Number(value))) {
         return 'Enter campaign budget or a valid number'
       }
-      if (parseFloat(value) <= MIN_CAMPAIGN_BUDGET_VALUE) {
-        return `Campaign budget should be greater than ${MIN_CAMPAIGN_BUDGET_VALUE}`
+
+      if (parseFloat(value) < MIN_CAMPAIGN_BUDGET_VALUE) {
+        return `Campaign budget can not be lower than ${MIN_CAMPAIGN_BUDGET_VALUE}`
       }
 
       if (validateBudget(value)) {
@@ -38,8 +39,9 @@ export const validateCreateCampaignFrom = (availableBalance: bigint, balanceToke
       if (value === '' || Number.isNaN(Number(value))) {
         return 'Enter CPM min value or a valid number'
       }
-      if (parseFloat(value) <= MIN_CPM_VALUE) {
-        return `CPM min should be greater than ${MIN_CPM_VALUE}`
+
+      if (parseFloat(value) < MIN_CPM_VALUE) {
+        return `CPM min can not be lower than ${MIN_CPM_VALUE}`
       }
       return null
     },
