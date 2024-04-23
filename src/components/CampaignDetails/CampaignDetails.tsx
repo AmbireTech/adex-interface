@@ -51,6 +51,36 @@ const useStyles = createStyles((theme) => ({
   }
 }))
 
+type FormattedAmountProps = {
+  chainId: number
+  tokenAddress: string
+  amount: bigint
+  tokenDecimals: number
+}
+
+const FormattedAmount = ({
+  chainId,
+  tokenAddress,
+  amount,
+  tokenDecimals
+}: FormattedAmountProps) => (
+  <Flex align="center">
+    <Image
+      maw={15}
+      mx="auto"
+      radius="md"
+      src={getTokenIcon(chainId, tokenAddress)}
+      alt={tokenAddress}
+    />
+    <Text ml="xs">
+      {formatCurrency(
+        Number(parseBigNumTokenAmountToDecimal(amount, tokenDecimals)),
+        DIGITS_AFTER_FLOATING_POINT
+      )}
+    </Text>
+  </Flex>
+)
+
 const CampaignDetails = () => {
   const { classes, cx } = useStyles()
   const { campaignsData, updateCampaignDataById } = useCampaignsData()
@@ -68,33 +98,6 @@ const CampaignDetails = () => {
   )
 
   const campaign = useMemo(() => campaignDeta?.campaign, [campaignDeta])
-
-  const budget = useMemo(
-    () =>
-      campaign && (
-        <Flex align="center">
-          <Image
-            maw={15}
-            mx="auto"
-            radius="md"
-            src={getTokenIcon(campaign.outpaceChainId, campaign?.outpaceAssetAddr)}
-            alt={campaign?.outpaceAssetAddr}
-          />
-          <Text ml="xs">
-            {formatCurrency(
-              Number(
-                parseBigNumTokenAmountToDecimal(
-                  campaign.campaignBudget,
-                  campaign.outpaceAssetDecimals
-                )
-              ),
-              DIGITS_AFTER_FLOATING_POINT
-            )}
-          </Text>
-        </Flex>
-      ),
-    [campaign]
-  )
 
   useEffect(() => {
     if (id) {
@@ -139,7 +142,19 @@ const CampaignDetails = () => {
                   value=""
                 />
                 {/* TODO: Add data for it */}
-                <CampaignDetailsRow lineHeight="sm" textSize="sm" title="Budget" value={budget} />
+                <CampaignDetailsRow
+                  lineHeight="sm"
+                  textSize="sm"
+                  title="Budget"
+                  value={
+                    <FormattedAmount
+                      chainId={campaign.outpaceChainId}
+                      tokenAddress={campaign.outpaceAssetAddr}
+                      amount={campaign.campaignBudget}
+                      tokenDecimals={campaign.outpaceAssetDecimals}
+                    />
+                  }
+                />
                 <CampaignDetailsRow
                   lineHeight="sm"
                   title="Created"
@@ -161,15 +176,13 @@ const CampaignDetails = () => {
                   lineHeight="sm"
                   title="CPM min"
                   value={
-                    campaign.pricingBounds.IMPRESSION?.min &&
-                    formatCurrency(
-                      Number(
-                        parseBigNumTokenAmountToDecimal(
-                          campaign.pricingBounds.IMPRESSION.min,
-                          campaign.outpaceAssetDecimals
-                        )
-                      ),
-                      DIGITS_AFTER_FLOATING_POINT
+                    campaign.pricingBounds.IMPRESSION?.min && (
+                      <FormattedAmount
+                        chainId={campaign.outpaceChainId}
+                        tokenAddress={campaign.outpaceAssetAddr}
+                        amount={campaign.pricingBounds.IMPRESSION.min}
+                        tokenDecimals={campaign.outpaceAssetDecimals}
+                      />
                     )
                   }
                 />
@@ -177,15 +190,13 @@ const CampaignDetails = () => {
                   lineHeight="sm"
                   title="CPM max"
                   value={
-                    campaign.pricingBounds.IMPRESSION?.max &&
-                    formatCurrency(
-                      Number(
-                        parseBigNumTokenAmountToDecimal(
-                          campaign.pricingBounds.IMPRESSION.max,
-                          campaign.outpaceAssetDecimals
-                        )
-                      ),
-                      DIGITS_AFTER_FLOATING_POINT
+                    campaign.pricingBounds.IMPRESSION?.max && (
+                      <FormattedAmount
+                        chainId={campaign.outpaceChainId}
+                        tokenAddress={campaign.outpaceAssetAddr}
+                        amount={campaign.pricingBounds.IMPRESSION.max}
+                        tokenDecimals={campaign.outpaceAssetDecimals}
+                      />
                     )
                   }
                 />
