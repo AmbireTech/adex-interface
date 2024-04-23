@@ -1,4 +1,4 @@
-import { Campaign } from 'adex-common/dist/types/Dsp/Campaign'
+import { Bound, Campaign } from 'adex-common/dist/types/Dsp/Campaign'
 import { Devices } from './createCampaign'
 
 export type SelectData = { value: string; label: string }
@@ -12,6 +12,7 @@ export type CampaignUI = Campaign & {
   startsAt: Date
   endsAt: Date
   currency: string
+  cpmPricingBounds: Bound
 }
 
 export type ImageSizes = {

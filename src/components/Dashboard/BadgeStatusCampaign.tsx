@@ -6,12 +6,13 @@ import CompletedIcon from 'resources/icons/CompletedIcon'
 import DraftIcon from 'resources/icons/Draft'
 import UnderReviewIcon from 'resources/icons/UnderReview'
 import StopIcon from 'resources/icons/Stop'
-// import ActiveIcon from 'resources/icons/Active'
+import ActiveIcon from 'resources/icons/Active'
 // import PausedIcon from 'resources/icons/Paused'
 // import ArchivedIcon from 'resources/icons/Archived'
 
 const BadgeStatusCampaign = ({ type }: BadgeType) => {
   const getStatusLabel = useCallback((status: number): IBadgeConfig => {
+    console.log({ status })
     switch (status) {
       case CampaignStatus.created:
         return {
@@ -29,8 +30,8 @@ const BadgeStatusCampaign = ({ type }: BadgeType) => {
 
       case CampaignStatus.ready:
         return {
-          color: 'completed',
-          text: 'Completed',
+          color: 'blue',
+          text: 'Ready',
           icon: <CompletedIcon size="13px" />
         }
 
@@ -47,13 +48,13 @@ const BadgeStatusCampaign = ({ type }: BadgeType) => {
           text: 'Completed',
           icon: <CompletedIcon size="13px" />
         }
-      // TODO: uncomment when CampaignStatus.active is added
-      // case CampaignStatus.active:
-      //   return {
-      //     color: 'success',
-      //     text: 'Active',
-      //     icon: <ActiveIcon size="13px" />
-      //   }
+
+      case CampaignStatus.active:
+        return {
+          color: 'success',
+          text: 'Active',
+          icon: <ActiveIcon size="13px" />
+        }
       // TODO: uncomment when CampaignStatus.stopped is added
       // case CampaignStatus.stopped:
       //   return {
@@ -100,6 +101,8 @@ const BadgeStatusCampaign = ({ type }: BadgeType) => {
   }, [])
 
   const status = useMemo(() => getStatusLabel(type), [getStatusLabel, type])
+
+  console.log({ status })
 
   return <CustomBadge color={status.color} text={status.text} icon={status.icon} />
 }

@@ -24,10 +24,13 @@ const Regions = ({
   const elements = useMemo(
     () =>
       regions?.map((item) => ({
-        ...item,
+        segment: item.segment,
+        share: '-',
+        impressions: item.impressions,
+        clicks: item.clicks,
+        ctr: `${item.ctr} %`,
         avgCpm: `${item.avgCpm} ${currencyName}`,
-        paid: `${item.paid} ${currencyName}`,
-        ctr: `${item.ctr} %`
+        paid: `${item.paid} ${currencyName}`
       })) || [],
     [regions, currencyName]
   )

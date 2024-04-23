@@ -24,13 +24,31 @@ const defaultCampaignData: CampaignData = {
   paid: 0
 }
 
+type CamapignBackendDataRes = Campaign & {
+  totalSpent: number
+  impressions?: number
+  verifiedImpressions?: number
+  clicks?: number
+}
+
 const eventAggregatestResToAdvData = (dataRes: EventAggregatesDataRes): EvAggrData => {
   const newData: EvAggrData = {
     clicks: dataRes.events[0].totals.CLICK.eventCounts,
     impressions: dataRes.events[0].totals.IMPRESSION.eventCounts,
-    payouts:
+    payouts: Number(
       BigInt(dataRes.events[0].totals.CLICK.eventPayouts) +
-      BigInt(dataRes.events[0].totals.IMPRESSION.eventPayouts)
+        BigInt(dataRes.events[0].totals.IMPRESSION.eventPayouts)
+    )
+  }
+
+  return newData
+}
+
+const campaignDataResToAdvData = (dataRes: CamapignBackendDataRes): EvAggrData => {
+  const newData: EvAggrData = {
+    clicks: dataRes.clicks || 0,
+    impressions: dataRes.impressions || 0,
+    payouts: Number(dataRes.totalSpent || 0n) / 10 ** -dataRes.outpaceAssetDecimals
   }
 
   return newData
@@ -112,7 +130,7 @@ const CampaignsDataProvider: FC<PropsWithChildren> = ({ children }) => {
         return {
           clicks: 0,
           impressions: 0,
-          payouts: BigInt(0)
+          payouts: 0
         }
       }
     },
@@ -123,7 +141,7 @@ const CampaignsDataProvider: FC<PropsWithChildren> = ({ children }) => {
     async (campaignId: string) => {
       console.log({ campaignId })
       try {
-        const campaignDetailsRes = await adexServicesRequest<Campaign>('backend', {
+        const campaignDetailsRes = await adexServicesRequest<CamapignBackendDataRes>('backend', {
           route: `/dsp/campaigns/by-id/${campaignId}`,
           method: 'GET'
         })
@@ -134,7 +152,8 @@ const CampaignsDataProvider: FC<PropsWithChildren> = ({ children }) => {
           return
         }
 
-        const advData = await getCampaignAdvancedData(campaignId)
+        // const advData = await getCampaignAdvancedData(campaignId)
+        const advData = campaignDataResToAdvData(campaignDetailsRes)
 
         setCampaignData((prev) => {
           const updatedCmp = campaignResToCampaignData(
@@ -151,23 +170,30 @@ const CampaignsDataProvider: FC<PropsWithChildren> = ({ children }) => {
         showNotification('error', `getting campaign with id ${campaignId}`, 'Data error')
       }
     },
-    [adexServicesRequest, getCampaignAdvancedData, showNotification]
+    [adexServicesRequest, showNotification]
   )
 
   const updateAllCampaignsData = useCallback(
     async (updateAdvanced?: boolean) => {
       try {
-        const dataRes = await adexServicesRequest<Array<Campaign>>('backend', {
+        const dataRes = await adexServicesRequest<Array<CamapignBackendDataRes>>('backend', {
           route: '/dsp/campaigns/by-owner',
           method: 'GET'
         })
 
+        console.log({ dataRes })
+
         let advData: EvAggrData[]
 
-        if (updateAdvanced) {
-          const calls = [...dataRes].map(({ id }) => getCampaignAdvancedData(id))
+        // if (updateAdvanced) {
+        //   const calls = [...dataRes].map(({ id }) => getCampaignAdvancedData(id))
 
-          advData = await Promise.all(calls)
+        //   advData = await Promise.all(calls)
+        //   console.log({ advData })
+        // }
+
+        if (updateAdvanced) {
+          advData = [...dataRes].map((cmpDataRes) => campaignDataResToAdvData(cmpDataRes))
           console.log({ advData })
         }
 

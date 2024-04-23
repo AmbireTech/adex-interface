@@ -2,7 +2,7 @@ import CustomTable from 'components/common/CustomTable'
 import { useMemo } from 'react'
 import { BaseAnalyticsData } from 'types'
 
-const headings = ['Hostname', 'Website', 'Impressions', 'Clicks', 'CTR%', 'Spent', 'Average CPM']
+const headings = ['Hostname', 'Impressions', 'Clicks', 'CTR%', 'Spent', 'Average CPM']
 
 const Placements = ({
   placements,
@@ -18,12 +18,12 @@ const Placements = ({
   const elements = useMemo(
     () =>
       placements?.map((item) => ({
-        ...item,
-        avgCpm: `${item.avgCpm} ${currencyName}`,
-        paid: `${item.paid} ${currencyName}`,
+        segment: item.segment,
         impressions: item.impressions.toLocaleString(),
         clicks: item.clicks.toLocaleString(),
-        ctr: `${item.ctr} %`
+        ctr: `${item.ctr} %`,
+        paid: `${item.paid} ${currencyName}`,
+        avgCpm: `${item.avgCpm} ${currencyName}`
       })) || [],
     [placements, currencyName]
   )

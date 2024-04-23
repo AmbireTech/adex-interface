@@ -80,7 +80,8 @@ const CampaignSummary = () => {
   )
 
   const hasEmptyTargetUrl = useMemo(
-    () => adUnits && adUnits.length && adUnits.some((adUnit) => adUnit.banner?.targetUrl === ''),
+    () =>
+      adUnits && adUnits.length ? adUnits.some((adUnit) => adUnit.banner?.targetUrl === '') : true,
     [adUnits]
   )
 
@@ -158,12 +159,13 @@ const CampaignSummary = () => {
           noBorder
         />
       </Flex>
-      <Flex justify="space-between" className={classes.bg} p="lg">
+      {/* Temporary disabled */}
+      {/* <Flex justify="space-between" className={classes.bg} p="lg">
         <Text color="secondaryText" weight="bold">
           Estimated Daily Impressions
         </Text>
         <Text color="secondaryText">0</Text>
-      </Flex>
+      </Flex> */}
       <Flex direction="column" justify="space-between" align="center">
         {!isTheLastStep ? (
           <Button

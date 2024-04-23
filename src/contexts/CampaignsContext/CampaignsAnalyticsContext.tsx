@@ -21,7 +21,7 @@ import {
 } from 'types'
 import { timeout } from 'helpers'
 
-import { dashboardTableElements } from 'components/Dashboard/mockData'
+// import { dashboardTableElements } from 'components/Dashboard/mockData'
 
 const keySeparator = '👩🏼‍🏫'
 
@@ -65,21 +65,26 @@ const analyticsDataToMappedAnalytics = (
   const clickPaid = analyticsData[3]
 
   // TODO: remove when no testing
-  if (!impCounts.length) {
-    const mockedData = dashboardTableElements[0][analyticsType]
+  // if (!impCounts.length) {
+  //   const mockedData = dashboardTableElements[0][analyticsType]
 
-    return [...mockedData]
-  }
+  //   return [...mockedData]
+  // }
 
   const mapped = impCounts.reduce((aggr, el) => {
     const next = new Map(aggr)
 
-    const segment = (el.segment || el.time).toString()
+    const segment = (
+      analyticsType === 'timeframe' ? el.time || el.segment || '-' : el.segment || el.time || '-'
+    ).toString()
     const nexSegment = aggr.get(segment) || {
       segment,
       clicks: 0,
       impressions: 0,
-      paid: 0
+      paid: 0,
+      analyticsType,
+      ctr: '',
+      avgCpm: ''
     }
 
     // TODO: optimize the mapping
@@ -102,15 +107,15 @@ const analyticsDataToMappedAnalytics = (
         )?.value || 0
       )
 
-    return next
+    return next.set(segment, nexSegment)
   }, new Map<string, BaseAnalyticsData>())
 
   const resMap = Array.from(mapped, ([segment, value]) => ({
     ...value,
     segment,
     analyticsType,
-    ctr: value.clicks && value.impressions ? (value.clicks / value.impressions) * 100 : 0,
-    avgCpm: value.paid && value.impressions ? (value.paid / value.impressions) * 1000 : 0
+    ctr: value.clicks && value.impressions ? (value.clicks / value.impressions) * 100 : 'N/A',
+    avgCpm: value.paid && value.impressions ? (value.paid / value.impressions) * 1000 : 'N/A'
   }))
 
   return resMap
