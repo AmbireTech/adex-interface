@@ -137,6 +137,18 @@ export const lightTheme: MantineThemeOverride = {
       '#7E4D40',
       '#6C483F'
     ],
+    completed: [
+      '#7EB6D5',
+      '#5AACDB',
+      '#30A5E8',
+      '#00A2FF',
+      '#178CCF',
+      '#2579A9',
+      '#2D6A8D',
+      '#315D76',
+      '#335264',
+      '#324956'
+    ],
     alternativeBackground: [
       '#FFFFFF',
       '#FFFFFF',
@@ -220,6 +232,54 @@ export const lightTheme: MantineThemeOverride = {
       '#6B6635',
       '#5B5835',
       '#4F4C33'
+    ],
+    warning: [
+      '#C4485E',
+      '#C72C48',
+      '#C71636',
+      '#C90024', // Warning
+      '#A3122C',
+      '#861D30',
+      '#6F2431',
+      '#5D2731',
+      '#4F282F',
+      '#43272C'
+    ],
+    nonDecorativeBorders: [
+      '#DADCE1',
+      '#C3C6D0',
+      '#ACB2C3',
+      '#959EB8',
+      '#858EA6',
+      '#787F96',
+      '#6D7386',
+      '#646976',
+      '#5C5F69',
+      '#54565D'
+    ],
+    stopped: [
+      '#3877AD',
+      '#256DAB',
+      '#1364AA',
+      '#005CAC', // Stopped
+      '#0F528B',
+      '#194972',
+      '#1F415F',
+      '#213A50',
+      '#223443',
+      '#222F3A'
+    ],
+    paused: [
+      '#C1A94D',
+      '#C6A730',
+      '#C5A11B',
+      '#C69E05', // Paused
+      '#A18416',
+      '#847020',
+      '#6E5F26',
+      '#5D5229',
+      '#4F4729',
+      '#433E28'
     ]
     // NOTE: needs 10 shades to work https://mantine.dev/theming/colors/
     // attention: ['#FFBE4D', '#FFBE4D', '#FFBE4D'],

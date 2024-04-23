@@ -5,13 +5,13 @@ import { CustomProjection, Graticule } from '@visx/geo'
 import { Zoom } from '@visx/zoom'
 import { geoNaturalEarth1 } from 'd3-geo'
 import { Tooltip, createStyles } from '@mantine/core'
-import { IRegion } from 'types'
+import { BaseAnalyticsData } from 'types'
 import topology from './world-topo.json'
 
 export type GeoCustomProps = {
   width: number
   height: number
-  regions?: IRegion[]
+  regions?: BaseAnalyticsData[]
 }
 
 interface FeatureShape {
@@ -68,8 +68,8 @@ const useStyles = createStyles(() => ({
 export default function GeoCustom({ width, height, regions }: GeoCustomProps) {
   const { classes } = useStyles()
   const centerX = useMemo(() => width / 2, [width])
-  const centerY = useMemo(() => height / 2, [height])
-  const initialScale = useMemo(() => (width / 1000) * 100, [width])
+  const centerY = useMemo(() => height / 2.5, [height])
+  const initialScale = useMemo(() => width / 6, [width])
 
   return width < 10 ? null : (
     <Zoom<SVGSVGElement>
@@ -113,11 +113,15 @@ export default function GeoCustom({ width, height, regions }: GeoCustomProps) {
                       />
                       {customProjection.features.map(({ feature, path }) => {
                         const selectedRegion = regions?.find(
-                          (region) => region.country === feature.properties.name
+                          (region) => region.segment === feature.properties.name
                         )
 
                         const tooltipText = selectedRegion
-                          ? `${selectedRegion.country} Impressions: ${selectedRegion.impressions}\n Clicks: ${selectedRegion.clicks}\n Share: ${selectedRegion.share} %\n CTR: ${selectedRegion.ctrPercents} %`
+                          ? `${selectedRegion.segment} Impressions: ${
+                              selectedRegion.impressions
+                            }\n Clicks: ${selectedRegion.clicks}\n Share: ${'TODO'} %\n CTR: ${
+                              selectedRegion.ctr
+                            } %`
                           : `${feature.properties.name} Impressions: 0 Clicks: 0 Share: 0 % CTR: 0 %`
                         return (
                           <Tooltip.Floating multiline w={200} label={tooltipText}>

@@ -1,11 +1,13 @@
 import { Global, MantineProvider, Progress } from '@mantine/core'
+import { ModalsProvider } from '@mantine/modals'
 import { AccountProvider } from 'contexts/AccountContext'
-import { BillingDetailsProvider } from 'contexts/BillingDetailsContext'
+import { CampaignsDataProvider, CampaignsAnalyticsProvider } from 'contexts/CampaignsContext'
 import { RouterProvider } from 'react-router-dom'
 import { router } from 'Router'
 import { lightTheme } from 'themes'
+import { Notifications } from '@mantine/notifications'
 
-const ENV = process.env.REACT_APP_ENV || 'staging'
+const ENV = process.env.REACT_APP_ENV
 
 function GlobalStyles() {
   return (
@@ -37,13 +39,18 @@ const EnvBanner = () => (
 function App() {
   return (
     <AccountProvider>
-      <MantineProvider withGlobalStyles withNormalizeCSS theme={lightTheme}>
-        <GlobalStyles />
-        <BillingDetailsProvider>
-          {ENV && <EnvBanner />}
-          <RouterProvider router={router} />
-        </BillingDetailsProvider>
-      </MantineProvider>
+      <CampaignsDataProvider>
+        <CampaignsAnalyticsProvider>
+          <MantineProvider withGlobalStyles withNormalizeCSS theme={lightTheme}>
+            <ModalsProvider>
+              <GlobalStyles />
+              <Notifications />
+              {ENV && <EnvBanner />}
+              <RouterProvider router={router} />
+            </ModalsProvider>
+          </MantineProvider>
+        </CampaignsAnalyticsProvider>
+      </CampaignsDataProvider>
     </AccountProvider>
   )
 }

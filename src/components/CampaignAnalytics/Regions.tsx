@@ -1,6 +1,6 @@
-import { IRegion } from 'types'
+import { BaseAnalyticsData } from 'types'
 import { useMemo } from 'react'
-import { Grid } from '@mantine/core'
+import { Grid, Modal } from '@mantine/core'
 import { useViewportSize } from '@mantine/hooks'
 import CustomTable from 'components/common/CustomTable'
 import GeoCustom from '../common/CustomTableWithDropdown/WorldMap'
@@ -9,41 +9,54 @@ const headings = ['Country', 'Share', 'Impressions', 'Clicks', 'CTR%', 'Average 
 
 const Regions = ({
   regions,
-  isMapVisible
+  isMapVisible,
+  currencyName,
+  onClose
 }: {
-  regions: IRegion[] | undefined
+  regions: BaseAnalyticsData[] | undefined
   isMapVisible: boolean
+  currencyName: string
+  onClose: () => void
 }) => {
-  const { width: windowWidth } = useViewportSize()
+  const { width: windowWidth, height: windowHeight } = useViewportSize()
+
+  // TODO: add elements types, fix custom table data
+  const elements = useMemo(
+    () =>
+      regions?.map((item) => ({
+        segment: item.segment,
+        share: '-',
+        impressions: item.impressions,
+        clicks: item.clicks,
+        ctr: `${item.ctr} %`,
+        avgCpm: `${item.avgCpm} ${currencyName}`,
+        paid: `${item.paid} ${currencyName}`
+      })) || [],
+    [regions, currencyName]
+  )
+
   if (!regions?.length) {
     return <div>No regions found</div>
   }
 
-  const elements = useMemo(
-    () =>
-      regions?.map((item) => ({
-        ...item,
-        impressions: item.impressions.toLocaleString(),
-        clicks: item.clicks.toLocaleString(),
-        ctrPercents: `${item.ctrPercents} %`
-      })),
-    [regions]
-  )
-
   return (
     <Grid grow>
-      {isMapVisible && (
-        <Grid.Col h={420} mb="sm">
-          <GeoCustom
-            width={windowWidth >= 768 ? windowWidth - 290 : windowWidth - 60}
-            height={420}
-            regions={regions}
-          />
-        </Grid.Col>
-      )}
       <Grid.Col>
         <CustomTable background headings={headings} elements={elements} />
       </Grid.Col>
+      <Modal
+        opened={isMapVisible}
+        onClose={onClose}
+        title="Word Map"
+        size={windowWidth >= 768 ? windowWidth - 290 : windowWidth - 60}
+        padding="lg"
+      >
+        <GeoCustom
+          width={windowWidth >= 768 ? windowWidth - 290 : windowWidth - 60}
+          height={windowHeight}
+          regions={regions}
+        />
+      </Modal>
     </Grid>
   )
 }

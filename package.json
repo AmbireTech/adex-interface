@@ -1,14 +1,18 @@
 {
   "name": "adex-interface",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "private": true,
   "homepage": ".",
   "dependencies": {
     "@ambire/login-sdk-core": "^0.0.21",
     "@emotion/react": "^11.10.6",
     "@mantine/core": "^6.0.8",
+    "@mantine/dates": "6.0.8",
+    "@mantine/dropzone": "^6.0.8",
     "@mantine/form": "^6.0.8",
     "@mantine/hooks": "^6.0.8",
+    "@mantine/modals": "6.0.8",
+    "@mantine/notifications": "^6.0.8",
     "@react-spring/web": "9.4.5",
     "@testing-library/jest-dom": "^5.14.1",
     "@testing-library/react": "^13.0.0",
@@ -27,13 +31,18 @@
     "@visx/scale": "^3.3.0",
     "@visx/xychart": "^3.3.0",
     "@visx/zoom": "^3.3.0",
+    "adex-common": "github:AmbireTech/adex-common#a0cec371537a640a7cc67162c953d6be06842ba1",
     "blockies-ts": "^1.0.0",
     "d3-geo": "^3.1.0",
+    "dayjs": "^1.11.10",
+    "i18n-iso-countries": "^7.11.0",
+    "lottie-react": "^2.4.0",
     "qrcode.react": "^3.1.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.11.1",
     "react-scripts": "5.0.1",
+    "superjson": "^2.2.0",
     "topojson-client": "^3.1.0",
     "typescript": "^4.4.2",
     "web-vitals": "^2.1.0"
@@ -83,7 +92,7 @@
   },
   "engines": {
     "npm": "use-yarn",
-    "node": ">=16.20.0 <17",
+    "node": ">=18.16.0 <19",
     "yarn": ">=1.22"
   }
 }

@@ -1,4 +1,3 @@
-import useAccount from 'hooks/useAccount'
 import {
   Container,
   Button,
@@ -15,9 +14,12 @@ import LogInBackground from 'resources/backgrounds/pattern.svg'
 import LowerShape from 'resources/backgrounds/lowerShape.svg'
 import UpperShape from 'resources/backgrounds/upperShape.svg'
 import AdExLogo from 'resources/logos/AdExLogo'
-import { useMemo } from 'react'
+import { useCallback, useEffect, useMemo } from 'react'
 import HelpIcon from 'resources/icons/Help'
 import CustomAnchor from 'components/common/customAnchor/CustomAnchor'
+import { useNavigate } from 'react-router-dom'
+import useAccount from 'hooks/useAccount'
+import { appVersion } from 'helpers'
 
 const useStyles = createStyles(() => {
   return {
@@ -41,10 +43,16 @@ const useStyles = createStyles(() => {
 
 function LogIn() {
   const { classes } = useStyles()
-  const { connectWallet } = useAccount()
+  const { connectWallet, authenticated } = useAccount()
   const year = useMemo(() => new Date().getFullYear(), [])
   const theme = useMantineTheme()
+  const navigate = useNavigate()
 
+  useEffect(() => {
+    if (authenticated) navigate('/dashboard/get-started', { replace: true })
+  }, [authenticated, navigate])
+
+  const handleGetStartedBtnClicked = useCallback(() => connectWallet(), [connectWallet])
   return (
     <Container fluid h="100vh" className={classes.container}>
       <Flex h="100%" pt="xl" pb="xl" direction="column" justify="space-around" align="center">
@@ -62,10 +70,10 @@ function LogIn() {
             Welcome to AdEx
           </Title>
           <Title className={classes.subTitle} align="center" color="secondaryText" order={2}>
-            Open-source, transparent & fraud-proof display advertising
+            Reach Beyond Web3
           </Title>
         </div>
-        <Button variant="filled" size="xl" onClick={connectWallet}>
+        <Button variant="filled" size="xl" onClick={handleGetStartedBtnClicked}>
           Get Started
         </Button>
         <Flex direction="column" align="center">
@@ -73,7 +81,7 @@ function LogIn() {
             <ThemeIcon variant="outline" size="sm" color="secondaryText" className={classes.icon}>
               <HelpIcon />
             </ThemeIcon>
-            <CustomAnchor external href="https://mantine.dev/" color="dimmed">
+            <CustomAnchor external href="https://help.adex.network/hc/en-us" color="dimmed">
               Help Center
             </CustomAnchor>
           </Group>
@@ -81,7 +89,7 @@ function LogIn() {
             ©{year} AdEx. All Rights Reserved.
           </Text>
           <Text size="sm" color="secondaryText">
-            V.0.00.01
+            V.{appVersion}
           </Text>
         </Flex>
       </Flex>

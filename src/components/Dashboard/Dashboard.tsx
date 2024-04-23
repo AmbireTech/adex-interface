@@ -1,80 +1,103 @@
-import { Container, Flex, Text } from '@mantine/core'
+import { Campaign, CampaignStatus, CampaignType } from 'adex-common'
+import { Container, Flex, Text, UnstyledButton } from '@mantine/core'
 import { useCallback, useMemo, useState } from 'react'
-import { useDisclosure } from '@mantine/hooks'
 import CustomTable from 'components/common/CustomTable'
-import { BadgeType, ICampaignData } from 'types'
-import { CampaignDetailsModal } from 'components/common/Modals'
+import { parsePeriodForCampaign } from 'helpers'
+import { campaignHeaders } from 'constant'
 import { useNavigate } from 'react-router-dom'
+import useCampaignsData from 'hooks/useCampaignsData'
+import { parseBigNumTokenAmountToDecimal } from 'helpers/balances'
 import BadgeStatusCampaign from './BadgeStatusCampaign'
-import { dashboardTableElements } from './mockData'
-
-const headings = [
-  'Campaign name',
-  'Model',
-  'Status',
-  'Served',
-  'Budget',
-  'Impressions',
-  'Clicks',
-  'CTR',
-  'Period'
-]
 
 const Dashboard = () => {
-  const [opened, { open, close }] = useDisclosure(false)
-  const [selectedItem, setSelectedItem] = useState<ICampaignData | null>(null)
   const navigate = useNavigate()
+  const { campaignsData } = useCampaignsData()
+  const [showArchived, setShowArchived] = useState(false)
+  const filteredCampaignData = useMemo(() => {
+    if (!showArchived) {
+      // TODO: change 'CampaignStatus.expired' to 'CampaignStatus.archived' when has been added to the model
+      return campaignsData && Array.from(campaignsData.values()).length > 0
+        ? Array.from(campaignsData.values()).filter(
+            (campaign) => campaign.campaign.status !== CampaignStatus.expired
+          )
+        : []
+    }
+    return Array.from(campaignsData.values())
+  }, [campaignsData, showArchived])
+
   const elements = useMemo(
     () =>
-      dashboardTableElements.map((el) => {
-        return {
-          id: el.id,
-          campaignName: el.campaignName,
-          model: el.model,
-          status: <BadgeStatusCampaign type={el.status as BadgeType} />,
-          served: el.served,
-          budget: el.budget,
-          impressions: el.impressions.toLocaleString(),
-          clicks: el.clicks.toLocaleString(),
-          ctr: el.ctr,
-          period: el.period
-        }
-      }),
-    []
+      filteredCampaignData.length
+        ? filteredCampaignData.map((cmpData) => {
+            const budget = parseBigNumTokenAmountToDecimal(
+              cmpData.campaign.campaignBudget,
+              cmpData.campaign.outpaceAssetDecimals
+            )
+
+            return {
+              id: cmpData.campaignId,
+              title: cmpData.campaign.title,
+              type: CampaignType[cmpData.campaign.type],
+              status: <BadgeStatusCampaign type={cmpData.campaign.status} />,
+              served: `${((cmpData.paid / budget) * 100).toFixed(4)} %`,
+              budget,
+              impressions: cmpData.impressions,
+              clicks: cmpData.clicks,
+              ctr: cmpData.ctr,
+              period: parsePeriodForCampaign([
+                cmpData.campaign.activeFrom,
+                cmpData.campaign.activeTo
+              ])
+            }
+          })
+        : [],
+    [filteredCampaignData]
   )
 
   const handlePreview = useCallback(
-    (item: ICampaignData) => {
-      setSelectedItem(item)
-      open()
-    },
-    [open]
-  )
-
-  const handleAnalytics = useCallback(
-    (item: ICampaignData) => {
-      navigate(`/campaign-analytics/${item.id}`)
+    (item: Campaign) => {
+      navigate(`/dashboard/campaign-details/${item.id}`)
     },
     [navigate]
   )
 
-  const handleDuplicate = useCallback((item: ICampaignData) => {
+  const handleAnalytics = useCallback(
+    (item: Campaign) => {
+      navigate(`/dashboard/campaign-analytics/${item.id}`)
+    },
+    [navigate]
+  )
+
+  const handleDuplicate = useCallback((item: Campaign) => {
+    // TODO: Implement duplication logic
     console.log('item', item)
   }, [])
 
-  const handleDelete = useCallback((item: ICampaignData) => {
+  const handleDelete = useCallback((item: Campaign) => {
+    // TODO: Implement deletion logic
     console.log('item', item)
+  }, [])
+
+  const toggleShowArchived = useCallback(() => {
+    setShowArchived((prevShowArchived) => !prevShowArchived)
   }, [])
 
   return (
     <Container fluid>
       <Flex direction="column" justify="start">
-        <Text size="sm" color="secondaryText" weight="bold" mb="md">
-          All Campaigns
-        </Text>
+        <Flex justify="space-between" align="center">
+          <Text size="sm" color="secondaryText" weight="bold" mb="md">
+            All Campaigns
+          </Text>
+          <UnstyledButton onClick={toggleShowArchived}>
+            <Text size="sm" underline color="secondaryText">
+              {showArchived ? 'Hide Archived' : 'Show Archived'}
+            </Text>
+          </UnstyledButton>
+        </Flex>
         <CustomTable
           background
-          headings={headings}
+          headings={campaignHeaders}
           elements={elements}
           onPreview={handlePreview}
           onAnalytics={handleAnalytics}
@@ -82,7 +105,6 @@ const Dashboard = () => {
           onDelete={handleDelete}
         />
       </Flex>
-      <CampaignDetailsModal item={selectedItem} opened={opened} close={close} />
     </Container>
   )
 }

@@ -2,25 +2,29 @@ import {
   Title,
   Text,
   Flex,
-  ActionIcon,
+  // ActionIcon,
+  // Indicator,
   Group,
-  Indicator,
   Menu,
   rem,
   createStyles,
-  UnstyledButton
+  UnstyledButton,
+  CopyButton
 } from '@mantine/core'
 import { capitalizeFirstLetter, formatDate, maskAddress } from 'helpers/formatters'
 import useAccount from 'hooks/useAccount'
-import { useMemo, useState } from 'react'
-import BellIcon from 'resources/icons/Bell'
+import { useCallback, useMemo, useState } from 'react'
 import DownArrowIcon from 'resources/icons/DownArrow'
 import LogoutIcon from 'resources/icons/Logout'
-import ValidatorsIcon from 'resources/icons/Validators'
-import WithdrawIcon from 'resources/icons/Withdraw'
+// import BellIcon from 'resources/icons/Bell'
 import Blockies from 'components/common/Blockies'
-import { useLocation } from 'react-router-dom'
+// import ValidatorsIcon from 'resources/icons/Validators'
+// import WithdrawIcon from 'resources/icons/Withdraw'
+import { useLocation, useNavigate } from 'react-router-dom'
 import StakingIcon from 'resources/icons/Staking'
+import { useAdExApi } from 'hooks/useAdexServices'
+import useCustomNotifications from 'hooks/useCustomNotifications'
+import CopyIcon from 'resources/icons/Copy'
 
 const useStyles = createStyles((theme) => ({
   rotateUpsideDown: {
@@ -43,7 +47,8 @@ const useStyles = createStyles((theme) => ({
 
 function TopBar() {
   const { classes, cx } = useStyles()
-  const { adexAccount } = useAccount()
+  const { adexAccount, disconnectWallet, resetAdexAccount } = useAccount()
+  const { showNotification } = useCustomNotifications()
   const location = useLocation()
   const splitPath = useMemo(() => location.pathname.split('/'), [location.pathname])
   const title = useMemo(
@@ -52,6 +57,45 @@ function TopBar() {
   )
 
   const [opened, setOpened] = useState<boolean>(false)
+
+  const { adexServicesRequest } = useAdExApi()
+  const navigate = useNavigate()
+
+  const handleLogutBtnClicked = useCallback(() => {
+    if (!adexAccount.accessToken && !adexAccount.refreshToken) return
+
+    adexServicesRequest('backend', {
+      route: '/dsp/logout',
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: {
+        refreshToken: adexAccount.refreshToken
+      }
+    })
+      .then((res) => {
+        if (!res) throw new Error('Logout failed')
+        if (Object.keys(res).length === 0 && res.constructor === Object) {
+          disconnectWallet()
+          resetAdexAccount()
+          showNotification('info', 'Successfully logged out', 'Logging out')
+          navigate('/login', { replace: true })
+        }
+      })
+      .catch((e) => {
+        console.error('Logging out failed', e)
+        showNotification('error', e.message, 'Logging out failed')
+      })
+  }, [
+    disconnectWallet,
+    adexAccount.accessToken,
+    adexAccount.refreshToken,
+    adexServicesRequest,
+    resetAdexAccount,
+    showNotification,
+    navigate
+  ])
 
   return (
     <Flex direction="row" gap="md" justify="space-between" align="center" style={{ flexGrow: 1 }}>
@@ -63,11 +107,21 @@ function TopBar() {
       </Flex>
       <Flex direction="row" justify="end" gap="md" align="center">
         <Group position="center">
-          <Indicator>
+          {/* <Indicator>
             <ActionIcon>
               <BellIcon size={rem(24)} />
             </ActionIcon>
-          </Indicator>
+          </Indicator> */}
+          <CopyButton value={adexAccount.address}>
+            {({ copied, copy }) => (
+              <CopyIcon
+                className={classes.menu}
+                color={copied ? 'green' : undefined}
+                size={rem(24)}
+                onClick={copy}
+              />
+            )}
+          </CopyButton>
         </Group>
 
         <Menu
@@ -79,13 +133,13 @@ function TopBar() {
           <Menu.Target>
             <UnstyledButton>
               <Group>
-                <Blockies seedString={adexAccount?.address || ''} />
+                <Blockies seedString={adexAccount.address} />
                 <div>
-                  <Text weight="bold" size="xs">
+                  {/* <Text weight="bold" size="xs">
                     John Doe
-                  </Text>
+                  </Text> */}
                   <Text color="secondaryText" size="xs">
-                    {maskAddress(adexAccount?.address || '')}
+                    {maskAddress(adexAccount.address)}
                   </Text>
                 </div>
                 <DownArrowIcon
@@ -96,14 +150,26 @@ function TopBar() {
             </UnstyledButton>
           </Menu.Target>
           <Menu.Dropdown>
-            <Menu.Item rightSection={<WithdrawIcon className={classes.icon} />}>
+            {/* <Menu.Item rightSection={<WithdrawIcon className={classes.icon} />}>
               Withdraw funds
+            </Menu.Item> */}
+            <Menu.Item
+              component="a"
+              href="https://staking.adex.network/#/"
+              target="_blank"
+              rightSection={<StakingIcon className={classes.icon} />}
+            >
+              Staking
             </Menu.Item>
-            <Menu.Item rightSection={<StakingIcon className={classes.icon} />}>Staking</Menu.Item>
-            <Menu.Item rightSection={<ValidatorsIcon className={classes.icon} />}>
+            {/* <Menu.Item rightSection={<ValidatorsIcon className={classes.icon} />}>
               Validators
+            </Menu.Item> */}
+            <Menu.Item
+              onClick={handleLogutBtnClicked}
+              rightSection={<LogoutIcon className={classes.icon} />}
+            >
+              Log out
             </Menu.Item>
-            <Menu.Item rightSection={<LogoutIcon className={classes.icon} />}>Log out</Menu.Item>
           </Menu.Dropdown>
         </Menu>
       </Flex>

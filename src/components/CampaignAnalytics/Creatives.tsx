@@ -4,8 +4,12 @@ import UrlIcon from 'resources/icons/Url'
 import { CreativePreviewModal } from 'components/common/Modals'
 import { useCallback, useState } from 'react'
 import { useDisclosure } from '@mantine/hooks'
-import { ICreative } from 'types'
+import { BaseAnalyticsData } from 'types'
 import { formatCurrency } from 'helpers'
+import { AdUnit } from 'adex-common'
+import { getMediaUrlWithProvider } from 'helpers/createCampaignHelpers'
+
+const IPFS_GATEWAY = process.env.REACT_APP_IPFS_GATEWAY
 
 const useStyles = createStyles((theme) => ({
   icon: {
@@ -16,13 +20,19 @@ const useStyles = createStyles((theme) => ({
   }
 }))
 
-const Creatives = ({ creatives }: { creatives: ICreative[] | undefined }) => {
+const Creatives = ({
+  creatives,
+  units,
+  currencyName
+}: {
+  creatives: BaseAnalyticsData[] | undefined
+  units: AdUnit[] | undefined
+  currencyName: string
+}) => {
   const [opened, { open, close }] = useDisclosure(false)
   const { classes } = useStyles()
-  if (!creatives?.length) {
-    return <div>No creatives found</div>
-  }
-  const headings = ['Media', 'Impressions', 'Clicks', 'CTR%', 'Spent']
+
+  const headings = ['Media', 'Size', 'Impressions', 'Clicks', 'CTR%', 'Spent', 'Link']
   const [selectedMedia, setSelectedMedia] = useState('')
   const handleMediaClick = useCallback(
     (media: string) => {
@@ -32,24 +42,34 @@ const Creatives = ({ creatives }: { creatives: ICreative[] | undefined }) => {
     [open]
   )
 
+  if (!creatives?.length || !units?.length) {
+    return <div>No creatives found</div>
+  }
+
   const elements = creatives?.map((item) => {
+    const unitForId = units.find((x) => x.id === item.segment)
+    const media = unitForId?.banner?.mediaUrl || ''
+
     return {
-      ...item,
       media: (
         <Flex align="center">
           <UrlIcon size="25px" className={classes.icon} />
           <Image
             ml="sm"
-            src={item.media}
-            maw="300px"
-            onClick={() => handleMediaClick(item.media)}
+            src={getMediaUrlWithProvider(media, IPFS_GATEWAY)}
+            mah="100px"
+            maw="50px"
+            onClick={() => handleMediaClick(media || '')}
             className={classes.image}
           />
         </Flex>
       ),
+      size: `${unitForId?.banner?.format.w}x${unitForId?.banner?.format.w}`,
       impressions: formatCurrency(item.impressions, 0),
       clicks: formatCurrency(item.clicks, 0),
-      ctrPercents: `${item.ctrPercents} %`
+      ctr: `${item.ctr} %`,
+      paid: `${item.paid} ${currencyName}`,
+      link: unitForId?.banner?.targetUrl
     }
   })
   return (

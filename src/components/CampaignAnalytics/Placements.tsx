@@ -1,10 +1,16 @@
 import CustomTable from 'components/common/CustomTable'
 import { useMemo } from 'react'
-import { IPlacement } from 'types'
+import { BaseAnalyticsData } from 'types'
 
-const headings = ['Website', 'Impressions', 'Clicks', 'CTR%', 'Spent', 'Average CPM']
+const headings = ['Hostname', 'Impressions', 'Clicks', 'CTR%', 'Spent', 'Average CPM']
 
-const Placements = ({ placements }: { placements: IPlacement[] | undefined }) => {
+const Placements = ({
+  placements,
+  currencyName
+}: {
+  placements: BaseAnalyticsData[] | undefined
+  currencyName: string
+}) => {
   if (!placements?.length) {
     return <div>No placement found</div>
   }
@@ -12,12 +18,14 @@ const Placements = ({ placements }: { placements: IPlacement[] | undefined }) =>
   const elements = useMemo(
     () =>
       placements?.map((item) => ({
-        ...item,
+        segment: item.segment,
         impressions: item.impressions.toLocaleString(),
         clicks: item.clicks.toLocaleString(),
-        ctrPercents: `${item.ctrPercents} %`
-      })),
-    [placements]
+        ctr: `${item.ctr} %`,
+        paid: `${item.paid} ${currencyName}`,
+        avgCpm: `${item.avgCpm} ${currencyName}`
+      })) || [],
+    [placements, currencyName]
   )
   return <CustomTable background headings={headings} elements={elements} />
 }

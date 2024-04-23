@@ -1,11 +1,31 @@
-import { Container, Grid, Flex, Title, Button } from '@mantine/core'
+import { Container, Grid, Flex, Title, Button, Text } from '@mantine/core'
 import DepositIcon from 'resources/icons/Deposit'
 import CampaignIcon from 'resources/icons/Campaign'
 import CustomCard from 'components/common/CustomCard'
+import AddSignerIcon from 'resources/icons/AddSigner'
+import { useNavigate } from 'react-router-dom'
+import CustomPopover from 'components/common/CustomPopover'
+import { IS_MANUAL_DEPOSITING } from 'constants/balances'
+import useAccount from 'hooks/useAccount'
+import { useMemo } from 'react'
 
 const GetStarted = () => {
+  const navigate = useNavigate()
+  const {
+    adexAccount: { availableBalance }
+  } = useAccount()
+
+  const hasAvailableBalance = useMemo(
+    () => availableBalance && availableBalance > 0,
+    [availableBalance]
+  )
+
+  const hasPopover = useMemo(
+    () => Boolean(IS_MANUAL_DEPOSITING) && !hasAvailableBalance,
+    [hasAvailableBalance]
+  )
   return (
-    <Container>
+    <Container m={0}>
       <Flex mih={50} gap="sm" justify="space-around" align="center" direction="column" wrap="wrap">
         <Grid grow justify="center" align="center">
           <Grid.Col>
@@ -16,8 +36,8 @@ const GetStarted = () => {
               width={294}
               height={330}
               title="Step 1"
-              text="Add funds to your account"
-              icon={<DepositIcon size="60px" />}
+              text="Fill in company details"
+              icon={<AddSignerIcon strokeWidth="1" size="60px" />}
               color="secondary"
             >
               <Button
@@ -25,9 +45,9 @@ const GetStarted = () => {
                 size="lg"
                 variant="filled"
                 color="secondary"
-                onClick={() => console.log('Add funds clicked')}
+                onClick={() => navigate('/dashboard/billing')}
               >
-                Add funds
+                Add details
               </Button>
             </CustomCard>
           </Grid.Col>
@@ -36,31 +56,71 @@ const GetStarted = () => {
               width={294}
               height={330}
               title="Step 2"
+              text="Add funds to your account"
+              icon={<DepositIcon size="60px" />}
+              color="secondary"
+            >
+              {hasPopover ? (
+                <CustomPopover
+                  popoverContent={
+                    <Text size="sm">
+                      Contact us on <a href="mailto: dsp@adex.network"> dsp@adex.network</a> to
+                      &quot;add money&quot; / &quot;launch campaign&quot;
+                    </Text>
+                  }
+                >
+                  <Button w="70%" size="lg" variant="filled" color="secondary">
+                    Add funds
+                  </Button>
+                </CustomPopover>
+              ) : (
+                <Button
+                  w="70%"
+                  size="lg"
+                  variant="filled"
+                  color="secondary"
+                  onClick={() => navigate('/dashboard/deposit')}
+                >
+                  Add funds
+                </Button>
+              )}
+            </CustomCard>
+          </Grid.Col>
+          <Grid.Col md={4} order={3} xs={12}>
+            <CustomCard
+              width={294}
+              height={330}
+              title="Step 2"
               text="Create a new campaign"
               icon={<CampaignIcon size="60px" />}
               color="secondary"
             >
-              <Button
-                w="70%"
-                size="lg"
-                variant="filled"
-                color="secondary"
-                p="0"
-                onClick={() => console.log('Create a campaign clicked')}
-              >
-                Create a campaign
-              </Button>
+              {hasPopover ? (
+                <CustomPopover
+                  popoverContent={
+                    <Text size="sm">
+                      Contact us on <a href="mailto: dsp@adex.network"> dsp@adex.network</a> to
+                      &quot;add money&quot; / &quot;launch campaign&quot;
+                    </Text>
+                  }
+                >
+                  <Button w="70%" size="lg" variant="filled" color="secondary" p="0">
+                    Create a campaign
+                  </Button>
+                </CustomPopover>
+              ) : (
+                <Button
+                  w="70%"
+                  size="lg"
+                  variant="filled"
+                  color="secondary"
+                  p="0"
+                  onClick={() => navigate('/dashboard/create-campaign')}
+                >
+                  Create a campaign
+                </Button>
+              )}
             </CustomCard>
-          </Grid.Col>
-          <Grid.Col md={4} order={4} xs={12}>
-            <CustomCard
-              width={164}
-              height={164}
-              icon={<CampaignIcon size="60px" />}
-              text="Desktop"
-              color="brand"
-              action={() => console.log('Desktop clicked')}
-            />
           </Grid.Col>
         </Grid>
       </Flex>

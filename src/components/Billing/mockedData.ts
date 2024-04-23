@@ -1,4 +1,4 @@
-import { IBillingDetails, IInvoiceDetails, IInvoices, IStatements } from 'types'
+import { IInvoiceDetails, IInvoices, IStatements } from 'types'
 
 const invoiceElements: IInvoices[] = [
   {
@@ -965,16 +965,5 @@ const invoiceDetails: IInvoiceDetails = {
   ],
   vatPercentageInUSD: 10
 }
-const initBillingDetails: IBillingDetails = {
-  firstName: '',
-  lastName: '',
-  companyName: '',
-  companyNumber: 1,
-  companyNumberPrim: 2,
-  companyAddress: '',
-  companyCountry: '',
-  companyCity: '',
-  companyZipCode: 0
-}
 
-export { invoiceElements, statementElements, invoiceDetails, initBillingDetails }
+export { invoiceElements, statementElements, invoiceDetails }
