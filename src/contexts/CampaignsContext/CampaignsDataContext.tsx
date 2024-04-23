@@ -11,7 +11,11 @@ import {
 import { useAdExApi } from 'hooks/useAdexServices'
 import useAccount from 'hooks/useAccount'
 import useCustomNotifications from 'hooks/useCustomNotifications'
-import { CampaignData, EventAggregatesDataRes, EvAggrData } from 'types/campaignsData'
+import {
+  CampaignData,
+  //  EventAggregatesDataRes,
+  EvAggrData
+} from 'types/campaignsData'
 import { CREATE_CAMPAIGN_DEFAULT_VALUE } from 'constants/createCampaign'
 import { parseBigNumTokenAmountToDecimal } from 'helpers/balances'
 
@@ -32,18 +36,18 @@ type CamapignBackendDataRes = Campaign & {
   clicks?: number
 }
 
-const eventAggregatestResToAdvData = (dataRes: EventAggregatesDataRes): EvAggrData => {
-  const newData: EvAggrData = {
-    clicks: dataRes.events[0].totals.CLICK.eventCounts,
-    impressions: dataRes.events[0].totals.IMPRESSION.eventCounts,
-    payouts: Number(
-      BigInt(dataRes.events[0].totals.CLICK.eventPayouts) +
-        BigInt(dataRes.events[0].totals.IMPRESSION.eventPayouts)
-    )
-  }
+// const eventAggregatestResToAdvData = (dataRes: EventAggregatesDataRes): EvAggrData => {
+//   const newData: EvAggrData = {
+//     clicks: dataRes.events[0].totals.CLICK.eventCounts,
+//     impressions: dataRes.events[0].totals.IMPRESSION.eventCounts,
+//     payouts: Number(
+//       BigInt(dataRes.events[0].totals.CLICK.eventPayouts) +
+//         BigInt(dataRes.events[0].totals.IMPRESSION.eventPayouts)
+//     )
+//   }
 
-  return newData
-}
+//   return newData
+// }
 
 const campaignDataResToAdvData = (dataRes: CamapignBackendDataRes): EvAggrData => {
   const newData: EvAggrData = {
@@ -119,26 +123,26 @@ const CampaignsDataProvider: FC<PropsWithChildren> = ({ children }) => {
     new Map<Campaign['id'], CampaignData>()
   )
 
-  const getCampaignAdvancedData = useCallback(
-    async (campaignId: string): Promise<EvAggrData> => {
-      try {
-        // TODO: this data can be get from the backend if implemented to return this by id or by owner
-        const eventAggregatesRes = await adexServicesRequest<EventAggregatesDataRes>('validator', {
-          route: `/v5_a/channel/${campaignId}/events-aggregates`,
-          method: 'GET'
-        })
+  // const getCampaignAdvancedData = useCallback(
+  //   async (campaignId: string): Promise<EvAggrData> => {
+  //     try {
+  //       // TODO: this data can be get from the backend if implemented to return this by id or by owner
+  //       const eventAggregatesRes = await adexServicesRequest<EventAggregatesDataRes>('validator', {
+  //         route: `/v5_a/channel/${campaignId}/events-aggregates`,
+  //         method: 'GET'
+  //       })
 
-        return eventAggregatestResToAdvData(eventAggregatesRes)
-      } catch (err) {
-        return {
-          clicks: 0,
-          impressions: 0,
-          payouts: 0
-        }
-      }
-    },
-    [adexServicesRequest]
-  )
+  //       return eventAggregatestResToAdvData(eventAggregatesRes)
+  //     } catch (err) {
+  //       return {
+  //         clicks: 0,
+  //         impressions: 0,
+  //         payouts: 0
+  //       }
+  //     }
+  //   },
+  //   [adexServicesRequest]
+  // )
 
   const updateCampaignDataById = useCallback(
     async (campaignId: string) => {
@@ -221,7 +225,7 @@ const CampaignsDataProvider: FC<PropsWithChildren> = ({ children }) => {
         showNotification('error', 'getting campaigns data', 'Data error')
       }
     },
-    [adexServicesRequest, getCampaignAdvancedData, showNotification]
+    [adexServicesRequest, showNotification]
   )
 
   useEffect(() => {
