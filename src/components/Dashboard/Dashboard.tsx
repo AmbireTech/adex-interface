@@ -6,6 +6,7 @@ import { parsePeriodForCampaign } from 'helpers'
 import { campaignHeaders } from 'constant'
 import { useNavigate } from 'react-router-dom'
 import useCampaignsData from 'hooks/useCampaignsData'
+import { parseBigNumTokenAmountToDecimal } from 'helpers/balances'
 import BadgeStatusCampaign from './BadgeStatusCampaign'
 
 const Dashboard = () => {
@@ -28,18 +29,18 @@ const Dashboard = () => {
     () =>
       filteredCampaignData.length
         ? filteredCampaignData.map((cmpData) => {
+            const budget = parseBigNumTokenAmountToDecimal(
+              cmpData.campaign.campaignBudget,
+              cmpData.campaign.outpaceAssetDecimals
+            )
+
             return {
               id: cmpData.campaignId,
               title: cmpData.campaign.title,
-              model: CampaignType[cmpData.campaign.type],
+              type: CampaignType[cmpData.campaign.type],
               status: <BadgeStatusCampaign type={cmpData.campaign.status} />,
-              served: cmpData.paid
-                ? (Number(cmpData.campaign.campaignBudget) / cmpData.paid) * 100
-                : 0,
-              budget:
-                // TODO: use fn
-                Number(cmpData.campaign.campaignBudget) *
-                10 ** -cmpData.campaign.outpaceAssetDecimals,
+              served: `${((cmpData.paid / budget) * 100).toFixed(4)} %`,
+              budget,
               impressions: cmpData.impressions,
               clicks: cmpData.clicks,
               ctr: cmpData.ctr,
