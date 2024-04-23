@@ -1,12 +1,12 @@
 import { useEffect, useMemo } from 'react'
 import { useParams } from 'react-router-dom'
-import { Container, Grid, createStyles, Text, Flex, Image } from '@mantine/core'
+import { Container, Grid, createStyles, Text, Flex } from '@mantine/core'
 import BadgeStatusCampaign from 'components/Dashboard/BadgeStatusCampaign'
 import { formatCatsAndLocsData } from 'helpers/createCampaignHelpers'
 import { CATEGORIES, COUNTRIES } from 'constants/createCampaign'
 import { AdUnit } from 'adex-common/dist/types'
 import MediaBanner from 'components/common/MediaBanner'
-import { formatCurrency, formatDateTime } from 'helpers/formatters'
+import { formatDateTime } from 'helpers/formatters'
 import GoBack from 'components/common/GoBack'
 import CampaignDetailsRow from 'components/common/CampainDetailsRow/CampaignDetailsRow'
 import useCampaignsData from 'hooks/useCampaignsData'
@@ -14,9 +14,7 @@ import ActiveIcon from 'resources/icons/Active'
 import CampaignActionBtn from 'components/CampaignAnalytics/CampaignActionBtn'
 import StopIcon from 'resources/icons/Stop'
 import ArchivedIcon from 'resources/icons/Archived'
-import { parseBigNumTokenAmountToDecimal } from 'helpers/balances'
-import { getTokenIcon } from 'lib/Icons'
-import { DIGITS_AFTER_FLOATING_POINT } from 'constants/balances'
+import FormattedAmount from 'components/common/FormattedAmount/FormattedAmount'
 import CatsLocsFormatted from './CatsLocsFormatted'
 
 const useStyles = createStyles((theme) => ({
@@ -50,40 +48,6 @@ const useStyles = createStyles((theme) => ({
     margin: `${theme.spacing.sm} 0`
   }
 }))
-
-type FormattedAmountProps = {
-  chainId: number
-  tokenAddress: string
-  amount: bigint
-  tokenDecimals: number
-  isCPMAmount?: boolean
-}
-
-const FormattedAmount = ({
-  chainId,
-  tokenAddress,
-  amount,
-  tokenDecimals,
-  isCPMAmount = false
-}: FormattedAmountProps) => (
-  <Flex align="center">
-    <Image
-      maw={15}
-      mx="auto"
-      radius="md"
-      src={getTokenIcon(chainId, tokenAddress)}
-      alt={tokenAddress}
-    />
-    <Text ml="xs">
-      {formatCurrency(
-        isCPMAmount
-          ? Number(parseBigNumTokenAmountToDecimal(amount, tokenDecimals)) * 1000
-          : Number(parseBigNumTokenAmountToDecimal(amount, tokenDecimals)),
-        DIGITS_AFTER_FLOATING_POINT
-      )}
-    </Text>
-  </Flex>
-)
 
 const CampaignDetails = () => {
   const { classes, cx } = useStyles()
@@ -206,7 +170,6 @@ const CampaignDetails = () => {
                     )
                   }
                 />
-                {/* TODO: Add data for it */}
                 <CampaignDetailsRow
                   lineHeight="sm"
                   textSize="sm"
@@ -215,7 +178,6 @@ const CampaignDetails = () => {
                     campaign.targetingInput.inputs.advanced.limitDailyAverageSpending ? 'Yes' : 'No'
                   }
                 />
-                {/* TODO: Add data for it */}
                 <CampaignDetailsRow
                   lineHeight="sm"
                   textSize="sm"
