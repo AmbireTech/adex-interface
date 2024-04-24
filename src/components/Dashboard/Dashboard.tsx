@@ -68,15 +68,15 @@ const Dashboard = () => {
     [navigate]
   )
 
-  const handleDuplicate = useCallback((item: Campaign) => {
-    // TODO: Implement duplication logic
-    console.log('item', item)
-  }, [])
+  // const handleDuplicate = useCallback((item: Campaign) => {
+  //   // TODO: Implement duplication logic
+  //   console.log('item', item)
+  // }, [])
 
-  const handleDelete = useCallback((item: Campaign) => {
-    // TODO: Implement deletion logic
-    console.log('item', item)
-  }, [])
+  // const handleDelete = useCallback((item: Campaign) => {
+  //   // TODO: Implement deletion logic
+  //   console.log('item', item)
+  // }, [])
 
   const toggleShowArchived = useCallback(() => {
     setShowArchived((prevShowArchived) => !prevShowArchived)
@@ -101,8 +101,9 @@ const Dashboard = () => {
           elements={elements}
           onPreview={handlePreview}
           onAnalytics={handleAnalytics}
-          onDuplicate={handleDuplicate}
-          onDelete={handleDelete}
+          // Temporary disabled until no functionality implemented
+          // onDuplicate={handleDuplicate}
+          // onDelete={handleDelete}
         />
       </Flex>
     </Container>
