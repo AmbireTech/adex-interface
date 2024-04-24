@@ -21,7 +21,7 @@ import {
 } from 'types'
 import { timeout } from 'helpers'
 
-// import { dashboardTableElements } from 'components/Dashboard/mockData'
+import { dashboardTableElements } from 'components/Dashboard/mockData'
 
 const keySeparator = '👩🏼‍🏫'
 
@@ -64,12 +64,12 @@ const analyticsDataToMappedAnalytics = (
   const clickCounts = analyticsData[2]
   const clickPaid = analyticsData[3]
 
-  // TODO: remove when no testing
-  // if (!impCounts.length) {
-  //   const mockedData = dashboardTableElements[0][analyticsType]
+  // On development env using mock data
+  if (process.env.NODE_ENV === 'development') {
+    const mockedData = dashboardTableElements[0][analyticsType]
 
-  //   return [...mockedData]
-  // }
+    return [...mockedData]
+  }
 
   const mapped = impCounts.reduce((aggr, el) => {
     const next = new Map(aggr)

@@ -48,7 +48,7 @@ const Creatives = ({
 
   const elements = creatives?.map((item) => {
     const unitForId = units.find((x) => x.id === item.segment)
-    const media = unitForId?.banner?.mediaUrl || ''
+    const media = getMediaUrlWithProvider(unitForId?.banner?.mediaUrl, IPFS_GATEWAY) || ''
 
     return {
       media: (
@@ -56,7 +56,7 @@ const Creatives = ({
           <UrlIcon size="25px" className={classes.icon} />
           <Image
             ml="sm"
-            src={getMediaUrlWithProvider(media, IPFS_GATEWAY)}
+            src={media}
             mah="100px"
             maw="50px"
             onClick={() => handleMediaClick(media || '')}
@@ -64,7 +64,9 @@ const Creatives = ({
           />
         </Flex>
       ),
-      size: `${unitForId?.banner?.format.w}x${unitForId?.banner?.format.w}`,
+      size: unitForId?.banner
+        ? `${unitForId?.banner?.format.w}x${unitForId?.banner?.format.w}`
+        : '',
       impressions: formatCurrency(item.impressions, 0),
       clicks: formatCurrency(item.clicks, 0),
       ctr: `${item.ctr} %`,
