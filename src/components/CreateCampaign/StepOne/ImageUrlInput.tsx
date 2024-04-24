@@ -38,7 +38,7 @@ const ImageUrlInput = ({
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const { value } = event.target
 
-      if (!isValidHttpUrl(value)) {
+      if (value.length > 8 && !isValidHttpUrl(value)) {
         setError('Please enter a valid URL')
       } else {
         setError('')
