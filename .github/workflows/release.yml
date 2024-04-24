@@ -21,7 +21,7 @@ jobs:
 
       - name: Build 🛠️
         env:
-          REACT_APP_ENV: production
+          REACT_APP_NODE_ENV: production
           REACT_APP_BASE_URL: https://vhoda.adex.network
           REACT_APP_IPFS_GATEWAY: https://ipfs.adex.network/ipfs/
           REACT_APP_DAPP_NAME: "AdEx Platform"
