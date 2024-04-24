@@ -1,5 +1,13 @@
 import { useLocalStorage } from '@mantine/hooks'
-import { createContext, FC, PropsWithChildren, useMemo, useCallback, useEffect } from 'react'
+import {
+  createContext,
+  FC,
+  PropsWithChildren,
+  useMemo,
+  useCallback,
+  useEffect,
+  useState
+} from 'react'
 import { Account, BillingDetails, IAdExAccount } from 'types'
 import {
   getMessageToSign,
@@ -133,6 +141,7 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
   const { showNotification } = useCustomNotifications()
   const ambireSDK = useMemo(() => ambireLoginSDK, [])
 
+  const [sdkMsgSignature, setSdkMsgSignature] = useState<string>('')
   const [adexAccount, setAdexAccount] = useLocalStorage<IAccountContext['adexAccount']>({
     key: 'adexAccount',
     defaultValue: { ...defaultValue },
@@ -169,10 +178,10 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
     [setAdexAccount]
   )
 
-  const connectWallet = useCallback(
-    () => ambireSDK.openLogin({ chainId: DEFAULT_CHAIN_ID }),
-    [ambireSDK]
-  )
+  const connectWallet = useCallback(() => {
+    // console.log({ ambireSDK })
+    ambireSDK.openLogin({ chainId: DEFAULT_CHAIN_ID })
+  }, [ambireSDK])
 
   const disconnectWallet = useCallback(() => ambireSDK.openLogout(), [ambireSDK])
 
@@ -277,7 +286,16 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
         showNotification('warning', 'Ambire sdk no address or chain')
         return
       }
+
+      // TODO: this need to be fixed because it can be called more than once
+      // because it's triggered on more than oe event
+      // This check works atm but it's not ok
+      // if (prev.address !== '' && prev.chainId !== 0 && prev.authMsgResp !== null) {
+      //   return prev
+      // }
+
       try {
+        console.log('getMessageToSign', { address, chainId })
         const authMsgRsp = await getMessageToSign({ address, chainId })
 
         setAdexAccount((prev) => {
@@ -296,14 +314,15 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
     [setAdexAccount, showNotification]
   )
 
-  const handleMsgSigned = useCallback(
-    async ({ signature }: any) => {
-      if (!signature || !adexAccount.authMsgResp || adexAccount.authenticated) return
+  useEffect(() => {
+    if (!sdkMsgSignature || !adexAccount.authMsgResp || adexAccount.authenticated) return
 
+    async function verify() {
       try {
+        // console.log('verifyLogin')
         const authResp = await verifyLogin({
           authMsg: { ...adexAccount.authMsgResp },
-          signature
+          signature: sdkMsgSignature
         })
 
         if (!authResp) return
@@ -323,9 +342,16 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
         console.error('Error verify login:', error)
         showNotification('error', 'Verify login failed')
       }
-    },
-    [adexAccount.authMsgResp, adexAccount.authenticated, setAdexAccount, showNotification]
-  )
+    }
+
+    verify()
+  }, [
+    sdkMsgSignature,
+    adexAccount.authMsgResp,
+    adexAccount.authenticated,
+    setAdexAccount,
+    showNotification
+  ])
 
   const handleMsgRejected = useCallback(() => {
     disconnectWallet()
@@ -350,8 +376,8 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
     ambireSDK.onAlreadyLoggedIn(handleRegistrationOrLoginSuccess)
   }, [ambireSDK, handleRegistrationOrLoginSuccess])
   useEffect(() => {
-    ambireSDK.onMsgSigned(handleMsgSigned)
-  }, [ambireSDK, handleMsgSigned])
+    ambireSDK.onMsgSigned(({ signature }: any) => setSdkMsgSignature(signature))
+  }, [ambireSDK])
 
   useEffect(() => {
     ambireSDK.onMsgRejected(handleMsgRejected)
