@@ -12,6 +12,7 @@ import AttentionIcon from 'resources/icons/Attention'
 import useCampaignsData from 'hooks/useCampaignsData'
 import useCustomNotifications from 'hooks/useCustomNotifications'
 import useAccount from 'hooks/useAccount'
+import { isValidHttpUrl } from 'helpers/validators'
 
 const useStyles = createStyles((theme) => ({
   bg: {
@@ -81,7 +82,9 @@ const CampaignSummary = () => {
 
   const hasEmptyTargetUrl = useMemo(
     () =>
-      adUnits && adUnits.length ? adUnits.some((adUnit) => adUnit.banner?.targetUrl === '') : true,
+      adUnits && adUnits.length
+        ? adUnits.some((adUnit) => !isValidHttpUrl(adUnit.banner?.targetUrl || ''))
+        : true,
     [adUnits]
   )
 
