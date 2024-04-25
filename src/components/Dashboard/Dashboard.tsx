@@ -1,6 +1,6 @@
-import { Campaign, CampaignStatus, CampaignType } from 'adex-common'
-import { Container, Flex, Text, UnstyledButton } from '@mantine/core'
-import { useCallback, useMemo, useState } from 'react'
+import { Campaign, CampaignType } from 'adex-common'
+import { Container, Flex, Text } from '@mantine/core'
+import { useCallback, useMemo } from 'react'
 import CustomTable from 'components/common/CustomTable'
 import { parsePeriodForCampaign } from 'helpers'
 import { campaignHeaders } from 'constant'
@@ -12,18 +12,19 @@ import BadgeStatusCampaign from './BadgeStatusCampaign'
 const Dashboard = () => {
   const navigate = useNavigate()
   const { campaignsData } = useCampaignsData()
-  const [showArchived, setShowArchived] = useState(false)
+  // Temporary disabled show/hide archived until no functionality implemented
+  // const [showArchived, setShowArchived] = useState(false)
   const filteredCampaignData = useMemo(() => {
-    if (!showArchived) {
-      // TODO: change 'CampaignStatus.expired' to 'CampaignStatus.archived' when has been added to the model
-      return campaignsData && Array.from(campaignsData.values()).length > 0
-        ? Array.from(campaignsData.values()).filter(
-            (campaign) => campaign.campaign.status !== CampaignStatus.expired
-          )
-        : []
-    }
+    // if (!showArchived) {
+    //   // TODO: change 'CampaignStatus.expired' to 'CampaignStatus.archived' when has been added to the model
+    //   return campaignsData && Array.from(campaignsData.values()).length > 0
+    //     ? Array.from(campaignsData.values()).filter(
+    //         (campaign) => campaign.campaign.status !== CampaignStatus.expired
+    //       )
+    //     : []
+    // }
     return Array.from(campaignsData.values())
-  }, [campaignsData, showArchived])
+  }, [campaignsData])
 
   const elements = useMemo(
     () =>
@@ -68,19 +69,19 @@ const Dashboard = () => {
     [navigate]
   )
 
-  const handleDuplicate = useCallback((item: Campaign) => {
-    // TODO: Implement duplication logic
-    console.log('item', item)
-  }, [])
+  // const handleDuplicate = useCallback((item: Campaign) => {
+  //   // TODO: Implement duplication logic
+  //   console.log('item', item)
+  // }, [])
 
-  const handleDelete = useCallback((item: Campaign) => {
-    // TODO: Implement deletion logic
-    console.log('item', item)
-  }, [])
+  // const handleDelete = useCallback((item: Campaign) => {
+  //   // TODO: Implement deletion logic
+  //   console.log('item', item)
+  // }, [])
 
-  const toggleShowArchived = useCallback(() => {
-    setShowArchived((prevShowArchived) => !prevShowArchived)
-  }, [])
+  // const toggleShowArchived = useCallback(() => {
+  //   setShowArchived((prevShowArchived) => !prevShowArchived)
+  // }, [])
 
   return (
     <Container fluid>
@@ -89,11 +90,12 @@ const Dashboard = () => {
           <Text size="sm" color="secondaryText" weight="bold" mb="md">
             All Campaigns
           </Text>
-          <UnstyledButton onClick={toggleShowArchived}>
+          {/* Temporary disabled show/hide archived until no functionality implemented */}
+          {/* <UnstyledButton onClick={toggleShowArchived}>
             <Text size="sm" underline color="secondaryText">
               {showArchived ? 'Hide Archived' : 'Show Archived'}
             </Text>
-          </UnstyledButton>
+          </UnstyledButton> */}
         </Flex>
         <CustomTable
           background
@@ -101,8 +103,9 @@ const Dashboard = () => {
           elements={elements}
           onPreview={handlePreview}
           onAnalytics={handleAnalytics}
-          onDuplicate={handleDuplicate}
-          onDelete={handleDelete}
+          // Temporary disabled until no functionality implemented
+          // onDuplicate={handleDuplicate}
+          // onDelete={handleDelete}
         />
       </Flex>
     </Container>

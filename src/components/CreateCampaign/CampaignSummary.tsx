@@ -12,6 +12,7 @@ import AttentionIcon from 'resources/icons/Attention'
 import useCampaignsData from 'hooks/useCampaignsData'
 import useCustomNotifications from 'hooks/useCustomNotifications'
 import useAccount from 'hooks/useAccount'
+import { isValidHttpUrl } from 'helpers/validators'
 
 const useStyles = createStyles((theme) => ({
   bg: {
@@ -79,15 +80,17 @@ const CampaignSummary = () => {
     [formattedCats, formattedLocs]
   )
 
-  const hasEmptyTargetUrl = useMemo(
+  const hasInvalidTargetUrl = useMemo(
     () =>
-      adUnits && adUnits.length ? adUnits.some((adUnit) => adUnit.banner?.targetUrl === '') : true,
+      adUnits && adUnits.length
+        ? adUnits.some((adUnit) => !isValidHttpUrl(adUnit.banner?.targetUrl || ''))
+        : true,
     [adUnits]
   )
 
   useEffect(() => {
-    setIsNextBtnDisabled((step === 0 && hasEmptyTargetUrl) || (step === 1 && noSelectedCatsOrLogs))
-  }, [step, noSelectedCatsOrLogs, hasEmptyTargetUrl])
+    setIsNextBtnDisabled((step === 0 && !adUnits.length) || (step === 1 && noSelectedCatsOrLogs))
+  }, [step, noSelectedCatsOrLogs, adUnits])
 
   const isTheLastStep = useMemo(() => step === CREATE_CAMPAIGN_STEPS - 1, [step])
   const isFirstStep = useMemo(() => step === 0, [step])
@@ -120,6 +123,15 @@ const CampaignSummary = () => {
   const form = useCreateCampaignFormContext()
 
   const handleNextStepBtnClicked = useCallback(() => {
+    if (step === 0 && hasInvalidTargetUrl) {
+      showNotification(
+        'error',
+        'Please enter a target URL starting with https://',
+        'Invalid Target URL'
+      )
+      return
+    }
+
     if (step < CREATE_CAMPAIGN_STEPS - 1) {
       if (step === 2) {
         form.validate()
@@ -131,7 +143,7 @@ const CampaignSummary = () => {
 
       updateCampaign('step', step + 1)
     }
-  }, [step, updateCampaign, form])
+  }, [step, updateCampaign, form, hasInvalidTargetUrl, showNotification])
 
   return (
     <>

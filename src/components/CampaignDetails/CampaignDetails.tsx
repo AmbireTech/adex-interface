@@ -17,6 +17,9 @@ import ArchivedIcon from 'resources/icons/Archived'
 import FormattedAmount from 'components/common/FormattedAmount/FormattedAmount'
 import CatsLocsFormatted from './CatsLocsFormatted'
 
+// Temporary added to disable action buttons until no functionality implemented
+const ACTION_BUTTONS_DISABLED = true
+
 const useStyles = createStyles((theme) => ({
   wrapper: {
     background: theme.colors.mainBackground[theme.fn.primaryShade()],
@@ -239,30 +242,32 @@ const CampaignDetails = () => {
                   </div>
                 </Grid.Col>
               </Grid>
-              <Grid>
-                <Grid.Col>
-                  <Flex justify="flex-end" align="center" gap="xs" mt="xl">
-                    <CampaignActionBtn
-                      text="Activate"
-                      icon={<ActiveIcon size="13px" />}
-                      color="success"
-                      onBtnClicked={() => console.log('Activate btn clicked')}
-                    />
-                    <CampaignActionBtn
-                      text="Stop"
-                      icon={<StopIcon size="13px" />}
-                      color="stopped"
-                      onBtnClicked={() => console.log('Stop btn clicked')}
-                    />
-                    <CampaignActionBtn
-                      text="Archive"
-                      icon={<ArchivedIcon size="13px" />}
-                      color="secondaryText"
-                      onBtnClicked={() => console.log('Archive btn clicked')}
-                    />
-                  </Flex>
-                </Grid.Col>
-              </Grid>
+              {!ACTION_BUTTONS_DISABLED && (
+                <Grid>
+                  <Grid.Col>
+                    <Flex justify="flex-end" align="center" gap="xs" mt="xl">
+                      <CampaignActionBtn
+                        text="Activate"
+                        icon={<ActiveIcon size="13px" />}
+                        color="success"
+                        onBtnClicked={() => console.log('Activate btn clicked')}
+                      />
+                      <CampaignActionBtn
+                        text="Stop"
+                        icon={<StopIcon size="13px" />}
+                        color="stopped"
+                        onBtnClicked={() => console.log('Stop btn clicked')}
+                      />
+                      <CampaignActionBtn
+                        text="Archive"
+                        icon={<ArchivedIcon size="13px" />}
+                        color="secondaryText"
+                        onBtnClicked={() => console.log('Archive btn clicked')}
+                      />
+                    </Flex>
+                  </Grid.Col>
+                </Grid>
+              )}
             </Grid.Col>
           </Grid>
         </Container>
