@@ -23,7 +23,7 @@ import { timeout } from 'helpers'
 
 import { dashboardTableElements } from 'components/Dashboard/mockData'
 
-const keySeparator = '👩🏼‍🏫'
+const keySeparator = '👩🏼'
 
 type DataStatus = 'loading' | 'processed'
 
@@ -62,7 +62,7 @@ const analyticsDataToMappedAnalytics = (
   const impCounts = analyticsData[0]
   const impPaid = analyticsData[1]
   const clickCounts = analyticsData[2]
-  const clickPaid = analyticsData[3]
+  // const clickPaid = analyticsData[3]
 
   // On development env using mock data
   if (process.env.NODE_ENV === 'development' && !impCounts.length) {
@@ -96,9 +96,10 @@ const analyticsDataToMappedAnalytics = (
       clickCounts.find((x) => x[segmentField] === impElement[segmentField])?.value || 0
     )
 
-    nexSegment.paid +=
-      Number(impPaid.find((x) => x[segmentField] === impElement[segmentField])?.value || 0) +
-      Number(clickPaid.find((x) => x[segmentField] === impElement[segmentField])?.value || 0)
+    nexSegment.paid += Number(
+      impPaid.find((x) => x[segmentField] === impElement[segmentField])?.value || 0
+    )
+    //  + Number(clickPaid.find((x) => x[segmentField] === impElement[segmentField])?.value || 0)
 
     return next.set(segmentKey, nexSegment)
   }, new Map<string, BaseAnalyticsData>())
@@ -114,6 +115,8 @@ const analyticsDataToMappedAnalytics = (
       avgCpm: paid && value.impressions ? (paid / value.impressions) * 1000 : 'N/A'
     }
   })
+    // TODO: remove the sort when table sorting
+    .sort((a, b) => b.impressions - a.impressions)
 
   return resMap
 }
@@ -155,7 +158,7 @@ const CampaignsAnalyticsProvider: FC<PropsWithChildren> = ({ children }) => {
     async (params: AnalyticsDataQuery, dataKey: string) => {
       try {
         const analyticsDataRes = await adexServicesRequest<AnalyticsDataRes>('validator', {
-          route: '/v5_a/analytics/for-advertiser',
+          route: '/v5_a/analytics/for-dsp-users',
           method: 'GET',
           queryParams: Object.entries(params).reduce(
             (query: Record<string, string>, [key, value]) => {
@@ -239,11 +242,13 @@ const CampaignsAnalyticsProvider: FC<PropsWithChildren> = ({ children }) => {
         segmentBy: analyticsType === 'timeframe' ? 'campaignId' : analyticsType
       }
 
+      // NOTE: do not get click paid until we have this king of payment models
+      // TODO: bring back payments by click if enabled
       const queries: AnalyticsDataQuery[] = [
         { ...baseQuery, eventType: 'IMPRESSION', metric: 'count' },
         { ...baseQuery, eventType: 'IMPRESSION', metric: 'paid' },
-        { ...baseQuery, eventType: 'CLICK', metric: 'count' },
-        { ...baseQuery, eventType: 'CLICK', metric: 'paid' }
+        { ...baseQuery, eventType: 'CLICK', metric: 'count' }
+        // { ...baseQuery, eventType: 'CLICK', metric: 'paid' }
       ]
 
       const keys: string[] = []
