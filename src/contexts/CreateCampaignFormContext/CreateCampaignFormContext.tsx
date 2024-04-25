@@ -6,7 +6,7 @@ import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import { FC, PropsWithChildren, useEffect } from 'react'
 import { CampaignUI } from 'types'
 
-const MIN_CAMPAIGN_BUDGET_VALUE = 500
+const MIN_CAMPAIGN_BUDGET_VALUE = 200
 const MIN_CPM_VALUE = 0.1
 
 const [CrCampaignFormProvider, useCreateCampaignFormContext, useCreateCampaignForm] =
