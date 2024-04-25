@@ -65,20 +65,24 @@ const analyticsDataToMappedAnalytics = (
   const clickPaid = analyticsData[3]
 
   // On development env using mock data
-  if (process.env.NODE_ENV === 'development') {
+  if (process.env.NODE_ENV === 'development' && !impCounts.length) {
     const mockedData = dashboardTableElements[0][analyticsType]
 
     return [...mockedData]
   }
 
-  const mapped = impCounts.reduce((aggr, el) => {
+  const mapped = impCounts.reduce((aggr, impElement) => {
     const next = new Map(aggr)
 
-    const segment = (
-      analyticsType === 'timeframe' ? el.time || el.segment || '-' : el.segment || el.time || '-'
-    ).toString()
-    const nexSegment = aggr.get(segment) || {
-      segment,
+    const segmentField = (analyticsType === 'timeframe' ? 'time' : 'segment') as keyof Omit<
+      AnalyticsData,
+      'value'
+    >
+
+    const segmentKey = impElement?.[segmentField]?.toString() || '🦄'
+
+    const nexSegment = aggr.get(segmentKey) || {
+      segment: segmentKey,
       clicks: 0,
       impressions: 0,
       paid: 0,
@@ -87,36 +91,29 @@ const analyticsDataToMappedAnalytics = (
       avgCpm: ''
     }
 
-    // TODO: optimize the mapping
-    nexSegment.impressions += Number(el.value)
+    nexSegment.impressions += Number(impElement.value)
     nexSegment.clicks += Number(
-      clickCounts.find(
-        (x) => (x.segment && el.segment && x.segment === el.segment) || x.time === el.time
-      )?.value || 0
+      clickCounts.find((x) => x[segmentField] === impElement[segmentField])?.value || 0
     )
-    // TODO: calc here BIGINT to num
-    nexSegment.paid +=
-      Number(
-        impPaid.find(
-          (x) => (x.segment && el.segment && x.segment === el.segment) || x.time === el.time
-        )?.value || 0
-      ) +
-      Number(
-        clickPaid.find(
-          (x) => (x.segment && el.segment && x.segment === el.segment) || x.time === el.time
-        )?.value || 0
-      )
 
-    return next.set(segment, nexSegment)
+    nexSegment.paid +=
+      Number(impPaid.find((x) => x[segmentField] === impElement[segmentField])?.value || 0) +
+      Number(clickPaid.find((x) => x[segmentField] === impElement[segmentField])?.value || 0)
+
+    return next.set(segmentKey, nexSegment)
   }, new Map<string, BaseAnalyticsData>())
 
-  const resMap = Array.from(mapped, ([segment, value]) => ({
-    ...value,
-    segment,
-    analyticsType,
-    ctr: value.clicks && value.impressions ? (value.clicks / value.impressions) * 100 : 'N/A',
-    avgCpm: value.paid && value.impressions ? (value.paid / value.impressions) * 1000 : 'N/A'
-  }))
+  const resMap = Array.from(mapped, ([segment, value]) => {
+    const paid = value.paid
+    return {
+      ...value,
+      segment,
+      paid,
+      analyticsType,
+      ctr: value.clicks && value.impressions ? (value.clicks / value.impressions) * 100 : 'N/A',
+      avgCpm: paid && value.impressions ? (paid / value.impressions) * 1000 : 'N/A'
+    }
+  })
 
   return resMap
 }
