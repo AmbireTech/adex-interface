@@ -1,7 +1,8 @@
 import { Bound, Campaign } from 'adex-common/dist/types/Dsp/Campaign'
+import { Alpha3Code } from 'adex-common'
 import { Devices } from './createCampaign'
 
-export type SelectData = { value: string; label: string }
+export type SelectData = { value: string | Alpha3Code; label: string }
 
 export type PaymentModelType = 'cpm' | 'cpc'
 
@@ -28,7 +29,7 @@ export type CreateCampaignType = {
     value: CampaignUI[CampaignItemKey]
   ) => void
   updateCampaignWithPrevStateNested: (nestedKey: string, value: any) => void
-  updateAllCampaign: (camp: any) => void
+  updatePartOfCampaign: (camp: Partial<CampaignUI>) => void
   publishCampaign: () => Promise<any>
   resetCampaign: () => void
 }

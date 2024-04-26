@@ -4,7 +4,6 @@ import { CREATE_CAMPAIGN_STEPS } from 'constants/createCampaign'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import LeftArrowIcon from 'resources/icons/LeftArrow'
-import { useCreateCampaignFormContext } from 'contexts/CreateCampaignFormContext'
 import useCreateCampaignData from 'hooks/useCreateCampaignData/useCreateCampaignData'
 import CampaignDetailsRow from 'components/common/CampainDetailsRow'
 import { ConfirmModal, SuccessModal } from 'components/common/Modals'
@@ -120,8 +119,6 @@ const CampaignSummary = () => {
     updateBalance
   ])
 
-  const form = useCreateCampaignFormContext()
-
   const handleNextStepBtnClicked = useCallback(() => {
     if (step === 0 && hasInvalidTargetUrl) {
       showNotification(
@@ -134,16 +131,14 @@ const CampaignSummary = () => {
 
     if (step < CREATE_CAMPAIGN_STEPS - 1) {
       if (step === 2) {
-        form.validate()
-        const isValidForm = form.isValid()
-        if (!isValidForm) return
-        const element = document.getElementById('createCampaignSubmitBtn')
+        const element = document.getElementById('createCampaignSubmitBtn1')
         element?.click()
+        return
       }
 
       updateCampaign('step', step + 1)
     }
-  }, [step, updateCampaign, form, hasInvalidTargetUrl, showNotification])
+  }, [step, updateCampaign, hasInvalidTargetUrl, showNotification])
 
   return (
     <>
