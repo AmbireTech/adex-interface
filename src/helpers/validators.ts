@@ -1,6 +1,6 @@
 import { parseBigNumTokenAmountToDecimal } from './balances'
 
-const MIN_CAMPAIGN_BUDGET_VALUE = 500
+const MIN_CAMPAIGN_BUDGET_VALUE = 200
 const MIN_CPM_VALUE = 0.1
 
 export const isValidHttpUrl = (inputURL: string) => {
