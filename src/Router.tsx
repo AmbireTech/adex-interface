@@ -10,7 +10,6 @@ import useAccount from 'hooks/useAccount'
 import Deposit from 'components/Deposit'
 import CreateCampaign from 'components/CreateCampaign'
 import { CreateCampaignContextProvider } from 'contexts/CreateCampaignContext/CreateCampaignContext'
-import { CreateCampaignFormProvider } from 'contexts/CreateCampaignFormContext'
 import NotFound404 from 'components/404/404'
 import AdminPanel from './admin/Admin'
 import CampaignDetails from './components/CampaignDetails'
@@ -79,9 +78,7 @@ export const router = createBrowserRouter(
           path: 'create-campaign',
           element: (
             <CreateCampaignContextProvider>
-              <CreateCampaignFormProvider>
-                <CreateCampaign />
-              </CreateCampaignFormProvider>
+              <CreateCampaign />
             </CreateCampaignContextProvider>
           )
         },
