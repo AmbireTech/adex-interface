@@ -5,6 +5,9 @@ import {
 } from 'adex-common/dist/types'
 import { CampaignUI, SelectData } from 'types'
 
+const isoCountries = require('i18n-iso-countries')
+isoCountries.registerLocale(require('i18n-iso-countries/langs/en.json'))
+
 export const CREATE_CAMPAIGN_STEPS = 4
 export const CAMPAIGN_CATEGORIES_INPUT = 'targetingInput.inputs.categories'
 export const CAMPAIGN_LOCATION_INPUT = 'targetingInput.inputs.location'
@@ -24,6 +27,17 @@ const parseCats = () => {
   })
 
   return arr
+}
+
+const parseLocs = () => {
+  const countryCodes = isoCountries.getNames('en', { select: 'official' })
+  const countries: SelectData[] = []
+
+  Object.entries(countryCodes).forEach(([key, value]) => {
+    countries.push({ value: isoCountries.alpha2ToAlpha3(key), label: value as string })
+  })
+
+  return countries
 }
 
 export const DEFAULT_CATS_LOCS_VALUE: TargetingInputSingle = {
@@ -100,10 +114,4 @@ export const CREATE_CAMPAIGN_DEFAULT_VALUE: CampaignUI = {
 }
 
 export const CATEGORIES: SelectData[] = parseCats()
-
-// TODO: Add/get more Countries
-export const COUNTRIES: SelectData[] = [
-  { value: 'BG', label: 'Bulgaria' },
-  { value: 'UK', label: 'United Kingdom' },
-  { value: 'USA', label: 'United States of America' }
-]
+export const COUNTRIES: SelectData[] = parseLocs()
