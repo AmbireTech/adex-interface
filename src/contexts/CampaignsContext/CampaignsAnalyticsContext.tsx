@@ -23,7 +23,7 @@ import { timeout } from 'helpers'
 
 import { dashboardTableElements } from 'components/Dashboard/mockData'
 
-const keySeparator = '👩🏼‍🏫'
+const keySeparator = '👩🏼'
 
 type DataStatus = 'loading' | 'processed'
 
@@ -62,23 +62,27 @@ const analyticsDataToMappedAnalytics = (
   const impCounts = analyticsData[0]
   const impPaid = analyticsData[1]
   const clickCounts = analyticsData[2]
-  const clickPaid = analyticsData[3]
+  // const clickPaid = analyticsData[3]
 
   // On development env using mock data
-  if (process.env.NODE_ENV === 'development') {
+  if (process.env.NODE_ENV === 'development' && !impCounts.length) {
     const mockedData = dashboardTableElements[0][analyticsType]
 
     return [...mockedData]
   }
 
-  const mapped = impCounts.reduce((aggr, el) => {
+  const mapped = impCounts.reduce((aggr, impElement) => {
     const next = new Map(aggr)
 
-    const segment = (
-      analyticsType === 'timeframe' ? el.time || el.segment || '-' : el.segment || el.time || '-'
-    ).toString()
-    const nexSegment = aggr.get(segment) || {
-      segment,
+    const segmentField = (analyticsType === 'timeframe' ? 'time' : 'segment') as keyof Omit<
+      AnalyticsData,
+      'value'
+    >
+
+    const segmentKey = impElement?.[segmentField]?.toString() || '🦄'
+
+    const nexSegment = aggr.get(segmentKey) || {
+      segment: segmentKey,
       clicks: 0,
       impressions: 0,
       paid: 0,
@@ -87,36 +91,32 @@ const analyticsDataToMappedAnalytics = (
       avgCpm: ''
     }
 
-    // TODO: optimize the mapping
-    nexSegment.impressions += Number(el.value)
+    nexSegment.impressions += Number(impElement.value)
     nexSegment.clicks += Number(
-      clickCounts.find(
-        (x) => (x.segment && el.segment && x.segment === el.segment) || x.time === el.time
-      )?.value || 0
+      clickCounts.find((x) => x[segmentField] === impElement[segmentField])?.value || 0
     )
-    // TODO: calc here BIGINT to num
-    nexSegment.paid +=
-      Number(
-        impPaid.find(
-          (x) => (x.segment && el.segment && x.segment === el.segment) || x.time === el.time
-        )?.value || 0
-      ) +
-      Number(
-        clickPaid.find(
-          (x) => (x.segment && el.segment && x.segment === el.segment) || x.time === el.time
-        )?.value || 0
-      )
 
-    return next.set(segment, nexSegment)
+    nexSegment.paid += Number(
+      impPaid.find((x) => x[segmentField] === impElement[segmentField])?.value || 0
+    )
+    //  + Number(clickPaid.find((x) => x[segmentField] === impElement[segmentField])?.value || 0)
+
+    return next.set(segmentKey, nexSegment)
   }, new Map<string, BaseAnalyticsData>())
 
-  const resMap = Array.from(mapped, ([segment, value]) => ({
-    ...value,
-    segment,
-    analyticsType,
-    ctr: value.clicks && value.impressions ? (value.clicks / value.impressions) * 100 : 'N/A',
-    avgCpm: value.paid && value.impressions ? (value.paid / value.impressions) * 1000 : 'N/A'
-  }))
+  const resMap = Array.from(mapped, ([segment, value]) => {
+    const paid = value.paid
+    return {
+      ...value,
+      segment,
+      paid,
+      analyticsType,
+      ctr: value.clicks && value.impressions ? (value.clicks / value.impressions) * 100 : 'N/A',
+      avgCpm: paid && value.impressions ? (paid / value.impressions) * 1000 : 'N/A'
+    }
+  })
+    // TODO: remove the sort when table sorting
+    .sort((a, b) => b.impressions - a.impressions)
 
   return resMap
 }
@@ -158,7 +158,7 @@ const CampaignsAnalyticsProvider: FC<PropsWithChildren> = ({ children }) => {
     async (params: AnalyticsDataQuery, dataKey: string) => {
       try {
         const analyticsDataRes = await adexServicesRequest<AnalyticsDataRes>('validator', {
-          route: '/v5_a/analytics/for-advertiser',
+          route: '/v5_a/analytics/for-dsp-users',
           method: 'GET',
           queryParams: Object.entries(params).reduce(
             (query: Record<string, string>, [key, value]) => {
@@ -242,11 +242,13 @@ const CampaignsAnalyticsProvider: FC<PropsWithChildren> = ({ children }) => {
         segmentBy: analyticsType === 'timeframe' ? 'campaignId' : analyticsType
       }
 
+      // NOTE: do not get click paid until we have this king of payment models
+      // TODO: bring back payments by click if enabled
       const queries: AnalyticsDataQuery[] = [
         { ...baseQuery, eventType: 'IMPRESSION', metric: 'count' },
         { ...baseQuery, eventType: 'IMPRESSION', metric: 'paid' },
-        { ...baseQuery, eventType: 'CLICK', metric: 'count' },
-        { ...baseQuery, eventType: 'CLICK', metric: 'paid' }
+        { ...baseQuery, eventType: 'CLICK', metric: 'count' }
+        // { ...baseQuery, eventType: 'CLICK', metric: 'paid' }
       ]
 
       const keys: string[] = []
