@@ -117,7 +117,7 @@ export default function GeoCustom({ width, height, regions }: GeoCustomProps) {
                         )
 
                         const tooltipText = selectedRegion
-                          ? `${selectedRegion.segment} Impressions: ${
+                          ? `${feature.properties.name} Impressions: ${
                               selectedRegion.impressions
                             }\n Clicks: ${selectedRegion.clicks}\n Share: ${'TODO'} %\n CTR: ${
                               selectedRegion.ctr
