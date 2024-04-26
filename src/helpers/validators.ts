@@ -15,7 +15,7 @@ export const isValidHttpUrl = (inputURL: string) => {
   return url.protocol === 'http:' || url.protocol === 'https:'
 }
 
-const validateBudget = (value: string, availableBalance: bigint, decimals: number) => {
+const validateBudget = (value: bigint, availableBalance: bigint, decimals: number) => {
   const formattedToken = Number(parseBigNumTokenAmountToDecimal(availableBalance, decimals))
   return formattedToken < Number(value)
 }
@@ -31,14 +31,15 @@ export const validateCurrency = (value: string) => {
 }
 
 export const validateCampaignBudget = (
-  value: string,
+  value: bigint,
   availableBalance: bigint,
   decimals: number
 ) => {
-  if (value === '' || Number.isNaN(Number(value))) {
+  if (Number(value) === 0 || Number.isNaN(Number(value))) {
     return { isValid: false, errMsg: 'Enter campaign budget or a valid number' }
   }
-  if (parseFloat(value) < MIN_CAMPAIGN_BUDGET_VALUE) {
+
+  if (Number(value) < MIN_CAMPAIGN_BUDGET_VALUE) {
     return {
       isValid: false,
       errMsg: `Campaign budget can not be lower than ${MIN_CAMPAIGN_BUDGET_VALUE}`
