@@ -5,7 +5,7 @@ import useAccount from 'hooks/useAccount'
 import { ChangeEvent, useCallback, useMemo, useState } from 'react'
 
 type CampaignBudgetProps = {
-  defaultValue: string
+  defaultValue: number
   onChange: (event: ChangeEvent<HTMLInputElement>) => void
   error: string
 }

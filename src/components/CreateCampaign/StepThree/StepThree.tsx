@@ -24,8 +24,7 @@ import CampaignName from './CampaignName'
 type InputValuesProps = {
   paymentModel: string
   currency: string
-  // TODO: fix the type
-  campaignBudget: any
+  campaignBudget: bigint
   cpmPricingBoundsMin: bigint
   cpmPricingBoundsMax: bigint
   title: string
@@ -188,7 +187,7 @@ const StepThree = () => {
             4. Campaign Budget
           </Text>
           <CampaignBudget
-            defaultValue={inputValues.campaignBudget}
+            defaultValue={Number(inputValues.campaignBudget)}
             onChange={handleChange}
             error={errors.campaignBudget}
           />
