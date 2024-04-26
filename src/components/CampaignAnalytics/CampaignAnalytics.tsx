@@ -60,12 +60,17 @@ const CampaignAnalytics = () => {
     [id, perCampaign]
   )
 
-  console.log('currencyName', currencyName)
-
   const campaign: Campaign | undefined = useMemo(
     () => (id ? campaignsData.get(id)?.campaign : undefined),
     [id, campaignsData]
   )
+
+  const totalPaid: number = useMemo(
+    () => (id ? campaignsData.get(id)?.paid || 0 : 0),
+    [id, campaignsData]
+  )
+
+  console.log('totalPaid', totalPaid)
 
   const campaignAnalytics = useMemo(
     () => analyticsData.get(analyticsKey?.key || ''),
@@ -165,13 +170,20 @@ const CampaignAnalytics = () => {
               />
             </Tabs.Panel>
             <Tabs.Panel value="hostname" pt="xs">
-              <Placements placements={campaignMappedAnalytics} currencyName={currencyName} />
+              <Placements
+                placements={campaignMappedAnalytics}
+                currencyName={currencyName}
+                // NOTE: currently we have only have one placement per campaign
+                // TODO; this can be get from analytics but that means 2x request to validator
+                placement={campaign?.targetingInput.inputs.placements.in[0] || 'site'}
+              />
             </Tabs.Panel>
             <Tabs.Panel value="country" pt="xs">
               <Regions
                 regions={campaignMappedAnalytics}
                 isMapVisible={isMapVisible}
                 currencyName={currencyName}
+                totalPaid={totalPaid}
                 onClose={() => setIsMapVisible(false)}
               />
             </Tabs.Panel>
