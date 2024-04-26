@@ -23,7 +23,8 @@ const Regions = ({
 }) => {
   const { width: windowWidth, height: windowHeight } = useViewportSize()
   const getCountryName = useCallback(
-    (segmentCode: Alpha3Code) => AllCountries.find(({ code }) => code === segmentCode)?.name,
+    (segmentCode: Alpha3Code) =>
+      AllCountries.find(({ code }) => code === segmentCode)?.name || 'Unknown',
     []
   )
 
