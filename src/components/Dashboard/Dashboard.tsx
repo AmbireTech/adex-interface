@@ -1,13 +1,27 @@
-import { Campaign, CampaignType } from 'adex-common'
+import { Campaign, CampaignType, EventType } from 'adex-common'
 import { Container, Flex, Text } from '@mantine/core'
 import { useCallback, useMemo } from 'react'
 import CustomTable from 'components/common/CustomTable'
 import { parsePeriodForCampaign } from 'helpers'
-import { campaignHeaders } from 'constant'
 import { useNavigate } from 'react-router-dom'
 import useCampaignsData from 'hooks/useCampaignsData'
 import { parseBigNumTokenAmountToDecimal } from 'helpers/balances'
 import BadgeStatusCampaign from './BadgeStatusCampaign'
+
+const campaignHeaders = [
+  'Name',
+  'Model',
+  'Placement',
+  'Status',
+  'Served',
+  'Budget',
+  'Impressions',
+  'Clicks',
+  'CTR',
+  'Period',
+  'CPM',
+  'Average CPM'
+]
 
 const Dashboard = () => {
   const navigate = useNavigate()
@@ -30,25 +44,40 @@ const Dashboard = () => {
     () =>
       filteredCampaignData.length
         ? filteredCampaignData.map((cmpData) => {
+            const decimals = cmpData.campaign.outpaceAssetDecimals
             const budget = parseBigNumTokenAmountToDecimal(
               cmpData.campaign.campaignBudget,
-              cmpData.campaign.outpaceAssetDecimals
+              decimals
             )
 
             return {
               id: cmpData.campaignId,
               title: cmpData.campaign.title,
               type: CampaignType[cmpData.campaign.type],
+              placement: cmpData.campaign.targetingInput.inputs.placements.in[0] || '-',
               status: <BadgeStatusCampaign type={cmpData.campaign.status} />,
               served: `${((cmpData.paid / budget) * 100).toFixed(4)} %`,
-              budget,
+              // TODO: get token name
+              budget: `${budget} USDC`,
               impressions: cmpData.impressions,
               clicks: cmpData.clicks,
               ctr: cmpData.ctr,
               period: parsePeriodForCampaign([
                 cmpData.campaign.activeFrom,
                 cmpData.campaign.activeTo
-              ])
+              ]),
+              cpm: `${(
+                parseBigNumTokenAmountToDecimal(
+                  cmpData.campaign.pricingBounds[EventType.IMPRESSION]?.min || 0n,
+                  decimals
+                ) * 1000
+              ).toFixed(2)} - ${(
+                parseBigNumTokenAmountToDecimal(
+                  cmpData.campaign.pricingBounds[EventType.IMPRESSION]?.max || 0n,
+                  decimals
+                ) * 1000
+              ).toFixed(2)}`,
+              avgCpm: cmpData.avgCpm
             }
           })
         : [],

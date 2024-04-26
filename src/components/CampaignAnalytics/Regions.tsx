@@ -5,35 +5,40 @@ import { useViewportSize } from '@mantine/hooks'
 import CustomTable from 'components/common/CustomTable'
 import GeoCustom from '../common/CustomTableWithDropdown/WorldMap'
 
-const headings = ['Country', 'Share', 'Impressions', 'Clicks', 'CTR%', 'Average CPM', 'Spent']
+const headings = ['Country', 'Share', 'Impressions', 'Clicks', 'CTR %', 'Average CPM', 'Spent']
 
 const Regions = ({
   regions,
   isMapVisible,
   currencyName,
+  totalPaid,
   onClose
 }: {
   regions: BaseAnalyticsData[] | undefined
   isMapVisible: boolean
   currencyName: string
+  totalPaid: number
   onClose: () => void
 }) => {
   const { width: windowWidth, height: windowHeight } = useViewportSize()
 
   // TODO: add elements types, fix custom table data
-  const elements = useMemo(
-    () =>
+  const elements = useMemo(() => {
+    const paid = regions?.reduce((sum, i) => sum + i.paid, 0) || 1
+    // TODO: investigate analytics timeframe edge case
+    console.log(totalPaid)
+    return (
       regions?.map((item) => ({
         segment: item.segment,
-        share: '-',
+        share: `${(item.paid / paid) * 100} %`,
         impressions: item.impressions,
         clicks: item.clicks,
-        ctr: `${item.ctr} %`,
+        ctr: `${item.ctr}`,
         avgCpm: `${item.avgCpm} ${currencyName}`,
         paid: `${item.paid} ${currencyName}`
-      })) || [],
-    [regions, currencyName]
-  )
+      })) || []
+    )
+  }, [regions, totalPaid, currencyName])
 
   if (!regions?.length) {
     return <div>No regions found</div>

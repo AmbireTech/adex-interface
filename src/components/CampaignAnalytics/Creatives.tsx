@@ -1,8 +1,8 @@
+import { useMemo, useCallback, useState } from 'react'
 import CustomTable from 'components/common/CustomTable'
 import { Flex, Image, createStyles } from '@mantine/core'
 import UrlIcon from 'resources/icons/Url'
 import { CreativePreviewModal } from 'components/common/Modals'
-import { useCallback, useState } from 'react'
 import { useDisclosure } from '@mantine/hooks'
 import { BaseAnalyticsData } from 'types'
 import { formatCurrency } from 'helpers'
@@ -32,7 +32,11 @@ const Creatives = ({
   const [opened, { open, close }] = useDisclosure(false)
   const { classes } = useStyles()
 
-  const headings = ['Media', 'Size', 'Impressions', 'Clicks', 'CTR%', 'Spent', 'Link']
+  const headings = useMemo(
+    () => ['Media', 'Size', 'Impressions', 'Clicks', 'CTR %', `Spent (${currencyName})`, 'Link'],
+    [currencyName]
+  )
+
   const [selectedMedia, setSelectedMedia] = useState('')
   const handleMediaClick = useCallback(
     (media: string) => {
@@ -69,8 +73,8 @@ const Creatives = ({
         : '',
       impressions: formatCurrency(item.impressions, 0),
       clicks: formatCurrency(item.clicks, 0),
-      ctr: `${item.ctr} %`,
-      paid: `${item.paid} ${currencyName}`,
+      ctr: `${item.ctr}`,
+      paid: `${item.paid}`,
       link: unitForId?.banner?.targetUrl
     }
   })
