@@ -11,6 +11,7 @@ import {
   validatePaymentModel,
   validateTitle
 } from 'helpers/validators'
+import { PaymentModelType } from 'types'
 import CampaignPeriod from './CampaignPeriod'
 import PaymentModel from './PaymentModel'
 import SelectCurrency from './SelectCurrency'
@@ -58,7 +59,7 @@ const StepThree = () => {
       cpmPricingBounds: { min, max },
       title
     },
-    updateCampaign
+    updatePartOfCampaign
   } = useCreateCampaignContext()
 
   const {
@@ -77,8 +78,6 @@ const StepThree = () => {
   const [errors, setErrors] = useState<FormErrorsProps>({
     ...DEFAULT_ERROR_VALUES
   })
-
-  console.log('errors', errors)
 
   const handleChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target
@@ -137,10 +136,23 @@ const StepThree = () => {
 
   const submitForm = useCallback(() => {
     const isValid = validateFields()
-    // TODO: if the form is valid update campaign and increase THE STEP
-    console.log('isValid', isValid)
-    if (isValid) updateCampaign('step', step + 1)
-  }, [validateFields, updateCampaign, step])
+
+    if (isValid) {
+      const updatedProps = {
+        step: step + 1,
+        paymentModel: inputValues.paymentModel as PaymentModelType,
+        campaignBudget: inputValues.campaignBudget,
+        currency: inputValues.currency,
+        cpmPricingBounds: {
+          min: inputValues.cpmPricingBoundsMin,
+          max: inputValues.cpmPricingBoundsMax
+        },
+        title: inputValues.title
+      }
+
+      updatePartOfCampaign(updatedProps)
+    }
+  }, [validateFields, step, inputValues, updatePartOfCampaign])
 
   return (
     <>

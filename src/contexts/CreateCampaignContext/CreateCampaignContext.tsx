@@ -40,9 +40,12 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
 
   const { adexServicesRequest } = useAdExApi()
 
-  const updateAllCampaign = useCallback(
-    (value: any) => {
-      setCampaign(value)
+  const updatePartOfCampaign = useCallback(
+    (value: Partial<CampaignUI>) => {
+      setCampaign((prevState) => ({
+        ...prevState,
+        ...value
+      }))
     },
     [setCampaign]
   )
@@ -122,7 +125,7 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
     () => ({
       campaign,
       setCampaign,
-      updateAllCampaign,
+      updatePartOfCampaign,
       updateCampaign,
       updateCampaignWithPrevStateNested,
       publishCampaign,
@@ -131,7 +134,7 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
     [
       campaign,
       setCampaign,
-      updateAllCampaign,
+      updatePartOfCampaign,
       updateCampaign,
       updateCampaignWithPrevStateNested,
       publishCampaign,

@@ -28,7 +28,7 @@ export type CreateCampaignType = {
     value: CampaignUI[CampaignItemKey]
   ) => void
   updateCampaignWithPrevStateNested: (nestedKey: string, value: any) => void
-  updateAllCampaign: (camp: any) => void
+  updatePartOfCampaign: (camp: Partial<CampaignUI>) => void
   publishCampaign: () => Promise<any>
   resetCampaign: () => void
 }
