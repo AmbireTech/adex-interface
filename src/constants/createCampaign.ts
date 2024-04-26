@@ -1,12 +1,10 @@
+import { CampaignUI, SelectData } from 'types'
 import {
   TargetingInputSingle,
   TargetingPlacementInput,
-  IabTaxonomyV3
-} from 'adex-common/dist/types'
-import { CampaignUI, SelectData } from 'types'
-
-const isoCountries = require('i18n-iso-countries')
-isoCountries.registerLocale(require('i18n-iso-countries/langs/en.json'))
+  IabTaxonomyV3,
+  AllCountries
+} from 'adex-common'
 
 export const CREATE_CAMPAIGN_STEPS = 4
 export const CAMPAIGN_CATEGORIES_INPUT = 'targetingInput.inputs.categories'
@@ -30,12 +28,10 @@ const parseCats = () => {
 }
 
 const parseLocs = () => {
-  const countryCodes = isoCountries.getNames('en', { select: 'official' })
-  const countries: SelectData[] = []
-
-  Object.entries(countryCodes).forEach(([key, value]) => {
-    countries.push({ value: isoCountries.alpha2ToAlpha3(key), label: value as string })
-  })
+  const countries: SelectData[] = AllCountries.map((country) => ({
+    value: country.code,
+    label: country.name
+  }))
 
   return countries
 }
