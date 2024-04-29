@@ -70,9 +70,8 @@ export const TimeFrame = ({
   useEffect(() => {
     if (timeFrames) {
       const result = timeFrames.map((obj) => {
-        console.log({ obj })
         const filteredObj: FilteredAnalytics = {
-          segment: new Date(Number(obj.segment)).toLocaleDateString()
+          segment: new Date(Number(obj.segment)).toLocaleString()
         }
 
         Object.entries(metricsToShow).forEach(([metricKey, show]) => {
@@ -104,7 +103,7 @@ export const TimeFrame = ({
   }, [])
 
   if (!timeFrames?.length) {
-    return <div>No time frames found</div>
+    return <div>No time frame data found 🙈</div>
   }
 
   return (
