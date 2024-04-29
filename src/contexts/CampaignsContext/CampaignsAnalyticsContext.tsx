@@ -126,8 +126,12 @@ const analyticsDataToMappedAnalytics = (
       segment,
       paid,
       analyticsType,
-      ctr: value.clicks && value.impressions ? (value.clicks / value.impressions) * 100 : 'N/A',
-      avgCpm: paid && value.impressions ? (paid / value.impressions) * 1000 : 'N/A'
+      ctr:
+        value.clicks && value.impressions
+          ? Number(((value.clicks / value.impressions) * 100).toFixed(2))
+          : 'N/A',
+      avgCpm:
+        paid && value.impressions ? Number(((paid / value.impressions) * 1000).toFixed(2)) : 'N/A'
     }
   })
     // TODO: remove the sort when table sorting
