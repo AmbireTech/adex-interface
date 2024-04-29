@@ -90,7 +90,7 @@ const GetStarted = () => {
             <CustomCard
               width={294}
               height={330}
-              title="Step 2"
+              title="Step 3"
               text="Create a new campaign"
               icon={<CampaignIcon size="60px" />}
               color="secondary"
