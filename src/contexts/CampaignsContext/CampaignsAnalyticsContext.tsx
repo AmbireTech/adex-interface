@@ -33,7 +33,14 @@ type QueryStatusAndType = {
 }
 
 const min = 60 * 1000
-const defaultRefreshQuery = 60 * min
+const defaultRefreshQuery = 1 * min
+
+const MINUTE = 60 * 1000
+const HOUR = 60 * MINUTE
+const DAY = 24 * HOUR
+// const WEEK = 7 * DAY
+const MONTH = 30 * DAY
+const YEAR = 356 * DAY
 
 function getDefaultEpoch(timestamp: number) {
   return Math.floor(timestamp / defaultRefreshQuery) * defaultRefreshQuery
@@ -116,17 +123,20 @@ const analyticsDataToMappedAnalytics = (
     }
   })
     // TODO: remove the sort when table sorting
-    .sort((a, b) => b.impressions - a.impressions)
+    .sort((a, b) =>
+      analyticsType === 'timeframe'
+        ? Number(a.segment) - Number(b.segment)
+        : b.impressions - a.impressions
+    )
+
+  console.log({ resMap })
 
   return resMap
 }
 
 interface ICampaignsAnalyticsContext {
-  // analyticsData: AnalyticsData[]
   analyticsData: Map<string, AnalyticsData[]>
   // TODO: all campaigns event aggregations by account
-  updateCampaignAnalyticsByQuery: (queryParams: AnalyticsDataQuery) => string
-  getAnalyticsKeyFromQuery: (queryParams: AnalyticsDataQuery) => string
   getAnalyticsKeyAndUpdate: (
     campaign: Campaign,
     analyticsType: AnalyticsType
@@ -163,7 +173,9 @@ const CampaignsAnalyticsProvider: FC<PropsWithChildren> = ({ children }) => {
           queryParams: Object.entries(params).reduce(
             (query: Record<string, string>, [key, value]) => {
               const updated = { ...query }
-              updated[key] = value.toString()
+              if (value !== undefined) {
+                updated[key] = value.toString()
+              }
               return updated
             },
             {}
@@ -197,19 +209,8 @@ const CampaignsAnalyticsProvider: FC<PropsWithChildren> = ({ children }) => {
   )
 
   const updateCampaignAnalyticsByQuery = useCallback(
-    (query: AnalyticsDataQuery): string => {
-      // const campaign = campaignsData.get(campaignId)?.campaign
-
-      // if (!campaign) {
-      //   return ''
-      // }
-
-      // TODO: update analytics another way, because having campaignsData here can trigger infinite loop
-
-      const dataKey = getAnalyticsKeyFromQuery(query)
-
+    (query: AnalyticsDataQuery, dataKey: string): void => {
       updateAnalytics(query, dataKey)
-      return dataKey
     },
     [updateAnalytics]
   )
@@ -230,6 +231,19 @@ const CampaignsAnalyticsProvider: FC<PropsWithChildren> = ({ children }) => {
         end: new Date(Date.now())
       }
 
+      const periodDiff = period.end.getTime() - period.start.getTime()
+
+      let timeframe: AnalyticsDataQuery['timeframe'] = 'year'
+      const isTimeframe = analyticsType === 'timeframe'
+
+      if (isTimeframe && periodDiff >= YEAR) {
+        timeframe = 'month'
+      } else if (isTimeframe && periodDiff > MONTH) {
+        timeframe = 'week'
+      } else if (isTimeframe) {
+        timeframe = 'day'
+      }
+
       // TODO: alg to set the timeframe depending on campaign start/end and current date
       const baseQuery: AnalyticsDataQuery = {
         campaignId: campaign.id,
@@ -238,8 +252,8 @@ const CampaignsAnalyticsProvider: FC<PropsWithChildren> = ({ children }) => {
         eventType: 'CLICK',
         limit: 10000000,
         timezone: 'UTC',
-        timeframe: 'week',
-        segmentBy: analyticsType === 'timeframe' ? 'campaignId' : analyticsType
+        timeframe,
+        segmentBy: analyticsType === 'timeframe' ? undefined : analyticsType
       }
 
       // NOTE: do not get click paid until we have this king of payment models
@@ -251,28 +265,30 @@ const CampaignsAnalyticsProvider: FC<PropsWithChildren> = ({ children }) => {
         // { ...baseQuery, eventType: 'CLICK', metric: 'paid' }
       ]
 
-      const keys: string[] = []
+      const keys: string[] = queries.map((q) => getAnalyticsKeyFromQuery(q))
+      const dataStatusKey = keys.join(keySeparator)
 
-      // NOTE: ust in case to call the queries in some intervals
-      // eslint-disable-next-line no-restricted-syntax
-      for (const q of queries) {
-        // eslint-disable-next-line no-await-in-loop
-        await timeout(69)
-        const k = updateCampaignAnalyticsByQuery(q)
-        keys.push(k)
+      if (!dataToMapStatus.get(dataStatusKey)) {
+        // NOTE: use in case to call the queries in some intervals
+        // eslint-disable-next-line no-restricted-syntax
+        for (const [i, q] of queries.entries()) {
+          updateCampaignAnalyticsByQuery(q, keys[i])
+          if (i < queries.length) {
+            // eslint-disable-next-line no-await-in-loop
+            await timeout(69)
+          }
+        }
+
+        setDataToMapStatus((prev) => {
+          const next = new Map(prev)
+          next.set(dataStatusKey, { dataStatus: 'loading', analyticsType })
+          return next
+        })
       }
 
-      const key = keys.join(keySeparator)
-
-      setDataToMapStatus((prev) => {
-        const next = new Map(prev)
-        next.set(key, { dataStatus: 'loading', analyticsType })
-        return next
-      })
-
-      return { key, period }
+      return { key: dataStatusKey, period }
     },
-    [updateCampaignAnalyticsByQuery]
+    [dataToMapStatus, updateCampaignAnalyticsByQuery]
   )
 
   useEffect(() => {
@@ -340,20 +356,12 @@ const CampaignsAnalyticsProvider: FC<PropsWithChildren> = ({ children }) => {
 
   const contextValue = useMemo(
     () => ({
-      updateCampaignAnalyticsByQuery,
       analyticsData,
-      getAnalyticsKeyFromQuery,
       getAnalyticsKeyAndUpdate,
       initialAnalyticsLoading,
       mappedAnalytics
     }),
-    [
-      updateCampaignAnalyticsByQuery,
-      analyticsData,
-      getAnalyticsKeyAndUpdate,
-      initialAnalyticsLoading,
-      mappedAnalytics
-    ]
+    [analyticsData, getAnalyticsKeyAndUpdate, initialAnalyticsLoading, mappedAnalytics]
   )
 
   return (
