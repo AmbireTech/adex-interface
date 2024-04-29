@@ -35,6 +35,13 @@ type QueryStatusAndType = {
 const min = 60 * 1000
 const defaultRefreshQuery = 60 * min
 
+const MINUTE = 60 * 1000
+const HOUR = 60 * MINUTE
+const DAY = 24 * HOUR
+// const WEEK = 7 * DAY
+const MONTH = 30 * DAY
+const YEAR = 356 * DAY
+
 function getDefaultEpoch(timestamp: number) {
   return Math.floor(timestamp / defaultRefreshQuery) * defaultRefreshQuery
 }
@@ -116,7 +123,13 @@ const analyticsDataToMappedAnalytics = (
     }
   })
     // TODO: remove the sort when table sorting
-    .sort((a, b) => b.impressions - a.impressions)
+    .sort((a, b) =>
+      analyticsType === 'timeframe'
+        ? Number(a.segment) - Number(b.segment)
+        : b.impressions - a.impressions
+    )
+
+  console.log({ resMap })
 
   return resMap
 }
@@ -163,7 +176,9 @@ const CampaignsAnalyticsProvider: FC<PropsWithChildren> = ({ children }) => {
           queryParams: Object.entries(params).reduce(
             (query: Record<string, string>, [key, value]) => {
               const updated = { ...query }
-              updated[key] = value.toString()
+              if (value !== undefined) {
+                updated[key] = value.toString()
+              }
               return updated
             },
             {}
@@ -230,6 +245,21 @@ const CampaignsAnalyticsProvider: FC<PropsWithChildren> = ({ children }) => {
         end: new Date(Date.now())
       }
 
+      // TODO: use the query + period as requests throttle (epoch for the end (10-30 secs))
+
+      const periodDiff = period.end.getTime() - period.start.getTime()
+
+      let timeframe: AnalyticsDataQuery['timeframe'] = 'year'
+      const isTimeframe = analyticsType === 'timeframe'
+
+      if (isTimeframe && periodDiff >= YEAR) {
+        timeframe = 'month'
+      } else if (isTimeframe && periodDiff > MONTH) {
+        timeframe = 'week'
+      } else if (isTimeframe) {
+        timeframe = 'day'
+      }
+
       // TODO: alg to set the timeframe depending on campaign start/end and current date
       const baseQuery: AnalyticsDataQuery = {
         campaignId: campaign.id,
@@ -238,8 +268,8 @@ const CampaignsAnalyticsProvider: FC<PropsWithChildren> = ({ children }) => {
         eventType: 'CLICK',
         limit: 10000000,
         timezone: 'UTC',
-        timeframe: 'week',
-        segmentBy: analyticsType === 'timeframe' ? 'campaignId' : analyticsType
+        timeframe,
+        segmentBy: analyticsType === 'timeframe' ? undefined : analyticsType
       }
 
       // NOTE: do not get click paid until we have this king of payment models
