@@ -71,13 +71,16 @@ const Dashboard = () => {
                   cmpData.campaign.pricingBounds[EventType.IMPRESSION]?.min || 0n,
                   decimals
                 ) * 1000
-              ).toFixed(2)} - ${(
+              ).toFixed(1)} - ${(
                 parseBigNumTokenAmountToDecimal(
                   cmpData.campaign.pricingBounds[EventType.IMPRESSION]?.max || 0n,
                   decimals
                 ) * 1000
-              ).toFixed(2)}`,
-              avgCpm: cmpData.avgCpm
+              ).toFixed(1)}`,
+              avgCpm:
+                typeof cmpData.avgCpm === 'number'
+                  ? Number(cmpData.avgCpm).toFixed(2)
+                  : cmpData.avgCpm
             }
           })
         : [],
@@ -111,6 +114,12 @@ const Dashboard = () => {
   // const toggleShowArchived = useCallback(() => {
   //   setShowArchived((prevShowArchived) => !prevShowArchived)
   // }, [])
+
+  // useEffect(() => {
+  //   if (filteredCampaignData.length === 0) {
+  //     navigate('/dashboard/get-started', { replace: true })
+  //   }
+  // }, [navigate, filteredCampaignData.length])
 
   return (
     <Container fluid>
