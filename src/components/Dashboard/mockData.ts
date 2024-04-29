@@ -146,7 +146,7 @@ const dashboardTableElements: (CampaignData & {
       {
         analyticsType: 'country',
 
-        segment: 'United States',
+        segment: 'USA',
 
         impressions: 123456789,
         clicks: 10048,
@@ -157,7 +157,7 @@ const dashboardTableElements: (CampaignData & {
       {
         analyticsType: 'country',
 
-        segment: 'Bulgaria',
+        segment: 'BGR',
 
         impressions: 12345678,
         clicks: 10048,
@@ -167,7 +167,7 @@ const dashboardTableElements: (CampaignData & {
       },
       {
         analyticsType: 'country',
-        segment: 'Germany',
+        segment: 'DEU',
 
         impressions: 1234567,
         clicks: 10048,
@@ -177,7 +177,7 @@ const dashboardTableElements: (CampaignData & {
       },
       {
         analyticsType: 'country',
-        segment: 'France',
+        segment: 'FRA',
 
         impressions: 123456,
         clicks: 10048,
@@ -187,7 +187,7 @@ const dashboardTableElements: (CampaignData & {
       },
       {
         analyticsType: 'country',
-        segment: 'Australia',
+        segment: 'AUS',
 
         impressions: 12345,
         clicks: 10048,
@@ -197,7 +197,7 @@ const dashboardTableElements: (CampaignData & {
       },
       {
         analyticsType: 'country',
-        segment: 'India',
+        segment: 'IND',
 
         impressions: 1234,
         clicks: 10048,
@@ -207,7 +207,7 @@ const dashboardTableElements: (CampaignData & {
       },
       {
         analyticsType: 'country',
-        segment: 'China',
+        segment: 'CHN',
 
         impressions: 123,
         clicks: 10048,
@@ -217,7 +217,7 @@ const dashboardTableElements: (CampaignData & {
       },
       {
         analyticsType: 'country',
-        segment: 'Russia',
+        segment: 'RUS',
 
         impressions: 12,
         clicks: 10048,
@@ -227,7 +227,7 @@ const dashboardTableElements: (CampaignData & {
       },
       {
         analyticsType: 'country',
-        segment: 'Austria',
+        segment: 'AUT',
 
         impressions: 1,
         clicks: 10048,
@@ -237,7 +237,7 @@ const dashboardTableElements: (CampaignData & {
       },
       {
         analyticsType: 'country',
-        segment: 'Brazil',
+        segment: 'BRA',
 
         impressions: 12343421,
         clicks: 10048,
@@ -247,7 +247,7 @@ const dashboardTableElements: (CampaignData & {
       },
       {
         analyticsType: 'country',
-        segment: 'Spain',
+        segment: 'ESP',
 
         impressions: 132,
         clicks: 10048,
@@ -257,7 +257,7 @@ const dashboardTableElements: (CampaignData & {
       },
       {
         analyticsType: 'country',
-        segment: 'Albania',
+        segment: 'ALB',
 
         impressions: 12,
         clicks: 10048,
