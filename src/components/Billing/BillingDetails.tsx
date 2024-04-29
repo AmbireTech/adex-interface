@@ -13,22 +13,14 @@ const BillingDetails = () => {
 
     validate: {
       firstName: (value: string) => {
-        if (value.length === 0) {
-          return null
-        }
-
-        if (value.length < 2) {
+        if (value.length > 0 && value.length < 2) {
           return 'First name must have at least 2 letters'
         }
 
         return null
       },
       lastName: (value: string) => {
-        if (value.length === 0) {
-          return null
-        }
-
-        if (value.length < 2) {
+        if (value.length > 0 && value.length < 2) {
           return 'Last name must have at least 2 letters'
         }
 
