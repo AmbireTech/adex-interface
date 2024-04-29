@@ -13,11 +13,11 @@ const campaignHeaders = [
   'Model',
   'Placement',
   'Status',
-  'Served',
+  'Served %',
   'Budget',
   'Impressions',
   'Clicks',
-  'CTR',
+  'CTR %',
   'Period',
   'CPM',
   'Average CPM'
@@ -56,12 +56,12 @@ const Dashboard = () => {
               type: CampaignType[cmpData.campaign.type],
               placement: cmpData.campaign.targetingInput.inputs.placements.in[0] || '-',
               status: <BadgeStatusCampaign type={cmpData.campaign.status} />,
-              served: `${((cmpData.paid / budget) * 100).toFixed(4)} %`,
+              served: `${((cmpData.paid / budget) * 100).toFixed(4)}`,
               // TODO: get token name
               budget: `${budget} USDC`,
               impressions: cmpData.impressions,
               clicks: cmpData.clicks,
-              ctr: cmpData.ctr,
+              ctr: `${cmpData.ctr}`,
               period: (
                 <span>
                   <span>{periodNumberToDate(cmpData.campaign.activeFrom)} </span>
