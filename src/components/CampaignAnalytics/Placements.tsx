@@ -45,7 +45,7 @@ const Placements = ({
 
   const headings = useMemo(
     () => [
-      placement === 'app' ? 'App' : 'Site',
+      placement === 'app' ? 'App' : 'Website',
       'Impressions',
       'Clicks',
       'CTR %',
