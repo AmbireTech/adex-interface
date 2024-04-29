@@ -63,11 +63,11 @@ const TopUpWithFiat = () => {
           coins.
         </Alert>
       </Grid.Col>
-      <Grid.Col>
+      {/* <Grid.Col>
         <Alert icon={<InfoIcon size="1rem" />} color="attention" variant="outline">
           Note that invoices are generated in the currency in which the campaign was initiated.
         </Alert>
-      </Grid.Col>
+      </Grid.Col> */}
       <Grid.Col>
         <Text size="sm" color="secondaryText" fw="bold">
           Deposit with credit card to your account directly using one of our partners

@@ -13,11 +13,11 @@ const campaignHeaders = [
   'Model',
   'Placement',
   'Status',
-  'Served',
+  'Served %',
   'Budget',
   'Impressions',
   'Clicks',
-  'CTR',
+  'CTR %',
   'Period',
   'CPM',
   'Average CPM'
@@ -56,12 +56,12 @@ const Dashboard = () => {
               type: CampaignType[cmpData.campaign.type],
               placement: cmpData.campaign.targetingInput.inputs.placements.in[0] || '-',
               status: <BadgeStatusCampaign type={cmpData.campaign.status} />,
-              served: `${((cmpData.paid / budget) * 100).toFixed(4)} %`,
+              served: `${((cmpData.paid / budget) * 100).toFixed(4)}`,
               // TODO: get token name
               budget: `${budget} USDC`,
               impressions: cmpData.impressions,
               clicks: cmpData.clicks,
-              ctr: cmpData.ctr,
+              ctr: `${cmpData.ctr}`,
               period: (
                 <span>
                   <span>{periodNumberToDate(cmpData.campaign.activeFrom)} </span>
@@ -84,7 +84,7 @@ const Dashboard = () => {
                   <span>
                     {(
                       parseBigNumTokenAmountToDecimal(
-                        cmpData.campaign.pricingBounds[EventType.IMPRESSION]?.min || 0n,
+                        cmpData.campaign.pricingBounds[EventType.IMPRESSION]?.max || 0n,
                         decimals
                       ) * 1000
                     ).toFixed(2)}
@@ -92,7 +92,10 @@ const Dashboard = () => {
                   <br />
                 </span>
               ),
-              avgCpm: cmpData.avgCpm
+              avgCpm:
+                typeof cmpData.avgCpm === 'number'
+                  ? Number(cmpData.avgCpm).toFixed(2)
+                  : cmpData.avgCpm
             }
           })
         : [],
@@ -126,6 +129,12 @@ const Dashboard = () => {
   // const toggleShowArchived = useCallback(() => {
   //   setShowArchived((prevShowArchived) => !prevShowArchived)
   // }, [])
+
+  // useEffect(() => {
+  //   if (filteredCampaignData.length === 0) {
+  //     navigate('/dashboard/get-started', { replace: true })
+  //   }
+  // }, [navigate, filteredCampaignData.length])
 
   return (
     <Container fluid>

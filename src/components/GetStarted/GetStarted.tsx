@@ -21,7 +21,7 @@ const GetStarted = () => {
   )
 
   const hasPopover = useMemo(
-    () => Boolean(IS_MANUAL_DEPOSITING) && !hasAvailableBalance,
+    () => IS_MANUAL_DEPOSITING === 'true' && !hasAvailableBalance,
     [hasAvailableBalance]
   )
   return (
@@ -37,7 +37,7 @@ const GetStarted = () => {
               height={330}
               title="Step 1"
               text="Fill in company details"
-              icon={<AddSignerIcon strokeWidth="1" size="60px" />}
+              icon={<AddSignerIcon strokeWidth="0.8px" size="60px" />}
               color="secondary"
             >
               <Button
@@ -90,7 +90,7 @@ const GetStarted = () => {
             <CustomCard
               width={294}
               height={330}
-              title="Step 2"
+              title="Step 3"
               text="Create a new campaign"
               icon={<CampaignIcon size="60px" />}
               color="secondary"
