@@ -42,8 +42,16 @@ const DAY = 24 * HOUR
 const MONTH = 30 * DAY
 const YEAR = 356 * DAY
 
-function getDefaultEpoch(timestamp: number) {
-  return Math.floor(timestamp / defaultRefreshQuery) * defaultRefreshQuery
+function getEpoch(timestamp: number, floor: number): number {
+  return Math.floor(timestamp / floor) * floor
+}
+
+function getRefreshKey(timestamp: number): number {
+  return getEpoch(timestamp, defaultRefreshQuery)
+}
+
+function getPeriodInitialEpoch(timestamp: number): number {
+  return getEpoch(timestamp, HOUR)
 }
 
 const getAnalyticsKeyFromQuery = (queryParams: AnalyticsDataQuery): string => {
@@ -53,7 +61,7 @@ const getAnalyticsKeyFromQuery = (queryParams: AnalyticsDataQuery): string => {
     .reduce((result: string, key: string) => {
       if (queryParams[key as keyof AnalyticsDataQuery] !== undefined) {
         const val = queryParams[key as keyof AnalyticsDataQuery]
-        return `${result}_${val instanceof Date ? getDefaultEpoch(val.getTime()) : val?.toString()}`
+        return `${result}_${val instanceof Date ? getRefreshKey(val.getTime()) : val?.toString()}`
       }
 
       return result
@@ -118,8 +126,12 @@ const analyticsDataToMappedAnalytics = (
       segment,
       paid,
       analyticsType,
-      ctr: value.clicks && value.impressions ? (value.clicks / value.impressions) * 100 : 'N/A',
-      avgCpm: paid && value.impressions ? (paid / value.impressions) * 1000 : 'N/A'
+      ctr:
+        value.clicks && value.impressions
+          ? Number(((value.clicks / value.impressions) * 100).toFixed(2))
+          : 'N/A',
+      avgCpm:
+        paid && value.impressions ? Number(((paid / value.impressions) * 1000).toFixed(2)) : 'N/A'
     }
   })
     // TODO: remove the sort when table sorting
@@ -227,7 +239,7 @@ const CampaignsAnalyticsProvider: FC<PropsWithChildren> = ({ children }) => {
       }
 
       const period = {
-        start: new Date(Number(campaign.activeFrom)),
+        start: new Date(getPeriodInitialEpoch(Number(campaign.activeFrom)) - 1),
         end: new Date(Date.now())
       }
 
