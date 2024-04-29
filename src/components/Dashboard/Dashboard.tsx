@@ -2,7 +2,7 @@ import { Campaign, CampaignType, EventType } from 'adex-common'
 import { Container, Flex, Text } from '@mantine/core'
 import { useCallback, useMemo } from 'react'
 import CustomTable from 'components/common/CustomTable'
-import { parsePeriodForCampaign } from 'helpers'
+import { periodNumberToDate } from 'helpers'
 import { useNavigate } from 'react-router-dom'
 import useCampaignsData from 'hooks/useCampaignsData'
 import { parseBigNumTokenAmountToDecimal } from 'helpers/balances'
@@ -62,21 +62,36 @@ const Dashboard = () => {
               impressions: cmpData.impressions,
               clicks: cmpData.clicks,
               ctr: cmpData.ctr,
-              period: parsePeriodForCampaign([
-                cmpData.campaign.activeFrom,
-                cmpData.campaign.activeTo
-              ]),
-              cpm: `${(
-                parseBigNumTokenAmountToDecimal(
-                  cmpData.campaign.pricingBounds[EventType.IMPRESSION]?.min || 0n,
-                  decimals
-                ) * 1000
-              ).toFixed(2)} - ${(
-                parseBigNumTokenAmountToDecimal(
-                  cmpData.campaign.pricingBounds[EventType.IMPRESSION]?.max || 0n,
-                  decimals
-                ) * 1000
-              ).toFixed(2)}`,
+              period: (
+                <span>
+                  <span>{periodNumberToDate(cmpData.campaign.activeFrom)} </span>
+                  <br />
+                  <span>{periodNumberToDate(cmpData.campaign.activeTo)} </span>
+                </span>
+              ),
+              cpm: (
+                <span>
+                  <span>
+                    {(
+                      parseBigNumTokenAmountToDecimal(
+                        cmpData.campaign.pricingBounds[EventType.IMPRESSION]?.min || 0n,
+                        decimals
+                      ) * 1000
+                    ).toFixed(2)}
+                  </span>
+                  <br />
+
+                  <span>
+                    {(
+                      parseBigNumTokenAmountToDecimal(
+                        cmpData.campaign.pricingBounds[EventType.IMPRESSION]?.min || 0n,
+                        decimals
+                      ) * 1000
+                    ).toFixed(2)}
+                  </span>
+                  <br />
+                </span>
+              ),
               avgCpm: cmpData.avgCpm
             }
           })

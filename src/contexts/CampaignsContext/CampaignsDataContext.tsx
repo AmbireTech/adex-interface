@@ -86,8 +86,8 @@ const campaignResToCampaignData = (
   }
 
   if (adv.impressions > 0) {
-    adv.ctr = (adv.clicks / adv.impressions) * 100
-    adv.avgCpm = (adv.paid / adv.impressions) * 1000
+    adv.ctr = Number(((adv.clicks / adv.impressions) * 100).toFixed(4))
+    adv.avgCpm = Number(((adv.paid / adv.impressions) * 1000).toFixed(2))
   }
 
   const currentCMP = {
