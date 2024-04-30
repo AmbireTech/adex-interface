@@ -1,19 +1,6 @@
 import { createStyles } from '@mantine/core'
-import { Metrics, XYChartProps, BaseAnalyticsData } from 'types'
+import { Accessors, XYChartProps, BaseAnalyticsData, MetricsToShow } from 'types'
 import ChartControls from './Chart'
-
-const updateTooltipData = (obj: any, values: any) => {
-  const keys = Object.keys(obj)
-  keys.forEach((key) => {
-    const value = obj[key]
-    if (value && typeof value === 'object') {
-      updateTooltipData(value, values)
-    } else if (Object.prototype.hasOwnProperty.call(values, key)) {
-      // eslint-disable-next-line
-      obj[key] = values[key]
-    }
-  })
-}
 
 const useStyles = createStyles((theme) => ({
   row: {
@@ -35,9 +22,17 @@ const useStyles = createStyles((theme) => ({
   }
 }))
 
+const metricLabel: { [x in keyof MetricsToShow]?: string } = {
+  clicks: 'Clicks',
+  impressions: 'Impressions',
+  avgCpm: 'Average CPM',
+  paid: 'Spend',
+  ctr: 'CTR %'
+}
+
 const TimeFrameChart = ({ height, width, timeFrameData, metricsToShow }: XYChartProps) => {
   const { classes } = useStyles()
-  const filledOpacity = 0.1
+  const filledOpacity = 0.069
   return (
     <ChartControls data={timeFrameData} metricsToShow={metricsToShow}>
       {({
@@ -90,37 +85,37 @@ const TimeFrameChart = ({ height, width, timeFrameData, metricsToShow }: XYChart
             <>
               <AreaSeries
                 className={!metricsToShow.impressions ? classes.hidden : undefined}
-                dataKey="Impressions"
+                dataKey="impressions"
                 data={data}
-                xAccessor={accessors.x.Impressions}
-                yAccessor={accessors.y.Impressions}
+                xAccessor={accessors.x.impressions}
+                yAccessor={accessors.y.impressions}
                 fillOpacity={filledOpacity}
                 curve={curve}
               />
               <AreaSeries
-                className={!metricsToShow.clickAndCRT ? classes.hidden : undefined}
-                dataKey="Clicks and CRT"
+                className={!metricsToShow.clicks ? classes.hidden : undefined}
+                dataKey="clicks"
                 data={data}
-                xAccessor={accessors.x['Clicks and CRT']}
-                yAccessor={accessors.y['Clicks and CRT']}
+                xAccessor={accessors.x.clicks}
+                yAccessor={accessors.y.clicks}
                 fillOpacity={filledOpacity}
                 curve={curve}
               />
               <AreaSeries
-                className={!metricsToShow.averageCPM ? classes.hidden : undefined}
-                dataKey="Average CPM"
+                className={!metricsToShow.avgCpm ? classes.hidden : undefined}
+                dataKey="avgCpm"
                 data={data}
-                xAccessor={accessors.x['Average CPM']}
-                yAccessor={accessors.y['Average CPM']}
+                xAccessor={accessors.x.avgCpm}
+                yAccessor={accessors.y.avgCpm}
                 fillOpacity={filledOpacity}
                 curve={curve}
               />
               <AreaSeries
-                className={!metricsToShow.spent ? classes.hidden : undefined}
-                dataKey="Total spent"
+                className={!metricsToShow.paid ? classes.hidden : undefined}
+                dataKey="paid"
                 data={data}
-                xAccessor={accessors.x['Total spent']}
-                yAccessor={accessors.y['Total spent']}
+                xAccessor={accessors.x.paid}
+                yAccessor={accessors.y.paid}
                 fillOpacity={filledOpacity}
                 curve={curve}
               />
@@ -149,26 +144,34 @@ const TimeFrameChart = ({ height, width, timeFrameData, metricsToShow }: XYChart
               showSeriesGlyphs={sharedTooltip && !renderBarGroup}
               renderGlyph={enableTooltipGlyph ? renderTooltipGlyph : undefined}
               renderTooltip={({ tooltipData, colorScale }) => {
-                const copiedData = JSON.parse(JSON.stringify(tooltipData)) as typeof tooltipData
-                const foundTimeFrameItem = timeFrameData.find(
-                  (i) => i.segment === copiedData?.datumByKey.Impressions.datum.segment
-                )
-                updateTooltipData(copiedData, foundTimeFrameItem)
+                const currentSegment = tooltipData?.nearestDatum?.datum?.segment || ''
 
                 return (
-                  <div>
+                  <div key={currentSegment}>
+                    <span className={classes.row}>{currentSegment}</span>
+                    <br />
+                    <br />
+                    <div />
                     {(
                       (sharedTooltip
-                        ? Object.keys(copiedData?.datumByKey ?? {})
-                        : [copiedData?.nearestDatum?.key]
-                      ).filter((item) => item) as Metrics[]
+                        ? Object.keys(tooltipData?.datumByKey ?? {})
+                        : [tooltipData?.nearestDatum?.key]
+                      ).filter((item) => item) as (keyof Accessors)[]
                     ).map((item) => {
-                      const value =
-                        copiedData?.nearestDatum?.datum &&
-                        accessors[renderHorizontally ? 'x' : 'y'][item](
-                          copiedData?.nearestDatum?.datum
-                        )
+                      const originalData = timeFrameData?.find(
+                        (x) => x.segment === tooltipData?.nearestDatum?.datum?.segment
+                      )
 
+                      let value =
+                        originalData &&
+                        currentSegment &&
+                        accessors[renderHorizontally ? 'x' : 'y'][item](originalData)
+
+                      if (item === 'clicks' && value && originalData) {
+                        value += ` (CTR: ${accessors[renderHorizontally ? 'x' : 'y'].ctr(
+                          originalData
+                        )} %)`
+                      }
                       const dotColor = colorScale?.(item)
 
                       return (
@@ -181,7 +184,8 @@ const TimeFrameChart = ({ height, width, timeFrameData, metricsToShow }: XYChart
                               }}
                             />
                             <span>
-                              {item}: {value == null || Number.isNaN(value) ? '–' : value}
+                              {metricLabel[item]}:{' '}
+                              {value == null || Number.isNaN(value) ? '–' : value}
                             </span>
                           </div>
                         )
