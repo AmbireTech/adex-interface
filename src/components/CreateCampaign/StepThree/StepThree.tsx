@@ -1,5 +1,5 @@
 import { ActionIcon, Button, Grid, Group, Text, Tooltip } from '@mantine/core'
-import { ChangeEvent, useCallback, useMemo, useState } from 'react'
+import { ChangeEvent, useCallback, useState } from 'react'
 import InfoFilledIcon from 'resources/icons/InfoFilled'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import useAccount from 'hooks/useAccount'
@@ -18,17 +18,6 @@ import SelectCurrency from './SelectCurrency'
 import CampaignBudget from './CampaignBudget'
 import CpmMinMax from './CpmMinMax'
 import CampaignName from './CampaignName'
-
-// TODO: move all the types in types file
-
-type InputValuesProps = {
-  paymentModel: string
-  currency: string
-  campaignBudget: bigint
-  cpmPricingBoundsMin: string
-  cpmPricingBoundsMax: string
-  title: string
-}
 
 type FormErrorsProps = {
   paymentModel: string
@@ -65,19 +54,6 @@ const StepThree = () => {
     adexAccount: { availableBalance, balanceToken }
   } = useAccount()
 
-  const defaultValue: InputValuesProps = useMemo(
-    () => ({
-      paymentModel,
-      currency,
-      campaignBudget,
-      cpmPricingBoundsMin: min,
-      cpmPricingBoundsMax: max,
-      title
-    }),
-    [paymentModel, currency, campaignBudget, min, max, title]
-  )
-  // TODO: remove inputValues
-  const [inputValues, setInputValues] = useState<InputValuesProps>({ ...defaultValue })
   const [errors, setErrors] = useState<FormErrorsProps>({
     ...DEFAULT_ERROR_VALUES
   })
@@ -107,15 +83,9 @@ const StepThree = () => {
       }
 
       updatePartOfCampaign({ ...updatedValue })
-      // TODO: remove inputValues
-      setInputValues((prev) => {
-        return { ...prev, [name]: value }
-      })
     },
     [updatePartOfCampaign, min, max]
   )
-
-  console.log('inputValues', inputValues)
 
   const handleOnFocus = useCallback(
     (name: string) => {
@@ -132,47 +102,41 @@ const StepThree = () => {
   const validateFields = useCallback(() => {
     const newErrors = { ...DEFAULT_ERROR_VALUES }
 
-    const paymentModelValidation = validatePaymentModel(inputValues.paymentModel)
+    const paymentModelValidation = validatePaymentModel(paymentModel)
     if (!paymentModelValidation.isValid) newErrors.paymentModel = paymentModelValidation.errMsg
 
-    const currencyValidation = validateCurrency(inputValues.currency)
+    const currencyValidation = validateCurrency(currency)
     if (!currencyValidation.isValid) newErrors.currency = currencyValidation.errMsg
 
     const campaignBudgetValidation = validateCampaignBudget(
-      inputValues.campaignBudget,
+      campaignBudget,
       availableBalance,
       balanceToken.decimals
     )
     if (!campaignBudgetValidation.isValid)
       newErrors.campaignBudget = campaignBudgetValidation.errMsg
 
-    const cpmPricingBoundsMinValidation = validateCPMMin(
-      inputValues.cpmPricingBoundsMin,
-      inputValues.cpmPricingBoundsMax
-    )
+    const cpmPricingBoundsMinValidation = validateCPMMin(min, max)
     if (!cpmPricingBoundsMinValidation.isValid)
       newErrors.cpmPricingBoundsMin = cpmPricingBoundsMinValidation.errMsg
 
-    const cpmPricingBoundsMaxValidation = validateCPMMax(
-      inputValues.cpmPricingBoundsMin,
-      inputValues.cpmPricingBoundsMax
-    )
+    const cpmPricingBoundsMaxValidation = validateCPMMax(min, max)
     if (!cpmPricingBoundsMaxValidation.isValid)
       newErrors.cpmPricingBoundsMax = cpmPricingBoundsMaxValidation.errMsg
 
-    const titleValidation = validateTitle(inputValues.title)
+    const titleValidation = validateTitle(title)
     if (!titleValidation.isValid) newErrors.title = titleValidation.errMsg
 
     setErrors(newErrors)
 
     return Object.values(newErrors).every((error) => !error)
   }, [
-    inputValues.paymentModel,
-    inputValues.campaignBudget,
-    inputValues.currency,
-    inputValues.cpmPricingBoundsMin,
-    inputValues.cpmPricingBoundsMax,
-    inputValues.title,
+    paymentModel,
+    campaignBudget,
+    currency,
+    min,
+    max,
+    title,
     availableBalance,
     balanceToken.decimals
   ])
@@ -203,7 +167,7 @@ const StepThree = () => {
             2. Payment Model
           </Text>
           <PaymentModel
-            defaultValue={inputValues.paymentModel}
+            defaultValue={paymentModel}
             onChange={handleChange}
             error={errors.paymentModel}
           />
@@ -212,18 +176,14 @@ const StepThree = () => {
           <Text color="secondaryText" size="sm" weight="bold" mb="xs">
             3. Currency
           </Text>
-          <SelectCurrency
-            defaultValue={inputValues.currency}
-            onChange={handleChange}
-            error={errors.currency}
-          />
+          <SelectCurrency defaultValue={currency} onChange={handleChange} error={errors.currency} />
         </Grid.Col>
         <Grid.Col mb="md">
           <Text color="secondaryText" size="sm" weight="bold" mb="xs">
             4. Campaign Budget
           </Text>
           <CampaignBudget
-            defaultValue={Number(inputValues.campaignBudget)}
+            defaultValue={Number(campaignBudget)}
             onChange={handleChange}
             onFocus={() => handleOnFocus('campaignBudget')}
             error={errors.campaignBudget}
@@ -241,8 +201,8 @@ const StepThree = () => {
             </Tooltip>
           </Group>
           <CpmMinMax
-            defaultValueMin={Number(inputValues.cpmPricingBoundsMin)}
-            defaultValueMax={Number(inputValues.cpmPricingBoundsMax)}
+            defaultValueMin={Number(min)}
+            defaultValueMax={Number(max)}
             onChangeMin={handleChange}
             onChangeMax={handleChange}
             errorMin={errors.cpmPricingBoundsMin}
@@ -256,7 +216,7 @@ const StepThree = () => {
             6. Campaign Name
           </Text>
           <CampaignName
-            defaultValue={inputValues.title}
+            defaultValue={title}
             onChange={handleChange}
             onFocus={() => handleOnFocus('title')}
             error={errors.title}
