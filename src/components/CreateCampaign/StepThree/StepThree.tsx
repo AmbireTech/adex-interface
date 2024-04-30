@@ -1,5 +1,5 @@
 import { ActionIcon, Button, Grid, Group, Text, Tooltip } from '@mantine/core'
-import { ChangeEvent, useCallback, useState } from 'react'
+import { ChangeEvent, useCallback, useMemo, useState } from 'react'
 import InfoFilledIcon from 'resources/icons/InfoFilled'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import useAccount from 'hooks/useAccount'
@@ -11,7 +11,7 @@ import {
   validatePaymentModel,
   validateTitle
 } from 'helpers/validators'
-import { PaymentModelType } from 'types'
+import { CampaignUI } from 'types'
 import CampaignPeriod from './CampaignPeriod'
 import PaymentModel from './PaymentModel'
 import SelectCurrency from './SelectCurrency'
@@ -25,8 +25,8 @@ type InputValuesProps = {
   paymentModel: string
   currency: string
   campaignBudget: bigint
-  cpmPricingBoundsMin: bigint
-  cpmPricingBoundsMax: bigint
+  cpmPricingBoundsMin: string
+  cpmPricingBoundsMax: string
   title: string
 }
 
@@ -65,24 +65,68 @@ const StepThree = () => {
     adexAccount: { availableBalance, balanceToken }
   } = useAccount()
 
-  const defaultValue: InputValuesProps = {
-    paymentModel,
-    currency,
-    campaignBudget,
-    cpmPricingBoundsMin: min,
-    cpmPricingBoundsMax: max,
-    title
-  }
+  const defaultValue: InputValuesProps = useMemo(
+    () => ({
+      paymentModel,
+      currency,
+      campaignBudget,
+      cpmPricingBoundsMin: min,
+      cpmPricingBoundsMax: max,
+      title
+    }),
+    [paymentModel, currency, campaignBudget, min, max, title]
+  )
+  // TODO: remove inputValues
   const [inputValues, setInputValues] = useState<InputValuesProps>({ ...defaultValue })
   const [errors, setErrors] = useState<FormErrorsProps>({
     ...DEFAULT_ERROR_VALUES
   })
 
-  const handleChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = event.target
+  const handleChange = useCallback(
+    (event: ChangeEvent<HTMLInputElement>) => {
+      const { name, value } = event.target
+      let updatedValue: Partial<CampaignUI>
+      if (name === 'cpmPricingBoundsMin') {
+        if (Number.isNaN(parseFloat(value))) return
+        updatedValue = {
+          cpmPricingBounds: {
+            min: value,
+            max
+          }
+        }
+      } else if (name === 'cpmPricingBoundsMax') {
+        if (Number.isNaN(parseFloat(value))) return
+        updatedValue = {
+          cpmPricingBounds: {
+            min,
+            max: value
+          }
+        }
+      } else {
+        updatedValue = { [name]: value }
+      }
 
-    setInputValues((prev) => ({ ...prev, [name]: value }))
-  }, [])
+      updatePartOfCampaign({ ...updatedValue })
+      // TODO: remove inputValues
+      setInputValues((prev) => {
+        return { ...prev, [name]: value }
+      })
+    },
+    [updatePartOfCampaign, min, max]
+  )
+
+  console.log('inputValues', inputValues)
+
+  const handleOnFocus = useCallback(
+    (name: string) => {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        [name]: ''
+      }))
+    },
+
+    []
+  )
 
   // TODO: Move the validateFields in other file
   const validateFields = useCallback(() => {
@@ -138,20 +182,12 @@ const StepThree = () => {
 
     if (isValid) {
       const updatedProps = {
-        step: step + 1,
-        paymentModel: inputValues.paymentModel as PaymentModelType,
-        campaignBudget: inputValues.campaignBudget,
-        currency: inputValues.currency,
-        cpmPricingBounds: {
-          min: inputValues.cpmPricingBoundsMin,
-          max: inputValues.cpmPricingBoundsMax
-        },
-        title: inputValues.title
+        step: step + 1
       }
 
       updatePartOfCampaign(updatedProps)
     }
-  }, [validateFields, step, inputValues, updatePartOfCampaign])
+  }, [validateFields, step, updatePartOfCampaign])
 
   return (
     <>
@@ -189,6 +225,7 @@ const StepThree = () => {
           <CampaignBudget
             defaultValue={Number(inputValues.campaignBudget)}
             onChange={handleChange}
+            onFocus={() => handleOnFocus('campaignBudget')}
             error={errors.campaignBudget}
           />
         </Grid.Col>
@@ -210,6 +247,8 @@ const StepThree = () => {
             onChangeMax={handleChange}
             errorMin={errors.cpmPricingBoundsMin}
             errorMax={errors.cpmPricingBoundsMax}
+            onFocusMin={() => handleOnFocus('cpmPricingBoundsMin')}
+            onFocusMax={() => handleOnFocus('cpmPricingBoundsMax')}
           />
         </Grid.Col>
         <Grid.Col mb="md">
@@ -219,6 +258,7 @@ const StepThree = () => {
           <CampaignName
             defaultValue={inputValues.title}
             onChange={handleChange}
+            onFocus={() => handleOnFocus('title')}
             error={errors.title}
           />
         </Grid.Col>

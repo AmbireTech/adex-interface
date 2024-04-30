@@ -1,4 +1,4 @@
-import { Bound, Campaign } from 'adex-common/dist/types/Dsp/Campaign'
+import { Campaign } from 'adex-common/dist/types/Dsp/Campaign'
 import { Alpha3Code } from 'adex-common'
 import { Devices } from './createCampaign'
 
@@ -13,7 +13,10 @@ export type CampaignUI = Campaign & {
   startsAt: Date
   endsAt: Date
   currency: string
-  cpmPricingBounds: Bound
+  cpmPricingBounds: {
+    min: string
+    max: string
+  }
 }
 
 export type ImageSizes = {

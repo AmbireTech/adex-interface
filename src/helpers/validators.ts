@@ -56,7 +56,7 @@ export const validateCampaignBudget = (
   return { isValid: true, errMsg: '' }
 }
 
-export const validateCPMMin = (valueMin: bigint, valueMax: bigint) => {
+export const validateCPMMin = (valueMin: string, valueMax: string) => {
   if (Number(valueMin) === 0 || Number.isNaN(Number(valueMin))) {
     return {
       isValid: false,
@@ -81,7 +81,7 @@ export const validateCPMMin = (valueMin: bigint, valueMax: bigint) => {
   return { isValid: true, errMsg: '' }
 }
 
-export const validateCPMMax = (valueMin: bigint, valueMax: bigint) => {
+export const validateCPMMax = (valueMin: string, valueMax: string) => {
   if (Number(valueMax) === 0 || Number.isNaN(Number(valueMax))) {
     return {
       isValid: false,

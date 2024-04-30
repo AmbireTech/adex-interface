@@ -2,15 +2,16 @@ import { Flex, MediaQuery, TextInput, Text } from '@mantine/core'
 import InfoAlertMessage from 'components/common/InfoAlertMessage'
 import { parseBigNumTokenAmountToDecimal } from 'helpers/balances'
 import useAccount from 'hooks/useAccount'
-import { ChangeEvent, useCallback, useMemo, useState } from 'react'
+import { ChangeEvent, FocusEventHandler, useCallback, useMemo, useState } from 'react'
 
 type CampaignBudgetProps = {
   defaultValue: number
   onChange: (event: ChangeEvent<HTMLInputElement>) => void
+  onFocus: FocusEventHandler<HTMLInputElement>
   error: string
 }
 
-const CampaignBudget = ({ defaultValue, onChange, error }: CampaignBudgetProps) => {
+const CampaignBudget = ({ defaultValue, onChange, onFocus, error }: CampaignBudgetProps) => {
   const [value, setValue] = useState('')
   const {
     adexAccount: { availableBalance, balanceToken }
@@ -52,6 +53,7 @@ const CampaignBudget = ({ defaultValue, onChange, error }: CampaignBudgetProps) 
           defaultValue={defaultValue}
           name="campaignBudget"
           onChange={(event) => handleOnChange(event)}
+          onFocus={onFocus}
           error={error && <Text size="sm">{error}</Text>}
         />
       </MediaQuery>

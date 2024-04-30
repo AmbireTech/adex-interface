@@ -1,5 +1,5 @@
 import { Flex, TextInput, Text, MediaQuery } from '@mantine/core'
-import { ChangeEvent } from 'react'
+import { ChangeEvent, FocusEventHandler } from 'react'
 
 type CpmMinMaxtProps = {
   errorMin: string
@@ -8,6 +8,8 @@ type CpmMinMaxtProps = {
   defaultValueMax: number
   onChangeMin: (event: ChangeEvent<HTMLInputElement>) => void
   onChangeMax: (event: ChangeEvent<HTMLInputElement>) => void
+  onFocusMin: FocusEventHandler<HTMLInputElement>
+  onFocusMax: FocusEventHandler<HTMLInputElement>
 }
 
 const CpmMinMax = ({
@@ -16,7 +18,9 @@ const CpmMinMax = ({
   defaultValueMin,
   defaultValueMax,
   onChangeMin,
-  onChangeMax
+  onChangeMax,
+  onFocusMin,
+  onFocusMax
 }: CpmMinMaxtProps) => {
   return (
     <MediaQuery
@@ -42,6 +46,7 @@ const CpmMinMax = ({
           name="cpmPricingBoundsMin"
           defaultValue={defaultValueMin}
           onChange={(event) => onChangeMin(event)}
+          onFocus={onFocusMin}
           error={errorMin && <Text size="sm">{errorMin}</Text>}
         />
         <TextInput
@@ -60,6 +65,7 @@ const CpmMinMax = ({
           name="cpmPricingBoundsMax"
           defaultValue={defaultValueMax}
           onChange={(event) => onChangeMax(event)}
+          onFocus={onFocusMax}
           error={errorMax && <Text size="sm">{errorMax}</Text>}
         />
       </Flex>
