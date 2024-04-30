@@ -12,6 +12,7 @@ import { useAdExApi } from 'hooks/useAdexServices'
 import useAccount from 'hooks/useAccount'
 import useCustomNotifications from 'hooks/useCustomNotifications'
 import {
+  BaseData,
   CampaignData,
   //  EventAggregatesDataRes,
   EvAggrData
@@ -24,8 +25,8 @@ const defaultCampaignData: CampaignData = {
   campaign: { ...CREATE_CAMPAIGN_DEFAULT_VALUE },
   impressions: 0,
   clicks: 0,
-  ctr: 'N/A',
-  avgCpm: 'N/A',
+  ctr: 0,
+  avgCpm: 0,
   paid: 0
 }
 
@@ -64,24 +65,20 @@ const campaignResToCampaignData = (
   advData?: EvAggrData,
   prevCmp?: CampaignData
 ): CampaignData => {
-  const adv: {
-    impressions: number
-    clicks: number
-    ctr: number | string
-    avgCpm: number | string
-    paid: number
-  } = {
+  const adv: BaseData = {
     ...(advData || {
       clicks: 0,
       impressions: 0
     }),
     ...{
-      paid: parseBigNumTokenAmountToDecimal(
-        BigInt(advData?.payouts || 0n),
-        cmpRes.outpaceAssetDecimals
+      paid: Number(
+        parseBigNumTokenAmountToDecimal(
+          BigInt(advData?.payouts || 0n),
+          cmpRes.outpaceAssetDecimals
+        ).toFixed(2)
       ),
-      ctr: 'N/A',
-      avgCpm: 'N/A'
+      ctr: 0,
+      avgCpm: 0
     }
   }
 

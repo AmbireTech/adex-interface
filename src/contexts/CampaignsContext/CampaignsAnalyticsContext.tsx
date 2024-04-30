@@ -80,7 +80,7 @@ const analyticsDataToMappedAnalytics = (
   // const clickPaid = analyticsData[3]
 
   // On development env using mock data
-  if (process.env.NODE_ENV === 'development' && !impCounts.length) {
+  if (process.env.NODE_ENV === 'development') {
     const mockedData = dashboardTableElements[0][analyticsType]
 
     return [...mockedData]
@@ -102,8 +102,8 @@ const analyticsDataToMappedAnalytics = (
       impressions: 0,
       paid: 0,
       analyticsType,
-      ctr: '',
-      avgCpm: ''
+      ctr: 0,
+      avgCpm: 0
     }
 
     nexSegment.impressions += Number(impElement.value)
@@ -129,9 +129,8 @@ const analyticsDataToMappedAnalytics = (
       ctr:
         value.clicks && value.impressions
           ? Number(((value.clicks / value.impressions) * 100).toFixed(2))
-          : 'N/A',
-      avgCpm:
-        paid && value.impressions ? Number(((paid / value.impressions) * 1000).toFixed(2)) : 'N/A'
+          : 0,
+      avgCpm: paid && value.impressions ? Number(((paid / value.impressions) * 1000).toFixed(2)) : 0
     }
   })
     // TODO: remove the sort when table sorting
