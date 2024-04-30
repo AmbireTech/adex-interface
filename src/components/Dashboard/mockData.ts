@@ -269,96 +269,73 @@ const dashboardTableElements: (CampaignData & {
     timeframe: [
       {
         analyticsType: 'timeframe',
-        segment: '1713933799',
+        segment: '1713933799000',
         impressions: 9146,
-        clicks: 5,
-        ctr: 96,
-        avgCpm: 0.164,
-        paid: 69
+        clicks: 1,
+        paid: 3
       },
       {
         analyticsType: 'timeframe',
 
-        segment: '1714020199',
+        segment: '1714020199000',
         impressions: 300,
         clicks: 5,
-
-        ctr: 3,
-        avgCpm: 0.0063,
         paid: 1.01
       },
       {
         analyticsType: 'timeframe',
-        segment: '1714106599',
+        segment: '1714106599000',
         impressions: 30568,
-        clicks: 5,
-
-        ctr: 21,
-        avgCpm: 0.153,
+        clicks: 55,
         paid: 4.21
       },
       {
         analyticsType: 'timeframe',
-        segment: '1714192999',
+        segment: '1714192999000',
         impressions: 21000,
-        ctr: 232,
-        clicks: 5,
-
-        avgCpm: 0.111,
+        clicks: 42,
         paid: 3.21
       },
       {
         analyticsType: 'timeframe',
-        segment: '1714279399',
-        impressions: 16000,
-        ctr: 55,
-        clicks: 5,
-        avgCpm: 0.089,
-        paid: 2.21
+        segment: '1714279399000',
+        impressions: 0,
+        clicks: 0,
+        paid: 0
       },
       {
         analyticsType: 'timeframe',
-        segment: '1714365799',
+        segment: '1714365699000',
         impressions: 9146,
-        clicks: 5,
-        ctr: 96,
-        avgCpm: 0.164,
-        paid: 69
+        clicks: 15,
+        paid: 3
       },
       {
         analyticsType: 'timeframe',
-        segment: '13/04/2024',
-        clicks: 5,
+        segment: '1714365799000',
+        clicks: 2,
         impressions: 300,
-        ctr: 3,
-        avgCpm: 0.0063,
         paid: 1.01
       },
       {
         analyticsType: 'timeframe',
-        segment: '1714452199',
+        segment: '1714452199000',
         impressions: 30568,
-        clicks: 5,
-        ctr: 21,
-        avgCpm: 0.153,
+        clicks: 21,
         paid: 4.21
       },
       {
         analyticsType: 'timeframe',
-        segment: '1714462999',
+        segment: '1714462999000',
         impressions: 21000,
-        clicks: 5,
-        ctr: 232,
-        avgCpm: 0.111,
+        clicks: 17,
         paid: 3.21
       },
       {
         analyticsType: 'timeframe',
-        segment: '1714480999',
+        segment: '1714480999000',
         clicks: 5,
         impressions: 16000,
-        ctr: 55,
-        avgCpm: 0.089,
         paid: 2.21
       }
     ]
