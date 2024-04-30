@@ -98,7 +98,7 @@ export const TimeFrame = ({
     [timeFrames]
   )
 
-  const handleMetricClick = useCallback((value: boolean, propNameToRemove: string) => {
+  const handleMetricClick = useCallback((value: boolean, propNameToRemove: keyof MetricsToShow) => {
     setMetricsToShow((prev) => ({ ...prev, [propNameToRemove]: value }))
   }, [])
 
@@ -127,7 +127,7 @@ export const TimeFrame = ({
               )} % CTR)`}
               text="Total clicks & CTR"
               bgColor="chartColorTwo"
-              onClick={(v: boolean) => handleMetricClick(v, 'clickAndCRT')}
+              onClick={(v: boolean) => handleMetricClick(v, 'clicks')}
               whiteFontColor
             />
           </Grid.Col>
@@ -136,7 +136,7 @@ export const TimeFrame = ({
               value={`~ ${formatCurrency(totalSum.avgCpm, 3)} ${currencyName} / CPM`}
               text="Average CPM"
               bgColor="chartColorThree"
-              onClick={(v: boolean) => handleMetricClick(v, 'averageCPM')}
+              onClick={(v: boolean) => handleMetricClick(v, 'avgCpm')}
               whiteFontColor
             />
           </Grid.Col>
@@ -145,7 +145,7 @@ export const TimeFrame = ({
               value={`~ ${formatCurrency(totalSum.paid, 2)} ${currencyName}`}
               text="Total spent"
               bgColor="chartColorFour"
-              onClick={(v: boolean) => handleMetricClick(v, 'spent')}
+              onClick={(v: boolean) => handleMetricClick(v, 'paid')}
             />
           </Grid.Col>
         </Grid>

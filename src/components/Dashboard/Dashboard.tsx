@@ -61,7 +61,7 @@ const Dashboard = () => {
               budget: `${budget} USDC`,
               impressions: cmpData.impressions,
               clicks: cmpData.clicks,
-              ctr: `${cmpData.ctr}`,
+              ctr: cmpData.ctr || 0,
               period: (
                 <span>
                   <span>{periodNumberToDate(cmpData.campaign.activeFrom)} </span>
@@ -92,10 +92,7 @@ const Dashboard = () => {
                   <br />
                 </span>
               ),
-              avgCpm:
-                typeof cmpData.avgCpm === 'number'
-                  ? Number(cmpData.avgCpm).toFixed(2)
-                  : cmpData.avgCpm
+              avgCpm: cmpData.avgCpm?.toFixed(2) || 0
             }
           })
         : [],

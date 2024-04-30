@@ -1,4 +1,4 @@
-import { BaseAnalyticsData } from 'types'
+import { BaseAnalyticsData, MetricsToShow } from 'types'
 
 export type Partial<T> = {
   [P in keyof T]?: T[P]
@@ -15,7 +15,5 @@ export type XYChartProps = {
   height: number
   timeFrameData: FilteredAnalytics[]
   // TODO: Add type for it
-  metricsToShow: any
+  metricsToShow: MetricsToShow
 }
-
-export type Metrics = 'Impressions' | 'Clicks and CRT' | 'Average CPM' | 'Total spent'

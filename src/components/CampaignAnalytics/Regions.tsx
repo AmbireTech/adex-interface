@@ -36,12 +36,12 @@ const Regions = ({
     return (
       regions?.map((item) => ({
         segment: getCountryName(item.segment as Alpha3Code),
-        share: `${(item.paid / paid) * 100} %`,
+        share: `${((item.paid / paid) * 100).toFixed(2)} %`,
         impressions: item.impressions,
         clicks: item.clicks,
         ctr: `${item.ctr}`,
         avgCpm: `${item.avgCpm} ${currencyName}`,
-        paid: `${item.paid} ${currencyName}`
+        paid: `${item.paid.toFixed(4)} ${currencyName}`
       })) || []
     )
   }, [regions, totalPaid, currencyName, getCountryName])

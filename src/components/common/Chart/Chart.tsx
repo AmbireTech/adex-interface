@@ -11,33 +11,53 @@ import getAnimatedOrUnanimatedComponents from './getAnimatedOrUnanimatedComponen
 const dateScaleConfig = { type: 'band', paddingInner: 0.3 } as const
 const temperatureScaleConfig = { type: 'linear' } as const
 const numTicks = 4
-
-const getDate = (d: FilteredAnalytics) => d.segment
-const getImpressions = (d: FilteredAnalytics) => Number(d.impressions || 0)
-const getClickAndCRT = (d: FilteredAnalytics) => Number(d.ctr || 0)
-const getAverageCPM = (d: FilteredAnalytics) => Number(d.avgCpm || 0)
-const getSpent = (d: FilteredAnalytics) => Number(d.paid || 0)
 const defaultAnnotationDataIndex = 13
 const selectedDatumPatternId = 'xychart-selected-datum'
 
+const getDate = (d: FilteredAnalytics) => d.segment
+const getImpressions = (d: FilteredAnalytics) => Number(d.impressions || 0)
+const getClicks = (d: FilteredAnalytics) => Number(d.clicks || 0)
+const getCtr = (d: FilteredAnalytics) => Number(d.ctr || 0)
+const getAverageCPM = (d: FilteredAnalytics) => Number(d.avgCpm || 0)
+const getSpent = (d: FilteredAnalytics) => Number(d.paid || 0)
+
+type Range = {
+  min: number
+  max: number
+}
+const normalize = (num: number, range: Range): number => {
+  // return (num - range.min) / (range.max - range.min)
+  // NOTE: just like if there is 0 in the range - this the min not 0 val will not start from 0
+  // TODO: better normalization
+  return num / range.max
+}
+
+const getRange = (dataArray: number[]): { min: number; max: number } => {
+  const min = Math.min(...dataArray)
+  const max = Math.max(...dataArray)
+  return { min, max }
+}
+
 const ChartControls = ({ children, data, metricsToShow }: ControlsProps) => {
-  const maxImpressions = useMemo(() => Math.max(...data.map((i) => i.impressions || 0)), [data])
-  const maxClickAndCRT = useMemo(() => Math.max(...data.map((i) => Number(i.ctr) || 0)), [data])
-  const maxAverageCPM = useMemo(() => Math.max(...data.map((i) => Number(i.avgCpm) || 0)), [data])
-  const maxSpent = useMemo(() => Math.max(...data.map((i) => i.paid || 0)), [data])
+  const impRange = useMemo(() => getRange(data.map((i) => i.impressions || 0)), [data])
+  const clicksRange = useMemo(() => getRange(data.map((i) => i.clicks || 0)), [data])
+  const avgCpmRange = useMemo(() => getRange(data.map((i) => i.avgCpm || 0)), [data])
+  const paidRange = useMemo(() => getRange(data.map((i) => i.paid || 0)), [data])
 
   const scaledData = useMemo(
     () =>
       data.map((item) => {
-        return {
+        const normalized = {
           ...item,
-          impressions: Math.log(1 + (item.impressions || 0)) / Math.log(1 + maxImpressions),
-          clickAndCRT: Math.log(1 + (Number(item.ctr) || 0)) / Math.log(1 + maxClickAndCRT),
-          averageCPM: Math.log(1 + (Number(item.avgCpm) || 0)) / Math.log(1 + maxAverageCPM),
-          spent: Math.log(1 + (item.paid || 0)) / Math.log(1 + maxSpent)
+          impressions: normalize(item.impressions || 0, impRange),
+          clicks: normalize(item.clicks || 0, clicksRange),
+          avgCpm: normalize(item.avgCpm || 0, avgCpmRange),
+          paid: normalize(item.paid || 0, paidRange)
         }
+
+        return normalized
       }),
-    [data, maxAverageCPM, maxClickAndCRT, maxImpressions, maxSpent]
+    [avgCpmRange, clicksRange, data, impRange, paidRange]
   )
 
   const appTheme = useMantineTheme()
@@ -45,13 +65,13 @@ const ChartControls = ({ children, data, metricsToShow }: ControlsProps) => {
     () =>
       [
         metricsToShow.impressions && appTheme.colors.chartColorOne[appTheme.fn.primaryShade()],
-        metricsToShow.ctr && appTheme.colors.chartColorTwo[appTheme.fn.primaryShade()],
+        metricsToShow.clicks && appTheme.colors.chartColorTwo[appTheme.fn.primaryShade()],
         metricsToShow.avgCpm && appTheme.colors.chartColorThree[appTheme.fn.primaryShade()],
         metricsToShow.paid && appTheme.colors.chartColorFour[appTheme.fn.primaryShade()]
       ].map((x) => x?.toString() || ''),
     [
       metricsToShow.impressions,
-      metricsToShow.ctr,
+      metricsToShow.clicks,
       metricsToShow.avgCpm,
       metricsToShow.paid,
       appTheme.colors.chartColorOne,
@@ -145,16 +165,18 @@ const ChartControls = ({ children, data, metricsToShow }: ControlsProps) => {
 
   const accessors = {
     x: {
-      Impressions: getDate,
-      'Clicks and CRT': getDate,
-      'Average CPM': getDate,
-      'Total spent': getDate
+      impressions: getDate,
+      clicks: getDate,
+      avgCpm: getDate,
+      paid: getDate,
+      ctr: getDate
     },
     y: {
-      Impressions: getImpressions,
-      'Clicks and CRT': getClickAndCRT,
-      'Average CPM': getAverageCPM,
-      'Total spent': getSpent
+      impressions: getImpressions,
+      clicks: getClicks,
+      avgCpm: getAverageCPM,
+      paid: getSpent,
+      ctr: getCtr
     },
     date: getDate
   }

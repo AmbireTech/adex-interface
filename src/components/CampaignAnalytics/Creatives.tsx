@@ -33,8 +33,8 @@ const Creatives = ({
   const { classes } = useStyles()
 
   const headings = useMemo(
-    () => ['Media', 'Size', 'Impressions', 'Clicks', 'CTR %', `Spent (${currencyName})`, 'Link'],
-    [currencyName]
+    () => ['Media', 'Size', 'Impressions', 'Clicks', 'CTR %', 'Spent', 'Link'],
+    []
   )
 
   const [selectedMedia, setSelectedMedia] = useState('')
@@ -50,34 +50,37 @@ const Creatives = ({
     return <div>No creatives found</div>
   }
 
-  const elements = creatives?.map((item) => {
-    const unitForId = units.find((x) => x.id === item.segment)
-    const media = getMediaUrlWithProvider(unitForId?.banner?.mediaUrl, IPFS_GATEWAY) || ''
+  const elements = useMemo(() => {
+    return creatives?.map((item) => {
+      const unitForId = units.find((x) => x.id === item.segment)
+      const media = getMediaUrlWithProvider(unitForId?.banner?.mediaUrl, IPFS_GATEWAY) || ''
 
-    return {
-      media: (
-        <Flex align="center">
-          <UrlIcon size="25px" className={classes.icon} />
-          <Image
-            ml="sm"
-            src={media}
-            mah="100px"
-            maw="50px"
-            onClick={() => handleMediaClick(media || '')}
-            className={classes.image}
-          />
-        </Flex>
-      ),
-      size: unitForId?.banner
-        ? `${unitForId?.banner?.format.w}x${unitForId?.banner?.format.w}`
-        : '',
-      impressions: formatCurrency(item.impressions, 0),
-      clicks: formatCurrency(item.clicks, 0),
-      ctr: `${item.ctr}`,
-      paid: `${item.paid}`,
-      link: unitForId?.banner?.targetUrl
-    }
-  })
+      return {
+        media: (
+          <Flex align="center">
+            <UrlIcon size="25px" className={classes.icon} />
+            <Image
+              ml="sm"
+              src={media}
+              mah="100px"
+              maw="50px"
+              onClick={() => handleMediaClick(media || '')}
+              className={classes.image}
+            />
+          </Flex>
+        ),
+        size: unitForId?.banner
+          ? `${unitForId?.banner?.format.w}x${unitForId?.banner?.format.w}`
+          : '',
+        impressions: formatCurrency(item.impressions, 0),
+        clicks: formatCurrency(item.clicks, 0),
+        ctr: `${item.ctr}`,
+        paid: `${item.paid.toFixed(4)} ${currencyName}`,
+        link: unitForId?.banner?.targetUrl
+      }
+    })
+  }, [classes.icon, classes.image, creatives, currencyName, handleMediaClick, units])
+
   return (
     <>
       <CustomTable background headings={headings} elements={elements} />
