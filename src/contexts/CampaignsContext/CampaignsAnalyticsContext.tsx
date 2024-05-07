@@ -42,8 +42,16 @@ const DAY = 24 * HOUR
 const MONTH = 30 * DAY
 const YEAR = 356 * DAY
 
-function getDefaultEpoch(timestamp: number) {
-  return Math.floor(timestamp / defaultRefreshQuery) * defaultRefreshQuery
+function getEpoch(timestamp: number, floor: number): number {
+  return Math.floor(timestamp / floor) * floor
+}
+
+function getRefreshKey(timestamp: number): number {
+  return getEpoch(timestamp, defaultRefreshQuery)
+}
+
+function getPeriodInitialEpoch(timestamp: number): number {
+  return getEpoch(timestamp, HOUR)
 }
 
 const getAnalyticsKeyFromQuery = (queryParams: AnalyticsDataQuery): string => {
@@ -53,7 +61,7 @@ const getAnalyticsKeyFromQuery = (queryParams: AnalyticsDataQuery): string => {
     .reduce((result: string, key: string) => {
       if (queryParams[key as keyof AnalyticsDataQuery] !== undefined) {
         const val = queryParams[key as keyof AnalyticsDataQuery]
-        return `${result}_${val instanceof Date ? getDefaultEpoch(val.getTime()) : val?.toString()}`
+        return `${result}_${val instanceof Date ? getRefreshKey(val.getTime()) : val?.toString()}`
       }
 
       return result
@@ -72,8 +80,12 @@ const analyticsDataToMappedAnalytics = (
   // const clickPaid = analyticsData[3]
 
   // On development env using mock data
-  if (process.env.NODE_ENV === 'development' && !impCounts.length) {
-    const mockedData = dashboardTableElements[0][analyticsType]
+  if (process.env.NODE_ENV === 'development' && !analyticsData.length) {
+    const mockedData = dashboardTableElements[0][analyticsType].map((x) => ({
+      ...x,
+      ctr: Number(((x.clicks / x.impressions) * 100).toFixed(4)),
+      avgCpm: Number(((x.paid / x.impressions) * 1000).toFixed(2))
+    }))
 
     return [...mockedData]
   }
@@ -81,21 +93,19 @@ const analyticsDataToMappedAnalytics = (
   const mapped = impCounts.reduce((aggr, impElement) => {
     const next = new Map(aggr)
 
-    const segmentField = (analyticsType === 'timeframe' ? 'time' : 'segment') as keyof Omit<
-      AnalyticsData,
-      'value'
-    >
+    const segmentField: keyof Omit<AnalyticsData, 'value'> =
+      analyticsType === 'timeframe' ? 'time' : 'segment'
 
-    const segmentKey = impElement?.[segmentField]?.toString() || '🦄'
+    const segmentKey: string = impElement?.[segmentField]?.toString() || '🦄'
 
-    const nexSegment = aggr.get(segmentKey) || {
+    const nexSegment: BaseAnalyticsData = aggr.get(segmentKey) || {
       segment: segmentKey,
       clicks: 0,
       impressions: 0,
       paid: 0,
       analyticsType,
-      ctr: '',
-      avgCpm: ''
+      ctr: 0,
+      avgCpm: 0
     }
 
     nexSegment.impressions += Number(impElement.value)
@@ -118,8 +128,11 @@ const analyticsDataToMappedAnalytics = (
       segment,
       paid,
       analyticsType,
-      ctr: value.clicks && value.impressions ? (value.clicks / value.impressions) * 100 : 'N/A',
-      avgCpm: paid && value.impressions ? (paid / value.impressions) * 1000 : 'N/A'
+      ctr:
+        value.clicks && value.impressions
+          ? Number(((value.clicks / value.impressions) * 100).toFixed(2))
+          : 0,
+      avgCpm: paid && value.impressions ? Number(((paid / value.impressions) * 1000).toFixed(2)) : 0
     }
   })
     // TODO: remove the sort when table sorting
@@ -189,12 +202,9 @@ const CampaignsAnalyticsProvider: FC<PropsWithChildren> = ({ children }) => {
         // }
 
         setAnalyticsData((prev) => {
-          console.log({ dataKey })
-          console.log({ prev })
           const next = new Map(prev)
           const nextAggr = analyticsDataRes?.aggr || prev.get(dataKey) || []
           next.set(dataKey, nextAggr)
-          console.log({ next })
           return next
         })
       } catch (err) {
@@ -220,14 +230,12 @@ const CampaignsAnalyticsProvider: FC<PropsWithChildren> = ({ children }) => {
       campaign: Campaign,
       analyticsType: AnalyticsType
     ): Promise<{ key: string; period: AnalyticsPeriod } | undefined> => {
-      console.log({ campaign })
-
       if (!campaign.id || !analyticsType) {
         return
       }
 
       const period = {
-        start: new Date(Number(campaign.activeFrom)),
+        start: new Date(getPeriodInitialEpoch(Number(campaign.activeFrom)) - 1),
         end: new Date(Date.now())
       }
 

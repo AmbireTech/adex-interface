@@ -63,7 +63,7 @@ const Placements = ({
         impressions: item.impressions.toLocaleString(),
         clicks: item.clicks.toLocaleString(),
         ctr: `${item.ctr}`,
-        paid: `${item.paid} ${currencyName}`,
+        paid: `${item.paid.toFixed(4)} ${currencyName}`,
         avgCpm: `${item.avgCpm} ${currencyName}`
       })) || [],
     [placements, placement, currencyName]

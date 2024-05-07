@@ -7,11 +7,12 @@ import getAnimatedOrUnanimatedComponents from 'components/common/Chart/getAnimat
 
 type Accessor = (d: FilteredAnalytics) => number | string
 
-interface Accessors {
-  Impressions: Accessor
-  'Clicks and CRT': Accessor
-  'Average CPM': Accessor
-  'Total spent': Accessor
+export type Accessors = {
+  impressions: Accessor
+  clicks: Accessor
+  avgCpm: Accessor
+  paid: Accessor
+  ctr: Accessor
 }
 
 export type DataKey = keyof Accessors

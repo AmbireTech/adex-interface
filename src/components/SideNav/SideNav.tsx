@@ -49,7 +49,7 @@ function SideNav() {
     isAdmin,
     adexAccount: { availableBalance }
   } = useAccount()
-
+  const isManualDepositing = useMemo(() => IS_MANUAL_DEPOSITING === 'true', [])
   const location = useLocation()
   const match = useMatch(location.pathname)
   const year = useMemo(() => new Date().getFullYear(), [])
@@ -78,7 +78,7 @@ function SideNav() {
         <Balance />
       </Navbar.Section>
       <Navbar.Section className={classes.newCampaign}>
-        <CreateCampaignBtn hasPopover={Boolean(IS_MANUAL_DEPOSITING) && !hasAvailableBalance} />
+        <CreateCampaignBtn hasPopover={isManualDepositing && !hasAvailableBalance} />
       </Navbar.Section>
       <Navbar.Section mx="-xs" grow component={ScrollArea}>
         <Box>
@@ -93,7 +93,7 @@ function SideNav() {
             icon={<DepositIcon />}
             label="Top Up Account"
             active={useResolvedPath('deposit').pathname === match?.pathname}
-            hasPopover={Boolean(IS_MANUAL_DEPOSITING)}
+            hasPopover={isManualDepositing}
             popoverContent={
               <Text size="sm">
                 Contact us on <a href="mailto: dsp@adex.network"> dsp@adex.network</a> to &quot;add

@@ -12,10 +12,20 @@ const BillingDetails = () => {
     initialValues: billingDetails,
 
     validate: {
-      firstName: (value: string) =>
-        value.length < 2 ? 'First name must have at least 2 letters' : null,
-      lastName: (value: string) =>
-        value.length < 2 ? 'Last name must have at least 2 letters' : null,
+      firstName: (value: string) => {
+        if (value.length > 0 && value.length < 2) {
+          return 'First name must have at least 2 letters'
+        }
+
+        return null
+      },
+      lastName: (value: string) => {
+        if (value.length > 0 && value.length < 2) {
+          return 'Last name must have at least 2 letters'
+        }
+
+        return null
+      },
       companyName: (value: string) =>
         value.length < 2 ? 'Company name must have at least 2 characters' : null,
       companyNumber: (value: string) =>
@@ -39,7 +49,6 @@ const BillingDetails = () => {
           <TextInput
             radius="sm"
             size="lg"
-            required
             placeholder="First name"
             {...form.getInputProps('firstName')}
           />
@@ -48,7 +57,6 @@ const BillingDetails = () => {
           <TextInput
             radius="sm"
             size="lg"
-            required
             placeholder="Last name"
             {...form.getInputProps('lastName')}
           />

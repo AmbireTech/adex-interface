@@ -1,15 +1,18 @@
 import { Campaign, EventType, Placement } from 'adex-common'
 
-export type CampaignData = {
-  campaignId: string
-  campaign: Campaign
+export type BaseData = {
   impressions: number
   clicks: number
   // clicks / impressions * 100
-  ctr?: number | string
+  ctr?: number
   // paid / impressions * 1000
-  avgCpm?: number | string
+  avgCpm?: number
   paid: number
+}
+
+export type CampaignData = BaseData & {
+  campaignId: string
+  campaign: Campaign
 }
 
 export type Timeframe = 'year' | 'month' | 'week' | 'day' | 'hour'
@@ -95,14 +98,7 @@ export type AnalyticsType = 'timeframe' | 'hostname' | 'country' | 'adUnit'
 
 export type TabType = 'placements' | 'regions' | 'creatives' | 'timeframe'
 
-export type BaseAnalyticsData = {
-  impressions: number
-  clicks: number
-  // clicks / impressions * 100
-  ctr?: number | string
-  // paid / impressions * 1000
-  avgCpm?: number | string
-  paid: number
+export type BaseAnalyticsData = BaseData & {
   analyticsType: AnalyticsType
   // time for timeframe analytics,  country name, host name, creative name
   segment: string

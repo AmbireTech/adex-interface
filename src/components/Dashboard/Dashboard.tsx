@@ -2,7 +2,7 @@ import { Campaign, CampaignType, EventType } from 'adex-common'
 import { Container, Flex, Text } from '@mantine/core'
 import { useCallback, useMemo } from 'react'
 import CustomTable from 'components/common/CustomTable'
-import { parsePeriodForCampaign } from 'helpers'
+import { periodNumberToDate } from 'helpers'
 import { useNavigate } from 'react-router-dom'
 import useCampaignsData from 'hooks/useCampaignsData'
 import { parseBigNumTokenAmountToDecimal } from 'helpers/balances'
@@ -13,11 +13,11 @@ const campaignHeaders = [
   'Model',
   'Placement',
   'Status',
-  'Served',
+  'Served %',
   'Budget',
   'Impressions',
   'Clicks',
-  'CTR',
+  'CTR %',
   'Period',
   'CPM',
   'Average CPM'
@@ -56,28 +56,43 @@ const Dashboard = () => {
               type: CampaignType[cmpData.campaign.type],
               placement: cmpData.campaign.targetingInput.inputs.placements.in[0] || '-',
               status: <BadgeStatusCampaign type={cmpData.campaign.status} />,
-              served: `${((cmpData.paid / budget) * 100).toFixed(4)} %`,
+              served: `${((cmpData.paid / budget) * 100).toFixed(4)}`,
               // TODO: get token name
               budget: `${budget} USDC`,
               impressions: cmpData.impressions,
               clicks: cmpData.clicks,
-              ctr: cmpData.ctr,
-              period: parsePeriodForCampaign([
-                cmpData.campaign.activeFrom,
-                cmpData.campaign.activeTo
-              ]),
-              cpm: `${(
-                parseBigNumTokenAmountToDecimal(
-                  cmpData.campaign.pricingBounds[EventType.IMPRESSION]?.min || 0n,
-                  decimals
-                ) * 1000
-              ).toFixed(2)} - ${(
-                parseBigNumTokenAmountToDecimal(
-                  cmpData.campaign.pricingBounds[EventType.IMPRESSION]?.max || 0n,
-                  decimals
-                ) * 1000
-              ).toFixed(2)}`,
-              avgCpm: cmpData.avgCpm
+              ctr: cmpData.ctr || 0,
+              period: (
+                <span>
+                  <span>{periodNumberToDate(cmpData.campaign.activeFrom)} </span>
+                  <br />
+                  <span>{periodNumberToDate(cmpData.campaign.activeTo)} </span>
+                </span>
+              ),
+              cpm: (
+                <span>
+                  <span>
+                    {(
+                      parseBigNumTokenAmountToDecimal(
+                        cmpData.campaign.pricingBounds[EventType.IMPRESSION]?.min || 0n,
+                        decimals
+                      ) * 1000
+                    ).toFixed(2)}
+                  </span>
+                  <br />
+
+                  <span>
+                    {(
+                      parseBigNumTokenAmountToDecimal(
+                        cmpData.campaign.pricingBounds[EventType.IMPRESSION]?.max || 0n,
+                        decimals
+                      ) * 1000
+                    ).toFixed(2)}
+                  </span>
+                  <br />
+                </span>
+              ),
+              avgCpm: cmpData.avgCpm?.toFixed(2) || 0
             }
           })
         : [],
@@ -111,6 +126,12 @@ const Dashboard = () => {
   // const toggleShowArchived = useCallback(() => {
   //   setShowArchived((prevShowArchived) => !prevShowArchived)
   // }, [])
+
+  // useEffect(() => {
+  //   if (filteredCampaignData.length === 0) {
+  //     navigate('/dashboard/get-started', { replace: true })
+  //   }
+  // }, [navigate, filteredCampaignData.length])
 
   return (
     <Container fluid>
