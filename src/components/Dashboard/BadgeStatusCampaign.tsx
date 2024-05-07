@@ -7,7 +7,7 @@ import DraftIcon from 'resources/icons/Draft'
 import UnderReviewIcon from 'resources/icons/UnderReview'
 import StopIcon from 'resources/icons/Stop'
 import ActiveIcon from 'resources/icons/Active'
-// import PausedIcon from 'resources/icons/Paused'
+import PausedIcon from 'resources/icons/Paused'
 // import ArchivedIcon from 'resources/icons/Archived'
 
 const BadgeStatusCampaign = ({ type }: BadgeType) => {
@@ -63,12 +63,12 @@ const BadgeStatusCampaign = ({ type }: BadgeType) => {
       //     icon: <StopIcon size="13px" />
       //   }
       // TODO: uncomment when CampaignStatus.paused is added
-      // case CampaignStatus.paused:
-      //   return {
-      //     color: 'paused',
-      //     text: 'Paused',
-      //     icon: <PausedIcon size="13px" />
-      //   }
+      case CampaignStatus.paused:
+        return {
+          color: 'paused',
+          text: 'Paused',
+          icon: <PausedIcon size="13px" />
+        }
       // TODO: uncomment when CampaignStatus.archived is added
       // case CampaignStatus.archived:
       //   return {
