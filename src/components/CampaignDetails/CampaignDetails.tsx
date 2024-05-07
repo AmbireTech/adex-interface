@@ -4,7 +4,7 @@ import { Container, Grid, createStyles, Text, Flex } from '@mantine/core'
 import BadgeStatusCampaign from 'components/Dashboard/BadgeStatusCampaign'
 import { formatCatsAndLocsData } from 'helpers/createCampaignHelpers'
 import { CATEGORIES, COUNTRIES } from 'constants/createCampaign'
-import { AdUnit } from 'adex-common/dist/types'
+import { AdUnit, CampaignStatus } from 'adex-common/dist/types'
 import MediaBanner from 'components/common/MediaBanner'
 import { formatDateTime } from 'helpers/formatters'
 import GoBack from 'components/common/GoBack'
@@ -243,24 +243,31 @@ const CampaignDetails = () => {
               <Grid>
                 <Grid.Col>
                   <Flex justify="flex-end" align="center" gap="xs" mt="xl">
-                    <CampaignActionBtn
-                      text="Activate"
-                      icon={<ActiveIcon size="13px" />}
-                      color="success"
-                      onBtnClicked={() => console.log('Activate btn clicked')}
-                    />
-                    <CampaignActionBtn
-                      text="Stop"
-                      icon={<StopIcon size="13px" />}
-                      color="stopped"
-                      onBtnClicked={() => console.log('Stop btn clicked')}
-                    />
-                    <CampaignActionBtn
-                      text="Archive"
-                      icon={<ArchivedIcon size="13px" />}
-                      color="secondaryText"
-                      onBtnClicked={() => console.log('Archive btn clicked')}
-                    />
+                    {campaign.status === CampaignStatus.paused && (
+                      <CampaignActionBtn
+                        text="Activate"
+                        icon={<ActiveIcon size="13px" />}
+                        color="success"
+                        onBtnClicked={() => console.log('Activate btn clicked')}
+                      />
+                    )}
+                    {campaign.status === CampaignStatus.active && (
+                      <CampaignActionBtn
+                        text="Pause"
+                        icon={<StopIcon size="13px" />}
+                        color="paused"
+                        onBtnClicked={() => console.log('Pause btn clicked')}
+                      />
+                    )}
+                    {(campaign.status === CampaignStatus.paused ||
+                      campaign.status === CampaignStatus.active) && (
+                      <CampaignActionBtn
+                        text="Close"
+                        icon={<ArchivedIcon size="13px" />}
+                        color="secondaryText"
+                        onBtnClicked={() => console.log('Close btn clicked')}
+                      />
+                    )}
                   </Flex>
                 </Grid.Col>
               </Grid>
