@@ -69,6 +69,7 @@ export const CREATE_CAMPAIGN_DEFAULT_VALUE: CampaignUI = {
   owner: '',
   title: '',
   adUnits: [],
+  adUnitsExtended: [],
   validators: [],
   pricingBounds: {
     IMPRESSION: {

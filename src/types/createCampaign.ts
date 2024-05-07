@@ -40,9 +40,11 @@ export type CreateCampaignOverview = {
   title: string
   value: any
 }
-
+export type AdUnitExtended = AdUnit & {
+  error: string
+}
 export type ImageUrlInputProps = MantineStyleSystemProps & {
-  image: AdUnit
+  image: AdUnitExtended
   toRemove?: boolean
   onDelete?: (file: AdUnit) => void
   onChange?: ChangeEventHandler<HTMLInputElement> | undefined
@@ -53,7 +55,7 @@ export type UploadedBannersProps = {
   updateAutoUTMChecked: (isChecked: boolean) => void
   autoUTMChecked: boolean
   onDeleteCreativeBtnClicked: (file: AdUnit) => void
-  handleOnInputChange: (inputText: string, fileId: string) => void
+  // handleOnInputChange: (inputText: string, fileId: string) => void
 }
 
 export type MultiSelectAndRadioButtonsProps = {

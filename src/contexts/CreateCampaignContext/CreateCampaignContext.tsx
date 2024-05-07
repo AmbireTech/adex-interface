@@ -7,6 +7,8 @@ import useAccount from 'hooks/useAccount'
 import { useAdExApi } from 'hooks/useAdexServices'
 import { mapCampaignUItoCampaign } from 'helpers/createCampaignHelpers'
 import { parseToBigNumPrecision } from 'helpers/balances'
+import { isValidHttpUrl } from 'helpers/validators'
+import { AdUnit } from 'adex-common'
 
 const CreateCampaignContext = createContext<CreateCampaignType | null>(null)
 
@@ -85,6 +87,32 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
     [setCampaign]
   )
 
+  // TODO: move it in validator file
+  const validateField = useCallback((value: string | undefined) => {
+    if (!value || value.length === 0) {
+      return 'Enter a target URL'
+    }
+    if (!isValidHttpUrl(value)) {
+      return 'Please enter a valid URL'
+    }
+    return ''
+  }, [])
+
+  const validateAdUnits = useCallback(() => {
+    setCampaign((prevState) => {
+      const updated = {
+        ...prevState,
+        ...prevState.adUnitsExtended.map((item) => {
+          const copy = { ...item }
+          copy.error = validateField(item.banner?.targetUrl)
+          return copy
+        })
+      }
+
+      return updated
+    })
+  }, [setCampaign, validateField])
+
   const resetCampaign = useCallback(
     () => setCampaign({ ...defaultValue }),
     [setCampaign, defaultValue]
@@ -94,6 +122,8 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
     const mappedCampaign = mapCampaignUItoCampaign(campaign)
 
     mappedCampaign.id = `${campaign.title}-${Date.now().toString(16)}`
+    mappedCampaign.adUnits = [...(campaign.adUnitsExtended as AdUnit[])]
+
     mappedCampaign.campaignBudget = parseToBigNumPrecision(
       Number(mappedCampaign.campaignBudget),
       balanceToken.decimals
@@ -129,7 +159,8 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
       updateCampaign,
       updateCampaignWithPrevStateNested,
       publishCampaign,
-      resetCampaign
+      resetCampaign,
+      validateAdUnits
     }),
     [
       campaign,
@@ -138,7 +169,8 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
       updateCampaign,
       updateCampaignWithPrevStateNested,
       publishCampaign,
-      resetCampaign
+      resetCampaign,
+      validateAdUnits
     ]
   )
 

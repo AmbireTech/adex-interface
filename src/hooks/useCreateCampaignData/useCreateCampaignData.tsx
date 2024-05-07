@@ -9,7 +9,7 @@ import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import DesktopIcon from 'resources/icons/Desktop'
 import MobileIcon from 'resources/icons/Mobile'
 import { AdUnit, TargetingInputSingle } from 'adex-common/dist/types'
-import { SelectData } from 'types'
+import { AdUnitExtended, SelectData } from 'types'
 import { CATEGORIES, COUNTRIES } from 'constants/createCampaign'
 import ImageUrlInput from 'components/CreateCampaign/StepOne/ImageUrlInput'
 import RangeText from 'components/common/RangeText'
@@ -137,7 +137,7 @@ const useCreateCampaignData = () => {
   const adUnitsFormatted = useMemo(
     () =>
       adUnits.map((image: AdUnit) => {
-        return <ImageUrlInput key={image.id} image={image} mb="sm" preview />
+        return <ImageUrlInput key={image.id} image={image as AdUnitExtended} mb="sm" preview />
       }),
     [adUnits]
   )

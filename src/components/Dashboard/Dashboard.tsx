@@ -54,7 +54,7 @@ const Dashboard = () => {
               id: cmpData.campaignId,
               title: cmpData.campaign.title,
               type: CampaignType[cmpData.campaign.type],
-              placement: cmpData.campaign.targetingInput.inputs.placements.in[0] || '-',
+              placement: cmpData.campaign.targetingInput.inputs.placements?.in[0] || '-',
               status: <BadgeStatusCampaign type={cmpData.campaign.status} />,
               served: `${((cmpData.paid / budget) * 100).toFixed(4)} %`,
               // TODO: get token name

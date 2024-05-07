@@ -11,7 +11,6 @@ import AttentionIcon from 'resources/icons/Attention'
 import useCampaignsData from 'hooks/useCampaignsData'
 import useCustomNotifications from 'hooks/useCustomNotifications'
 import useAccount from 'hooks/useAccount'
-import { isValidHttpUrl } from 'helpers/validators'
 
 const useStyles = createStyles((theme) => ({
   bg: {
@@ -57,10 +56,11 @@ const CampaignSummary = () => {
   const [opened, { open, close }] = useDisclosure(false)
   const { updateBalance } = useAccount()
   const {
-    campaign: { step, adUnits },
+    campaign: { step, adUnitsExtended },
     updateCampaign,
     publishCampaign,
-    resetCampaign
+    resetCampaign,
+    validateAdUnits
   } = useCreateCampaignContext()
   const {
     formattedSelectedDevice,
@@ -79,17 +79,38 @@ const CampaignSummary = () => {
     [formattedCats, formattedLocs]
   )
 
-  const hasInvalidTargetUrl = useMemo(
-    () =>
-      adUnits && adUnits.length
-        ? adUnits.some((adUnit) => !isValidHttpUrl(adUnit.banner?.targetUrl || ''))
-        : true,
-    [adUnits]
-  )
+  // const validateField = useCallback((value: string | undefined) => {
+  //   if (!value || value.length === 0) {
+  //     return 'Enter a target URL'
+  //   }
+  //   if (!isValidHttpUrl(value)) {
+  //     return 'Please enter a valid URL'
+  //   }
+  //   return ''
+  // }, [])
+
+  // const validate = useCallback(() => {
+  //   const copy = [...adUnitsExtended].map((item) => {
+  //     const test = { ...item }
+  //     test.error = validateField(item.banner?.targetUrl)
+  //     return test
+  //   })
+  //   updateCampaign('adUnitsExtended', copy)
+  // }, [adUnitsExtended, validateField, updateCampaign])
+
+  // const hasInvalidTargetUrl = useMemo(
+  //   () =>
+  //     adUnitsExtended && adUnitsExtended.length
+  //       ? adUnitsExtended.some((adUnit) => !isValidHttpUrl(adUnit.banner?.targetUrl || ''))
+  //       : true,
+  //   [adUnitsExtended]
+  // )
 
   useEffect(() => {
-    setIsNextBtnDisabled((step === 0 && !adUnits.length) || (step === 1 && noSelectedCatsOrLogs))
-  }, [step, noSelectedCatsOrLogs, adUnits])
+    setIsNextBtnDisabled(
+      (step === 0 && !adUnitsExtended.length) || (step === 1 && noSelectedCatsOrLogs)
+    )
+  }, [step, noSelectedCatsOrLogs, adUnitsExtended])
 
   const isTheLastStep = useMemo(() => step === CREATE_CAMPAIGN_STEPS - 1, [step])
   const isFirstStep = useMemo(() => step === 0, [step])
@@ -120,13 +141,15 @@ const CampaignSummary = () => {
   ])
 
   const handleNextStepBtnClicked = useCallback(() => {
-    if (step === 0 && hasInvalidTargetUrl) {
-      showNotification(
-        'error',
-        'Please enter a target URL starting with https://',
-        'Invalid Target URL'
-      )
-      return
+    if (step === 0) {
+      validateAdUnits()
+      // showNotification(
+      //   'error',
+      //   'Please enter a target URL starting with https://',
+      //   'Invalid Target URL'
+      // )
+
+      // return
     }
 
     if (step < CREATE_CAMPAIGN_STEPS - 1) {
@@ -138,7 +161,7 @@ const CampaignSummary = () => {
 
       updateCampaign('step', step + 1)
     }
-  }, [step, updateCampaign, hasInvalidTargetUrl, showNotification])
+  }, [step, updateCampaign, validateAdUnits])
 
   return (
     <>

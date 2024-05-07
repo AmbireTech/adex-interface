@@ -1,8 +1,8 @@
-import { ActionIcon, Input, Text } from '@mantine/core'
+import { ActionIcon, TextInput, Text } from '@mantine/core'
 import InfoAlertMessage from 'components/common/InfoAlertMessage'
 import MediaBanner from 'components/common/MediaBanner'
-import { isValidHttpUrl } from 'helpers/validators'
-import { useCallback, useState } from 'react'
+// import { isValidHttpUrl } from 'helpers/validators'
+import { useCallback } from 'react'
 import DeleteIcon from 'resources/icons/Delete'
 import { ImageUrlInputProps } from 'types'
 
@@ -14,7 +14,7 @@ const ImageUrlInput = ({
   preview,
   ...rest
 }: ImageUrlInputProps) => {
-  const [error, setError] = useState('')
+  // const [error, setError] = useState('')
 
   const getRightSection = useCallback(() => {
     if (preview)
@@ -34,16 +34,22 @@ const ImageUrlInput = ({
     )
   }, [image, preview, onDelete])
 
+  // const validateField = useCallback((value: string) => {
+  //   if (value.length === 0) {
+  //     setError('Enter a target URL')
+  //   } else if (!isValidHttpUrl(value)) {
+  //     setError('Please enter a valid URL')
+  //   } else {
+  //     setError('')
+  //   }
+  // }, [])
+
   const handleChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      const { value } = event.target
+      // const { value } = event.target
+      // validateField(value)
 
-      if (value.length > 8 && !isValidHttpUrl(value)) {
-        setError('Please enter a valid URL')
-      } else {
-        setError('')
-      }
-
+      // validateField()
       onChange?.(event)
     },
     [onChange]
@@ -52,11 +58,12 @@ const ImageUrlInput = ({
   return (
     <>
       {toRemove && <InfoAlertMessage message="The banner size does not meet the requirements." />}
-      <Input
+      <TextInput
         onChange={handleChange}
-        error={toRemove}
+        error={toRemove || (image.error !== '' && <Text size="sm">{image.error}</Text>)}
         disabled={toRemove || preview}
         defaultValue={image.banner?.targetUrl}
+        onFocus={() => console.log('onFocus')}
         type="url"
         variant="default"
         placeholder="Please enter a target URL starting with https://"
@@ -65,7 +72,6 @@ const ImageUrlInput = ({
         rightSection={getRightSection()}
         {...rest}
       />
-      {error && <Text color="warning">{error}</Text>}
     </>
   )
 }

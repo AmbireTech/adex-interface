@@ -1,6 +1,6 @@
 import { Campaign } from 'adex-common/dist/types/Dsp/Campaign'
 import { Alpha3Code } from 'adex-common'
-import { Devices } from './createCampaign'
+import { AdUnitExtended, Devices } from './createCampaign'
 
 export type SelectData = { value: string | Alpha3Code; label: string }
 
@@ -17,6 +17,7 @@ export type CampaignUI = Campaign & {
     min: string
     max: string
   }
+  adUnitsExtended: AdUnitExtended[]
 }
 
 export type ImageSizes = {
@@ -35,4 +36,5 @@ export type CreateCampaignType = {
   updatePartOfCampaign: (camp: Partial<CampaignUI>) => void
   publishCampaign: () => Promise<any>
   resetCampaign: () => void
+  validateAdUnits: () => void
 }

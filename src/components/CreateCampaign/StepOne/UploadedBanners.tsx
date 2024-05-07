@@ -1,20 +1,22 @@
-import { useCallback, useMemo } from 'react'
+import { useCallback, useMemo, useRef } from 'react'
 import { Checkbox, Grid } from '@mantine/core'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import { AdUnit } from 'adex-common/dist/types'
 import { ALLOWED_BANNER_SIZES } from 'constants/banners'
-import { UploadedBannersProps } from 'types'
+import { AdUnitExtended, UploadedBannersProps } from 'types'
 import ImageUrlInput from './ImageUrlInput'
 
 const UploadedBanners = ({
   updateAutoUTMChecked,
   autoUTMChecked,
-  onDeleteCreativeBtnClicked,
-  handleOnInputChange
-}: UploadedBannersProps) => {
+  onDeleteCreativeBtnClicked
+}: // handleOnInputChange
+UploadedBannersProps) => {
   const {
-    campaign: { adUnits, devices }
+    campaign: { adUnitsExtended, devices },
+    updateCampaign
   } = useCreateCampaignContext()
+  console.log('adUnitsExtended', adUnitsExtended)
 
   const allowedSizes = useMemo(
     () =>
@@ -34,6 +36,27 @@ const UploadedBanners = ({
     [allowedSizes]
   )
 
+  const debounceTimer = useRef<NodeJS.Timeout>()
+  const handleOnInputChange = useCallback(
+    (inputText: string, adUnitId: string) => {
+      // const isValid = isValidHttpUrl(inputText)
+      // if (!isValid) return
+
+      if (debounceTimer.current) clearTimeout(debounceTimer.current)
+
+      debounceTimer.current = setTimeout(() => {
+        const updated = [...adUnitsExtended]
+        updated.forEach((element) => {
+          const elCopy = { ...element }
+          if (elCopy.id === adUnitId) elCopy.banner!.targetUrl = inputText
+          return elCopy
+        })
+        updateCampaign('adUnitsExtended', updated)
+      }, 300)
+    },
+    [updateCampaign, adUnitsExtended]
+  )
+
   return (
     <Grid>
       <Grid.Col>
@@ -43,8 +66,8 @@ const UploadedBanners = ({
           onChange={(event) => updateAutoUTMChecked(event.currentTarget.checked)}
         />
       </Grid.Col>
-      {adUnits.length > 0 &&
-        adUnits.map((image: AdUnit) => {
+      {adUnitsExtended.length > 0 &&
+        adUnitsExtended.map((image: AdUnitExtended) => {
           return (
             <Grid.Col key={image.id}>
               <ImageUrlInput

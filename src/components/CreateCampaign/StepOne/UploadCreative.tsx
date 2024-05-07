@@ -1,5 +1,5 @@
 import { Grid, Text } from '@mantine/core'
-import { useCallback, useMemo, useRef, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { AdUnit } from 'adex-common/dist/types'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import useDropzone from 'hooks/useDropzone'
@@ -10,48 +10,48 @@ import FilesDropzone from './FilesDropzone'
 
 const UploadCreative = () => {
   const {
-    campaign: { adUnits },
+    campaign: { adUnitsExtended },
     updateCampaign
   } = useCreateCampaignContext()
 
   const [autoUTMChecked, setAutoUTMChecked] = useState(false)
   const updateAutoUTMChecked = useCallback((isChecked: boolean) => setAutoUTMChecked(isChecked), [])
-  const debounceTimer = useRef<NodeJS.Timeout>()
+  // const debounceTimer = useRef<NodeJS.Timeout>()
 
   const { onDrop } = useDropzone()
 
-  const hasUploadedCreatives = useMemo(() => adUnits.length > 0, [adUnits.length])
+  const hasUploadedCreatives = useMemo(() => adUnitsExtended.length > 0, [adUnitsExtended.length])
 
   const handleDeleteCreativeBtnClicked = useCallback(
     (file: AdUnit) => {
       updateCampaign(
-        'adUnits',
-        adUnits.filter((item) => item.id !== file.id)
+        'adUnitsExtended',
+        adUnitsExtended.filter((item) => item.id !== file.id)
       )
       URL.revokeObjectURL(file.banner?.mediaUrl || '')
     },
-    [updateCampaign, adUnits]
+    [updateCampaign, adUnitsExtended]
   )
 
-  const handleOnInputChange = useCallback(
-    (inputText: string, adUnitId: string) => {
-      // const isValid = isValidHttpUrl(inputText)
-      // if (!isValid) return
+  // const handleOnInputChange = useCallback(
+  //   (inputText: string, adUnitId: string) => {
+  //     // const isValid = isValidHttpUrl(inputText)
+  //     // if (!isValid) return
 
-      if (debounceTimer.current) clearTimeout(debounceTimer.current)
+  //     if (debounceTimer.current) clearTimeout(debounceTimer.current)
 
-      debounceTimer.current = setTimeout(() => {
-        const updated = [...adUnits]
-        updated.forEach((element) => {
-          const elCopy = { ...element }
-          if (elCopy.id === adUnitId) elCopy.banner!.targetUrl = inputText
-          return elCopy
-        })
-        updateCampaign('adUnits', updated)
-      }, 300)
-    },
-    [updateCampaign, adUnits]
-  )
+  //     debounceTimer.current = setTimeout(() => {
+  //       const updated = [...adUnits]
+  //       updated.forEach((element) => {
+  //         const elCopy = { ...element }
+  //         if (elCopy.id === adUnitId) elCopy.banner!.targetUrl = inputText
+  //         return elCopy
+  //       })
+  //       updateCampaign('adUnits', updated)
+  //     }, 300)
+  //   },
+  //   [updateCampaign, adUnits]
+  // )
 
   return (
     <Grid>
@@ -62,7 +62,7 @@ const UploadCreative = () => {
         <Text color="secondaryText" size="xs" weight="bold" mb="xs">
           Accepted banner sizes
         </Text>
-        <BannerSizesList adUnits={adUnits} />
+        <BannerSizesList adUnits={adUnitsExtended} />
         <FilesDropzone onDrop={onDrop} />
       </Grid.Col>
 
@@ -72,7 +72,7 @@ const UploadCreative = () => {
             autoUTMChecked={autoUTMChecked}
             updateAutoUTMChecked={updateAutoUTMChecked}
             onDeleteCreativeBtnClicked={handleDeleteCreativeBtnClicked}
-            handleOnInputChange={handleOnInputChange}
+            // handleOnInputChange={handleOnInputChange}
           />
         </Grid.Col>
       ) : null}

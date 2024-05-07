@@ -21,11 +21,11 @@ const useDropzone = () => {
   )
   const {
     updateCampaign,
-    campaign: { adUnits }
+    campaign: { adUnitsExtended }
   } = useCreateCampaignContext()
   const { uploadMedia, uploadZipMedia } = useMediaUpload()
 
-  const adUnitsCopy = useMemo(() => [...adUnits], [adUnits])
+  const adUnitsCopy = useMemo(() => [...adUnitsExtended], [adUnitsExtended])
 
   const onDrop = useCallback(
     (files: FileWithPath[] | null) => {
@@ -66,6 +66,7 @@ const useDropzone = () => {
               id: `${file.name.replace(/\s+/g, '')}-${Date.now().toString(16)}`,
               title: file.name,
               type: AdUnitType.Banner,
+              error: '',
               banner: {
                 format: {
                   w: 0,
@@ -92,7 +93,7 @@ const useDropzone = () => {
                 }
 
                 adUnitsCopy.push(adUnit)
-                updateCampaign('adUnits', adUnitsCopy)
+                updateCampaign('adUnitsExtended', adUnitsCopy)
                 updateUploadedFiles(null)
               })
             } else {
@@ -101,7 +102,7 @@ const useDropzone = () => {
                 adUnit.banner.format = { w: htmlBannerSizes?.width, h: htmlBannerSizes?.height }
 
                 adUnitsCopy.push(adUnit)
-                updateCampaign('adUnits', adUnitsCopy)
+                updateCampaign('adUnitsExtended', adUnitsCopy)
                 updateUploadedFiles(null)
               })
             }
