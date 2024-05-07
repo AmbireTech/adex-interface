@@ -62,7 +62,6 @@ const BadgeStatusCampaign = ({ type }: BadgeType) => {
       //     text: 'Stopped',
       //     icon: <StopIcon size="13px" />
       //   }
-      // TODO: uncomment when CampaignStatus.paused is added
       case CampaignStatus.paused:
         return {
           color: 'paused',

@@ -51,7 +51,7 @@ const useStyles = createStyles((theme) => ({
 
 const CampaignDetails = () => {
   const { classes, cx } = useStyles()
-  const { campaignsData, updateCampaignDataById } = useCampaignsData()
+  const { campaignsData, updateCampaignDataById, changeCampaignStatus } = useCampaignsData()
 
   const { id } = useParams()
 
@@ -248,7 +248,7 @@ const CampaignDetails = () => {
                         text="Activate"
                         icon={<ActiveIcon size="13px" />}
                         color="success"
-                        onBtnClicked={() => console.log('Activate btn clicked')}
+                        onBtnClicked={() => changeCampaignStatus('resume', campaign.id)}
                       />
                     )}
                     {campaign.status === CampaignStatus.active && (
@@ -256,7 +256,7 @@ const CampaignDetails = () => {
                         text="Pause"
                         icon={<StopIcon size="13px" />}
                         color="paused"
-                        onBtnClicked={() => console.log('Pause btn clicked')}
+                        onBtnClicked={() => changeCampaignStatus('pause', campaign.id)}
                       />
                     )}
                     {(campaign.status === CampaignStatus.paused ||
@@ -265,7 +265,7 @@ const CampaignDetails = () => {
                         text="Close"
                         icon={<ArchivedIcon size="13px" />}
                         color="secondaryText"
-                        onBtnClicked={() => console.log('Close btn clicked')}
+                        onBtnClicked={() => changeCampaignStatus('close', campaign.id)}
                       />
                     )}
                   </Flex>
