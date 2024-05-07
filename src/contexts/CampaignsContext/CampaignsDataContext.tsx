@@ -37,8 +37,6 @@ type CamapignBackendDataRes = Campaign & {
   clicks?: number
 }
 
-type StatusToChange = 'resume' | 'close' | 'pause'
-
 // const eventAggregatestResToAdvData = (dataRes: EventAggregatesDataRes): EvAggrData => {
 //   const newData: EvAggrData = {
 //     clicks: dataRes.events[0].totals.CLICK.eventCounts,
@@ -99,16 +97,16 @@ const campaignResToCampaignData = (
   return currentCMP
 }
 
-const getCampaignStatus = (status: StatusToChange) => {
+const getURLSubRouteByCampaignStatus = (status: CampaignStatus) => {
   switch (status) {
-    case 'resume':
-      return CampaignStatus.active
-    case 'close':
-      return CampaignStatus.closedByUser
-    case 'pause':
-      return CampaignStatus.paused
+    case CampaignStatus.active:
+      return 'resume'
+    case CampaignStatus.closedByUser:
+      return 'close'
+    case CampaignStatus.paused:
+      return 'pause'
     default:
-      return 0
+    // do nothing
   }
 }
 interface ICampaignsDataContext {
@@ -119,7 +117,7 @@ interface ICampaignsDataContext {
   updateAllCampaignsData: (updateAdvanced?: boolean) => void
   // updateEventAggregates: (params: Campaign['id']) => void
   initialDataLoading: boolean
-  changeCampaignStatus: (status: StatusToChange, campaignId: Campaign['id']) => void
+  changeCampaignStatus: (status: CampaignStatus, campaignId: Campaign['id']) => void
 }
 
 const CampaignsDataContext = createContext<ICampaignsDataContext | null>(null)
@@ -157,10 +155,10 @@ const CampaignsDataProvider: FC<PropsWithChildren> = ({ children }) => {
   // )
 
   const changeCampaignStatus = useCallback(
-    async (status: StatusToChange, campaignId: string) => {
+    async (status: CampaignStatus, campaignId: string) => {
       try {
         const campaignStatusRes = await adexServicesRequest<{ success: boolean }>('backend', {
-          route: `/dsp/campaigns/${status}/${campaignId}`,
+          route: `/dsp/campaigns/${getURLSubRouteByCampaignStatus(status)}/${campaignId}`,
           method: 'POST'
         })
 
@@ -176,7 +174,7 @@ const CampaignsDataProvider: FC<PropsWithChildren> = ({ children }) => {
 
           const updated = {
             ...prevCampaignState,
-            campaign: { ...prevCampaignState?.campaign, status: getCampaignStatus(status) }
+            campaign: { ...prevCampaignState?.campaign, status }
           }
 
           const next = new Map(prev)

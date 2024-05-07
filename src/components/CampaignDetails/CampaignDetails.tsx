@@ -254,7 +254,9 @@ const CampaignDetails = () => {
                         text="Activate"
                         icon={<ActiveIcon size="13px" />}
                         color="success"
-                        onBtnClicked={() => changeCampaignStatus('resume', campaign.id)}
+                        onBtnClicked={() =>
+                          changeCampaignStatus(CampaignStatus.active, campaign.id)
+                        }
                       />
                     )}
                     {campaign.status === CampaignStatus.active && (
@@ -262,7 +264,9 @@ const CampaignDetails = () => {
                         text="Pause"
                         icon={<StopIcon size="13px" />}
                         color="paused"
-                        onBtnClicked={() => changeCampaignStatus('pause', campaign.id)}
+                        onBtnClicked={() =>
+                          changeCampaignStatus(CampaignStatus.paused, campaign.id)
+                        }
                       />
                     )}
                     {(campaign.status === CampaignStatus.paused ||
@@ -271,7 +275,9 @@ const CampaignDetails = () => {
                         text="Close"
                         icon={<ArchivedIcon size="13px" />}
                         color="secondaryText"
-                        onBtnClicked={() => changeCampaignStatus('close', campaign.id)}
+                        onBtnClicked={() =>
+                          changeCampaignStatus(CampaignStatus.closedByUser, campaign.id)
+                        }
                       />
                     )}
                   </Flex>
