@@ -1,13 +1,14 @@
 import { MediaQuery, TextInput, Text } from '@mantine/core'
-import { ChangeEvent } from 'react'
+import { ChangeEvent, FocusEventHandler } from 'react'
 
 type CampaignNameProps = {
   defaultValue: string
   onChange: (event: ChangeEvent<HTMLInputElement>) => void
+  onFocus: FocusEventHandler<HTMLInputElement>
   error: string
 }
 
-const CampaignName = ({ defaultValue, onChange, error }: CampaignNameProps) => {
+const CampaignName = ({ defaultValue, onChange, error, onFocus }: CampaignNameProps) => {
   return (
     <MediaQuery
       smallerThan="lg"
@@ -22,6 +23,7 @@ const CampaignName = ({ defaultValue, onChange, error }: CampaignNameProps) => {
         name="title"
         defaultValue={defaultValue}
         onChange={(event) => onChange(event)}
+        onFocus={onFocus}
         error={error && <Text size="sm">{error}</Text>}
       />
     </MediaQuery>

@@ -94,7 +94,13 @@ const CampaignDetails = () => {
                   title="Title"
                   value={campaign?.title}
                 />
-                <CampaignDetailsRow lineHeight="sm" textSize="sm" title="Id" value={campaign?.id} />
+                <CampaignDetailsRow
+                  lineHeight="sm"
+                  textSize="sm"
+                  title="Id"
+                  nowrap
+                  value={campaign?.id}
+                />
                 <CampaignDetailsRow
                   lineHeight="sm"
                   textSize="sm"
