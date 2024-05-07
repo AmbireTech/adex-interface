@@ -1,4 +1,4 @@
-import { Campaign } from 'adex-common'
+import { Campaign, CampaignStatus } from 'adex-common'
 import {
   createContext,
   FC,
@@ -97,6 +97,18 @@ const campaignResToCampaignData = (
   return currentCMP
 }
 
+const getURLSubRouteByCampaignStatus = (status: CampaignStatus) => {
+  switch (status) {
+    case CampaignStatus.active:
+      return 'resume'
+    case CampaignStatus.closedByUser:
+      return 'close'
+    case CampaignStatus.paused:
+      return 'pause'
+    default:
+      throw new Error('Invalid status')
+  }
+}
 interface ICampaignsDataContext {
   campaignsData: Map<string, CampaignData>
   // TODO: all campaigns event aggregations by account
@@ -105,6 +117,7 @@ interface ICampaignsDataContext {
   updateAllCampaignsData: (updateAdvanced?: boolean) => void
   // updateEventAggregates: (params: Campaign['id']) => void
   initialDataLoading: boolean
+  changeCampaignStatus: (status: CampaignStatus, campaignId: Campaign['id']) => void
 }
 
 const CampaignsDataContext = createContext<ICampaignsDataContext | null>(null)
@@ -140,6 +153,42 @@ const CampaignsDataProvider: FC<PropsWithChildren> = ({ children }) => {
   //   },
   //   [adexServicesRequest]
   // )
+
+  const changeCampaignStatus = useCallback(
+    async (status: CampaignStatus, campaignId: string) => {
+      try {
+        const campaignStatusRes = await adexServicesRequest<{ success: boolean }>('backend', {
+          route: `/dsp/campaigns/${getURLSubRouteByCampaignStatus(status)}/${campaignId}`,
+          method: 'POST'
+        })
+
+        if (!campaignStatusRes.success) {
+          showNotification('error', `changing campaign status with id ${campaignId}`, 'Data error')
+          return
+        }
+
+        setCampaignData((prev) => {
+          const prevCampaignState = prev.get(campaignId)
+
+          if (!prevCampaignState) return prev
+
+          const updated = {
+            ...prevCampaignState,
+            campaign: { ...prevCampaignState?.campaign, status }
+          }
+
+          const next = new Map(prev)
+          next.set(campaignId, updated)
+
+          return next
+        })
+      } catch (err) {
+        console.log(err)
+        showNotification('error', `changing campaign status with id ${campaignId}`, 'Data error')
+      }
+    },
+    [adexServicesRequest, showNotification]
+  )
 
   const updateCampaignDataById = useCallback(
     async (campaignId: string) => {
@@ -244,9 +293,16 @@ const CampaignsDataProvider: FC<PropsWithChildren> = ({ children }) => {
       campaignsData,
       updateCampaignDataById,
       updateAllCampaignsData,
-      initialDataLoading
+      initialDataLoading,
+      changeCampaignStatus
     }),
-    [campaignsData, updateCampaignDataById, updateAllCampaignsData, initialDataLoading]
+    [
+      campaignsData,
+      updateCampaignDataById,
+      updateAllCampaignsData,
+      initialDataLoading,
+      changeCampaignStatus
+    ]
   )
 
   return (

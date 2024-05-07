@@ -4,7 +4,7 @@ import { Container, Grid, createStyles, Text, Flex } from '@mantine/core'
 import BadgeStatusCampaign from 'components/Dashboard/BadgeStatusCampaign'
 import { formatCatsAndLocsData } from 'helpers/createCampaignHelpers'
 import { CATEGORIES, COUNTRIES } from 'constants/createCampaign'
-import { AdUnit } from 'adex-common/dist/types'
+import { AdUnit, CampaignStatus } from 'adex-common/dist/types'
 import MediaBanner from 'components/common/MediaBanner'
 import { formatDateTime } from 'helpers/formatters'
 import GoBack from 'components/common/GoBack'
@@ -16,9 +16,6 @@ import StopIcon from 'resources/icons/Stop'
 import ArchivedIcon from 'resources/icons/Archived'
 import FormattedAmount from 'components/common/FormattedAmount/FormattedAmount'
 import CatsLocsFormatted from './CatsLocsFormatted'
-
-// Temporary added to disable action buttons until no functionality implemented
-const ACTION_BUTTONS_DISABLED = true
 
 const useStyles = createStyles((theme) => ({
   wrapper: {
@@ -54,7 +51,7 @@ const useStyles = createStyles((theme) => ({
 
 const CampaignDetails = () => {
   const { classes, cx } = useStyles()
-  const { campaignsData, updateCampaignDataById } = useCampaignsData()
+  const { campaignsData, updateCampaignDataById, changeCampaignStatus } = useCampaignsData()
 
   const { id } = useParams()
 
@@ -248,32 +245,44 @@ const CampaignDetails = () => {
                   </div>
                 </Grid.Col>
               </Grid>
-              {!ACTION_BUTTONS_DISABLED && (
-                <Grid>
-                  <Grid.Col>
-                    <Flex justify="flex-end" align="center" gap="xs" mt="xl">
+
+              <Grid>
+                <Grid.Col>
+                  <Flex justify="flex-end" align="center" gap="xs" mt="xl">
+                    {campaign.status === CampaignStatus.paused && (
                       <CampaignActionBtn
                         text="Activate"
                         icon={<ActiveIcon size="13px" />}
                         color="success"
-                        onBtnClicked={() => console.log('Activate btn clicked')}
+                        onBtnClicked={() =>
+                          changeCampaignStatus(CampaignStatus.active, campaign.id)
+                        }
                       />
+                    )}
+                    {campaign.status === CampaignStatus.active && (
                       <CampaignActionBtn
-                        text="Stop"
+                        text="Pause"
                         icon={<StopIcon size="13px" />}
-                        color="stopped"
-                        onBtnClicked={() => console.log('Stop btn clicked')}
+                        color="paused"
+                        onBtnClicked={() =>
+                          changeCampaignStatus(CampaignStatus.paused, campaign.id)
+                        }
                       />
+                    )}
+                    {(campaign.status === CampaignStatus.paused ||
+                      campaign.status === CampaignStatus.active) && (
                       <CampaignActionBtn
-                        text="Archive"
+                        text="Close"
                         icon={<ArchivedIcon size="13px" />}
                         color="secondaryText"
-                        onBtnClicked={() => console.log('Archive btn clicked')}
+                        onBtnClicked={() =>
+                          changeCampaignStatus(CampaignStatus.closedByUser, campaign.id)
+                        }
                       />
-                    </Flex>
-                  </Grid.Col>
-                </Grid>
-              )}
+                    )}
+                  </Flex>
+                </Grid.Col>
+              </Grid>
             </Grid.Col>
           </Grid>
         </Container>
