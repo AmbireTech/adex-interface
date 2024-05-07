@@ -106,7 +106,7 @@ const getURLSubRouteByCampaignStatus = (status: CampaignStatus) => {
     case CampaignStatus.paused:
       return 'pause'
     default:
-    // do nothing
+      throw new Error('Invalid status')
   }
 }
 interface ICampaignsDataContext {
