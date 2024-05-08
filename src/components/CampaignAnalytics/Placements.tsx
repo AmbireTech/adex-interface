@@ -48,9 +48,9 @@ const Placements = ({
       placement === 'app' ? 'App' : 'Website',
       'Impressions',
       'Clicks',
-      'CTR %',
-      'Spent',
-      'Average CPM'
+      'CTR',
+      'Average CPM',
+      'Spent'
     ],
     [placement]
   )
@@ -62,9 +62,9 @@ const Placements = ({
         segment: getHumneSrcName(item.segment, placement),
         impressions: item.impressions.toLocaleString(),
         clicks: item.clicks.toLocaleString(),
-        ctr: `${item.ctr}`,
-        paid: `${item.paid.toFixed(4)} ${currencyName}`,
-        avgCpm: `${item.avgCpm} ${currencyName}`
+        ctr: `${item.ctr} %`,
+        avgCpm: `${item.avgCpm} ${currencyName}`,
+        paid: `${item.paid.toFixed(4)} ${currencyName}`
       })) || [],
     [placements, placement, currencyName]
   )

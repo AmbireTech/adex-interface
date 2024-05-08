@@ -1,6 +1,6 @@
 import { useMemo, useCallback, useState } from 'react'
 import CustomTable from 'components/common/CustomTable'
-import { Flex, Image, createStyles } from '@mantine/core'
+import { Flex, Image, createStyles, Anchor } from '@mantine/core'
 import UrlIcon from 'resources/icons/Url'
 import { CreativePreviewModal } from 'components/common/Modals'
 import { useDisclosure } from '@mantine/hooks'
@@ -33,7 +33,7 @@ const Creatives = ({
   const { classes } = useStyles()
 
   const headings = useMemo(
-    () => ['Media', 'Size', 'Impressions', 'Clicks', 'CTR %', 'Spent', 'Link'],
+    () => ['Media', 'Size', 'Impressions', 'Clicks', 'CTR %', 'Spent', 'Target'],
     []
   )
 
@@ -58,7 +58,9 @@ const Creatives = ({
       return {
         media: (
           <Flex align="center">
-            <UrlIcon size="25px" className={classes.icon} />
+            <Anchor href={media} target="_blank">
+              <UrlIcon size="25px" className={classes.icon} />
+            </Anchor>
             <Image
               ml="sm"
               src={media}

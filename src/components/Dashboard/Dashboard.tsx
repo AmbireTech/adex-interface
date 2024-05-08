@@ -1,4 +1,8 @@
-import { Campaign, CampaignType, EventType } from 'adex-common'
+import {
+  Campaign,
+  // CampaignType,
+  EventType
+} from 'adex-common'
 import { Container, Flex, Text } from '@mantine/core'
 import { useCallback, useMemo } from 'react'
 import CustomTable from 'components/common/CustomTable'
@@ -10,17 +14,16 @@ import BadgeStatusCampaign from './BadgeStatusCampaign'
 
 const campaignHeaders = [
   'Name',
-  'Model',
+  // 'Model',
   'Placement',
   'Status',
-  'Served %',
+  'Served',
   'Budget',
   'Impressions',
   'Clicks',
-  'CTR %',
+  'CTR',
   'Period',
-  'CPM',
-  'Average CPM'
+  'CPM'
 ]
 
 const Dashboard = () => {
@@ -53,15 +56,18 @@ const Dashboard = () => {
             return {
               id: cmpData.campaignId,
               title: cmpData.campaign.title,
-              type: CampaignType[cmpData.campaign.type],
-              placement: cmpData.campaign.targetingInput.inputs.placements.in[0] || '-',
+              // type: CampaignType[cmpData.campaign.type],
+              placement:
+                cmpData.campaign.targetingInput.inputs.placements.in[0] === 'app'
+                  ? 'App'
+                  : 'Website',
               status: <BadgeStatusCampaign type={cmpData.campaign.status} />,
-              served: `${((cmpData.paid / budget) * 100).toFixed(4)}`,
+              served: `${((cmpData.paid / budget) * 100).toFixed(2)} %`,
               // TODO: get token name
               budget: `${budget} USDC`,
               impressions: cmpData.impressions,
               clicks: cmpData.clicks,
-              ctr: cmpData.ctr || 0,
+              ctr: `${cmpData.ctr || 0} %`,
               period: (
                 <span>
                   <span>{periodNumberToDate(cmpData.campaign.activeFrom)} </span>
@@ -79,8 +85,7 @@ const Dashboard = () => {
                       ) * 1000
                     ).toFixed(2)}
                   </span>
-                  <br />
-
+                  {' - '}{' '}
                   <span>
                     {(
                       parseBigNumTokenAmountToDecimal(
@@ -90,9 +95,9 @@ const Dashboard = () => {
                     ).toFixed(2)}
                   </span>
                   <br />
+                  <span>{`(avg: ${cmpData.avgCpm?.toFixed(2) || 0})`}</span>
                 </span>
-              ),
-              avgCpm: cmpData.avgCpm?.toFixed(2) || 0
+              )
             }
           })
         : [],
