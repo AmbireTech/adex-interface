@@ -7,6 +7,7 @@ import useAccount from 'hooks/useAccount'
 import { useAdExApi } from 'hooks/useAdexServices'
 import { mapCampaignUItoCampaign } from 'helpers/createCampaignHelpers'
 import { parseToBigNumPrecision } from 'helpers/balances'
+import { AdUnit } from 'adex-common'
 
 const CreateCampaignContext = createContext<CreateCampaignType | null>(null)
 
@@ -39,6 +40,50 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
   })
 
   const { adexServicesRequest } = useAdExApi()
+
+  const addAdUnit = useCallback(
+    (adUnitToAdd: AdUnit) => {
+      setCampaign((prev) => {
+        const updated = { ...prev, adUnits: [...prev.adUnits, adUnitToAdd] }
+        return updated
+      })
+    },
+    [setCampaign]
+  )
+
+  const removeAdUnit = useCallback(
+    (adUnitIdToRemove: string) => {
+      setCampaign((prev) => {
+        const updated = {
+          ...prev,
+          adUnits: [...prev.adUnits.filter((item) => item.id !== adUnitIdToRemove)]
+        }
+        return updated
+      })
+    },
+    [setCampaign]
+  )
+
+  const addTargetURLToAdUnit = useCallback(
+    (inputText: string, adUnitId: string) => {
+      setCampaign((prev) => {
+        const { adUnits } = { ...prev }
+
+        adUnits.forEach((element) => {
+          const elCopy = { ...element }
+          if (elCopy.id === adUnitId) elCopy.banner!.targetUrl = inputText
+          return elCopy
+        })
+
+        const updated = {
+          ...prev,
+          adUnits
+        }
+        return updated
+      })
+    },
+    [setCampaign]
+  )
 
   const updatePartOfCampaign = useCallback(
     (value: Partial<CampaignUI>) => {
@@ -129,7 +174,10 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
       updateCampaign,
       updateCampaignWithPrevStateNested,
       publishCampaign,
-      resetCampaign
+      resetCampaign,
+      addAdUnit,
+      removeAdUnit,
+      addTargetURLToAdUnit
     }),
     [
       campaign,
@@ -138,7 +186,10 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
       updateCampaign,
       updateCampaignWithPrevStateNested,
       publishCampaign,
-      resetCampaign
+      resetCampaign,
+      addAdUnit,
+      removeAdUnit,
+      addTargetURLToAdUnit
     ]
   )
 

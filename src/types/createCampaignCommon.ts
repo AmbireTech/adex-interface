@@ -1,4 +1,4 @@
-import { Campaign } from 'adex-common/dist/types/Dsp/Campaign'
+import { AdUnit, Campaign } from 'adex-common/dist/types/Dsp/Campaign'
 import { Alpha3Code } from 'adex-common'
 import { Devices } from './createCampaign'
 
@@ -35,4 +35,7 @@ export type CreateCampaignType = {
   updatePartOfCampaign: (camp: Partial<CampaignUI>) => void
   publishCampaign: () => Promise<any>
   resetCampaign: () => void
+  addAdUnit: (adUnitToAdd: AdUnit) => void
+  removeAdUnit: (adUnitIdToRemove: string) => void
+  addTargetURLToAdUnit: (inputText: string, adUnitId: string) => void
 }
