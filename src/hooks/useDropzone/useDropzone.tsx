@@ -5,7 +5,8 @@ import { AdUnitType } from 'adex-common/dist/types'
 import {
   getHTMLBannerDimensions,
   getMediaSize,
-  getMediaUrlWithProvider
+  getMediaUrlWithProvider,
+  isVideoMedia
 } from 'helpers/createCampaignHelpers'
 // import { validateHTMLBanner } from 'helpers/htmlBannerValidators'
 import { FileWithPath } from '@mantine/dropzone'
@@ -55,7 +56,7 @@ const useDropzone = () => {
             const adUnit = {
               id: `${file.name.replace(/\s+/g, '')}-${Date.now().toString(16)}`,
               title: file.name,
-              type: AdUnitType.Banner,
+              type: isVideoMedia(file.type) ? AdUnitType.Video : AdUnitType.Banner,
               banner: {
                 format: {
                   w: 0,
