@@ -10,6 +10,7 @@ import {
   HTMLBannerDimensions,
   CampaignUI
 } from 'types'
+import dayjs from 'dayjs'
 
 export const checkSelectedDevices = (devices: Devices[]) => {
   if (devices.length === 1) {
@@ -225,4 +226,10 @@ export const mapCampaignUItoCampaign = (campaignUI: CampaignUI): ReducedCampaign
   return {
     ...campaign
   }
+}
+
+export const isPastDateTime = (dateTime: Date | string) => {
+  const givenDateTime = dayjs(dateTime)
+  const currentDateTime = dayjs()
+  return givenDateTime.isBefore(currentDateTime)
 }

@@ -5,9 +5,10 @@ import superjson, { serialize } from 'superjson'
 import { CampaignUI, CreateCampaignType } from 'types'
 import useAccount from 'hooks/useAccount'
 import { useAdExApi } from 'hooks/useAdexServices'
-import { mapCampaignUItoCampaign } from 'helpers/createCampaignHelpers'
+import { isPastDateTime, mapCampaignUItoCampaign } from 'helpers/createCampaignHelpers'
 import { parseToBigNumPrecision } from 'helpers/balances'
 import { AdUnit } from 'adex-common'
+import dayjs from 'dayjs'
 
 const CreateCampaignContext = createContext<CreateCampaignType | null>(null)
 
@@ -27,7 +28,10 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
       outpaceAssetAddr: balanceToken?.address || '',
       outpaceAddr: adexAccount?.address || '0x',
       outpaceAssetDecimals: balanceToken.decimals,
-      outpaceChainId: balanceToken.chainId
+      outpaceChainId: balanceToken.chainId,
+      startsAt: isPastDateTime(CREATE_CAMPAIGN_DEFAULT_VALUE.startsAt)
+        ? dayjs().add(1, 'hour').toDate()
+        : CREATE_CAMPAIGN_DEFAULT_VALUE.startsAt
     }),
     [adexAccount?.address, balanceToken?.address, balanceToken?.decimals, balanceToken?.chainId]
   )
