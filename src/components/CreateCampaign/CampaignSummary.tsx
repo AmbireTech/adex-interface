@@ -12,6 +12,7 @@ import useCampaignsData from 'hooks/useCampaignsData'
 import useCustomNotifications from 'hooks/useCustomNotifications'
 import useAccount from 'hooks/useAccount'
 import { isValidHttpUrl } from 'helpers/validators'
+import { useNavigate } from 'react-router-dom'
 
 const useStyles = createStyles((theme) => ({
   bg: {
@@ -54,6 +55,7 @@ const useStyles = createStyles((theme) => ({
 
 const CampaignSummary = () => {
   const { classes, cx } = useStyles()
+  const navigate = useNavigate()
   const [opened, { open, close }] = useDisclosure(false)
   const { updateBalance } = useAccount()
   const {
@@ -138,6 +140,11 @@ const CampaignSummary = () => {
       updateCampaign('step', step + 1)
     }
   }, [step, adUnits, updateCampaign, showNotification])
+
+  const handleOnModalClose = useCallback(() => {
+    navigate('/dashboard/')
+    close()
+  }, [navigate, close])
 
   return (
     <>
@@ -228,7 +235,11 @@ const CampaignSummary = () => {
           </Group>
         </UnstyledButton>
       </Flex>
-      <SuccessModal text="Campaign launched successfully!" opened={opened} close={close} />
+      <SuccessModal
+        text="Campaign launched successfully!"
+        opened={opened}
+        close={handleOnModalClose}
+      />
     </>
   )
 }

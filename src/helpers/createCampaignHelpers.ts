@@ -123,12 +123,12 @@ export const getHTMLBannerDimensions = async (
         }
 
         document.body.removeChild(tempIframe)
-
+        URL.revokeObjectURL(blobUrl)
         resolve(dimensions)
       }
       tempIframe.onerror = (error) => {
         document.body.removeChild(tempIframe)
-
+        URL.revokeObjectURL(blobUrl)
         reject(error)
       }
     })

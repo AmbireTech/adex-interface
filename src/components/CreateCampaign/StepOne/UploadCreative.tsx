@@ -24,7 +24,6 @@ const UploadCreative = () => {
   const handleDeleteCreativeBtnClicked = useCallback(
     (file: AdUnit) => {
       removeAdUnit(file.id)
-      URL.revokeObjectURL(file.banner?.mediaUrl || '')
     },
     [removeAdUnit]
   )
