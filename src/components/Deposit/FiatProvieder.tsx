@@ -19,21 +19,11 @@ const useStyles = createStyles((theme) => ({
   }
 }))
 
-const FiatProvider = ({
-  logo,
-  name,
-  type,
-  fees,
-  limits,
-  currencies,
-  onClick
-}: IFiatProviderProps) => {
+const FiatProvider = ({ logo, type, fees, limits, currencies, onClick }: IFiatProviderProps) => {
   const { classes } = useStyles()
   return (
     <Grid className={classes.wrapper} align="center" onClick={onClick}>
-      <Grid.Col span={4}>
-        <img src={logo} alt={name} />
-      </Grid.Col>
+      <Grid.Col span={4}>{logo}</Grid.Col>
       <Grid.Col span={8} className={classes.fontSizeSmall}>
         <Title order={6}>{type}</Title>
         <Text>Fees: {fees}</Text>
