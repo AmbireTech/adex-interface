@@ -1,6 +1,7 @@
+import { ReactNode } from 'react'
+
 export interface IFiatProviderProps {
-  logo: any
-  name: string
+  logo: ReactNode
   type: string
   fees: string
   limits: string
