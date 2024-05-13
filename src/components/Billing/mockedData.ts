@@ -1,6 +1,7 @@
-import { IInvoiceDetails, IInvoices, IStatements } from 'types'
+import { IInvoiceDetails, IStatements } from 'types'
 
-const invoiceElements: IInvoices[] = [
+// const invoiceElements: IInvoices[] = [
+const invoiceElements = [
   {
     id: 1,
     companyName: 'Company Name Long 0',
