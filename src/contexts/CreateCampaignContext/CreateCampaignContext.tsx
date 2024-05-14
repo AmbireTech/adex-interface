@@ -1,11 +1,19 @@
 import { useLocalStorage } from '@mantine/hooks'
-import { FC, PropsWithChildren, createContext, useCallback, useMemo } from 'react'
+import {
+  FC,
+  PropsWithChildren,
+  createContext,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState
+} from 'react'
 import { CREATE_CAMPAIGN_DEFAULT_VALUE } from 'constants/createCampaign'
 import superjson, { serialize } from 'superjson'
 import { CampaignUI, CreateCampaignType } from 'types'
 import useAccount from 'hooks/useAccount'
 import { useAdExApi } from 'hooks/useAdexServices'
-import { isPastDateTime, mapCampaignUItoCampaign } from 'helpers/createCampaignHelpers'
+import { deepEqual, isPastDateTime, mapCampaignUItoCampaign } from 'helpers/createCampaignHelpers'
 import { parseToBigNumPrecision } from 'helpers/balances'
 import { AdUnit } from 'adex-common'
 import dayjs from 'dayjs'
@@ -36,12 +44,35 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
     [adexAccount?.address, balanceToken?.address, balanceToken?.decimals, balanceToken?.chainId]
   )
 
-  const [campaign, setCampaign] = useLocalStorage<CampaignUI>({
+  const [campaign, setCampaign] = useState<CampaignUI>(defaultValue)
+
+  const [campaignPersist, setCampaignPersist] = useLocalStorage<CampaignUI>({
     key: 'createCampaign',
     defaultValue,
     serialize: superjson.stringify,
     deserialize: (str) => (typeof str === 'undefined' ? defaultValue : superjson.parse(str))
   })
+
+  useEffect(() => {
+    if (!deepEqual(campaignPersist, defaultValue)) {
+      setCampaign(campaignPersist)
+    }
+  }, [campaignPersist, setCampaign, defaultValue])
+
+  useEffect(() => {
+    window.onbeforeunload = (event: BeforeUnloadEvent) => {
+      event.preventDefault()
+      setCampaign((prev) => {
+        setCampaignPersist(prev)
+        return prev
+      })
+      return true
+    }
+
+    return () => {
+      window.onbeforeunload = null
+    }
+  }, []) // eslint-disable-line
 
   const { adexServicesRequest } = useAdExApi()
 
