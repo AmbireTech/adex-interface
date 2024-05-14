@@ -1,4 +1,3 @@
-import { useLocalStorage } from '@mantine/hooks'
 import {
   FC,
   PropsWithChildren,
@@ -46,24 +45,21 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
 
   const [campaign, setCampaign] = useState<CampaignUI>(defaultValue)
 
-  const [campaignPersist, setCampaignPersist] = useLocalStorage<CampaignUI>({
-    key: 'createCampaign',
-    defaultValue,
-    serialize: superjson.stringify,
-    deserialize: (str) => (typeof str === 'undefined' ? defaultValue : superjson.parse(str))
-  })
-
   useEffect(() => {
-    if (!deepEqual(campaignPersist, defaultValue)) {
-      setCampaign(campaignPersist)
+    const savedCampaign = localStorage.getItem('createCampaign')
+    if (savedCampaign) {
+      const parsedCampaign = superjson.parse<CampaignUI>(savedCampaign)
+      if (!deepEqual(parsedCampaign, defaultValue)) {
+        setCampaign(parsedCampaign)
+      }
     }
-  }, [campaignPersist, setCampaign, defaultValue])
+  }, [defaultValue])
 
   useEffect(() => {
     window.onbeforeunload = (event: BeforeUnloadEvent) => {
       event.preventDefault()
       setCampaign((prev) => {
-        setCampaignPersist(prev)
+        localStorage.setItem('createCampaign', superjson.stringify(prev))
         return prev
       })
       return true
@@ -72,7 +68,7 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
     return () => {
       window.onbeforeunload = null
     }
-  }, []) // eslint-disable-line
+  }, [])
 
   const { adexServicesRequest } = useAdExApi()
 
