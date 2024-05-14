@@ -1,6 +1,8 @@
 import { Grid, Space, Table, createStyles } from '@mantine/core'
-import { invoiceDetails } from 'components/Billing/mockedData'
+// TODO: delete mock data
+// import { invoiceDetails } from 'components/Billing/mockedData'
 import { useMemo } from 'react'
+import { IInvoiceDetails } from 'types'
 
 const useStyles = createStyles((theme) => ({
   wrapper: {
@@ -29,7 +31,7 @@ const useStyles = createStyles((theme) => ({
   }
 }))
 
-const InvoicesPDF = () => {
+const InvoicesPDF = ({ invoiceDetails }: { invoiceDetails: IInvoiceDetails }) => {
   const { classes, cx } = useStyles()
 
   const formatDate = (date: string) =>

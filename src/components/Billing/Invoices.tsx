@@ -2,7 +2,7 @@ import { Title } from '@mantine/core'
 import CustomTable from 'components/common/CustomTable'
 import { PrintModal } from 'components/common/Modals'
 import { useDisclosure } from '@mantine/hooks'
-import { useCallback, useMemo } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 
 import useCampaignsData from 'hooks/useCampaignsData'
 // TODO: Delete mock data
@@ -23,6 +23,7 @@ const Invoices = () => {
       billingDetails: { companyName }
     }
   } = useAccount()
+  const [selectedCampaignId, setSelectedCampaignId] = useState('')
 
   const invoiceElements: IInvoices[] = useMemo(
     () =>
@@ -41,14 +42,14 @@ const Invoices = () => {
             to: dayjs(Number(campaign.campaign.activeTo)).format('DD/MM/YYYY')
           },
           // TODO: get the real data for amount spent
-          amountSpent: '20'
+          amountSpent: '-'
         })),
     [campaigns, companyName]
   )
 
   const handlePreview = useCallback(
     (item: any) => {
-      console.log('item', item)
+      setSelectedCampaignId(item.id)
       open()
     },
     [open]
@@ -57,7 +58,7 @@ const Invoices = () => {
   return invoiceElements && invoiceElements.length ? (
     <>
       <CustomTable headings={columnTitles} elements={invoiceElements} onPreview={handlePreview} />
-      <PrintModal opened={opened} close={close} />
+      <PrintModal campaignId={selectedCampaignId} opened={opened} close={close} />
     </>
   ) : (
     // TODO: needs to be style
