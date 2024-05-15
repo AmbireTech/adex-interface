@@ -56,13 +56,12 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
   }, [defaultValue])
 
   useEffect(() => {
-    window.onbeforeunload = (event: BeforeUnloadEvent) => {
-      event.preventDefault()
+    window.onbeforeunload = () => {
       setCampaign((prev) => {
         localStorage.setItem('createCampaign', superjson.stringify(prev))
         return prev
       })
-      return true
+      return undefined
     }
 
     return () => {
