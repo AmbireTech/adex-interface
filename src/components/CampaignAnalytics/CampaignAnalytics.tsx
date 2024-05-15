@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState, useMemo } from 'react'
 import { Container, Flex, Loader, Tabs } from '@mantine/core'
 import { useParams } from 'react-router-dom'
-import { AnalyticsType, TabType, BaseAnalyticsData, AnalyticsPeriod } from 'types'
+import { AnalyticsType, BaseAnalyticsData, AnalyticsPeriod } from 'types'
 import GoBack from 'components/common/GoBack/GoBack'
 import DownloadCSV from 'components/common/DownloadCSV'
 import useCampaignAnalytics from 'hooks/useCampaignAnalytics'
@@ -14,20 +14,6 @@ import Regions from './Regions'
 import { TimeFrame } from './TimeFrame'
 import { generateCVSData } from './CvsDownloadConfigurations'
 import SeeOnMapBtn from './SeeOnMapBtn'
-
-// TODO: temp - unify and use anal
-const analyticTypeToHeader = (aType: AnalyticsType): TabType => {
-  switch (aType) {
-    case 'country':
-      return 'regions'
-    case 'hostname':
-      return 'placements'
-    case 'adUnit':
-      return 'creatives'
-    default:
-      return 'timeframe'
-  }
-}
 
 const CampaignAnalytics = () => {
   const { id } = useParams()
@@ -112,7 +98,7 @@ const CampaignAnalytics = () => {
       setIsMapBtnShown(activeTab === 'country')
 
       // TODO: fix csf Data types an add the type to useState
-      setCsvData(generateCVSData(analyticTypeToHeader(activeTab), campaignMappedAnalytics))
+      setCsvData(generateCVSData(activeTab, campaignMappedAnalytics))
     }
   }, [activeTab, campaignMappedAnalytics])
 
