@@ -1,5 +1,5 @@
 import { Grid, Text } from '@mantine/core'
-import { useCallback, useMemo, useRef, useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import { AdUnit } from 'adex-common/dist/types'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import useDropzone from 'hooks/useDropzone'
@@ -11,7 +11,8 @@ import FilesDropzone from './FilesDropzone'
 const UploadCreative = () => {
   const {
     campaign: { adUnits },
-    updateCampaign
+    removeAdUnit,
+    addTargetURLToAdUnit
   } = useCreateCampaignContext()
 
   const [autoUTMChecked, setAutoUTMChecked] = useState(false)
@@ -20,17 +21,11 @@ const UploadCreative = () => {
 
   const { onDrop } = useDropzone()
 
-  const hasUploadedCreatives = useMemo(() => adUnits.length > 0, [adUnits.length])
-
   const handleDeleteCreativeBtnClicked = useCallback(
     (file: AdUnit) => {
-      updateCampaign(
-        'adUnits',
-        adUnits.filter((item) => item.id !== file.id)
-      )
-      URL.revokeObjectURL(file.banner?.mediaUrl || '')
+      removeAdUnit(file.id)
     },
-    [updateCampaign, adUnits]
+    [removeAdUnit]
   )
 
   const handleOnInputChange = useCallback(
@@ -41,16 +36,10 @@ const UploadCreative = () => {
       if (debounceTimer.current) clearTimeout(debounceTimer.current)
 
       debounceTimer.current = setTimeout(() => {
-        const updated = [...adUnits]
-        updated.forEach((element) => {
-          const elCopy = { ...element }
-          if (elCopy.id === adUnitId) elCopy.banner!.targetUrl = inputText
-          return elCopy
-        })
-        updateCampaign('adUnits', updated)
+        addTargetURLToAdUnit(inputText, adUnitId)
       }, 300)
     },
-    [updateCampaign, adUnits]
+    [addTargetURLToAdUnit]
   )
 
   return (
@@ -66,7 +55,7 @@ const UploadCreative = () => {
         <FilesDropzone onDrop={onDrop} />
       </Grid.Col>
 
-      {hasUploadedCreatives ? (
+      {adUnits.length ? (
         <Grid.Col>
           <UploadedBanners
             autoUTMChecked={autoUTMChecked}

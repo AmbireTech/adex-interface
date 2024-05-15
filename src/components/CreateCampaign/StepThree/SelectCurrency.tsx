@@ -4,7 +4,7 @@ import { formatCurrency } from 'helpers'
 import { parseBigNumTokenAmountToDecimal } from 'helpers/balances'
 import useAccount from 'hooks/useAccount'
 import { getTokenIcon, networks } from 'lib/Icons'
-import { ChangeEvent, forwardRef, useCallback, useMemo } from 'react'
+import { ChangeEvent, FocusEventHandler, forwardRef, useCallback, useMemo } from 'react'
 import { Token } from 'types'
 
 type ItemProps = Token &
@@ -17,6 +17,7 @@ type ItemProps = Token &
 type SelectCurrencyProps = {
   defaultValue: string
   onChange: (event: ChangeEvent<HTMLInputElement>) => void
+  onFocus: FocusEventHandler<HTMLInputElement>
   error: string
 }
 
@@ -40,7 +41,7 @@ const SelectItem = forwardRef<HTMLDivElement, ItemProps>(
   )
 )
 
-const SelectCurrency = ({ defaultValue, onChange, error }: SelectCurrencyProps) => {
+const SelectCurrency = ({ defaultValue, onChange, onFocus, error }: SelectCurrencyProps) => {
   const {
     adexAccount: {
       availableBalance,
@@ -86,6 +87,7 @@ const SelectCurrency = ({ defaultValue, onChange, error }: SelectCurrencyProps) 
         data={mappedDeposits}
         defaultValue={defaultValue}
         onChange={(event) => handleSelectChange(event)}
+        onFocus={onFocus}
         maw="50%"
         maxDropdownHeight={400}
         error={error && <Text size="sm">{error}</Text>}

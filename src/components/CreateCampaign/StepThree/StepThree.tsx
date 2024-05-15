@@ -176,7 +176,12 @@ const StepThree = () => {
           <Text color="secondaryText" size="sm" weight="bold" mb="xs">
             3. Currency
           </Text>
-          <SelectCurrency defaultValue={currency} onChange={handleChange} error={errors.currency} />
+          <SelectCurrency
+            defaultValue={currency}
+            onChange={handleChange}
+            error={errors.currency}
+            onFocus={() => handleOnFocus('currency')}
+          />
         </Grid.Col>
         <Grid.Col mb="md">
           <Text color="secondaryText" size="sm" weight="bold" mb="xs">

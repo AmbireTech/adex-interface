@@ -52,7 +52,9 @@ export const router = createBrowserRouter(
       path: '/dashboard',
       element: (
         <RequireAuth>
-          <UserPanel />
+          <CreateCampaignContextProvider>
+            <UserPanel />
+          </CreateCampaignContextProvider>
         </RequireAuth>
       ),
       children: [
@@ -76,11 +78,7 @@ export const router = createBrowserRouter(
         },
         {
           path: 'create-campaign',
-          element: (
-            <CreateCampaignContextProvider>
-              <CreateCampaign />
-            </CreateCampaignContextProvider>
-          )
+          element: <CreateCampaign />
         },
         {
           path: 'admin',
