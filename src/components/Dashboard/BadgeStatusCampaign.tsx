@@ -55,6 +55,14 @@ const BadgeStatusCampaign = ({ type }: BadgeType) => {
           text: 'Active',
           icon: <ActiveIcon size="13px" />
         }
+
+      case CampaignStatus.exhausted:
+        return {
+          // TODO: check what color needs to be
+          color: 'stopped',
+          text: 'Exhausted',
+          icon: undefined
+        }
       // TODO: uncomment when CampaignStatus.stopped is added
       // case CampaignStatus.stopped:
       //   return {

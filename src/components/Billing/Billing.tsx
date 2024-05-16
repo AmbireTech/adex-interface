@@ -47,7 +47,6 @@ function Billing() {
   const handleTabClicked = (value: TabType) => setSelectedTab(value)
 
   /* Temporary added, should be removed */
-  const [openedInvoicesPopOver, setOpenedInvoicesPopOver] = useState(false)
   const [openedStatements, setOpenedStatements] = useState(false)
 
   return (
@@ -63,31 +62,16 @@ function Billing() {
           action={() => handleTabClicked(TabType.BillingTab)}
           variant="shadow"
         />
-        {/* Temporary added popover, should be removed */}
-        <Popover
-          opened={openedInvoicesPopOver}
-          onChange={setOpenedInvoicesPopOver}
-          closeOnClickOutside
-        >
-          <Popover.Target>
-            <div>
-              <CustomCard
-                width="100%"
-                height={100}
-                text="Invoices"
-                iconLeft={<InvoiceIcon size="24px" />}
-                color="secondary"
-                active={selectedTab === TabType.InvoicesTab}
-                // action={() => handleTabClicked(TabType.InvoicesTab)}
-                action={() => setOpenedInvoicesPopOver((o) => !o)}
-                variant="shadow"
-              />
-            </div>
-          </Popover.Target>
-          <Popover.Dropdown>
-            <Text>Coming Soon...</Text>
-          </Popover.Dropdown>
-        </Popover>
+        <CustomCard
+          width="100%"
+          height={100}
+          text="Invoices"
+          iconLeft={<InvoiceIcon size="24px" />}
+          color="secondary"
+          active={selectedTab === TabType.InvoicesTab}
+          action={() => handleTabClicked(TabType.InvoicesTab)}
+          variant="shadow"
+        />
         {/* Temporary added popover, should be removed */}
         <Popover opened={openedStatements} onChange={setOpenedStatements} closeOnClickOutside>
           <Popover.Target>
