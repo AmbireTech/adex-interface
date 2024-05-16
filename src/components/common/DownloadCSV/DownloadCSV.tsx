@@ -1,23 +1,38 @@
 import { Flex, Text, UnstyledButton } from '@mantine/core'
+import { AdUnit } from 'adex-common'
 import DownloadIcon from 'resources/icons/Download'
+import { BaseAnalyticsData, Country, Hostname } from 'types'
+
+export type CSVDataType = BaseAnalyticsData[]
+export type CSVHeadersType = Hostname | Country | AdUnit
 
 interface DownloadCSVProps {
-  data: any[] | undefined
+  data: CSVDataType | undefined
   filename: string
-  mapHeadersToDataProperties: any
+  mapHeadersToDataProperties: CSVHeadersType
 }
 
 const DownloadCSV = ({ data, filename, mapHeadersToDataProperties }: DownloadCSVProps) => {
-  const convertToCSV = (dataToConvert: any[] | undefined, mappingHeaders?: any) => {
-    const headerRow = Object.keys(mappingHeaders).join(',')
-    const csvRows = []
-
-    csvRows.push(headerRow)
+  const convertToCSV = (
+    dataToConvert: CSVDataType | undefined,
+    mappingHeaders?: CSVHeadersType | undefined
+  ) => {
+    if (!mappingHeaders) return
+    const headers = Object.keys(mappingHeaders)
+    const headerRow = headers.join(',')
+    const csvRows: string[] = [headerRow]
 
     dataToConvert?.forEach((item) => {
-      const values = Object.keys(mappingHeaders).map((header: string) => {
-        const propertyName = mappingHeaders[header]
-        const escapedValue = item[propertyName].toString().replace(/"/g, '""')
+      const values = headers.map((header) => {
+        const propertyName = mappingHeaders[
+          header as keyof CSVHeadersType
+        ] as keyof BaseAnalyticsData
+        if (propertyName === 'share') {
+          const totalPaid = dataToConvert.reduce((sum, i) => sum + i.paid, 0) || 1
+          return `${((item.paid / totalPaid) * 100).toFixed(2)} %`
+        }
+        const value = item[propertyName]
+        const escapedValue = value ? value.toString().replace(/"/g, '""') : ''
         return `"${escapedValue}"`
       })
       csvRows.push(values.join(','))
@@ -27,11 +42,12 @@ const DownloadCSV = ({ data, filename, mapHeadersToDataProperties }: DownloadCSV
   }
 
   const downloadCSV = (
-    dataCSV: any[] | undefined,
+    dataCSV: CSVDataType | undefined,
     filenameCSV: string,
-    mapping: object | undefined
+    mapping: CSVHeadersType | undefined
   ) => {
     const csv = convertToCSV(dataCSV, mapping)
+    if (!csv) return
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
     const url = URL.createObjectURL(blob)
     const link = document.createElement('a')

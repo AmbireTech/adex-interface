@@ -1,12 +1,21 @@
-import { useLocalStorage } from '@mantine/hooks'
-import { FC, PropsWithChildren, createContext, useCallback, useMemo } from 'react'
+import {
+  FC,
+  PropsWithChildren,
+  createContext,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState
+} from 'react'
 import { CREATE_CAMPAIGN_DEFAULT_VALUE } from 'constants/createCampaign'
 import superjson, { serialize } from 'superjson'
 import { CampaignUI, CreateCampaignType } from 'types'
 import useAccount from 'hooks/useAccount'
 import { useAdExApi } from 'hooks/useAdexServices'
-import { mapCampaignUItoCampaign } from 'helpers/createCampaignHelpers'
+import { deepEqual, isPastDateTime, mapCampaignUItoCampaign } from 'helpers/createCampaignHelpers'
 import { parseToBigNumPrecision } from 'helpers/balances'
+import { AdUnit } from 'adex-common'
+import dayjs from 'dayjs'
 
 const CreateCampaignContext = createContext<CreateCampaignType | null>(null)
 
@@ -26,19 +35,85 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
       outpaceAssetAddr: balanceToken?.address || '',
       outpaceAddr: adexAccount?.address || '0x',
       outpaceAssetDecimals: balanceToken.decimals,
-      outpaceChainId: balanceToken.chainId
+      outpaceChainId: balanceToken.chainId,
+      startsAt: isPastDateTime(CREATE_CAMPAIGN_DEFAULT_VALUE.startsAt)
+        ? dayjs().add(1, 'hour').toDate()
+        : CREATE_CAMPAIGN_DEFAULT_VALUE.startsAt
     }),
     [adexAccount?.address, balanceToken?.address, balanceToken?.decimals, balanceToken?.chainId]
   )
 
-  const [campaign, setCampaign] = useLocalStorage<CampaignUI>({
-    key: 'createCampaign',
-    defaultValue,
-    serialize: superjson.stringify,
-    deserialize: (str) => (typeof str === 'undefined' ? defaultValue : superjson.parse(str))
-  })
+  const [campaign, setCampaign] = useState<CampaignUI>(defaultValue)
+
+  useEffect(() => {
+    const savedCampaign = localStorage.getItem('createCampaign')
+    if (savedCampaign) {
+      const parsedCampaign = superjson.parse<CampaignUI>(savedCampaign)
+      if (!deepEqual(parsedCampaign, defaultValue)) {
+        setCampaign(parsedCampaign)
+      }
+    }
+  }, [defaultValue])
+
+  useEffect(() => {
+    window.onbeforeunload = () => {
+      setCampaign((prev) => {
+        localStorage.setItem('createCampaign', superjson.stringify(prev))
+        return prev
+      })
+      return undefined
+    }
+
+    return () => {
+      window.onbeforeunload = null
+    }
+  }, [])
 
   const { adexServicesRequest } = useAdExApi()
+
+  const addAdUnit = useCallback(
+    (adUnitToAdd: AdUnit) => {
+      setCampaign((prev) => {
+        const updated = { ...prev, adUnits: [...prev.adUnits, adUnitToAdd] }
+        return updated
+      })
+    },
+    [setCampaign]
+  )
+
+  const removeAdUnit = useCallback(
+    (adUnitIdToRemove: string) => {
+      setCampaign((prev) => {
+        const updated = {
+          ...prev,
+          adUnits: [...prev.adUnits.filter((item) => item.id !== adUnitIdToRemove)]
+        }
+        return updated
+      })
+    },
+    [setCampaign]
+  )
+
+  const addTargetURLToAdUnit = useCallback(
+    (inputText: string, adUnitId: string) => {
+      setCampaign((prev) => {
+        const { adUnits } = { ...prev }
+
+        adUnits.forEach((element) => {
+          const elCopy = { ...element }
+          if (elCopy.id === adUnitId) elCopy.banner!.targetUrl = inputText
+          return elCopy
+        })
+
+        const updated = {
+          ...prev,
+          adUnits
+        }
+        return updated
+      })
+    },
+    [setCampaign]
+  )
 
   const updatePartOfCampaign = useCallback(
     (value: Partial<CampaignUI>) => {
@@ -129,7 +204,10 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
       updateCampaign,
       updateCampaignWithPrevStateNested,
       publishCampaign,
-      resetCampaign
+      resetCampaign,
+      addAdUnit,
+      removeAdUnit,
+      addTargetURLToAdUnit
     }),
     [
       campaign,
@@ -138,7 +216,10 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
       updateCampaign,
       updateCampaignWithPrevStateNested,
       publishCampaign,
-      resetCampaign
+      resetCampaign,
+      addAdUnit,
+      removeAdUnit,
+      addTargetURLToAdUnit
     ]
   )
 

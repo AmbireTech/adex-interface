@@ -6,7 +6,7 @@ import { AllCountries, Alpha3Code } from 'adex-common'
 import CustomTable from 'components/common/CustomTable'
 import GeoCustom from '../common/CustomTableWithDropdown/WorldMap'
 
-const headings = ['Country', 'Share', 'Impressions', 'Clicks', 'CTR %', 'Average CPM', 'Spent']
+const headings = ['Country', 'Share', 'Impressions', 'Clicks', 'CTR', 'Average CPM', 'Spent']
 
 const Regions = ({
   regions,
@@ -39,7 +39,7 @@ const Regions = ({
         share: `${((item.paid / paid) * 100).toFixed(2)} %`,
         impressions: item.impressions,
         clicks: item.clicks,
-        ctr: `${item.ctr}`,
+        ctr: `${item.ctr} %`,
         avgCpm: `${item.avgCpm} ${currencyName}`,
         paid: `${item.paid.toFixed(4)} ${currencyName}`
       })) || []

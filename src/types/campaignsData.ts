@@ -5,6 +5,7 @@ export type BaseData = {
   clicks: number
   // clicks / impressions * 100
   ctr?: number
+  share?: number
   // paid / impressions * 1000
   avgCpm?: number
   paid: number
