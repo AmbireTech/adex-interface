@@ -87,14 +87,16 @@ const PrintModal = ({ campaignId, opened, close }: PrintModalProps) => {
     setAnalyticsKey(undefined)
 
     const checkAnalytics = async () => {
-      const key = await getAnalyticsKeyAndUpdate(campaign, 'hostname')
-      setAnalyticsKey(key)
+      try {
+        const key = await getAnalyticsKeyAndUpdate(campaign, 'hostname')
+        setAnalyticsKey(key)
+      } catch (e) {
+        console.error('Can not get Analytics key: ', e)
+      }
     }
 
     checkAnalytics()
   }, [campaign, getAnalyticsKeyAndUpdate])
-
-  console.log('campaignMappedAnalytics', campaignMappedAnalytics)
 
   const elements: IInvoiceDetails = useMemo(() => {
     return {
@@ -137,8 +139,10 @@ const PrintModal = ({ campaignId, opened, close }: PrintModalProps) => {
         </Group>
         <div className={classes.wrapper}>
           <div id="printable" className={classes.printable}>
-            {/* TODO: Remove InvoicesPDF */}
-            <InvoicesPDF invoiceDetails={elements} />
+            <InvoicesPDF
+              invoiceDetails={elements}
+              placement={campaign?.targetingInput.inputs.placements.in[0] || 'site'}
+            />
           </div>
         </div>
       </div>

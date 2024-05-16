@@ -1,9 +1,12 @@
 import { Grid, Space, Table, createStyles } from '@mantine/core'
-import { formatDate } from 'helpers'
+import { Placement } from 'adex-common'
+import { formatDate, getHumneSrcName } from 'helpers'
 // TODO: delete mock data
 // import { invoiceDetails } from 'components/Billing/mockedData'
 import { useMemo } from 'react'
 import { IInvoiceDetails } from 'types'
+
+type InvoicesPDFProps = { invoiceDetails: IInvoiceDetails; placement: Placement }
 
 const useStyles = createStyles((theme) => ({
   wrapper: {
@@ -32,7 +35,7 @@ const useStyles = createStyles((theme) => ({
   }
 }))
 
-const InvoicesPDF = ({ invoiceDetails }: { invoiceDetails: IInvoiceDetails }) => {
+const InvoicesPDF = ({ invoiceDetails, placement }: InvoicesPDFProps) => {
   const { classes, cx } = useStyles()
 
   const calculateTotal = useMemo(() => {
@@ -86,9 +89,7 @@ const InvoicesPDF = ({ invoiceDetails }: { invoiceDetails: IInvoiceDetails }) =>
           <thead>
             <tr>
               <th>No.</th>
-              {/* TODO: check what the placement is */}
-              {/* <th> {placement === 'app' ? 'App' : 'Website'}</th> */}
-              <th>Website</th>
+              <th> {placement === 'app' ? 'App' : 'Website'}</th>
               <th>Impressions</th>
               <th>Clicks</th>
               <th>CTR %</th>
@@ -101,7 +102,7 @@ const InvoicesPDF = ({ invoiceDetails }: { invoiceDetails: IInvoiceDetails }) =>
               // eslint-disable-next-line
               <tr key={index}>
                 <td>{index + 1}</td>
-                <td>{e.segment}</td>
+                <td>{getHumneSrcName(e.segment, placement)}</td>
                 <td>{e.impressions.toLocaleString()}</td>
                 <td>{e.clicks.toLocaleString()}</td>
                 <td>{e.ctr}</td>
