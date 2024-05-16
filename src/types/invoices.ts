@@ -1,6 +1,6 @@
 export interface IInvoices {
   [index: string]: any
-  id: number
+  id: string
   companyName: string
   campaignPeriod: {
     from: string
