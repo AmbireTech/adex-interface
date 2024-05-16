@@ -8,9 +8,9 @@ import useCampaignsData from 'hooks/useCampaignsData'
 // TODO: Delete mock data
 // import { invoiceElements } from './mockedData'
 import { CampaignFundsActive, IInvoices } from 'types'
-import dayjs from 'dayjs'
 import { CampaignStatus } from 'adex-common'
 import useAccount from 'hooks/useAccount'
+import { formatDateShort } from 'helpers'
 
 const columnTitles = ['Company Name', 'Campaign Period', 'Amount Spent']
 
@@ -36,25 +36,28 @@ const Invoices = () => {
     []
   )
 
+  const isCampaignEnded = useCallback(
+    (campaignStatus: CampaignStatus) =>
+      [CampaignStatus.expired, CampaignStatus.closedByUser, CampaignStatus.exhausted].includes(
+        campaignStatus
+      ),
+    []
+  )
+
   const invoiceElements: IInvoices[] = useMemo(
     () =>
       campaigns
-        .filter(
-          (c) =>
-            c.campaign.status === CampaignStatus.expired ||
-            c.campaign.status === CampaignStatus.closedByUser ||
-            c.campaign.status === CampaignStatus.exhausted
-        )
+        .filter((c) => isCampaignEnded(c.campaign.status))
         .map((campaign) => ({
           id: campaign.campaignId,
           companyName,
           campaignPeriod: {
-            from: dayjs(Number(campaign.campaign.activeFrom)).format('DD/MM/YYYY'),
-            to: dayjs(Number(campaign.campaign.activeTo)).format('DD/MM/YYYY')
+            from: formatDateShort(new Date(Number(campaign.campaign.activeFrom))),
+            to: formatDateShort(new Date(Number(campaign.campaign.activeTo)))
           },
           amountSpent: `${campaign.paid} ${getCurrencyName(campaign.campaignId, perCampaign)} `
         })),
-    [campaigns, companyName, getCurrencyName, perCampaign]
+    [campaigns, companyName, getCurrencyName, perCampaign, isCampaignEnded]
   )
 
   const handlePreview = useCallback(
