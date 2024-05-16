@@ -7,7 +7,7 @@ import { useCallback, useMemo, useState } from 'react'
 import useCampaignsData from 'hooks/useCampaignsData'
 // TODO: Delete mock data
 // import { invoiceElements } from './mockedData'
-import { IInvoices } from 'types'
+import { CampaignFundsActive, IInvoices } from 'types'
 import dayjs from 'dayjs'
 import { CampaignStatus } from 'adex-common'
 import useAccount from 'hooks/useAccount'
@@ -20,10 +20,21 @@ const Invoices = () => {
   const campaigns = useMemo(() => Array.from(campaignsData.values()), [campaignsData])
   const {
     adexAccount: {
-      billingDetails: { companyName }
+      billingDetails: { companyName },
+      fundsOnCampaigns: { perCampaign }
     }
   } = useAccount()
+
   const [selectedCampaignId, setSelectedCampaignId] = useState('')
+
+  const getCurrencyName = useCallback(
+    (campaignId: string, campaings: CampaignFundsActive[]) =>
+      campaignId && !!campaings.length
+        ? campaings.find((item) => item.id === campaignId)?.token.name || ''
+        : '',
+
+    []
+  )
 
   const invoiceElements: IInvoices[] = useMemo(
     () =>
@@ -41,10 +52,9 @@ const Invoices = () => {
             from: dayjs(Number(campaign.campaign.activeFrom)).format('DD/MM/YYYY'),
             to: dayjs(Number(campaign.campaign.activeTo)).format('DD/MM/YYYY')
           },
-          // TODO: get the real data for amount spent
-          amountSpent: '-'
+          amountSpent: `${campaign.paid} ${getCurrencyName(campaign.campaignId, perCampaign)} `
         })),
-    [campaigns, companyName]
+    [campaigns, companyName, getCurrencyName, perCampaign]
   )
 
   const handlePreview = useCallback(

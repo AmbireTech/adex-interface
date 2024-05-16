@@ -1,11 +1,11 @@
 import { Button, Group, Modal, createStyles } from '@mantine/core'
-// import { useDisclosure } from '@mantine/hooks'
 import InvoicesPDF from 'components/common/CustomTable/InvoicesPDF'
+import { ADEX_COMPANY_DETAILS } from 'constants/adexCompanyDetatils'
 import useAccount from 'hooks/useAccount'
 import useCampaignAnalytics from 'hooks/useCampaignAnalytics'
 import useCampaignsData from 'hooks/useCampaignsData'
 import { useEffect, useMemo, useState } from 'react'
-import { AnalyticsPeriod, BaseAnalyticsData, IInvoiceData, IInvoiceDetails } from 'types'
+import { AnalyticsPeriod, BaseAnalyticsData, IInvoiceDetails } from 'types'
 
 const useStyles = createStyles((theme) => ({
   wrapper: {
@@ -48,7 +48,11 @@ type PrintModalProps = {
 const PrintModal = ({ campaignId, opened, close }: PrintModalProps) => {
   const { campaignsData } = useCampaignsData()
   const {
-    adexAccount: { billingDetails, address }
+    adexAccount: {
+      billingDetails,
+      address,
+      fundsOnCampaigns: { perCampaign }
+    }
   } = useAccount()
   const { getAnalyticsKeyAndUpdate, mappedAnalytics } = useCampaignAnalytics()
   const [analyticsKey, setAnalyticsKey] = useState<
@@ -66,6 +70,13 @@ const PrintModal = ({ campaignId, opened, close }: PrintModalProps) => {
   )
 
   const campaign = useMemo(() => campaignData?.campaign, [campaignData])
+  const currencyName = useMemo(
+    () =>
+      campaign?.id && !!perCampaign.length
+        ? perCampaign.find((item) => item.id === campaign?.id)?.token.name || ''
+        : '',
+    [campaign?.id, perCampaign]
+  )
   const campaignMappedAnalytics: BaseAnalyticsData[] | undefined = useMemo(
     () => mappedAnalytics.get(analyticsKey?.key || ''),
     [analyticsKey, mappedAnalytics]
@@ -88,42 +99,20 @@ const PrintModal = ({ campaignId, opened, close }: PrintModalProps) => {
   const elements: IInvoiceDetails = useMemo(() => {
     return {
       invoiceId: campaign?.id || '',
-      // TODO: Fix the invoice date
-      invoiceDate: Date.now().toString(),
-      seller: {
-        name: billingDetails.companyName,
-        address: billingDetails.companyAddress,
-        city: billingDetails.companyCity,
-        country: billingDetails.companyCountry,
-        regNumber: billingDetails.companyNumber,
-        vatRegNumber: billingDetails.companyNumberPrim,
+      // TODO: Fix the invoice date. use campaign closing date whenever it's added in the
+      invoiceDate: new Date(),
+      seller: ADEX_COMPANY_DETAILS,
+      buyer: {
+        ...billingDetails,
         ethAddress: address
       },
-      buyer: {
-        name: 'AdEx Network',
-        address: 'address line 2',
-        city: 'City 2',
-        country: 'Country 2',
-        regNumber: '304503203',
-        vatRegNumber: 'LT100011416217',
-        ethAddress: '0x2F0FC72542A8bD8ds1c51B2751686A3Bf3eks42w'
-      },
       invoiceData:
-        campaignMappedAnalytics && campaignMappedAnalytics.length
-          ? campaignMappedAnalytics.map(
-              (element) =>
-                ({
-                  description: element.segment,
-                  unitOfMeasure: 'impressions',
-                  quantity: element.impressions,
-                  priceInUsd: element.ctr,
-                  amountInUsd: element.paid
-                } as IInvoiceData)
-            )
-          : [],
-      vatPercentageInUSD: 0
+        campaignMappedAnalytics && campaignMappedAnalytics.length ? campaignMappedAnalytics : [],
+      // TODO: Check if the value of VAT% should be greater than 0
+      vatPercentageInUSD: 0,
+      currencyName
     }
-  }, [])
+  }, [address, billingDetails, campaign?.id, campaignMappedAnalytics, currencyName])
 
   const { classes } = useStyles()
   return (

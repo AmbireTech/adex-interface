@@ -1,4 +1,4 @@
-import { IInvoiceDetails, IStatements } from 'types'
+import { IStatements } from 'types'
 
 // const invoiceElements: IInvoices[] = [
 const invoiceElements = [
@@ -857,7 +857,9 @@ const statementElements: IStatements[] = [
 ]
 // const invoiceElements: IInvoices[] | null = null
 // const statementElements: IStatements[] | null = null
-const invoiceDetails: IInvoiceDetails = {
+
+// const invoiceDetails: IInvoiceDetails = {
+const invoiceDetails = {
   invoiceId: 'BDG0086',
   invoiceDate: '01.02.2023',
   seller: {

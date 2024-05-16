@@ -1,4 +1,5 @@
 import { Grid, Space, Table, createStyles } from '@mantine/core'
+import { formatDate } from 'helpers'
 // TODO: delete mock data
 // import { invoiceDetails } from 'components/Billing/mockedData'
 import { useMemo } from 'react'
@@ -13,7 +14,7 @@ const useStyles = createStyles((theme) => ({
     }
   },
   title: {
-    fontSize: theme.fontSizes.xl,
+    fontSize: theme.fontSizes.lg,
     fontWeight: theme.other.fontWeights.bold
   },
   right: {
@@ -34,16 +35,9 @@ const useStyles = createStyles((theme) => ({
 const InvoicesPDF = ({ invoiceDetails }: { invoiceDetails: IInvoiceDetails }) => {
   const { classes, cx } = useStyles()
 
-  const formatDate = (date: string) =>
-    new Date(date).toLocaleDateString('en-us', {
-      day: 'numeric',
-      year: 'numeric',
-      month: 'long'
-    })
-
   const calculateTotal = useMemo(() => {
-    return invoiceDetails.invoiceData.map((item) => item.amountInUsd).reduce((a, b) => a + b, 0)
-  }, [])
+    return invoiceDetails.invoiceData.map((item) => item.paid).reduce((a, b) => a + b, 0)
+  }, [invoiceDetails.invoiceData])
 
   return (
     <Grid grow align="center">
@@ -57,30 +51,30 @@ const InvoicesPDF = ({ invoiceDetails }: { invoiceDetails: IInvoiceDetails }) =>
       <Grid.Col span={6}>
         <div className={classes.wrapper}>
           <span className={classes.italic}>Seller</span>
-          <span className={classes.bold}>{invoiceDetails.seller.name}</span>
-          <span>{invoiceDetails.seller.address}</span>
-          <span>{invoiceDetails.seller.city}</span>
-          <span>{invoiceDetails.seller.country}</span>
+          <span className={classes.bold}>{invoiceDetails.seller.companyName}</span>
+          <span>{invoiceDetails.seller.companyAddress}</span>
+          <span>{invoiceDetails.seller.companyCity}</span>
+          <span>{invoiceDetails.seller.companyCountry}</span>
         </div>
         <Space h="xl" />
         <div className={classes.wrapper}>
-          <span>Reg. No.: {invoiceDetails.seller.regNumber}</span>
-          <span>VAT Reg. No.: {invoiceDetails.seller.vatRegNumber}</span>
+          <span>Reg. No.: {invoiceDetails.seller.companyNumber}</span>
+          <span>VAT Reg. No.: {invoiceDetails.seller.companyNumberPrim}</span>
           <span>ETH Address: {invoiceDetails.seller.ethAddress}</span>
         </div>
       </Grid.Col>
       <Grid.Col span={6}>
         <div className={classes.wrapper}>
           <span className={classes.italic}>Buyer</span>
-          <span className={classes.bold}>{invoiceDetails.buyer.name}</span>
-          <span>{invoiceDetails.buyer.address}</span>
-          <span>{invoiceDetails.buyer.city}</span>
-          <span>{invoiceDetails.buyer.country}</span>
+          <span className={classes.bold}>{invoiceDetails.buyer.companyName}</span>
+          <span>{invoiceDetails.buyer.companyAddress}</span>
+          <span>{invoiceDetails.buyer.companyCity}</span>
+          <span>{invoiceDetails.buyer.companyCountry}</span>
         </div>
         <Space h="xl" />
         <div className={classes.wrapper}>
-          <span>Reg. No.: {invoiceDetails.buyer.regNumber}</span>
-          <span>VAT Reg. No.: {invoiceDetails.buyer.vatRegNumber}</span>
+          <span>Reg. No.: {invoiceDetails.buyer.companyNumber}</span>
+          <span>VAT Reg. No.: {invoiceDetails.buyer.companyNumberPrim}</span>
           <span>ETH Address: {invoiceDetails.buyer.ethAddress}</span>
         </div>
       </Grid.Col>
@@ -92,11 +86,14 @@ const InvoicesPDF = ({ invoiceDetails }: { invoiceDetails: IInvoiceDetails }) =>
           <thead>
             <tr>
               <th>No.</th>
-              <th>Description</th>
-              <th>Unit of Measure</th>
-              <th>Quantity</th>
-              <th>Price, USD</th>
-              <th>Amount, USD</th>
+              {/* TODO: check what the placement is */}
+              {/* <th> {placement === 'app' ? 'App' : 'Website'}</th> */}
+              <th>Website</th>
+              <th>Impressions</th>
+              <th>Clicks</th>
+              <th>CTR %</th>
+              <th>Average CPM</th>
+              <th>Spent</th>
             </tr>
           </thead>
           <tbody>
@@ -104,30 +101,31 @@ const InvoicesPDF = ({ invoiceDetails }: { invoiceDetails: IInvoiceDetails }) =>
               // eslint-disable-next-line
               <tr key={index}>
                 <td>{index + 1}</td>
-                <td>{e.description}</td>
-                <td>{e.unitOfMeasure}</td>
-                <td>{e.quantity}</td>
-                <td>{e.priceInUsd}</td>
-                <td>{e.amountInUsd}</td>
+                <td>{e.segment}</td>
+                <td>{e.impressions.toLocaleString()}</td>
+                <td>{e.clicks.toLocaleString()}</td>
+                <td>{e.ctr}</td>
+                <td>{`${e.avgCpm} ${invoiceDetails.currencyName}`}</td>
+                <td>{`${e.paid.toFixed(4)} ${invoiceDetails.currencyName}`}</td>
               </tr>
             ))}
           </tbody>
         </Table>
       </Grid.Col>
       <Grid.Col span={9} className={cx(classes.right, classes.bold)}>
-        Total Exl. VAT, USD
+        {`Total Exl. VAT, ${invoiceDetails.currencyName}`}
       </Grid.Col>
       <Grid.Col span={2} className={cx(classes.right, classes.bold)}>
         {calculateTotal.toFixed(2)}
       </Grid.Col>
       <Grid.Col span={9} className={cx(classes.right, classes.bold)}>
-        VAT 0%, USD
+        {`VAT 0%, ${invoiceDetails.currencyName}`}
       </Grid.Col>
       <Grid.Col span={2} className={cx(classes.right, classes.bold)}>
         {invoiceDetails.vatPercentageInUSD.toFixed(2)}
       </Grid.Col>
       <Grid.Col span={9} className={cx(classes.right, classes.bold)}>
-        Total Incl. VAT, USD
+        {`Total Incl. VAT, ${invoiceDetails.currencyName}`}
       </Grid.Col>
       <Grid.Col span={2} className={cx(classes.right, classes.bold)}>
         {(calculateTotal + invoiceDetails.vatPercentageInUSD).toFixed(2)}
