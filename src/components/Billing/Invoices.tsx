@@ -14,6 +14,11 @@ import { formatDateShort } from 'helpers'
 
 const columnTitles = ['Company Name', 'Campaign Period', 'Amount Spent']
 
+const isCampaignEnded = (campaignStatus: CampaignStatus) =>
+  [CampaignStatus.expired, CampaignStatus.closedByUser, CampaignStatus.exhausted].includes(
+    campaignStatus
+  )
+
 const Invoices = () => {
   const [opened, { open, close }] = useDisclosure(false)
   const { campaignsData } = useCampaignsData()
@@ -36,14 +41,6 @@ const Invoices = () => {
     []
   )
 
-  const isCampaignEnded = useCallback(
-    (campaignStatus: CampaignStatus) =>
-      [CampaignStatus.expired, CampaignStatus.closedByUser, CampaignStatus.exhausted].includes(
-        campaignStatus
-      ),
-    []
-  )
-
   const invoiceElements: IInvoices[] = useMemo(
     () =>
       campaigns
@@ -57,7 +54,7 @@ const Invoices = () => {
           },
           amountSpent: `${campaign.paid} ${getCurrencyName(campaign.campaignId, perCampaign)} `
         })),
-    [campaigns, companyName, getCurrencyName, perCampaign, isCampaignEnded]
+    [campaigns, companyName, getCurrencyName, perCampaign]
   )
 
   const handlePreview = useCallback(
