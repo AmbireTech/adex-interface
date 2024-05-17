@@ -25,7 +25,7 @@ import { dashboardTableElements } from 'components/Dashboard/mockData'
 
 const keySeparator = '👩🏼'
 
-type DataStatus = 'loading' | 'processed'
+type DataStatus = 'loading' | 'updating' | 'processed'
 
 type QueryStatusAndType = {
   dataStatus: DataStatus
@@ -236,7 +236,7 @@ const CampaignsAnalyticsProvider: FC<PropsWithChildren> = ({ children }) => {
 
       const period = {
         start: new Date(getPeriodInitialEpoch(Number(campaign.activeFrom)) - 1),
-        end: new Date(Date.now())
+        end: new Date(Math.min(Date.now(), Number(campaign.activeTo)))
       }
 
       const periodDiff = period.end.getTime() - period.start.getTime()
