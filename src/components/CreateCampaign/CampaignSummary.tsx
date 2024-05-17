@@ -13,6 +13,7 @@ import useCustomNotifications from 'hooks/useCustomNotifications'
 import useAccount from 'hooks/useAccount'
 import { isValidHttpUrl } from 'helpers/validators'
 import { useNavigate } from 'react-router-dom'
+import throttle from 'lodash.throttle'
 
 const useStyles = createStyles((theme) => ({
   bg: {
@@ -113,6 +114,11 @@ const CampaignSummary = () => {
     updateBalance
   ])
 
+  const throttledLaunchCampaign = useMemo(
+    () => throttle(launchCampaign, 1069, { leading: true }),
+    [launchCampaign]
+  )
+
   const handleNextStepBtnClicked = useCallback(() => {
     if (step === 0) {
       const hasInvalidTargetUrl =
@@ -202,7 +208,7 @@ const CampaignSummary = () => {
             cancelBtnLabel="Go Back"
             confirmBtnLabel="Launch Campaign"
             onCancelClicked={() => console.log('Canceled')}
-            onConfirmClicked={launchCampaign}
+            onConfirmClicked={throttledLaunchCampaign}
           >
             <Flex justify="center" className={classes.confirmModalContent}>
               <div className={classes.iconWrapper}>
