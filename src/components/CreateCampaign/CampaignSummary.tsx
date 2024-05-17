@@ -2,7 +2,7 @@ import { Button, Flex, Group, Text, UnstyledButton, createStyles } from '@mantin
 import { useDisclosure } from '@mantine/hooks'
 import { CREATE_CAMPAIGN_STEPS } from 'constants/createCampaign'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import LeftArrowIcon from 'resources/icons/LeftArrow'
 import useCreateCampaignData from 'hooks/useCreateCampaignData/useCreateCampaignData'
 import CampaignDetailsRow from 'components/common/CampainDetailsRow'
@@ -13,6 +13,7 @@ import useCustomNotifications from 'hooks/useCustomNotifications'
 import useAccount from 'hooks/useAccount'
 import { isValidHttpUrl } from 'helpers/validators'
 import { useNavigate } from 'react-router-dom'
+import debounce from 'lodash.debounce'
 
 const useStyles = createStyles((theme) => ({
   bg: {
@@ -74,7 +75,6 @@ const CampaignSummary = () => {
   } = useCreateCampaignData()
   const { updateAllCampaignsData } = useCampaignsData()
   const { showNotification } = useCustomNotifications()
-  const debounceTimer = useRef<NodeJS.Timeout>()
 
   const [isNextBtnDisabled, setIsNextBtnDisabled] = useState(false)
   const noSelectedCatsOrLogs = useMemo(
@@ -114,13 +114,7 @@ const CampaignSummary = () => {
     updateBalance
   ])
 
-  const debouncedClickHandler = useCallback(() => {
-    if (debounceTimer.current) clearTimeout(debounceTimer.current)
-
-    debounceTimer.current = setTimeout(() => {
-      launchCampaign()
-    }, 300)
-  }, [launchCampaign])
+  const debouncedLaunchCampaign = useMemo(() => debounce(launchCampaign, 500), [launchCampaign])
 
   const handleNextStepBtnClicked = useCallback(() => {
     if (step === 0) {
@@ -157,9 +151,9 @@ const CampaignSummary = () => {
 
   useEffect(() => {
     return () => {
-      if (debounceTimer.current) clearTimeout(debounceTimer.current)
+      debouncedLaunchCampaign.cancel()
     }
-  }, [])
+  }, [debouncedLaunchCampaign])
 
   return (
     <>
@@ -217,7 +211,7 @@ const CampaignSummary = () => {
             cancelBtnLabel="Go Back"
             confirmBtnLabel="Launch Campaign"
             onCancelClicked={() => console.log('Canceled')}
-            onConfirmClicked={debouncedClickHandler}
+            onConfirmClicked={debouncedLaunchCampaign}
           >
             <Flex justify="center" className={classes.confirmModalContent}>
               <div className={classes.iconWrapper}>
