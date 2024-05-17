@@ -115,7 +115,7 @@ const CampaignSummary = () => {
   ])
 
   const throttledLaunchCampaign = useMemo(
-    () => throttle(launchCampaign, 500, { leading: true }),
+    () => throttle(launchCampaign, 1069, { leading: true }),
     [launchCampaign]
   )
 
