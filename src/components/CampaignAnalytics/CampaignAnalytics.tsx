@@ -56,8 +56,6 @@ const CampaignAnalytics = () => {
     [id, campaignsData]
   )
 
-  console.log('totalPaid', totalPaid)
-
   const campaignAnalytics = useMemo(
     () => analyticsData.get(analyticsKey?.key || ''),
     [analyticsData, analyticsKey]
@@ -113,6 +111,13 @@ const CampaignAnalytics = () => {
     return <div>Invalid campaign ID</div>
   }
 
+  const loading = useMemo(
+    () => !analyticsKey || !campaignMappedAnalytics,
+    [analyticsKey, campaignMappedAnalytics]
+  )
+
+  // TODO: better tabs optimization, this si temp fix that prevents 80-90% of the prev re-renders, there is sill 1 extra re-rended that can be fixed
+
   return (
     <Container fluid>
       <GoBack title="Campaign Analytics" />
@@ -123,6 +128,7 @@ const CampaignAnalytics = () => {
         styles={() => ({
           tabsList: { border: 'none', padding: '20px 0' }
         })}
+        keepMounted={false}
       >
         <Flex justify="space-between" align="baseline">
           <Tabs.List>
@@ -142,47 +148,46 @@ const CampaignAnalytics = () => {
             )}
           </Flex>
         </Flex>
-        {!analyticsKey || !campaignMappedAnalytics ? (
-          <Flex justify="center" align="center" h="60vh">
+        {loading && (
+          <Flex justify="center" align="center" mt={69}>
             <Loader size="xl" />
           </Flex>
-        ) : (
-          <>
-            <Tabs.Panel value="timeframe" pt="xs">
-              <TimeFrame
-                timeFrames={campaignMappedAnalytics}
-                period={analyticsKey?.period}
-                currencyName={currencyName}
-              />
-            </Tabs.Panel>
-            <Tabs.Panel value="hostname" pt="xs">
-              <Placements
-                placements={campaignMappedAnalytics}
-                currencyName={currencyName}
-                // NOTE: currently we have only have one placement per campaign
-                // TODO; this can be get from analytics but that means 2x request to validator
-                placement={campaign?.targetingInput.inputs.placements.in[0] || 'site'}
-              />
-            </Tabs.Panel>
-            <Tabs.Panel value="country" pt="xs">
-              <Regions
-                regions={campaignMappedAnalytics}
-                isMapVisible={isMapVisible}
-                currencyName={currencyName}
-                totalPaid={totalPaid}
-                onClose={() => setIsMapVisible(false)}
-              />
-            </Tabs.Panel>
-            <Tabs.Panel value="adUnit" pt="xs">
-              <Creatives
-                creatives={campaignMappedAnalytics}
-                units={campaign?.adUnits}
-                currencyName={currencyName}
-              />
-            </Tabs.Panel>
-          </>
         )}
       </Tabs>
+
+      {}
+      {!loading && activeTab === 'timeframe' && (
+        <TimeFrame
+          timeFrames={campaignMappedAnalytics}
+          period={analyticsKey?.period}
+          currencyName={currencyName}
+        />
+      )}
+      {!loading && activeTab === 'hostname' && (
+        <Placements
+          placements={campaignMappedAnalytics}
+          currencyName={currencyName}
+          // NOTE: currently we have only have one placement per campaign
+          // TODO; this can be get from analytics but that means 2x request to validator
+          placement={campaign?.targetingInput.inputs.placements.in[0] || 'site'}
+        />
+      )}
+      {!loading && activeTab === 'country' && (
+        <Regions
+          regions={campaignMappedAnalytics}
+          isMapVisible={isMapVisible}
+          currencyName={currencyName}
+          totalPaid={totalPaid}
+          onClose={() => setIsMapVisible(false)}
+        />
+      )}
+      {!loading && activeTab === 'adUnit' && (
+        <Creatives
+          creatives={campaignMappedAnalytics}
+          units={campaign?.adUnits}
+          currencyName={currencyName}
+        />
+      )}
     </Container>
   )
 }
