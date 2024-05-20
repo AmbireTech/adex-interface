@@ -1,4 +1,4 @@
-import { Container, Flex, Grid, Popover, Stack, createStyles, Text } from '@mantine/core'
+import { Container, Flex, Grid, Popover, Stack, Text, createStyles } from '@mantine/core'
 import { useMediaQuery } from '@mantine/hooks'
 import CustomCard from 'components/common/CustomCard'
 import { useState } from 'react'
@@ -18,11 +18,8 @@ enum TabType {
 const useStyles = createStyles((theme) => {
   return {
     container: {
-      backgroundColor: theme.colors.mainBackground[theme.fn.primaryShade()],
-      borderRadius: theme.radius.sm,
-      boxShadow: theme.shadows.xs,
       overflow: 'hidden',
-      padding: theme.spacing.lg
+      padding: theme.spacing.xs
     }
   }
 })

@@ -7,7 +7,7 @@ import { useCallback, useMemo, useState } from 'react'
 import useCampaignsData from 'hooks/useCampaignsData'
 // TODO: Delete mock data
 // import { invoiceElements } from './mockedData'
-import { CampaignFundsActive, IInvoices } from 'types'
+import { CampaignFundsActive } from 'types'
 import { CampaignStatus } from 'adex-common'
 import useAccount from 'hooks/useAccount'
 import { formatDateShort } from 'helpers'
@@ -41,17 +41,20 @@ const Invoices = () => {
     []
   )
 
-  const invoiceElements: IInvoices[] = useMemo(
+  const invoiceElements = useMemo(
     () =>
       campaigns
         .filter((c) => isCampaignEnded(c.campaign.status))
         .map((campaign) => ({
           id: campaign.campaignId,
           companyName,
-          campaignPeriod: {
-            from: formatDateShort(new Date(Number(campaign.campaign.activeFrom))),
-            to: formatDateShort(new Date(Number(campaign.campaign.activeTo)))
-          },
+          campaignPeriod: (
+            <span>
+              <span>{formatDateShort(new Date(Number(campaign.campaign.activeFrom)))} </span>
+              <br />
+              <span>{formatDateShort(new Date(Number(campaign.campaign.activeTo)))} </span>
+            </span>
+          ),
           amountSpent: `${campaign.paid} ${getCurrencyName(campaign.campaignId, perCampaign)} `
         })),
     [campaigns, companyName, getCurrencyName, perCampaign]
@@ -67,7 +70,12 @@ const Invoices = () => {
 
   return invoiceElements && invoiceElements.length ? (
     <>
-      <CustomTable headings={columnTitles} elements={invoiceElements} onPreview={handlePreview} />
+      <CustomTable
+        background
+        headings={columnTitles}
+        elements={invoiceElements}
+        onPreview={handlePreview}
+      />
       <PrintModal campaignId={selectedCampaignId} opened={opened} close={close} />
     </>
   ) : (
