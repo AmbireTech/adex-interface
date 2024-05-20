@@ -26,8 +26,11 @@ const useStyles = createStyles((theme) => ({
     overflow: 'hidden',
     overflowX: 'auto'
   },
-  mobileTableWrapper: { borderBottom: '1px solid #33333333', textAlign: 'center' },
-  gridRow: { borderBottom: '1px solid #33333333' },
+  mobileTableWrapper: {
+    borderBottom: `1px solid ${theme.colors.decorativeBorders[theme.fn.primaryShade()]}`,
+    textAlign: 'center'
+  },
+  gridRow: { borderBottom: `1px solid ${theme.colors.decorativeBorders[theme.fn.primaryShade()]}` },
   cell: {
     overflow: 'hidden',
     whiteSpace: 'nowrap',
