@@ -37,7 +37,7 @@ function Billing() {
 
   return (
     <Grid grow columns={10}>
-      <Grid.Col span={2}>
+      <Grid.Col sm={10} md={3} lg={2}>
         <Grid>
           <Grid.Col>
             <CustomCard
@@ -88,10 +88,11 @@ function Billing() {
           </Grid.Col>
         </Grid>
       </Grid.Col>
-      <Grid.Col span={5}>
+      <Grid.Col sm={10} md={7} lg={4}>
         <TabSwitch selectedTab={selectedTab} />
       </Grid.Col>
-      <Grid.Col span={3} />
+      {/* Note: this column is an empty, we use it instead of margin */}
+      <Grid.Col sm={0} md={0} lg={4} />
     </Grid>
   )
 }
