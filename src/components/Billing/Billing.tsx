@@ -20,7 +20,7 @@ const useStyles = createStyles((theme, { windowWidth }: { windowWidth: number })
     container: {
       overflow: 'hidden',
       padding: theme.spacing.xs,
-      width: rem(windowWidth * 0.4)
+      width: windowWidth >= 768 ? rem(windowWidth * 0.4) : rem(windowWidth)
     }
   }
 })
