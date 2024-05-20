@@ -1,4 +1,4 @@
-import { Button, Group, Modal, ScrollArea, createStyles } from '@mantine/core'
+import { Button, Flex, Group, Loader, Modal, ScrollArea, createStyles } from '@mantine/core'
 import InvoicesPDF from 'components/common/CustomTable/InvoicesPDF'
 import { ADEX_COMPANY_DETAILS } from 'constants/adexCompanyDetatils'
 import useAccount from 'hooks/useAccount'
@@ -132,21 +132,30 @@ const PrintModal = ({ campaignId, opened, close }: PrintModalProps) => {
       }}
     >
       <div>
-        <Group position="right">
-          <Button mt="md" mb="md" onClick={() => window.print()}>
-            Print
-          </Button>
-        </Group>
-        <ScrollArea h={750}>
-          <div className={classes.wrapper}>
-            <div id="printable" className={classes.printable}>
-              <InvoicesPDF
-                invoiceDetails={elements}
-                placement={campaign?.targetingInput.inputs.placements.in[0] || 'site'}
-              />
-            </div>
-          </div>
-        </ScrollArea>
+        {!analyticsKey || !campaignMappedAnalytics ? (
+          <Flex justify="center" align="center" h="60vh">
+            <Loader size="xl" />
+          </Flex>
+        ) : (
+          <>
+            <Group position="right">
+              <Button mt="md" mb="md" onClick={() => window.print()}>
+                Print
+              </Button>
+            </Group>
+
+            <ScrollArea h={750}>
+              <div className={classes.wrapper}>
+                <div id="printable" className={classes.printable}>
+                  <InvoicesPDF
+                    invoiceDetails={elements}
+                    placement={campaign?.targetingInput.inputs.placements.in[0] || 'site'}
+                  />
+                </div>
+              </div>
+            </ScrollArea>
+          </>
+        )}
       </div>
     </Modal>
   )
