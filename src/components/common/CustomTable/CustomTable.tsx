@@ -24,8 +24,7 @@ const useStyles = createStyles((theme) => ({
   tableWrapper: {
     width: '100%',
     overflow: 'hidden',
-    overflowX: 'auto',
-    minWidth: 669
+    overflowX: 'auto'
   },
   mobileTableWrapper: { borderBottom: '1px solid #33333333', textAlign: 'center' },
   gridRow: { borderBottom: '1px solid #33333333' },

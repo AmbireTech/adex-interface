@@ -8,8 +8,7 @@ const useStyles = createStyles((theme) => ({
     borderRadius: theme.radius.sm,
     boxShadow: theme.shadows.xs,
     overflow: 'hidden',
-    padding: theme.spacing.lg,
-    maxWidth: 669
+    padding: theme.spacing.lg
   }
 }))
 

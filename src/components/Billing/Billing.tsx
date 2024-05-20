@@ -1,5 +1,5 @@
-import { Container, Flex, Grid, Popover, Stack, Text, createStyles } from '@mantine/core'
-import { useMediaQuery } from '@mantine/hooks'
+import { Container, Flex, Grid, Popover, Stack, Text, createStyles, rem } from '@mantine/core'
+import { useMediaQuery, useViewportSize } from '@mantine/hooks'
 import CustomCard from 'components/common/CustomCard'
 import { useState } from 'react'
 import BillingDetailsIcon from 'resources/icons/BillingDetails'
@@ -15,11 +15,12 @@ enum TabType {
   StatementsTab
 }
 
-const useStyles = createStyles((theme) => {
+const useStyles = createStyles((theme, { windowWidth }: { windowWidth: number }) => {
   return {
     container: {
       overflow: 'hidden',
-      padding: theme.spacing.xs
+      padding: theme.spacing.xs,
+      width: rem(windowWidth * 0.4)
     }
   }
 })
@@ -39,7 +40,8 @@ const TabSwitch = ({ selectedTab }: { selectedTab: TabType }) => {
 
 function Billing() {
   const isMobile = useMediaQuery('(max-width: 75rem)')
-  const { classes } = useStyles()
+  const { width: windowWidth } = useViewportSize()
+  const { classes } = useStyles({ windowWidth })
   const [selectedTab, setSelectedTab] = useState<TabType>(TabType.BillingTab)
   const handleTabClicked = (value: TabType) => setSelectedTab(value)
 
