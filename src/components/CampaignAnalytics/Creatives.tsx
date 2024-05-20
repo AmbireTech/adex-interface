@@ -46,13 +46,9 @@ const Creatives = ({
     [open]
   )
 
-  if (!creatives?.length || !units?.length) {
-    return <div>No creatives found</div>
-  }
-
   const elements = useMemo(() => {
     return creatives?.map((item) => {
-      const unitForId = units.find((x) => x.id === item.segment)
+      const unitForId = units?.find((x) => x.id === item.segment)
       const media = getMediaUrlWithProvider(unitForId?.banner?.mediaUrl, IPFS_GATEWAY) || ''
 
       return {
@@ -82,6 +78,10 @@ const Creatives = ({
       }
     })
   }, [classes.icon, classes.image, creatives, currencyName, handleMediaClick, units])
+
+  if (!elements?.length) {
+    return <div>No creatives found</div>
+  }
 
   return (
     <>

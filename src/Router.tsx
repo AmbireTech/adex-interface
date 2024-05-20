@@ -4,7 +4,8 @@ import Dashboard from 'components/Dashboard'
 import Billing from 'components/Billing'
 import GetStarted from 'components/GetStarted'
 import CampaignAnalytics from 'components/CampaignAnalytics'
-import { createBrowserRouter, Navigate, useLocation } from 'react-router-dom'
+import { createBrowserRouter, Navigate, useLocation, useRouteError, Link } from 'react-router-dom'
+import { Button } from '@mantine/core'
 
 import useAccount from 'hooks/useAccount'
 import Deposit from 'components/Deposit'
@@ -13,6 +14,20 @@ import { CreateCampaignContextProvider } from 'contexts/CreateCampaignContext/Cr
 import NotFound404 from 'components/404/404'
 import AdminPanel from './admin/Admin'
 import CampaignDetails from './components/CampaignDetails'
+
+function ErrorBoundary() {
+  const error = useRouteError()
+  console.error(error)
+  return (
+    <div>
+      <div>Unexpected error occurred</div>
+      <br />
+      <Button variant="filled" color="secondaryAccent" size="md" component={Link} to="/dashboard">
+        Go to dashboard
+      </Button>
+    </div>
+  )
+}
 
 function RequireAuth({ children, admin }: { children: JSX.Element; admin?: boolean }) {
   const {
@@ -41,7 +56,8 @@ export const router = createBrowserRouter(
   [
     {
       path: '/',
-      element: <Navigate to="/dashboard" />
+      element: <Navigate to="/dashboard" />,
+      errorElement: <ErrorBoundary />
     },
     {
       path: '/login',
@@ -57,6 +73,7 @@ export const router = createBrowserRouter(
           </CreateCampaignContextProvider>
         </RequireAuth>
       ),
+      errorElement: <ErrorBoundary />,
       children: [
         {
           path: '',

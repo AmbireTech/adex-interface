@@ -30,9 +30,8 @@ const EnvBanner = () => (
   <Progress
     radius="xs"
     size={18}
-    animate
     style={{ zIndex: 42069, opacity: 0.5, position: 'fixed', top: 0, left: 0, right: 0 }}
-    sections={[{ value: 100, color: 'grape', label: ENV }]}
+    sections={[{ value: 100, color: 'pink', label: ENV }]}
   />
 )
 
