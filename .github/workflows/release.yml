@@ -30,8 +30,8 @@ jobs:
           REACT_APP_VALIDATOR_BASE_URL: https://scratchy.adex.network:8443
         run: yarn build
 
-      - name: GH pages 404
-        run: cp ./build/index.html ./build/404.html
+      # - name: GH pages 404
+      #   run: cp ./build/index.html ./build/404.html
 
       - name: Release (prod 🍩🐼)
         if: github.ref == 'refs/heads/main'
