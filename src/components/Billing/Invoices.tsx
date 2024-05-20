@@ -7,12 +7,11 @@ import { useCallback, useMemo, useState } from 'react'
 import useCampaignsData from 'hooks/useCampaignsData'
 // TODO: Delete mock data
 // import { invoiceElements } from './mockedData'
-import { CampaignFundsActive } from 'types'
 import { CampaignStatus } from 'adex-common'
 import useAccount from 'hooks/useAccount'
 import { formatDateShort } from 'helpers'
 
-const columnTitles = ['Company Name', 'Campaign Period', 'Amount Spent']
+const columnTitles = ['Company Name', 'Campaign Period']
 
 const isCampaignEnded = (campaignStatus: CampaignStatus) =>
   [CampaignStatus.expired, CampaignStatus.closedByUser, CampaignStatus.exhausted].includes(
@@ -25,21 +24,11 @@ const Invoices = () => {
   const campaigns = useMemo(() => Array.from(campaignsData.values()), [campaignsData])
   const {
     adexAccount: {
-      billingDetails: { companyName },
-      fundsOnCampaigns: { perCampaign }
+      billingDetails: { companyName }
     }
   } = useAccount()
 
   const [selectedCampaignId, setSelectedCampaignId] = useState('')
-
-  const getCurrencyName = useCallback(
-    (campaignId: string, campaings: CampaignFundsActive[]) =>
-      campaignId && !!campaings.length
-        ? campaings.find((item) => item.id === campaignId)?.token.name || ''
-        : '',
-
-    []
-  )
 
   const invoiceElements = useMemo(
     () =>
@@ -54,10 +43,9 @@ const Invoices = () => {
               <br />
               <span>{formatDateShort(new Date(Number(campaign.campaign.activeTo)))} </span>
             </span>
-          ),
-          amountSpent: `${campaign.paid} ${getCurrencyName(campaign.campaignId, perCampaign)} `
+          )
         })),
-    [campaigns, companyName, getCurrencyName, perCampaign]
+    [campaigns, companyName]
   )
 
   const handlePreview = useCallback(
