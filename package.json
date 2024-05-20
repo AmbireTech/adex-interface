@@ -2,7 +2,6 @@
   "name": "adex-interface",
   "version": "0.1.27",
   "private": true,
-  "homepage": ".",
   "dependencies": {
     "@ambire/login-sdk-core": "^0.0.21",
     "@emotion/react": "^11.10.6",
