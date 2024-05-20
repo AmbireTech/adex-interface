@@ -1,5 +1,5 @@
 import { Container, Flex, Grid, Popover, Stack, Text, createStyles, rem } from '@mantine/core'
-import { useMediaQuery, useViewportSize } from '@mantine/hooks'
+import { useViewportSize } from '@mantine/hooks'
 import CustomCard from 'components/common/CustomCard'
 import { useState } from 'react'
 import BillingDetailsIcon from 'resources/icons/BillingDetails'
@@ -15,17 +15,30 @@ enum TabType {
   StatementsTab
 }
 
-const useStyles = createStyles(
-  (theme, { windowWidth, isMobile }: { windowWidth: number; isMobile: boolean }) => {
-    return {
-      container: {
-        overflow: 'hidden',
-        padding: theme.spacing.xs,
-        width: !isMobile ? rem(windowWidth * 0.4) : rem(windowWidth)
+const useStyles = createStyles((theme, { windowWidth }: { windowWidth: number }) => {
+  return {
+    btnsContainer: {
+      flexDirection: 'row',
+      [theme.other.media.mobile]: {
+        flexDirection: 'column'
+      }
+    },
+    stackWidth: {
+      width: rem(300),
+      [theme.other.media.mobile]: {
+        width: '100%'
+      }
+    },
+    container: {
+      overflow: 'hidden',
+      padding: theme.spacing.xs,
+      width: rem(windowWidth * 0.4),
+      [theme.other.media.mobile]: {
+        width: rem(windowWidth)
       }
     }
   }
-)
+})
 
 const TabSwitch = ({ selectedTab }: { selectedTab: TabType }) => {
   switch (selectedTab) {
@@ -41,9 +54,8 @@ const TabSwitch = ({ selectedTab }: { selectedTab: TabType }) => {
 }
 
 function Billing() {
-  const isMobile = useMediaQuery('(max-width: 75rem)')
   const { width: windowWidth } = useViewportSize()
-  const { classes } = useStyles({ windowWidth, isMobile })
+  const { classes } = useStyles({ windowWidth })
   const [selectedTab, setSelectedTab] = useState<TabType>(TabType.BillingTab)
   const handleTabClicked = (value: TabType) => setSelectedTab(value)
 
@@ -51,8 +63,8 @@ function Billing() {
   const [openedStatements, setOpenedStatements] = useState(false)
 
   return (
-    <Flex gap="xl" direction={isMobile ? 'column' : 'row'}>
-      <Stack w={isMobile ? '100%' : '300px'}>
+    <Flex gap="xl" className={classes.btnsContainer}>
+      <Stack className={classes.stackWidth}>
         <CustomCard
           width="100%"
           height={100}
