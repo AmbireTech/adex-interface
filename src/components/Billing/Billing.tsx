@@ -15,15 +15,17 @@ enum TabType {
   StatementsTab
 }
 
-const useStyles = createStyles((theme, { windowWidth }: { windowWidth: number }) => {
-  return {
-    container: {
-      overflow: 'hidden',
-      padding: theme.spacing.xs,
-      width: windowWidth >= 768 ? rem(windowWidth * 0.4) : rem(windowWidth)
+const useStyles = createStyles(
+  (theme, { windowWidth, isMobile }: { windowWidth: number; isMobile: boolean }) => {
+    return {
+      container: {
+        overflow: 'hidden',
+        padding: theme.spacing.xs,
+        width: !isMobile ? rem(windowWidth * 0.4) : rem(windowWidth)
+      }
     }
   }
-})
+)
 
 const TabSwitch = ({ selectedTab }: { selectedTab: TabType }) => {
   switch (selectedTab) {
@@ -41,7 +43,7 @@ const TabSwitch = ({ selectedTab }: { selectedTab: TabType }) => {
 function Billing() {
   const isMobile = useMediaQuery('(max-width: 75rem)')
   const { width: windowWidth } = useViewportSize()
-  const { classes } = useStyles({ windowWidth })
+  const { classes } = useStyles({ windowWidth, isMobile })
   const [selectedTab, setSelectedTab] = useState<TabType>(TabType.BillingTab)
   const handleTabClicked = (value: TabType) => setSelectedTab(value)
 
