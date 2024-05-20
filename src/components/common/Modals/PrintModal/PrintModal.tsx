@@ -1,4 +1,4 @@
-import { Button, Group, Modal, createStyles } from '@mantine/core'
+import { Button, Group, Modal, ScrollArea, createStyles } from '@mantine/core'
 import InvoicesPDF from 'components/common/CustomTable/InvoicesPDF'
 import { ADEX_COMPANY_DETAILS } from 'constants/adexCompanyDetatils'
 import useAccount from 'hooks/useAccount'
@@ -137,14 +137,16 @@ const PrintModal = ({ campaignId, opened, close }: PrintModalProps) => {
             Print
           </Button>
         </Group>
-        <div className={classes.wrapper}>
-          <div id="printable" className={classes.printable}>
-            <InvoicesPDF
-              invoiceDetails={elements}
-              placement={campaign?.targetingInput.inputs.placements.in[0] || 'site'}
-            />
+        <ScrollArea h={750}>
+          <div className={classes.wrapper}>
+            <div id="printable" className={classes.printable}>
+              <InvoicesPDF
+                invoiceDetails={elements}
+                placement={campaign?.targetingInput.inputs.placements.in[0] || 'site'}
+              />
+            </div>
           </div>
-        </div>
+        </ScrollArea>
       </div>
     </Modal>
   )
