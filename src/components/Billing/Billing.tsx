@@ -29,17 +29,8 @@ const TabSwitch = ({ selectedTab }: { selectedTab: TabType }) => {
   }
 }
 
-const BillingCard = ({ action, active, text, iconLeft }: Partial<ICustomCardProps>) => (
-  <CustomCard
-    width="100%"
-    height={100}
-    color="secondary"
-    variant="shadow"
-    text={text!}
-    iconLeft={iconLeft}
-    active={active}
-    action={action}
-  />
+const BillingCard = (props: Omit<ICustomCardProps, 'width' | 'height' | 'color' | 'variant'>) => (
+  <CustomCard {...props} width="100%" height={100} color="secondary" variant="shadow" />
 )
 
 function Billing() {
