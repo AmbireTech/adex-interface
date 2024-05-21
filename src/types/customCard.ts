@@ -1,6 +1,6 @@
 import { MantineColor } from '@mantine/core'
 
-type CustomCardType = 'border' | 'shadow'
+export type CustomCardType = 'border' | 'shadow'
 
 export interface ICustomCardProps {
   icon?: React.ReactNode
