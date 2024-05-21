@@ -1,8 +1,19 @@
-import { Button, Flex, Grid, TextInput } from '@mantine/core'
+import { Button, Flex, Grid, TextInput, createStyles, Text } from '@mantine/core'
 import { useForm } from '@mantine/form'
 import useAccount from 'hooks/useAccount'
 
+const useStyles = createStyles((theme) => ({
+  container: {
+    backgroundColor: theme.colors.mainBackground[theme.fn.primaryShade()],
+    borderRadius: theme.radius.sm,
+    boxShadow: theme.shadows.xs,
+    overflow: 'hidden',
+    padding: theme.spacing.lg
+  }
+}))
+
 const BillingDetails = () => {
+  const { classes } = useStyles()
   const {
     updateBillingDetails,
     adexAccount: { billingDetails }
@@ -40,10 +51,15 @@ const BillingDetails = () => {
   })
 
   return (
-    <form onSubmit={form.onSubmit((values) => updateBillingDetails(values))}>
+    <form
+      className={classes.container}
+      onSubmit={form.onSubmit((values) => updateBillingDetails(values))}
+    >
       <Grid gutter="xs">
         <Grid.Col>
-          <span>Company details</span>
+          <Text size="sm" color="secondaryText" weight="bold">
+            Company details
+          </Text>
         </Grid.Col>
         <Grid.Col>
           <TextInput
@@ -88,7 +104,9 @@ const BillingDetails = () => {
           />
         </Grid.Col>
         <Grid.Col>
-          <span>Company address</span>
+          <Text size="sm" color="secondaryText" weight="bold">
+            Company address
+          </Text>
         </Grid.Col>
         <Grid.Col>
           <TextInput

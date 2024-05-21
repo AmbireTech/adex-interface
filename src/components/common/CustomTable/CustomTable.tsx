@@ -26,8 +26,17 @@ const useStyles = createStyles((theme) => ({
     overflow: 'hidden',
     overflowX: 'auto'
   },
-  mobileTableWrapper: { borderBottom: '1px solid #33333333', textAlign: 'center' },
-  gridRow: { borderBottom: '1px solid #33333333' }
+  mobileTableWrapper: {
+    borderBottom: `1px solid ${theme.colors.decorativeBorders[theme.fn.primaryShade()]}`,
+    textAlign: 'center'
+  },
+  gridRow: { borderBottom: `1px solid ${theme.colors.decorativeBorders[theme.fn.primaryShade()]}` },
+  cell: {
+    overflow: 'hidden',
+    whiteSpace: 'nowrap',
+    textOverflow: 'ellipsis',
+    maxWidth: 200
+  }
 }))
 
 const CustomTable = ({
@@ -135,12 +144,8 @@ const CustomTable = ({
       <tr key={e.id}>
         {columns.map((column: string) => {
           return (
-            <td key={column}>
-              {typeof e[column] === 'object' &&
-              typeof e[column].from === 'string' &&
-              typeof e[column].to === 'string'
-                ? `${e[column].from} - ${e[column].to}`
-                : e[column]}
+            <td key={column} className={classes.cell}>
+              {e[column]}
             </td>
           )
         })}
@@ -190,6 +195,7 @@ const CustomTable = ({
     onDuplicate,
     onDelete,
     classes.gridRow,
+    classes.cell,
     head
   ])
 
