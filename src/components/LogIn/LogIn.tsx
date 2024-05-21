@@ -8,7 +8,8 @@ import {
   ThemeIcon,
   Flex,
   rem,
-  useMantineTheme
+  useMantineTheme,
+  LoadingOverlay
 } from '@mantine/core'
 import LogInBackground from 'resources/backgrounds/pattern.svg'
 import LowerShape from 'resources/backgrounds/lowerShape.svg'
@@ -43,7 +44,7 @@ const useStyles = createStyles(() => {
 
 function LogIn() {
   const { classes } = useStyles()
-  const { connectWallet, authenticated } = useAccount()
+  const { connectWallet, authenticated, isLoading } = useAccount()
   const year = useMemo(() => new Date().getFullYear(), [])
   const theme = useMantineTheme()
   const navigate = useNavigate()
@@ -55,6 +56,7 @@ function LogIn() {
   const handleGetStartedBtnClicked = useCallback(() => connectWallet(), [connectWallet])
   return (
     <Container fluid h="100vh" className={classes.container}>
+      <LoadingOverlay visible={isLoading} transitionDuration={500} overlayBlur={2} />
       <Flex h="100%" pt="xl" pb="xl" direction="column" justify="space-around" align="center">
         <div className={classes.logoContainer}>
           <AdExLogo
