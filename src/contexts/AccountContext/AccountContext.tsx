@@ -67,6 +67,7 @@ interface IAccountContext {
   ) => Promise<T>
   updateBalance: () => Promise<void>
   updateBillingDetails: (billingDetails: BillingDetails) => Promise<void>
+  isLoading: boolean
 }
 
 const AccountContext = createContext<IAccountContext | null>(null)
@@ -140,7 +141,7 @@ function deserializeJSON(value: string) {
 const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
   const { showNotification } = useCustomNotifications()
   const ambireSDK = useMemo(() => ambireLoginSDK, [])
-
+  const [isLoading, setIsLoading] = useState(false)
   const [sdkMsgSignature, setSdkMsgSignature] = useState<string>('')
   const [adexAccount, setAdexAccount] = useLocalStorage<IAccountContext['adexAccount']>({
     key: 'adexAccount',
@@ -325,7 +326,10 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
           signature: sdkMsgSignature
         })
 
-        if (!authResp) return
+        if (!authResp) {
+          setIsLoading(false)
+          throw new Error('Verify login failed')
+        }
 
         setAdexAccount((prev) => {
           const { accessToken, refreshToken } = authResp
@@ -338,9 +342,11 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
 
           return next
         })
+        setIsLoading(false)
       } catch (error) {
         console.error('Error verify login:', error)
         showNotification('error', 'Verify login failed')
+        setIsLoading(false)
       }
     }
 
@@ -349,8 +355,8 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
     sdkMsgSignature,
     adexAccount.authMsgResp,
     adexAccount.authenticated,
-    setAdexAccount,
-    showNotification
+    showNotification,
+    setAdexAccount
   ])
 
   const handleMsgRejected = useCallback(() => {
@@ -376,7 +382,12 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
     ambireSDK.onAlreadyLoggedIn(handleRegistrationOrLoginSuccess)
   }, [ambireSDK, handleRegistrationOrLoginSuccess])
   useEffect(() => {
-    ambireSDK.onMsgSigned(({ signature }: any) => setSdkMsgSignature(signature))
+    ambireSDK.onMsgSigned(({ signature }: any) =>
+      setSdkMsgSignature(() => {
+        setIsLoading(true)
+        return signature
+      })
+    )
   }, [ambireSDK])
 
   useEffect(() => {
@@ -486,7 +497,8 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
       resetAdexAccount,
       adexServicesRequest,
       updateBalance,
-      updateBillingDetails
+      updateBillingDetails,
+      isLoading
     }),
     [
       adexAccount,
@@ -500,7 +512,8 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
       resetAdexAccount,
       adexServicesRequest,
       updateBalance,
-      updateBillingDetails
+      updateBillingDetails,
+      isLoading
     ]
   )
 
