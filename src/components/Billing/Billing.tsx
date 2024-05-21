@@ -1,6 +1,6 @@
-import { Grid, MantineColor, Popover, Text } from '@mantine/core'
+import { Grid, Popover, Text } from '@mantine/core'
 // import { useViewportSize } from '@mantine/hooks'
-import { CustomCardType } from 'types'
+import { ICustomCardProps } from 'types'
 import CustomCard from 'components/common/CustomCard'
 import { useState } from 'react'
 import BillingDetailsIcon from 'resources/icons/BillingDetails'
@@ -16,13 +16,6 @@ enum TabType {
   StatementsTab
 }
 
-type CustomCardCommonProps = {
-  color: MantineColor
-  width: number | string
-  height: number | string
-  variant?: CustomCardType
-}
-
 const TabSwitch = ({ selectedTab }: { selectedTab: TabType }) => {
   switch (selectedTab) {
     case TabType.BillingTab:
@@ -36,12 +29,18 @@ const TabSwitch = ({ selectedTab }: { selectedTab: TabType }) => {
   }
 }
 
-const CARD_COMMON_PROPS: CustomCardCommonProps = {
-  width: '100%',
-  height: 100,
-  color: 'secondary',
-  variant: 'shadow'
-}
+const BillingCard = ({ action, active, text, iconLeft }: Partial<ICustomCardProps>) => (
+  <CustomCard
+    width="100%"
+    height={100}
+    color="secondary"
+    variant="shadow"
+    text={text!}
+    iconLeft={iconLeft}
+    active={active}
+    action={action}
+  />
+)
 
 function Billing() {
   const [selectedTab, setSelectedTab] = useState<TabType>(TabType.BillingTab)
@@ -55,21 +54,19 @@ function Billing() {
       <Grid.Col sm={10} md={3} lg={2}>
         <Grid>
           <Grid.Col>
-            <CustomCard
+            <BillingCard
               text="Billing details"
               iconLeft={<BillingDetailsIcon size="24px" />}
               active={selectedTab === TabType.BillingTab}
               action={() => handleTabClicked(TabType.BillingTab)}
-              {...CARD_COMMON_PROPS}
             />
           </Grid.Col>
           <Grid.Col>
-            <CustomCard
+            <BillingCard
               text="Invoices"
               iconLeft={<InvoiceIcon size="24px" />}
               active={selectedTab === TabType.InvoicesTab}
               action={() => handleTabClicked(TabType.InvoicesTab)}
-              {...CARD_COMMON_PROPS}
             />
           </Grid.Col>
           <Grid.Col>
@@ -77,13 +74,12 @@ function Billing() {
             <Popover opened={openedStatements} onChange={setOpenedStatements} closeOnClickOutside>
               <Popover.Target>
                 <div>
-                  <CustomCard
+                  <BillingCard
                     text="Account Statements"
                     iconLeft={<StatementsIcon size="24px" />}
                     active={selectedTab === TabType.StatementsTab}
                     // action={() => handleTabClicked(TabType.StatementsTab)}
                     action={() => setOpenedStatements((o) => !o)}
-                    {...CARD_COMMON_PROPS}
                   />
                 </div>
               </Popover.Target>
