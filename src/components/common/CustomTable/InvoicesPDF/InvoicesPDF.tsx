@@ -35,14 +35,16 @@ const useStyles = createStyles((theme) => ({
     fontStyle: 'italic'
   },
   wrap: {
-    maxWidth: 200,
     wordBreak: 'break-word'
   },
   smallFontSize: {
     fontSize: theme.fontSizes.xs
   },
   borderBottom: { borderBottom: '1px solid black', width: '90%', height: '70%' },
-  signature: { display: 'flex', justifyContent: 'center', fontSize: theme.fontSizes.xs }
+  signature: { display: 'flex', justifyContent: 'center', fontSize: theme.fontSizes.xs },
+  rightAlignedText: {
+    textAlign: 'end'
+  }
 }))
 
 const InvoicesPDF = ({ invoiceDetails, placement }: InvoicesPDFProps) => {
@@ -53,12 +55,12 @@ const InvoicesPDF = ({ invoiceDetails, placement }: InvoicesPDFProps) => {
   }, [invoiceDetails.invoiceData])
 
   return (
-    <Grid grow align="center">
+    <Grid grow align="center" className={classes.smallFontSize}>
       <Grid.Col span={12}>
         <div className={classes.right}>
           <div className={classes.title}>VAT Invoice</div>
           <div className={classes.title}>No. {invoiceDetails.invoiceId}</div>
-          <span className={classes.smallFontSize}>{formatDate(invoiceDetails.invoiceDate)}</span>
+          <span>{formatDate(invoiceDetails.invoiceDate)}</span>
         </div>
       </Grid.Col>
       <Grid.Col span={6}>
@@ -94,16 +96,24 @@ const InvoicesPDF = ({ invoiceDetails, placement }: InvoicesPDFProps) => {
       <Grid.Col span={12}>
         <Space h="xl" />
         <Space h="xl" />
-        <Table withBorder withColumnBorders fontSize="xs">
+        <Table withBorder withColumnBorders fontSize="xs" verticalSpacing="xs" w="100%">
           <thead>
             <tr>
               <th>No.</th>
-              <th> {placement === 'app' ? 'App' : 'Website'}</th>
+              <th>{placement === 'app' ? 'App' : 'Website'}</th>
               <th>Impressions</th>
               <th>Clicks</th>
               <th>CTR %</th>
-              <th>Average CPM</th>
-              <th>Spent</th>
+              <th>
+                <span>Average CPM</span>
+                <br />
+                <span>({invoiceDetails.currencyName})</span>
+              </th>
+              <th>
+                <span>Spent</span>
+                <br />
+                <span>({invoiceDetails.currencyName})</span>
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -112,34 +122,32 @@ const InvoicesPDF = ({ invoiceDetails, placement }: InvoicesPDFProps) => {
               <tr key={index}>
                 <td>{index + 1}</td>
                 <td className={classes.wrap}>{getHumneSrcName(e.segment, placement)}</td>
-                <td className={classes.wrap}>{e.impressions.toLocaleString()}</td>
-                <td className={classes.wrap}>{e.clicks.toLocaleString()}</td>
-                <td className={classes.wrap}>{e.ctr}</td>
-                <td className={classes.wrap}>{`${e.avgCpm} ${invoiceDetails.currencyName}`}</td>
-                <td className={classes.wrap}>{`${e.paid.toFixed(4)} ${
-                  invoiceDetails.currencyName
-                }`}</td>
+                <td className={classes.rightAlignedText}>{e.impressions.toLocaleString()}</td>
+                <td className={classes.rightAlignedText}>{e.clicks.toLocaleString()}</td>
+                <td className={classes.rightAlignedText}>{e.ctr}</td>
+                <td className={classes.rightAlignedText}>{e.avgCpm}</td>
+                <td className={classes.rightAlignedText}>{e.paid.toFixed(4)}</td>
               </tr>
             ))}
           </tbody>
         </Table>
       </Grid.Col>
-      <Grid.Col span={9} className={cx(classes.right, classes.bold, classes.smallFontSize)}>
+      <Grid.Col span={9} className={cx(classes.right, classes.bold)}>
         {`Total Exl. VAT, ${invoiceDetails.currencyName}`}
       </Grid.Col>
-      <Grid.Col span={2} className={cx(classes.right, classes.bold, classes.smallFontSize)}>
+      <Grid.Col span={2} className={cx(classes.right, classes.bold)}>
         {calculateTotal.toFixed(2)}
       </Grid.Col>
-      <Grid.Col span={9} className={cx(classes.right, classes.bold, classes.smallFontSize)}>
+      <Grid.Col span={9} className={cx(classes.right, classes.bold)}>
         {`VAT 0%, ${invoiceDetails.currencyName}`}
       </Grid.Col>
-      <Grid.Col span={2} className={cx(classes.right, classes.bold, classes.smallFontSize)}>
+      <Grid.Col span={2} className={cx(classes.right, classes.bold)}>
         {invoiceDetails.vatPercentageInUSD.toFixed(2)}
       </Grid.Col>
-      <Grid.Col span={9} className={cx(classes.right, classes.bold, classes.smallFontSize)}>
+      <Grid.Col span={9} className={cx(classes.right, classes.bold)}>
         {`Total Incl. VAT, ${invoiceDetails.currencyName}`}
       </Grid.Col>
-      <Grid.Col span={2} className={cx(classes.right, classes.bold, classes.smallFontSize)}>
+      <Grid.Col span={2} className={cx(classes.right, classes.bold)}>
         {(calculateTotal + invoiceDetails.vatPercentageInUSD).toFixed(2)}
       </Grid.Col>
       <Grid.Col span={12}>
