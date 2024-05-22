@@ -11,13 +11,14 @@ type InvoicesPDFProps = { invoiceDetails: IInvoiceDetails; placement: Placement 
 const useStyles = createStyles((theme) => ({
   wrapper: {
     color: theme.colors.secondaryText[theme.fn.primaryShade()],
+    fontSize: theme.fontSizes.xs,
     span: {
       display: 'block',
       wordBreak: 'break-word'
     }
   },
   title: {
-    fontSize: theme.fontSizes.lg,
+    fontSize: theme.fontSizes.sm,
     fontWeight: theme.other.fontWeights.bold
   },
   right: {
@@ -32,6 +33,17 @@ const useStyles = createStyles((theme) => ({
   },
   italic: {
     fontStyle: 'italic'
+  },
+  wrap: {
+    wordBreak: 'break-word'
+  },
+  smallFontSize: {
+    fontSize: theme.fontSizes.xs
+  },
+  borderBottom: { borderBottom: '1px solid black', width: '90%', height: '70%' },
+  signature: { display: 'flex', justifyContent: 'center', fontSize: theme.fontSizes.xs },
+  rightAlignedText: {
+    textAlign: 'end'
   }
 }))
 
@@ -43,7 +55,7 @@ const InvoicesPDF = ({ invoiceDetails, placement }: InvoicesPDFProps) => {
   }, [invoiceDetails.invoiceData])
 
   return (
-    <Grid grow align="center">
+    <Grid grow align="center" className={classes.smallFontSize}>
       <Grid.Col span={12}>
         <div className={classes.right}>
           <div className={classes.title}>VAT Invoice</div>
@@ -84,17 +96,24 @@ const InvoicesPDF = ({ invoiceDetails, placement }: InvoicesPDFProps) => {
       <Grid.Col span={12}>
         <Space h="xl" />
         <Space h="xl" />
-        <Space h="xl" />
-        <Table withBorder withColumnBorders>
+        <Table withBorder withColumnBorders fontSize="xs" verticalSpacing="xs" w="100%">
           <thead>
             <tr>
               <th>No.</th>
-              <th> {placement === 'app' ? 'App' : 'Website'}</th>
+              <th>{placement === 'app' ? 'App' : 'Website'}</th>
               <th>Impressions</th>
               <th>Clicks</th>
               <th>CTR %</th>
-              <th>Average CPM</th>
-              <th>Spent</th>
+              <th>
+                <span>Average CPM</span>
+                <br />
+                <span>({invoiceDetails.currencyName})</span>
+              </th>
+              <th>
+                <span>Spent</span>
+                <br />
+                <span>({invoiceDetails.currencyName})</span>
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -102,12 +121,12 @@ const InvoicesPDF = ({ invoiceDetails, placement }: InvoicesPDFProps) => {
               // eslint-disable-next-line
               <tr key={index}>
                 <td>{index + 1}</td>
-                <td>{getHumneSrcName(e.segment, placement)}</td>
-                <td>{e.impressions.toLocaleString()}</td>
-                <td>{e.clicks.toLocaleString()}</td>
-                <td>{e.ctr}</td>
-                <td>{`${e.avgCpm} ${invoiceDetails.currencyName}`}</td>
-                <td>{`${e.paid.toFixed(4)} ${invoiceDetails.currencyName}`}</td>
+                <td className={classes.wrap}>{getHumneSrcName(e.segment, placement)}</td>
+                <td className={classes.rightAlignedText}>{e.impressions.toLocaleString()}</td>
+                <td className={classes.rightAlignedText}>{e.clicks.toLocaleString()}</td>
+                <td className={classes.rightAlignedText}>{e.ctr}</td>
+                <td className={classes.rightAlignedText}>{e.avgCpm}</td>
+                <td className={classes.rightAlignedText}>{e.paid.toFixed(4)}</td>
               </tr>
             ))}
           </tbody>
@@ -136,17 +155,13 @@ const InvoicesPDF = ({ invoiceDetails, placement }: InvoicesPDFProps) => {
       </Grid.Col>
       <Grid.Col span={4}>
         Seller
-        <div style={{ borderBottom: '1px solid black', width: '90%', height: '70%' }} />
-        <span style={{ display: 'flex', justifyContent: 'center', fontSize: '10px' }}>
-          Title / Name / Signature
-        </span>
+        <div className={classes.borderBottom} />
+        <span className={classes.signature}>Title / Name / Signature</span>
       </Grid.Col>
       <Grid.Col span={4}>
         Buyer
-        <div style={{ borderBottom: '1px solid black', width: '90%', height: '70%' }} />
-        <span style={{ display: 'flex', justifyContent: 'center', fontSize: '10px' }}>
-          Title / Name / Signature
-        </span>
+        <div className={classes.borderBottom} />
+        <span className={classes.signature}>Title / Name / Signature</span>
       </Grid.Col>
     </Grid>
   )
