@@ -24,6 +24,23 @@ export type ImageSizes = {
   height: number
 }
 
+type BannerFormatTypes =
+  | 'appBannerFormats'
+  | 'siteBannerFormatsDesktop'
+  | 'siteBannerFormatsMobile'
+  | 'appBidFloors'
+  | 'siteDesktopBidFloors'
+  | 'siteMobileBidFloors'
+
+type Format = {
+  value: string
+  count: number
+}
+
+export type BannerFormats = {
+  [key in BannerFormatTypes]: Format[]
+}
+
 export type CreateCampaignType = {
   campaign: CampaignUI
   setCampaign: (val: CampaignUI | ((prevState: CampaignUI) => CampaignUI)) => void
@@ -38,4 +55,5 @@ export type CreateCampaignType = {
   addAdUnit: (adUnitToAdd: AdUnit) => void
   removeAdUnit: (adUnitIdToRemove: string) => void
   addTargetURLToAdUnit: (inputText: string, adUnitId: string) => void
+  bannerSizes: BannerFormats
 }

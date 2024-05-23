@@ -9,17 +9,128 @@ import {
 } from 'react'
 import { CREATE_CAMPAIGN_DEFAULT_VALUE } from 'constants/createCampaign'
 import superjson, { serialize } from 'superjson'
-import { CampaignUI, CreateCampaignType } from 'types'
+import { BannerFormats, CampaignUI, CreateCampaignType } from 'types'
 import useAccount from 'hooks/useAccount'
 import { useAdExApi } from 'hooks/useAdexServices'
 import { deepEqual, isPastDateTime, mapCampaignUItoCampaign } from 'helpers/createCampaignHelpers'
 import { parseToBigNumPrecision } from 'helpers/balances'
 import { AdUnit } from 'adex-common'
 import dayjs from 'dayjs'
+import useCustomNotifications from 'hooks/useCustomNotifications'
+
+const mockData = {
+  appBannerFormats: [
+    {
+      value: '320x50',
+      count: 5583960
+    },
+    {
+      value: '300x50',
+      count: 3862456
+    },
+    {
+      value: '250x50',
+      count: 2240770
+    },
+    {
+      value: '728x90',
+      count: 1735665
+    },
+    {
+      value: '300x250',
+      count: 1136181
+    }
+  ],
+  siteBannerFormatsDesktop: [
+    {
+      value: '300x250',
+      count: 727348
+    },
+    {
+      value: '728x90',
+      count: 689367
+    },
+    {
+      value: '300x50',
+      count: 657506
+    },
+    {
+      value: '160x90',
+      count: 630174
+    }
+  ],
+  siteBannerFormatsMobile: [
+    {
+      value: '300x250',
+      count: 1432677
+    },
+    {
+      value: '320x50',
+      count: 863368
+    },
+    {
+      value: '300x50',
+      count: 819345
+    }
+  ],
+  appBidFloors: [
+    {
+      value: '0_20-0_30',
+      count: 2355568
+    },
+    {
+      value: '0_50-1_00',
+      count: 425406
+    },
+    {
+      value: '1_00-2_00',
+      count: 339714
+    },
+    {
+      value: '0_30-0_50',
+      count: 333687
+    }
+  ],
+  siteDesktopBidFloors: [
+    {
+      value: '1_00-2_00',
+      count: 101983
+    },
+    {
+      value: '0_50-1_00',
+      count: 95211
+    },
+    {
+      value: '0_20-0_30',
+      count: 77664
+    }
+  ],
+  siteMobileBidFloors: [
+    {
+      value: '1_00-2_00',
+      count: 94638
+    },
+    {
+      value: '0_50-1_00',
+      count: 93996
+    }
+  ]
+}
+
+const bannerSizesDefaultValue = {
+  appBannerFormats: [],
+  siteBannerFormatsDesktop: [],
+  siteBannerFormatsMobile: [],
+  appBidFloors: [],
+  siteDesktopBidFloors: [],
+  siteMobileBidFloors: []
+}
 
 const CreateCampaignContext = createContext<CreateCampaignType | null>(null)
 
 const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
+  const { adexServicesRequest } = useAdExApi()
+  const { showNotification } = useCustomNotifications()
   // TODO: the address will be fixed and will always has a default value
   const {
     adexAccount,
@@ -44,6 +155,7 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
   )
 
   const [campaign, setCampaign] = useState<CampaignUI>(defaultValue)
+  const [bannerSizes, setBannerSizes] = useState<BannerFormats>(bannerSizesDefaultValue)
 
   useEffect(() => {
     const savedCampaign = localStorage.getItem('createCampaign')
@@ -54,6 +166,33 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
       }
     }
   }, [defaultValue])
+
+  const getBannerSizes = useCallback(async () => {
+    let result
+    if (process.env.NODE_ENV === 'development') {
+      result = mockData
+      setBannerSizes(result)
+    } else {
+      try {
+        result = await adexServicesRequest('backend', {
+          route: '/dsp/stats/common',
+          method: 'GET'
+        })
+
+        if (!result) {
+          throw new Error('Getting banner sizes failed.')
+        }
+        setBannerSizes(result as BannerFormats)
+      } catch (e) {
+        console.error(e)
+        showNotification('error', 'Getting banner sizes failed', 'Getting banner sizes failed')
+      }
+    }
+  }, [adexServicesRequest, showNotification])
+
+  useEffect(() => {
+    getBannerSizes()
+  }, []) // eslint-disable-line
 
   useEffect(() => {
     window.onbeforeunload = () => {
@@ -68,8 +207,6 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
       window.onbeforeunload = null
     }
   }, [])
-
-  const { adexServicesRequest } = useAdExApi()
 
   const addAdUnit = useCallback(
     (adUnitToAdd: AdUnit) => {
@@ -207,7 +344,8 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
       resetCampaign,
       addAdUnit,
       removeAdUnit,
-      addTargetURLToAdUnit
+      addTargetURLToAdUnit,
+      bannerSizes
     }),
     [
       campaign,
@@ -219,7 +357,8 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
       resetCampaign,
       addAdUnit,
       removeAdUnit,
-      addTargetURLToAdUnit
+      addTargetURLToAdUnit,
+      bannerSizes
     ]
   )
 
