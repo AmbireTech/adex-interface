@@ -32,13 +32,14 @@ type BannerFormatTypes =
   | 'siteDesktopBidFloors'
   | 'siteMobileBidFloors'
 
-type Format = {
+export type BannerSizesPopularCount = {
   value: string
   count: number
+  checked?: boolean
 }
 
 export type BannerFormats = {
-  [key in BannerFormatTypes]: Format[]
+  [key in BannerFormatTypes]: BannerSizesPopularCount[]
 }
 
 export type CreateCampaignType = {

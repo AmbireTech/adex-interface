@@ -49,7 +49,7 @@ const UploadCreative = () => {
           3. Upload creatives
         </Text>
         <Text color="secondaryText" size="xs" weight="bold" mb="xs">
-          Accepted banner sizes
+          Popular banner sizes
         </Text>
         <BannerSizesList adUnits={adUnits} />
         <FilesDropzone onDrop={onDrop} />

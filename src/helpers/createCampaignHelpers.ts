@@ -1,5 +1,5 @@
 import { AdUnit, TargetingInputApplyProp, TargetingInputSingle } from 'adex-common/dist/types'
-import { BANNER_SIZES } from 'constants/banners'
+// import { BANNER_SIZES } from 'constants/banners'
 import { DEFAULT_CATS_LOCS_VALUE } from 'constants/createCampaign'
 import { Campaign } from 'adex-common'
 import {
@@ -9,16 +9,16 @@ import {
   FileWithPath,
   HTMLBannerDimensions,
   CampaignUI
+  // BannerFormats
 } from 'types'
 import dayjs from 'dayjs'
 
 export const checkSelectedDevices = (devices: Devices[]) => {
+  if (!devices.length) return null
   if (devices.length === 1) {
-    if (devices.includes('mobile')) return 'mobile'
-    if (devices.includes('desktop')) return 'desktop'
+    return devices[0]
   }
   if (devices.length === 2) return 'both'
-  return null
 }
 
 export const formatCatsAndLocsData = (inputValues: TargetingInputSingle, lib: SelectData[]) => {
@@ -52,15 +52,18 @@ export const updateCatsLocsObject = (selectedRadio: TargetingInputApplyProp, val
 export const findArrayWithLengthInObjectAsValue = (obj: object) =>
   Object.entries(obj).find(([, value]) => Array.isArray(value) && value.length > 0)
 
-export const checkBannerSizes = (adUnits: AdUnit[]) =>
-  BANNER_SIZES.map((item) => {
+export const checkBannerSizes = (
+  bannerSizes: {
+    value: string
+    count: number
+    checked?: boolean
+  }[],
+  adUnits: AdUnit[]
+) =>
+  bannerSizes.map((item) => {
     const copy = { ...item }
     adUnits.forEach((adUnit) => {
-      if (
-        adUnit.banner?.format.w === item.bannerSizes.w &&
-        adUnit.banner?.format.h === item.bannerSizes.h
-      )
-        copy.checked = true
+      copy.checked = !!(item.value === `${adUnit.banner?.format.w}x${adUnit.banner?.format.h}`)
     })
 
     return copy
