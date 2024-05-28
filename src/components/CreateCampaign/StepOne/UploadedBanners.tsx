@@ -24,17 +24,17 @@ const UploadedBanners = ({
         }
       }
     },
-    bannerSizes
+    supplyStats
   } = useCreateCampaignContext()
 
   const allowedSizes = useMemo(() => {
     const selectedPlatform = placement === 'app' ? placement : checkSelectedDevices(devices)
-    const selectedBannerSizes = selectBannerSizes(selectedPlatform, bannerSizes).map(
+    const selectedBannerSizes = selectBannerSizes(selectedPlatform, supplyStats).map(
       (item) => item.value
     )
 
     return selectedBannerSizes
-  }, [bannerSizes, placement, devices])
+  }, [supplyStats, placement, devices])
 
   const isMatchedTheSizes = useCallback(
     (img: AdUnit) =>

@@ -24,7 +24,7 @@ export type ImageSizes = {
   height: number
 }
 
-type BannerFormatTypes =
+type SupplyStatsTypes =
   | 'appBannerFormats'
   | 'siteBannerFormatsDesktop'
   | 'siteBannerFormatsMobile'
@@ -32,14 +32,14 @@ type BannerFormatTypes =
   | 'siteDesktopBidFloors'
   | 'siteMobileBidFloors'
 
-export type BannerSizesPopularCount = {
+export type SupplyStatsDetails = {
   value: string
   count: number
   checked?: boolean
 }
 
-export type BannerFormats = {
-  [key in BannerFormatTypes]: BannerSizesPopularCount[]
+export type SupplyStats = {
+  [key in SupplyStatsTypes]: SupplyStatsDetails[]
 }
 
 export type CreateCampaignType = {
@@ -56,5 +56,5 @@ export type CreateCampaignType = {
   addAdUnit: (adUnitToAdd: AdUnit) => void
   removeAdUnit: (adUnitIdToRemove: string) => void
   addTargetURLToAdUnit: (inputText: string, adUnitId: string) => void
-  bannerSizes: BannerFormats
+  supplyStats: SupplyStats
 }

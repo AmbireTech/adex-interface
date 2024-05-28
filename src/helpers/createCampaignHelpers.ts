@@ -13,9 +13,8 @@ import {
   FileWithPath,
   HTMLBannerDimensions,
   CampaignUI,
-  BannerFormats,
-  BannerSizesPopularCount
-  // BannerFormats
+  SupplyStats,
+  SupplyStatsDetails
 } from 'types'
 import dayjs from 'dayjs'
 
@@ -77,8 +76,8 @@ export const checkBannerSizes = (
 
 export const selectBannerSizes = (
   bannerSizeType: Placement | Devices | 'both' | null | undefined,
-  sizes: BannerFormats
-): BannerSizesPopularCount[] => {
+  sizes: SupplyStats
+): SupplyStatsDetails[] => {
   switch (bannerSizeType) {
     case 'app':
       return sizes.appBannerFormats

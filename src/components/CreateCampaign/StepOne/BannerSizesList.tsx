@@ -9,7 +9,7 @@ import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import { useMemo } from 'react'
 import { AdUnit } from 'adex-common/dist/types'
 import useCreateCampaignData from 'hooks/useCreateCampaignData/useCreateCampaignData'
-import { BannerSizesPopularCount } from 'types'
+import { SupplyStatsDetails } from 'types'
 
 const BannerSizesList = ({ adUnits }: { adUnits: AdUnit[] }) => {
   const {
@@ -23,7 +23,7 @@ const BannerSizesList = ({ adUnits }: { adUnits: AdUnit[] }) => {
         }
       }
     },
-    bannerSizes
+    supplyStats
   } = useCreateCampaignContext()
 
   const { uniqueSizesWithCount } = useCreateCampaignData()
@@ -31,12 +31,12 @@ const BannerSizesList = ({ adUnits }: { adUnits: AdUnit[] }) => {
   const updatedBannerSizes = useMemo(() => {
     const selectedPlatform = placement === 'app' ? placement : checkSelectedDevices(devices)
 
-    const selectedBannerSizes = selectBannerSizes(selectedPlatform, bannerSizes)
+    const selectedBannerSizes = selectBannerSizes(selectedPlatform, supplyStats)
     return selectedBannerSizes && selectedBannerSizes.length
       ? checkBannerSizes(selectedBannerSizes, adUnits)
           .sort((a, b) => b.count - a.count)
           // Note: remove duplicate banner sizes of mobile and desktop devices when both selected
-          .reduce((acc: BannerSizesPopularCount[], curr: BannerSizesPopularCount) => {
+          .reduce((acc: SupplyStatsDetails[], curr: SupplyStatsDetails) => {
             if (!acc.find((item) => item.value === curr.value)) {
               acc.push(curr)
             }
@@ -44,7 +44,7 @@ const BannerSizesList = ({ adUnits }: { adUnits: AdUnit[] }) => {
           }, [])
           .slice(0, 10)
       : []
-  }, [adUnits, devices, placement, bannerSizes])
+  }, [adUnits, devices, placement, supplyStats])
 
   return updatedBannerSizes ? (
     <Grid>

@@ -9,7 +9,7 @@ import {
 } from 'react'
 import { CREATE_CAMPAIGN_DEFAULT_VALUE } from 'constants/createCampaign'
 import superjson, { serialize } from 'superjson'
-import { BannerFormats, CampaignUI, CreateCampaignType } from 'types'
+import { SupplyStats, CampaignUI, CreateCampaignType } from 'types'
 import useAccount from 'hooks/useAccount'
 import { useAdExApi } from 'hooks/useAdexServices'
 import { deepEqual, isPastDateTime, mapCampaignUItoCampaign } from 'helpers/createCampaignHelpers'
@@ -117,7 +117,7 @@ const mockData = {
   ]
 }
 
-const bannerSizesDefaultValue = {
+const supplyStatsDefaultValue = {
   appBannerFormats: [],
   siteBannerFormatsDesktop: [],
   siteBannerFormatsMobile: [],
@@ -155,7 +155,7 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
   )
 
   const [campaign, setCampaign] = useState<CampaignUI>(defaultValue)
-  const [bannerSizes, setBannerSizes] = useState<BannerFormats>(bannerSizesDefaultValue)
+  const [supplyStats, setSupplyStats] = useState<SupplyStats>(supplyStatsDefaultValue)
 
   useEffect(() => {
     const savedCampaign = localStorage.getItem('createCampaign')
@@ -167,11 +167,11 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
     }
   }, [defaultValue])
 
-  const getBannerSizes = useCallback(async () => {
+  const getSupplyStats = useCallback(async () => {
     let result
     if (process.env.NODE_ENV === 'development') {
       result = mockData
-      setBannerSizes(result)
+      setSupplyStats(result)
     } else {
       try {
         result = await adexServicesRequest('backend', {
@@ -182,7 +182,7 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
         if (!result) {
           throw new Error('Getting banner sizes failed.')
         }
-        setBannerSizes(result as BannerFormats)
+        setSupplyStats(result as SupplyStats)
       } catch (e) {
         console.error(e)
         showNotification('error', 'Getting banner sizes failed', 'Getting banner sizes failed')
@@ -191,7 +191,7 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
   }, [adexServicesRequest, showNotification])
 
   useEffect(() => {
-    getBannerSizes()
+    getSupplyStats()
   }, []) // eslint-disable-line
 
   useEffect(() => {
@@ -345,7 +345,7 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
       addAdUnit,
       removeAdUnit,
       addTargetURLToAdUnit,
-      bannerSizes
+      supplyStats
     }),
     [
       campaign,
@@ -358,7 +358,7 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
       addAdUnit,
       removeAdUnit,
       addTargetURLToAdUnit,
-      bannerSizes
+      supplyStats
     ]
   )
 

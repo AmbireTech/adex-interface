@@ -1,4 +1,4 @@
-import { Flex, createStyles, Text } from '@mantine/core'
+import { Flex, createStyles, Text, Indicator } from '@mantine/core'
 
 const useStyles = createStyles((theme, { active }: { active: boolean }) => ({
   wrapper: {
@@ -24,11 +24,20 @@ const BannerSizeMock = ({
   addedBannerCount: number | undefined
 }) => {
   const { classes } = useStyles({ active })
+
   return (
-    <Flex direction="column" align="center">
-      <div className={classes.wrapper}>{!!addedBannerCount && <Text>{addedBannerCount}</Text>}</div>
-      <Text size="sm">{variant}</Text>
-    </Flex>
+    <Indicator
+      disabled={!addedBannerCount && !active}
+      inline
+      label={!!addedBannerCount && addedBannerCount}
+      size={16}
+    >
+      <Flex direction="column" align="center">
+        <div className={classes.wrapper}>
+          <Text size="sm">{variant}</Text>
+        </div>
+      </Flex>
+    </Indicator>
   )
 }
 
