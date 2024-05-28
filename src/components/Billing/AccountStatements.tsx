@@ -9,24 +9,45 @@ import { Deposit, CampaignFundsActive, CampaignRefunds } from 'types'
 const columnTitles = ['Document', 'Date of issue']
 
 type OperationEntry = (Deposit | CampaignFundsActive | CampaignRefunds) & {
-  created: Date
+  date: Date
   type: 'deposit' | 'campaign' | 'refund'
 }
 
-type ByMonth = {
-  [x: string]: {
+type ByPeriodAndToken = {
+  [index: string]: {
     operations: OperationEntry[]
   }
 }
 
 type WithBalances = {
   periodIndex: string
+  tokenIndex: string
   operations: OperationEntry[]
   startBalance: bigint
   endBalance: bigint
 }
 
-const getMonthIndex = (date: Date): string => `${date.getUTCFullYear()}-${date.getUTCMonth()}`
+const getPeriodIndex = (date: Date): string => `${date.getUTCFullYear()}-${date.getUTCMonth()}`
+const getTokenIndex = (token: OperationEntry['token']): string =>
+  `${token.chainId}-${token.address}`
+
+const toOpEntry = (
+  x: Deposit | CampaignFundsActive | CampaignRefunds,
+  type: OperationEntry['type']
+): OperationEntry => {
+  // TODO: type
+  // @ts-ignore
+  const date: Date = new Date(x.created || x.startDate || x.closeDate)
+
+  console.log({ date })
+
+  return {
+    ...x,
+    amount: BigInt(x.amount),
+    date,
+    type
+  }
+}
 
 const AccountStatements = () => {
   const {
@@ -34,42 +55,38 @@ const AccountStatements = () => {
   } = useAccount()
 
   const statements = useMemo(() => {
-    const deposits: OperationEntry[] = fundsDeposited.deposits.map((x) => ({
-      ...x,
-      amount: BigInt(x.amount),
-      created: new Date(x.created),
-      type: 'deposit'
-    }))
+    const deposits: OperationEntry[] = fundsDeposited.deposits.map((x) => toOpEntry(x, 'deposit'))
 
-    const campaigns: OperationEntry[] = fundsOnCampaigns.perCampaign.map((x) => ({
-      ...x,
-      amount: BigInt(x.amount),
-      created: new Date(x.startDate),
-      type: 'campaign'
-    }))
+    const campaigns: OperationEntry[] = fundsOnCampaigns.perCampaign.map((x) =>
+      toOpEntry(x, 'campaign')
+    )
 
-    const refunds: OperationEntry[] = refundsFromCampaigns.perCampaign.map((x) => ({
-      ...x,
-      amount: BigInt(x.amount),
-      created: new Date(x.closeDate),
-      type: 'refund'
-    }))
+    const refunds: OperationEntry[] = refundsFromCampaigns.perCampaign.map((x) =>
+      toOpEntry(x, 'refund')
+    )
 
-    const byMonths = [...deposits, ...campaigns, ...refunds]
-      .sort((a, b) => a.created.getTime() - b.created.getTime())
+    const currentPeriodIndex = getPeriodIndex(new Date())
+
+    const byPeriodAndToken = [...deposits, ...campaigns, ...refunds]
+      // NOTE: statements only for fully ended periods
+      .filter((x) => getPeriodIndex(x.date) < currentPeriodIndex)
+      .sort((a, b) => a.date.getTime() - b.date.getTime())
       .reduce((months, current) => {
         const next = { ...months }
-        const index = getMonthIndex(current.created)
+        const { date, token } = current
+        const index = `${getPeriodIndex(date)}.${getTokenIndex(token)}`
         next[index] = next[index] || {}
         next[index].operations = [...(next[index].operations || []), current]
 
         return next
-      }, {} as ByMonth)
+      }, {} as ByPeriodAndToken)
 
-    // TODO: group and sort by token
-    const withBalances = Object.keys(byMonths)
+    const withBalances = Object.keys(byPeriodAndToken)
       .sort()
-      .map((key) => ({ periodIndex: key, ...byMonths[key] }))
+      .map((key) => {
+        const indexSplit = key.split('.')
+        return { periodIndex: indexSplit[0], tokenIndex: indexSplit[1], ...byPeriodAndToken[key] }
+      })
       .reduce((balances, current, index) => {
         const nextAggr = [...balances]
         let startBalance: bigint = BigInt(0)
@@ -89,18 +106,18 @@ const AccountStatements = () => {
           return nextBal
         }, startBalance)
 
-        const currentPeriod = {
+        const currentStatemet = {
           ...current,
           startBalance,
           endBalance
         }
 
-        nextAggr.push(currentPeriod)
+        nextAggr.push(currentStatemet)
 
         return nextAggr
       }, [] as WithBalances[])
 
-    console.log(byMonths)
+    console.log(byPeriodAndToken)
     console.log(withBalances)
 
     return []
