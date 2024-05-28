@@ -9,6 +9,7 @@ import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import { useMemo } from 'react'
 import { AdUnit } from 'adex-common/dist/types'
 import useCreateCampaignData from 'hooks/useCreateCampaignData/useCreateCampaignData'
+import { BannerSizesPopularCount } from 'types'
 
 const BannerSizesList = ({ adUnits }: { adUnits: AdUnit[] }) => {
   const {
@@ -34,6 +35,13 @@ const BannerSizesList = ({ adUnits }: { adUnits: AdUnit[] }) => {
     return selectedBannerSizes && selectedBannerSizes.length
       ? checkBannerSizes(selectedBannerSizes, adUnits)
           .sort((a, b) => b.count - a.count)
+          // Note: remove duplicate banner sizes of mobile and desktop devices when both selected
+          .reduce((acc: BannerSizesPopularCount[], curr: BannerSizesPopularCount) => {
+            if (!acc.find((item) => item.value === curr.value)) {
+              acc.push(curr)
+            }
+            return acc
+          }, [])
           .slice(0, 10)
       : []
   }, [adUnits, devices, placement, bannerSizes])
