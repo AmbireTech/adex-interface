@@ -14,11 +14,19 @@ const useStyles = createStyles((theme, { active }: { active: boolean }) => ({
   }
 }))
 
-const BannerSizeMock = ({ variant, active }: { variant: string; active: boolean }) => {
+const BannerSizeMock = ({
+  variant,
+  active,
+  addedBannerCount
+}: {
+  variant: string
+  active: boolean
+  addedBannerCount: number | undefined
+}) => {
   const { classes } = useStyles({ active })
   return (
     <Flex direction="column" align="center">
-      <div className={classes.wrapper}>{/* <div className={classes.inner} /> */}</div>
+      <div className={classes.wrapper}>{!!addedBannerCount && <Text>{addedBannerCount}</Text>}</div>
       <Text size="sm">{variant}</Text>
     </Flex>
   )

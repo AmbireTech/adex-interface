@@ -1,5 +1,9 @@
-import { AdUnit, TargetingInputApplyProp, TargetingInputSingle } from 'adex-common/dist/types'
-// import { BANNER_SIZES } from 'constants/banners'
+import {
+  AdUnit,
+  Placement,
+  TargetingInputApplyProp,
+  TargetingInputSingle
+} from 'adex-common/dist/types'
 import { DEFAULT_CATS_LOCS_VALUE } from 'constants/createCampaign'
 import { Campaign } from 'adex-common'
 import {
@@ -8,7 +12,9 @@ import {
   ImageSizes,
   FileWithPath,
   HTMLBannerDimensions,
-  CampaignUI
+  CampaignUI,
+  BannerFormats,
+  BannerSizesPopularCount
   // BannerFormats
 } from 'types'
 import dayjs from 'dayjs'
@@ -68,6 +74,24 @@ export const checkBannerSizes = (
 
     return copy
   })
+
+export const selectBannerSizes = (
+  bannerSizeType: Placement | Devices | 'both' | null | undefined,
+  sizes: BannerFormats
+): BannerSizesPopularCount[] => {
+  switch (bannerSizeType) {
+    case 'app':
+      return sizes.appBannerFormats
+    case 'mobile':
+      return sizes.siteBannerFormatsMobile
+    case 'desktop':
+      return sizes.siteBannerFormatsDesktop
+    case 'both':
+      return [...sizes.siteBannerFormatsMobile, ...sizes.siteBannerFormatsDesktop]
+    default:
+      return []
+  }
+}
 
 export const findDuplicates = (array: string[]) => {
   const countMap: any = {}
