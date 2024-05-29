@@ -9,10 +9,16 @@ import {
 } from 'react'
 import { CREATE_CAMPAIGN_DEFAULT_VALUE } from 'constants/createCampaign'
 import superjson, { serialize } from 'superjson'
-import { SupplyStats, CampaignUI, CreateCampaignType } from 'types'
+import { SupplyStats, CampaignUI, CreateCampaignType, SupplyStatsDetails } from 'types'
 import useAccount from 'hooks/useAccount'
 import { useAdExApi } from 'hooks/useAdexServices'
-import { deepEqual, isPastDateTime, mapCampaignUItoCampaign } from 'helpers/createCampaignHelpers'
+import {
+  checkSelectedDevices,
+  deepEqual,
+  isPastDateTime,
+  mapCampaignUItoCampaign,
+  selectBannerSizes
+} from 'helpers/createCampaignHelpers'
 import { parseToBigNumPrecision } from 'helpers/balances'
 import { AdUnit } from 'adex-common'
 import dayjs from 'dayjs'
@@ -156,6 +162,15 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
 
   const [campaign, setCampaign] = useState<CampaignUI>(defaultValue)
   const [supplyStats, setSupplyStats] = useState<SupplyStats>(supplyStatsDefaultValue)
+  const [selectedBannerSizes, setSelectedBannerSizes] = useState<SupplyStatsDetails[]>([])
+
+  useEffect(() => {
+    const placement = campaign.targetingInput.inputs.placements.in[0]
+    const devices = campaign.devices
+    const mappedSupplyStats: Record<string, SupplyStatsDetails[]> = selectBannerSizes(supplyStats)
+    const selectedPlatform = placement === 'app' ? placement : checkSelectedDevices(devices)
+    setSelectedBannerSizes(selectedPlatform ? mappedSupplyStats[selectedPlatform] : [])
+  }, [campaign.devices, campaign.targetingInput.inputs.placements.in, supplyStats])
 
   useEffect(() => {
     const savedCampaign = localStorage.getItem('createCampaign')
@@ -345,7 +360,7 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
       addAdUnit,
       removeAdUnit,
       addTargetURLToAdUnit,
-      supplyStats
+      selectedBannerSizes
     }),
     [
       campaign,
@@ -358,7 +373,7 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
       addAdUnit,
       removeAdUnit,
       addTargetURLToAdUnit,
-      supplyStats
+      selectedBannerSizes
     ]
   )
 

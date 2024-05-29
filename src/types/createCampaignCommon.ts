@@ -56,5 +56,5 @@ export type CreateCampaignType = {
   addAdUnit: (adUnitToAdd: AdUnit) => void
   removeAdUnit: (adUnitIdToRemove: string) => void
   addTargetURLToAdUnit: (inputText: string, adUnitId: string) => void
-  supplyStats: SupplyStats
+  selectedBannerSizes: SupplyStatsDetails[]
 }

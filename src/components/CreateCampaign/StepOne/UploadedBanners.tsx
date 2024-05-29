@@ -2,8 +2,7 @@ import { useCallback, useMemo } from 'react'
 import { Checkbox, Grid } from '@mantine/core'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import { AdUnit } from 'adex-common/dist/types'
-import { SupplyStatsDetails, UploadedBannersProps } from 'types'
-import { checkSelectedDevices, selectBannerSizes } from 'helpers/createCampaignHelpers'
+import { UploadedBannersProps } from 'types'
 import ImageUrlInput from './ImageUrlInput'
 
 const UploadedBanners = ({
@@ -13,34 +12,9 @@ const UploadedBanners = ({
   handleOnInputChange
 }: UploadedBannersProps) => {
   const {
-    campaign: {
-      adUnits,
-      devices,
-      targetingInput: {
-        inputs: {
-          placements: {
-            in: [placement]
-          }
-        }
-      }
-    },
-    supplyStats
+    campaign: { adUnits },
+    selectedBannerSizes
   } = useCreateCampaignContext()
-
-  const mappedSupplyStats: Record<string, SupplyStatsDetails[]> = useMemo(
-    () => selectBannerSizes(supplyStats),
-    [supplyStats]
-  )
-
-  const selectedPlatform = useMemo(
-    () => (placement === 'app' ? placement : checkSelectedDevices(devices)),
-    [placement, devices]
-  )
-
-  const selectedBannerSizes = useMemo(
-    () => (selectedPlatform ? mappedSupplyStats[selectedPlatform] : []),
-    [selectedPlatform, mappedSupplyStats]
-  )
 
   const allowedSizes = useMemo(
     () => selectedBannerSizes.map((item) => item.value),

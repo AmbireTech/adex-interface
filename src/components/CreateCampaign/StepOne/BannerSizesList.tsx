@@ -1,10 +1,6 @@
 import { Grid } from '@mantine/core'
 import BannerSizeMock from 'components/common/BannerSizeMock'
-import {
-  checkBannerSizes,
-  checkSelectedDevices,
-  selectBannerSizes
-} from 'helpers/createCampaignHelpers'
+import { checkBannerSizes } from 'helpers/createCampaignHelpers'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import { useMemo } from 'react'
 import { AdUnit } from 'adex-common/dist/types'
@@ -12,35 +8,8 @@ import useCreateCampaignData from 'hooks/useCreateCampaignData/useCreateCampaign
 import { SupplyStatsDetails } from 'types'
 
 const BannerSizesList = ({ adUnits }: { adUnits: AdUnit[] }) => {
-  const {
-    campaign: {
-      devices,
-      targetingInput: {
-        inputs: {
-          placements: {
-            in: [placement]
-          }
-        }
-      }
-    },
-    supplyStats
-  } = useCreateCampaignContext()
-
+  const { selectedBannerSizes } = useCreateCampaignContext()
   const { uniqueSizesWithCount } = useCreateCampaignData()
-
-  const mappedSupplyStats: Record<string, SupplyStatsDetails[]> = useMemo(
-    () => selectBannerSizes(supplyStats),
-    [supplyStats]
-  )
-
-  const selectedPlatform = useMemo(
-    () => (placement === 'app' ? placement : checkSelectedDevices(devices)),
-    [placement, devices]
-  )
-  const selectedBannerSizes = useMemo(
-    () => (selectedPlatform ? mappedSupplyStats[selectedPlatform] : []),
-    [selectedPlatform, mappedSupplyStats]
-  )
 
   const updatedBannerSizes = useMemo(
     () =>
