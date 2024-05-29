@@ -4,9 +4,14 @@ import { formatDate, getHumneSrcName } from 'helpers'
 // TODO: delete mock data
 // import { invoiceDetails } from 'components/Billing/mockedData'
 import { useMemo } from 'react'
-import { IInvoiceDetails } from 'types'
+import { IInvoiceDetails, InvoiceCompanyDetails, StatementData } from 'types'
 
 type InvoicesPDFProps = { invoiceDetails: IInvoiceDetails; placement: Placement }
+type StatementsPDFProps = {
+  statement: StatementData
+  seller: InvoiceCompanyDetails
+  buyer: InvoiceCompanyDetails
+}
 
 const useStyles = createStyles((theme) => ({
   wrapper: {
@@ -47,7 +52,7 @@ const useStyles = createStyles((theme) => ({
   }
 }))
 
-const InvoicesPDF = ({ invoiceDetails, placement }: InvoicesPDFProps) => {
+export const InvoicesPDF = ({ invoiceDetails, placement }: InvoicesPDFProps) => {
   const { classes, cx } = useStyles()
 
   const calculateTotal = useMemo(() => {
@@ -167,4 +172,12 @@ const InvoicesPDF = ({ invoiceDetails, placement }: InvoicesPDFProps) => {
   )
 }
 
-export default InvoicesPDF
+export const StatementsPDF = ({ statement, seller, buyer }: StatementsPDFProps) => {
+  // const { classes, cx } = useStyles()
+
+  return (
+    JSON.stringify(statement, null, 2),
+    JSON.stringify(seller, null, 2),
+    JSON.stringify(buyer, null, 2)
+  )
+}

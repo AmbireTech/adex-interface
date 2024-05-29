@@ -1,5 +1,5 @@
 import { Button, Flex, Group, Loader, Modal, createStyles } from '@mantine/core'
-import InvoicesPDF from 'components/common/CustomTable/InvoicesPDF'
+import { InvoicesPDF } from 'components/Billing/BillingPDF'
 import { ADEX_COMPANY_DETAILS } from 'constants/adexCompanyDetatils'
 import useAccount from 'hooks/useAccount'
 import useCampaignAnalytics from 'hooks/useCampaignAnalytics'
@@ -45,7 +45,7 @@ type PrintModalProps = {
   close: () => void
 }
 
-const PrintModal = ({ campaignId, opened, close }: PrintModalProps) => {
+export const InvoicesModal = ({ campaignId, opened, close }: PrintModalProps) => {
   const { campaignsData } = useCampaignsData()
   const {
     adexAccount: {
@@ -158,5 +158,3 @@ const PrintModal = ({ campaignId, opened, close }: PrintModalProps) => {
     </Modal>
   )
 }
-
-export default PrintModal

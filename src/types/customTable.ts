@@ -1,6 +1,5 @@
 import { PropsWithChildren } from 'react'
-import { IInvoices } from './invoices'
-import { IStatements } from './statements'
+import { IStatements, IInvoices } from 'types'
 
 export interface ICustomTableProps extends PropsWithChildren {
   background?: boolean

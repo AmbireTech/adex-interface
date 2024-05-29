@@ -1,17 +1,11 @@
-import { useMemo } from 'react'
-import { Title } from '@mantine/core'
+import { useMemo, useCallback } from 'react'
+import { Title, Button, Flex, Group, Loader, Modal, createStyles } from '@mantine/core'
 import CustomTable from 'components/common/CustomTable'
-// import { useDisclosure } from '@mantine/hooks'
-// import { PrintModal } from 'components/common/Modals'
+import { useDisclosure } from '@mantine/hooks'
 import useAccount from 'hooks/useAccount'
-import { Deposit, CampaignFundsActive, CampaignRefunds } from 'types'
+import { Deposit, CampaignFundsActive, CampaignRefunds, OperationEntry, StatementData } from 'types'
 
-const columnTitles = ['Document', 'Date of issue']
-
-type OperationEntry = (Deposit | CampaignFundsActive | CampaignRefunds) & {
-  date: Date
-  type: 'deposit' | 'campaign' | 'refund'
-}
+const columnTitles = ['Date of issue', 'Token']
 
 type ByPeriodAndToken = {
   [index: string]: {
@@ -19,15 +13,11 @@ type ByPeriodAndToken = {
   }
 }
 
-type WithBalances = {
-  periodIndex: string
-  tokenIndex: string
-  operations: OperationEntry[]
-  startBalance: bigint
-  endBalance: bigint
-}
-
 const getPeriodIndex = (date: Date): string => `${date.getUTCFullYear()}-${date.getUTCMonth()}`
+const periodIndexToDate = (index: string): Date => {
+  const split = index.split('-')
+  return new Date(Number(split[0]), Number(split[1]))
+}
 const getTokenIndex = (token: OperationEntry['token']): string =>
   `${token.chainId}-${token.address}`
 
@@ -39,8 +29,6 @@ const toOpEntry = (
   // @ts-ignore
   const date: Date = new Date(x.created || x.startDate || x.closeDate)
 
-  console.log({ date })
-
   return {
     ...x,
     amount: BigInt(x.amount),
@@ -49,7 +37,85 @@ const toOpEntry = (
   }
 }
 
+const useStyles = createStyles((theme) => ({
+  wrapper: {
+    border: '1px solid',
+    borderRadius: theme.radius.sm,
+    borderColor: theme.colors.decorativeBorders[theme.fn.primaryShade()],
+    padding: theme.spacing.lg
+  },
+  header: {
+    backgroundColor: theme.colors.lightBackground[theme.fn.primaryShade()],
+    padding: theme.spacing.xl
+  },
+  title: {
+    fontSize: theme.fontSizes.xl,
+    fontWeight: theme.other.fontWeights.bold
+  },
+  close: {
+    color: theme.colors.mainText[theme.fn.primaryShade()]
+  },
+  printable: {
+    [theme.other.media.print]: {
+      // NOTE: it's not fixed/absolute to body but modal.inner
+      overflow: 'visible',
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      bottom: 0,
+      width: '100%',
+      padding: theme.spacing.xl
+    }
+  }
+}))
+
+type ModalProps = {
+  statement: StatementData
+  opened: boolean
+  close: () => void
+}
+
+const StatementModal = ({ statement, opened, close }: ModalProps) => {
+  const { classes } = useStyles()
+  return (
+    <Modal
+      title="Invoice"
+      size="xl"
+      opened={opened}
+      onClose={close}
+      centered
+      radius="sm"
+      classNames={{
+        header: classes.header,
+        title: classes.title,
+        close: classes.close
+      }}
+    >
+      <div>
+        {!statement ? (
+          <Flex justify="center" align="center" h="60vh">
+            <Loader size="xl" />
+          </Flex>
+        ) : (
+          <>
+            <Group position="right">
+              <Button mt="md" mb="md" onClick={() => window.print()}>
+                Print
+              </Button>
+            </Group>
+
+            <div className={classes.wrapper}>
+              <div id="printable" className={classes.printable} />
+            </div>
+          </>
+        )}
+      </div>
+    </Modal>
+  )
+}
+
 const AccountStatements = () => {
+  const [opened, { open, close }] = useDisclosure(false)
   const {
     adexAccount: { fundsDeposited, fundsOnCampaigns, refundsFromCampaigns }
   } = useAccount()
@@ -115,13 +181,28 @@ const AccountStatements = () => {
         nextAggr.push(currentStatemet)
 
         return nextAggr
-      }, [] as WithBalances[])
+      }, [] as StatementData[])
 
     console.log(byPeriodAndToken)
     console.log(withBalances)
 
-    return []
+    return withBalances
   }, [fundsDeposited, fundsOnCampaigns, refundsFromCampaigns])
+
+  const elements = useMemo(() => {
+    return statements.map((st) => ({
+      id: `${st.periodIndex}.${st.tokenIndex}`,
+      date: periodIndexToDate(st.periodIndex).toLocaleDateString(undefined, {
+        year: 'numeric',
+        month: 'short'
+      }),
+      token: st.operations[0].token.name
+    }))
+  }, [statements])
+
+  const onPreview = useCallback(() => {
+    open()
+  }, [open])
 
   if (!statements) {
     return <Title order={4}>No AccountStatements found.</Title>
@@ -130,8 +211,8 @@ const AccountStatements = () => {
   return (
     <>
       {/* Temporary disabled */}
-      {/* <PrintModal opened={opened} close={close} /> */}
-      <CustomTable headings={columnTitles} elements={statements} />
+      <StatementModal statement={statements[0]} opened={opened} close={close} />
+      <CustomTable headings={columnTitles} elements={elements} onPreview={onPreview} />
     </>
   )
 }
