@@ -1,4 +1,4 @@
-import { useMemo, useCallback } from 'react'
+import { useMemo, useCallback, useState, SetStateAction } from 'react'
 import { Title } from '@mantine/core'
 import CustomTable from 'components/common/CustomTable'
 import { useDisclosure } from '@mantine/hooks'
@@ -115,9 +115,15 @@ const AccountStatements = () => {
     return withBalances
   }, [fundsDeposited, fundsOnCampaigns, refundsFromCampaigns])
 
+  const [stIndex, setStIndex] = useState(0)
+
+  const statement = useMemo(() => {
+    return statements?.[stIndex] || null
+  }, [statements, stIndex])
+
   const elements = useMemo(() => {
-    return statements.map((st) => ({
-      id: `${st.periodIndex}.${st.tokenIndex}`,
+    return statements.map((st, index) => ({
+      id: index,
       date: periodIndexToDate(st.periodIndex).toLocaleDateString(undefined, {
         year: 'numeric',
         month: 'short'
@@ -126,24 +132,28 @@ const AccountStatements = () => {
     }))
   }, [statements])
 
-  const onPreview = useCallback(() => {
-    open()
-  }, [open])
+  const onPreview = useCallback(
+    (el: { id: SetStateAction<number> }) => {
+      setStIndex(el.id)
+      open()
+    },
+    [open]
+  )
 
   if (!statements) {
     return <Title order={4}>No AccountStatements found.</Title>
   }
 
-  const statement = useMemo(() => statements[0], [statements])
-
   return (
     <>
       <BillingDetailsModal title="Statement" loading={!statement} opened={opened} close={close}>
-        <StatementsPDF
-          statement={statement}
-          seller={ADEX_COMPANY_DETAILS}
-          buyer={{ ...billingDetails, ethAddress: address }}
-        />
+        {statement && (
+          <StatementsPDF
+            statement={statement}
+            seller={ADEX_COMPANY_DETAILS}
+            buyer={{ ...billingDetails, ethAddress: address }}
+          />
+        )}
       </BillingDetailsModal>
       <CustomTable headings={columnTitles} elements={elements} onPreview={onPreview} />
     </>
