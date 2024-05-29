@@ -48,7 +48,7 @@ const useStyles = createStyles((theme) => ({
   smallFontSize: {
     fontSize: theme.fontSizes.xs
   },
-  borderBottom: { borderBottom: '1px solid black', width: '90%', height: '70%' },
+  borderBottom: { borderBottom: '1px solid black', width: '100%', height: '70%' },
   signature: { display: 'flex', justifyContent: 'center', fontSize: theme.fontSizes.xs },
   rightAlignedText: {
     textAlign: 'end'
@@ -108,16 +108,6 @@ const BillingBlank = ({ children, header, footer, seller, buyer }: DetailsProps)
         {footer}
         <Space h="xl" />
       </Grid.Col>
-      <Grid.Col span={4}>
-        Seller
-        <div className={classes.borderBottom} />
-        <span className={classes.signature}>Title / Name / Signature</span>
-      </Grid.Col>
-      <Grid.Col span={4}>
-        Buyer
-        <div className={classes.borderBottom} />
-        <span className={classes.signature}>Title / Name / Signature</span>
-      </Grid.Col>
     </Grid>
   )
 }
@@ -134,16 +124,14 @@ export const InvoicesPDF = ({ invoiceDetails, placement }: InvoicesPDFProps) => 
       seller={invoiceDetails.seller}
       buyer={invoiceDetails.buyer}
       header={
-        <Grid.Col span={12}>
-          <div className={classes.right}>
-            <div className={classes.title}>VAT Invoice</div>
-            <div className={classes.title}>No. {invoiceDetails.invoiceId}</div>
-            <span>{formatDate(invoiceDetails.invoiceDate)}</span>
-          </div>
-        </Grid.Col>
+        <div className={classes.right}>
+          <div className={classes.title}>VAT Invoice</div>
+          <div className={classes.title}>No. {invoiceDetails.invoiceId}</div>
+          <span>{formatDate(invoiceDetails.invoiceDate)}</span>
+        </div>
       }
       footer={
-        <>
+        <Grid>
           <Grid.Col span={9} className={cx(classes.right, classes.bold)}>
             {`Total Exl. VAT, ${invoiceDetails.currencyName}`}
           </Grid.Col>
@@ -162,7 +150,17 @@ export const InvoicesPDF = ({ invoiceDetails, placement }: InvoicesPDFProps) => 
           <Grid.Col span={2} className={cx(classes.right, classes.bold)}>
             {(calculateTotal + invoiceDetails.vatPercentageInUSD).toFixed(2)}
           </Grid.Col>
-        </>
+          <Grid.Col span={4}>
+            Seller
+            <div className={classes.borderBottom} />
+            <span className={classes.signature}>Title / Name / Signature</span>
+          </Grid.Col>
+          <Grid.Col span={4}>
+            Buyer
+            <div className={classes.borderBottom} />
+            <span className={classes.signature}>Title / Name / Signature</span>
+          </Grid.Col>
+        </Grid>
       }
     >
       <Table withBorder withColumnBorders fontSize="xs" verticalSpacing="xs" w="100%">
@@ -221,9 +219,20 @@ export const StatementsPDF = ({ statement, seller, buyer }: StatementsPDFProps) 
         </Grid.Col>
       }
       footer={
-        <Grid.Col span={9} className={cx(classes.right, classes.bold)}>
-          {`End balance, ${statement.endBalance}`}
-        </Grid.Col>
+        <>
+          <Grid.Col span={12} className={cx(classes.right, classes.bold)}>
+            {`End balance, ${statement.endBalance}`}
+          </Grid.Col>
+          <Grid.Col span={12}>
+            <Space h="xl" />
+            <Space h="xl" />
+            <div className={classes.borderBottom} />
+          </Grid.Col>
+          <Grid.Col span={12}>This is not a bill.</Grid.Col>
+          <Grid.Col span={12}>
+            This is a summary of account activity for the time period started above
+          </Grid.Col>
+        </>
       }
     >
       <>
