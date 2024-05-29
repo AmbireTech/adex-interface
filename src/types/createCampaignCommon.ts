@@ -24,6 +24,24 @@ export type ImageSizes = {
   height: number
 }
 
+type SupplyStatsTypes =
+  | 'appBannerFormats'
+  | 'siteBannerFormatsDesktop'
+  | 'siteBannerFormatsMobile'
+  | 'appBidFloors'
+  | 'siteDesktopBidFloors'
+  | 'siteMobileBidFloors'
+
+export type SupplyStatsDetails = {
+  value: string
+  count: number
+  checked?: boolean
+}
+
+export type SupplyStats = {
+  [key in SupplyStatsTypes]: SupplyStatsDetails[]
+}
+
 export type CreateCampaignType = {
   campaign: CampaignUI
   setCampaign: (val: CampaignUI | ((prevState: CampaignUI) => CampaignUI)) => void
@@ -38,4 +56,5 @@ export type CreateCampaignType = {
   addAdUnit: (adUnitToAdd: AdUnit) => void
   removeAdUnit: (adUnitIdToRemove: string) => void
   addTargetURLToAdUnit: (inputText: string, adUnitId: string) => void
+  selectedBannerSizes: SupplyStatsDetails[]
 }

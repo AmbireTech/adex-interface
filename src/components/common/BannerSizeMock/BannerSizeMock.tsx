@@ -1,37 +1,43 @@
-import { Flex, createStyles, Text } from '@mantine/core'
-import { BannerVariantNew } from 'types'
+import { Flex, createStyles, Text, Indicator } from '@mantine/core'
 
-const useStyles = createStyles(
-  (theme, { variant, active }: { variant: BannerVariantNew; active: boolean }) => ({
-    wrapper: {
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      width: 72,
-      height: 62,
-      background: theme.colors.lightBackground[theme.fn.primaryShade()],
-      border: '1px solid',
-      borderColor: active ? 'blue' : theme.colors.decorativeBorders[theme.fn.primaryShade()],
-      borderRadius: theme.radius.sm
-    },
-    inner: {
-      width: variant.width,
-      height: variant.height,
-      backgroundColor: theme.colors.decorativeBorders[theme.fn.primaryShade()],
-      borderRadius: theme.radius.xs
-    }
-  })
-)
+const useStyles = createStyles((theme, { active }: { active: boolean }) => ({
+  wrapper: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: 72,
+    height: 62,
+    background: theme.colors.lightBackground[theme.fn.primaryShade()],
+    border: '1px solid',
+    borderColor: active ? 'blue' : theme.colors.decorativeBorders[theme.fn.primaryShade()],
+    borderRadius: theme.radius.sm
+  }
+}))
 
-const BannerSizeMock = ({ variant }: { variant: BannerVariantNew }) => {
-  const { classes } = useStyles({ variant, active: !!variant.checked })
+const BannerSizeMock = ({
+  variant,
+  active,
+  addedBannerCount
+}: {
+  variant: string
+  active: boolean
+  addedBannerCount: number | undefined
+}) => {
+  const { classes } = useStyles({ active })
+
   return (
-    <Flex direction="column" align="center">
-      <div className={classes.wrapper}>
-        <div className={classes.inner} />
-      </div>
-      <Text size="sm">{`${variant.bannerSizes.w} x ${variant.bannerSizes.h}`}</Text>
-    </Flex>
+    <Indicator
+      disabled={!addedBannerCount && !active}
+      inline
+      label={!!addedBannerCount && addedBannerCount}
+      size={16}
+    >
+      <Flex direction="column" align="center">
+        <div className={classes.wrapper}>
+          <Text size="sm">{variant}</Text>
+        </div>
+      </Flex>
+    </Indicator>
   )
 }
 

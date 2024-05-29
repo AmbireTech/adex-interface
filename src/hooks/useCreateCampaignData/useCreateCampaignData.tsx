@@ -151,7 +151,8 @@ const useCreateCampaignData = () => {
     campaignBudgetFormatted,
     campaignNameFormatted,
     adUnitsFormatted,
-    campaignPeriodFormatted
+    campaignPeriodFormatted,
+    uniqueSizesWithCount
   }
 }
 

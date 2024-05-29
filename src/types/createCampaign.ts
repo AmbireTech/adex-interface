@@ -9,23 +9,11 @@ export type Sizes = {
   h: number
 }
 
-export type BannerVariantNew = {
-  width: number
-  height: number
-  bannerSizes: Sizes
-  device: Devices
-  checked: boolean
-}
-
 export type FileWithPath = Blob & {
   lastModified: number
   name: string
   webkitRelativePath: string
   path?: string
-}
-
-export type AllowedBannerSizes = {
-  [key in Devices]: Sizes[]
 }
 
 export type ValidationRegExBanner = {

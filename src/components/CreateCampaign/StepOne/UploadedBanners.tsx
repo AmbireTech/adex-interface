@@ -2,7 +2,6 @@ import { useCallback, useMemo } from 'react'
 import { Checkbox, Grid } from '@mantine/core'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import { AdUnit } from 'adex-common/dist/types'
-import { ALLOWED_BANNER_SIZES } from 'constants/banners'
 import { UploadedBannersProps } from 'types'
 import ImageUrlInput from './ImageUrlInput'
 
@@ -13,24 +12,20 @@ const UploadedBanners = ({
   handleOnInputChange
 }: UploadedBannersProps) => {
   const {
-    campaign: { adUnits, devices }
+    campaign: { adUnits },
+    selectedBannerSizes
   } = useCreateCampaignContext()
 
   const allowedSizes = useMemo(
-    () =>
-      devices.length > 0 && devices.length > 1
-        ? [...ALLOWED_BANNER_SIZES.desktop.flat(), ...ALLOWED_BANNER_SIZES.mobile.flat()]
-        : ALLOWED_BANNER_SIZES[devices[0]],
-    [devices]
+    () => selectedBannerSizes.map((item) => item.value),
+    [selectedBannerSizes]
   )
 
   const isMatchedTheSizes = useCallback(
     (img: AdUnit) =>
       allowedSizes &&
       allowedSizes.length > 0 &&
-      allowedSizes.find(
-        (item) => item.w === img.banner?.format.w && item.h === img.banner?.format.h
-      ),
+      allowedSizes.includes(`${img.banner?.format.w}x${img.banner?.format.h}`),
     [allowedSizes]
   )
 

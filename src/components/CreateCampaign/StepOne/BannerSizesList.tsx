@@ -1,44 +1,52 @@
 import { Grid } from '@mantine/core'
 import BannerSizeMock from 'components/common/BannerSizeMock'
-import { checkBannerSizes, checkSelectedDevices } from 'helpers/createCampaignHelpers'
+import { checkBannerSizes } from 'helpers/createCampaignHelpers'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import { useMemo } from 'react'
 import { AdUnit } from 'adex-common/dist/types'
+import useCreateCampaignData from 'hooks/useCreateCampaignData/useCreateCampaignData'
+import { SupplyStatsDetails } from 'types'
 
 const BannerSizesList = ({ adUnits }: { adUnits: AdUnit[] }) => {
-  const {
-    campaign: { devices }
-  } = useCreateCampaignContext()
-  const selectedDevices = useMemo(() => checkSelectedDevices(devices), [devices])
-  const updatedBannerSizes = useMemo(() => checkBannerSizes(adUnits), [adUnits])
+  const { selectedBannerSizes } = useCreateCampaignContext()
+  const { uniqueSizesWithCount } = useCreateCampaignData()
 
-  const mobileSizes = useMemo(
-    () => updatedBannerSizes.filter((item) => item.device === 'mobile'),
-    [updatedBannerSizes]
+  const updatedBannerSizes = useMemo(
+    () =>
+      selectedBannerSizes && selectedBannerSizes.length
+        ? checkBannerSizes(selectedBannerSizes, adUnits)
+            .sort((a, b) => b.count - a.count)
+            // Note: remove duplicate banner sizes of mobile and desktop devices when both selected
+            .reduce((acc: SupplyStatsDetails[], curr: SupplyStatsDetails) => {
+              if (!acc.find((item) => item.value === curr.value)) {
+                acc.push(curr)
+              }
+              return acc
+            }, [])
+            .slice(0, 10)
+        : [],
+    [adUnits, selectedBannerSizes]
   )
-  const desktopSizes = useMemo(
-    () => updatedBannerSizes.filter((item) => item.device === 'desktop'),
-    [updatedBannerSizes]
-  )
 
-  const selectedBannerSizes = useMemo(() => {
-    if (selectedDevices === 'mobile') return mobileSizes
-    if (selectedDevices === 'desktop') return desktopSizes
-    if (selectedDevices === 'both') return updatedBannerSizes
-    return null
-  }, [selectedDevices, mobileSizes, desktopSizes, updatedBannerSizes])
-
-  const generateBanners = (sizes: any[]) => (
+  return updatedBannerSizes ? (
     <Grid>
-      {sizes.map((item) => (
-        <Grid.Col span="content" key={`${item.bannerSizes.w}x${item.bannerSizes.h}`}>
-          <BannerSizeMock variant={item} />
-        </Grid.Col>
-      ))}
-    </Grid>
-  )
+      {updatedBannerSizes.map((item) => {
+        const addedBannerCount = uniqueSizesWithCount.find(
+          ({ value }) => item.value === value
+        )?.count
 
-  return selectedBannerSizes ? generateBanners(selectedBannerSizes) : null
+        return (
+          <Grid.Col span="content" key={`${item.value}+${item.count}`}>
+            <BannerSizeMock
+              variant={item.value}
+              active={!!item.checked}
+              addedBannerCount={addedBannerCount}
+            />
+          </Grid.Col>
+        )
+      })}
+    </Grid>
+  ) : null
 }
 
 export default BannerSizesList
