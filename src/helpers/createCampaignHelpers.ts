@@ -74,8 +74,7 @@ export const selectBannerSizes = (
 ): Record<string, SupplyStatsDetails[]> => ({
   app: supplyStats.appBannerFormats,
   mobile: supplyStats.siteBannerFormatsMobile,
-  desktop: supplyStats.siteBannerFormatsDesktop,
-  both: [...supplyStats.siteBannerFormatsMobile, ...supplyStats.siteBannerFormatsDesktop]
+  desktop: supplyStats.siteBannerFormatsDesktop
 })
 
 export const findDuplicates = (array: string[]) => {

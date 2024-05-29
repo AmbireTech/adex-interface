@@ -7,36 +7,49 @@ import { AdUnit } from 'adex-common/dist/types'
 import useCreateCampaignData from 'hooks/useCreateCampaignData/useCreateCampaignData'
 import { SupplyStatsDetails } from 'types'
 
+const getPopularBannerSizes = (bannerSizes: SupplyStatsDetails[] | SupplyStatsDetails[][]) => {
+  let result: SupplyStatsDetails[][] | SupplyStatsDetails[] = []
+
+  if (bannerSizes.length && Array.isArray(bannerSizes[0])) {
+    result = (bannerSizes as SupplyStatsDetails[][])
+      .map((item: SupplyStatsDetails[]) => item.slice(0, 10))
+      .flat()
+  } else {
+    result = (bannerSizes as SupplyStatsDetails[]).slice(0, 10)
+  }
+
+  return result.sort((a, b) => b.count - a.count)
+}
+
 const BannerSizesList = ({ adUnits }: { adUnits: AdUnit[] }) => {
   const { selectedBannerSizes } = useCreateCampaignContext()
   const { uniqueSizesWithCount } = useCreateCampaignData()
 
-  const updatedBannerSizes = useMemo(
+  const popularBannerSizes = useMemo(
     () =>
       selectedBannerSizes && selectedBannerSizes.length
-        ? checkBannerSizes(selectedBannerSizes, adUnits)
-            .sort((a, b) => b.count - a.count)
-            // Note: remove duplicate banner sizes of mobile and desktop devices when both selected
-            .reduce((acc: SupplyStatsDetails[], curr: SupplyStatsDetails) => {
-              if (!acc.find((item) => item.value === curr.value)) {
-                acc.push(curr)
-              }
-              return acc
-            }, [])
-            .slice(0, 10)
+        ? getPopularBannerSizes(selectedBannerSizes)
         : [],
-    [adUnits, selectedBannerSizes]
+    [selectedBannerSizes]
+  )
+
+  const updatedBannerSizes = useMemo(
+    () =>
+      popularBannerSizes && popularBannerSizes.length
+        ? checkBannerSizes(popularBannerSizes, adUnits)
+        : [],
+    [adUnits, popularBannerSizes]
   )
 
   return updatedBannerSizes ? (
-    <Grid>
+    <Grid columns={10}>
       {updatedBannerSizes.map((item) => {
         const addedBannerCount = uniqueSizesWithCount.find(
           ({ value }) => item.value === value
         )?.count
 
         return (
-          <Grid.Col span="content" key={`${item.value}+${item.count}`}>
+          <Grid.Col xs={2} sm={2} md={2} lg={2} xl={1} key={`${item.value}+${item.count}`}>
             <BannerSizeMock
               variant={item.value}
               active={!!item.checked}

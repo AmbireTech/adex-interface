@@ -17,7 +17,7 @@ const UploadedBanners = ({
   } = useCreateCampaignContext()
 
   const allowedSizes = useMemo(
-    () => selectedBannerSizes.map((item) => item.value),
+    () => selectedBannerSizes.flat().map((item) => item.value),
     [selectedBannerSizes]
   )
 
