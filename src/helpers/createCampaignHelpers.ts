@@ -1,9 +1,4 @@
-import {
-  AdUnit,
-  Placement,
-  TargetingInputApplyProp,
-  TargetingInputSingle
-} from 'adex-common/dist/types'
+import { AdUnit, TargetingInputApplyProp, TargetingInputSingle } from 'adex-common/dist/types'
 import { DEFAULT_CATS_LOCS_VALUE } from 'constants/createCampaign'
 import { Campaign } from 'adex-common'
 import {
@@ -75,22 +70,13 @@ export const checkBannerSizes = (
   })
 
 export const selectBannerSizes = (
-  bannerSizeType: Placement | Devices | 'both' | null | undefined,
-  sizes: SupplyStats
-): SupplyStatsDetails[] => {
-  switch (bannerSizeType) {
-    case 'app':
-      return sizes.appBannerFormats
-    case 'mobile':
-      return sizes.siteBannerFormatsMobile
-    case 'desktop':
-      return sizes.siteBannerFormatsDesktop
-    case 'both':
-      return [...sizes.siteBannerFormatsMobile, ...sizes.siteBannerFormatsDesktop]
-    default:
-      return []
-  }
-}
+  supplyStats: SupplyStats
+): Record<string, SupplyStatsDetails[]> => ({
+  app: supplyStats.appBannerFormats,
+  mobile: supplyStats.siteBannerFormatsMobile,
+  desktop: supplyStats.siteBannerFormatsDesktop,
+  both: [...supplyStats.siteBannerFormatsMobile, ...supplyStats.siteBannerFormatsDesktop]
+})
 
 export const findDuplicates = (array: string[]) => {
   const countMap: any = {}

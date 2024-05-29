@@ -28,23 +28,36 @@ const BannerSizesList = ({ adUnits }: { adUnits: AdUnit[] }) => {
 
   const { uniqueSizesWithCount } = useCreateCampaignData()
 
-  const updatedBannerSizes = useMemo(() => {
-    const selectedPlatform = placement === 'app' ? placement : checkSelectedDevices(devices)
+  const mappedSupplyStats: Record<string, SupplyStatsDetails[]> = useMemo(
+    () => selectBannerSizes(supplyStats),
+    [supplyStats]
+  )
 
-    const selectedBannerSizes = selectBannerSizes(selectedPlatform, supplyStats)
-    return selectedBannerSizes && selectedBannerSizes.length
-      ? checkBannerSizes(selectedBannerSizes, adUnits)
-          .sort((a, b) => b.count - a.count)
-          // Note: remove duplicate banner sizes of mobile and desktop devices when both selected
-          .reduce((acc: SupplyStatsDetails[], curr: SupplyStatsDetails) => {
-            if (!acc.find((item) => item.value === curr.value)) {
-              acc.push(curr)
-            }
-            return acc
-          }, [])
-          .slice(0, 10)
-      : []
-  }, [adUnits, devices, placement, supplyStats])
+  const selectedPlatform = useMemo(
+    () => (placement === 'app' ? placement : checkSelectedDevices(devices)),
+    [placement, devices]
+  )
+  const selectedBannerSizes = useMemo(
+    () => (selectedPlatform ? mappedSupplyStats[selectedPlatform] : []),
+    [selectedPlatform, mappedSupplyStats]
+  )
+
+  const updatedBannerSizes = useMemo(
+    () =>
+      selectedBannerSizes && selectedBannerSizes.length
+        ? checkBannerSizes(selectedBannerSizes, adUnits)
+            .sort((a, b) => b.count - a.count)
+            // Note: remove duplicate banner sizes of mobile and desktop devices when both selected
+            .reduce((acc: SupplyStatsDetails[], curr: SupplyStatsDetails) => {
+              if (!acc.find((item) => item.value === curr.value)) {
+                acc.push(curr)
+              }
+              return acc
+            }, [])
+            .slice(0, 10)
+        : [],
+    [adUnits, selectedBannerSizes]
+  )
 
   return updatedBannerSizes ? (
     <Grid>

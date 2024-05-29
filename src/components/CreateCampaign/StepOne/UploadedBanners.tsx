@@ -2,7 +2,7 @@ import { useCallback, useMemo } from 'react'
 import { Checkbox, Grid } from '@mantine/core'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import { AdUnit } from 'adex-common/dist/types'
-import { UploadedBannersProps } from 'types'
+import { SupplyStatsDetails, UploadedBannersProps } from 'types'
 import { checkSelectedDevices, selectBannerSizes } from 'helpers/createCampaignHelpers'
 import ImageUrlInput from './ImageUrlInput'
 
@@ -27,14 +27,25 @@ const UploadedBanners = ({
     supplyStats
   } = useCreateCampaignContext()
 
-  const allowedSizes = useMemo(() => {
-    const selectedPlatform = placement === 'app' ? placement : checkSelectedDevices(devices)
-    const selectedBannerSizes = selectBannerSizes(selectedPlatform, supplyStats).map(
-      (item) => item.value
-    )
+  const mappedSupplyStats: Record<string, SupplyStatsDetails[]> = useMemo(
+    () => selectBannerSizes(supplyStats),
+    [supplyStats]
+  )
 
-    return selectedBannerSizes
-  }, [supplyStats, placement, devices])
+  const selectedPlatform = useMemo(
+    () => (placement === 'app' ? placement : checkSelectedDevices(devices)),
+    [placement, devices]
+  )
+
+  const selectedBannerSizes = useMemo(
+    () => (selectedPlatform ? mappedSupplyStats[selectedPlatform] : []),
+    [selectedPlatform, mappedSupplyStats]
+  )
+
+  const allowedSizes = useMemo(
+    () => selectedBannerSizes.map((item) => item.value),
+    [selectedBannerSizes]
+  )
 
   const isMatchedTheSizes = useCallback(
     (img: AdUnit) =>
