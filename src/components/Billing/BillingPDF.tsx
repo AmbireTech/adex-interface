@@ -176,8 +176,12 @@ export const StatementsPDF = ({ statement, seller, buyer }: StatementsPDFProps) 
   // const { classes, cx } = useStyles()
 
   return (
-    JSON.stringify(statement, null, 2),
-    JSON.stringify(seller, null, 2),
-    JSON.stringify(buyer, null, 2)
+    <div>
+      {
+        (JSON.stringify(statement.periodIndex, null, 2),
+        JSON.stringify(seller, null, 2),
+        JSON.stringify(buyer, null, 2))
+      }
+    </div>
   )
 }

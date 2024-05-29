@@ -31,13 +31,6 @@ export interface IInvoiceDetails {
   currencyName: string
 }
 
-export interface IStatements {
-  [index: string]: any
-  id: number
-  date: string
-  token: string
-}
-
 export type OperationEntry = (Deposit | CampaignFundsActive | CampaignRefunds) & {
   date: Date
   type: 'deposit' | 'campaign' | 'refund'
