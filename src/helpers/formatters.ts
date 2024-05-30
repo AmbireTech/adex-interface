@@ -43,3 +43,18 @@ export const maskAddress = (address: string) =>
     : ''
 
 export const capitalizeFirstLetter = (str: string) => str.charAt(0).toUpperCase() + str.slice(1)
+
+export const getMonthRangeString = (date: Date): string => {
+  const first = new Date(date.getFullYear(), date.getMonth(), 1)
+  const last = new Date(date.getFullYear(), date.getMonth() + 1, 0)
+
+  return `${formatDateShort(first)} - ${formatDateShort(last)}`
+}
+
+export const monthPeriodIndex = (date: Date): string =>
+  `${date.getUTCFullYear()}-${date.getUTCMonth()}`
+
+export const monthPeriodIndexToDate = (index: string): Date => {
+  const split = index.split('-')
+  return new Date(Number(split[0]), Number(split[1]))
+}

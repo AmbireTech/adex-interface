@@ -1,6 +1,5 @@
 import { Title } from '@mantine/core'
 import CustomTable from 'components/common/CustomTable'
-import { PrintModal } from 'components/common/Modals'
 import { useDisclosure } from '@mantine/hooks'
 import { useCallback, useMemo, useState } from 'react'
 
@@ -10,6 +9,7 @@ import useCampaignsData from 'hooks/useCampaignsData'
 import { CampaignStatus } from 'adex-common'
 import useAccount from 'hooks/useAccount'
 import { formatDateShort } from 'helpers'
+import { InvoicesModal } from './InvoicesModal'
 
 const columnTitles = ['Company Name', 'Campaign Period']
 
@@ -64,7 +64,7 @@ const Invoices = () => {
         elements={invoiceElements}
         onPreview={handlePreview}
       />
-      <PrintModal campaignId={selectedCampaignId} opened={opened} close={close} />
+      <InvoicesModal campaignId={selectedCampaignId} opened={opened} close={close} />
     </>
   ) : (
     // TODO: needs to be style
