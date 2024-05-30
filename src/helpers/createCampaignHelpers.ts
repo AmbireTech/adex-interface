@@ -200,6 +200,7 @@ export const initAllLocales = () => {
 
 type ReducedCampaign = Omit<
   Campaign,
+  | 'id'
   | 'created'
   | 'owner'
   | 'validators'
@@ -214,6 +215,8 @@ type ReducedCampaign = Omit<
 
 export const mapCampaignUItoCampaign = (campaignUI: CampaignUI): ReducedCampaign => {
   const {
+    // NOTE: temp id fix
+    id,
     step,
     devices,
     paymentModel,

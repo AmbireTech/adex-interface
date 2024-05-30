@@ -1,11 +1,10 @@
 import { PropsWithChildren } from 'react'
-import { IInvoices } from './invoices'
-import { IStatements } from './statements'
+import { IInvoices } from 'types'
 
 export interface ICustomTableProps extends PropsWithChildren {
   background?: boolean
   headings: string[]
-  elements: IInvoices[] | IStatements[] | any[]
+  elements: IInvoices[] | any[]
   onPreview?: (e: any) => any
   onAnalytics?: (e: any) => any
   onDuplicate?: (e: any) => any

@@ -40,7 +40,7 @@ const Dashboard = () => {
     //       )
     //     : []
     // }
-    return Array.from(campaignsData.values())
+    return Array.from(campaignsData.values()).reverse()
   }, [campaignsData])
 
   const elements = useMemo(

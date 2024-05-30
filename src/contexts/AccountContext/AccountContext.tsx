@@ -29,6 +29,7 @@ const ambireLoginSDK = new AmbireLoginSDK({
 export const BACKEND_BASE_URL = process.env.REACT_APP_BACKEND_BASE_URL
 export const VALIDATOR_BASE_URL = process.env.REACT_APP_VALIDATOR_BASE_URL
 
+console.log({ BACKEND_BASE_URL })
 const processResponse = (res: any) => {
   // console.log('res', res)
   if (res.status >= 200 && res.status < 400) {
