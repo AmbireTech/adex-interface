@@ -327,7 +327,7 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
     const mappedCampaign = mapCampaignUItoCampaign(campaign)
 
     // NOTE: only for draft but it will come from BE
-    // mappedCampaign.id = `${campaign.title}-${Date.now().toString(16)}`
+    mappedCampaign.id = ''
     mappedCampaign.campaignBudget = parseToBigNumPrecision(
       Number(mappedCampaign.campaignBudget),
       balanceToken.decimals
