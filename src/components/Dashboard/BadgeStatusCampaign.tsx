@@ -90,13 +90,12 @@ const BadgeStatusCampaign = ({ type }: BadgeType) => {
       //     text: 'Rejected',
       //     icon: <UnderReviewIcon size="13px" />
       //   }
-      // TODO: uncomment when CampaignStatus.draft is added
-      // case CampaignStatus.draft:
-      //   return {
-      //     color: 'draft',
-      //     text: 'Created',
-      //     icon: <DraftIcon size="13px" />
-      //   }
+      case CampaignStatus.draft:
+        return {
+          color: 'draft',
+          text: 'Draft',
+          icon: <DraftIcon size="13px" />
+        }
 
       default:
         return {

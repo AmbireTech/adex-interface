@@ -354,6 +354,37 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
     })
   }, [campaign, adexServicesRequest, balanceToken.decimals])
 
+  const saveToDraftCampaign = useCallback(() => {
+    const mappedCampaign = mapCampaignUItoCampaign(campaign)
+
+    mappedCampaign.id = `${campaign.title}-${Date.now().toString(16)}`
+    mappedCampaign.campaignBudget = parseToBigNumPrecision(
+      Number(mappedCampaign.campaignBudget),
+      balanceToken.decimals
+    )
+    mappedCampaign.pricingBounds.IMPRESSION!.min = parseToBigNumPrecision(
+      Number(campaign.cpmPricingBounds.min) / 1000,
+      balanceToken.decimals
+    )
+    mappedCampaign.pricingBounds.IMPRESSION!.max = parseToBigNumPrecision(
+      Number(campaign.cpmPricingBounds.max) / 1000,
+      balanceToken.decimals
+    )
+    mappedCampaign.activeFrom = BigInt(campaign.startsAt.getTime())
+    mappedCampaign.activeTo = BigInt(campaign.endsAt.getTime())
+
+    const body = serialize(mappedCampaign).json
+
+    return adexServicesRequest('backend', {
+      route: '/dsp/campaigns/draft',
+      method: 'POST',
+      body,
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+  }, [campaign, adexServicesRequest, balanceToken.decimals])
+
   const contextValue = useMemo(
     () => ({
       campaign,
@@ -366,7 +397,8 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
       addAdUnit,
       removeAdUnit,
       addTargetURLToAdUnit,
-      selectedBannerSizes
+      selectedBannerSizes,
+      saveToDraftCampaign
     }),
     [
       campaign,
@@ -379,7 +411,8 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
       addAdUnit,
       removeAdUnit,
       addTargetURLToAdUnit,
-      selectedBannerSizes
+      selectedBannerSizes,
+      saveToDraftCampaign
     ]
   )
 
