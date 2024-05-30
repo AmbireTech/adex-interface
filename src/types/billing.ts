@@ -34,6 +34,7 @@ export interface IInvoiceDetails {
 export type OperationEntry = (Deposit | CampaignFundsActive | CampaignRefunds) & {
   date: Date
   type: 'deposit' | 'campaign' | 'refund'
+  id: string
 }
 
 export type StatementData = {
@@ -42,4 +43,5 @@ export type StatementData = {
   operations: OperationEntry[]
   startBalance: bigint
   endBalance: bigint
+  token: OperationEntry['token']
 }

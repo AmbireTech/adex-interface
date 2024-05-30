@@ -1,10 +1,17 @@
 import { Grid, Space, Table, createStyles } from '@mantine/core'
 import { Placement } from 'adex-common'
-import { formatDate, getHumneSrcName } from 'helpers'
+import {
+  formatDate,
+  getHumneSrcName,
+  getMonthRangeString,
+  monthPeriodIndexToDate,
+  parseBigNumTokenAmountToDecimal,
+  formatCurrency
+} from 'helpers'
 // TODO: delete mock data
 // import { invoiceDetails } from 'components/Billing/mockedData'
 import { useMemo, PropsWithChildren, ReactNode } from 'react'
-import { IInvoiceDetails, InvoiceCompanyDetails, StatementData } from 'types'
+import { IInvoiceDetails, InvoiceCompanyDetails, OperationEntry, StatementData } from 'types'
 
 type InvoicesPDFProps = { invoiceDetails: IInvoiceDetails; placement: Placement }
 type SidesDetails = {
@@ -14,6 +21,18 @@ type SidesDetails = {
 
 type StatementsPDFProps = SidesDetails & {
   statement: StatementData
+}
+
+type DetailsProps = PropsWithChildren &
+  SidesDetails & {
+    header: ReactNode
+    footer: ReactNode
+  }
+
+const formatTokenAmount = (amount: bigint, token: OperationEntry['token']): string => {
+  return `${formatCurrency(parseBigNumTokenAmountToDecimal(amount, token.decimals), 2)} ${
+    token.name
+  }`
 }
 
 const useStyles = createStyles((theme) => ({
@@ -45,6 +64,9 @@ const useStyles = createStyles((theme) => ({
   wrap: {
     wordBreak: 'break-word'
   },
+  noWrap: {
+    whiteSpace: 'nowrap'
+  },
   smallFontSize: {
     fontSize: theme.fontSizes.xs
   },
@@ -55,17 +77,11 @@ const useStyles = createStyles((theme) => ({
   }
 }))
 
-type DetailsProps = PropsWithChildren &
-  SidesDetails & {
-    header: ReactNode
-    footer: ReactNode
-  }
-
 const BillingBlank = ({ children, header, footer, seller, buyer }: DetailsProps) => {
   const { classes } = useStyles()
 
   return (
-    <Grid grow align="center" className={classes.smallFontSize}>
+    <Grid grow align="center" className={classes.smallFontSize} p={12}>
       <Grid.Col span={12}>{header}</Grid.Col>
       <Grid.Col span={6}>
         <div className={classes.wrapper}>
@@ -150,12 +166,12 @@ export const InvoicesPDF = ({ invoiceDetails, placement }: InvoicesPDFProps) => 
           <Grid.Col span={2} className={cx(classes.right, classes.bold)}>
             {(calculateTotal + invoiceDetails.vatPercentageInUSD).toFixed(2)}
           </Grid.Col>
-          <Grid.Col span={4}>
+          <Grid.Col span={6}>
             Seller
             <div className={classes.borderBottom} />
             <span className={classes.signature}>Title / Name / Signature</span>
           </Grid.Col>
-          <Grid.Col span={4}>
+          <Grid.Col span={6}>
             Buyer
             <div className={classes.borderBottom} />
             <span className={classes.signature}>Title / Name / Signature</span>
@@ -213,15 +229,20 @@ export const StatementsPDF = ({ statement, seller, buyer }: StatementsPDFProps) 
         <Grid.Col span={12}>
           <div className={classes.right}>
             <div className={classes.title}>Statement</div>
-            <div className={classes.title}>Period {statement.periodIndex}</div>
-            <span>Token {statement.tokenIndex}</span>
+            <div className={classes.title}>
+              Period {getMonthRangeString(monthPeriodIndexToDate(statement.periodIndex))}
+            </div>
+            <span>
+              {/* TODO: chain id to name */}
+              Currency / Token: {statement.token.name} (chain: {statement.token.chainId})
+            </span>
           </div>
         </Grid.Col>
       }
       footer={
         <>
           <Grid.Col span={12} className={cx(classes.right, classes.bold)}>
-            {`End balance, ${statement.endBalance}`}
+            {`End balance, ${formatTokenAmount(statement.endBalance, statement.token)}`}
           </Grid.Col>
           <Grid.Col span={12}>
             <Space h="xl" />
@@ -230,14 +251,15 @@ export const StatementsPDF = ({ statement, seller, buyer }: StatementsPDFProps) 
           </Grid.Col>
           <Grid.Col span={12}>This is not a bill.</Grid.Col>
           <Grid.Col span={12}>
-            This is a summary of account activity for the time period started above
+            This is a summary of account activity for the time period stated above
           </Grid.Col>
         </>
       }
     >
       <>
         <Grid.Col span={9} className={cx(classes.right, classes.bold)}>
-          {`Start balance, ${statement.startBalance}`}
+          {`Start balance, ${formatTokenAmount(statement.startBalance, statement.token)}`}
+          <Space h="xl" />
         </Grid.Col>
         <Table withBorder withColumnBorders fontSize="xs" verticalSpacing="xs" w="100%">
           <thead>
@@ -245,6 +267,7 @@ export const StatementsPDF = ({ statement, seller, buyer }: StatementsPDFProps) 
               <th>#</th>
               <th>Date</th>
               <th>Type</th>
+              <th>Description</th>
               <th>amount</th>
             </tr>
           </thead>
@@ -253,11 +276,15 @@ export const StatementsPDF = ({ statement, seller, buyer }: StatementsPDFProps) 
               // eslint-disable-next-line
               <tr key={index}>
                 <td>{index + 1}</td>
-                <td className={classes.wrap}>{e.date.toLocaleDateString()}</td>
-                <td className={classes.rightAlignedText}>{e.type}</td>
-                <td className={classes.rightAlignedText}>
+                <td>{e.date.toLocaleDateString()}</td>
+                <td>{e.type}</td>
+                <td className={classes.wrap}>{e.id}</td>
+                <td className={cx(classes.rightAlignedText, classes.noWrap)}>
                   {' '}
-                  {`${e.type === 'campaign' ? '-' : '+'}   ${e.amount.toString()}`}
+                  {`${e.type === 'campaign' ? '-' : '+'}   ${formatTokenAmount(
+                    e.amount,
+                    statement.token
+                  )}`}
                 </td>
               </tr>
             ))}

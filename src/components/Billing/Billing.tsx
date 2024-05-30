@@ -8,7 +8,7 @@ import InvoiceIcon from 'resources/icons/Invoice'
 import StatementsIcon from 'resources/icons/Statements'
 import BillingDetails from './BillingDetails'
 import Invoices from './Invoices'
-import AccountStatements from './AccountStatements'
+import Statements from './AccountStatements'
 
 enum TabType {
   BillingTab,
@@ -23,7 +23,7 @@ const TabSwitch = ({ selectedTab }: { selectedTab: TabType }) => {
     case TabType.InvoicesTab:
       return <Invoices />
     case TabType.StatementsTab:
-      return <AccountStatements />
+      return <Statements />
     default:
       return <BillingDetails />
   }

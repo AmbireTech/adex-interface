@@ -5,22 +5,18 @@ import { useDisclosure } from '@mantine/hooks'
 import useAccount from 'hooks/useAccount'
 import { Deposit, CampaignFundsActive, CampaignRefunds, OperationEntry, StatementData } from 'types'
 import { ADEX_COMPANY_DETAILS } from 'constants/adexCompanyDetatils'
+import { getMonthRangeString, monthPeriodIndex, monthPeriodIndexToDate } from 'helpers'
 import { BillingDetailsModal } from './BillingDetailsModal'
 import { StatementsPDF } from './BillingPDF'
 
-const columnTitles = ['Date of issue', 'Token']
+const columnTitles = ['Date of issue', 'Currency / Token']
 
 type ByPeriodAndToken = {
-  [index: string]: {
+  [periodIndex: string]: {
     operations: OperationEntry[]
   }
 }
 
-const getPeriodIndex = (date: Date): string => `${date.getUTCFullYear()}-${date.getUTCMonth()}`
-const periodIndexToDate = (index: string): Date => {
-  const split = index.split('-')
-  return new Date(Number(split[0]), Number(split[1]))
-}
 const getTokenIndex = (token: OperationEntry['token']): string =>
   `${token.chainId}-${token.address}`
 
@@ -36,11 +32,13 @@ const toOpEntry = (
     ...x,
     amount: BigInt(x.amount),
     date,
-    type
+    type,
+    // @ts-ignore
+    id: x.id || x.txHash
   }
 }
 
-const AccountStatements = () => {
+const Statements = () => {
   const [opened, { open, close }] = useDisclosure(false)
   const {
     adexAccount: { address, billingDetails, fundsDeposited, fundsOnCampaigns, refundsFromCampaigns }
@@ -57,16 +55,16 @@ const AccountStatements = () => {
       toOpEntry(x, 'refund')
     )
 
-    const currentPeriodIndex = getPeriodIndex(new Date())
+    const currentPeriodIndex = monthPeriodIndex(new Date())
 
     const byPeriodAndToken = [...deposits, ...campaigns, ...refunds]
       // NOTE: statements only for fully ended periods
-      .filter((x) => getPeriodIndex(x.date) < currentPeriodIndex)
+      .filter((x) => monthPeriodIndex(x.date) < currentPeriodIndex)
       .sort((a, b) => a.date.getTime() - b.date.getTime())
       .reduce((months, current) => {
         const next = { ...months }
         const { date, token } = current
-        const index = `${getPeriodIndex(date)}.${getTokenIndex(token)}`
+        const index = `${monthPeriodIndex(date)}.${getTokenIndex(token)}`
         next[index] = next[index] || {}
         next[index].operations = [...(next[index].operations || []), current]
 
@@ -100,6 +98,7 @@ const AccountStatements = () => {
 
         const currentStatemet = {
           ...current,
+          token: current.operations[0].token,
           startBalance,
           endBalance
         }
@@ -122,14 +121,13 @@ const AccountStatements = () => {
   }, [statements, stIndex])
 
   const elements = useMemo(() => {
-    return statements.map((st, index) => ({
-      id: index,
-      date: periodIndexToDate(st.periodIndex).toLocaleDateString(undefined, {
-        year: 'numeric',
-        month: 'short'
-      }),
-      token: st.operations[0].token.name
-    }))
+    return statements
+      .map((st, index) => ({
+        id: index,
+        date: getMonthRangeString(monthPeriodIndexToDate(st.periodIndex)),
+        token: st.operations[0].token.name
+      }))
+      .reverse()
   }, [statements])
 
   const onPreview = useCallback(
@@ -160,4 +158,4 @@ const AccountStatements = () => {
   )
 }
 
-export default AccountStatements
+export default Statements
