@@ -326,7 +326,8 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
   const publishCampaign = useCallback(() => {
     const mappedCampaign = mapCampaignUItoCampaign(campaign)
 
-    mappedCampaign.id = `${campaign.title}-${Date.now().toString(16)}`
+    // NOTE: only for draft but it will come from BE
+    // mappedCampaign.id = `${campaign.title}-${Date.now().toString(16)}`
     mappedCampaign.campaignBudget = parseToBigNumPrecision(
       Number(mappedCampaign.campaignBudget),
       balanceToken.decimals
