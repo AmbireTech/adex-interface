@@ -1,5 +1,5 @@
-import { useEffect, useMemo } from 'react'
-import { useParams } from 'react-router-dom'
+import { useCallback, useEffect, useMemo } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
 import { Container, Grid, createStyles, Text, Flex } from '@mantine/core'
 import BadgeStatusCampaign from 'components/Dashboard/BadgeStatusCampaign'
 import { formatCatsAndLocsData } from 'helpers/createCampaignHelpers'
@@ -15,6 +15,9 @@ import CampaignActionBtn from 'components/CampaignAnalytics/CampaignActionBtn'
 import StopIcon from 'resources/icons/Stop'
 import ArchivedIcon from 'resources/icons/Archived'
 import FormattedAmount from 'components/common/FormattedAmount/FormattedAmount'
+import EditIcon from 'resources/icons/Edit'
+import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
+import useCustomNotifications from 'hooks/useCustomNotifications'
 import CatsLocsFormatted from './CatsLocsFormatted'
 
 const useStyles = createStyles((theme) => ({
@@ -52,6 +55,9 @@ const useStyles = createStyles((theme) => ({
 const CampaignDetails = () => {
   const { classes, cx } = useStyles()
   const { campaignsData, updateCampaignDataById, changeCampaignStatus } = useCampaignsData()
+  const { updateCampaignFromDraft } = useCreateCampaignContext()
+  const navigate = useNavigate()
+  const { showNotification } = useCustomNotifications()
 
   const { id } = useParams()
 
@@ -66,6 +72,15 @@ const CampaignDetails = () => {
   )
 
   const campaign = useMemo(() => campaignData?.campaign, [campaignData])
+
+  const handleEdit = useCallback(() => {
+    if (campaign) {
+      updateCampaignFromDraft(campaign)
+      navigate('/dashboard/create-campaign')
+    } else {
+      showNotification('error', 'Editing draft campaign failed', 'Editing draft campaign failed')
+    }
+  }, [updateCampaignFromDraft, navigate, showNotification, campaign])
 
   useEffect(() => {
     if (id) {
@@ -278,6 +293,14 @@ const CampaignDetails = () => {
                         onBtnClicked={() =>
                           changeCampaignStatus(CampaignStatus.closedByUser, campaign.id)
                         }
+                      />
+                    )}
+                    {campaign.status === CampaignStatus.draft && (
+                      <CampaignActionBtn
+                        text="Edit"
+                        icon={<EditIcon size="13px" />}
+                        color="draft"
+                        onBtnClicked={handleEdit}
                       />
                     )}
                   </Flex>
