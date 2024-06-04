@@ -105,7 +105,12 @@ const CampaignDetails = () => {
                   lineHeight="sm"
                   textSize="sm"
                   title="Status"
-                  value={<BadgeStatusCampaign type={campaign?.status as number} />}
+                  value={
+                    <span>
+                      {campaign?.status === CampaignStatus.rejected && `${campaign.reviewMessage} `}
+                      <BadgeStatusCampaign type={campaign?.status as number} />
+                    </span>
+                  }
                 />
                 {/* TODO: Add data for it */}
                 <CampaignDetailsRow

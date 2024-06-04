@@ -3162,9 +3162,9 @@ address@^1.0.1, address@^1.1.2:
   resolved "https://registry.yarnpkg.com/address/-/address-1.2.2.tgz#2b5248dac5485a6390532c6a517fda2e3faac89e"
   integrity sha512-4B/qKCfeE/ODUaAUpSwfzazo5x29WD4r3vXiWsB7I2mSDAihwEqKO+g8GELZUQSSAo5e1XTYh3ZVfLyxBc12nA==
 
-"adex-common@github:AmbireTech/adex-common#b82665e9a581b4c67f087d5501ffd9d26654425f":
+"adex-common@github:AmbireTech/adex-common#4822d8750cb2b3e18711ca7b20cfc57a642c3986":
   version "1.0.1"
-  resolved "https://codeload.github.com/AmbireTech/adex-common/tar.gz/b82665e9a581b4c67f087d5501ffd9d26654425f"
+  resolved "https://codeload.github.com/AmbireTech/adex-common/tar.gz/4822d8750cb2b3e18711ca7b20cfc57a642c3986"
   dependencies:
     i18n-iso-countries "^7.11.0"
 
