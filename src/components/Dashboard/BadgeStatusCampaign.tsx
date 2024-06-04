@@ -63,13 +63,6 @@ const BadgeStatusCampaign = ({ type }: BadgeType) => {
           text: 'Exhausted',
           icon: undefined
         }
-      // TODO: uncomment when CampaignStatus.stopped is added
-      // case CampaignStatus.stopped:
-      //   return {
-      //     color: 'stopped',
-      //     text: 'Stopped',
-      //     icon: <StopIcon size="13px" />
-      //   }
       case CampaignStatus.paused:
         return {
           color: 'paused',
@@ -84,12 +77,12 @@ const BadgeStatusCampaign = ({ type }: BadgeType) => {
       //     icon: <ArchivedIcon size="13px" />
       //   }
       // TODO: uncomment when CampaignStatus.rejected is added
-      // case CampaignStatus.rejected:
-      //   return {
-      //     color: 'warning',
-      //     text: 'Rejected',
-      //     icon: <UnderReviewIcon size="13px" />
-      //   }
+      case CampaignStatus.rejected:
+        return {
+          color: 'warning',
+          text: 'Rejected',
+          icon: <UnderReviewIcon size="13px" />
+        }
       // TODO: uncomment when CampaignStatus.draft is added
       // case CampaignStatus.draft:
       //   return {
