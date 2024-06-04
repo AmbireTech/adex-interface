@@ -10,6 +10,8 @@ import { periodNumberToDate } from 'helpers'
 import { useNavigate } from 'react-router-dom'
 import useCampaignsData from 'hooks/useCampaignsData'
 import { parseBigNumTokenAmountToDecimal } from 'helpers/balances'
+import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
+import useCustomNotifications from 'hooks/useCustomNotifications'
 import BadgeStatusCampaign from './BadgeStatusCampaign'
 
 const campaignHeaders = [
@@ -29,6 +31,8 @@ const campaignHeaders = [
 const Dashboard = () => {
   const navigate = useNavigate()
   const { campaignsData } = useCampaignsData()
+  const { updateCampaignFromDraft } = useCreateCampaignContext()
+  const { showNotification } = useCustomNotifications()
   // Temporary disabled show/hide archived until no functionality implemented
   // const [showArchived, setShowArchived] = useState(false)
   const filteredCampaignData = useMemo(() => {
@@ -58,10 +62,13 @@ const Dashboard = () => {
               title: cmpData.campaign.title,
               // type: CampaignType[cmpData.campaign.type],
               placement:
-                cmpData.campaign.targetingInput.inputs.placements.in[0] === 'app'
+                cmpData.campaign.targetingInput.inputs.placements?.in[0] === 'app'
                   ? 'App'
                   : 'Website',
-              status: <BadgeStatusCampaign type={cmpData.campaign.status} />,
+              status: {
+                value: cmpData.campaign.status,
+                element: <BadgeStatusCampaign type={cmpData.campaign.status} />
+              },
               served: `${((cmpData.paid / budget) * 100).toFixed(2)} %`,
               // TODO: get token name
               budget: `${budget} USDC`,
@@ -118,6 +125,23 @@ const Dashboard = () => {
     [navigate]
   )
 
+  const handleEdit = useCallback(
+    (item: Campaign) => {
+      const selectedCampaign = filteredCampaignData.find(
+        (campaign) => campaign.campaignId === item.id
+      )?.campaign
+
+      // TODO: should map the selectedCampaign as CampaignUI
+      if (selectedCampaign) {
+        updateCampaignFromDraft(selectedCampaign)
+        navigate('/dashboard/create-campaign')
+      } else {
+        showNotification('error', 'Editing draft campaign failed', 'Editing draft campaign failed')
+      }
+    },
+    [filteredCampaignData, updateCampaignFromDraft, navigate, showNotification]
+  )
+
   // const handleDuplicate = useCallback((item: Campaign) => {
   //   // TODO: Implement duplication logic
   //   console.log('item', item)
@@ -158,6 +182,7 @@ const Dashboard = () => {
           elements={elements}
           onPreview={handlePreview}
           onAnalytics={handleAnalytics}
+          onEdit={handleEdit}
           // Temporary disabled until no functionality implemented
           // onDuplicate={handleDuplicate}
           // onDelete={handleDelete}

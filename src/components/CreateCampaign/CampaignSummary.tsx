@@ -154,9 +154,8 @@ const CampaignSummary = () => {
 
       if (res && res.success) {
         await updateAllCampaignsData()
-        // await updateBalance()
-        // open()
         resetCampaign()
+        navigate('/dashboard/')
       } else {
         showNotification('warning', 'invalid campaign data response', 'Data error')
       }
@@ -164,8 +163,7 @@ const CampaignSummary = () => {
       console.error(err)
       showNotification('error', 'Creating campaign failed', 'Data error')
     }
-    // console.log('SAVE DRAFT', campaign)
-  }, [resetCampaign, saveToDraftCampaign, showNotification, updateAllCampaignsData])
+  }, [resetCampaign, saveToDraftCampaign, showNotification, updateAllCampaignsData, navigate])
 
   const handleOnModalClose = useCallback(() => {
     navigate('/dashboard/')

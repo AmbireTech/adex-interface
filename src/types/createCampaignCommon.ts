@@ -7,6 +7,7 @@ export type SelectData = { value: string | Alpha3Code; label: string }
 export type PaymentModelType = 'cpm' | 'cpc'
 
 export type CampaignUI = Campaign & {
+  _id?: string
   step: number
   devices: Devices[]
   paymentModel: PaymentModelType
@@ -17,6 +18,8 @@ export type CampaignUI = Campaign & {
     min: string
     max: string
   }
+  ownerHashed?: string
+  updated?: string
 }
 
 export type ImageSizes = {
@@ -58,4 +61,5 @@ export type CreateCampaignType = {
   addTargetURLToAdUnit: (inputText: string, adUnitId: string) => void
   selectedBannerSizes: SupplyStatsDetails[] | SupplyStatsDetails[][]
   saveToDraftCampaign: () => Promise<any>
+  updateCampaignFromDraft: (draftCampaign: Campaign) => void
 }

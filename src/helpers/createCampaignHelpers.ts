@@ -198,9 +198,10 @@ export const initAllLocales = () => {
   return allLocales
 }
 
+export type Modify<T, R> = Omit<T, keyof R> & R
+
 type ReducedCampaign = Omit<
-  Campaign,
-  | 'id'
+  Modify<Campaign, { id?: string }>,
   | 'created'
   | 'owner'
   | 'validators'
@@ -213,10 +214,26 @@ type ReducedCampaign = Omit<
   | 'lastModifiedBy'
 >
 
-export const mapCampaignUItoCampaign = (campaignUI: CampaignUI): ReducedCampaign => {
+type ReducedDraftCampaign = Omit<
+  Modify<Campaign, { id?: string }>,
+  | '_id'
+  | 'created'
+  | 'owner'
+  | 'validators'
+  | 'targetingRules'
+  | 'status'
+  | 'reviewStatus'
+  | 'modified'
+  | 'archived'
+  | 'createdBy'
+  | 'lastModifiedBy'
+  | 'ownerHashed'
+  | 'updated'
+>
+
+export const mapCampaignUItoDraftCampaign = (campaignUI: CampaignUI): ReducedDraftCampaign => {
   const {
-    // NOTE: temp id fix
-    id,
+    _id,
     step,
     devices,
     paymentModel,
@@ -234,6 +251,37 @@ export const mapCampaignUItoCampaign = (campaignUI: CampaignUI): ReducedCampaign
     createdBy,
     lastModifiedBy,
     cpmPricingBounds,
+    ownerHashed,
+    updated,
+    ...campaign
+  } = campaignUI
+
+  return {
+    ...campaign
+  }
+}
+
+export const mapCampaignUItoCampaign = (campaignUI: CampaignUI): ReducedCampaign => {
+  const {
+    step,
+    devices,
+    paymentModel,
+    startsAt,
+    endsAt,
+    currency,
+    created,
+    owner,
+    validators,
+    targetingRules,
+    status,
+    reviewStatus,
+    modified,
+    archived,
+    createdBy,
+    lastModifiedBy,
+    cpmPricingBounds,
+    ownerHashed,
+    updated,
     ...campaign
   } = campaignUI
 

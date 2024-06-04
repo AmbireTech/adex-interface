@@ -9,4 +9,6 @@ export interface ICustomTableProps extends PropsWithChildren {
   onAnalytics?: (e: any) => any
   onDuplicate?: (e: any) => any
   onDelete?: (e: any) => any
+  // TODO: Fix all the any types
+  onEdit?: (e: any) => any
 }

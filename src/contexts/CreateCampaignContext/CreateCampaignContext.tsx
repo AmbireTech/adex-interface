@@ -16,12 +16,14 @@ import {
   deepEqual,
   isPastDateTime,
   mapCampaignUItoCampaign,
+  mapCampaignUItoDraftCampaign,
   selectBannerSizes
 } from 'helpers/createCampaignHelpers'
 import { parseToBigNumPrecision } from 'helpers/balances'
-import { AdUnit, Placement } from 'adex-common'
+import { AdUnit, Campaign, Placement } from 'adex-common'
 import dayjs from 'dayjs'
 import useCustomNotifications from 'hooks/useCustomNotifications'
+import { formatDateTime } from 'helpers'
 
 const mockData = {
   appBannerFormats: [
@@ -130,6 +132,8 @@ const supplyStatsDefaultValue = {
   siteDesktopBidFloors: [],
   siteMobileBidFloors: []
 }
+
+const removeProperty = (propKey: any, { [propKey]: propValue, ...rest }) => rest
 
 const CreateCampaignContext = createContext<CreateCampaignType | null>(null)
 
@@ -324,7 +328,8 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
   )
 
   const publishCampaign = useCallback(() => {
-    const mappedCampaign = mapCampaignUItoCampaign(campaign)
+    // TODO: fix the type
+    let mappedCampaign: any = mapCampaignUItoCampaign(campaign)
 
     // NOTE: only for draft but it will come from BE
     // mappedCampaign.id = `${campaign.title}-${Date.now().toString(16)}`
@@ -343,6 +348,12 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
     mappedCampaign.activeFrom = BigInt(campaign.startsAt.getTime())
     mappedCampaign.activeTo = BigInt(campaign.endsAt.getTime())
 
+    if (mappedCampaign.id && mappedCampaign.id === '') {
+      mappedCampaign = removeProperty('id', mappedCampaign)
+    }
+
+    console.log('mappedPUBLISHCampaign', mappedCampaign)
+
     const body = serialize(mappedCampaign).json
 
     return adexServicesRequest('backend', {
@@ -356,9 +367,9 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
   }, [campaign, adexServicesRequest, balanceToken.decimals])
 
   const saveToDraftCampaign = useCallback(() => {
-    const mappedCampaign = mapCampaignUItoCampaign(campaign)
+    // TODO: fix the type
+    let mappedCampaign: any = mapCampaignUItoDraftCampaign(campaign)
 
-    mappedCampaign.id = `${campaign.title}-${Date.now().toString(16)}`
     mappedCampaign.campaignBudget = parseToBigNumPrecision(
       Number(mappedCampaign.campaignBudget),
       balanceToken.decimals
@@ -374,6 +385,15 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
     mappedCampaign.activeFrom = BigInt(campaign.startsAt.getTime())
     mappedCampaign.activeTo = BigInt(campaign.endsAt.getTime())
 
+    if (mappedCampaign.title === '') {
+      console.log('here')
+      mappedCampaign.title = `Draft Campaign ${formatDateTime(new Date())}`
+    }
+
+    if (mappedCampaign.id === '') {
+      mappedCampaign = removeProperty('id', mappedCampaign)
+    }
+
     const body = serialize(mappedCampaign).json
 
     return adexServicesRequest('backend', {
@@ -385,6 +405,30 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
       }
     })
   }, [campaign, adexServicesRequest, balanceToken.decimals])
+
+  const updateCampaignFromDraft = useCallback((draftCampaign: Campaign) => {
+    const mappedDraftCampaign: CampaignUI = {
+      ...draftCampaign,
+      step: 0,
+      devices: ['mobile', 'desktop'],
+      paymentModel: 'cpm',
+      startsAt:
+        (draftCampaign?.activeFrom && new Date(Number(draftCampaign?.activeFrom))) || new Date(),
+      endsAt: (draftCampaign?.activeTo && new Date(Number(draftCampaign?.activeTo))) || new Date(),
+      // TODO: fix them
+      currency: 'test',
+      cpmPricingBounds: {
+        min: (
+          Number(draftCampaign.pricingBounds.IMPRESSION!.min) *
+          1000 *
+          draftCampaign.outpaceAssetDecimals
+        ).toString(),
+        max: draftCampaign.pricingBounds.IMPRESSION!.max.toString()
+      }
+    }
+
+    setCampaign(mappedDraftCampaign)
+  }, [])
 
   const contextValue = useMemo(
     () => ({
@@ -399,7 +443,8 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
       removeAdUnit,
       addTargetURLToAdUnit,
       selectedBannerSizes,
-      saveToDraftCampaign
+      saveToDraftCampaign,
+      updateCampaignFromDraft
     }),
     [
       campaign,
@@ -413,7 +458,8 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
       removeAdUnit,
       addTargetURLToAdUnit,
       selectedBannerSizes,
-      saveToDraftCampaign
+      saveToDraftCampaign,
+      updateCampaignFromDraft
     ]
   )
 
