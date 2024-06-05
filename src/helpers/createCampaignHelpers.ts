@@ -217,6 +217,7 @@ type ReducedCampaign = Omit<
 
 export const mapCampaignUItoCampaign = (campaignUI: CampaignUI): ReducedCampaign => {
   const {
+    _id,
     step,
     devices,
     paymentModel,
@@ -269,6 +270,10 @@ export const prepareCampaignObject = (campaign: CampaignUI, decimals: number) =>
 
   if (mappedCampaign.id === '') {
     mappedCampaign = removeProperty('id', mappedCampaign)
+  }
+  // eslint-disable-next-line no-underscore-dangle
+  if (mappedCampaign._id) {
+    mappedCampaign = removeProperty('_id', mappedCampaign)
   }
 
   return mappedCampaign
