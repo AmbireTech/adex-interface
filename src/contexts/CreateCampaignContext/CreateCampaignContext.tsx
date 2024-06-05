@@ -360,37 +360,40 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
     })
   }, [campaign, adexServicesRequest, balanceToken.decimals])
 
-  const updateCampaignFromDraft = useCallback((draftCampaign: Campaign) => {
-    const mappedDraftCampaign: CampaignUI = {
-      ...draftCampaign,
-      step: 0,
-      devices: ['mobile', 'desktop'],
-      paymentModel: 'cpm',
-      startsAt:
-        (draftCampaign?.activeFrom && new Date(Number(draftCampaign?.activeFrom))) || new Date(),
-      endsAt: (draftCampaign?.activeTo && new Date(Number(draftCampaign?.activeTo))) || new Date(),
-      // TODO: fix them
-      currency: 'test',
-      cpmPricingBounds: {
-        min: parseFromBigNumPrecision(
-          BigInt(Number(draftCampaign.pricingBounds.IMPRESSION!.min) * 1000),
-          draftCampaign.outpaceAssetDecimals
-        ).toString(),
-        max: parseFromBigNumPrecision(
-          BigInt(Number(draftCampaign.pricingBounds.IMPRESSION!.max) * 1000),
-          draftCampaign.outpaceAssetDecimals
-        ).toString()
-      },
-      campaignBudget: BigInt(
-        parseFromBigNumPrecision(
-          BigInt(Number(draftCampaign.campaignBudget)),
-          draftCampaign.outpaceAssetDecimals
+  const updateCampaignFromDraft = useCallback(
+    (draftCampaign: Campaign) => {
+      const mappedDraftCampaign: CampaignUI = {
+        ...draftCampaign,
+        step: 0,
+        devices: ['mobile', 'desktop'],
+        paymentModel: 'cpm',
+        startsAt:
+          (draftCampaign?.activeFrom && new Date(Number(draftCampaign?.activeFrom))) || new Date(),
+        endsAt:
+          (draftCampaign?.activeTo && new Date(Number(draftCampaign?.activeTo))) || new Date(),
+        currency: balanceToken.name,
+        cpmPricingBounds: {
+          min: parseFromBigNumPrecision(
+            BigInt(Number(draftCampaign.pricingBounds.IMPRESSION!.min) * 1000),
+            draftCampaign.outpaceAssetDecimals
+          ).toString(),
+          max: parseFromBigNumPrecision(
+            BigInt(Number(draftCampaign.pricingBounds.IMPRESSION!.max) * 1000),
+            draftCampaign.outpaceAssetDecimals
+          ).toString()
+        },
+        campaignBudget: BigInt(
+          parseFromBigNumPrecision(
+            BigInt(Number(draftCampaign.campaignBudget)),
+            draftCampaign.outpaceAssetDecimals
+          )
         )
-      )
-    }
+      }
 
-    setCampaign(mappedDraftCampaign)
-  }, [])
+      setCampaign(mappedDraftCampaign)
+    },
+    [balanceToken.name]
+  )
 
   const contextValue = useMemo(
     () => ({
