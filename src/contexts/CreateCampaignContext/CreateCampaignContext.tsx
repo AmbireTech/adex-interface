@@ -15,11 +15,10 @@ import { useAdExApi } from 'hooks/useAdexServices'
 import {
   deepEqual,
   isPastDateTime,
-  mapCampaignUItoCampaign,
-  mapCampaignUItoDraftCampaign,
+  prepareCampaignObject,
   selectBannerSizes
 } from 'helpers/createCampaignHelpers'
-import { parseToBigNumPrecision } from 'helpers/balances'
+import { parseFromBigNumPrecision } from 'helpers/balances'
 import { AdUnit, Campaign, Placement } from 'adex-common'
 import dayjs from 'dayjs'
 import useCustomNotifications from 'hooks/useCustomNotifications'
@@ -132,8 +131,6 @@ const supplyStatsDefaultValue = {
   siteDesktopBidFloors: [],
   siteMobileBidFloors: []
 }
-
-const removeProperty = (propKey: any, { [propKey]: propValue, ...rest }) => rest
 
 const CreateCampaignContext = createContext<CreateCampaignType | null>(null)
 
@@ -328,33 +325,11 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
   )
 
   const publishCampaign = useCallback(() => {
-    // TODO: fix the type
-    let mappedCampaign: any = mapCampaignUItoCampaign(campaign)
+    const preparedCampaign = prepareCampaignObject(campaign, balanceToken.decimals)
 
-    // NOTE: only for draft but it will come from BE
-    // mappedCampaign.id = `${campaign.title}-${Date.now().toString(16)}`
-    mappedCampaign.campaignBudget = parseToBigNumPrecision(
-      Number(mappedCampaign.campaignBudget),
-      balanceToken.decimals
-    )
-    mappedCampaign.pricingBounds.IMPRESSION!.min = parseToBigNumPrecision(
-      Number(campaign.cpmPricingBounds.min) / 1000,
-      balanceToken.decimals
-    )
-    mappedCampaign.pricingBounds.IMPRESSION!.max = parseToBigNumPrecision(
-      Number(campaign.cpmPricingBounds.max) / 1000,
-      balanceToken.decimals
-    )
-    mappedCampaign.activeFrom = BigInt(campaign.startsAt.getTime())
-    mappedCampaign.activeTo = BigInt(campaign.endsAt.getTime())
+    console.log('mappedCampaignPublish', preparedCampaign)
 
-    if (mappedCampaign.id && mappedCampaign.id === '') {
-      mappedCampaign = removeProperty('id', mappedCampaign)
-    }
-
-    console.log('mappedPUBLISHCampaign', mappedCampaign)
-
-    const body = serialize(mappedCampaign).json
+    const body = serialize(preparedCampaign).json
 
     return adexServicesRequest('backend', {
       route: '/dsp/campaigns',
@@ -367,34 +342,13 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
   }, [campaign, adexServicesRequest, balanceToken.decimals])
 
   const saveToDraftCampaign = useCallback(() => {
-    // TODO: fix the type
-    let mappedCampaign: any = mapCampaignUItoDraftCampaign(campaign)
+    const preparedCampaign = prepareCampaignObject(campaign, balanceToken.decimals)
 
-    mappedCampaign.campaignBudget = parseToBigNumPrecision(
-      Number(mappedCampaign.campaignBudget),
-      balanceToken.decimals
-    )
-    mappedCampaign.pricingBounds.IMPRESSION!.min = parseToBigNumPrecision(
-      Number(campaign.cpmPricingBounds.min) / 1000,
-      balanceToken.decimals
-    )
-    mappedCampaign.pricingBounds.IMPRESSION!.max = parseToBigNumPrecision(
-      Number(campaign.cpmPricingBounds.max) / 1000,
-      balanceToken.decimals
-    )
-    mappedCampaign.activeFrom = BigInt(campaign.startsAt.getTime())
-    mappedCampaign.activeTo = BigInt(campaign.endsAt.getTime())
-
-    if (mappedCampaign.title === '') {
-      console.log('here')
-      mappedCampaign.title = `Draft Campaign ${formatDateTime(new Date())}`
+    if (preparedCampaign.title === '') {
+      preparedCampaign.title = `Draft Campaign ${formatDateTime(new Date())}`
     }
 
-    if (mappedCampaign.id === '') {
-      mappedCampaign = removeProperty('id', mappedCampaign)
-    }
-
-    const body = serialize(mappedCampaign).json
+    const body = serialize(preparedCampaign).json
 
     return adexServicesRequest('backend', {
       route: '/dsp/campaigns/draft',
@@ -418,13 +372,21 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
       // TODO: fix them
       currency: 'test',
       cpmPricingBounds: {
-        min: (
-          Number(draftCampaign.pricingBounds.IMPRESSION!.min) *
-          1000 *
+        min: parseFromBigNumPrecision(
+          BigInt(Number(draftCampaign.pricingBounds.IMPRESSION!.min) * 1000),
           draftCampaign.outpaceAssetDecimals
         ).toString(),
-        max: draftCampaign.pricingBounds.IMPRESSION!.max.toString()
-      }
+        max: parseFromBigNumPrecision(
+          BigInt(Number(draftCampaign.pricingBounds.IMPRESSION!.max) * 1000),
+          draftCampaign.outpaceAssetDecimals
+        ).toString()
+      },
+      campaignBudget: BigInt(
+        parseFromBigNumPrecision(
+          BigInt(Number(draftCampaign.campaignBudget)),
+          draftCampaign.outpaceAssetDecimals
+        )
+      )
     }
 
     setCampaign(mappedDraftCampaign)

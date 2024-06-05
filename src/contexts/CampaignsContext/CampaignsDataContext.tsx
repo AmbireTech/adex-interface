@@ -253,11 +253,19 @@ const CampaignsDataProvider: FC<PropsWithChildren> = ({ children }) => {
         console.log({ dataRes })
         if (Array.isArray(dataRes)) {
           setCampaignData((prev) => {
-            const next = new Map(prev)
+            const next = new Map()
+
+            const dataResIds = new Set(dataRes.map((cmp: Campaign) => cmp.id))
 
             dataRes.forEach((cmp: Campaign, index: number) => {
               const currentCMP = campaignResToCampaignData(cmp, advData?.[index], prev.get(cmp.id))
               next.set(cmp.id, currentCMP)
+            })
+
+            prev.forEach((value, key) => {
+              if (dataResIds.has(key)) {
+                next.set(key, value)
+              }
             })
 
             return next

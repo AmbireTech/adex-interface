@@ -8,6 +8,12 @@ export function parseToBigNumPrecision(amount: number, decimals: number): bigint
   return BigInt(amountIntScaled)
 }
 
+export function parseFromBigNumPrecision(amount: bigint, decimals: number): number {
+  const scaledAmount = Number(amount)
+  const divisor = 10 ** decimals
+  return scaledAmount / divisor
+}
+
 export function parseBigNumTokenAmountToDecimal(amount: bigint, decimals: number): number {
   return Number(amount) / 10 ** decimals
 }

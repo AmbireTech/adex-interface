@@ -62,7 +62,7 @@ const Dashboard = () => {
               title: cmpData.campaign.title,
               // type: CampaignType[cmpData.campaign.type],
               placement:
-                cmpData.campaign.targetingInput.inputs.placements?.in[0] === 'app'
+                cmpData.campaign.targetingInput.inputs.placements.in[0] === 'app'
                   ? 'App'
                   : 'Website',
               status: {
