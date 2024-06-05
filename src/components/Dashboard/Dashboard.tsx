@@ -69,7 +69,10 @@ const Dashboard = () => {
                 value: cmpData.campaign.status,
                 element: <BadgeStatusCampaign type={cmpData.campaign.status} />
               },
-              served: `${((cmpData.paid / budget) * 100).toFixed(2)} %`,
+              served:
+                cmpData.paid && budget
+                  ? `${((cmpData.paid / budget) * 100).toFixed(2)} %`
+                  : '0.00 %',
               // TODO: get token name
               budget: `${budget} USDC`,
               impressions: cmpData.impressions,
@@ -131,7 +134,6 @@ const Dashboard = () => {
         (campaign) => campaign.campaignId === item.id
       )?.campaign
 
-      // TODO: should map the selectedCampaign as CampaignUI
       if (selectedCampaign) {
         updateCampaignFromDraft(selectedCampaign)
         navigate('/dashboard/create-campaign')
