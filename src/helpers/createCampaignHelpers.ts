@@ -217,7 +217,7 @@ type ReducedCampaign = Omit<
 
 export const mapCampaignUItoCampaign = (campaignUI: CampaignUI): ReducedCampaign => {
   const {
-    _id,
+    _id: id,
     step,
     devices,
     paymentModel,
