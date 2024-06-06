@@ -24,7 +24,16 @@ const headersToDataProperties: IHeadersToDataProps = {
     'CTR%': 'crt',
     Spent: 'paid'
   },
-  timeframe: {}
+  timeframe: {},
+  ssp: {
+    SSP: 'segment',
+    Share: 'share',
+    Impressions: 'impressions',
+    Clicks: 'clicks',
+    'CTR%': 'ctr',
+    'Average CPM': 'avgCpm',
+    Spent: 'paid'
+  }
 }
 
 // TODO: remove TabType use AnalyticsType

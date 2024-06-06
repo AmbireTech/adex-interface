@@ -10,6 +10,7 @@ import { Campaign } from 'adex-common'
 import useAccount from 'hooks/useAccount'
 import Placements from './Placements'
 import Creatives from './Creatives'
+import SSPs from './SSPs'
 import Regions from './Regions'
 import { TimeFrame } from './TimeFrame'
 import { generateCVSData } from './CvsDownloadConfigurations'
@@ -35,7 +36,8 @@ const CampaignAnalytics = () => {
   const {
     adexAccount: {
       fundsOnCampaigns: { perCampaign }
-    }
+    },
+    isAdmin
   } = useAccount()
 
   const currencyName = useMemo(
@@ -136,6 +138,7 @@ const CampaignAnalytics = () => {
             <Tabs.Tab value="hostname">PLACEMENTS</Tabs.Tab>
             <Tabs.Tab value="country">REGIONS</Tabs.Tab>
             <Tabs.Tab value="adUnit">CREATIVES</Tabs.Tab>
+            {isAdmin && <Tabs.Tab value="ssp">SSPs</Tabs.Tab>}
           </Tabs.List>
           <Flex align="center" justify="space-between">
             {isMapBtnShown && <SeeOnMapBtn onBtnClicked={() => setIsMapVisible((prev) => !prev)} />}
@@ -187,6 +190,9 @@ const CampaignAnalytics = () => {
           units={campaign?.adUnits}
           currencyName={currencyName}
         />
+      )}
+      {isAdmin && !loading && activeTab === 'ssp' && (
+        <SSPs data={campaignMappedAnalytics} currencyName={currencyName} />
       )}
     </Container>
   )
