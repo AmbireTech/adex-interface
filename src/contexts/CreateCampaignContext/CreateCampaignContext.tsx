@@ -191,24 +191,23 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
 
   const getSupplyStats = useCallback(async () => {
     let result
-    if (process.env.NODE_ENV === 'development') {
+
+    try {
+      result = await adexServicesRequest('backend', {
+        route: '/dsp/stats/common',
+        method: 'GET'
+      })
+
+      if (!result) {
+        throw new Error('Getting banner sizes failed.')
+      }
+      setSupplyStats(result as SupplyStats)
+    } catch (e) {
+      console.error(e)
+      showNotification('error', 'Getting banner sizes failed', 'Getting banner sizes failed')
+      // TODO: add fallback or just use mock data
       result = mockData
       setSupplyStats(result)
-    } else {
-      try {
-        result = await adexServicesRequest('backend', {
-          route: '/dsp/stats/common',
-          method: 'GET'
-        })
-
-        if (!result) {
-          throw new Error('Getting banner sizes failed.')
-        }
-        setSupplyStats(result as SupplyStats)
-      } catch (e) {
-        console.error(e)
-        showNotification('error', 'Getting banner sizes failed', 'Getting banner sizes failed')
-      }
     }
   }, [adexServicesRequest, showNotification])
 
