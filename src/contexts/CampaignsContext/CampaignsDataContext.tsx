@@ -263,8 +263,8 @@ const CampaignsDataProvider: FC<PropsWithChildren> = ({ children }) => {
             })
 
             prev.forEach((value, key) => {
-              if (dataResIds.has(key)) {
-                next.set(key, value)
+              if (!dataResIds.has(key)) {
+                next.delete(key)
               }
             })
 

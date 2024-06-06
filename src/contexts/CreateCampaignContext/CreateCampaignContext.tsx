@@ -201,6 +201,15 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
       if (!result) {
         throw new Error('Getting banner sizes failed.')
       }
+
+      const hasEmptyValueResponse = Object.values(result).every(
+        (value) => Array.isArray(value) && value.length === 0
+      )
+
+      if (hasEmptyValueResponse) {
+        result = mockData
+      }
+
       setSupplyStats(result as SupplyStats)
     } catch (e) {
       console.error(e)
