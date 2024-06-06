@@ -62,4 +62,5 @@ export type CreateCampaignType = {
   selectedBannerSizes: SupplyStatsDetails[] | SupplyStatsDetails[][]
   saveToDraftCampaign: () => Promise<any>
   updateCampaignFromDraft: (draftCampaign: Campaign) => void
+  defaultValue: CampaignUI
 }

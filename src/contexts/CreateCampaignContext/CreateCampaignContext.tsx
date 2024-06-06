@@ -409,7 +409,8 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
       addTargetURLToAdUnit,
       selectedBannerSizes,
       saveToDraftCampaign,
-      updateCampaignFromDraft
+      updateCampaignFromDraft,
+      defaultValue
     }),
     [
       campaign,
@@ -424,7 +425,8 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
       addTargetURLToAdUnit,
       selectedBannerSizes,
       saveToDraftCampaign,
-      updateCampaignFromDraft
+      updateCampaignFromDraft,
+      defaultValue
     ]
   )
 

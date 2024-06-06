@@ -12,7 +12,6 @@ import PausedIcon from 'resources/icons/Paused'
 
 const BadgeStatusCampaign = ({ type }: BadgeType) => {
   const getStatusLabel = useCallback((status: number): IBadgeConfig => {
-    console.log({ status })
     switch (status) {
       case CampaignStatus.created:
         return {
@@ -107,8 +106,6 @@ const BadgeStatusCampaign = ({ type }: BadgeType) => {
   }, [])
 
   const status = useMemo(() => getStatusLabel(type), [getStatusLabel, type])
-
-  console.log({ status })
 
   return <CustomBadge color={status.color} text={status.text} icon={status.icon} />
 }
