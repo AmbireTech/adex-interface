@@ -349,24 +349,27 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
     })
   }, [campaign, adexServicesRequest, balanceToken.decimals])
 
-  const saveToDraftCampaign = useCallback(() => {
-    const preparedCampaign = prepareCampaignObject(campaign, balanceToken.decimals)
+  const saveToDraftCampaign = useCallback(
+    (camp?: CampaignUI) => {
+      const preparedCampaign = prepareCampaignObject(camp || campaign, balanceToken.decimals)
 
-    if (preparedCampaign.title === '') {
-      preparedCampaign.title = `Draft Campaign ${formatDateTime(new Date())}`
-    }
-
-    const body = serialize(preparedCampaign).json
-
-    return adexServicesRequest('backend', {
-      route: '/dsp/campaigns/draft',
-      method: 'POST',
-      body,
-      headers: {
-        'Content-Type': 'application/json'
+      if (preparedCampaign.title === '') {
+        preparedCampaign.title = `Draft Campaign ${formatDateTime(new Date())}`
       }
-    })
-  }, [campaign, adexServicesRequest, balanceToken.decimals])
+
+      const body = serialize(preparedCampaign).json
+
+      return adexServicesRequest('backend', {
+        route: '/dsp/campaigns/draft',
+        method: 'POST',
+        body,
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+    },
+    [campaign, adexServicesRequest, balanceToken.decimals]
+  )
 
   const updateCampaignFromDraft = useCallback(
     (draftCampaign: Campaign) => {

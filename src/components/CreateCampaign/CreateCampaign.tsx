@@ -76,15 +76,17 @@ const CreateCampaign = () => {
         setCampaign((prev) => {
           if (!deepEqual(prev, defaultValue)) {
             modals.openConfirmModal({
-              title: 'Unsaved changes',
+              title: 'You may have unsaved changes',
               children: (
-                <Text size="sm">There are unsaved changes. Do you want them saved as a draft?</Text>
+                <Text size="sm">
+                  You may have unsaved changes. Do you want to save them as a draft?
+                </Text>
               ),
               labels: { confirm: 'Yes', cancel: 'No' },
               onCancel: () => console.log('No'),
               onConfirm: async () => {
                 try {
-                  const res = await saveToDraftCampaign()
+                  const res = await saveToDraftCampaign(prev)
 
                   if (res && res.success) {
                     await updateAllCampaignsData()
