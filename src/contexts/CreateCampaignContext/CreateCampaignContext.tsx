@@ -354,12 +354,6 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
       const currCampaign = camp || campaign
       const preparedCampaign = prepareCampaignObject(currCampaign, balanceToken.decimals)
 
-      // if (test.step < 2) {
-      //   preparedCampaign.active
-      // }
-      console.log('defaultValue.startAt', defaultValue.startsAt)
-      console.log('test.startAt', currCampaign.startsAt)
-      console.log('are equal', defaultValue.startsAt === currCampaign.startsAt)
       if (defaultValue.startsAt === currCampaign.startsAt) {
         preparedCampaign.activeFrom = null
       }
@@ -370,7 +364,6 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
         preparedCampaign.title = `Draft Campaign ${formatDateTime(new Date())}`
       }
 
-      console.log('preparedCampaign', preparedCampaign)
       const body = serialize(preparedCampaign).json
 
       return adexServicesRequest('backend', {
