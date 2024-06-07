@@ -63,7 +63,8 @@ const CampaignSummary = () => {
     campaign: { step, adUnits },
     updateCampaign,
     publishCampaign,
-    resetCampaign
+    resetCampaign,
+    saveToDraftCampaign
   } = useCreateCampaignContext()
   const {
     formattedSelectedDevice,
@@ -147,6 +148,23 @@ const CampaignSummary = () => {
     }
   }, [step, adUnits, updateCampaign, showNotification])
 
+  const handleSaveDraftClicked = useCallback(async () => {
+    try {
+      const res = await saveToDraftCampaign()
+
+      if (res && res.success) {
+        await updateAllCampaignsData()
+        resetCampaign()
+        navigate('/dashboard/')
+      } else {
+        showNotification('warning', 'invalid campaign data response', 'Data error')
+      }
+    } catch (err) {
+      console.error(err)
+      showNotification('error', 'Creating campaign failed', 'Data error')
+    }
+  }, [resetCampaign, saveToDraftCampaign, showNotification, updateAllCampaignsData, navigate])
+
   const handleOnModalClose = useCallback(() => {
     navigate('/dashboard/')
     close()
@@ -221,7 +239,7 @@ const CampaignSummary = () => {
             </Flex>
           </ConfirmModal>
         )}
-        <Button w="90%" size="lg" mt="md" variant="outline">
+        <Button w="90%" size="lg" mt="md" variant="outline" onClick={handleSaveDraftClicked}>
           Save Draft
         </Button>
         <UnstyledButton

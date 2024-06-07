@@ -51,6 +51,7 @@ const useDropzone = () => {
               }
             } catch (err) {
               console.error('ERROR: ', err)
+              return
             }
 
             const adUnit = {

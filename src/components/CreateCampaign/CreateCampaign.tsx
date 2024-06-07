@@ -1,5 +1,10 @@
-import { Grid, createStyles } from '@mantine/core'
+import { Grid, createStyles, Text } from '@mantine/core'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
+import { useEffect } from 'react'
+import { modals } from '@mantine/modals'
+import useCustomNotifications from 'hooks/useCustomNotifications'
+import useCampaignsData from 'hooks/useCampaignsData'
+import { deepEqual } from 'helpers/createCampaignHelpers'
 import CustomStepper from './CampaignStepper'
 import CampaignSummary from './CampaignSummary'
 import StepOne from './StepOne/StepOne'
@@ -56,8 +61,51 @@ const Wizard = ({ step }: { step: number }) => {
 const CreateCampaign = () => {
   const { classes } = useStyles()
   const {
-    campaign: { step }
+    setCampaign,
+    campaign: { step },
+    saveToDraftCampaign,
+    defaultValue
   } = useCreateCampaignContext()
+  const { updateAllCampaignsData } = useCampaignsData()
+  const { showNotification } = useCustomNotifications()
+
+  useEffect(() => {
+    return () => {
+      // NOTE: because of the strict mode on dev env it invokes twice
+      if (process.env.NODE_ENV !== 'development') {
+        setCampaign((prev) => {
+          if (!deepEqual(prev, defaultValue)) {
+            modals.openConfirmModal({
+              title: 'You may have unsaved changes',
+              children: (
+                <Text size="sm">
+                  You may have unsaved changes. Do you want to save them as a draft?
+                </Text>
+              ),
+              labels: { confirm: 'Yes', cancel: 'No' },
+              onCancel: () => console.log('No'),
+              onConfirm: async () => {
+                try {
+                  const res = await saveToDraftCampaign(prev)
+
+                  if (res && res.success) {
+                    await updateAllCampaignsData()
+                  } else {
+                    showNotification('warning', 'invalid campaign data response', 'Data error')
+                  }
+                } catch (err) {
+                  console.error(err)
+                  showNotification('error', 'Creating campaign failed', 'Data error')
+                }
+              }
+            })
+          }
+
+          return prev
+        })
+      }
+    }
+  }, []) // eslint-disable-line
 
   return (
     <Grid columns={24} align="flex-start" mr="xl" ml="xl" mt="md">

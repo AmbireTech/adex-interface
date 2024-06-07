@@ -17,6 +17,8 @@ export type CampaignUI = Campaign & {
     min: string
     max: string
   }
+  ownerHashed?: string
+  updated?: string
 }
 
 export type ImageSizes = {
@@ -57,4 +59,7 @@ export type CreateCampaignType = {
   removeAdUnit: (adUnitIdToRemove: string) => void
   addTargetURLToAdUnit: (inputText: string, adUnitId: string) => void
   selectedBannerSizes: SupplyStatsDetails[] | SupplyStatsDetails[][]
+  saveToDraftCampaign: (camp?: CampaignUI) => Promise<any>
+  updateCampaignFromDraft: (draftCampaign: Campaign) => void
+  defaultValue: CampaignUI
 }
