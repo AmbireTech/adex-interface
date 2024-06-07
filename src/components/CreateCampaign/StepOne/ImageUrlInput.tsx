@@ -52,6 +52,8 @@ const ImageUrlInput = ({
   return (
     <>
       {toRemove && <InfoAlertMessage message="The banner size does not meet the requirements." />}
+      {/* TODO: temp for test */}
+      <MediaBanner adUnit={image} />
       <Input
         onChange={handleChange}
         error={toRemove}

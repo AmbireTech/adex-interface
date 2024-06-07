@@ -1,4 +1,4 @@
-import { Alert } from '@mantine/core'
+import { Alert, Flex, Text, createStyles } from '@mantine/core'
 // import BannerSizeMock from 'components/common/BannerSizeMock'
 import { checkBannerSizes } from 'helpers/createCampaignHelpers'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
@@ -7,6 +7,13 @@ import { AdUnit } from 'adex-common/dist/types'
 // import useCreateCampaignData from 'hooks/useCreateCampaignData/useCreateCampaignData'
 import { SupplyStatsDetails } from 'types'
 import InfoIcon from 'resources/icons/Info'
+import CustomAnchor from 'components/common/customAnchor'
+
+const useStyles = createStyles((theme) => ({
+  brandTextColor: {
+    color: theme.colors.brand[theme.fn.primaryShade()]
+  }
+}))
 
 const getPopularBannerSizes = (bannerSizes: SupplyStatsDetails[] | SupplyStatsDetails[][]) => {
   let result: SupplyStatsDetails[][] | SupplyStatsDetails[] = []
@@ -24,6 +31,7 @@ const getPopularBannerSizes = (bannerSizes: SupplyStatsDetails[] | SupplyStatsDe
 
 const BannerSizesList = ({ adUnits }: { adUnits: AdUnit[] }) => {
   const { selectedBannerSizes } = useCreateCampaignContext()
+  const { classes } = useStyles()
   // const { uniqueSizesWithCount } = useCreateCampaignData()
 
   const popularBannerSizes = useMemo(
@@ -61,7 +69,20 @@ const BannerSizesList = ({ adUnits }: { adUnits: AdUnit[] }) => {
     //   })}
     // </Grid>
     <Alert icon={<InfoIcon style={{ marginTop: 0 }} />} color="attention" variant="outline">
-      Recommended banner sizes: {updatedBannerSizes.map((size) => size.value).join(', ')}
+      <Flex justify="space-between">
+        <Text>
+          Recommended banner sizes: {updatedBannerSizes.map((size) => size.value).join(', ')}{' '}
+        </Text>
+        <CustomAnchor
+          external
+          underline
+          weight="bold"
+          href="https://help.adex.network/hc/en-us"
+          className={classes.brandTextColor}
+        >
+          see all
+        </CustomAnchor>
+      </Flex>
     </Alert>
   ) : null
 }
