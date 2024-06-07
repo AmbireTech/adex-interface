@@ -7,7 +7,7 @@ import {
   useMemo,
   useState
 } from 'react'
-import { CREATE_CAMPAIGN_DEFAULT_VALUE } from 'constants/createCampaign'
+import { CREATE_CAMPAIGN_DEFAULT_VALUE, dateNowPlusThirtyDays } from 'constants/createCampaign'
 import superjson, { serialize } from 'superjson'
 import { SupplyStats, CampaignUI, CreateCampaignType, SupplyStatsDetails, Devices } from 'types'
 import useAccount from 'hooks/useAccount'
@@ -351,12 +351,26 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
 
   const saveToDraftCampaign = useCallback(
     (camp?: CampaignUI) => {
-      const preparedCampaign = prepareCampaignObject(camp || campaign, balanceToken.decimals)
+      const currCampaign = camp || campaign
+      const preparedCampaign = prepareCampaignObject(currCampaign, balanceToken.decimals)
 
+      // if (test.step < 2) {
+      //   preparedCampaign.active
+      // }
+      console.log('defaultValue.startAt', defaultValue.startsAt)
+      console.log('test.startAt', currCampaign.startsAt)
+      console.log('are equal', defaultValue.startsAt === currCampaign.startsAt)
+      if (defaultValue.startsAt === currCampaign.startsAt) {
+        preparedCampaign.activeFrom = null
+      }
+      if (defaultValue.endsAt === currCampaign.endsAt) {
+        preparedCampaign.activeTo = null
+      }
       if (preparedCampaign.title === '') {
         preparedCampaign.title = `Draft Campaign ${formatDateTime(new Date())}`
       }
 
+      console.log('preparedCampaign', preparedCampaign)
       const body = serialize(preparedCampaign).json
 
       return adexServicesRequest('backend', {
@@ -368,7 +382,13 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
         }
       })
     },
-    [campaign, adexServicesRequest, balanceToken.decimals]
+    [
+      campaign,
+      adexServicesRequest,
+      balanceToken.decimals,
+      defaultValue.startsAt,
+      defaultValue.endsAt
+    ]
   )
 
   const updateCampaignFromDraft = useCallback(
@@ -381,7 +401,8 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
         startsAt:
           (draftCampaign?.activeFrom && new Date(Number(draftCampaign?.activeFrom))) || new Date(),
         endsAt:
-          (draftCampaign?.activeTo && new Date(Number(draftCampaign?.activeTo))) || new Date(),
+          (draftCampaign?.activeTo && new Date(Number(draftCampaign?.activeTo))) ||
+          dateNowPlusThirtyDays(),
         currency: balanceToken.name,
         cpmPricingBounds: {
           min: parseFromBigNumPrecision(
@@ -395,7 +416,7 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
         },
         campaignBudget: BigInt(
           parseFromBigNumPrecision(
-            BigInt(Number(draftCampaign.campaignBudget)),
+            BigInt(Math.floor(Number(draftCampaign.campaignBudget))),
             draftCampaign.outpaceAssetDecimals
           )
         )

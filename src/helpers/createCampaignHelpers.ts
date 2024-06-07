@@ -217,7 +217,6 @@ type ReducedCampaign = Omit<
 
 export const mapCampaignUItoCampaign = (campaignUI: CampaignUI): ReducedCampaign => {
   const {
-    _id: id,
     step,
     devices,
     paymentModel,
@@ -254,7 +253,7 @@ export const prepareCampaignObject = (campaign: CampaignUI, decimals: number) =>
   // NOTE: only for draft but it will come from BE
   // mappedCampaign.id = `${campaign.title}-${Date.now().toString(16)}`
   mappedCampaign.campaignBudget = parseToBigNumPrecision(
-    Number(mappedCampaign.campaignBudget),
+    Math.floor(Number(mappedCampaign.campaignBudget)),
     decimals
   )
   mappedCampaign.pricingBounds.IMPRESSION!.min = parseToBigNumPrecision(

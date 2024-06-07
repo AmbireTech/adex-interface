@@ -158,13 +158,19 @@ const CampaignDetails = () => {
                   lineHeight="sm"
                   textSize="sm"
                   title="Starts"
-                  value={formatDateTime(new Date(Number(campaign.activeFrom)))}
+                  value={
+                    campaign.activeFrom
+                      ? formatDateTime(new Date(Number(campaign.activeFrom)))
+                      : 'N/A'
+                  }
                 />
                 <CampaignDetailsRow
                   lineHeight="sm"
                   textSize="sm"
                   title="Ends"
-                  value={formatDateTime(new Date(Number(campaign.activeTo)))}
+                  value={
+                    campaign.activeTo ? formatDateTime(new Date(Number(campaign.activeTo))) : 'N/A'
+                  }
                 />
                 <CampaignDetailsRow
                   lineHeight="sm"

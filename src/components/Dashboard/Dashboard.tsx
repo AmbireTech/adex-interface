@@ -80,9 +80,17 @@ const Dashboard = () => {
               ctr: `${cmpData.ctr || 0} %`,
               period: (
                 <span>
-                  <span>{periodNumberToDate(cmpData.campaign.activeFrom)} </span>
+                  <span>
+                    {cmpData.campaign.activeFrom
+                      ? periodNumberToDate(cmpData.campaign.activeFrom)
+                      : 'N/A'}
+                  </span>
                   <br />
-                  <span>{periodNumberToDate(cmpData.campaign.activeTo)} </span>
+                  <span>
+                    {cmpData.campaign.activeTo
+                      ? periodNumberToDate(cmpData.campaign.activeTo)
+                      : 'N/A'}
+                  </span>
                 </span>
               ),
               cpm: (

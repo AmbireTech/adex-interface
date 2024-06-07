@@ -7,7 +7,6 @@ export type SelectData = { value: string | Alpha3Code; label: string }
 export type PaymentModelType = 'cpm' | 'cpc'
 
 export type CampaignUI = Campaign & {
-  _id?: string
   step: number
   devices: Devices[]
   paymentModel: PaymentModelType
