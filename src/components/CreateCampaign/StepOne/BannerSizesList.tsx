@@ -59,6 +59,7 @@ const BannerSizesList = ({ adUnits }: { adUnits: AdUnit[] }) => {
           external
           underline
           weight="bold"
+          // TODO: update the URL
           href="https://help.adex.network/hc/en-us"
           className={classes.brandTextColor}
         >
