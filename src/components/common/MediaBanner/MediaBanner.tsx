@@ -4,16 +4,20 @@ import { getMediaUrlWithProvider, isVideoMedia } from 'helpers/createCampaignHel
 import { useMemo } from 'react'
 
 const IPFS_GATEWAY = process.env.REACT_APP_IPFS_GATEWAY
+const SCALE_VALUE = 4
 
-const useStyles = createStyles(() => ({
+const useStyles = createStyles((theme) => ({
   container: {
+    zIndex: 9999,
     maxWidth: 40,
     maxHeight: 40,
     overflow: 'hidden',
     transition: 'transform 0.3s ease-in-out',
     '&:hover': {
-      // TODO: fix the scale value
-      transform: 'scale(3.1)'
+      transform: `scale(${SCALE_VALUE})`,
+      border: '0.5px solid',
+      borderColor: theme.colors.decorativeBorders[theme.fn.primaryShade()],
+      borderRadius: theme.radius.xs
     }
   }
 }))

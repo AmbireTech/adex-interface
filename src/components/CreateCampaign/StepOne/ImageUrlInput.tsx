@@ -1,10 +1,55 @@
-import { ActionIcon, Input, Text } from '@mantine/core'
+import { ActionIcon, Flex, Input, Text, createStyles, getStylesRef } from '@mantine/core'
+import CustomBadge from 'components/common/CustomBadge'
 import InfoAlertMessage from 'components/common/InfoAlertMessage'
 import MediaBanner from 'components/common/MediaBanner'
 import { isValidHttpUrl } from 'helpers/validators'
 import { useCallback, useState } from 'react'
 import DeleteIcon from 'resources/icons/Delete'
 import { ImageUrlInputProps } from 'types'
+
+const useStyles = createStyles((theme) => {
+  const smallerSpacing = `${Number(theme.spacing.xs.split('rem')[0]) * 0.8}rem`
+
+  return {
+    inputField: {
+      ref: getStylesRef('inputField'),
+      flexGrow: 1,
+      '&:disabled': {
+        flexGrow: 1
+      }
+    },
+    mediaWrapper: {
+      ref: getStylesRef('mediaWrapper'),
+      borderRight: '1px solid',
+      borderColor: theme.colors.decorativeBorders[theme.fn.primaryShade()],
+      padding: smallerSpacing
+    },
+    wrapper: {
+      backgroundColor: theme.colors.lightBackground[theme.fn.primaryShade()],
+      border: '1px solid',
+      borderColor: theme.colors.decorativeBorders[theme.fn.primaryShade()],
+      borderRadius: theme.radius.md,
+      '&:focus-within': {
+        borderColor: theme.colors.brand[theme.fn.primaryShade()],
+        [`& .${getStylesRef('mediaWrapper')}`]: {
+          borderColor: theme.colors.brand[theme.fn.primaryShade()]
+        },
+        [`& .${getStylesRef('inputField')}`]: {
+          color: theme.colors.brand[theme.fn.primaryShade()]
+        }
+      }
+    },
+    inputError: {
+      borderColor: theme.colors.warning[theme.fn.primaryShade()],
+      [`& .${getStylesRef('mediaWrapper')}`]: {
+        borderColor: theme.colors.warning[theme.fn.primaryShade()]
+      }
+    },
+    infoError: {
+      padding: theme.spacing.xs
+    }
+  }
+})
 
 const ImageUrlInput = ({
   image,
@@ -14,13 +59,11 @@ const ImageUrlInput = ({
   preview,
   ...rest
 }: ImageUrlInputProps) => {
+  const { classes, cx } = useStyles()
   const [error, setError] = useState('')
 
   const getRightSection = useCallback(() => {
-    if (preview)
-      return <Text size="xs" pr="xs">{`${image.banner?.format.w}x${image.banner?.format.h}`}</Text>
-
-    if (!onDelete) return null
+    if (preview || !onDelete) return null
 
     return (
       <ActionIcon
@@ -51,23 +94,39 @@ const ImageUrlInput = ({
 
   return (
     <>
-      {toRemove && <InfoAlertMessage message="The banner size does not meet the requirements." />}
-      {/* TODO: temp for test */}
-      <MediaBanner adUnit={image} />
-      <Input
-        onChange={handleChange}
-        error={toRemove}
-        disabled={toRemove || preview}
-        defaultValue={image.banner?.targetUrl}
-        type="url"
-        variant="default"
-        placeholder="Please enter a target URL starting with https://"
-        size="lg"
-        icon={<MediaBanner adUnit={image} />}
-        rightSection={getRightSection()}
+      {toRemove && (
+        <div className={classes.infoError}>
+          <InfoAlertMessage message="The banner size does not meet the requirements." />
+        </div>
+      )}
+      <Flex
+        justify="flex-start"
+        align="center"
+        gap="xs"
+        className={cx(classes.wrapper, { [classes.inputError]: error || toRemove })}
         {...rest}
-      />
-      {error && <Text color="warning">{error}</Text>}
+      >
+        <div className={classes.mediaWrapper}>
+          <MediaBanner adUnit={image} />
+        </div>
+        <CustomBadge
+          color={error || toRemove ? 'warning' : 'brand'}
+          text={`${image.banner?.format.w}x${image.banner?.format.h}`}
+        />
+        <Input
+          className={classes.inputField}
+          onChange={handleChange}
+          error={toRemove}
+          disabled={toRemove || preview}
+          defaultValue={image.banner?.targetUrl}
+          type="url"
+          variant="unstyled"
+          placeholder="Please enter a target URL starting with https://"
+          size="md"
+          rightSection={getRightSection()}
+        />
+        {error && <Text color="warning">{error}</Text>}
+      </Flex>
     </>
   )
 }

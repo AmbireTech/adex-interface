@@ -12,7 +12,7 @@ const useStyles = createStyles((theme) => ({
     borderColor: theme.colors.decorativeBorders[theme.fn.primaryShade()],
     boxShadow: theme.shadows.sm,
     borderRadius: theme.radius.md,
-    marginBottom: theme.spacing.sm,
+    marginBottom: theme.spacing.xs,
     background:
       theme.colors.warning[theme.fn.primaryShade()] + theme.other.shades.hexColorSuffix.lightest
   },
