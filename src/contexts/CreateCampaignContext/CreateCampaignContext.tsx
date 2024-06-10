@@ -7,7 +7,7 @@ import {
   useMemo,
   useState
 } from 'react'
-import { CREATE_CAMPAIGN_DEFAULT_VALUE } from 'constants/createCampaign'
+import { CREATE_CAMPAIGN_DEFAULT_VALUE, dateNowPlusThirtyDays } from 'constants/createCampaign'
 import superjson, { serialize } from 'superjson'
 import { SupplyStats, CampaignUI, CreateCampaignType, SupplyStatsDetails, Devices } from 'types'
 import useAccount from 'hooks/useAccount'
@@ -15,13 +15,14 @@ import { useAdExApi } from 'hooks/useAdexServices'
 import {
   deepEqual,
   isPastDateTime,
-  mapCampaignUItoCampaign,
+  prepareCampaignObject,
   selectBannerSizes
 } from 'helpers/createCampaignHelpers'
-import { parseToBigNumPrecision } from 'helpers/balances'
-import { AdUnit, Placement } from 'adex-common'
+import { parseFromBigNumPrecision } from 'helpers/balances'
+import { AdUnit, Campaign, Placement } from 'adex-common'
 import dayjs from 'dayjs'
 import useCustomNotifications from 'hooks/useCustomNotifications'
+import { formatDateTime } from 'helpers'
 
 const mockData = {
   appBannerFormats: [
@@ -190,24 +191,32 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
 
   const getSupplyStats = useCallback(async () => {
     let result
-    if (process.env.NODE_ENV === 'development') {
+
+    try {
+      result = await adexServicesRequest('backend', {
+        route: '/dsp/stats/common',
+        method: 'GET'
+      })
+
+      if (!result) {
+        throw new Error('Getting banner sizes failed.')
+      }
+
+      const hasEmptyValueResponse = Object.values(result).every(
+        (value) => Array.isArray(value) && value.length === 0
+      )
+
+      if (hasEmptyValueResponse) {
+        result = mockData
+      }
+
+      setSupplyStats(result as SupplyStats)
+    } catch (e) {
+      console.error(e)
+      showNotification('error', 'Getting banner sizes failed', 'Getting banner sizes failed')
+      // TODO: add fallback or just use mock data
       result = mockData
       setSupplyStats(result)
-    } else {
-      try {
-        result = await adexServicesRequest('backend', {
-          route: '/dsp/stats/common',
-          method: 'GET'
-        })
-
-        if (!result) {
-          throw new Error('Getting banner sizes failed.')
-        }
-        setSupplyStats(result as SupplyStats)
-      } catch (e) {
-        console.error(e)
-        showNotification('error', 'Getting banner sizes failed', 'Getting banner sizes failed')
-      }
     }
   }, [adexServicesRequest, showNotification])
 
@@ -324,26 +333,11 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
   )
 
   const publishCampaign = useCallback(() => {
-    const mappedCampaign = mapCampaignUItoCampaign(campaign)
+    const preparedCampaign = prepareCampaignObject(campaign, balanceToken.decimals)
 
-    // NOTE: only for draft but it will come from BE
-    // mappedCampaign.id = `${campaign.title}-${Date.now().toString(16)}`
-    mappedCampaign.campaignBudget = parseToBigNumPrecision(
-      Number(mappedCampaign.campaignBudget),
-      balanceToken.decimals
-    )
-    mappedCampaign.pricingBounds.IMPRESSION!.min = parseToBigNumPrecision(
-      Number(campaign.cpmPricingBounds.min) / 1000,
-      balanceToken.decimals
-    )
-    mappedCampaign.pricingBounds.IMPRESSION!.max = parseToBigNumPrecision(
-      Number(campaign.cpmPricingBounds.max) / 1000,
-      balanceToken.decimals
-    )
-    mappedCampaign.activeFrom = BigInt(campaign.startsAt.getTime())
-    mappedCampaign.activeTo = BigInt(campaign.endsAt.getTime())
+    console.log('mappedCampaignPublish', preparedCampaign)
 
-    const body = serialize(mappedCampaign).json
+    const body = serialize(preparedCampaign).json
 
     return adexServicesRequest('backend', {
       route: '/dsp/campaigns',
@@ -354,6 +348,77 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
       }
     })
   }, [campaign, adexServicesRequest, balanceToken.decimals])
+
+  const saveToDraftCampaign = useCallback(
+    (camp?: CampaignUI) => {
+      const currCampaign = camp || campaign
+      const preparedCampaign = prepareCampaignObject(currCampaign, balanceToken.decimals)
+
+      if (defaultValue.startsAt === currCampaign.startsAt) {
+        preparedCampaign.activeFrom = null
+      }
+      if (defaultValue.endsAt === currCampaign.endsAt) {
+        preparedCampaign.activeTo = null
+      }
+      if (preparedCampaign.title === '') {
+        preparedCampaign.title = `Draft Campaign ${formatDateTime(new Date())}`
+      }
+
+      const body = serialize(preparedCampaign).json
+
+      return adexServicesRequest('backend', {
+        route: '/dsp/campaigns/draft',
+        method: 'POST',
+        body,
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+    },
+    [
+      campaign,
+      adexServicesRequest,
+      balanceToken.decimals,
+      defaultValue.startsAt,
+      defaultValue.endsAt
+    ]
+  )
+
+  const updateCampaignFromDraft = useCallback(
+    (draftCampaign: Campaign) => {
+      const mappedDraftCampaign: CampaignUI = {
+        ...draftCampaign,
+        step: 0,
+        devices: ['mobile', 'desktop'],
+        paymentModel: 'cpm',
+        startsAt:
+          (draftCampaign?.activeFrom && new Date(Number(draftCampaign?.activeFrom))) || new Date(),
+        endsAt:
+          (draftCampaign?.activeTo && new Date(Number(draftCampaign?.activeTo))) ||
+          dateNowPlusThirtyDays(),
+        currency: balanceToken.name,
+        cpmPricingBounds: {
+          min: parseFromBigNumPrecision(
+            BigInt(Number(draftCampaign.pricingBounds.IMPRESSION!.min) * 1000),
+            draftCampaign.outpaceAssetDecimals
+          ).toString(),
+          max: parseFromBigNumPrecision(
+            BigInt(Number(draftCampaign.pricingBounds.IMPRESSION!.max) * 1000),
+            draftCampaign.outpaceAssetDecimals
+          ).toString()
+        },
+        campaignBudget: BigInt(
+          parseFromBigNumPrecision(
+            BigInt(Math.floor(Number(draftCampaign.campaignBudget))),
+            draftCampaign.outpaceAssetDecimals
+          )
+        )
+      }
+
+      setCampaign(mappedDraftCampaign)
+    },
+    [balanceToken.name]
+  )
 
   const contextValue = useMemo(
     () => ({
@@ -367,7 +432,10 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
       addAdUnit,
       removeAdUnit,
       addTargetURLToAdUnit,
-      selectedBannerSizes
+      selectedBannerSizes,
+      saveToDraftCampaign,
+      updateCampaignFromDraft,
+      defaultValue
     }),
     [
       campaign,
@@ -380,7 +448,10 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
       addAdUnit,
       removeAdUnit,
       addTargetURLToAdUnit,
-      selectedBannerSizes
+      selectedBannerSizes,
+      saveToDraftCampaign,
+      updateCampaignFromDraft,
+      defaultValue
     ]
   )
 

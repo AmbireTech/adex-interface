@@ -12,6 +12,7 @@ import {
   SupplyStatsDetails
 } from 'types'
 import dayjs from 'dayjs'
+import { parseToBigNumPrecision } from 'helpers'
 
 export const checkSelectedDevices = (devices: Devices[]) => {
   if (!devices.length) return null
@@ -198,9 +199,10 @@ export const initAllLocales = () => {
   return allLocales
 }
 
+export type Modify<T, R> = Omit<T, keyof R> & R
+
 type ReducedCampaign = Omit<
-  Campaign,
-  | 'id'
+  Modify<Campaign, { id?: string }>,
   | 'created'
   | 'owner'
   | 'validators'
@@ -215,8 +217,6 @@ type ReducedCampaign = Omit<
 
 export const mapCampaignUItoCampaign = (campaignUI: CampaignUI): ReducedCampaign => {
   const {
-    // NOTE: temp id fix
-    id,
     step,
     devices,
     paymentModel,
@@ -234,12 +234,48 @@ export const mapCampaignUItoCampaign = (campaignUI: CampaignUI): ReducedCampaign
     createdBy,
     lastModifiedBy,
     cpmPricingBounds,
+    ownerHashed,
+    updated,
     ...campaign
   } = campaignUI
 
   return {
     ...campaign
   }
+}
+
+const removeProperty = (propKey: any, { [propKey]: propValue, ...rest }) => rest
+
+export const prepareCampaignObject = (campaign: CampaignUI, decimals: number) => {
+  // TODO: fix the type
+  let mappedCampaign: any = mapCampaignUItoCampaign(campaign)
+
+  // NOTE: only for draft but it will come from BE
+  // mappedCampaign.id = `${campaign.title}-${Date.now().toString(16)}`
+  mappedCampaign.campaignBudget = parseToBigNumPrecision(
+    Math.floor(Number(mappedCampaign.campaignBudget)),
+    decimals
+  )
+  mappedCampaign.pricingBounds.IMPRESSION!.min = parseToBigNumPrecision(
+    Number(campaign.cpmPricingBounds.min) / 1000,
+    decimals
+  )
+  mappedCampaign.pricingBounds.IMPRESSION!.max = parseToBigNumPrecision(
+    Number(campaign.cpmPricingBounds.max) / 1000,
+    decimals
+  )
+  mappedCampaign.activeFrom = BigInt(campaign.startsAt.getTime())
+  mappedCampaign.activeTo = BigInt(campaign.endsAt.getTime())
+
+  if (mappedCampaign.id === '') {
+    mappedCampaign = removeProperty('id', mappedCampaign)
+  }
+  // eslint-disable-next-line no-underscore-dangle
+  if (mappedCampaign._id) {
+    mappedCampaign = removeProperty('_id', mappedCampaign)
+  }
+
+  return mappedCampaign
 }
 
 export const isPastDateTime = (dateTime: Date | string) => {

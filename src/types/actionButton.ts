@@ -1,7 +1,7 @@
-import { PropsWithChildren, ReactNode } from 'react'
+import { MouseEventHandler, PropsWithChildren, ReactNode } from 'react'
 
 export interface IActionButtonProps extends PropsWithChildren {
-  action: (e: any) => any
+  action: MouseEventHandler<HTMLButtonElement>
   icon: ReactNode
   title: string
 }

@@ -7,6 +7,8 @@ import { Fragment, useMemo } from 'react'
 import AnalyticsIcon from 'resources/icons/Analytics'
 import DuplicateIcon from 'resources/icons/Duplicate'
 import DeleteIcon from 'resources/icons/Delete'
+import { CampaignStatus } from 'adex-common'
+import EditIcon from 'resources/icons/Edit'
 import ActionButton from './ActionButton/ActionButton'
 
 const useStyles = createStyles((theme) => ({
@@ -46,7 +48,8 @@ const CustomTable = ({
   onPreview,
   onAnalytics,
   onDuplicate,
-  onDelete
+  onDelete,
+  onEdit
 }: ICustomTableProps) => {
   const isMobile = useMediaQuery('(max-width: 75rem)')
 
@@ -82,31 +85,85 @@ const CustomTable = ({
     [isMobile, headings]
   )
 
-  const hasAction = !!onPreview || !!onAnalytics || !!onDuplicate || !!onDelete
+  const hasAction = !!onPreview || !!onAnalytics || !!onDuplicate || !!onDelete || !!onEdit
 
   const rows = useMemo(() => {
     if (isMobile)
-      return list.map((e) => (
-        <>
-          <Divider bg="#EBEEFA" m="1px 0" w="100%" p="15px" />
-          {columns.map((column, i) => {
-            return (
-              <Grid className={classes.gridRow} m="1px 0" w="100%" key={column}>
-                {head[i]}
+      return list.map((e) => {
+        const isDraftCampaign = e.status?.value === CampaignStatus.draft
+        return (
+          <>
+            <Divider bg="#EBEEFA" m="1px 0" w="100%" p="15px" />
+            {columns.map((column, i) => {
+              const columnParsed = column === 'status' ? e[column].element : e[column]
+              return (
+                <Grid className={classes.gridRow} m="1px 0" w="100%" key={column}>
+                  {head[i]}
 
-                <Grid.Col span={6}>
-                  {typeof e[column] === 'object' &&
-                  typeof e[column].from === 'string' &&
-                  typeof e[column].to === 'string'
-                    ? `${e[column].from} - ${e[column].to}`
-                    : e[column]}
-                </Grid.Col>
-              </Grid>
+                  <Grid.Col span={6}>{columnParsed}</Grid.Col>
+                </Grid>
+              )
+            })}
+            {hasAction && (
+              <Grid.Col span={12}>
+                <Flex justify="center" mb="2rem">
+                  {!!onPreview && (
+                    <ActionButton
+                      title="View PDF"
+                      icon={<VisibilityIcon size="20px" />}
+                      action={() => onPreview(e)}
+                    />
+                  )}
+                  {!!onAnalytics && !isDraftCampaign && (
+                    <ActionButton
+                      title="View Analytics"
+                      icon={<AnalyticsIcon size="20px" />}
+                      action={() => onAnalytics(e)}
+                    />
+                  )}
+                  {!!onDuplicate && (
+                    <ActionButton
+                      title="Duplicate"
+                      icon={<DuplicateIcon size="20px" />}
+                      action={() => onDuplicate(e)}
+                    />
+                  )}
+                  {!!onDelete && (
+                    <ActionButton
+                      title="Delete"
+                      icon={<DeleteIcon size="20px" />}
+                      action={() => onDelete(e)}
+                    />
+                  )}
+                  {!!onEdit && isDraftCampaign && (
+                    <ActionButton
+                      title="Edit"
+                      icon={<EditIcon size="20px" />}
+                      action={() => onEdit(e)}
+                    />
+                  )}
+                </Flex>
+              </Grid.Col>
+            )}
+          </>
+        )
+      })
+    return list.map((e) => {
+      const isDraftCampaign = e.status?.value === CampaignStatus.draft
+      return (
+        <tr key={e.id}>
+          {columns.map((column: string) => {
+            const columnParsed = column === 'status' ? e[column].element : e[column]
+
+            return (
+              <td key={column} className={classes.cell}>
+                {columnParsed}
+              </td>
             )
           })}
           {hasAction && (
-            <Grid.Col span={12}>
-              <Flex justify="center" mb="2rem">
+            <td>
+              <Group>
                 {!!onPreview && (
                   <ActionButton
                     title="View PDF"
@@ -114,7 +171,7 @@ const CustomTable = ({
                     action={() => onPreview(e)}
                   />
                 )}
-                {!!onAnalytics && (
+                {!!onAnalytics && !isDraftCampaign && (
                   <ActionButton
                     title="View Analytics"
                     icon={<AnalyticsIcon size="20px" />}
@@ -135,56 +192,19 @@ const CustomTable = ({
                     action={() => onDelete(e)}
                   />
                 )}
-              </Flex>
-            </Grid.Col>
-          )}
-        </>
-      ))
-    return list.map((e) => (
-      <tr key={e.id}>
-        {columns.map((column: string) => {
-          return (
-            <td key={column} className={classes.cell}>
-              {e[column]}
+                {!!onEdit && isDraftCampaign && (
+                  <ActionButton
+                    title="Edit"
+                    icon={<EditIcon size="20px" />}
+                    action={() => onEdit(e)}
+                  />
+                )}
+              </Group>
             </td>
-          )
-        })}
-        {hasAction && (
-          <td>
-            <Group>
-              {!!onPreview && (
-                <ActionButton
-                  title="View PDF"
-                  icon={<VisibilityIcon size="20px" />}
-                  action={() => onPreview(e)}
-                />
-              )}
-              {!!onAnalytics && (
-                <ActionButton
-                  title="View Analytics"
-                  icon={<AnalyticsIcon size="20px" />}
-                  action={() => onAnalytics(e)}
-                />
-              )}
-              {!!onDuplicate && (
-                <ActionButton
-                  title="Duplicate"
-                  icon={<DuplicateIcon size="20px" />}
-                  action={() => onDuplicate(e)}
-                />
-              )}
-              {!!onDelete && (
-                <ActionButton
-                  title="Delete"
-                  icon={<DeleteIcon size="20px" />}
-                  action={() => onDelete(e)}
-                />
-              )}
-            </Group>
-          </td>
-        )}
-      </tr>
-    ))
+          )}
+        </tr>
+      )
+    })
   }, [
     isMobile,
     list,
@@ -194,6 +214,7 @@ const CustomTable = ({
     onAnalytics,
     onDuplicate,
     onDelete,
+    onEdit,
     classes.gridRow,
     classes.cell,
     head

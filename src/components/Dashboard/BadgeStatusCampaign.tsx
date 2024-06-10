@@ -12,7 +12,6 @@ import PausedIcon from 'resources/icons/Paused'
 
 const BadgeStatusCampaign = ({ type }: BadgeType) => {
   const getStatusLabel = useCallback((status: number): IBadgeConfig => {
-    console.log({ status })
     switch (status) {
       case CampaignStatus.created:
         return {
@@ -83,13 +82,12 @@ const BadgeStatusCampaign = ({ type }: BadgeType) => {
           text: 'Rejected',
           icon: <UnderReviewIcon size="13px" />
         }
-      // TODO: uncomment when CampaignStatus.draft is added
-      // case CampaignStatus.draft:
-      //   return {
-      //     color: 'draft',
-      //     text: 'Created',
-      //     icon: <DraftIcon size="13px" />
-      //   }
+      case CampaignStatus.draft:
+        return {
+          color: 'draft',
+          text: 'Draft',
+          icon: <DraftIcon size="13px" />
+        }
 
       default:
         return {
@@ -101,8 +99,6 @@ const BadgeStatusCampaign = ({ type }: BadgeType) => {
   }, [])
 
   const status = useMemo(() => getStatusLabel(type), [getStatusLabel, type])
-
-  console.log({ status })
 
   return <CustomBadge color={status.color} text={status.text} icon={status.icon} />
 }

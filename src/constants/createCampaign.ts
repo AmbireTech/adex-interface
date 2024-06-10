@@ -12,7 +12,7 @@ export const CAMPAIGN_LOCATION_INPUT = 'targetingInput.inputs.location'
 export const CAMPAIGN_PLACEMENTS_INPUT = 'targetingInput.inputs.placements.in'
 const THIRTY_DAYS_IN_MILLISECONDS = 2592000000
 
-const dateNowPlusThirtyDays = () => {
+export const dateNowPlusThirtyDays = () => {
   const currentDate = new Date()
   return new Date(currentDate.getTime() + THIRTY_DAYS_IN_MILLISECONDS)
 }
