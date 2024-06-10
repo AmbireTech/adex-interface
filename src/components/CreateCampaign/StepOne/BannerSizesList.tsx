@@ -1,13 +1,13 @@
 import { Alert, Flex, Text, createStyles } from '@mantine/core'
-// import BannerSizeMock from 'components/common/BannerSizeMock'
 import { checkBannerSizes } from 'helpers/createCampaignHelpers'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import { useMemo } from 'react'
 import { AdUnit } from 'adex-common/dist/types'
-// import useCreateCampaignData from 'hooks/useCreateCampaignData/useCreateCampaignData'
 import { SupplyStatsDetails } from 'types'
 import InfoIcon from 'resources/icons/Info'
 import CustomAnchor from 'components/common/customAnchor'
+
+const SIZES_COUNT_TO_SHOW = 6
 
 const useStyles = createStyles((theme) => ({
   brandTextColor: {
@@ -20,10 +20,10 @@ const getPopularBannerSizes = (bannerSizes: SupplyStatsDetails[] | SupplyStatsDe
 
   if (bannerSizes.length && Array.isArray(bannerSizes[0])) {
     result = (bannerSizes as SupplyStatsDetails[][])
-      .map((item: SupplyStatsDetails[]) => item.slice(0, 6))
+      .map((item: SupplyStatsDetails[]) => item.slice(0, SIZES_COUNT_TO_SHOW))
       .flat()
   } else {
-    result = (bannerSizes as SupplyStatsDetails[]).slice(0, 6)
+    result = (bannerSizes as SupplyStatsDetails[]).slice(0, SIZES_COUNT_TO_SHOW)
   }
 
   return result.sort((a, b) => b.count - a.count)
@@ -53,7 +53,7 @@ const BannerSizesList = ({ adUnits }: { adUnits: AdUnit[] }) => {
     <Alert icon={<InfoIcon style={{ marginTop: 0 }} />} color="attention" variant="outline">
       <Flex justify="space-between">
         <Text>
-          Recommended banner sizes: {updatedBannerSizes.map((size) => size.value).join(', ')}{' '}
+          Recommended banner sizes: {updatedBannerSizes.map((size) => size.value).join(', ')}
         </Text>
         <CustomAnchor
           external
