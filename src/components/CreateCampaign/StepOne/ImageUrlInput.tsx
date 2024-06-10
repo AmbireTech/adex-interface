@@ -13,10 +13,7 @@ const useStyles = createStyles((theme) => {
   return {
     inputField: {
       ref: getStylesRef('inputField'),
-      flexGrow: 1,
-      '&:disabled': {
-        flexGrow: 1
-      }
+      flexGrow: 1
     },
     mediaWrapper: {
       ref: getStylesRef('mediaWrapper'),

@@ -32,7 +32,6 @@ const getPopularBannerSizes = (bannerSizes: SupplyStatsDetails[] | SupplyStatsDe
 const BannerSizesList = ({ adUnits }: { adUnits: AdUnit[] }) => {
   const { selectedBannerSizes } = useCreateCampaignContext()
   const { classes } = useStyles()
-  // const { uniqueSizesWithCount } = useCreateCampaignData()
 
   const popularBannerSizes = useMemo(
     () =>
@@ -51,23 +50,6 @@ const BannerSizesList = ({ adUnits }: { adUnits: AdUnit[] }) => {
   )
 
   return updatedBannerSizes ? (
-    // <Grid columns={10}>
-    //   {updatedBannerSizes.map((item) => {
-    //     const addedBannerCount = uniqueSizesWithCount.find(
-    //       ({ value }) => item.value === value
-    //     )?.count
-
-    //     return (
-    //       <Grid.Col xs={2} sm={2} md={2} lg={2} xl={1} key={`${item.value}+${item.count}`}>
-    //         <BannerSizeMock
-    //           variant={item.value}
-    //           active={!!item.checked}
-    //           addedBannerCount={addedBannerCount}
-    //         />
-    //       </Grid.Col>
-    //     )
-    //   })}
-    // </Grid>
     <Alert icon={<InfoIcon style={{ marginTop: 0 }} />} color="attention" variant="outline">
       <Flex justify="space-between">
         <Text>

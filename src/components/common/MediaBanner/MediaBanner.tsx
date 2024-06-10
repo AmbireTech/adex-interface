@@ -13,6 +13,7 @@ const useStyles = createStyles((theme) => ({
     maxHeight: 40,
     overflow: 'hidden',
     transition: 'transform 0.3s ease-in-out',
+    background: theme.colors.alternativeBackground[theme.fn.primaryShade()],
     '&:hover': {
       transform: `scale(${SCALE_VALUE})`,
       border: '0.5px solid',
