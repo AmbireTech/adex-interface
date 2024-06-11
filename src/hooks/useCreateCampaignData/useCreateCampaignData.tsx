@@ -20,7 +20,13 @@ const useCreateCampaignData = () => {
     campaign: {
       devices,
       targetingInput: {
-        inputs: { location, categories }
+        inputs: {
+          location,
+          categories,
+          placements: {
+            in: [placement]
+          }
+        }
       },
       cpmPricingBounds,
       adUnits,
@@ -57,8 +63,14 @@ const useCreateCampaignData = () => {
         </Flex>
       )
     }
-    return null
+    return <Text align="end">N/A</Text>
   }, [selectedDevices])
+
+  const formattedSelectedPlacement = useMemo(() => {
+    if (placement)
+      return <Text align="end">{placement === 'app' ? 'Applications' : 'Websites'}</Text>
+    return null
+  }, [placement])
 
   const priceBoundsFormatted = useMemo(
     () => (
@@ -152,7 +164,8 @@ const useCreateCampaignData = () => {
     campaignNameFormatted,
     adUnitsFormatted,
     campaignPeriodFormatted,
-    uniqueSizesWithCount
+    uniqueSizesWithCount,
+    formattedSelectedPlacement
   }
 }
 
