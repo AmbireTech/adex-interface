@@ -19,6 +19,7 @@ export type CampaignUI = Campaign & {
   }
   ownerHashed?: string
   updated?: string
+  autoUTMChecked: boolean
 }
 
 export type ImageSizes = {
@@ -62,4 +63,5 @@ export type CreateCampaignType = {
   saveToDraftCampaign: (camp?: CampaignUI) => Promise<any>
   updateCampaignFromDraft: (draftCampaign: Campaign) => void
   defaultValue: CampaignUI
+  addUTMToTargetURLS: () => void
 }

@@ -13,6 +13,7 @@ import { SupplyStats, CampaignUI, CreateCampaignType, SupplyStatsDetails, Device
 import useAccount from 'hooks/useAccount'
 import { useAdExApi } from 'hooks/useAdexServices'
 import {
+  addUrlUtmTracking,
   deepEqual,
   isPastDateTime,
   prepareCampaignObject,
@@ -282,6 +283,32 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
     [setCampaign]
   )
 
+  const addUTMToTargetURLS = useCallback(() => {
+    setCampaign((prev) => {
+      const { adUnits, autoUTMChecked, title } = { ...prev }
+
+      if (autoUTMChecked) {
+        adUnits.forEach((element, index) => {
+          const elCopy = { ...element }
+
+          elCopy.banner!.targetUrl = addUrlUtmTracking({
+            targetUrl: elCopy.banner!.targetUrl,
+            campaign: title,
+            content: `${index + 1}_${elCopy.type}`
+            // src: 'adex_PUBHOSTNAME'
+          })
+          return elCopy
+        })
+      }
+
+      const updated = {
+        ...prev,
+        adUnits
+      }
+      return updated
+    })
+  }, [setCampaign])
+
   const updatePartOfCampaign = useCallback(
     (value: Partial<CampaignUI>) => {
       setCampaign((prevState) => ({
@@ -391,6 +418,7 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
         step: 0,
         devices: ['mobile', 'desktop'],
         paymentModel: 'cpm',
+        autoUTMChecked: false,
         startsAt:
           (draftCampaign?.activeFrom && new Date(Number(draftCampaign?.activeFrom))) || new Date(),
         endsAt:
@@ -435,7 +463,8 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
       selectedBannerSizes,
       saveToDraftCampaign,
       updateCampaignFromDraft,
-      defaultValue
+      defaultValue,
+      addUTMToTargetURLS
     }),
     [
       campaign,
@@ -451,7 +480,8 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
       selectedBannerSizes,
       saveToDraftCampaign,
       updateCampaignFromDraft,
-      defaultValue
+      defaultValue,
+      addUTMToTargetURLS
     ]
   )
 

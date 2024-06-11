@@ -220,6 +220,7 @@ export const mapCampaignUItoCampaign = (campaignUI: CampaignUI): ReducedCampaign
     step,
     devices,
     paymentModel,
+    autoUTMChecked,
     startsAt,
     endsAt,
     currency,
@@ -299,4 +300,49 @@ export function deepEqual<T>(obj1: T, obj2: T): boolean {
   return keys1.every(
     (key) => keys2.includes(key) && deepEqual((obj1 as any)[key], (obj2 as any)[key])
   )
+}
+
+const UTM_PARAMS = {
+  utm_source: 'ADEX',
+  utm_medium: 'CPM',
+  utm_campaign: 'none',
+  utm_content: 'none'
+}
+
+export const addUrlUtmTracking = ({
+  targetUrl,
+  campaign,
+  content
+}: // src
+{
+  targetUrl: string
+  campaign: string
+  content: string
+  // src: string
+}) => {
+  if (targetUrl) {
+    const url = new URL(targetUrl)
+    url.search = ''
+
+    const params = new URLSearchParams(url.search)
+    Object.entries(UTM_PARAMS).forEach(([key, value]) => {
+      params.set(key, value)
+    })
+
+    if (campaign) {
+      params.set('utm_campaign', campaign)
+    }
+    if (content) {
+      params.set('utm_content', content)
+    }
+    // if (src) {
+    //   params.set('utm_source', src)
+    // }
+
+    url.search = params.toString()
+
+    return url.toString()
+  }
+
+  return targetUrl
 }
