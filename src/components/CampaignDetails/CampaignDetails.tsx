@@ -314,6 +314,16 @@ const CampaignDetails = () => {
                         onBtnClicked={handleEdit}
                       />
                     )}
+                    {campaign.status === CampaignStatus.inReview && (
+                      <CampaignActionBtn
+                        text="Cancel"
+                        icon={<ArchivedIcon size="13px" />}
+                        color="secondaryText"
+                        onBtnClicked={() =>
+                          changeCampaignStatus(CampaignStatus.closedByUser, campaign.id)
+                        }
+                      />
+                    )}
                   </Flex>
                 </Grid.Col>
               </Grid>
