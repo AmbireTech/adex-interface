@@ -4,14 +4,17 @@ import {
   EventType
 } from 'adex-common'
 import { Container, Flex, Text } from '@mantine/core'
-import { useCallback, useMemo } from 'react'
+import { useCallback, useMemo, useState } from 'react'
+import { useDisclosure } from '@mantine/hooks'
 import CustomTable from 'components/common/CustomTable'
 import { periodNumberToDate } from 'helpers'
 import { useNavigate } from 'react-router-dom'
-import useCampaignsData from 'hooks/useCampaignsData'
+import { useCampaignsData } from 'hooks/useCampaignsData'
 import { parseBigNumTokenAmountToDecimal } from 'helpers/balances'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import useCustomNotifications from 'hooks/useCustomNotifications'
+import { AdminCampaignModal } from 'components/common/Modals'
+import { CampaignData } from 'types'
 import BadgeStatusCampaign from './BadgeStatusCampaign'
 
 const campaignHeaders = [
@@ -28,9 +31,11 @@ const campaignHeaders = [
   'CPM'
 ]
 
-const Dashboard = () => {
+const Dashboard = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
   const navigate = useNavigate()
   const { campaignsData } = useCampaignsData()
+  const [opened, { open, close }] = useDisclosure(false)
+  const [selectedItem, setSelectedItem] = useState<CampaignData | null>(null)
   const { updateCampaignFromDraft } = useCreateCampaignContext()
   const { showNotification } = useCustomNotifications()
   // Temporary disabled show/hide archived until no functionality implemented
@@ -124,9 +129,14 @@ const Dashboard = () => {
 
   const handlePreview = useCallback(
     (item: Campaign) => {
-      navigate(`/dashboard/campaign-details/${item.id}`)
+      if (isAdminPanel) {
+        setSelectedItem(campaignsData?.get(item.id) || null)
+        open()
+      } else {
+        navigate(`/dashboard/campaign-details/${item.id}`)
+      }
     },
-    [navigate]
+    [campaignsData, isAdminPanel, navigate, open]
   )
 
   const handleAnalytics = useCallback(
@@ -176,9 +186,13 @@ const Dashboard = () => {
     <Container fluid>
       <Flex direction="column" justify="start">
         <Flex justify="space-between" align="center">
-          <Text size="sm" color="secondaryText" weight="bold" mb="md">
-            All Campaigns
-          </Text>
+          {isAdminPanel ? (
+            'WSWDD'
+          ) : (
+            <Text size="sm" color="secondaryText" weight="bold" mb="md">
+              All Campaigns
+            </Text>
+          )}
           {/* Temporary disabled show/hide archived until no functionality implemented */}
           {/* <UnstyledButton onClick={toggleShowArchived}>
             <Text size="sm" underline color="secondaryText">
@@ -198,6 +212,7 @@ const Dashboard = () => {
           // onDelete={handleDelete}
         />
       </Flex>
+      <AdminCampaignModal item={selectedItem?.campaign || null} opened={opened} close={close} />
     </Container>
   )
 }

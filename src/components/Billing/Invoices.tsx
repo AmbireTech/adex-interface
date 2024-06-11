@@ -3,7 +3,7 @@ import CustomTable from 'components/common/CustomTable'
 import { useDisclosure } from '@mantine/hooks'
 import { useCallback, useMemo, useState } from 'react'
 
-import useCampaignsData from 'hooks/useCampaignsData'
+import { useCampaignsData } from 'hooks/useCampaignsData'
 // TODO: Delete mock data
 // import { invoiceElements } from './mockedData'
 import { CampaignStatus } from 'adex-common'
