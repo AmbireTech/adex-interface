@@ -1,3 +1,3 @@
-import useCampaignsData from './useCampaignsData'
+import { useCampaignsData, useCampaignsDataAdmin } from './useCampaignsData'
 
-export default useCampaignsData
+export { useCampaignsData, useCampaignsDataAdmin }

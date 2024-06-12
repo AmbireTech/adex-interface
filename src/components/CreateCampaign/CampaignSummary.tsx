@@ -8,7 +8,7 @@ import useCreateCampaignData from 'hooks/useCreateCampaignData/useCreateCampaign
 import CampaignDetailsRow from 'components/common/CampainDetailsRow'
 import { ConfirmModal, SuccessModal } from 'components/common/Modals'
 import AttentionIcon from 'resources/icons/Attention'
-import useCampaignsData from 'hooks/useCampaignsData'
+import { useCampaignsData } from 'hooks/useCampaignsData'
 import useCustomNotifications from 'hooks/useCustomNotifications'
 import useAccount from 'hooks/useAccount'
 import { isValidHttpUrl } from 'helpers/validators'

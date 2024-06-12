@@ -11,8 +11,9 @@ import useAccount from 'hooks/useAccount'
 import Deposit from 'components/Deposit'
 import CreateCampaign from 'components/CreateCampaign'
 import { CreateCampaignContextProvider } from 'contexts/CreateCampaignContext/CreateCampaignContext'
+import { CampaignsDataProvider, CampaignsAnalyticsProvider } from 'contexts/CampaignsContext'
 import NotFound404 from 'components/404/404'
-import AdminPanel from './admin/Admin'
+// import AdminPanel from './admin/Admin'
 import CampaignDetails from './components/CampaignDetails'
 
 function ErrorBoundary() {
@@ -68,9 +69,13 @@ export const router = createBrowserRouter(
       path: '/dashboard',
       element: (
         <RequireAuth>
-          <CreateCampaignContextProvider>
-            <UserPanel />
-          </CreateCampaignContextProvider>
+          <CampaignsDataProvider type="user">
+            <CampaignsAnalyticsProvider>
+              <CreateCampaignContextProvider>
+                <UserPanel />
+              </CreateCampaignContextProvider>
+            </CampaignsAnalyticsProvider>
+          </CampaignsDataProvider>
         </RequireAuth>
       ),
       errorElement: <ErrorBoundary />,
@@ -101,7 +106,9 @@ export const router = createBrowserRouter(
           path: 'admin',
           element: (
             <RequireAuth>
-              <AdminPanel />
+              <CampaignsDataProvider type="admin">
+                <Dashboard isAdminPanel />
+              </CampaignsDataProvider>
             </RequireAuth>
           )
         }
