@@ -3,7 +3,9 @@ import {
   CAMPAIGN_CATEGORIES_INPUT,
   CAMPAIGN_LOCATION_INPUT,
   CATEGORIES,
-  COUNTRIES
+  CAT_GROUPS,
+  COUNTRIES,
+  REGION_GROUPS
 } from 'constants/createCampaign'
 import { useCallback, useMemo } from 'react'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
@@ -70,6 +72,7 @@ const StepTwo = () => {
           defaultSelectValue={
             catSelectedRadioAndValuesArray && (catSelectedRadioAndValuesArray[1] as string[])
           }
+          groups={CAT_GROUPS}
           label="Categories"
         />
       </Grid.Col>
@@ -87,6 +90,7 @@ const StepTwo = () => {
             locSelectedRadioAndValuesArray && (locSelectedRadioAndValuesArray[1] as string[])
           }
           multiSelectData={COUNTRIES}
+          groups={REGION_GROUPS}
           label="Countries"
         />
       </Grid.Col>

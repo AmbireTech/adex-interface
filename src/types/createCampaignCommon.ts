@@ -2,7 +2,7 @@ import { AdUnit, Campaign } from 'adex-common/dist/types/Dsp/Campaign'
 import { Alpha3Code } from 'adex-common'
 import { Devices } from './createCampaign'
 
-export type SelectData = { value: string | Alpha3Code; label: string }
+export type SelectData = { value: string | Alpha3Code; label: string; group?: string }
 
 export type PaymentModelType = 'cpm' | 'cpc'
 
