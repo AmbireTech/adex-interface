@@ -3,7 +3,7 @@ import {
   // CampaignType,
   EventType
 } from 'adex-common'
-import { Container, Flex, Text } from '@mantine/core'
+import { Container, Flex, Text, Badge } from '@mantine/core'
 import { useCallback, useMemo, useState } from 'react'
 import { useDisclosure } from '@mantine/hooks'
 import CustomTable from 'components/common/CustomTable'
@@ -15,6 +15,7 @@ import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import useCustomNotifications from 'hooks/useCustomNotifications'
 import { AdminCampaignModal } from 'components/common/Modals'
 import { CampaignData } from 'types'
+import UnderReviewIcon from 'resources/icons/UnderReview'
 import BadgeStatusCampaign from './BadgeStatusCampaign'
 
 const campaignHeaders = [
@@ -49,7 +50,9 @@ const Dashboard = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
     //       )
     //     : []
     // }
-    return Array.from(campaignsData.values()).reverse()
+    return Array.from(campaignsData.values()).sort((a, b) =>
+      Number(b.campaign.created - a.campaign.created)
+    )
   }, [campaignsData])
 
   const elements = useMemo(
@@ -187,7 +190,17 @@ const Dashboard = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
       <Flex direction="column" justify="start">
         <Flex justify="space-between" align="center">
           {isAdminPanel ? (
-            'WSWDD'
+            <Badge
+              variant="gradient"
+              gradient={{ from: 'violet', to: 'purple' }}
+              size="xl"
+              mb="md"
+              fullWidth
+              leftSection={<UnderReviewIcon size="13px" />}
+              rightSection={<UnderReviewIcon size="13px" />}
+            >
+              Admin Panel
+            </Badge>
           ) : (
             <Text size="sm" color="secondaryText" weight="bold" mb="md">
               All Campaigns
