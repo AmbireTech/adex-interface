@@ -1,5 +1,6 @@
 import {
   Campaign,
+  CampaignStatus,
   // CampaignType,
   EventType
 } from 'adex-common'
@@ -28,6 +29,28 @@ const campaignHeaders = [
   'CPM'
 ]
 
+const statusOrder = {
+  active: 1,
+  paused: 2,
+  stopped: 3,
+  completed: 4
+}
+
+const getStatusOrder = (status: CampaignStatus) => {
+  switch (status) {
+    case CampaignStatus.active:
+      return statusOrder.active
+    case CampaignStatus.paused:
+      return statusOrder.paused
+    case CampaignStatus.closedByUser:
+    case CampaignStatus.expired:
+    case CampaignStatus.exhausted:
+      return statusOrder.stopped
+    default:
+      return statusOrder.completed
+  }
+}
+
 const Dashboard = () => {
   const navigate = useNavigate()
   const { campaignsData } = useCampaignsData()
@@ -44,7 +67,9 @@ const Dashboard = () => {
     //       )
     //     : []
     // }
-    return Array.from(campaignsData.values()).reverse()
+    return Array.from(campaignsData.values()).sort((a, b) => {
+      return getStatusOrder(a.campaign.status) - getStatusOrder(b.campaign.status)
+    })
   }, [campaignsData])
 
   const elements = useMemo(
