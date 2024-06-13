@@ -4,8 +4,8 @@ import {
   // CampaignType,
   EventType
 } from 'adex-common'
-import { Container, Flex, Text } from '@mantine/core'
-import { useCallback, useMemo } from 'react'
+import { Container, Flex, Loader, Text } from '@mantine/core'
+import { useCallback, useEffect, useMemo } from 'react'
 import CustomTable from 'components/common/CustomTable'
 import { periodNumberToDate } from 'helpers'
 import { useNavigate } from 'react-router-dom'
@@ -53,7 +53,7 @@ const getStatusOrder = (status: CampaignStatus) => {
 
 const Dashboard = () => {
   const navigate = useNavigate()
-  const { campaignsData } = useCampaignsData()
+  const { campaignsData, initialDataLoading } = useCampaignsData()
   const { updateCampaignFromDraft } = useCreateCampaignContext()
   const { showNotification } = useCustomNotifications()
   // Temporary disabled show/hide archived until no functionality implemented
@@ -197,6 +197,13 @@ const Dashboard = () => {
   //   }
   // }, [navigate, filteredCampaignData.length])
 
+  // NOTE: redirect to get-started page id no campaigns found
+  useEffect(() => {
+    if (!filteredCampaignData.length && !initialDataLoading) {
+      navigate('/dashboard/get-started', { replace: true })
+    }
+  }, [filteredCampaignData, initialDataLoading, navigate])
+
   return (
     <Container fluid>
       <Flex direction="column" justify="start">
@@ -211,17 +218,23 @@ const Dashboard = () => {
             </Text>
           </UnstyledButton> */}
         </Flex>
-        <CustomTable
-          background
-          headings={campaignHeaders}
-          elements={elements}
-          onPreview={handlePreview}
-          onAnalytics={handleAnalytics}
-          onEdit={handleEdit}
-          // Temporary disabled until no functionality implemented
-          // onDuplicate={handleDuplicate}
-          // onDelete={handleDelete}
-        />
+        {!initialDataLoading ? (
+          <CustomTable
+            background
+            headings={campaignHeaders}
+            elements={elements}
+            onPreview={handlePreview}
+            onAnalytics={handleAnalytics}
+            onEdit={handleEdit}
+            // Temporary disabled until no functionality implemented
+            // onDuplicate={handleDuplicate}
+            // onDelete={handleDelete}
+          />
+        ) : (
+          <Flex justify="center" align="center" h="60vh">
+            <Loader size="xl" />
+          </Flex>
+        )}
       </Flex>
     </Container>
   )
