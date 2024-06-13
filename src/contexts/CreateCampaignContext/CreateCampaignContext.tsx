@@ -166,17 +166,22 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
   const [selectedBannerSizes, setSelectedBannerSizes] = useState<
     SupplyStatsDetails[] | SupplyStatsDetails[][]
   >([])
+  const [selectedBidFloors, setSelectedBidFloors] = useState<
+    SupplyStatsDetails[] | SupplyStatsDetails[][]
+  >([])
 
   useEffect(() => {
     const placement = campaign.targetingInput.inputs.placements.in[0]
     const devices = campaign.devices
-    const mappedSupplyStats: Record<string, SupplyStatsDetails[]> = selectBannerSizes(supplyStats)
+    const mappedSupplyStats: Record<string, SupplyStatsDetails[][]> = selectBannerSizes(supplyStats)
     const selectedPlatforms: Placement | Devices[] = placement === 'app' ? placement : devices
     if (Array.isArray(selectedPlatforms)) {
-      const result = selectedPlatforms.map((platform) => mappedSupplyStats[platform])
+      const result = selectedPlatforms.map((platform) => mappedSupplyStats[platform][0])
       setSelectedBannerSizes(result)
+      setSelectedBidFloors(selectedPlatforms.map((platform) => mappedSupplyStats[platform][1]))
     } else {
-      setSelectedBannerSizes(selectedPlatforms ? mappedSupplyStats[selectedPlatforms] : [])
+      setSelectedBannerSizes(selectedPlatforms ? mappedSupplyStats[selectedPlatforms][0] : [])
+      setSelectedBidFloors(selectedPlatforms ? mappedSupplyStats[selectedPlatforms][1] : [])
     }
   }, [campaign.devices, campaign.targetingInput.inputs.placements.in, supplyStats])
 
@@ -464,7 +469,8 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
       saveToDraftCampaign,
       updateCampaignFromDraft,
       defaultValue,
-      addUTMToTargetURLS
+      addUTMToTargetURLS,
+      selectedBidFloors
     }),
     [
       campaign,
@@ -481,7 +487,8 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
       saveToDraftCampaign,
       updateCampaignFromDraft,
       defaultValue,
-      addUTMToTargetURLS
+      addUTMToTargetURLS,
+      selectedBidFloors
     ]
   )
 

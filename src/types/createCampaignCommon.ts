@@ -64,4 +64,5 @@ export type CreateCampaignType = {
   updateCampaignFromDraft: (draftCampaign: Campaign) => void
   defaultValue: CampaignUI
   addUTMToTargetURLS: () => void
+  selectedBidFloors: SupplyStatsDetails[] | SupplyStatsDetails[][]
 }

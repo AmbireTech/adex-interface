@@ -1,5 +1,5 @@
 import { ActionIcon, Button, Grid, Group, Text, Tooltip } from '@mantine/core'
-import { ChangeEvent, useCallback, useState } from 'react'
+import { ChangeEvent, useCallback, useMemo, useState } from 'react'
 import InfoFilledIcon from 'resources/icons/InfoFilled'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import useAccount from 'hooks/useAccount'
@@ -12,6 +12,7 @@ import {
   validateTitle
 } from 'helpers/validators'
 import { CampaignUI } from 'types'
+import { parseRange } from 'helpers/createCampaignHelpers'
 import CampaignPeriod from './CampaignPeriod'
 import PaymentModel from './PaymentModel'
 import SelectCurrency from './SelectCurrency'
@@ -47,7 +48,8 @@ const StepThree = () => {
       cpmPricingBounds: { min, max },
       title
     },
-    updatePartOfCampaign
+    updatePartOfCampaign,
+    selectedBidFloors
   } = useCreateCampaignContext()
 
   const {
@@ -57,6 +59,11 @@ const StepThree = () => {
   const [errors, setErrors] = useState<FormErrorsProps>({
     ...DEFAULT_ERROR_VALUES
   })
+
+  const recommendedPaymentBounds = useMemo(
+    () => parseRange(selectedBidFloors.flat().sort((a, b) => b.count - a.count)[0].value),
+    [selectedBidFloors]
+  )
 
   const handleChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
@@ -199,7 +206,10 @@ const StepThree = () => {
             <Text color="secondaryText" size="sm" weight="bold">
               5. CPM
             </Text>
-            <Tooltip label="Recommended: Min - 0.10; Max - 0.5" ml="sm">
+            <Tooltip
+              label={`Recommended CPM in USD: Min - ${recommendedPaymentBounds.min}; Max - ${recommendedPaymentBounds.max}`}
+              ml="sm"
+            >
               <ActionIcon color="secondaryText" size="xs">
                 <InfoFilledIcon />
               </ActionIcon>

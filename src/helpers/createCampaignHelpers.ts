@@ -72,10 +72,10 @@ export const checkBannerSizes = (
 
 export const selectBannerSizes = (
   supplyStats: SupplyStats
-): Record<string, SupplyStatsDetails[]> => ({
-  app: supplyStats.appBannerFormats,
-  mobile: supplyStats.siteBannerFormatsMobile,
-  desktop: supplyStats.siteBannerFormatsDesktop
+): Record<string, SupplyStatsDetails[][]> => ({
+  app: [supplyStats.appBannerFormats, supplyStats.appBidFloors],
+  mobile: [supplyStats.siteBannerFormatsMobile, supplyStats.siteMobileBidFloors],
+  desktop: [supplyStats.siteBannerFormatsDesktop, supplyStats.siteDesktopBidFloors]
 })
 
 export const findDuplicates = (array: string[]) => {
@@ -348,3 +348,17 @@ export const addUrlUtmTracking = ({
 }
 
 export const capitalize = (s: string) => s && s[0].toUpperCase() + s.slice(1)
+
+export const parseRange = (str: string): { min: number; max: number } => {
+  const pattern = /^(\d+)_(\d+)-(\d+)_(\d+)$/
+  const match = str.match(pattern)
+
+  if (!match) {
+    throw new Error('Invalid input format. Expected format: "0_20-0_30"')
+  }
+
+  const min = parseFloat(`${match[1]}.${match[2]}`)
+  const max = parseFloat(`${match[3]}.${match[4]}`)
+
+  return { min, max }
+}
