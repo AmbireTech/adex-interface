@@ -95,9 +95,7 @@ const Dashboard = () => {
                 element: <BadgeStatusCampaign type={cmpData.campaign.status} />
               },
               served:
-                cmpData.paid && budget
-                  ? `${((cmpData.paid / budget) * 100).toFixed(2)} %`
-                  : '0.00 %',
+                cmpData.paid && budget ? `${Math.round((cmpData.paid / budget) * 100)} %` : '0 %',
               // TODO: get token name
               budget: `${budget} USDC`,
               impressions: cmpData.impressions,
