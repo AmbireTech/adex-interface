@@ -39,10 +39,7 @@ const CampaignBudget = ({ defaultValue, onChange, onFocus, error }: CampaignBudg
 
   useEffect(() => {
     let currentError
-    if (
-      Number(value) < MIN_CAMPAIGN_BUDGET_VALUE &&
-      Number(defaultValue) < MIN_CAMPAIGN_BUDGET_VALUE
-    ) {
+    if (value !== '' && Number(value) < MIN_CAMPAIGN_BUDGET_VALUE) {
       currentError = `Campaign budget can not be lower than ${MIN_CAMPAIGN_BUDGET_VALUE}`
     } else {
       currentError = ''

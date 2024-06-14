@@ -20,6 +20,7 @@ export type CampaignUI = Campaign & {
   ownerHashed?: string
   updated?: string
   autoUTMChecked: boolean
+  asapStartingDate: boolean
 }
 
 export type ImageSizes = {

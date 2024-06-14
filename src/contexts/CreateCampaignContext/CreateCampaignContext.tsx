@@ -359,10 +359,10 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
     [setCampaign]
   )
 
-  const resetCampaign = useCallback(
-    () => setCampaign({ ...defaultValue }),
-    [setCampaign, defaultValue]
-  )
+  const resetCampaign = useCallback(() => {
+    setCampaign({ ...defaultValue })
+    localStorage.setItem('createCampaign', superjson.stringify({ ...defaultValue }))
+  }, [setCampaign, defaultValue])
 
   const publishCampaign = useCallback(() => {
     const preparedCampaign = prepareCampaignObject(campaign, balanceToken.decimals)
@@ -424,6 +424,7 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
         devices: ['mobile', 'desktop'],
         paymentModel: 'cpm',
         autoUTMChecked: false,
+        asapStartingDate: false,
         startsAt:
           (draftCampaign?.activeFrom && new Date(Number(draftCampaign?.activeFrom))) || new Date(),
         endsAt:

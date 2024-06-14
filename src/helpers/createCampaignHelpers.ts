@@ -237,6 +237,7 @@ export const mapCampaignUItoCampaign = (campaignUI: CampaignUI): ReducedCampaign
     cpmPricingBounds,
     ownerHashed,
     updated,
+    asapStartingDate,
     ...campaign
   } = campaignUI
 
@@ -265,7 +266,9 @@ export const prepareCampaignObject = (campaign: CampaignUI, decimals: number) =>
     Number(campaign.cpmPricingBounds.max) / 1000,
     decimals
   )
-  mappedCampaign.activeFrom = BigInt(campaign.startsAt.getTime())
+  mappedCampaign.activeFrom = campaign.asapStartingDate
+    ? BigInt(Date.now())
+    : BigInt(campaign.startsAt.getTime())
   mappedCampaign.activeTo = BigInt(campaign.endsAt.getTime())
 
   if (mappedCampaign.id === '') {

@@ -57,6 +57,7 @@ export const CREATE_CAMPAIGN_DEFAULT_VALUE: CampaignUI = {
   endsAt: dateNowPlusThirtyDays(),
   currency: '',
   autoUTMChecked: false,
+  asapStartingDate: false,
   outpaceAssetAddr: '',
   outpaceAssetDecimals: 0,
   outpaceAddr: '',
