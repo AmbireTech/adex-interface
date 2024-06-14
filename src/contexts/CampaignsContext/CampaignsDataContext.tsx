@@ -122,7 +122,10 @@ interface ICampaignsDataContext {
 
 const CampaignsDataContext = createContext<ICampaignsDataContext | null>(null)
 
-const CampaignsDataProvider: FC<PropsWithChildren> = ({ children }) => {
+const CampaignsDataProvider: FC<PropsWithChildren & { type: 'user' | 'admin' }> = ({
+  children,
+  type
+}) => {
   const { showNotification } = useCustomNotifications()
   const { adexServicesRequest } = useAdExApi()
 
@@ -229,9 +232,11 @@ const CampaignsDataProvider: FC<PropsWithChildren> = ({ children }) => {
   const updateAllCampaignsData = useCallback(
     async (updateAdvanced?: boolean) => {
       try {
+        const route = type === 'user' ? '/dsp/campaigns/by-owner' : '/dsp/admin/campaigns'
         const dataRes = await adexServicesRequest<Array<CamapignBackendDataRes>>('backend', {
-          route: '/dsp/campaigns/by-owner',
-          method: 'GET'
+          route,
+          method: 'GET',
+          queryParams: { all: 'true' }
         })
 
         console.log({ dataRes })
@@ -282,8 +287,12 @@ const CampaignsDataProvider: FC<PropsWithChildren> = ({ children }) => {
         // setInitialDataLoading(false)
       }
     },
-    [adexServicesRequest, showNotification]
+    [adexServicesRequest, showNotification, type]
   )
+
+  useEffect(() => {
+    console.log({ type })
+  }, [type])
 
   useEffect(() => {
     if (authenticated) {

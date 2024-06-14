@@ -4,15 +4,19 @@ import {
   // CampaignType,
   EventType
 } from 'adex-common'
-import { Container, Flex, Loader, Text } from '@mantine/core'
-import { useCallback, useEffect, useMemo } from 'react'
+import { Container, Flex, Text, Badge, Loader } from '@mantine/core'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useDisclosure } from '@mantine/hooks'
 import CustomTable from 'components/common/CustomTable'
 import { periodNumberToDate } from 'helpers'
 import { useNavigate } from 'react-router-dom'
-import useCampaignsData from 'hooks/useCampaignsData'
+import { useCampaignsData } from 'hooks/useCampaignsData'
 import { parseBigNumTokenAmountToDecimal } from 'helpers/balances'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import useCustomNotifications from 'hooks/useCustomNotifications'
+import { AdminCampaignModal } from 'components/common/Modals'
+import { CampaignData } from 'types'
+import UnderReviewIcon from 'resources/icons/UnderReview'
 import BadgeStatusCampaign from './BadgeStatusCampaign'
 
 const campaignHeaders = [
@@ -51,9 +55,11 @@ const getStatusOrder = (status: CampaignStatus) => {
   }
 }
 
-const Dashboard = () => {
+const Dashboard = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
   const navigate = useNavigate()
   const { campaignsData, initialDataLoading } = useCampaignsData()
+  const [opened, { open, close }] = useDisclosure(false)
+  const [selectedItem, setSelectedItem] = useState<CampaignData | null>(null)
   const { updateCampaignFromDraft } = useCreateCampaignContext()
   const { showNotification } = useCustomNotifications()
   // Temporary disabled show/hide archived until no functionality implemented
@@ -147,9 +153,14 @@ const Dashboard = () => {
 
   const handlePreview = useCallback(
     (item: Campaign) => {
-      navigate(`/dashboard/campaign-details/${item.id}`)
+      if (isAdminPanel) {
+        setSelectedItem(campaignsData?.get(item.id) || null)
+        open()
+      } else {
+        navigate(`/dashboard/campaign-details/${item.id}`)
+      }
     },
-    [navigate]
+    [campaignsData, isAdminPanel, navigate, open]
   )
 
   const handleAnalytics = useCallback(
@@ -206,9 +217,23 @@ const Dashboard = () => {
     <Container fluid>
       <Flex direction="column" justify="start">
         <Flex justify="space-between" align="center">
-          <Text size="sm" color="secondaryText" weight="bold" mb="md">
-            All Campaigns
-          </Text>
+          {isAdminPanel ? (
+            <Badge
+              variant="gradient"
+              gradient={{ from: 'violet', to: 'purple' }}
+              size="xl"
+              mb="md"
+              fullWidth
+              leftSection={<UnderReviewIcon size="13px" />}
+              rightSection={<UnderReviewIcon size="13px" />}
+            >
+              Admin Panel
+            </Badge>
+          ) : (
+            <Text size="sm" color="secondaryText" weight="bold" mb="md">
+              All Campaigns
+            </Text>
+          )}
           {/* Temporary disabled show/hide archived until no functionality implemented */}
           {/* <UnstyledButton onClick={toggleShowArchived}>
             <Text size="sm" underline color="secondaryText">
@@ -234,6 +259,7 @@ const Dashboard = () => {
           </Flex>
         )}
       </Flex>
+      <AdminCampaignModal item={selectedItem?.campaign || null} opened={opened} close={close} />
     </Container>
   )
 }
