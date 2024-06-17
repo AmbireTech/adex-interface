@@ -74,7 +74,11 @@ const Dashboard = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
     //     : []
     // }
     return Array.from(campaignsData.values()).sort((a, b) => {
-      return getStatusOrder(a.campaign.status) - getStatusOrder(b.campaign.status)
+      const statusOrderDiff = getStatusOrder(a.campaign.status) - getStatusOrder(b.campaign.status)
+      if (statusOrderDiff !== 0) {
+        return statusOrderDiff
+      }
+      return Number(b.campaign.created) - Number(a.campaign.created)
     })
   }, [campaignsData])
 
