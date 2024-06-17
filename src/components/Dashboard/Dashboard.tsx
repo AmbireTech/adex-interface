@@ -34,6 +34,7 @@ const campaignHeaders = [
 ]
 
 const statusOrder = {
+  draft: 0,
   active: 1,
   paused: 2,
   stopped: 3,
@@ -42,6 +43,8 @@ const statusOrder = {
 
 const getStatusOrder = (status: CampaignStatus) => {
   switch (status) {
+    case CampaignStatus.draft:
+      return statusOrder.draft
     case CampaignStatus.active:
       return statusOrder.active
     case CampaignStatus.paused:
