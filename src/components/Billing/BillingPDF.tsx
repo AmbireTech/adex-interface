@@ -1,4 +1,4 @@
-import { Grid, Space, Table, createStyles } from '@mantine/core'
+import { Flex, Grid, Space, Table, createStyles, Text } from '@mantine/core'
 import { Placement } from 'adex-common'
 import {
   formatDate,
@@ -11,6 +11,7 @@ import {
 // TODO: delete mock data
 // import { invoiceDetails } from 'components/Billing/mockedData'
 import { useMemo, PropsWithChildren, ReactNode } from 'react'
+import AdExLogo from 'resources/logos/AdExLogo'
 import { IInvoiceDetails, InvoiceCompanyDetails, OperationEntry, StatementData } from 'types'
 
 type InvoicesPDFProps = { invoiceDetails: IInvoiceDetails; placement: Placement }
@@ -74,6 +75,14 @@ const useStyles = createStyles((theme) => ({
   signature: { display: 'flex', justifyContent: 'center', fontSize: theme.fontSizes.xs },
   rightAlignedText: {
     textAlign: 'end'
+  },
+  head: {
+    background: theme.black,
+    padding: theme.spacing.xl,
+    color: 'white'
+  },
+  logo: {
+    width: 200
   }
 }))
 
@@ -81,7 +90,17 @@ const BillingBlank = ({ children, header, footer, seller, buyer }: DetailsProps)
   const { classes } = useStyles()
 
   return (
-    <Grid grow align="center" className={classes.smallFontSize} p={12}>
+    <Grid grow align="center" className={classes.smallFontSize} p={0} m={0}>
+      <Grid.Col span={12} className={classes.head}>
+        <Flex justify="space-between" align="center">
+          <div className={classes.logo}>
+            <AdExLogo text="white" />
+          </div>
+          <Text size={64} weight="bold">
+            Invoice
+          </Text>
+        </Flex>
+      </Grid.Col>
       <Grid.Col span={12}>{header}</Grid.Col>
       <Grid.Col span={6}>
         <div className={classes.wrapper}>
@@ -141,7 +160,7 @@ export const InvoicesPDF = ({ invoiceDetails, placement }: InvoicesPDFProps) => 
       buyer={invoiceDetails.buyer}
       header={
         <div className={classes.right}>
-          <div className={classes.title}>VAT Invoice</div>
+          {/* <div className={classes.title}>VAT Invoice</div> */}
           <div className={classes.title}>No. {invoiceDetails.invoiceId}</div>
           <span>{formatDate(invoiceDetails.invoiceDate)}</span>
         </div>

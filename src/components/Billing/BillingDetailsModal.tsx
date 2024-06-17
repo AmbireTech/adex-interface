@@ -12,8 +12,8 @@ const useStyles = createStyles((theme) => ({
   wrapper: {
     border: '1px solid',
     borderRadius: theme.radius.sm,
-    borderColor: theme.colors.decorativeBorders[theme.fn.primaryShade()],
-    padding: theme.spacing.lg
+    borderColor: theme.colors.decorativeBorders[theme.fn.primaryShade()]
+    // padding: theme.spacing.lg
   },
   header: {
     backgroundColor: theme.colors.lightBackground[theme.fn.primaryShade()],
@@ -34,8 +34,8 @@ const useStyles = createStyles((theme) => ({
       top: 0,
       left: 0,
       bottom: 0,
-      width: '100%',
-      padding: theme.spacing.xl
+      width: '100%'
+      // padding: theme.spacing.xl
     }
   }
 }))
