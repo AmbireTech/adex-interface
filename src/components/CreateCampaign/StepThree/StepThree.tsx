@@ -1,5 +1,5 @@
-import { ActionIcon, Button, Grid, Group, Text, Tooltip } from '@mantine/core'
-import { ChangeEvent, useCallback, useState } from 'react'
+import { ActionIcon, Alert, Button, Checkbox, Grid, Group, Text, Tooltip } from '@mantine/core'
+import { ChangeEvent, useCallback, useMemo, useState } from 'react'
 import InfoFilledIcon from 'resources/icons/InfoFilled'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import useAccount from 'hooks/useAccount'
@@ -12,6 +12,8 @@ import {
   validateTitle
 } from 'helpers/validators'
 import { CampaignUI } from 'types'
+import { parseRange } from 'helpers/createCampaignHelpers'
+import InfoIcon from 'resources/icons/Info'
 import CampaignPeriod from './CampaignPeriod'
 import PaymentModel from './PaymentModel'
 import SelectCurrency from './SelectCurrency'
@@ -45,9 +47,12 @@ const StepThree = () => {
       currency,
       campaignBudget,
       cpmPricingBounds: { min, max },
-      title
+      title,
+      asapStartingDate
     },
-    updatePartOfCampaign
+    updatePartOfCampaign,
+    updateCampaign,
+    selectedBidFloors
   } = useCreateCampaignContext()
 
   const {
@@ -57,6 +62,12 @@ const StepThree = () => {
   const [errors, setErrors] = useState<FormErrorsProps>({
     ...DEFAULT_ERROR_VALUES
   })
+
+  const recommendedPaymentBounds = useMemo(() => {
+    const rangeUnparsed = selectedBidFloors.flat().sort((a, b) => b.count - a.count)[0]?.value
+
+    return rangeUnparsed ? parseRange(rangeUnparsed) : { min: 'N/A', max: 'N/A' }
+  }, [selectedBidFloors])
 
   const handleChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
@@ -162,6 +173,21 @@ const StepThree = () => {
           </Text>
           <CampaignPeriod />
         </Grid.Col>
+        <Grid.Col>
+          <Alert icon={<InfoIcon />} color="attention" variant="outline">
+            <Text>
+              The campaigns go through a approval process and if you select &quot;As soon as
+              possible&quot; the campaign will be launched once it is approved.
+            </Text>
+          </Alert>
+        </Grid.Col>
+        <Grid.Col>
+          <Checkbox
+            checked={asapStartingDate}
+            label="As soon as possible"
+            onChange={(event) => updateCampaign('asapStartingDate', event.currentTarget.checked)}
+          />
+        </Grid.Col>
         <Grid.Col mb="md">
           <Text color="secondaryText" size="sm" weight="bold" mb="xs">
             2. Payment Model
@@ -199,7 +225,10 @@ const StepThree = () => {
             <Text color="secondaryText" size="sm" weight="bold">
               5. CPM
             </Text>
-            <Tooltip label="Recommended: Min - 0.10; Max - 0.5" ml="sm">
+            <Tooltip
+              label={`Recommended CPM in USD: Min - ${recommendedPaymentBounds.min}; Max - ${recommendedPaymentBounds.max}`}
+              ml="sm"
+            >
               <ActionIcon color="secondaryText" size="xs">
                 <InfoFilledIcon />
               </ActionIcon>

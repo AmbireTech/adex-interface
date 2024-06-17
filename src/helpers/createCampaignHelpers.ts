@@ -72,10 +72,10 @@ export const checkBannerSizes = (
 
 export const selectBannerSizes = (
   supplyStats: SupplyStats
-): Record<string, SupplyStatsDetails[]> => ({
-  app: supplyStats.appBannerFormats,
-  mobile: supplyStats.siteBannerFormatsMobile,
-  desktop: supplyStats.siteBannerFormatsDesktop
+): Record<string, SupplyStatsDetails[][]> => ({
+  app: [supplyStats.appBannerFormats, supplyStats.appBidFloors],
+  mobile: [supplyStats.siteBannerFormatsMobile, supplyStats.siteMobileBidFloors],
+  desktop: [supplyStats.siteBannerFormatsDesktop, supplyStats.siteDesktopBidFloors]
 })
 
 export const findDuplicates = (array: string[]) => {
@@ -220,6 +220,7 @@ export const mapCampaignUItoCampaign = (campaignUI: CampaignUI): ReducedCampaign
     step,
     devices,
     paymentModel,
+    autoUTMChecked,
     startsAt,
     endsAt,
     currency,
@@ -236,6 +237,7 @@ export const mapCampaignUItoCampaign = (campaignUI: CampaignUI): ReducedCampaign
     cpmPricingBounds,
     ownerHashed,
     updated,
+    asapStartingDate,
     ...campaign
   } = campaignUI
 
@@ -264,7 +266,9 @@ export const prepareCampaignObject = (campaign: CampaignUI, decimals: number) =>
     Number(campaign.cpmPricingBounds.max) / 1000,
     decimals
   )
-  mappedCampaign.activeFrom = BigInt(campaign.startsAt.getTime())
+  mappedCampaign.activeFrom = campaign.asapStartingDate
+    ? BigInt(Date.now())
+    : BigInt(campaign.startsAt.getTime())
   mappedCampaign.activeTo = BigInt(campaign.endsAt.getTime())
 
   if (mappedCampaign.id === '') {
@@ -299,4 +303,65 @@ export function deepEqual<T>(obj1: T, obj2: T): boolean {
   return keys1.every(
     (key) => keys2.includes(key) && deepEqual((obj1 as any)[key], (obj2 as any)[key])
   )
+}
+
+const UTM_PARAMS = {
+  utm_source: 'ADEX',
+  utm_medium: 'CPM',
+  utm_campaign: 'none',
+  utm_content: 'none'
+}
+
+export const addUrlUtmTracking = ({
+  targetUrl,
+  campaign,
+  content
+}: // src
+{
+  targetUrl: string
+  campaign: string
+  content: string
+  // src: string
+}) => {
+  if (targetUrl) {
+    const url = new URL(targetUrl)
+    url.search = ''
+
+    const params = new URLSearchParams(url.search)
+    Object.entries(UTM_PARAMS).forEach(([key, value]) => {
+      params.set(key, value)
+    })
+
+    if (campaign) {
+      params.set('utm_campaign', campaign)
+    }
+    if (content) {
+      params.set('utm_content', content)
+    }
+    // if (src) {
+    //   params.set('utm_source', src)
+    // }
+
+    url.search = params.toString()
+
+    return url.toString()
+  }
+
+  return targetUrl
+}
+
+export const capitalize = (s: string) => s && s[0].toUpperCase() + s.slice(1)
+
+export const parseRange = (str: string): { min: number; max: number } => {
+  const pattern = /^(\d+)_(\d+)-(\d+)_(\d+)$/
+  const match = str.match(pattern)
+
+  if (!match) {
+    throw new Error('Invalid input format. Expected format: "0_20-0_30"')
+  }
+
+  const min = parseFloat(`${match[1]}.${match[2]}`)
+  const max = parseFloat(`${match[3]}.${match[4]}`)
+
+  return { min, max }
 }

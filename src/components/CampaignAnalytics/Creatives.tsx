@@ -73,7 +73,7 @@ const Creatives = ({
         impressions: formatCurrency(item.impressions, 0),
         clicks: formatCurrency(item.clicks, 0),
         ctr: `${item.ctr}`,
-        paid: `${item.paid.toFixed(4)} ${currencyName}`,
+        paid: `${item.paid.toFixed(2)} ${currencyName}`,
         link: unitForId?.banner?.targetUrl
       }
     })

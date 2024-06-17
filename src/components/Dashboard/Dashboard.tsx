@@ -1,10 +1,11 @@
 import {
   Campaign,
+  CampaignStatus,
   // CampaignType,
   EventType
 } from 'adex-common'
-import { Container, Flex, Text, Badge } from '@mantine/core'
-import { useCallback, useMemo, useState } from 'react'
+import { Container, Flex, Text, Badge, Loader } from '@mantine/core'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useDisclosure } from '@mantine/hooks'
 import CustomTable from 'components/common/CustomTable'
 import { periodNumberToDate } from 'helpers'
@@ -32,9 +33,34 @@ const campaignHeaders = [
   'CPM'
 ]
 
+const statusOrder = {
+  draft: 0,
+  active: 1,
+  paused: 2,
+  stopped: 3,
+  completed: 4
+}
+
+const getStatusOrder = (status: CampaignStatus) => {
+  switch (status) {
+    case CampaignStatus.draft:
+      return statusOrder.draft
+    case CampaignStatus.active:
+      return statusOrder.active
+    case CampaignStatus.paused:
+      return statusOrder.paused
+    case CampaignStatus.closedByUser:
+    case CampaignStatus.expired:
+    case CampaignStatus.exhausted:
+      return statusOrder.stopped
+    default:
+      return statusOrder.completed
+  }
+}
+
 const Dashboard = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
   const navigate = useNavigate()
-  const { campaignsData } = useCampaignsData()
+  const { campaignsData, initialDataLoading } = useCampaignsData()
   const [opened, { open, close }] = useDisclosure(false)
   const [selectedItem, setSelectedItem] = useState<CampaignData | null>(null)
   const { updateCampaignFromDraft } = useCreateCampaignContext()
@@ -50,9 +76,13 @@ const Dashboard = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
     //       )
     //     : []
     // }
-    return Array.from(campaignsData.values()).sort((a, b) =>
-      Number(b.campaign.created - a.campaign.created)
-    )
+    return Array.from(campaignsData.values()).sort((a, b) => {
+      const statusOrderDiff = getStatusOrder(a.campaign.status) - getStatusOrder(b.campaign.status)
+      if (statusOrderDiff !== 0) {
+        return statusOrderDiff
+      }
+      return Number(b.campaign.created) - Number(a.campaign.created)
+    })
   }, [campaignsData])
 
   const elements = useMemo(
@@ -78,9 +108,7 @@ const Dashboard = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
                 element: <BadgeStatusCampaign type={cmpData.campaign.status} />
               },
               served:
-                cmpData.paid && budget
-                  ? `${((cmpData.paid / budget) * 100).toFixed(2)} %`
-                  : '0.00 %',
+                cmpData.paid && budget ? `${Math.round((cmpData.paid / budget) * 100)} %` : '0 %',
               // TODO: get token name
               budget: `${budget} USDC`,
               impressions: cmpData.impressions,
@@ -185,6 +213,13 @@ const Dashboard = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
   //   }
   // }, [navigate, filteredCampaignData.length])
 
+  // NOTE: redirect to get-started page id no campaigns found
+  useEffect(() => {
+    if (!filteredCampaignData.length && !initialDataLoading) {
+      navigate('/dashboard/get-started', { replace: true })
+    }
+  }, [filteredCampaignData, initialDataLoading, navigate])
+
   return (
     <Container fluid>
       <Flex direction="column" justify="start">
@@ -213,17 +248,23 @@ const Dashboard = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
             </Text>
           </UnstyledButton> */}
         </Flex>
-        <CustomTable
-          background
-          headings={campaignHeaders}
-          elements={elements}
-          onPreview={handlePreview}
-          onAnalytics={handleAnalytics}
-          onEdit={handleEdit}
-          // Temporary disabled until no functionality implemented
-          // onDuplicate={handleDuplicate}
-          // onDelete={handleDelete}
-        />
+        {!initialDataLoading ? (
+          <CustomTable
+            background
+            headings={campaignHeaders}
+            elements={elements}
+            onPreview={handlePreview}
+            onAnalytics={handleAnalytics}
+            onEdit={handleEdit}
+            // Temporary disabled until no functionality implemented
+            // onDuplicate={handleDuplicate}
+            // onDelete={handleDelete}
+          />
+        ) : (
+          <Flex justify="center" align="center" h="60vh">
+            <Loader size="xl" />
+          </Flex>
+        )}
       </Flex>
       <AdminCampaignModal item={selectedItem?.campaign || null} opened={opened} close={close} />
     </Container>

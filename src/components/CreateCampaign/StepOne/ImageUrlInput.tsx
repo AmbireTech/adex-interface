@@ -44,6 +44,9 @@ const useStyles = createStyles((theme) => {
     },
     infoError: {
       padding: theme.spacing.xs
+    },
+    rightSection: {
+      backgroundColor: theme.colors.lightBackground[theme.fn.primaryShade()]
     }
   }
 })
@@ -121,6 +124,9 @@ const ImageUrlInput = ({
           placeholder="Please enter a target URL starting with https://"
           size="md"
           rightSection={getRightSection()}
+          classNames={{
+            rightSection: classes.rightSection
+          }}
         />
         {error && <Text color="warning">{error}</Text>}
       </Flex>

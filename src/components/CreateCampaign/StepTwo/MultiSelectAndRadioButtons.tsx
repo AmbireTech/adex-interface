@@ -2,15 +2,26 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { MultiSelect, Radio, Stack, Text } from '@mantine/core'
 import { TargetingInputApplyProp } from 'adex-common/dist/types'
 import { MultiSelectAndRadioButtonsProps } from 'types'
+import { capitalize } from 'helpers/createCampaignHelpers'
 
 const MultiSelectAndRadioButtons = ({
   multiSelectData,
   label,
   defaultSelectValue = [],
   defaultRadioValue = 'all',
-  onCategoriesChange
+  onCategoriesChange,
+  groups
 }: MultiSelectAndRadioButtonsProps) => {
-  const data = useMemo(() => [...multiSelectData], [multiSelectData])
+  const extendedData = useMemo(() => {
+    const regions = Object.keys(groups).map((region) => ({
+      label: capitalize(region),
+      value: region,
+      group: 'Groups'
+    }))
+    return [...regions, ...multiSelectData]
+  }, [multiSelectData, groups])
+
+  const data = useMemo(() => [...extendedData], [extendedData])
   const [selectedRadio, setSelectedRadio] = useState<TargetingInputApplyProp>(defaultRadioValue)
   const [selectedCategories, setSelectedCategories] = useState<string[]>([])
   const [selectedValue, setSelectedValue] = useState<string[]>(defaultSelectValue)
@@ -20,6 +31,25 @@ const MultiSelectAndRadioButtons = ({
     setSelectedCategories([])
     setSelectedValue([])
   }, [])
+
+  const handleSelectChange = useCallback(
+    (value: string[]) => {
+      const newSelectedValues = new Set<string>()
+
+      value.forEach((val) => {
+        if (groups[val]) {
+          groups[val].forEach((item) => {
+            newSelectedValues.add(item)
+          })
+        } else {
+          newSelectedValues.add(val)
+        }
+      })
+
+      setSelectedValue(Array.from(newSelectedValues))
+    },
+    [groups]
+  )
 
   const labelText = useMemo(() => {
     if (selectedRadio === 'in') return `Select ${label}`
@@ -56,7 +86,7 @@ const MultiSelectAndRadioButtons = ({
         value={selectedValue}
         disabled={selectedRadio === 'all'}
         data={data}
-        onChange={setSelectedValue}
+        onChange={handleSelectChange}
         placeholder={`Select ${label}`}
         styles={(theme) => ({
           input: {

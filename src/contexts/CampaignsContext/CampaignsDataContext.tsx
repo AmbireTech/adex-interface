@@ -272,16 +272,19 @@ const CampaignsDataProvider: FC<PropsWithChildren & { type: 'user' | 'admin' }> 
                 next.delete(key)
               }
             })
-
+            // TODO: check it again when dev has been merged
+            setInitialDataLoading(false)
             return next
           })
         } else {
           showNotification('warning', 'invalid campaigns data response', 'Data error')
           console.log({ dataRes })
+          setInitialDataLoading(false)
         }
       } catch (err) {
         console.log(err)
         showNotification('error', 'getting campaigns data', 'Data error')
+        // setInitialDataLoading(false)
       }
     },
     [adexServicesRequest, showNotification, type]
@@ -295,13 +298,13 @@ const CampaignsDataProvider: FC<PropsWithChildren & { type: 'user' | 'admin' }> 
     if (authenticated) {
       const updateCampaigns = async () => {
         await updateAllCampaignsData(true)
-        setInitialDataLoading(false)
+        // setInitialDataLoading(false)
       }
 
       updateCampaigns()
     } else {
       setCampaignData(new Map<string, CampaignData>())
-      setInitialDataLoading(false)
+      // setInitialDataLoading(false)
     }
   }, [updateAllCampaignsData, authenticated])
 

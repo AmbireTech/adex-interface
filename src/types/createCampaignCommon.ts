@@ -2,7 +2,7 @@ import { AdUnit, Campaign } from 'adex-common/dist/types/Dsp/Campaign'
 import { Alpha3Code } from 'adex-common'
 import { Devices } from './createCampaign'
 
-export type SelectData = { value: string | Alpha3Code; label: string }
+export type SelectData = { value: string | Alpha3Code; label: string; group?: string }
 
 export type PaymentModelType = 'cpm' | 'cpc'
 
@@ -19,6 +19,8 @@ export type CampaignUI = Campaign & {
   }
   ownerHashed?: string
   updated?: string
+  autoUTMChecked: boolean
+  asapStartingDate: boolean
 }
 
 export type ImageSizes = {
@@ -62,4 +64,6 @@ export type CreateCampaignType = {
   saveToDraftCampaign: (camp?: CampaignUI) => Promise<any>
   updateCampaignFromDraft: (draftCampaign: Campaign) => void
   defaultValue: CampaignUI
+  addUTMToTargetURLS: () => void
+  selectedBidFloors: SupplyStatsDetails[] | SupplyStatsDetails[][]
 }
