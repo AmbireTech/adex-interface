@@ -1,19 +1,19 @@
-import { Alert, Flex, Text } from '@mantine/core'
+import { Alert, Flex, Text, createStyles } from '@mantine/core'
 import { checkBannerSizes } from 'helpers/createCampaignHelpers'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import { useMemo } from 'react'
 import { AdUnit } from 'adex-common/dist/types'
 import { SupplyStatsDetails } from 'types'
 import InfoIcon from 'resources/icons/Info'
-// import CustomAnchor from 'components/common/customAnchor'
+import CustomAnchor from 'components/common/customAnchor'
 
 const SIZES_COUNT_TO_SHOW = 6
 
-// const useStyles = createStyles((theme) => ({
-//   brandTextColor: {
-//     color: theme.colors.brand[theme.fn.primaryShade()]
-//   }
-// }))
+const useStyles = createStyles((theme) => ({
+  brandTextColor: {
+    color: theme.colors.brand[theme.fn.primaryShade()]
+  }
+}))
 
 const getPopularBannerSizes = (bannerSizes: SupplyStatsDetails[] | SupplyStatsDetails[][]) => {
   let result: SupplyStatsDetails[][] | SupplyStatsDetails[] = []
@@ -31,7 +31,7 @@ const getPopularBannerSizes = (bannerSizes: SupplyStatsDetails[] | SupplyStatsDe
 
 const BannerSizesList = ({ adUnits }: { adUnits: AdUnit[] }) => {
   const { selectedBannerSizes } = useCreateCampaignContext()
-  // const { classes } = useStyles()
+  const { classes } = useStyles()
 
   const popularBannerSizes = useMemo(
     () =>
@@ -55,16 +55,15 @@ const BannerSizesList = ({ adUnits }: { adUnits: AdUnit[] }) => {
         <Text>
           Recommended banner sizes: {updatedBannerSizes.map((size) => size.value).join(', ')}
         </Text>
-        {/* <CustomAnchor
+        <CustomAnchor
           external
           underline
           weight="bold"
-          // TODO: update the URL
-          href="https://help.adex.network/hc/en-us"
+          href="https://help.adex.network/hc/en-us/articles/14499102255772-What-are-the-supported-ad-formats"
           className={classes.brandTextColor}
         >
           see all
-        </CustomAnchor> */}
+        </CustomAnchor>
       </Flex>
     </Alert>
   ) : null
