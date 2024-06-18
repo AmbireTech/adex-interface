@@ -95,6 +95,10 @@ const useStyles = createStyles((theme) => ({
   },
   tableBody: {
     backgroundColor: theme.colors.lightBackground[theme.fn.primaryShade()]
+  },
+  tableWrapper: {
+    borderRadius: theme.radius.sm,
+    overflow: 'hidden'
   }
 }))
 
@@ -184,7 +188,11 @@ export const InvoicesPDF = ({ invoiceDetails, placement }: InvoicesPDFProps) => 
       buyer={invoiceDetails.buyer}
       header={
         <>
-          <Flex justify="space-between" className={cx(classes.tableHeader, classes.wrap)} p="xs">
+          <Flex
+            justify="space-between"
+            className={cx(classes.tableHeader, classes.tableWrapper, classes.wrap)}
+            p="xs"
+          >
             <Text color="secondaryText">Invoice No.:</Text>
             <Text weight="bold">{invoiceDetails.invoiceId}</Text>
           </Flex>
@@ -201,63 +209,65 @@ export const InvoicesPDF = ({ invoiceDetails, placement }: InvoicesPDFProps) => 
         </>
       }
     >
-      <Table fontSize="xs" verticalSpacing="xs" w="100%">
-        <thead className={classes.tableHeader}>
-          <tr>
-            <th>No.</th>
-            <th>{placement === 'app' ? 'App' : 'Website'}</th>
-            <th>Impressions</th>
-            <th>Clicks</th>
-            <th>CTR %</th>
-            <th>
-              <span>Average CPM</span>
-              <br />
-              <span>({invoiceDetails.currencyName})</span>
-            </th>
-            <th>
-              <span>Spent</span>
-              <br />
-              <span>({invoiceDetails.currencyName})</span>
-            </th>
-          </tr>
-        </thead>
-        <tbody className={classes.tableBody}>
-          {invoiceDetails.invoiceData.map((e, index) => (
-            // eslint-disable-next-line
-            <tr key={index}>
-              <td>{index + 1}</td>
-              <td className={classes.wrap}>{getHumneSrcName(e.segment, placement)}</td>
-              <td className={classes.rightAlignedText}>{e.impressions.toLocaleString()}</td>
-              <td className={classes.rightAlignedText}>{e.clicks.toLocaleString()}</td>
-              <td className={classes.rightAlignedText}>{e.ctr}</td>
-              <td className={classes.rightAlignedText}>{e.avgCpm}</td>
-              <td className={classes.rightAlignedText}>{e.paid.toFixed(4)}</td>
+      <>
+        <Table fontSize="xs" verticalSpacing="xs" w="100%" className={classes.tableWrapper}>
+          <thead className={classes.tableHeader}>
+            <tr>
+              <th>No.</th>
+              <th>{placement === 'app' ? 'App' : 'Website'}</th>
+              <th>Impressions</th>
+              <th>Clicks</th>
+              <th>CTR %</th>
+              <th>
+                <span>Average CPM</span>
+                <br />
+                <span>({invoiceDetails.currencyName})</span>
+              </th>
+              <th>
+                <span>Spent</span>
+                <br />
+                <span>({invoiceDetails.currencyName})</span>
+              </th>
             </tr>
-          ))}
-        </tbody>
-      </Table>
-      <Grid.Col span={12}>
-        <Grid>
-          <Grid.Col span={10} className={cx(classes.right)}>
-            Subtotal
-          </Grid.Col>
-          <Grid.Col span={2} className={cx(classes.right)}>
-            {calculateTotal.toFixed(2)}
-          </Grid.Col>
-          <Grid.Col span={10} className={cx(classes.right)}>
-            {`VAT ${invoiceDetails.vatPercentageInUSD} %`}
-          </Grid.Col>
-          <Grid.Col span={2} className={cx(classes.right, classes.borderBottom)}>
-            {calculatedVatValue.toFixed(2)}
-          </Grid.Col>
-          <Grid.Col span={10} className={cx(classes.right, classes.bold)}>
-            {`Invoice total (${invoiceDetails.currencyName})`}
-          </Grid.Col>
-          <Grid.Col span={2} className={cx(classes.right, classes.bold)}>
-            {invoiceTotal.toFixed(2)}
-          </Grid.Col>
-        </Grid>
-      </Grid.Col>
+          </thead>
+          <tbody className={classes.tableBody}>
+            {invoiceDetails.invoiceData.map((e, index) => (
+              // eslint-disable-next-line
+              <tr key={index}>
+                <td>{index + 1}</td>
+                <td className={classes.wrap}>{getHumneSrcName(e.segment, placement)}</td>
+                <td className={classes.rightAlignedText}>{e.impressions.toLocaleString()}</td>
+                <td className={classes.rightAlignedText}>{e.clicks.toLocaleString()}</td>
+                <td className={classes.rightAlignedText}>{e.ctr}</td>
+                <td className={classes.rightAlignedText}>{e.avgCpm}</td>
+                <td className={classes.rightAlignedText}>{e.paid.toFixed(4)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </Table>
+        <Grid.Col span={12}>
+          <Grid>
+            <Grid.Col span={10} className={cx(classes.right)}>
+              Subtotal
+            </Grid.Col>
+            <Grid.Col span={2} className={cx(classes.right)}>
+              {calculateTotal.toFixed(2)}
+            </Grid.Col>
+            <Grid.Col span={10} className={cx(classes.right)}>
+              {`VAT ${invoiceDetails.vatPercentageInUSD} %`}
+            </Grid.Col>
+            <Grid.Col span={2} className={cx(classes.right, classes.borderBottom)}>
+              {calculatedVatValue.toFixed(2)}
+            </Grid.Col>
+            <Grid.Col span={10} className={cx(classes.right, classes.bold)}>
+              {`Invoice total (${invoiceDetails.currencyName})`}
+            </Grid.Col>
+            <Grid.Col span={2} className={cx(classes.right, classes.bold)}>
+              {invoiceTotal.toFixed(2)}
+            </Grid.Col>
+          </Grid>
+        </Grid.Col>
+      </>
     </BillingBlank>
   )
 }
@@ -272,7 +282,11 @@ export const StatementsPDF = ({ statement, seller, buyer }: StatementsPDFProps) 
       buyer={buyer}
       header={
         <>
-          <Flex justify="space-between" className={classes.tableHeader} p="xs">
+          <Flex
+            justify="space-between"
+            className={cx(classes.tableHeader, classes.tableWrapper)}
+            p="xs"
+          >
             <Text color="secondaryText">Statement Period:</Text>
             <Text weight="bold">
               {getMonthRangeString(monthPeriodIndexToDate(statement.periodIndex))}
@@ -300,7 +314,7 @@ export const StatementsPDF = ({ statement, seller, buyer }: StatementsPDFProps) 
       }
     >
       <>
-        <Table fontSize="xs" verticalSpacing="xs" w="100%">
+        <Table fontSize="xs" verticalSpacing="xs" w="100%" className={classes.tableWrapper}>
           <thead className={classes.tableHeader}>
             <tr>
               <th>#</th>
