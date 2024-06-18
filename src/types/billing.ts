@@ -24,6 +24,7 @@ export type InvoiceCompanyDetails = BillingDetails & {
 export interface IInvoiceDetails {
   invoiceId: string
   invoiceDate: Date
+  paymentDate: Date
   seller: InvoiceCompanyDetails & { email: string; website: string }
   buyer: InvoiceCompanyDetails
   invoiceData: BaseAnalyticsData[]

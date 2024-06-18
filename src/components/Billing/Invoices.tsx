@@ -2,7 +2,7 @@ import { Title } from '@mantine/core'
 import CustomTable from 'components/common/CustomTable'
 import { useDisclosure } from '@mantine/hooks'
 import { useCallback, useMemo, useState } from 'react'
-
+import { CampaignStatus } from 'adex-common'
 import { useCampaignsData } from 'hooks/useCampaignsData'
 // TODO: Delete mock data
 // import { invoiceElements } from './mockedData'
@@ -18,9 +18,7 @@ const Invoices = () => {
   const campaigns = useMemo(() => Array.from(campaignsData.values()), [campaignsData])
   const {
     adexAccount: {
-      billingDetails: { companyName },
-      fundsOnCampaigns: { perCampaign: fundsOnPerCampaign },
-      refundsFromCampaigns: { perCampaign: refundsFromPerCampaign }
+      billingDetails: { companyName }
     }
   } = useAccount()
 
@@ -29,33 +27,26 @@ const Invoices = () => {
   const invoiceElements = useMemo(
     () =>
       campaigns
-        .filter((c) => refundsFromPerCampaign.find((item) => item.id === c.campaign?.id))
+        .filter((c) =>
+          [CampaignStatus.expired, CampaignStatus.closedByUser, CampaignStatus.exhausted].includes(
+            c.campaign.status
+          )
+        )
+        .sort((a, b) => Number(b.campaign.activeFrom) - Number(a.campaign.activeFrom))
         .map((campaign) => {
-          const campaignStartDate = fundsOnPerCampaign.find(
-            (item) => item.id === campaign.campaign?.id
-          )?.startDate
-
-          const campaignCloseDate = refundsFromPerCampaign.find(
-            (item) => item.id === campaign.campaign?.id
-          )?.closeDate
-
           return {
             id: campaign.campaignId,
             companyName,
             campaignPeriod: (
               <span>
-                <span>
-                  {campaignStartDate ? formatDateShort(new Date(campaignStartDate)) : 'N/A'}
-                </span>
+                <span>{formatDateShort(new Date(Number(campaign.campaign.activeFrom)))} </span>
                 <br />
-                <span>
-                  {campaignCloseDate ? formatDateShort(new Date(campaignCloseDate)) : 'N/A'}
-                </span>
+                <span>{formatDateShort(new Date(Number(campaign.campaign.activeTo)))} </span>
               </span>
             )
           }
         }),
-    [campaigns, companyName, refundsFromPerCampaign, fundsOnPerCampaign]
+    [campaigns, companyName]
   )
 
   const handlePreview = useCallback(

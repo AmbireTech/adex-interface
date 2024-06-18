@@ -1,6 +1,5 @@
 import { Flex, Grid, Space, Table, createStyles, Text } from '@mantine/core'
 import { Placement } from 'adex-common'
-import dayjs from 'dayjs'
 import {
   formatDate,
   getHumneSrcName,
@@ -203,11 +202,9 @@ export const InvoicesPDF = ({ invoiceDetails, placement }: InvoicesPDFProps) => 
             </Text>
           </Flex>
           <Flex justify="space-between" pl="xs" pr="xs">
-            <Text color="secondaryText">Due Date:</Text>
+            <Text color="secondaryText">Payment Date:</Text>
             <Text color="secondaryText">
-              {invoiceDetails.invoiceDate
-                ? formatDate(dayjs(invoiceDetails.invoiceDate).add(7, 'day').toDate())
-                : 'N/A'}
+              {invoiceDetails.paymentDate ? formatDate(invoiceDetails.paymentDate) : 'N/A'}
             </Text>
           </Flex>
         </>

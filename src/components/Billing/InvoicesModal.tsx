@@ -19,7 +19,8 @@ export const InvoicesModal = ({ campaignId, opened, close }: PrintModalProps) =>
     adexAccount: {
       billingDetails,
       address,
-      refundsFromCampaigns: { perCampaign }
+      refundsFromCampaigns: { perCampaign: refunds },
+      fundsOnCampaigns: { perCampaign: openings }
     }
   } = useAccount()
   const { getAnalyticsKeyAndUpdate, mappedAnalytics } = useCampaignAnalytics()
@@ -39,19 +40,33 @@ export const InvoicesModal = ({ campaignId, opened, close }: PrintModalProps) =>
 
   const campaign = useMemo(() => campaignData?.campaign, [campaignData])
   const currencyName = useMemo(
-    () =>
-      campaign?.id && !!perCampaign.length
-        ? perCampaign.find((item) => item.id === campaign?.id)?.token.name || ''
-        : '',
-    [campaign?.id, perCampaign]
+    () => (campaign?.id ? openings.find((item) => item.id === campaign?.id)?.token.name || '' : ''),
+    [campaign?.id, openings]
   )
-  const closeDate = useMemo(
-    () =>
-      campaign?.id && !!perCampaign.length
-        ? perCampaign.find((item) => item.id === campaign?.id)?.closeDate || undefined
-        : undefined,
-    [campaign?.id, perCampaign]
-  )
+
+  const actualPeriod = useMemo(() => {
+    const to = Number(campaign?.activeTo || 0)
+
+    // NOTE: the actual payment is when the campaign is started (openings -> start dates, activeFrom is fallback)
+    // The question is: Is that ok from accounting stand point
+    // TODO: Should we have invoices for the full amount and credit notes for the refunds (on stop or expire with no full budget used)
+    const start = new Date(
+      openings.find((item) => item.id === campaign?.id)?.startDate ||
+        Number(campaign?.activeFrom) ||
+        0
+    ).getTime()
+
+    const end = new Date(
+      refunds.find((item) => item.id === campaign?.id)?.closeDate || to
+    ).getTime()
+
+    // TODO: discuss the payment and invoice date
+    return {
+      invoiceDate: Math.min(end, to),
+      paymentDate: start
+    }
+  }, [campaign?.activeFrom, campaign?.activeTo, campaign?.id, openings, refunds])
+
   const campaignMappedAnalytics: BaseAnalyticsData[] | undefined = useMemo(
     () => mappedAnalytics.get(analyticsKey?.key || ''),
     [analyticsKey, mappedAnalytics]
@@ -76,7 +91,8 @@ export const InvoicesModal = ({ campaignId, opened, close }: PrintModalProps) =>
   const elements: IInvoiceDetails = useMemo(() => {
     return {
       invoiceId: campaign?.id || '',
-      invoiceDate: (closeDate && new Date(closeDate)) || new Date(),
+      invoiceDate: new Date(actualPeriod.invoiceDate),
+      paymentDate: new Date(actualPeriod.paymentDate),
       seller: ADEX_COMPANY_DETAILS,
       buyer: {
         ...billingDetails,
@@ -88,7 +104,15 @@ export const InvoicesModal = ({ campaignId, opened, close }: PrintModalProps) =>
       vatPercentageInUSD: 22,
       currencyName
     }
-  }, [address, billingDetails, campaign?.id, campaignMappedAnalytics, currencyName, closeDate])
+  }, [
+    campaign?.id,
+    actualPeriod.invoiceDate,
+    actualPeriod.paymentDate,
+    billingDetails,
+    address,
+    campaignMappedAnalytics,
+    currencyName
+  ])
 
   return (
     <BillingDetailsModal
