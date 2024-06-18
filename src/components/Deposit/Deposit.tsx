@@ -1,11 +1,14 @@
-import { Container, Grid, Select, createStyles, Text } from '@mantine/core'
-import { useMemo, useState } from 'react'
+import { Container, Grid, Select, createStyles, Text, Modal, Flex, Button } from '@mantine/core'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import EthereumIcon from 'resources/networks/Ethereum'
 import PolygonIcon from 'resources/networks/Polygon'
 import SendCryptoIcon from 'resources/icons/SendCrypto'
 import DepositIcon from 'resources/icons/Deposit'
 import { DepositMethods, ITabSwitchDeposit } from 'types'
 import CustomCard from 'components/common/CustomCard'
+import { IS_MANUAL_DEPOSITING } from 'constants/balances'
+import AttentionIcon from 'resources/icons/Attention'
+import { Link, useNavigate } from 'react-router-dom'
 import SelectItem from './SelectItem'
 import SendCryptocurrency from './SendCryptocurrency'
 import TopUpWithFiat from './TopUpWithFiat'
@@ -20,6 +23,26 @@ const useStyles = createStyles((theme) => ({
   center: {
     display: 'flex',
     justifyContent: 'center'
+  },
+  confirmModalContent: {
+    background:
+      theme.colors.attention[theme.fn.primaryShade()] + theme.other.shades.hexColorSuffix.lightest,
+    padding: theme.spacing.xl
+  },
+  iconWrapper: {
+    width: 50,
+    height: 50,
+    background: `${theme.colors.attention[theme.fn.primaryShade()]}1A`,
+    borderRadius: '50%',
+    padding: theme.spacing.sm
+  },
+  attentionIcon: {
+    width: 25,
+    height: 25,
+    color: theme.colors.attention[theme.fn.primaryShade()]
+  },
+  root: {
+    padding: 0
   }
 }))
 
@@ -52,6 +75,19 @@ const Deposit = () => {
   const [network, setNetwork] = useState(data[0].value)
   const [selectedTab, setSelectedTab] = useState<DepositMethods | null>(null)
   const icon = useMemo(() => data.find(({ value }) => value === network)?.image, [network])
+
+  const isManualDepositing = useMemo(() => IS_MANUAL_DEPOSITING === 'true', [])
+  const [opened, setOpened] = useState(false)
+  const navigate = useNavigate()
+  const handleModalClicked = useCallback(() => setOpened((prev) => !prev), [])
+  const goBack = useCallback(() => {
+    navigate(-1)
+    handleModalClicked()
+  }, [navigate, handleModalClicked])
+
+  useEffect(() => {
+    if (isManualDepositing) setOpened(true)
+  }, [isManualDepositing, setOpened])
 
   return (
     <Container size="xs" className={classes.container} pt="lg" pb="lg">
@@ -104,6 +140,45 @@ const Deposit = () => {
           <TabSwitch selectedTab={selectedTab} />
         </Grid.Col>
       </Grid>
+      <Modal
+        opened={opened}
+        onClose={goBack}
+        closeOnClickOutside={false}
+        withCloseButton={false}
+        classNames={{
+          body: classes.root
+        }}
+      >
+        <Flex justify="center" className={classes.confirmModalContent}>
+          <div className={classes.iconWrapper}>
+            <AttentionIcon className={classes.attentionIcon} />
+          </div>
+          <Text>
+            To add funds to your account, please contact us at{' '}
+            <a href="mailto: contactus@adex.network" target="_blank" rel="noreferrer">
+              contactus@adex.network
+            </a>{' '}
+            and send us you account ID (the address which you can find in the upper right corner of
+            your profile). We will provide you with further instructions on how to deposit funds on
+            the address.
+          </Text>
+        </Flex>
+        <Flex justify="space-between" p="xl">
+          <Button size="lg" variant="outline" onClick={goBack}>
+            Go back
+          </Button>
+          <Button
+            component={Link}
+            target="_blank"
+            rel="noreferrer"
+            to="mailto: contactus@adex.network"
+            size="lg"
+            onClick={goBack}
+          >
+            Contact us
+          </Button>
+        </Flex>
+      </Modal>
     </Container>
   )
 }

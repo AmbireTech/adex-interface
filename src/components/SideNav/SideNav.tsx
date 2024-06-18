@@ -93,7 +93,7 @@ function SideNav() {
             icon={<DepositIcon />}
             label="Top Up Account"
             active={useResolvedPath('deposit').pathname === match?.pathname}
-            hasConfirmModal={isManualDepositing}
+            hasConfirmModal={false}
           />
           <NavLink
             to="/dashboard/billing"
