@@ -6,17 +6,11 @@ import { useCallback, useMemo, useState } from 'react'
 import { useCampaignsData } from 'hooks/useCampaignsData'
 // TODO: Delete mock data
 // import { invoiceElements } from './mockedData'
-import { CampaignStatus } from 'adex-common'
 import useAccount from 'hooks/useAccount'
 import { formatDateShort } from 'helpers'
 import { InvoicesModal } from './InvoicesModal'
 
 const columnTitles = ['Company Name', 'Campaign Period']
-
-const isCampaignEnded = (campaignStatus: CampaignStatus) =>
-  [CampaignStatus.expired, CampaignStatus.closedByUser, CampaignStatus.exhausted].includes(
-    campaignStatus
-  )
 
 const Invoices = () => {
   const [opened, { open, close }] = useDisclosure(false)
@@ -24,7 +18,9 @@ const Invoices = () => {
   const campaigns = useMemo(() => Array.from(campaignsData.values()), [campaignsData])
   const {
     adexAccount: {
-      billingDetails: { companyName }
+      billingDetails: { companyName },
+      fundsOnCampaigns: { perCampaign: fundsOnPerCampaign },
+      refundsFromCampaigns: { perCampaign: refundsFromPerCampaign }
     }
   } = useAccount()
 
@@ -33,19 +29,33 @@ const Invoices = () => {
   const invoiceElements = useMemo(
     () =>
       campaigns
-        .filter((c) => isCampaignEnded(c.campaign.status))
-        .map((campaign) => ({
-          id: campaign.campaignId,
-          companyName,
-          campaignPeriod: (
-            <span>
-              <span>{formatDateShort(new Date(Number(campaign.campaign.activeFrom)))} </span>
-              <br />
-              <span>{formatDateShort(new Date(Number(campaign.campaign.activeTo)))} </span>
-            </span>
-          )
-        })),
-    [campaigns, companyName]
+        .filter((c) => refundsFromPerCampaign.find((item) => item.id === c.campaign?.id))
+        .map((campaign) => {
+          const campaignStartDate = fundsOnPerCampaign.find(
+            (item) => item.id === campaign.campaign?.id
+          )?.startDate
+
+          const campaignCloseDate = refundsFromPerCampaign.find(
+            (item) => item.id === campaign.campaign?.id
+          )?.closeDate
+
+          return {
+            id: campaign.campaignId,
+            companyName,
+            campaignPeriod: (
+              <span>
+                <span>
+                  {campaignStartDate ? formatDateShort(new Date(campaignStartDate)) : 'N/A'}
+                </span>
+                <br />
+                <span>
+                  {campaignCloseDate ? formatDateShort(new Date(campaignCloseDate)) : 'N/A'}
+                </span>
+              </span>
+            )
+          }
+        }),
+    [campaigns, companyName, refundsFromPerCampaign, fundsOnPerCampaign]
   )
 
   const handlePreview = useCallback(

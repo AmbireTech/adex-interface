@@ -198,12 +198,16 @@ export const InvoicesPDF = ({ invoiceDetails, placement }: InvoicesPDFProps) => 
           </Flex>
           <Flex justify="space-between" pl="xs" pr="xs">
             <Text color="secondaryText">Invoice Date:</Text>
-            <Text color="secondaryText">{formatDate(invoiceDetails.invoiceDate)}</Text>
+            <Text color="secondaryText">
+              {invoiceDetails.invoiceDate ? formatDate(invoiceDetails.invoiceDate) : 'N/A'}
+            </Text>
           </Flex>
           <Flex justify="space-between" pl="xs" pr="xs">
             <Text color="secondaryText">Due Date:</Text>
             <Text color="secondaryText">
-              {formatDate(dayjs(invoiceDetails.invoiceDate).add(7, 'day').toDate())}
+              {invoiceDetails.invoiceDate
+                ? formatDate(dayjs(invoiceDetails.invoiceDate).add(7, 'day').toDate())
+                : 'N/A'}
             </Text>
           </Flex>
         </>

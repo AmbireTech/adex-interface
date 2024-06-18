@@ -19,7 +19,7 @@ export const InvoicesModal = ({ campaignId, opened, close }: PrintModalProps) =>
     adexAccount: {
       billingDetails,
       address,
-      fundsOnCampaigns: { perCampaign }
+      refundsFromCampaigns: { perCampaign }
     }
   } = useAccount()
   const { getAnalyticsKeyAndUpdate, mappedAnalytics } = useCampaignAnalytics()
@@ -43,6 +43,13 @@ export const InvoicesModal = ({ campaignId, opened, close }: PrintModalProps) =>
       campaign?.id && !!perCampaign.length
         ? perCampaign.find((item) => item.id === campaign?.id)?.token.name || ''
         : '',
+    [campaign?.id, perCampaign]
+  )
+  const closeDate = useMemo(
+    () =>
+      campaign?.id && !!perCampaign.length
+        ? perCampaign.find((item) => item.id === campaign?.id)?.closeDate || undefined
+        : undefined,
     [campaign?.id, perCampaign]
   )
   const campaignMappedAnalytics: BaseAnalyticsData[] | undefined = useMemo(
@@ -69,8 +76,7 @@ export const InvoicesModal = ({ campaignId, opened, close }: PrintModalProps) =>
   const elements: IInvoiceDetails = useMemo(() => {
     return {
       invoiceId: campaign?.id || '',
-      // TODO: Fix the invoice date. use campaign closing date whenever it's added in the
-      invoiceDate: new Date(),
+      invoiceDate: (closeDate && new Date(closeDate)) || new Date(),
       seller: ADEX_COMPANY_DETAILS,
       buyer: {
         ...billingDetails,
@@ -82,7 +88,7 @@ export const InvoicesModal = ({ campaignId, opened, close }: PrintModalProps) =>
       vatPercentageInUSD: 22,
       currencyName
     }
-  }, [address, billingDetails, campaign?.id, campaignMappedAnalytics, currencyName])
+  }, [address, billingDetails, campaign?.id, campaignMappedAnalytics, currencyName, closeDate])
 
   return (
     <BillingDetailsModal
