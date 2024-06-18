@@ -50,6 +50,7 @@ export type MultiSelectAndRadioButtonsProps = {
   defaultSelectValue?: string[]
   defaultRadioValue?: TargetingInputApplyProp
   onCategoriesChange: (selectedRadio: TargetingInputApplyProp, categories: string[]) => void
+  groups: { [key: string]: string[] }
 }
 
 export type RangeTextProps = MantineStyleSystemProps & {

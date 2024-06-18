@@ -1,5 +1,5 @@
 import { Grid, Text } from '@mantine/core'
-import { useCallback, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 import { AdUnit } from 'adex-common/dist/types'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import useDropzone from 'hooks/useDropzone'
@@ -10,13 +10,17 @@ import FilesDropzone from './FilesDropzone'
 
 const UploadCreative = () => {
   const {
-    campaign: { adUnits },
+    campaign: { adUnits, autoUTMChecked },
     removeAdUnit,
-    addTargetURLToAdUnit
+    addTargetURLToAdUnit,
+    updateCampaign,
+    addUTMToTargetURLS
   } = useCreateCampaignContext()
 
-  const [autoUTMChecked, setAutoUTMChecked] = useState(false)
-  const updateAutoUTMChecked = useCallback((isChecked: boolean) => setAutoUTMChecked(isChecked), [])
+  const updateAutoUTMChecked = useCallback(
+    (isChecked: boolean) => updateCampaign('autoUTMChecked', isChecked),
+    [updateCampaign]
+  )
   const debounceTimer = useRef<NodeJS.Timeout>()
 
   const { onDrop } = useDropzone()
@@ -41,6 +45,12 @@ const UploadCreative = () => {
     },
     [addTargetURLToAdUnit]
   )
+
+  useEffect(() => {
+    if (autoUTMChecked) {
+      addUTMToTargetURLS()
+    }
+  }, [autoUTMChecked, addUTMToTargetURLS])
 
   return (
     <Grid>

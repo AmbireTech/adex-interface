@@ -1,17 +1,22 @@
 import {
   Campaign,
+  CampaignStatus,
   // CampaignType,
   EventType
 } from 'adex-common'
-import { Container, Flex, Text } from '@mantine/core'
-import { useCallback, useMemo } from 'react'
+import { Container, Flex, Text, Badge, Loader } from '@mantine/core'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useDisclosure } from '@mantine/hooks'
 import CustomTable from 'components/common/CustomTable'
 import { periodNumberToDate } from 'helpers'
 import { useNavigate } from 'react-router-dom'
-import useCampaignsData from 'hooks/useCampaignsData'
+import { useCampaignsData } from 'hooks/useCampaignsData'
 import { parseBigNumTokenAmountToDecimal } from 'helpers/balances'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import useCustomNotifications from 'hooks/useCustomNotifications'
+import { AdminCampaignModal } from 'components/common/Modals'
+import { CampaignData } from 'types'
+import UnderReviewIcon from 'resources/icons/UnderReview'
 import BadgeStatusCampaign from './BadgeStatusCampaign'
 
 const campaignHeaders = [
@@ -28,9 +33,36 @@ const campaignHeaders = [
   'CPM'
 ]
 
-const Dashboard = () => {
+const statusOrder = {
+  draft: 0,
+  active: 1,
+  paused: 2,
+  stopped: 3,
+  completed: 4
+}
+
+const getStatusOrder = (status: CampaignStatus) => {
+  switch (status) {
+    case CampaignStatus.draft:
+      return statusOrder.draft
+    case CampaignStatus.active:
+      return statusOrder.active
+    case CampaignStatus.paused:
+      return statusOrder.paused
+    case CampaignStatus.closedByUser:
+    case CampaignStatus.expired:
+    case CampaignStatus.exhausted:
+      return statusOrder.stopped
+    default:
+      return statusOrder.completed
+  }
+}
+
+const Dashboard = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
   const navigate = useNavigate()
-  const { campaignsData } = useCampaignsData()
+  const { campaignsData, initialDataLoading } = useCampaignsData()
+  const [opened, { open, close }] = useDisclosure(false)
+  const [selectedItem, setSelectedItem] = useState<CampaignData | null>(null)
   const { updateCampaignFromDraft } = useCreateCampaignContext()
   const { showNotification } = useCustomNotifications()
   // Temporary disabled show/hide archived until no functionality implemented
@@ -44,7 +76,13 @@ const Dashboard = () => {
     //       )
     //     : []
     // }
-    return Array.from(campaignsData.values()).reverse()
+    return Array.from(campaignsData.values()).sort((a, b) => {
+      const statusOrderDiff = getStatusOrder(a.campaign.status) - getStatusOrder(b.campaign.status)
+      if (statusOrderDiff !== 0) {
+        return statusOrderDiff
+      }
+      return Number(b.campaign.created) - Number(a.campaign.created)
+    })
   }, [campaignsData])
 
   const elements = useMemo(
@@ -70,9 +108,7 @@ const Dashboard = () => {
                 element: <BadgeStatusCampaign type={cmpData.campaign.status} />
               },
               served:
-                cmpData.paid && budget
-                  ? `${((cmpData.paid / budget) * 100).toFixed(2)} %`
-                  : '0.00 %',
+                cmpData.paid && budget ? `${Math.round((cmpData.paid / budget) * 100)} %` : '0 %',
               // TODO: get token name
               budget: `${budget} USDC`,
               impressions: cmpData.impressions,
@@ -124,9 +160,14 @@ const Dashboard = () => {
 
   const handlePreview = useCallback(
     (item: Campaign) => {
-      navigate(`/dashboard/campaign-details/${item.id}`)
+      if (isAdminPanel) {
+        setSelectedItem(campaignsData?.get(item.id) || null)
+        open()
+      } else {
+        navigate(`/dashboard/campaign-details/${item.id}`)
+      }
     },
-    [navigate]
+    [campaignsData, isAdminPanel, navigate, open]
   )
 
   const handleAnalytics = useCallback(
@@ -172,13 +213,34 @@ const Dashboard = () => {
   //   }
   // }, [navigate, filteredCampaignData.length])
 
+  // NOTE: redirect to get-started page id no campaigns found
+  useEffect(() => {
+    if (!filteredCampaignData.length && !initialDataLoading) {
+      navigate('/dashboard/get-started', { replace: true })
+    }
+  }, [filteredCampaignData, initialDataLoading, navigate])
+
   return (
     <Container fluid>
       <Flex direction="column" justify="start">
         <Flex justify="space-between" align="center">
-          <Text size="sm" color="secondaryText" weight="bold" mb="md">
-            All Campaigns
-          </Text>
+          {isAdminPanel ? (
+            <Badge
+              variant="gradient"
+              gradient={{ from: 'violet', to: 'purple' }}
+              size="xl"
+              mb="md"
+              fullWidth
+              leftSection={<UnderReviewIcon size="13px" />}
+              rightSection={<UnderReviewIcon size="13px" />}
+            >
+              Admin Panel
+            </Badge>
+          ) : (
+            <Text size="sm" color="secondaryText" weight="bold" mb="md">
+              All Campaigns
+            </Text>
+          )}
           {/* Temporary disabled show/hide archived until no functionality implemented */}
           {/* <UnstyledButton onClick={toggleShowArchived}>
             <Text size="sm" underline color="secondaryText">
@@ -186,18 +248,25 @@ const Dashboard = () => {
             </Text>
           </UnstyledButton> */}
         </Flex>
-        <CustomTable
-          background
-          headings={campaignHeaders}
-          elements={elements}
-          onPreview={handlePreview}
-          onAnalytics={handleAnalytics}
-          onEdit={handleEdit}
-          // Temporary disabled until no functionality implemented
-          // onDuplicate={handleDuplicate}
-          // onDelete={handleDelete}
-        />
+        {!initialDataLoading ? (
+          <CustomTable
+            background
+            headings={campaignHeaders}
+            elements={elements}
+            onPreview={handlePreview}
+            onAnalytics={handleAnalytics}
+            onEdit={handleEdit}
+            // Temporary disabled until no functionality implemented
+            // onDuplicate={handleDuplicate}
+            // onDelete={handleDelete}
+          />
+        ) : (
+          <Flex justify="center" align="center" h="60vh">
+            <Loader size="xl" />
+          </Flex>
+        )}
       </Flex>
+      <AdminCampaignModal item={selectedItem?.campaign || null} opened={opened} close={close} />
     </Container>
   )
 }

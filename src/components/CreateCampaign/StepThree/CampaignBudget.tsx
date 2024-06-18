@@ -1,8 +1,9 @@
 import { Flex, MediaQuery, TextInput, Text } from '@mantine/core'
 import InfoAlertMessage from 'components/common/InfoAlertMessage'
 import { parseBigNumTokenAmountToDecimal } from 'helpers/balances'
+import { MIN_CAMPAIGN_BUDGET_VALUE } from 'helpers/validators'
 import useAccount from 'hooks/useAccount'
-import { ChangeEvent, FocusEventHandler, useCallback, useMemo, useState } from 'react'
+import { ChangeEvent, FocusEventHandler, useCallback, useEffect, useMemo, useState } from 'react'
 
 type CampaignBudgetProps = {
   defaultValue: number
@@ -12,6 +13,7 @@ type CampaignBudgetProps = {
 }
 
 const CampaignBudget = ({ defaultValue, onChange, onFocus, error }: CampaignBudgetProps) => {
+  const [err, setErr] = useState(error)
   const [value, setValue] = useState('')
   const {
     adexAccount: { availableBalance, balanceToken }
@@ -35,6 +37,16 @@ const CampaignBudget = ({ defaultValue, onChange, onFocus, error }: CampaignBudg
     [formattedToken, value]
   )
 
+  useEffect(() => {
+    let currentError
+    if (value !== '' && Number(value) < MIN_CAMPAIGN_BUDGET_VALUE) {
+      currentError = `Campaign budget can not be lower than ${MIN_CAMPAIGN_BUDGET_VALUE}`
+    } else {
+      currentError = ''
+    }
+    setErr(currentError)
+  }, [value, defaultValue])
+
   return (
     <Flex justify="space-between" align="flex-start">
       <MediaQuery
@@ -54,7 +66,7 @@ const CampaignBudget = ({ defaultValue, onChange, onFocus, error }: CampaignBudg
           name="campaignBudget"
           onChange={(event) => handleOnChange(event)}
           onFocus={onFocus}
-          error={error && <Text size="sm">{error}</Text>}
+          error={err && <Text size="sm">{err}</Text>}
         />
       </MediaQuery>
       {budgetIsGreaterThanBalance && (

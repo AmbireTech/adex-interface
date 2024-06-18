@@ -8,13 +8,14 @@ const SCALE_VALUE = 4
 
 const useStyles = createStyles((theme) => ({
   container: {
-    zIndex: 9999,
+    position: 'relative',
     maxWidth: 40,
     maxHeight: 40,
     overflow: 'hidden',
     transition: 'transform 0.3s ease-in-out',
     background: theme.colors.alternativeBackground[theme.fn.primaryShade()],
     '&:hover': {
+      zIndex: 9999,
       transform: `scale(${SCALE_VALUE})`,
       border: '0.5px solid',
       borderColor: theme.colors.decorativeBorders[theme.fn.primaryShade()],

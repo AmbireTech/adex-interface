@@ -13,6 +13,7 @@ import { SupplyStats, CampaignUI, CreateCampaignType, SupplyStatsDetails, Device
 import useAccount from 'hooks/useAccount'
 import { useAdExApi } from 'hooks/useAdexServices'
 import {
+  addUrlUtmTracking,
   deepEqual,
   isPastDateTime,
   prepareCampaignObject,
@@ -165,17 +166,22 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
   const [selectedBannerSizes, setSelectedBannerSizes] = useState<
     SupplyStatsDetails[] | SupplyStatsDetails[][]
   >([])
+  const [selectedBidFloors, setSelectedBidFloors] = useState<
+    SupplyStatsDetails[] | SupplyStatsDetails[][]
+  >([])
 
   useEffect(() => {
     const placement = campaign.targetingInput.inputs.placements.in[0]
     const devices = campaign.devices
-    const mappedSupplyStats: Record<string, SupplyStatsDetails[]> = selectBannerSizes(supplyStats)
+    const mappedSupplyStats: Record<string, SupplyStatsDetails[][]> = selectBannerSizes(supplyStats)
     const selectedPlatforms: Placement | Devices[] = placement === 'app' ? placement : devices
     if (Array.isArray(selectedPlatforms)) {
-      const result = selectedPlatforms.map((platform) => mappedSupplyStats[platform])
+      const result = selectedPlatforms.map((platform) => mappedSupplyStats[platform][0])
       setSelectedBannerSizes(result)
+      setSelectedBidFloors(selectedPlatforms.map((platform) => mappedSupplyStats[platform][1]))
     } else {
-      setSelectedBannerSizes(selectedPlatforms ? mappedSupplyStats[selectedPlatforms] : [])
+      setSelectedBannerSizes(selectedPlatforms ? mappedSupplyStats[selectedPlatforms][0] : [])
+      setSelectedBidFloors(selectedPlatforms ? mappedSupplyStats[selectedPlatforms][1] : [])
     }
   }, [campaign.devices, campaign.targetingInput.inputs.placements.in, supplyStats])
 
@@ -282,6 +288,32 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
     [setCampaign]
   )
 
+  const addUTMToTargetURLS = useCallback(() => {
+    setCampaign((prev) => {
+      const { adUnits, autoUTMChecked, title } = { ...prev }
+
+      if (autoUTMChecked) {
+        adUnits.forEach((element, index) => {
+          const elCopy = { ...element }
+
+          elCopy.banner!.targetUrl = addUrlUtmTracking({
+            targetUrl: elCopy.banner!.targetUrl,
+            campaign: title,
+            content: `${index + 1}_${elCopy.type}`
+            // src: 'adex_PUBHOSTNAME'
+          })
+          return elCopy
+        })
+      }
+
+      const updated = {
+        ...prev,
+        adUnits
+      }
+      return updated
+    })
+  }, [setCampaign])
+
   const updatePartOfCampaign = useCallback(
     (value: Partial<CampaignUI>) => {
       setCampaign((prevState) => ({
@@ -327,10 +359,10 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
     [setCampaign]
   )
 
-  const resetCampaign = useCallback(
-    () => setCampaign({ ...defaultValue }),
-    [setCampaign, defaultValue]
-  )
+  const resetCampaign = useCallback(() => {
+    setCampaign({ ...defaultValue })
+    localStorage.setItem('createCampaign', superjson.stringify({ ...defaultValue }))
+  }, [setCampaign, defaultValue])
 
   const publishCampaign = useCallback(() => {
     const preparedCampaign = prepareCampaignObject(campaign, balanceToken.decimals)
@@ -391,6 +423,8 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
         step: 0,
         devices: ['mobile', 'desktop'],
         paymentModel: 'cpm',
+        autoUTMChecked: false,
+        asapStartingDate: false,
         startsAt:
           (draftCampaign?.activeFrom && new Date(Number(draftCampaign?.activeFrom))) || new Date(),
         endsAt:
@@ -435,7 +469,9 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
       selectedBannerSizes,
       saveToDraftCampaign,
       updateCampaignFromDraft,
-      defaultValue
+      defaultValue,
+      addUTMToTargetURLS,
+      selectedBidFloors
     }),
     [
       campaign,
@@ -451,7 +487,9 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
       selectedBannerSizes,
       saveToDraftCampaign,
       updateCampaignFromDraft,
-      defaultValue
+      defaultValue,
+      addUTMToTargetURLS,
+      selectedBidFloors
     ]
   )
 

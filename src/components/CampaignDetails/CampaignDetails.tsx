@@ -9,7 +9,7 @@ import MediaBanner from 'components/common/MediaBanner'
 import { formatDateTime } from 'helpers/formatters'
 import GoBack from 'components/common/GoBack'
 import CampaignDetailsRow from 'components/common/CampainDetailsRow/CampaignDetailsRow'
-import useCampaignsData from 'hooks/useCampaignsData'
+import { useCampaignsData } from 'hooks/useCampaignsData'
 import ActiveIcon from 'resources/icons/Active'
 import CampaignActionBtn from 'components/CampaignAnalytics/CampaignActionBtn'
 import StopIcon from 'resources/icons/Stop'
@@ -312,6 +312,16 @@ const CampaignDetails = () => {
                         icon={<EditIcon size="13px" />}
                         color="draft"
                         onBtnClicked={handleEdit}
+                      />
+                    )}
+                    {campaign.status === CampaignStatus.inReview && (
+                      <CampaignActionBtn
+                        text="Cancel"
+                        icon={<ArchivedIcon size="13px" />}
+                        color="secondaryText"
+                        onBtnClicked={() =>
+                          changeCampaignStatus(CampaignStatus.closedByUser, campaign.id)
+                        }
                       />
                     )}
                   </Flex>

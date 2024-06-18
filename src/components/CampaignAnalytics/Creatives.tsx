@@ -68,12 +68,12 @@ const Creatives = ({
           </Flex>
         ),
         size: unitForId?.banner
-          ? `${unitForId?.banner?.format.w}x${unitForId?.banner?.format.w}`
+          ? `${unitForId?.banner?.format.w}x${unitForId?.banner?.format.h}`
           : '',
         impressions: formatCurrency(item.impressions, 0),
         clicks: formatCurrency(item.clicks, 0),
         ctr: `${item.ctr}`,
-        paid: `${item.paid.toFixed(4)} ${currencyName}`,
+        paid: `${item.paid.toFixed(2)} ${currencyName}`,
         link: unitForId?.banner?.targetUrl
       }
     })

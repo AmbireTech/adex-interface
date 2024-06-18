@@ -122,7 +122,10 @@ interface ICampaignsDataContext {
 
 const CampaignsDataContext = createContext<ICampaignsDataContext | null>(null)
 
-const CampaignsDataProvider: FC<PropsWithChildren> = ({ children }) => {
+const CampaignsDataProvider: FC<PropsWithChildren & { type: 'user' | 'admin' }> = ({
+  children,
+  type
+}) => {
   const { showNotification } = useCustomNotifications()
   const { adexServicesRequest } = useAdExApi()
 
@@ -229,9 +232,11 @@ const CampaignsDataProvider: FC<PropsWithChildren> = ({ children }) => {
   const updateAllCampaignsData = useCallback(
     async (updateAdvanced?: boolean) => {
       try {
+        const route = type === 'user' ? '/dsp/campaigns/by-owner' : '/dsp/admin/campaigns'
         const dataRes = await adexServicesRequest<Array<CamapignBackendDataRes>>('backend', {
-          route: '/dsp/campaigns/by-owner',
-          method: 'GET'
+          route,
+          method: 'GET',
+          queryParams: { all: 'true' }
         })
 
         console.log({ dataRes })
@@ -267,32 +272,39 @@ const CampaignsDataProvider: FC<PropsWithChildren> = ({ children }) => {
                 next.delete(key)
               }
             })
-
+            // TODO: check it again when dev has been merged
+            setInitialDataLoading(false)
             return next
           })
         } else {
           showNotification('warning', 'invalid campaigns data response', 'Data error')
           console.log({ dataRes })
+          setInitialDataLoading(false)
         }
       } catch (err) {
         console.log(err)
         showNotification('error', 'getting campaigns data', 'Data error')
+        // setInitialDataLoading(false)
       }
     },
-    [adexServicesRequest, showNotification]
+    [adexServicesRequest, showNotification, type]
   )
+
+  useEffect(() => {
+    console.log({ type })
+  }, [type])
 
   useEffect(() => {
     if (authenticated) {
       const updateCampaigns = async () => {
         await updateAllCampaignsData(true)
-        setInitialDataLoading(false)
+        // setInitialDataLoading(false)
       }
 
       updateCampaigns()
     } else {
       setCampaignData(new Map<string, CampaignData>())
-      setInitialDataLoading(false)
+      // setInitialDataLoading(false)
     }
   }, [updateAllCampaignsData, authenticated])
 
