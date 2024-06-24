@@ -1,4 +1,4 @@
-import { Container, Grid, Select, createStyles, Text, Modal, Flex, Button } from '@mantine/core'
+import { Container, Grid, Select, createStyles, Text } from '@mantine/core'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import EthereumIcon from 'resources/networks/Ethereum'
 import PolygonIcon from 'resources/networks/Polygon'
@@ -7,8 +7,9 @@ import DepositIcon from 'resources/icons/Deposit'
 import { DepositMethods, ITabSwitchDeposit } from 'types'
 import CustomCard from 'components/common/CustomCard'
 import { IS_MANUAL_DEPOSITING } from 'constants/balances'
-import AttentionIcon from 'resources/icons/Attention'
+// import AttentionIcon from 'resources/icons/Attention'
 import { Link, useNavigate } from 'react-router-dom'
+import { CustomConfirmModal } from 'components/common/Modals'
 import SelectItem from './SelectItem'
 import SendCryptocurrency from './SendCryptocurrency'
 import TopUpWithFiat from './TopUpWithFiat'
@@ -140,19 +141,13 @@ const Deposit = () => {
           <TabSwitch selectedTab={selectedTab} />
         </Grid.Col>
       </Grid>
-      <Modal
-        opened={opened}
-        onClose={goBack}
-        closeOnClickOutside={false}
-        withCloseButton={false}
-        classNames={{
-          body: classes.root
-        }}
-      >
-        <Flex justify="center" className={classes.confirmModalContent}>
-          <div className={classes.iconWrapper}>
-            <AttentionIcon className={classes.attentionIcon} />
-          </div>
+      <CustomConfirmModal
+        cancelBtnLabel="No"
+        confirmBtnLabel="Yes"
+        onCancelClicked={() => goBack()}
+        onConfirmClicked={() => goBack()}
+        color="attention"
+        text={
           <Text>
             To add funds to your account, please contact us at{' '}
             <a href="mailto: contactus@adex.network" target="_blank" rel="noreferrer">
@@ -162,23 +157,17 @@ const Deposit = () => {
             your profile). We will provide you with further instructions on how to deposit funds on
             the address.
           </Text>
-        </Flex>
-        <Flex justify="space-between" p="xl">
-          <Button size="lg" variant="outline" onClick={goBack}>
-            Go back
-          </Button>
-          <Button
-            component={Link}
-            target="_blank"
-            rel="noreferrer"
-            to="mailto: contactus@adex.network"
-            size="lg"
-            onClick={goBack}
-          >
-            Contact us
-          </Button>
-        </Flex>
-      </Modal>
+        }
+        opened={opened}
+        confirmBtnProps={{
+          component: Link,
+          target: '_blank',
+          rel: 'noreferrer',
+          to: 'mailto: contactus@adex.network',
+          size: 'lg'
+        }}
+        overlayTop
+      />
     </Container>
   )
 }
