@@ -93,13 +93,7 @@ function SideNav() {
             icon={<DepositIcon />}
             label="Top Up Account"
             active={useResolvedPath('deposit').pathname === match?.pathname}
-            hasPopover={isManualDepositing}
-            popoverContent={
-              <Text size="sm">
-                Contact us on <a href="mailto: dsp@adex.network"> dsp@adex.network</a> to &quot;add
-                money&quot; / &quot;launch campaign&quot;
-              </Text>
-            }
+            hasPopover={false}
           />
           <NavLink
             to="/dashboard/billing"
