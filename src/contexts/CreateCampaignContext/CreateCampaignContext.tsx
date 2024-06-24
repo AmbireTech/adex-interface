@@ -290,17 +290,28 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
 
   const addUTMToTargetURLS = useCallback(() => {
     setCampaign((prev) => {
-      const { adUnits, autoUTMChecked, title } = { ...prev }
+      const {
+        adUnits,
+        autoUTMChecked,
+        title,
+        targetingInput: {
+          inputs: {
+            placements: {
+              in: [placement]
+            }
+          }
+        }
+      } = { ...prev }
 
       if (autoUTMChecked) {
-        adUnits.forEach((element, index) => {
+        adUnits.forEach((element) => {
           const elCopy = { ...element }
 
           elCopy.banner!.targetUrl = addUrlUtmTracking({
             targetUrl: elCopy.banner!.targetUrl,
             campaign: title,
-            content: `${index + 1}_${elCopy.type}`
-            // src: 'adex_PUBHOSTNAME'
+            content: `${elCopy.banner!.format.w}x${elCopy.banner!.format.h}`,
+            term: placement === 'app' ? 'App' : 'Website'
           })
           return elCopy
         })

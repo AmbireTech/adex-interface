@@ -1,5 +1,5 @@
 import { Grid, Text } from '@mantine/core'
-import { useCallback, useEffect, useRef } from 'react'
+import { useCallback, useRef } from 'react'
 import { AdUnit } from 'adex-common/dist/types'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import useDropzone from 'hooks/useDropzone'
@@ -13,8 +13,7 @@ const UploadCreative = () => {
     campaign: { adUnits, autoUTMChecked },
     removeAdUnit,
     addTargetURLToAdUnit,
-    updateCampaign,
-    addUTMToTargetURLS
+    updateCampaign
   } = useCreateCampaignContext()
 
   const updateAutoUTMChecked = useCallback(
@@ -45,12 +44,6 @@ const UploadCreative = () => {
     },
     [addTargetURLToAdUnit]
   )
-
-  useEffect(() => {
-    if (autoUTMChecked) {
-      addUTMToTargetURLS()
-    }
-  }, [autoUTMChecked, addUTMToTargetURLS])
 
   return (
     <Grid>

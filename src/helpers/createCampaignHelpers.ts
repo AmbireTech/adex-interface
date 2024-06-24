@@ -306,8 +306,9 @@ export function deepEqual<T>(obj1: T, obj2: T): boolean {
 }
 
 const UTM_PARAMS = {
-  utm_source: 'ADEX',
+  utm_source: 'AdEx',
   utm_medium: 'CPM',
+  utm_term: 'none',
   utm_campaign: 'none',
   utm_content: 'none'
 }
@@ -315,13 +316,13 @@ const UTM_PARAMS = {
 export const addUrlUtmTracking = ({
   targetUrl,
   campaign,
-  content
-}: // src
-{
+  content,
+  term
+}: {
   targetUrl: string
   campaign: string
   content: string
-  // src: string
+  term: string
 }) => {
   if (targetUrl) {
     const url = new URL(targetUrl)
@@ -338,9 +339,9 @@ export const addUrlUtmTracking = ({
     if (content) {
       params.set('utm_content', content)
     }
-    // if (src) {
-    //   params.set('utm_source', src)
-    // }
+    if (term) {
+      params.set('utm_term', term)
+    }
 
     url.search = params.toString()
 
