@@ -28,27 +28,6 @@ const useStyles = createStyles((theme) => ({
   },
   brandColor: {
     color: theme.colors.brand[theme.fn.primaryShade()]
-  },
-  confirmModalContent: {
-    background:
-      theme.colors.attention[theme.fn.primaryShade()] + theme.other.shades.hexColorSuffix.lightest,
-    padding: theme.spacing.md,
-    border: `1px solid ${
-      theme.colors.attention[theme.fn.primaryShade()] + theme.other.shades.hexColorSuffix.lighter
-    }`,
-    borderRadius: theme.spacing.sm
-  },
-  attentionIcon: {
-    width: 25,
-    height: 25,
-    color: theme.colors.attention[theme.fn.primaryShade()]
-  },
-  iconWrapper: {
-    width: 50,
-    height: 50,
-    background: `${theme.colors.attention[theme.fn.primaryShade()]}1A`,
-    borderRadius: '50%',
-    padding: theme.spacing.sm
   }
 }))
 
