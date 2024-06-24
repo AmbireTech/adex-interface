@@ -34,15 +34,18 @@ const campaignHeaders = [
 ]
 
 const statusOrder = {
-  draft: 0,
-  active: 1,
-  paused: 2,
-  stopped: 3,
-  completed: 4
+  inReview: 0,
+  draft: 1,
+  active: 2,
+  paused: 3,
+  stopped: 4,
+  completed: 5
 }
 
 const getStatusOrder = (status: CampaignStatus) => {
   switch (status) {
+    case CampaignStatus.inReview:
+      return statusOrder.inReview
     case CampaignStatus.draft:
       return statusOrder.draft
     case CampaignStatus.active:
