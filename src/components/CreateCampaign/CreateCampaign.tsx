@@ -110,7 +110,6 @@ const CreateCampaign = () => {
                 <>
                   <Flex justify="center" className={classes.confirmModalContent}>
                     <div className={classes.iconWrapper}>
-                      {/* TODO: icon should be passed as a prop */}
                       <AttentionIcon className={classes.attentionIcon} />
                     </div>
                     <Text w="100%">
