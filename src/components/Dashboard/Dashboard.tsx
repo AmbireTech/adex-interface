@@ -182,6 +182,9 @@ const Dashboard = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
 
   const handleEdit = useCallback(
     (item: Campaign) => {
+      if (isAdminPanel) {
+        return
+      }
       const selectedCampaign = filteredCampaignData.find(
         (campaign) => campaign.campaignId === item.id
       )?.campaign
@@ -193,7 +196,7 @@ const Dashboard = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
         showNotification('error', 'Editing draft campaign failed', 'Editing draft campaign failed')
       }
     },
-    [filteredCampaignData, updateCampaignFromDraft, navigate, showNotification]
+    [isAdminPanel, filteredCampaignData, updateCampaignFromDraft, navigate, showNotification]
   )
 
   // const handleDuplicate = useCallback((item: Campaign) => {
