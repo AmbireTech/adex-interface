@@ -2,21 +2,15 @@ import { Title } from '@mantine/core'
 import CustomTable from 'components/common/CustomTable'
 import { useDisclosure } from '@mantine/hooks'
 import { useCallback, useMemo, useState } from 'react'
-
+import { CampaignStatus } from 'adex-common'
 import { useCampaignsData } from 'hooks/useCampaignsData'
 // TODO: Delete mock data
 // import { invoiceElements } from './mockedData'
-import { CampaignStatus } from 'adex-common'
 import useAccount from 'hooks/useAccount'
 import { formatDateShort } from 'helpers'
 import { InvoicesModal } from './InvoicesModal'
 
 const columnTitles = ['Company Name', 'Campaign Period']
-
-const isCampaignEnded = (campaignStatus: CampaignStatus) =>
-  [CampaignStatus.expired, CampaignStatus.closedByUser, CampaignStatus.exhausted].includes(
-    campaignStatus
-  )
 
 const Invoices = () => {
   const [opened, { open, close }] = useDisclosure(false)
@@ -33,18 +27,25 @@ const Invoices = () => {
   const invoiceElements = useMemo(
     () =>
       campaigns
-        .filter((c) => isCampaignEnded(c.campaign.status))
-        .map((campaign) => ({
-          id: campaign.campaignId,
-          companyName,
-          campaignPeriod: (
-            <span>
-              <span>{formatDateShort(new Date(Number(campaign.campaign.activeFrom)))} </span>
-              <br />
-              <span>{formatDateShort(new Date(Number(campaign.campaign.activeTo)))} </span>
-            </span>
+        .filter((c) =>
+          [CampaignStatus.expired, CampaignStatus.closedByUser, CampaignStatus.exhausted].includes(
+            c.campaign.status
           )
-        })),
+        )
+        .sort((a, b) => Number(b.campaign.activeFrom) - Number(a.campaign.activeFrom))
+        .map((campaign) => {
+          return {
+            id: campaign.campaignId,
+            companyName,
+            campaignPeriod: (
+              <span>
+                <span>{formatDateShort(new Date(Number(campaign.campaign.activeFrom)))} </span>
+                <br />
+                <span>{formatDateShort(new Date(Number(campaign.campaign.activeTo)))} </span>
+              </span>
+            )
+          }
+        }),
     [campaigns, companyName]
   )
 
