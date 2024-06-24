@@ -6,8 +6,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import LeftArrowIcon from 'resources/icons/LeftArrow'
 import useCreateCampaignData from 'hooks/useCreateCampaignData/useCreateCampaignData'
 import CampaignDetailsRow from 'components/common/CampainDetailsRow'
-import { ConfirmModal, SuccessModal } from 'components/common/Modals'
-import AttentionIcon from 'resources/icons/Attention'
+import { LaunchCampaignModal, SuccessModal } from 'components/common/Modals'
 import { useCampaignsData } from 'hooks/useCampaignsData'
 import useCustomNotifications from 'hooks/useCustomNotifications'
 import useAccount from 'hooks/useAccount'
@@ -29,28 +28,6 @@ const useStyles = createStyles((theme) => ({
   },
   brandColor: {
     color: theme.colors.brand[theme.fn.primaryShade()]
-  },
-  confirmModalContent: {
-    background:
-      theme.colors.attention[theme.fn.primaryShade()] + theme.other.shades.hexColorSuffix.lightest,
-    padding: theme.spacing.md,
-    border: `1px solid ${
-      theme.colors.attention[theme.fn.primaryShade()] + theme.other.shades.hexColorSuffix.lighter
-    }`,
-    borderRadius: theme.spacing.sm
-  },
-  attentionIcon: {
-    width: 25,
-    height: 25,
-    color: theme.colors.attention[theme.fn.primaryShade()]
-  },
-  iconWrapper: {
-    width: 50,
-    height: 50,
-    // TODO: Add the suffix 1A to the theme
-    background: `${theme.colors.attention[theme.fn.primaryShade()]}1A`,
-    borderRadius: '50%',
-    padding: theme.spacing.sm
   }
 }))
 
@@ -216,28 +193,17 @@ const CampaignSummary = () => {
             Next Step
           </Button>
         ) : (
-          <ConfirmModal
+          <LaunchCampaignModal
             w="90%"
             size="lg"
             mt="md"
             variant="filled"
-            title="Launch Campaign"
             btnLabel="Launch Campaign"
             cancelBtnLabel="Go Back"
             confirmBtnLabel="Launch Campaign"
             onCancelClicked={() => console.log('Canceled')}
             onConfirmClicked={throttledLaunchCampaign}
-          >
-            <Flex justify="center" className={classes.confirmModalContent}>
-              <div className={classes.iconWrapper}>
-                <AttentionIcon className={classes.attentionIcon} />
-              </div>
-              <Text align="center">
-                Once you click on “Launch campaign,” any further edits to the campaign will be
-                disabled. Are you certain you wish to proceed with the launch?
-              </Text>
-            </Flex>
-          </ConfirmModal>
+          />
         )}
         <Button w="90%" size="lg" mt="md" variant="outline" onClick={handleSaveDraftClicked}>
           Save Draft

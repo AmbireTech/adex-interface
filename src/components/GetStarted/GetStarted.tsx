@@ -60,7 +60,7 @@ const GetStarted = () => {
               icon={<DepositIcon size="60px" />}
               color="secondary"
             >
-              {hasPopover ? (
+              {/* {IS_MANUAL_DEPOSITING === 'true' ? (
                 <CustomPopover
                   popoverContent={
                     <Text size="sm">
@@ -73,17 +73,17 @@ const GetStarted = () => {
                     Add funds
                   </Button>
                 </CustomPopover>
-              ) : (
-                <Button
-                  w="70%"
-                  size="lg"
-                  variant="filled"
-                  color="secondary"
-                  onClick={() => navigate('/dashboard/deposit')}
-                >
-                  Add funds
-                </Button>
-              )}
+              ) : ( */}
+              <Button
+                w="70%"
+                size="lg"
+                variant="filled"
+                color="secondary"
+                onClick={() => navigate('/dashboard/deposit')}
+              >
+                Add funds
+              </Button>
+              {/* )} */}
             </CustomCard>
           </Grid.Col>
           <Grid.Col md={4} order={3} xs={12}>
