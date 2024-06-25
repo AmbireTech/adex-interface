@@ -5,7 +5,7 @@ import BadgeStatusCampaign from 'components/Dashboard/BadgeStatusCampaign'
 import { formatCatsAndLocsData } from 'helpers/createCampaignHelpers'
 import { CATEGORIES, COUNTRIES } from 'constants/createCampaign'
 import { AdUnit, CampaignStatus } from 'adex-common/dist/types'
-import MediaBanner from 'components/common/MediaBanner'
+import MediaThumb from 'components/common/MediaThumb'
 import { formatDateTime } from 'helpers/formatters'
 import GoBack from 'components/common/GoBack'
 import CampaignDetailsRow from 'components/common/CampainDetailsRow/CampaignDetailsRow'
@@ -283,7 +283,7 @@ const CampaignDetails = () => {
                             lineHeight="sm"
                             textSize="sm"
                             title={`${item.banner?.format.w}x${item.banner?.format.h}`}
-                            value={<MediaBanner adUnit={item} />}
+                            value={<MediaThumb adUnit={item} />}
                             noBorder={isLast}
                           />
                         )

@@ -343,7 +343,7 @@ export const addUrlUtmTracking = ({
       params.set('utm_term', params.get('utm_term') || term)
     }
 
-    url.search = params.toString()
+    url.search = encodeURIComponent(params.toString())
 
     return url.toString()
   }

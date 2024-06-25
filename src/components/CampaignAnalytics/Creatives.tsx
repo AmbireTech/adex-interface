@@ -1,22 +1,18 @@
-import { useMemo, useCallback, useState } from 'react'
+import { useMemo } from 'react'
 import CustomTable from 'components/common/CustomTable'
-import { Flex, Image, createStyles, Anchor } from '@mantine/core'
+import { Flex, createStyles, Anchor } from '@mantine/core'
 import UrlIcon from 'resources/icons/Url'
-import { CreativePreviewModal } from 'components/common/Modals'
-import { useDisclosure } from '@mantine/hooks'
 import { BaseAnalyticsData } from 'types'
 import { formatCurrency } from 'helpers'
 import { AdUnit } from 'adex-common'
 import { getMediaUrlWithProvider } from 'helpers/createCampaignHelpers'
+import MediaThumb from 'components/common/MediaThumb'
 
 const IPFS_GATEWAY = process.env.REACT_APP_IPFS_GATEWAY
 
 const useStyles = createStyles((theme) => ({
   icon: {
     color: theme.colors.brand[theme.fn.primaryShade()]
-  },
-  image: {
-    cursor: 'pointer'
   }
 }))
 
@@ -29,21 +25,11 @@ const Creatives = ({
   units: AdUnit[] | undefined
   currencyName: string
 }) => {
-  const [opened, { open, close }] = useDisclosure(false)
   const { classes } = useStyles()
 
   const headings = useMemo(
     () => ['Media', 'Size', 'Impressions', 'Clicks', 'CTR %', 'Spent', 'Target'],
     []
-  )
-
-  const [selectedMedia, setSelectedMedia] = useState('')
-  const handleMediaClick = useCallback(
-    (media: string) => {
-      setSelectedMedia(media)
-      open()
-    },
-    [open]
   )
 
   const elements = useMemo(() => {
@@ -54,17 +40,10 @@ const Creatives = ({
       return {
         media: (
           <Flex align="center">
-            <Anchor href={media} target="_blank">
+            <Anchor href={media} target="_blank" mr="sm">
               <UrlIcon size="25px" className={classes.icon} />
             </Anchor>
-            <Image
-              ml="sm"
-              src={media}
-              mah="100px"
-              maw="50px"
-              onClick={() => handleMediaClick(media || '')}
-              className={classes.image}
-            />
+            {unitForId && <MediaThumb adUnit={unitForId} />}
           </Flex>
         ),
         size: unitForId?.banner
@@ -77,18 +56,13 @@ const Creatives = ({
         link: unitForId?.banner?.targetUrl
       }
     })
-  }, [classes.icon, classes.image, creatives, currencyName, handleMediaClick, units])
+  }, [classes.icon, creatives, currencyName, units])
 
   if (!elements?.length) {
     return <div>No creatives found</div>
   }
 
-  return (
-    <>
-      <CustomTable background headings={headings} elements={elements} />
-      <CreativePreviewModal media={selectedMedia} opened={opened} close={close} />
-    </>
-  )
+  return <CustomTable background headings={headings} elements={elements} />
 }
 
 export default Creatives
