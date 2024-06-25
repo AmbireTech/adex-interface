@@ -37,9 +37,9 @@ const Creatives = ({
     []
   )
 
-  const [selectedMedia, setSelectedMedia] = useState('')
+  const [selectedMedia, setSelectedMedia] = useState<AdUnit | null>(null)
   const handleMediaClick = useCallback(
-    (media: string) => {
+    (media: AdUnit | null) => {
       setSelectedMedia(media)
       open()
     },
@@ -62,7 +62,7 @@ const Creatives = ({
               src={media}
               mah="100px"
               maw="50px"
-              onClick={() => handleMediaClick(media || '')}
+              onClick={() => handleMediaClick(unitForId || null)}
               className={classes.image}
             />
           </Flex>
@@ -86,7 +86,9 @@ const Creatives = ({
   return (
     <>
       <CustomTable background headings={headings} elements={elements} />
-      <CreativePreviewModal media={selectedMedia} opened={opened} close={close} />
+      {selectedMedia && (
+        <CreativePreviewModal media={selectedMedia} opened={opened} close={close} />
+      )}
     </>
   )
 }

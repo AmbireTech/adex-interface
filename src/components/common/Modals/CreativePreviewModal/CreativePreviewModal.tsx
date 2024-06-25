@@ -1,42 +1,26 @@
-import { Modal, Image, createStyles } from '@mantine/core'
-
-const useStyles = createStyles((theme) => ({
-  header: {
-    marginTop: theme.spacing.lg
-  },
-  title: {
-    fontSize: theme.fontSizes.xl,
-    fontWeight: theme.other.fontWeights.bold
-  },
-  close: {
-    color: theme.colors.mainText[theme.fn.primaryShade()]
-  }
-}))
+import { Modal } from '@mantine/core'
+import { AdUnit } from 'adex-common'
+import MediaBanner from 'components/common/MediaBanner'
 
 const CreativePreviewModal = ({
   media,
   opened,
   close
 }: {
-  media: string
+  media: AdUnit
   opened: boolean
   close: () => void
 }) => {
-  const { classes } = useStyles()
   return (
     <Modal
-      size="lg"
-      centered
-      //   padding="xl"
       opened={opened}
       onClose={close}
-      classNames={{
-        header: classes.header,
-        title: classes.title,
-        close: classes.close
-      }}
+      centered
+      withCloseButton={false}
+      withOverlay={false}
+      size="auto"
     >
-      <Image src={media} pt="xl" pb="xl" />
+      <MediaBanner adUnit={media} width={media.banner?.format.w} height={media.banner?.format.h} />
     </Modal>
   )
 }
