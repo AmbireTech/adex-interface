@@ -126,7 +126,7 @@ function SideNav() {
           All Rights Reserved.
         </Text>
         <Text color="secondaryText" size="sm">
-          V.{appVersion}
+          V.{appVersion}-beta
         </Text>
       </Navbar.Section>
     </>
