@@ -73,7 +73,7 @@ const CampaignSummary = () => {
       const res = await publishCampaign()
 
       if (res && res.success) {
-        await updateAllCampaignsData()
+        await updateAllCampaignsData(true)
         await updateBalance()
         open()
         resetCampaign()
@@ -131,7 +131,7 @@ const CampaignSummary = () => {
       const res = await saveToDraftCampaign()
 
       if (res && res.success) {
-        await updateAllCampaignsData()
+        await updateAllCampaignsData(true)
         resetCampaign()
         navigate('/dashboard/')
       } else {

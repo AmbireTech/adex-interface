@@ -134,7 +134,7 @@ const CreateCampaign = () => {
                           const res = await saveToDraftCampaign(prev)
 
                           if (res && res.success) {
-                            await updateAllCampaignsData()
+                            await updateAllCampaignsData(true)
                           } else {
                             showNotification(
                               'warning',
