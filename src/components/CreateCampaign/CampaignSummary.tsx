@@ -37,11 +37,12 @@ const CampaignSummary = () => {
   const [opened, { open, close }] = useDisclosure(false)
   const { updateBalance } = useAccount()
   const {
-    campaign: { step, adUnits },
+    campaign: { step, adUnits, autoUTMChecked },
     updateCampaign,
     publishCampaign,
     resetCampaign,
-    saveToDraftCampaign
+    saveToDraftCampaign,
+    addUTMToTargetURLS
   } = useCreateCampaignContext()
   const {
     formattedSelectedDevice,
@@ -146,6 +147,12 @@ const CampaignSummary = () => {
     navigate('/dashboard/')
     close()
   }, [navigate, close])
+
+  useEffect(() => {
+    if (autoUTMChecked) {
+      addUTMToTargetURLS()
+    }
+  }, [autoUTMChecked, addUTMToTargetURLS])
 
   return (
     <>

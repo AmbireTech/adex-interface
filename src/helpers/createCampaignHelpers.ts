@@ -306,22 +306,23 @@ export function deepEqual<T>(obj1: T, obj2: T): boolean {
 }
 
 const UTM_PARAMS = {
-  utm_source: 'ADEX',
-  utm_medium: 'CPM',
-  utm_campaign: 'none',
-  utm_content: 'none'
+  utm_source: 'AdEx',
+  utm_medium: 'CPM'
+  // utm_term: 'none',
+  // utm_campaign: 'none',
+  // utm_content: 'none'
 }
 
 export const addUrlUtmTracking = ({
   targetUrl,
   campaign,
-  content
-}: // src
-{
+  content,
+  term
+}: {
   targetUrl: string
   campaign: string
   content: string
-  // src: string
+  term: string
 }) => {
   if (targetUrl) {
     const url = new URL(targetUrl)
@@ -333,14 +334,14 @@ export const addUrlUtmTracking = ({
     })
 
     if (campaign) {
-      params.set('utm_campaign', campaign)
+      params.set('utm_campaign', params.get('utm_campaign') || campaign)
     }
     if (content) {
-      params.set('utm_content', content)
+      params.set('utm_content', params.get('utm_content') || content)
     }
-    // if (src) {
-    //   params.set('utm_source', src)
-    // }
+    if (term) {
+      params.set('utm_term', params.get('utm_term') || term)
+    }
 
     url.search = params.toString()
 
@@ -348,6 +349,16 @@ export const addUrlUtmTracking = ({
   }
 
   return targetUrl
+}
+
+export const hasUtmCampaign = (url: string) => {
+  try {
+    const urlObj = new URL(url)
+    return urlObj.searchParams.has('utm_campaign')
+  } catch (e) {
+    console.error('Invalid URL:', e)
+    return false
+  }
 }
 
 export const capitalize = (s: string) => s && s[0].toUpperCase() + s.slice(1)

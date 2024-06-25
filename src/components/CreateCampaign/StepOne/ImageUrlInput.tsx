@@ -107,7 +107,7 @@ const ImageUrlInput = ({
         {...rest}
       >
         <div className={classes.mediaWrapper}>
-          <MediaBanner adUnit={image} />
+          <MediaBanner adUnit={image} zoomOnHover />
         </div>
         <CustomBadge
           color={error || toRemove ? 'warning' : 'brand'}
