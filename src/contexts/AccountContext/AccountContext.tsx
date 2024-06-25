@@ -28,6 +28,7 @@ const ambireLoginSDK = new AmbireLoginSDK({
 
 export const BACKEND_BASE_URL = process.env.REACT_APP_BACKEND_BASE_URL
 export const VALIDATOR_BASE_URL = process.env.REACT_APP_VALIDATOR_BASE_URL
+const UNAUTHORIZED_ERR_STR = 'Unauthorized!'
 
 console.log({ BACKEND_BASE_URL })
 const processResponse = (res: any) => {
@@ -38,7 +39,7 @@ const processResponse = (res: any) => {
   // TODO: fix that
   return res.text().then((text: any) => {
     if (res.status === 401 || res.status === 403) {
-      console.error('unauthorized', text)
+      console.error(`${UNAUTHORIZED_ERR_STR}: `, text)
     }
 
     const err = getReqErr(res, text)
@@ -181,7 +182,7 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
   )
 
   const connectWallet = useCallback(() => {
-    // console.log({ ambireSDK })
+    console.log({ ambireSDK })
     ambireSDK.openLogin({ chainId: DEFAULT_CHAIN_ID })
   }, [ambireSDK])
 
@@ -277,9 +278,15 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
 
       return fetchService(req)
         .then(processResponse)
-        .catch((err) => showNotification('error', err.message, 'Data error'))
+        .catch((err) => {
+          // TODO: better check
+          if (err && err.message && err.message.includes(UNAUTHORIZED_ERR_STR)) {
+            resetAdexAccount()
+          }
+          showNotification('error', err.message, 'Data error')
+        })
     },
-    [adexAccount.accessToken, showNotification, updateAccessToken]
+    [adexAccount.accessToken, resetAdexAccount, showNotification, updateAccessToken]
   )
 
   const handleRegistrationOrLoginSuccess = useCallback(
