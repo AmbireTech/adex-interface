@@ -1,6 +1,6 @@
 import { Modal } from '@mantine/core'
 import { AdUnit } from 'adex-common'
-import MediaBanner from 'components/common/MediaBanner'
+import Media from 'components/common/Media'
 
 const CreativePreviewModal = ({
   media,
@@ -20,7 +20,7 @@ const CreativePreviewModal = ({
       withOverlay={false}
       size="auto"
     >
-      <MediaBanner adUnit={media} width={media.banner?.format.w} height={media.banner?.format.h} />
+      <Media adUnit={media} width={media.banner?.format.w} height={media.banner?.format.h} />
     </Modal>
   )
 }

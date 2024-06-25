@@ -4,49 +4,29 @@ import { getMediaUrlWithProvider, isVideoMedia } from 'helpers/createCampaignHel
 import { useMemo } from 'react'
 
 const IPFS_GATEWAY = process.env.REACT_APP_IPFS_GATEWAY
-const SCALE_VALUE = 4
 
 const useStyles = createStyles(
-  (
-    theme,
-    {
-      zoomOnHover,
-      width,
-      height
-    }: { zoomOnHover: boolean | undefined; width?: number | string; height?: number | string }
-  ) => ({
+  (theme, { width, height }: { width?: number | string; height?: number | string }) => ({
     container: {
       position: 'relative',
       maxWidth: width,
       maxHeight: height,
       overflow: 'hidden',
-      transition: zoomOnHover ? 'transform 0.3s ease-in-out' : 'none',
-      background: theme.colors.alternativeBackground[theme.fn.primaryShade()],
-      '&:hover': {
-        zIndex: zoomOnHover ? 9999 : 'auto',
-        transform: zoomOnHover ? `scale(${SCALE_VALUE})` : 'none',
-        border: zoomOnHover ? '0.5px solid' : 'none',
-        borderColor: zoomOnHover ? theme.colors.decorativeBorders[theme.fn.primaryShade()] : 'none',
-        borderRadius: zoomOnHover ? theme.radius.xs : 'none'
-      }
+      background: theme.colors.alternativeBackground[theme.fn.primaryShade()]
     }
   })
 )
 
-// TODO: Rename it to Media and remove on hover event
-
-const MediaBanner = ({
+const Media = ({
   adUnit,
-  zoomOnHover,
   width = 40,
   height = 40
 }: {
   adUnit: AdUnit
-  zoomOnHover?: boolean
   width?: number | string
   height?: number | string
 }) => {
-  const { classes } = useStyles({ zoomOnHover, width, height })
+  const { classes } = useStyles({ width, height })
 
   if (!adUnit.banner) {
     return null
@@ -92,4 +72,4 @@ const MediaBanner = ({
   )
 }
 
-export default MediaBanner
+export default Media

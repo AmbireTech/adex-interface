@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react'
 import { createStyles } from '@mantine/core'
 import { AdUnit } from 'adex-common/dist/types'
 import { useHover } from '@mantine/hooks'
-import MediaBanner from '../MediaBanner'
 import { CreativePreviewModal } from '../Modals'
+import Media from '../Media'
 
 const useStyles = createStyles((theme) => ({
   thumbContainer: {
@@ -30,7 +30,7 @@ const MediaThumb = ({ adUnit }: { adUnit: AdUnit }) => {
   return (
     <>
       <div ref={ref} className={classes.thumbContainer}>
-        <MediaBanner adUnit={adUnit} />
+        <Media adUnit={adUnit} />
       </div>
       <CreativePreviewModal
         media={adUnit}
