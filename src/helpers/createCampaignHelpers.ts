@@ -307,10 +307,10 @@ export function deepEqual<T>(obj1: T, obj2: T): boolean {
 
 const UTM_PARAMS = {
   utm_source: 'AdEx',
-  utm_medium: 'CPM',
-  utm_term: 'none',
-  utm_campaign: 'none',
-  utm_content: 'none'
+  utm_medium: 'CPM'
+  // utm_term: 'none',
+  // utm_campaign: 'none',
+  // utm_content: 'none'
 }
 
 export const addUrlUtmTracking = ({
@@ -334,13 +334,13 @@ export const addUrlUtmTracking = ({
     })
 
     if (campaign) {
-      params.set('utm_campaign', campaign)
+      params.set('utm_campaign', params.get('utm_campaign') || campaign)
     }
     if (content) {
-      params.set('utm_content', content)
+      params.set('utm_content', params.get('utm_content') || content)
     }
     if (term) {
-      params.set('utm_term', term)
+      params.set('utm_term', params.get('utm_term') || term)
     }
 
     url.search = params.toString()
@@ -349,6 +349,16 @@ export const addUrlUtmTracking = ({
   }
 
   return targetUrl
+}
+
+export const hasUtmCampaign = (url: string) => {
+  try {
+    const urlObj = new URL(url)
+    return urlObj.searchParams.has('utm_campaign')
+  } catch (e) {
+    console.error('Invalid URL:', e)
+    return false
+  }
 }
 
 export const capitalize = (s: string) => s && s[0].toUpperCase() + s.slice(1)

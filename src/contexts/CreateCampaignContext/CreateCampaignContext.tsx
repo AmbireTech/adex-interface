@@ -15,6 +15,7 @@ import { useAdExApi } from 'hooks/useAdexServices'
 import {
   addUrlUtmTracking,
   deepEqual,
+  hasUtmCampaign,
   isPastDateTime,
   prepareCampaignObject,
   selectBannerSizes
@@ -434,7 +435,9 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
         step: 0,
         devices: ['mobile', 'desktop'],
         paymentModel: 'cpm',
-        autoUTMChecked: false,
+        autoUTMChecked: draftCampaign.adUnits.every((adUnit) =>
+          hasUtmCampaign(adUnit.banner?.targetUrl || '')
+        ),
         asapStartingDate: false,
         startsAt:
           (draftCampaign?.activeFrom && new Date(Number(draftCampaign?.activeFrom))) || new Date(),
