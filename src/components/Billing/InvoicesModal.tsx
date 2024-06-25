@@ -101,7 +101,7 @@ export const InvoicesModal = ({ campaignId, opened, close }: PrintModalProps) =>
       invoiceData:
         campaignMappedAnalytics && campaignMappedAnalytics.length ? campaignMappedAnalytics : [],
       // TODO: Check if the value of VAT% should be greater than 0
-      vatPercentageInUSD: 22,
+      vatPercentageInUSD: 0,
       currencyName
     }
   }, [

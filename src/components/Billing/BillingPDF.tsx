@@ -51,10 +51,7 @@ const useStyles = createStyles((theme) => ({
     fontWeight: theme.other.fontWeights.bold
   },
   right: {
-    display: 'flex',
-    justifyContent: 'flex-end',
-    flexDirection: 'column',
-    alignItems: 'end'
+    textAlign: 'end'
   },
   bold: {
     fontWeight: theme.other.fontWeights.bold,
@@ -247,7 +244,7 @@ export const InvoicesPDF = ({ invoiceDetails, placement }: InvoicesPDFProps) => 
           </tbody>
         </Table>
         <Grid.Col span={12}>
-          <Grid>
+          <Grid justify="end">
             <Grid.Col span={10} className={cx(classes.right)}>
               Subtotal
             </Grid.Col>
@@ -258,7 +255,9 @@ export const InvoicesPDF = ({ invoiceDetails, placement }: InvoicesPDFProps) => 
               {`VAT ${invoiceDetails.vatPercentageInUSD} %`}
             </Grid.Col>
             <Grid.Col span={2} className={cx(classes.right, classes.borderBottom)}>
-              {calculatedVatValue.toFixed(2)}
+              {`${calculatedVatValue.toFixed(2)}${
+                invoiceDetails.vatPercentageInUSD === 0 ? '*' : ''
+              }`}
             </Grid.Col>
             <Grid.Col span={10} className={cx(classes.right, classes.bold)}>
               {`Invoice total (${invoiceDetails.currencyName})`}
@@ -266,6 +265,12 @@ export const InvoicesPDF = ({ invoiceDetails, placement }: InvoicesPDFProps) => 
             <Grid.Col span={2} className={cx(classes.right, classes.bold)}>
               {invoiceTotal.toFixed(2)}
             </Grid.Col>
+            {invoiceDetails.vatPercentageInUSD === 0 && (
+              <Grid.Col span={10} className={cx(classes.right)}>
+                * Services subject to reverse charge-VAT to be accounted for by the recipient as per
+                Art.196 Council Directive 2006/112/EC
+              </Grid.Col>
+            )}
           </Grid>
         </Grid.Col>
       </>
