@@ -6,26 +6,47 @@ import { useMemo } from 'react'
 const IPFS_GATEWAY = process.env.REACT_APP_IPFS_GATEWAY
 const SCALE_VALUE = 4
 
-const useStyles = createStyles((theme, { zoomOnHover }: { zoomOnHover: boolean | undefined }) => ({
-  container: {
-    position: 'relative',
-    maxWidth: 40,
-    maxHeight: 40,
-    overflow: 'hidden',
-    transition: zoomOnHover ? 'transform 0.3s ease-in-out' : 'none',
-    background: theme.colors.alternativeBackground[theme.fn.primaryShade()],
-    '&:hover': {
-      zIndex: zoomOnHover ? 9999 : 'auto',
-      transform: zoomOnHover ? `scale(${SCALE_VALUE})` : 'none',
-      border: zoomOnHover ? '0.5px solid' : 'none',
-      borderColor: zoomOnHover ? theme.colors.decorativeBorders[theme.fn.primaryShade()] : 'none',
-      borderRadius: zoomOnHover ? theme.radius.xs : 'none'
+const useStyles = createStyles(
+  (
+    theme,
+    {
+      zoomOnHover,
+      width,
+      height
+    }: { zoomOnHover: boolean | undefined; width?: number | string; height?: number | string }
+  ) => ({
+    container: {
+      position: 'relative',
+      maxWidth: width,
+      maxHeight: height,
+      overflow: 'hidden',
+      transition: zoomOnHover ? 'transform 0.3s ease-in-out' : 'none',
+      background: theme.colors.alternativeBackground[theme.fn.primaryShade()],
+      '&:hover': {
+        zIndex: zoomOnHover ? 9999 : 'auto',
+        transform: zoomOnHover ? `scale(${SCALE_VALUE})` : 'none',
+        border: zoomOnHover ? '0.5px solid' : 'none',
+        borderColor: zoomOnHover ? theme.colors.decorativeBorders[theme.fn.primaryShade()] : 'none',
+        borderRadius: zoomOnHover ? theme.radius.xs : 'none'
+      }
     }
-  }
-}))
+  })
+)
 
-const MediaBanner = ({ adUnit, zoomOnHover }: { adUnit: AdUnit; zoomOnHover?: boolean }) => {
-  const { classes } = useStyles({ zoomOnHover })
+// TODO: Rename it to Media and remove on hover event
+
+const MediaBanner = ({
+  adUnit,
+  zoomOnHover,
+  width = 40,
+  height = 40
+}: {
+  adUnit: AdUnit
+  zoomOnHover?: boolean
+  width?: number | string
+  height?: number | string
+}) => {
+  const { classes } = useStyles({ zoomOnHover, width, height })
 
   if (!adUnit.banner) {
     return null
@@ -48,7 +69,7 @@ const MediaBanner = ({ adUnit, zoomOnHover }: { adUnit: AdUnit; zoomOnHover?: bo
   if (mime === 'text/html') {
     return (
       <div className={classes.container}>
-        <iframe id={title} title={title} src={mediaUrlWithProvider} width={40} height={40} />
+        <iframe id={title} title={title} src={mediaUrlWithProvider} width={width} height={height} />
       </div>
     )
   }
@@ -56,7 +77,7 @@ const MediaBanner = ({ adUnit, zoomOnHover }: { adUnit: AdUnit; zoomOnHover?: bo
   if (isVideoMedia(mime)) {
     return (
       <div className={classes.container}>
-        <video width="40" height="40" autoPlay loop>
+        <video width={width} height={height} autoPlay loop>
           <source src={mediaUrlWithProvider} type="video/mp4" />
           <track src="captions_en.vtt" kind="captions" label="english_captions" />
         </video>
@@ -66,7 +87,7 @@ const MediaBanner = ({ adUnit, zoomOnHover }: { adUnit: AdUnit; zoomOnHover?: bo
 
   return (
     <div className={classes.container}>
-      <Image src={mediaUrlWithProvider} alt={title} height={40} width={40} />
+      <Image src={mediaUrlWithProvider} alt={title} width={width} height={height} />
     </div>
   )
 }

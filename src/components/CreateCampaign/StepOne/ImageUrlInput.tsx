@@ -1,7 +1,7 @@
 import { ActionIcon, Flex, Input, Text, createStyles, getStylesRef } from '@mantine/core'
 import CustomBadge from 'components/common/CustomBadge'
 import InfoAlertMessage from 'components/common/InfoAlertMessage'
-import MediaBanner from 'components/common/MediaBanner'
+import MediaThumb from 'components/common/MediaThumb'
 import { isValidHttpUrl } from 'helpers/validators'
 import { useCallback, useState } from 'react'
 import DeleteIcon from 'resources/icons/Delete'
@@ -107,7 +107,7 @@ const ImageUrlInput = ({
         {...rest}
       >
         <div className={classes.mediaWrapper}>
-          <MediaBanner adUnit={image} zoomOnHover />
+          <MediaThumb adUnit={image} />
         </div>
         <CustomBadge
           color={error || toRemove ? 'warning' : 'brand'}
