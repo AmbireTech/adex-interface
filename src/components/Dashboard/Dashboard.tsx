@@ -34,15 +34,18 @@ const campaignHeaders = [
 ]
 
 const statusOrder = {
-  draft: 0,
-  active: 1,
-  paused: 2,
-  stopped: 3,
-  completed: 4
+  inReview: 0,
+  draft: 1,
+  active: 2,
+  paused: 3,
+  stopped: 4,
+  completed: 5
 }
 
 const getStatusOrder = (status: CampaignStatus) => {
   switch (status) {
+    case CampaignStatus.inReview:
+      return statusOrder.inReview
     case CampaignStatus.draft:
       return statusOrder.draft
     case CampaignStatus.active:
@@ -60,7 +63,7 @@ const getStatusOrder = (status: CampaignStatus) => {
 
 const Dashboard = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
   const navigate = useNavigate()
-  const { campaignsData, initialDataLoading } = useCampaignsData()
+  const { campaignsData, initialDataLoading, updateAllCampaignsData } = useCampaignsData()
   const [opened, { open, close }] = useDisclosure(false)
   const [selectedItem, setSelectedItem] = useState<CampaignData | null>(null)
   const { updateCampaignFromDraft } = useCreateCampaignContext()
@@ -179,6 +182,9 @@ const Dashboard = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
 
   const handleEdit = useCallback(
     (item: Campaign) => {
+      if (isAdminPanel) {
+        return
+      }
       const selectedCampaign = filteredCampaignData.find(
         (campaign) => campaign.campaignId === item.id
       )?.campaign
@@ -190,7 +196,7 @@ const Dashboard = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
         showNotification('error', 'Editing draft campaign failed', 'Editing draft campaign failed')
       }
     },
-    [filteredCampaignData, updateCampaignFromDraft, navigate, showNotification]
+    [isAdminPanel, filteredCampaignData, updateCampaignFromDraft, navigate, showNotification]
   )
 
   // const handleDuplicate = useCallback((item: Campaign) => {
@@ -219,6 +225,10 @@ const Dashboard = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
       navigate('/dashboard/get-started', { replace: true })
     }
   }, [filteredCampaignData, initialDataLoading, navigate])
+
+  useEffect(() => {
+    updateAllCampaignsData(true)
+  }, [updateAllCampaignsData])
 
   return (
     <Container fluid>

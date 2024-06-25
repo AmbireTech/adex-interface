@@ -1,7 +1,7 @@
 import { Flex, MediaQuery, TextInput, Text } from '@mantine/core'
 import InfoAlertMessage from 'components/common/InfoAlertMessage'
 import { parseBigNumTokenAmountToDecimal } from 'helpers/balances'
-import { MIN_CAMPAIGN_BUDGET_VALUE } from 'helpers/validators'
+import { MIN_CAMPAIGN_BUDGET_VALUE, MIN_CAMPAIGN_BUDGET_VALUE_ADMIN } from 'helpers/validators'
 import useAccount from 'hooks/useAccount'
 import { ChangeEvent, FocusEventHandler, useCallback, useEffect, useMemo, useState } from 'react'
 
@@ -10,9 +10,16 @@ type CampaignBudgetProps = {
   onChange: (event: ChangeEvent<HTMLInputElement>) => void
   onFocus: FocusEventHandler<HTMLInputElement>
   error: string
+  isAdmin: boolean
 }
 
-const CampaignBudget = ({ defaultValue, onChange, onFocus, error }: CampaignBudgetProps) => {
+const CampaignBudget = ({
+  defaultValue,
+  onChange,
+  onFocus,
+  error,
+  isAdmin
+}: CampaignBudgetProps) => {
   const [err, setErr] = useState(error)
   const [value, setValue] = useState('')
   const {
@@ -39,13 +46,14 @@ const CampaignBudget = ({ defaultValue, onChange, onFocus, error }: CampaignBudg
 
   useEffect(() => {
     let currentError
-    if (value !== '' && Number(value) < MIN_CAMPAIGN_BUDGET_VALUE) {
-      currentError = `Campaign budget can not be lower than ${MIN_CAMPAIGN_BUDGET_VALUE}`
+    const minBudget = isAdmin ? MIN_CAMPAIGN_BUDGET_VALUE_ADMIN : MIN_CAMPAIGN_BUDGET_VALUE
+    if (value !== '' && Number(value) < minBudget) {
+      currentError = `Campaign budget can not be lower than ${minBudget}`
     } else {
       currentError = ''
     }
     setErr(currentError)
-  }, [value, defaultValue])
+  }, [value, defaultValue, isAdmin])
 
   return (
     <Flex justify="space-between" align="flex-start">

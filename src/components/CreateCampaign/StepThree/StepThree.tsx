@@ -56,7 +56,8 @@ const StepThree = () => {
   } = useCreateCampaignContext()
 
   const {
-    adexAccount: { availableBalance, balanceToken }
+    adexAccount: { availableBalance, balanceToken },
+    isAdmin
   } = useAccount()
 
   const [errors, setErrors] = useState<FormErrorsProps>({
@@ -118,11 +119,12 @@ const StepThree = () => {
 
     const currencyValidation = validateCurrency(currency)
     if (!currencyValidation.isValid) newErrors.currency = currencyValidation.errMsg
-
+    console.log({ isAdmin })
     const campaignBudgetValidation = validateCampaignBudget(
       campaignBudget,
       availableBalance,
-      balanceToken.decimals
+      balanceToken.decimals,
+      isAdmin
     )
     if (!campaignBudgetValidation.isValid)
       newErrors.campaignBudget = campaignBudgetValidation.errMsg
@@ -143,13 +145,14 @@ const StepThree = () => {
     return Object.values(newErrors).every((error) => !error)
   }, [
     paymentModel,
-    campaignBudget,
     currency,
+    campaignBudget,
+    availableBalance,
+    balanceToken.decimals,
+    isAdmin,
     min,
     max,
-    title,
-    availableBalance,
-    balanceToken.decimals
+    title
   ])
 
   const submitForm = useCallback(() => {
@@ -218,6 +221,7 @@ const StepThree = () => {
             onChange={handleChange}
             onFocus={() => handleOnFocus('campaignBudget')}
             error={errors.campaignBudget}
+            isAdmin={isAdmin}
           />
         </Grid.Col>
         <Grid.Col mb="md">

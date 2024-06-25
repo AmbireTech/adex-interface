@@ -1,4 +1,4 @@
-name: Release (prod 🍩🐼)
+name: Release (prod 🍩🐼🦄🕯️)
 on:
   push:
     branches:
@@ -22,9 +22,8 @@ jobs:
       - name: Build 🛠️
         env:
           REACT_APP_NODE_ENV: production
-          REACT_APP_BASE_URL: https://vhoda.adex.network
           REACT_APP_IPFS_GATEWAY: https://ipfs.adex.network/ipfs/
-          REACT_APP_DAPP_NAME: "AdEx Platform"
+          REACT_APP_DAPP_NAME: "AdEx Web Interface"
           REACT_APP_DAPP_ICON_PATH: https://raw.githubusercontent.com/AmbireTech/ambire-brand/main/adex-logos/Ambire_AdEx_Symbol_color.svg
           REACT_APP_BACKEND_BASE_URL: https://vhoda.adex.network
           REACT_APP_VALIDATOR_BASE_URL: https://scratchy.adex.network:8443
@@ -33,10 +32,12 @@ jobs:
       # - name: GH pages 404
       #   run: cp ./build/index.html ./build/404.html
 
-      - name: Release (prod 🍩🐼)
+      - name: Release (prod 🍩🐼🦄)
         if: github.ref == 'refs/heads/main'
         uses: JamesIves/github-pages-deploy-action@v4
         with:
+          token: ${{ secrets.ACCESS_TOKEN }}
+          repository-name: AmbireTech/adex-interface-prod-gh-pages
           branch: gh-pages
           folder: ./build
-          cname: dsp.adex.network
+          cname: web.adex.network

@@ -3,7 +3,6 @@ import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import { useEffect } from 'react'
 import { modals } from '@mantine/modals'
 import useCustomNotifications from 'hooks/useCustomNotifications'
-import { useCampaignsData } from 'hooks/useCampaignsData'
 import { deepEqual } from 'helpers/createCampaignHelpers'
 import AttentionIcon from 'resources/icons/Attention'
 import CustomStepper from './CampaignStepper'
@@ -94,7 +93,6 @@ const CreateCampaign = () => {
     saveToDraftCampaign,
     defaultValue
   } = useCreateCampaignContext()
-  const { updateAllCampaignsData } = useCampaignsData()
   const { showNotification } = useCustomNotifications()
 
   useEffect(() => {
@@ -134,7 +132,8 @@ const CreateCampaign = () => {
                           const res = await saveToDraftCampaign(prev)
 
                           if (res && res.success) {
-                            await updateAllCampaignsData()
+                            // TODO: move this func out of the button @boklik 🤷🏼‍♂️
+                            showNotification('error', 'Draft saved')
                           } else {
                             showNotification(
                               'warning',
