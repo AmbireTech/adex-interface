@@ -174,7 +174,7 @@ const StepThree = () => {
           <CampaignPeriod />
         </Grid.Col>
         <Grid.Col>
-          <Alert icon={<InfoIcon />} color="attention" variant="outline">
+          <Alert icon={<InfoIcon style={{ marginTop: 0 }} />} color="attention" variant="outline">
             <Text>
               The campaigns go through a approval process and if you select &quot;As soon as
               possible&quot; the campaign will be launched once it is approved.

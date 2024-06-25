@@ -6,26 +6,26 @@ import { useMemo } from 'react'
 const IPFS_GATEWAY = process.env.REACT_APP_IPFS_GATEWAY
 const SCALE_VALUE = 4
 
-const useStyles = createStyles((theme) => ({
+const useStyles = createStyles((theme, { zoomOnHover }: { zoomOnHover: boolean | undefined }) => ({
   container: {
     position: 'relative',
     maxWidth: 40,
     maxHeight: 40,
     overflow: 'hidden',
-    transition: 'transform 0.3s ease-in-out',
+    transition: zoomOnHover ? 'transform 0.3s ease-in-out' : 'none',
     background: theme.colors.alternativeBackground[theme.fn.primaryShade()],
     '&:hover': {
-      zIndex: 9999,
-      transform: `scale(${SCALE_VALUE})`,
-      border: '0.5px solid',
-      borderColor: theme.colors.decorativeBorders[theme.fn.primaryShade()],
-      borderRadius: theme.radius.xs
+      zIndex: zoomOnHover ? 9999 : 'auto',
+      transform: zoomOnHover ? `scale(${SCALE_VALUE})` : 'none',
+      border: zoomOnHover ? '0.5px solid' : 'none',
+      borderColor: zoomOnHover ? theme.colors.decorativeBorders[theme.fn.primaryShade()] : 'none',
+      borderRadius: zoomOnHover ? theme.radius.xs : 'none'
     }
   }
 }))
 
-const MediaBanner = ({ adUnit }: { adUnit: AdUnit }) => {
-  const { classes } = useStyles()
+const MediaBanner = ({ adUnit, zoomOnHover }: { adUnit: AdUnit; zoomOnHover?: boolean }) => {
+  const { classes } = useStyles({ zoomOnHover })
 
   if (!adUnit.banner) {
     return null

@@ -1,10 +1,11 @@
-import { Grid, createStyles, Text } from '@mantine/core'
+import { Grid, createStyles, Text, Flex, Button } from '@mantine/core'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import { useEffect } from 'react'
 import { modals } from '@mantine/modals'
 import useCustomNotifications from 'hooks/useCustomNotifications'
 import { useCampaignsData } from 'hooks/useCampaignsData'
 import { deepEqual } from 'helpers/createCampaignHelpers'
+import AttentionIcon from 'resources/icons/Attention'
 import CustomStepper from './CampaignStepper'
 import CampaignSummary from './CampaignSummary'
 import StepOne from './StepOne/StepOne'
@@ -39,6 +40,33 @@ const useStyles = createStyles((theme) => {
       height: '99%',
       border: '1px dashed',
       borderRadius: theme.radius.sm
+    },
+    body: {
+      background:
+        theme.colors.attention[theme.fn.primaryShade()] +
+        theme.other.shades.hexColorSuffix.lightest,
+      padding: theme.spacing.xl
+    },
+    confirmModalContent: {
+      background:
+        theme.colors.attention[theme.fn.primaryShade()] +
+        theme.other.shades.hexColorSuffix.lightest,
+      padding: theme.spacing.xl
+    },
+    iconWrapper: {
+      width: 50,
+      height: 50,
+      background: `${theme.colors.attention[theme.fn.primaryShade()]}1A`,
+      borderRadius: '50%',
+      padding: theme.spacing.sm
+    },
+    attentionIcon: {
+      width: 25,
+      height: 25,
+      color: theme.colors.attention[theme.fn.primaryShade()]
+    },
+    modalBody: {
+      padding: 0
     }
   }
 })
@@ -75,28 +103,59 @@ const CreateCampaign = () => {
       if (process.env.NODE_ENV !== 'development') {
         setCampaign((prev) => {
           if (!deepEqual(prev, defaultValue)) {
-            modals.openConfirmModal({
-              title: 'You may have unsaved changes',
+            modals.open({
+              withCloseButton: false,
+              closeOnClickOutside: false,
               children: (
-                <Text size="sm">
-                  You may have unsaved changes. Do you want to save them as a draft?
-                </Text>
-              ),
-              labels: { confirm: 'Yes', cancel: 'No' },
-              onCancel: () => console.log('No'),
-              onConfirm: async () => {
-                try {
-                  const res = await saveToDraftCampaign(prev)
+                <>
+                  <Flex justify="center" className={classes.confirmModalContent}>
+                    <div className={classes.iconWrapper}>
+                      <AttentionIcon className={classes.attentionIcon} />
+                    </div>
+                    <Text w="100%">
+                      You may have unsaved changes. Do you want to save them as a draft?
+                    </Text>
+                  </Flex>
+                  <Flex justify="space-between" p="xl">
+                    <Button
+                      size="lg"
+                      variant="outline"
+                      onClick={() => {
+                        modals.closeAll()
+                        console.log('No')
+                      }}
+                    >
+                      No
+                    </Button>
+                    <Button
+                      size="lg"
+                      onClick={async () => {
+                        try {
+                          const res = await saveToDraftCampaign(prev)
 
-                  if (res && res.success) {
-                    await updateAllCampaignsData()
-                  } else {
-                    showNotification('warning', 'invalid campaign data response', 'Data error')
-                  }
-                } catch (err) {
-                  console.error(err)
-                  showNotification('error', 'Creating campaign failed', 'Data error')
-                }
+                          if (res && res.success) {
+                            await updateAllCampaignsData()
+                          } else {
+                            showNotification(
+                              'warning',
+                              'invalid campaign data response',
+                              'Data error'
+                            )
+                          }
+                        } catch (err) {
+                          console.error(err)
+                          showNotification('error', 'Creating campaign failed', 'Data error')
+                        }
+                        modals.closeAll()
+                      }}
+                    >
+                      Yes
+                    </Button>
+                  </Flex>
+                </>
+              ),
+              classNames: {
+                body: classes.modalBody
               }
             })
           }

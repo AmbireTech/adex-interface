@@ -15,6 +15,7 @@ import { useAdExApi } from 'hooks/useAdexServices'
 import {
   addUrlUtmTracking,
   deepEqual,
+  hasUtmCampaign,
   isPastDateTime,
   prepareCampaignObject,
   selectBannerSizes
@@ -290,17 +291,28 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
 
   const addUTMToTargetURLS = useCallback(() => {
     setCampaign((prev) => {
-      const { adUnits, autoUTMChecked, title } = { ...prev }
+      const {
+        adUnits,
+        autoUTMChecked,
+        title,
+        targetingInput: {
+          inputs: {
+            placements: {
+              in: [placement]
+            }
+          }
+        }
+      } = { ...prev }
 
       if (autoUTMChecked) {
-        adUnits.forEach((element, index) => {
+        adUnits.forEach((element) => {
           const elCopy = { ...element }
 
           elCopy.banner!.targetUrl = addUrlUtmTracking({
             targetUrl: elCopy.banner!.targetUrl,
             campaign: title,
-            content: `${index + 1}_${elCopy.type}`
-            // src: 'adex_PUBHOSTNAME'
+            content: `${elCopy.banner!.format.w}x${elCopy.banner!.format.h}`,
+            term: placement === 'app' ? 'App' : 'Website'
           })
           return elCopy
         })
@@ -423,7 +435,9 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
         step: 0,
         devices: ['mobile', 'desktop'],
         paymentModel: 'cpm',
-        autoUTMChecked: false,
+        autoUTMChecked: draftCampaign.adUnits.every((adUnit) =>
+          hasUtmCampaign(adUnit.banner?.targetUrl || '')
+        ),
         asapStartingDate: false,
         startsAt:
           (draftCampaign?.activeFrom && new Date(Number(draftCampaign?.activeFrom))) || new Date(),
