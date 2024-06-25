@@ -7,7 +7,6 @@ import LeftArrowIcon from 'resources/icons/LeftArrow'
 import useCreateCampaignData from 'hooks/useCreateCampaignData/useCreateCampaignData'
 import CampaignDetailsRow from 'components/common/CampainDetailsRow'
 import { LaunchCampaignModal, SuccessModal } from 'components/common/Modals'
-import { useCampaignsData } from 'hooks/useCampaignsData'
 import useCustomNotifications from 'hooks/useCustomNotifications'
 import useAccount from 'hooks/useAccount'
 import { isValidHttpUrl } from 'helpers/validators'
@@ -52,7 +51,6 @@ const CampaignSummary = () => {
     adFormats,
     campaignBudgetFormatted
   } = useCreateCampaignData()
-  const { updateAllCampaignsData } = useCampaignsData()
   const { showNotification } = useCustomNotifications()
 
   const [isNextBtnDisabled, setIsNextBtnDisabled] = useState(false)
@@ -73,7 +71,6 @@ const CampaignSummary = () => {
       const res = await publishCampaign()
 
       if (res && res.success) {
-        await updateAllCampaignsData(true)
         await updateBalance()
         open()
         resetCampaign()
@@ -84,14 +81,7 @@ const CampaignSummary = () => {
       console.error(err)
       showNotification('error', 'Creating campaign failed', 'Data error')
     }
-  }, [
-    publishCampaign,
-    resetCampaign,
-    open,
-    updateAllCampaignsData,
-    showNotification,
-    updateBalance
-  ])
+  }, [publishCampaign, resetCampaign, open, showNotification, updateBalance])
 
   const throttledLaunchCampaign = useMemo(
     () => throttle(launchCampaign, 1069, { leading: true }),
@@ -131,7 +121,6 @@ const CampaignSummary = () => {
       const res = await saveToDraftCampaign()
 
       if (res && res.success) {
-        await updateAllCampaignsData(true)
         resetCampaign()
         navigate('/dashboard/')
       } else {
@@ -141,7 +130,7 @@ const CampaignSummary = () => {
       console.error(err)
       showNotification('error', 'Creating campaign failed', 'Data error')
     }
-  }, [resetCampaign, saveToDraftCampaign, showNotification, updateAllCampaignsData, navigate])
+  }, [resetCampaign, saveToDraftCampaign, showNotification, navigate])
 
   const handleOnModalClose = useCallback(() => {
     navigate('/dashboard/')

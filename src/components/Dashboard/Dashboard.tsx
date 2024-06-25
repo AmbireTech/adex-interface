@@ -63,7 +63,7 @@ const getStatusOrder = (status: CampaignStatus) => {
 
 const Dashboard = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
   const navigate = useNavigate()
-  const { campaignsData, initialDataLoading } = useCampaignsData()
+  const { campaignsData, initialDataLoading, updateAllCampaignsData } = useCampaignsData()
   const [opened, { open, close }] = useDisclosure(false)
   const [selectedItem, setSelectedItem] = useState<CampaignData | null>(null)
   const { updateCampaignFromDraft } = useCreateCampaignContext()
@@ -225,6 +225,10 @@ const Dashboard = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
       navigate('/dashboard/get-started', { replace: true })
     }
   }, [filteredCampaignData, initialDataLoading, navigate])
+
+  useEffect(() => {
+    updateAllCampaignsData(true)
+  }, [updateAllCampaignsData])
 
   return (
     <Container fluid>
