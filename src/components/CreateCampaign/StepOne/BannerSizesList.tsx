@@ -1,44 +1,72 @@
-import { Grid } from '@mantine/core'
-import BannerSizeMock from 'components/common/BannerSizeMock'
-import { checkBannerSizes, checkSelectedDevices } from 'helpers/createCampaignHelpers'
+import { Alert, Flex, Text, createStyles } from '@mantine/core'
+import { checkBannerSizes } from 'helpers/createCampaignHelpers'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import { useMemo } from 'react'
 import { AdUnit } from 'adex-common/dist/types'
+import { SupplyStatsDetails } from 'types'
+import InfoIcon from 'resources/icons/Info'
+import CustomAnchor from 'components/common/customAnchor'
+
+const SIZES_COUNT_TO_SHOW = 6
+
+const useStyles = createStyles((theme) => ({
+  brandTextColor: {
+    color: theme.colors.brand[theme.fn.primaryShade()]
+  }
+}))
+
+const getPopularBannerSizes = (bannerSizes: SupplyStatsDetails[] | SupplyStatsDetails[][]) => {
+  let result: SupplyStatsDetails[][] | SupplyStatsDetails[] = []
+
+  if (bannerSizes.length && Array.isArray(bannerSizes[0])) {
+    result = (bannerSizes as SupplyStatsDetails[][])
+      .map((item: SupplyStatsDetails[]) => item.slice(0, SIZES_COUNT_TO_SHOW))
+      .flat()
+  } else {
+    result = (bannerSizes as SupplyStatsDetails[]).slice(0, SIZES_COUNT_TO_SHOW)
+  }
+
+  return result.sort((a, b) => b.count - a.count)
+}
 
 const BannerSizesList = ({ adUnits }: { adUnits: AdUnit[] }) => {
-  const {
-    campaign: { devices }
-  } = useCreateCampaignContext()
-  const selectedDevices = useMemo(() => checkSelectedDevices(devices), [devices])
-  const updatedBannerSizes = useMemo(() => checkBannerSizes(adUnits), [adUnits])
+  const { selectedBannerSizes } = useCreateCampaignContext()
+  const { classes } = useStyles()
 
-  const mobileSizes = useMemo(
-    () => updatedBannerSizes.filter((item) => item.device === 'mobile'),
-    [updatedBannerSizes]
-  )
-  const desktopSizes = useMemo(
-    () => updatedBannerSizes.filter((item) => item.device === 'desktop'),
-    [updatedBannerSizes]
+  const popularBannerSizes = useMemo(
+    () =>
+      selectedBannerSizes && selectedBannerSizes.length
+        ? getPopularBannerSizes(selectedBannerSizes)
+        : [],
+    [selectedBannerSizes]
   )
 
-  const selectedBannerSizes = useMemo(() => {
-    if (selectedDevices === 'mobile') return mobileSizes
-    if (selectedDevices === 'desktop') return desktopSizes
-    if (selectedDevices === 'both') return updatedBannerSizes
-    return null
-  }, [selectedDevices, mobileSizes, desktopSizes, updatedBannerSizes])
-
-  const generateBanners = (sizes: any[]) => (
-    <Grid>
-      {sizes.map((item) => (
-        <Grid.Col span="content" key={`${item.bannerSizes.w}x${item.bannerSizes.h}`}>
-          <BannerSizeMock variant={item} />
-        </Grid.Col>
-      ))}
-    </Grid>
+  const updatedBannerSizes = useMemo(
+    () =>
+      popularBannerSizes && popularBannerSizes.length
+        ? checkBannerSizes(popularBannerSizes, adUnits)
+        : [],
+    [adUnits, popularBannerSizes]
   )
 
-  return selectedBannerSizes ? generateBanners(selectedBannerSizes) : null
+  return updatedBannerSizes ? (
+    <Alert icon={<InfoIcon style={{ marginTop: 0 }} />} color="attention" variant="outline">
+      <Flex justify="space-between">
+        <Text>
+          Recommended banner sizes: {updatedBannerSizes.map((size) => size.value).join(', ')}
+        </Text>
+        <CustomAnchor
+          external
+          underline
+          weight="bold"
+          href="https://help.adex.network/hc/en-us/articles/14499102255772-What-are-the-supported-ad-formats"
+          className={classes.brandTextColor}
+        >
+          see all
+        </CustomAnchor>
+      </Flex>
+    </Alert>
+  ) : null
 }
 
 export default BannerSizesList

@@ -28,7 +28,7 @@ const StepOne = () => {
           <SelectDevice />
         </Grid.Col>
       )}
-      {devices.length > 0 && (
+      {(placement === 'app' || devices.length > 0) && (
         <Grid.Col>
           <UploadCreative />
         </Grid.Col>

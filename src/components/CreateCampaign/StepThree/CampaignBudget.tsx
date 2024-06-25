@@ -1,12 +1,27 @@
-import { Flex, MediaQuery, TextInput } from '@mantine/core'
+import { Flex, MediaQuery, TextInput, Text } from '@mantine/core'
 import InfoAlertMessage from 'components/common/InfoAlertMessage'
-import { useCreateCampaignFormContext } from 'contexts/CreateCampaignFormContext'
 import { parseBigNumTokenAmountToDecimal } from 'helpers/balances'
+import { MIN_CAMPAIGN_BUDGET_VALUE, MIN_CAMPAIGN_BUDGET_VALUE_ADMIN } from 'helpers/validators'
 import useAccount from 'hooks/useAccount'
-import { useMemo } from 'react'
+import { ChangeEvent, FocusEventHandler, useCallback, useEffect, useMemo, useState } from 'react'
 
-const CampaignBudget = () => {
-  const form = useCreateCampaignFormContext()
+type CampaignBudgetProps = {
+  defaultValue: number
+  onChange: (event: ChangeEvent<HTMLInputElement>) => void
+  onFocus: FocusEventHandler<HTMLInputElement>
+  error: string
+  isAdmin: boolean
+}
+
+const CampaignBudget = ({
+  defaultValue,
+  onChange,
+  onFocus,
+  error,
+  isAdmin
+}: CampaignBudgetProps) => {
+  const [err, setErr] = useState(error)
+  const [value, setValue] = useState('')
   const {
     adexAccount: { availableBalance, balanceToken }
   } = useAccount()
@@ -15,11 +30,31 @@ const CampaignBudget = () => {
     () => Number(parseBigNumTokenAmountToDecimal(availableBalance, balanceToken.decimals)),
     [availableBalance, balanceToken.decimals]
   )
-  const budgetInput = useMemo(() => form.getInputProps('campaignBudget').value, [form])
-  const budgetIsGreaterThanBalance = useMemo(
-    () => formattedToken < Number(budgetInput),
-    [formattedToken, budgetInput]
+
+  const handleOnChange = useCallback(
+    (event: ChangeEvent<HTMLInputElement>) => {
+      setValue(event.target.value)
+      onChange(event)
+    },
+    [onChange]
   )
+
+  const budgetIsGreaterThanBalance = useMemo(
+    () => formattedToken < Number(value),
+    [formattedToken, value]
+  )
+
+  useEffect(() => {
+    let currentError
+    const minBudget = isAdmin ? MIN_CAMPAIGN_BUDGET_VALUE_ADMIN : MIN_CAMPAIGN_BUDGET_VALUE
+    if (value !== '' && Number(value) < minBudget) {
+      currentError = `Campaign budget can not be lower than ${minBudget}`
+    } else {
+      currentError = ''
+    }
+    setErr(currentError)
+  }, [value, defaultValue, isAdmin])
+
   return (
     <Flex justify="space-between" align="flex-start">
       <MediaQuery
@@ -35,7 +70,11 @@ const CampaignBudget = () => {
           // TODO: Should get/calculate estimated fee
           // description={`Estimated fee: 0.15 ${balanceToken.name}`}
           inputWrapperOrder={['input', 'description', 'error']}
-          {...form.getInputProps('campaignBudget')}
+          defaultValue={defaultValue}
+          name="campaignBudget"
+          onChange={(event) => handleOnChange(event)}
+          onFocus={onFocus}
+          error={err && <Text size="sm">{err}</Text>}
         />
       </MediaQuery>
       {budgetIsGreaterThanBalance && (

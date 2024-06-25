@@ -1,22 +1,18 @@
+import { useMemo } from 'react'
 import CustomTable from 'components/common/CustomTable'
-import { Flex, Image, createStyles } from '@mantine/core'
+import { Flex, createStyles, Anchor } from '@mantine/core'
 import UrlIcon from 'resources/icons/Url'
-import { CreativePreviewModal } from 'components/common/Modals'
-import { useCallback, useState } from 'react'
-import { useDisclosure } from '@mantine/hooks'
 import { BaseAnalyticsData } from 'types'
 import { formatCurrency } from 'helpers'
 import { AdUnit } from 'adex-common'
 import { getMediaUrlWithProvider } from 'helpers/createCampaignHelpers'
+import MediaThumb from 'components/common/MediaThumb'
 
 const IPFS_GATEWAY = process.env.REACT_APP_IPFS_GATEWAY
 
 const useStyles = createStyles((theme) => ({
   icon: {
     color: theme.colors.brand[theme.fn.primaryShade()]
-  },
-  image: {
-    cursor: 'pointer'
   }
 }))
 
@@ -29,55 +25,44 @@ const Creatives = ({
   units: AdUnit[] | undefined
   currencyName: string
 }) => {
-  const [opened, { open, close }] = useDisclosure(false)
   const { classes } = useStyles()
 
-  const headings = ['Media', 'Size', 'Impressions', 'Clicks', 'CTR%', 'Spent', 'Link']
-  const [selectedMedia, setSelectedMedia] = useState('')
-  const handleMediaClick = useCallback(
-    (media: string) => {
-      setSelectedMedia(media)
-      open()
-    },
-    [open]
+  const headings = useMemo(
+    () => ['Media', 'Size', 'Impressions', 'Clicks', 'CTR %', 'Spent', 'Target'],
+    []
   )
 
-  if (!creatives?.length || !units?.length) {
+  const elements = useMemo(() => {
+    return creatives?.map((item) => {
+      const unitForId = units?.find((x) => x.id === item.segment)
+      const media = getMediaUrlWithProvider(unitForId?.banner?.mediaUrl, IPFS_GATEWAY) || ''
+
+      return {
+        media: (
+          <Flex align="center">
+            <Anchor href={media} target="_blank" mr="sm">
+              <UrlIcon size="25px" className={classes.icon} />
+            </Anchor>
+            {unitForId && <MediaThumb adUnit={unitForId} />}
+          </Flex>
+        ),
+        size: unitForId?.banner
+          ? `${unitForId?.banner?.format.w}x${unitForId?.banner?.format.h}`
+          : '',
+        impressions: formatCurrency(item.impressions, 0),
+        clicks: formatCurrency(item.clicks, 0),
+        ctr: `${item.ctr}`,
+        paid: `${item.paid.toFixed(2)} ${currencyName}`,
+        link: unitForId?.banner?.targetUrl
+      }
+    })
+  }, [classes.icon, creatives, currencyName, units])
+
+  if (!elements?.length) {
     return <div>No creatives found</div>
   }
 
-  const elements = creatives?.map((item) => {
-    const unitForId = units.find((x) => x.id === item.segment)
-    const media = unitForId?.banner?.mediaUrl || ''
-
-    return {
-      media: (
-        <Flex align="center">
-          <UrlIcon size="25px" className={classes.icon} />
-          <Image
-            ml="sm"
-            src={getMediaUrlWithProvider(media, IPFS_GATEWAY)}
-            mah="100px"
-            maw="50px"
-            onClick={() => handleMediaClick(media || '')}
-            className={classes.image}
-          />
-        </Flex>
-      ),
-      size: `${unitForId?.banner?.format.w}x${unitForId?.banner?.format.w}`,
-      impressions: formatCurrency(item.impressions, 0),
-      clicks: formatCurrency(item.clicks, 0),
-      ctr: `${item.ctr} %`,
-      paid: `${item.paid} ${currencyName}`,
-      link: unitForId?.banner?.targetUrl
-    }
-  })
-  return (
-    <>
-      <CustomTable background headings={headings} elements={elements} />
-      <CreativePreviewModal media={selectedMedia} opened={opened} close={close} />
-    </>
-  )
+  return <CustomTable background headings={headings} elements={elements} />
 }
 
 export default Creatives

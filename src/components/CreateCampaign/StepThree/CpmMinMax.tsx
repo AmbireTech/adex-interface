@@ -1,9 +1,27 @@
 import { Flex, TextInput, Text, MediaQuery } from '@mantine/core'
-import { useCreateCampaignFormContext } from 'contexts/CreateCampaignFormContext'
+import { ChangeEvent, FocusEventHandler } from 'react'
 
-const CpmMinMax = () => {
-  const form = useCreateCampaignFormContext()
+type CpmMinMaxtProps = {
+  errorMin: string
+  errorMax: string
+  defaultValueMin: number
+  defaultValueMax: number
+  onChangeMin: (event: ChangeEvent<HTMLInputElement>) => void
+  onChangeMax: (event: ChangeEvent<HTMLInputElement>) => void
+  onFocusMin: FocusEventHandler<HTMLInputElement>
+  onFocusMax: FocusEventHandler<HTMLInputElement>
+}
 
+const CpmMinMax = ({
+  errorMin,
+  errorMax,
+  defaultValueMin,
+  defaultValueMax,
+  onChangeMin,
+  onChangeMax,
+  onFocusMin,
+  onFocusMax
+}: CpmMinMaxtProps) => {
   return (
     <MediaQuery
       smallerThan="lg"
@@ -25,7 +43,11 @@ const CpmMinMax = () => {
             </Text>
           }
           rightSectionWidth="auto"
-          {...form.getInputProps('cpmPricingBounds.min')}
+          name="cpmPricingBoundsMin"
+          defaultValue={defaultValueMin}
+          onChange={(event) => onChangeMin(event)}
+          onFocus={onFocusMin}
+          error={errorMin && <Text size="sm">{errorMin}</Text>}
         />
         <TextInput
           size="md"
@@ -40,7 +62,11 @@ const CpmMinMax = () => {
             </Text>
           }
           rightSectionWidth="md"
-          {...form.getInputProps('cpmPricingBounds.max')}
+          name="cpmPricingBoundsMax"
+          defaultValue={defaultValueMax}
+          onChange={(event) => onChangeMax(event)}
+          onFocus={onFocusMax}
+          error={errorMax && <Text size="sm">{errorMax}</Text>}
         />
       </Flex>
     </MediaQuery>

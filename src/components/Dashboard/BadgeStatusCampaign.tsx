@@ -7,12 +7,11 @@ import DraftIcon from 'resources/icons/Draft'
 import UnderReviewIcon from 'resources/icons/UnderReview'
 import StopIcon from 'resources/icons/Stop'
 import ActiveIcon from 'resources/icons/Active'
-// import PausedIcon from 'resources/icons/Paused'
+import PausedIcon from 'resources/icons/Paused'
 // import ArchivedIcon from 'resources/icons/Archived'
 
 const BadgeStatusCampaign = ({ type }: BadgeType) => {
   const getStatusLabel = useCallback((status: number): IBadgeConfig => {
-    console.log({ status })
     switch (status) {
       case CampaignStatus.created:
         return {
@@ -55,20 +54,20 @@ const BadgeStatusCampaign = ({ type }: BadgeType) => {
           text: 'Active',
           icon: <ActiveIcon size="13px" />
         }
-      // TODO: uncomment when CampaignStatus.stopped is added
-      // case CampaignStatus.stopped:
-      //   return {
-      //     color: 'stopped',
-      //     text: 'Stopped',
-      //     icon: <StopIcon size="13px" />
-      //   }
-      // TODO: uncomment when CampaignStatus.paused is added
-      // case CampaignStatus.paused:
-      //   return {
-      //     color: 'paused',
-      //     text: 'Paused',
-      //     icon: <PausedIcon size="13px" />
-      //   }
+
+      case CampaignStatus.exhausted:
+        return {
+          // TODO: check what color needs to be
+          color: 'stopped',
+          text: 'Exhausted',
+          icon: undefined
+        }
+      case CampaignStatus.paused:
+        return {
+          color: 'paused',
+          text: 'Paused',
+          icon: <PausedIcon size="13px" />
+        }
       // TODO: uncomment when CampaignStatus.archived is added
       // case CampaignStatus.archived:
       //   return {
@@ -77,19 +76,18 @@ const BadgeStatusCampaign = ({ type }: BadgeType) => {
       //     icon: <ArchivedIcon size="13px" />
       //   }
       // TODO: uncomment when CampaignStatus.rejected is added
-      // case CampaignStatus.rejected:
-      //   return {
-      //     color: 'warning',
-      //     text: 'Rejected',
-      //     icon: <UnderReviewIcon size="13px" />
-      //   }
-      // TODO: uncomment when CampaignStatus.draft is added
-      // case CampaignStatus.draft:
-      //   return {
-      //     color: 'draft',
-      //     text: 'Created',
-      //     icon: <DraftIcon size="13px" />
-      //   }
+      case CampaignStatus.rejected:
+        return {
+          color: 'warning',
+          text: 'Rejected',
+          icon: <UnderReviewIcon size="13px" />
+        }
+      case CampaignStatus.draft:
+        return {
+          color: 'draft',
+          text: 'Draft',
+          icon: <DraftIcon size="13px" />
+        }
 
       default:
         return {
@@ -101,8 +99,6 @@ const BadgeStatusCampaign = ({ type }: BadgeType) => {
   }, [])
 
   const status = useMemo(() => getStatusLabel(type), [getStatusLabel, type])
-
-  console.log({ status })
 
   return <CustomBadge color={status.color} text={status.text} icon={status.icon} />
 }

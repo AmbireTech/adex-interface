@@ -21,7 +21,7 @@ const GetStarted = () => {
   )
 
   const hasPopover = useMemo(
-    () => Boolean(IS_MANUAL_DEPOSITING) && !hasAvailableBalance,
+    () => IS_MANUAL_DEPOSITING === 'true' && !hasAvailableBalance,
     [hasAvailableBalance]
   )
   return (
@@ -37,7 +37,7 @@ const GetStarted = () => {
               height={330}
               title="Step 1"
               text="Fill in company details"
-              icon={<AddSignerIcon strokeWidth="1" size="60px" />}
+              icon={<AddSignerIcon strokeWidth="0.8px" size="60px" />}
               color="secondary"
             >
               <Button
@@ -60,7 +60,7 @@ const GetStarted = () => {
               icon={<DepositIcon size="60px" />}
               color="secondary"
             >
-              {hasPopover ? (
+              {/* {IS_MANUAL_DEPOSITING === 'true' ? (
                 <CustomPopover
                   popoverContent={
                     <Text size="sm">
@@ -73,24 +73,24 @@ const GetStarted = () => {
                     Add funds
                   </Button>
                 </CustomPopover>
-              ) : (
-                <Button
-                  w="70%"
-                  size="lg"
-                  variant="filled"
-                  color="secondary"
-                  onClick={() => navigate('/dashboard/deposit')}
-                >
-                  Add funds
-                </Button>
-              )}
+              ) : ( */}
+              <Button
+                w="70%"
+                size="lg"
+                variant="filled"
+                color="secondary"
+                onClick={() => navigate('/dashboard/deposit')}
+              >
+                Add funds
+              </Button>
+              {/* )} */}
             </CustomCard>
           </Grid.Col>
           <Grid.Col md={4} order={3} xs={12}>
             <CustomCard
               width={294}
               height={330}
-              title="Step 2"
+              title="Step 3"
               text="Create a new campaign"
               icon={<CampaignIcon size="60px" />}
               color="secondary"

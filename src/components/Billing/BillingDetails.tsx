@@ -1,8 +1,19 @@
-import { Button, Flex, Grid, TextInput } from '@mantine/core'
+import { Button, Flex, Grid, TextInput, createStyles, Text } from '@mantine/core'
 import { useForm } from '@mantine/form'
 import useAccount from 'hooks/useAccount'
 
+const useStyles = createStyles((theme) => ({
+  container: {
+    backgroundColor: theme.colors.mainBackground[theme.fn.primaryShade()],
+    borderRadius: theme.radius.sm,
+    boxShadow: theme.shadows.xs,
+    overflow: 'hidden',
+    padding: theme.spacing.lg
+  }
+}))
+
 const BillingDetails = () => {
+  const { classes } = useStyles()
   const {
     updateBillingDetails,
     adexAccount: { billingDetails }
@@ -12,10 +23,20 @@ const BillingDetails = () => {
     initialValues: billingDetails,
 
     validate: {
-      firstName: (value: string) =>
-        value.length < 2 ? 'First name must have at least 2 letters' : null,
-      lastName: (value: string) =>
-        value.length < 2 ? 'Last name must have at least 2 letters' : null,
+      firstName: (value: string) => {
+        if (value.length > 0 && value.length < 2) {
+          return 'First name must have at least 2 letters'
+        }
+
+        return null
+      },
+      lastName: (value: string) => {
+        if (value.length > 0 && value.length < 2) {
+          return 'Last name must have at least 2 letters'
+        }
+
+        return null
+      },
       companyName: (value: string) =>
         value.length < 2 ? 'Company name must have at least 2 characters' : null,
       companyNumber: (value: string) =>
@@ -30,16 +51,20 @@ const BillingDetails = () => {
   })
 
   return (
-    <form onSubmit={form.onSubmit((values) => updateBillingDetails(values))}>
+    <form
+      className={classes.container}
+      onSubmit={form.onSubmit((values) => updateBillingDetails(values))}
+    >
       <Grid gutter="xs">
         <Grid.Col>
-          <span>Company details</span>
+          <Text size="sm" color="secondaryText" weight="bold">
+            Company details
+          </Text>
         </Grid.Col>
         <Grid.Col>
           <TextInput
             radius="sm"
             size="lg"
-            required
             placeholder="First name"
             {...form.getInputProps('firstName')}
           />
@@ -48,7 +73,6 @@ const BillingDetails = () => {
           <TextInput
             radius="sm"
             size="lg"
-            required
             placeholder="Last name"
             {...form.getInputProps('lastName')}
           />
@@ -80,7 +104,9 @@ const BillingDetails = () => {
           />
         </Grid.Col>
         <Grid.Col>
-          <span>Company address</span>
+          <Text size="sm" color="secondaryText" weight="bold">
+            Company address
+          </Text>
         </Grid.Col>
         <Grid.Col>
           <TextInput

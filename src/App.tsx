@@ -1,7 +1,7 @@
 import { Global, MantineProvider, Progress } from '@mantine/core'
 import { ModalsProvider } from '@mantine/modals'
 import { AccountProvider } from 'contexts/AccountContext'
-import { CampaignsDataProvider, CampaignsAnalyticsProvider } from 'contexts/CampaignsContext'
+
 import { RouterProvider } from 'react-router-dom'
 import { router } from 'Router'
 import { lightTheme } from 'themes'
@@ -30,27 +30,22 @@ const EnvBanner = () => (
   <Progress
     radius="xs"
     size={18}
-    animate
     style={{ zIndex: 42069, opacity: 0.5, position: 'fixed', top: 0, left: 0, right: 0 }}
-    sections={[{ value: 100, color: 'grape', label: ENV }]}
+    sections={[{ value: 100, color: 'pink', label: ENV }]}
   />
 )
 
 function App() {
   return (
     <AccountProvider>
-      <CampaignsDataProvider>
-        <CampaignsAnalyticsProvider>
-          <MantineProvider withGlobalStyles withNormalizeCSS theme={lightTheme}>
-            <ModalsProvider>
-              <GlobalStyles />
-              <Notifications />
-              {ENV && <EnvBanner />}
-              <RouterProvider router={router} />
-            </ModalsProvider>
-          </MantineProvider>
-        </CampaignsAnalyticsProvider>
-      </CampaignsDataProvider>
+      <MantineProvider withGlobalStyles withNormalizeCSS theme={lightTheme}>
+        <ModalsProvider>
+          <GlobalStyles />
+          <Notifications />
+          {ENV && <EnvBanner />}
+          <RouterProvider router={router} />
+        </ModalsProvider>
+      </MantineProvider>
     </AccountProvider>
   )
 }

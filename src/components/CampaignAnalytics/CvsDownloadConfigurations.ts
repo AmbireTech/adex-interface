@@ -1,7 +1,7 @@
-import { IHeadersToDataProps, BaseAnalyticsData, TabType } from 'types'
+import { IHeadersToDataProps, BaseAnalyticsData, AnalyticsType } from 'types'
 
 const headersToDataProperties: IHeadersToDataProps = {
-  placements: {
+  hostname: {
     Website: 'segment',
     Impressions: 'impressions',
     Clicks: 'clicks',
@@ -9,7 +9,7 @@ const headersToDataProperties: IHeadersToDataProps = {
     Spent: 'paid',
     'Average CPM': 'avgCpm'
   },
-  regions: {
+  country: {
     Country: 'segment',
     Share: 'share',
     Impressions: 'impressions',
@@ -18,17 +18,26 @@ const headersToDataProperties: IHeadersToDataProps = {
     'Average CPM': 'avgCpm',
     Spent: 'paid'
   },
-  creatives: {
+  adUnit: {
     Impressions: 'impressions',
     Clicks: 'clicks',
     'CTR%': 'crt',
     Spent: 'paid'
   },
-  timeframe: {}
+  timeframe: {},
+  ssp: {
+    SSP: 'segment',
+    Share: 'share',
+    Impressions: 'impressions',
+    Clicks: 'clicks',
+    'CTR%': 'ctr',
+    'Average CPM': 'avgCpm',
+    Spent: 'paid'
+  }
 }
 
 // TODO: remove TabType use AnalyticsType
-const generateCVSData = (tabName: TabType, tabData: BaseAnalyticsData[] | undefined) => ({
+const generateCVSData = (tabName: AnalyticsType, tabData: BaseAnalyticsData[] | undefined) => ({
   mapHeadersToDataProperties: headersToDataProperties[tabName],
   tabData,
   filename: `${tabName}.csv`

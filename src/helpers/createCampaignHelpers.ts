@@ -1,5 +1,4 @@
 import { AdUnit, TargetingInputApplyProp, TargetingInputSingle } from 'adex-common/dist/types'
-import { BANNER_SIZES } from 'constants/banners'
 import { DEFAULT_CATS_LOCS_VALUE } from 'constants/createCampaign'
 import { Campaign } from 'adex-common'
 import {
@@ -8,16 +7,19 @@ import {
   ImageSizes,
   FileWithPath,
   HTMLBannerDimensions,
-  CampaignUI
+  CampaignUI,
+  SupplyStats,
+  SupplyStatsDetails
 } from 'types'
+import dayjs from 'dayjs'
+import { parseToBigNumPrecision } from 'helpers'
 
 export const checkSelectedDevices = (devices: Devices[]) => {
+  if (!devices.length) return null
   if (devices.length === 1) {
-    if (devices.includes('mobile')) return 'mobile'
-    if (devices.includes('desktop')) return 'desktop'
+    return devices[0]
   }
   if (devices.length === 2) return 'both'
-  return null
 }
 
 export const formatCatsAndLocsData = (inputValues: TargetingInputSingle, lib: SelectData[]) => {
@@ -51,19 +53,30 @@ export const updateCatsLocsObject = (selectedRadio: TargetingInputApplyProp, val
 export const findArrayWithLengthInObjectAsValue = (obj: object) =>
   Object.entries(obj).find(([, value]) => Array.isArray(value) && value.length > 0)
 
-export const checkBannerSizes = (adUnits: AdUnit[]) =>
-  BANNER_SIZES.map((item) => {
+export const checkBannerSizes = (
+  bannerSizes: {
+    value: string
+    count: number
+    checked?: boolean
+  }[],
+  adUnits: AdUnit[]
+) =>
+  bannerSizes.map((item) => {
     const copy = { ...item }
     adUnits.forEach((adUnit) => {
-      if (
-        adUnit.banner?.format.w === item.bannerSizes.w &&
-        adUnit.banner?.format.h === item.bannerSizes.h
-      )
-        copy.checked = true
+      copy.checked = !!(item.value === `${adUnit.banner?.format.w}x${adUnit.banner?.format.h}`)
     })
 
     return copy
   })
+
+export const selectBannerSizes = (
+  supplyStats: SupplyStats
+): Record<string, SupplyStatsDetails[][]> => ({
+  app: [supplyStats.appBannerFormats, supplyStats.appBidFloors],
+  mobile: [supplyStats.siteBannerFormatsMobile, supplyStats.siteMobileBidFloors],
+  desktop: [supplyStats.siteBannerFormatsDesktop, supplyStats.siteDesktopBidFloors]
+})
 
 export const findDuplicates = (array: string[]) => {
   const countMap: any = {}
@@ -123,12 +136,12 @@ export const getHTMLBannerDimensions = async (
         }
 
         document.body.removeChild(tempIframe)
-
+        URL.revokeObjectURL(blobUrl)
         resolve(dimensions)
       }
       tempIframe.onerror = (error) => {
         document.body.removeChild(tempIframe)
-
+        URL.revokeObjectURL(blobUrl)
         reject(error)
       }
     })
@@ -186,8 +199,10 @@ export const initAllLocales = () => {
   return allLocales
 }
 
+export type Modify<T, R> = Omit<T, keyof R> & R
+
 type ReducedCampaign = Omit<
-  Campaign,
+  Modify<Campaign, { id?: string }>,
   | 'created'
   | 'owner'
   | 'validators'
@@ -205,6 +220,7 @@ export const mapCampaignUItoCampaign = (campaignUI: CampaignUI): ReducedCampaign
     step,
     devices,
     paymentModel,
+    autoUTMChecked,
     startsAt,
     endsAt,
     currency,
@@ -219,10 +235,144 @@ export const mapCampaignUItoCampaign = (campaignUI: CampaignUI): ReducedCampaign
     createdBy,
     lastModifiedBy,
     cpmPricingBounds,
+    ownerHashed,
+    updated,
+    asapStartingDate,
     ...campaign
   } = campaignUI
 
   return {
     ...campaign
   }
+}
+
+const removeProperty = (propKey: any, { [propKey]: propValue, ...rest }) => rest
+
+export const prepareCampaignObject = (campaign: CampaignUI, decimals: number) => {
+  // TODO: fix the type
+  let mappedCampaign: any = mapCampaignUItoCampaign(campaign)
+
+  // NOTE: only for draft but it will come from BE
+  // mappedCampaign.id = `${campaign.title}-${Date.now().toString(16)}`
+  mappedCampaign.campaignBudget = parseToBigNumPrecision(
+    Math.floor(Number(mappedCampaign.campaignBudget)),
+    decimals
+  )
+  mappedCampaign.pricingBounds.IMPRESSION!.min = parseToBigNumPrecision(
+    Number(campaign.cpmPricingBounds.min) / 1000,
+    decimals
+  )
+  mappedCampaign.pricingBounds.IMPRESSION!.max = parseToBigNumPrecision(
+    Number(campaign.cpmPricingBounds.max) / 1000,
+    decimals
+  )
+  mappedCampaign.activeFrom = campaign.asapStartingDate
+    ? BigInt(Date.now())
+    : BigInt(campaign.startsAt.getTime())
+  mappedCampaign.activeTo = BigInt(campaign.endsAt.getTime())
+
+  if (mappedCampaign.id === '') {
+    mappedCampaign = removeProperty('id', mappedCampaign)
+  }
+  // eslint-disable-next-line no-underscore-dangle
+  if (mappedCampaign._id) {
+    mappedCampaign = removeProperty('_id', mappedCampaign)
+  }
+
+  return mappedCampaign
+}
+
+export const isPastDateTime = (dateTime: Date | string) => {
+  const givenDateTime = dayjs(dateTime)
+  const currentDateTime = dayjs()
+  return givenDateTime.isBefore(currentDateTime)
+}
+
+export function deepEqual<T>(obj1: T, obj2: T): boolean {
+  if (obj1 === obj2) return true
+
+  if (typeof obj1 !== 'object' || typeof obj2 !== 'object' || obj1 === null || obj2 === null) {
+    return false
+  }
+
+  const keys1 = Object.keys(obj1 as any)
+  const keys2 = Object.keys(obj2 as any)
+
+  if (keys1.length !== keys2.length) return false
+
+  return keys1.every(
+    (key) => keys2.includes(key) && deepEqual((obj1 as any)[key], (obj2 as any)[key])
+  )
+}
+
+const UTM_PARAMS = {
+  utm_source: 'AdEx',
+  utm_medium: 'CPM'
+  // utm_term: 'none',
+  // utm_campaign: 'none',
+  // utm_content: 'none'
+}
+
+export const addUrlUtmTracking = ({
+  targetUrl,
+  campaign,
+  content,
+  term
+}: {
+  targetUrl: string
+  campaign: string
+  content: string
+  term: string
+}) => {
+  if (targetUrl) {
+    const url = new URL(targetUrl)
+    url.search = ''
+
+    const params = new URLSearchParams(url.search)
+    Object.entries(UTM_PARAMS).forEach(([key, value]) => {
+      params.set(key, value)
+    })
+
+    if (campaign) {
+      params.set('utm_campaign', params.get('utm_campaign') || campaign)
+    }
+    if (content) {
+      params.set('utm_content', params.get('utm_content') || content)
+    }
+    if (term) {
+      params.set('utm_term', params.get('utm_term') || term)
+    }
+
+    url.search = encodeURIComponent(params.toString())
+
+    return url.toString()
+  }
+
+  return targetUrl
+}
+
+export const hasUtmCampaign = (url: string) => {
+  try {
+    const urlObj = new URL(url)
+    return urlObj.searchParams.has('utm_campaign')
+  } catch (e) {
+    console.error('Invalid URL:', e)
+    return false
+  }
+}
+
+export const capitalize = (s: string) => s && s[0].toUpperCase() + s.slice(1)
+
+export const parseRange = (str: string): { min: number; max: number } => {
+  const pattern = /^(\d+)_(\d+)-(\d+)_(\d+)$/
+  const match = str.match(pattern)
+
+  if (!match) {
+    throw new Error('Invalid input format. Expected format: "0_20-0_30"')
+  }
+
+  const min = parseFloat(`${match[1]}.${match[2]}`)
+  const max = parseFloat(`${match[3]}.${match[4]}`)
+
+  return { min, max }
 }

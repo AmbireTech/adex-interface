@@ -15,7 +15,7 @@ import DepositIcon from 'resources/icons/Deposit'
 import BillingIcon from 'resources/icons/Billing'
 import HelpIcon from 'resources/icons/Help'
 import AdExLogo from 'resources/logos/AdExLogo'
-import { useEffect, useMemo } from 'react'
+import { useMemo } from 'react'
 import { appVersion } from 'helpers'
 import { IS_MANUAL_DEPOSITING } from 'constants/balances'
 import NavLink from './NavLink'
@@ -47,20 +47,14 @@ const useStyles = createStyles((theme) => ({
 function SideNav() {
   const {
     isAdmin,
-    adexAccount: { availableBalance },
-    updateBalance
+    adexAccount: { availableBalance }
   } = useAccount()
-
+  const isManualDepositing = useMemo(() => IS_MANUAL_DEPOSITING === 'true', [])
   const location = useLocation()
   const match = useMatch(location.pathname)
   const year = useMemo(() => new Date().getFullYear(), [])
   const theme = useMantineTheme()
   const { classes } = useStyles()
-
-  useEffect(() => {
-    updateBalance()
-    // eslint-disable-next-line
-  }, [])
 
   const hasAvailableBalance = useMemo(
     () => availableBalance && availableBalance > 0,
@@ -84,7 +78,7 @@ function SideNav() {
         <Balance />
       </Navbar.Section>
       <Navbar.Section className={classes.newCampaign}>
-        <CreateCampaignBtn hasPopover={Boolean(IS_MANUAL_DEPOSITING) && !hasAvailableBalance} />
+        <CreateCampaignBtn hasPopover={isManualDepositing && !hasAvailableBalance} />
       </Navbar.Section>
       <Navbar.Section mx="-xs" grow component={ScrollArea}>
         <Box>
@@ -99,13 +93,7 @@ function SideNav() {
             icon={<DepositIcon />}
             label="Top Up Account"
             active={useResolvedPath('deposit').pathname === match?.pathname}
-            hasPopover={Boolean(IS_MANUAL_DEPOSITING) && !hasAvailableBalance}
-            popoverContent={
-              <Text size="sm">
-                Contact us on <a href="mailto: dsp@adex.network"> dsp@adex.network</a> to &quot;add
-                money&quot; / &quot;launch campaign&quot;
-              </Text>
-            }
+            hasPopover={false}
           />
           <NavLink
             to="/dashboard/billing"
@@ -138,7 +126,7 @@ function SideNav() {
           All Rights Reserved.
         </Text>
         <Text color="secondaryText" size="sm">
-          V.{appVersion}
+          V.{appVersion}-beta
         </Text>
       </Navbar.Section>
     </>

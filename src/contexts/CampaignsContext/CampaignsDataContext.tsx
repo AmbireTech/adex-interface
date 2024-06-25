@@ -1,4 +1,4 @@
-import { Campaign } from 'adex-common'
+import { Campaign, CampaignStatus } from 'adex-common'
 import {
   createContext,
   FC,
@@ -12,6 +12,7 @@ import { useAdExApi } from 'hooks/useAdexServices'
 import useAccount from 'hooks/useAccount'
 import useCustomNotifications from 'hooks/useCustomNotifications'
 import {
+  BaseData,
   CampaignData,
   //  EventAggregatesDataRes,
   EvAggrData
@@ -24,8 +25,8 @@ const defaultCampaignData: CampaignData = {
   campaign: { ...CREATE_CAMPAIGN_DEFAULT_VALUE },
   impressions: 0,
   clicks: 0,
-  ctr: 'N/A',
-  avgCpm: 'N/A',
+  ctr: 0,
+  avgCpm: 0,
   paid: 0
 }
 
@@ -64,30 +65,26 @@ const campaignResToCampaignData = (
   advData?: EvAggrData,
   prevCmp?: CampaignData
 ): CampaignData => {
-  const adv: {
-    impressions: number
-    clicks: number
-    ctr: number | string
-    avgCpm: number | string
-    paid: number
-  } = {
+  const adv: BaseData = {
     ...(advData || {
       clicks: 0,
       impressions: 0
     }),
     ...{
-      paid: parseBigNumTokenAmountToDecimal(
-        BigInt(advData?.payouts || 0n),
-        cmpRes.outpaceAssetDecimals
+      paid: Number(
+        parseBigNumTokenAmountToDecimal(
+          BigInt(advData?.payouts || 0n),
+          cmpRes.outpaceAssetDecimals
+        ).toFixed(2)
       ),
-      ctr: 'N/A',
-      avgCpm: 'N/A'
+      ctr: 0,
+      avgCpm: 0
     }
   }
 
   if (adv.impressions > 0) {
-    adv.ctr = (adv.clicks / adv.impressions) * 100
-    adv.avgCpm = (adv.paid / adv.impressions) * 1000
+    adv.ctr = Number(((adv.clicks / adv.impressions) * 100).toFixed(4))
+    adv.avgCpm = Number(((adv.paid / adv.impressions) * 1000).toFixed(2))
   }
 
   const currentCMP = {
@@ -100,6 +97,18 @@ const campaignResToCampaignData = (
   return currentCMP
 }
 
+const getURLSubRouteByCampaignStatus = (status: CampaignStatus) => {
+  switch (status) {
+    case CampaignStatus.active:
+      return 'resume'
+    case CampaignStatus.closedByUser:
+      return 'close'
+    case CampaignStatus.paused:
+      return 'pause'
+    default:
+      throw new Error('Invalid status')
+  }
+}
 interface ICampaignsDataContext {
   campaignsData: Map<string, CampaignData>
   // TODO: all campaigns event aggregations by account
@@ -108,11 +117,15 @@ interface ICampaignsDataContext {
   updateAllCampaignsData: (updateAdvanced?: boolean) => void
   // updateEventAggregates: (params: Campaign['id']) => void
   initialDataLoading: boolean
+  changeCampaignStatus: (status: CampaignStatus, campaignId: Campaign['id']) => void
 }
 
 const CampaignsDataContext = createContext<ICampaignsDataContext | null>(null)
 
-const CampaignsDataProvider: FC<PropsWithChildren> = ({ children }) => {
+const CampaignsDataProvider: FC<PropsWithChildren & { type: 'user' | 'admin' }> = ({
+  children,
+  type
+}) => {
   const { showNotification } = useCustomNotifications()
   const { adexServicesRequest } = useAdExApi()
 
@@ -143,6 +156,42 @@ const CampaignsDataProvider: FC<PropsWithChildren> = ({ children }) => {
   //   },
   //   [adexServicesRequest]
   // )
+
+  const changeCampaignStatus = useCallback(
+    async (status: CampaignStatus, campaignId: string) => {
+      try {
+        const campaignStatusRes = await adexServicesRequest<{ success: boolean }>('backend', {
+          route: `/dsp/campaigns/${getURLSubRouteByCampaignStatus(status)}/${campaignId}`,
+          method: 'POST'
+        })
+
+        if (!campaignStatusRes.success) {
+          showNotification('error', `changing campaign status with id ${campaignId}`, 'Data error')
+          return
+        }
+
+        setCampaignData((prev) => {
+          const prevCampaignState = prev.get(campaignId)
+
+          if (!prevCampaignState) return prev
+
+          const updated = {
+            ...prevCampaignState,
+            campaign: { ...prevCampaignState?.campaign, status }
+          }
+
+          const next = new Map(prev)
+          next.set(campaignId, updated)
+
+          return next
+        })
+      } catch (err) {
+        console.log(err)
+        showNotification('error', `changing campaign status with id ${campaignId}`, 'Data error')
+      }
+    },
+    [adexServicesRequest, showNotification]
+  )
 
   const updateCampaignDataById = useCallback(
     async (campaignId: string) => {
@@ -183,9 +232,11 @@ const CampaignsDataProvider: FC<PropsWithChildren> = ({ children }) => {
   const updateAllCampaignsData = useCallback(
     async (updateAdvanced?: boolean) => {
       try {
+        const route = type === 'user' ? '/dsp/campaigns/by-owner' : '/dsp/admin/campaigns'
         const dataRes = await adexServicesRequest<Array<CamapignBackendDataRes>>('backend', {
-          route: '/dsp/campaigns/by-owner',
-          method: 'GET'
+          route,
+          method: 'GET',
+          queryParams: { all: 'true' }
         })
 
         console.log({ dataRes })
@@ -207,38 +258,53 @@ const CampaignsDataProvider: FC<PropsWithChildren> = ({ children }) => {
         console.log({ dataRes })
         if (Array.isArray(dataRes)) {
           setCampaignData((prev) => {
-            const next = new Map(prev)
+            const next = new Map()
+
+            const dataResIds = new Set(dataRes.map((cmp: Campaign) => cmp.id))
 
             dataRes.forEach((cmp: Campaign, index: number) => {
               const currentCMP = campaignResToCampaignData(cmp, advData?.[index], prev.get(cmp.id))
               next.set(cmp.id, currentCMP)
             })
 
+            prev.forEach((value, key) => {
+              if (!dataResIds.has(key)) {
+                next.delete(key)
+              }
+            })
+            // TODO: check it again when dev has been merged
+            setInitialDataLoading(false)
             return next
           })
         } else {
           showNotification('warning', 'invalid campaigns data response', 'Data error')
           console.log({ dataRes })
+          setInitialDataLoading(false)
         }
       } catch (err) {
         console.log(err)
         showNotification('error', 'getting campaigns data', 'Data error')
+        // setInitialDataLoading(false)
       }
     },
-    [adexServicesRequest, showNotification]
+    [adexServicesRequest, showNotification, type]
   )
+
+  useEffect(() => {
+    console.log({ type })
+  }, [type])
 
   useEffect(() => {
     if (authenticated) {
       const updateCampaigns = async () => {
         await updateAllCampaignsData(true)
-        setInitialDataLoading(false)
+        // setInitialDataLoading(false)
       }
 
       updateCampaigns()
     } else {
       setCampaignData(new Map<string, CampaignData>())
-      setInitialDataLoading(false)
+      // setInitialDataLoading(false)
     }
   }, [updateAllCampaignsData, authenticated])
 
@@ -247,9 +313,16 @@ const CampaignsDataProvider: FC<PropsWithChildren> = ({ children }) => {
       campaignsData,
       updateCampaignDataById,
       updateAllCampaignsData,
-      initialDataLoading
+      initialDataLoading,
+      changeCampaignStatus
     }),
-    [campaignsData, updateCampaignDataById, updateAllCampaignsData, initialDataLoading]
+    [
+      campaignsData,
+      updateCampaignDataById,
+      updateAllCampaignsData,
+      initialDataLoading,
+      changeCampaignStatus
+    ]
   )
 
   return (

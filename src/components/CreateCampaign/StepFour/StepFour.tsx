@@ -25,7 +25,8 @@ const StepFour = () => {
     campaignBudgetFormatted,
     campaignNameFormatted,
     adUnitsFormatted,
-    campaignPeriodFormatted
+    campaignPeriodFormatted,
+    formattedSelectedPlacement
   } = useCreateCampaignData()
 
   const campaignOverview: CreateCampaignOverview[] = useMemo(
@@ -34,11 +35,12 @@ const StepFour = () => {
       { count: 2, title: 'Campaign Budget', value: campaignBudgetFormatted },
       { count: 3, title: 'CPM', value: priceBoundsFormatted },
       { count: 4, title: 'Campaign Period', value: campaignPeriodFormatted },
-      { count: 5, title: 'Device Type', value: formattedSelectedDevice },
-      { count: 6, title: 'Ad Format', value: adFormats },
-      { count: 7, title: 'Creatives', value: adUnitsFormatted },
-      { count: 8, title: 'Selected Categories', value: formattedCats },
-      { count: 9, title: 'Selected Countries', value: formattedLocs }
+      { count: 5, title: 'Placements', value: formattedSelectedPlacement },
+      { count: 6, title: 'Device Type', value: formattedSelectedDevice },
+      { count: 7, title: 'Ad Format', value: adFormats },
+      { count: 8, title: 'Creatives', value: adUnitsFormatted },
+      { count: 9, title: 'Selected Categories', value: formattedCats },
+      { count: 10, title: 'Selected Countries', value: formattedLocs }
     ],
     [
       formattedSelectedDevice,
@@ -49,7 +51,8 @@ const StepFour = () => {
       campaignBudgetFormatted,
       campaignNameFormatted,
       adUnitsFormatted,
-      campaignPeriodFormatted
+      campaignPeriodFormatted,
+      formattedSelectedPlacement
     ]
   )
 

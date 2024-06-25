@@ -113,11 +113,11 @@ export default function GeoCustom({ width, height, regions }: GeoCustomProps) {
                       />
                       {customProjection.features.map(({ feature, path }) => {
                         const selectedRegion = regions?.find(
-                          (region) => region.segment === feature.properties.name
+                          (region) => region.segment === feature.id
                         )
 
                         const tooltipText = selectedRegion
-                          ? `${selectedRegion.segment} Impressions: ${
+                          ? `${feature.properties.name} Impressions: ${
                               selectedRegion.impressions
                             }\n Clicks: ${selectedRegion.clicks}\n Share: ${'TODO'} %\n CTR: ${
                               selectedRegion.ctr

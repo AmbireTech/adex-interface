@@ -1,11 +1,10 @@
 import { Image, Select, Text, Flex, MediaQuery } from '@mantine/core'
 import { DIGITS_AFTER_FLOATING_POINT } from 'constants/balances'
-import { useCreateCampaignFormContext } from 'contexts/CreateCampaignFormContext'
 import { formatCurrency } from 'helpers'
 import { parseBigNumTokenAmountToDecimal } from 'helpers/balances'
 import useAccount from 'hooks/useAccount'
 import { getTokenIcon, networks } from 'lib/Icons'
-import { forwardRef, useMemo } from 'react'
+import { ChangeEvent, FocusEventHandler, forwardRef, useCallback, useMemo } from 'react'
 import { Token } from 'types'
 
 type ItemProps = Token &
@@ -14,6 +13,13 @@ type ItemProps = Token &
     label: string
     value: string
   }
+
+type SelectCurrencyProps = {
+  defaultValue: string
+  onChange: (event: ChangeEvent<HTMLInputElement>) => void
+  onFocus: FocusEventHandler<HTMLInputElement>
+  error: string
+}
 
 const SelectItem = forwardRef<HTMLDivElement, ItemProps>(
   ({ address, chainId, name, availableBalance, decimals, ...others }: ItemProps, ref) => (
@@ -35,8 +41,7 @@ const SelectItem = forwardRef<HTMLDivElement, ItemProps>(
   )
 )
 
-const SelectCurrency = () => {
-  const form = useCreateCampaignFormContext()
+const SelectCurrency = ({ defaultValue, onChange, onFocus, error }: SelectCurrencyProps) => {
   const {
     adexAccount: {
       availableBalance,
@@ -54,6 +59,21 @@ const SelectCurrency = () => {
       })),
     [availableBalance, balanceToken]
   )
+
+  const handleSelectChange = useCallback(
+    (value: string | null) => {
+      const event = {
+        target: {
+          value: value ? value.toString() : null,
+          name: 'currency'
+        }
+      } as ChangeEvent<HTMLInputElement>
+
+      onChange(event)
+    },
+    [onChange]
+  )
+
   return (
     <MediaQuery
       smallerThan="lg"
@@ -65,9 +85,12 @@ const SelectCurrency = () => {
         placeholder="Select currency"
         itemComponent={SelectItem}
         data={mappedDeposits}
-        {...form.getInputProps('currency')}
+        defaultValue={defaultValue}
+        onChange={(event) => handleSelectChange(event)}
+        onFocus={onFocus}
         maw="50%"
         maxDropdownHeight={400}
+        error={error && <Text size="sm">{error}</Text>}
       />
     </MediaQuery>
   )

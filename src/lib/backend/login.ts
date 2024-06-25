@@ -1,4 +1,4 @@
-import { BASE_URL } from 'constants/login'
+import { BACKEND_BASE_URL } from 'constants/login'
 import { fetchService, RequestOptions, getReqErr } from 'services'
 import { IAdExAccount, AppError, ErrorLevel } from 'types'
 
@@ -55,7 +55,7 @@ export const isTokenExpired = (token: string) => {
 }
 
 export const getMessageToSign = async (user: any) => {
-  const url = `${BASE_URL}/dsp/login-msg`
+  const url = `${BACKEND_BASE_URL}/dsp/login-msg`
   const method = 'POST'
   const body = {
     wallet: user.address,
@@ -81,7 +81,7 @@ type VerifyLoginProps = {
 }
 
 export const verifyLogin = async (body: VerifyLoginProps) => {
-  const url = `${BASE_URL}/dsp/login-verify`
+  const url = `${BACKEND_BASE_URL}/dsp/login-verify`
   const method = 'POST'
   const headers = {
     'Content-Type': 'application/json'
@@ -99,7 +99,7 @@ export const verifyLogin = async (body: VerifyLoginProps) => {
 
 export const refreshAccessToken = async (refreshToken: string) => {
   const req: RequestOptions<any> = {
-    url: `${BASE_URL}/dsp/refresh-token`,
+    url: `${BACKEND_BASE_URL}/dsp/refresh-token`,
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'

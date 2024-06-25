@@ -27,7 +27,8 @@ const CampaignDetailsRow = ({
   textSize = 'md',
   noBorder = false,
   column = false,
-  lineHeight = 'lg'
+  lineHeight = 'lg',
+  nowrap = false
 }: CampaignDetailsRowProps) => {
   const { classes, cx } = useStyles({ lighterColor: !!lighterColor })
   return (
@@ -49,7 +50,7 @@ const CampaignDetailsRow = ({
       >
         {title}
       </Text>
-      <Text className={cx(classes.text, { [classes.fullWidth]: column })}>{value}</Text>
+      <Text className={cx({ [classes.fullWidth]: column, [classes.text]: !!nowrap })}>{value}</Text>
     </Flex>
   )
 }

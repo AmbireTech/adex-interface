@@ -1,33 +1,20 @@
 import { useCallback, useEffect, useState, useMemo } from 'react'
 import { Container, Flex, Loader, Tabs } from '@mantine/core'
 import { useParams } from 'react-router-dom'
-import { AnalyticsType, TabType, BaseAnalyticsData, AnalyticsPeriod } from 'types'
+import { AnalyticsType, BaseAnalyticsData, AnalyticsPeriod } from 'types'
 import GoBack from 'components/common/GoBack/GoBack'
 import DownloadCSV from 'components/common/DownloadCSV'
 import useCampaignAnalytics from 'hooks/useCampaignAnalytics'
-import useCampaignsData from 'hooks/useCampaignsData'
+import { useCampaignsData } from 'hooks/useCampaignsData'
 import { Campaign } from 'adex-common'
 import useAccount from 'hooks/useAccount'
 import Placements from './Placements'
 import Creatives from './Creatives'
+import SSPs from './SSPs'
 import Regions from './Regions'
 import { TimeFrame } from './TimeFrame'
 import { generateCVSData } from './CvsDownloadConfigurations'
 import SeeOnMapBtn from './SeeOnMapBtn'
-
-// TODO: temp - unify and use anal
-const analyticTypeToHeader = (aType: AnalyticsType): TabType => {
-  switch (aType) {
-    case 'country':
-      return 'regions'
-    case 'hostname':
-      return 'placements'
-    case 'adUnit':
-      return 'creatives'
-    default:
-      return 'timeframe'
-  }
-}
 
 const CampaignAnalytics = () => {
   const { id } = useParams()
@@ -49,7 +36,8 @@ const CampaignAnalytics = () => {
   const {
     adexAccount: {
       fundsOnCampaigns: { perCampaign }
-    }
+    },
+    isAdmin
   } = useAccount()
 
   const currencyName = useMemo(
@@ -60,10 +48,13 @@ const CampaignAnalytics = () => {
     [id, perCampaign]
   )
 
-  console.log('currencyName', currencyName)
-
   const campaign: Campaign | undefined = useMemo(
     () => (id ? campaignsData.get(id)?.campaign : undefined),
+    [id, campaignsData]
+  )
+
+  const totalPaid: number = useMemo(
+    () => (id ? campaignsData.get(id)?.paid || 0 : 0),
     [id, campaignsData]
   )
 
@@ -107,7 +98,7 @@ const CampaignAnalytics = () => {
       setIsMapBtnShown(activeTab === 'country')
 
       // TODO: fix csf Data types an add the type to useState
-      setCsvData(generateCVSData(analyticTypeToHeader(activeTab), campaignMappedAnalytics))
+      setCsvData(generateCVSData(activeTab, campaignMappedAnalytics))
     }
   }, [activeTab, campaignMappedAnalytics])
 
@@ -122,6 +113,13 @@ const CampaignAnalytics = () => {
     return <div>Invalid campaign ID</div>
   }
 
+  const loading = useMemo(
+    () => !analyticsKey || !campaignMappedAnalytics,
+    [analyticsKey, campaignMappedAnalytics]
+  )
+
+  // TODO: better tabs optimization, this si temp fix that prevents 80-90% of the prev re-renders, there is sill 1 extra re-rended that can be fixed
+
   return (
     <Container fluid>
       <GoBack title="Campaign Analytics" />
@@ -132,6 +130,7 @@ const CampaignAnalytics = () => {
         styles={() => ({
           tabsList: { border: 'none', padding: '20px 0' }
         })}
+        keepMounted={false}
       >
         <Flex justify="space-between" align="baseline">
           <Tabs.List>
@@ -139,6 +138,7 @@ const CampaignAnalytics = () => {
             <Tabs.Tab value="hostname">PLACEMENTS</Tabs.Tab>
             <Tabs.Tab value="country">REGIONS</Tabs.Tab>
             <Tabs.Tab value="adUnit">CREATIVES</Tabs.Tab>
+            {isAdmin && <Tabs.Tab value="ssp">SSPs</Tabs.Tab>}
           </Tabs.List>
           <Flex align="center" justify="space-between">
             {isMapBtnShown && <SeeOnMapBtn onBtnClicked={() => setIsMapVisible((prev) => !prev)} />}
@@ -151,40 +151,49 @@ const CampaignAnalytics = () => {
             )}
           </Flex>
         </Flex>
-        {!analyticsKey || !campaignMappedAnalytics ? (
-          <Flex justify="center" align="center" h="60vh">
+        {loading && (
+          <Flex justify="center" align="center" mt={69}>
             <Loader size="xl" />
           </Flex>
-        ) : (
-          <>
-            <Tabs.Panel value="timeframe" pt="xs">
-              <TimeFrame
-                timeFrames={campaignMappedAnalytics}
-                period={analyticsKey?.period}
-                currencyName={currencyName}
-              />
-            </Tabs.Panel>
-            <Tabs.Panel value="hostname" pt="xs">
-              <Placements placements={campaignMappedAnalytics} currencyName={currencyName} />
-            </Tabs.Panel>
-            <Tabs.Panel value="country" pt="xs">
-              <Regions
-                regions={campaignMappedAnalytics}
-                isMapVisible={isMapVisible}
-                currencyName={currencyName}
-                onClose={() => setIsMapVisible(false)}
-              />
-            </Tabs.Panel>
-            <Tabs.Panel value="adUnit" pt="xs">
-              <Creatives
-                creatives={campaignMappedAnalytics}
-                units={campaign?.adUnits}
-                currencyName={currencyName}
-              />
-            </Tabs.Panel>
-          </>
         )}
       </Tabs>
+
+      {}
+      {!loading && activeTab === 'timeframe' && (
+        <TimeFrame
+          timeFrames={campaignMappedAnalytics}
+          period={analyticsKey?.period}
+          currencyName={currencyName}
+        />
+      )}
+      {!loading && activeTab === 'hostname' && (
+        <Placements
+          placements={campaignMappedAnalytics}
+          currencyName={currencyName}
+          // NOTE: currently we have only have one placement per campaign
+          // TODO; this can be get from analytics but that means 2x request to validator
+          placement={campaign?.targetingInput.inputs.placements.in[0] || 'site'}
+        />
+      )}
+      {!loading && activeTab === 'country' && (
+        <Regions
+          regions={campaignMappedAnalytics}
+          isMapVisible={isMapVisible}
+          currencyName={currencyName}
+          totalPaid={totalPaid}
+          onClose={() => setIsMapVisible(false)}
+        />
+      )}
+      {!loading && activeTab === 'adUnit' && (
+        <Creatives
+          creatives={campaignMappedAnalytics}
+          units={campaign?.adUnits}
+          currencyName={currencyName}
+        />
+      )}
+      {isAdmin && !loading && activeTab === 'ssp' && (
+        <SSPs data={campaignMappedAnalytics} currencyName={currencyName} />
+      )}
     </Container>
   )
 }

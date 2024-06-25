@@ -1,19 +1,57 @@
 import { Title } from '@mantine/core'
 import CustomTable from 'components/common/CustomTable'
-import { PrintModal } from 'components/common/Modals'
 import { useDisclosure } from '@mantine/hooks'
-import { useCallback } from 'react'
+import { useCallback, useMemo, useState } from 'react'
+import { CampaignStatus } from 'adex-common'
+import { useCampaignsData } from 'hooks/useCampaignsData'
+// TODO: Delete mock data
+// import { invoiceElements } from './mockedData'
+import useAccount from 'hooks/useAccount'
+import { formatDateShort } from 'helpers'
+import { InvoicesModal } from './InvoicesModal'
 
-import { invoiceElements } from './mockedData'
-
-const columnTitles = ['Company Name', 'Campaign Period', 'Amount Spent']
+const columnTitles = ['Company Name', 'Campaign Period']
 
 const Invoices = () => {
   const [opened, { open, close }] = useDisclosure(false)
+  const { campaignsData } = useCampaignsData()
+  const campaigns = useMemo(() => Array.from(campaignsData.values()), [campaignsData])
+  const {
+    adexAccount: {
+      billingDetails: { companyName }
+    }
+  } = useAccount()
+
+  const [selectedCampaignId, setSelectedCampaignId] = useState('')
+
+  const invoiceElements = useMemo(
+    () =>
+      campaigns
+        .filter((c) =>
+          [CampaignStatus.expired, CampaignStatus.closedByUser, CampaignStatus.exhausted].includes(
+            c.campaign.status
+          )
+        )
+        .sort((a, b) => Number(b.campaign.activeFrom) - Number(a.campaign.activeFrom))
+        .map((campaign) => {
+          return {
+            id: campaign.campaignId,
+            companyName,
+            campaignPeriod: (
+              <span>
+                <span>{formatDateShort(new Date(Number(campaign.campaign.activeFrom)))} </span>
+                <br />
+                <span>{formatDateShort(new Date(Number(campaign.campaign.activeTo)))} </span>
+              </span>
+            )
+          }
+        }),
+    [campaigns, companyName]
+  )
 
   const handlePreview = useCallback(
     (item: any) => {
-      console.log('item', item)
+      setSelectedCampaignId(item.id)
       open()
     },
     [open]
@@ -21,8 +59,13 @@ const Invoices = () => {
 
   return invoiceElements && invoiceElements.length ? (
     <>
-      <CustomTable headings={columnTitles} elements={invoiceElements} onPreview={handlePreview} />
-      <PrintModal opened={opened} close={close} />
+      <CustomTable
+        background
+        headings={columnTitles}
+        elements={invoiceElements}
+        onPreview={handlePreview}
+      />
+      <InvoicesModal campaignId={selectedCampaignId} opened={opened} close={close} />
     </>
   ) : (
     // TODO: needs to be style

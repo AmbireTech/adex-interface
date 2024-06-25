@@ -21,17 +21,16 @@ jobs:
 
       - name: Build 🛠️
         env:
-          REACT_APP_ENV: production
-          REACT_APP_BASE_URL: https://vhoda.adex.network/
+          REACT_APP_ENV: staging
           REACT_APP_IPFS_GATEWAY: https://ipfs.adex.network/ipfs/
-          REACT_APP_DAPP_NAME: "AdEx Platform staging"
+          REACT_APP_DAPP_NAME: "AdEx Web Interface - staging"
           REACT_APP_DAPP_ICON_PATH: https://raw.githubusercontent.com/AmbireTech/ambire-brand/main/adex-logos/Ambire_AdEx_Symbol_color.svg
-          REACT_APP_BACKEND_BASE_URL: https://vhoda.adex.network/
-          REACT_APP_VALIDATOR_BASE_URL: https://scratchy.adex.network:50443
+          REACT_APP_BACKEND_BASE_URL: https://vhoda.adex.network
+          REACT_APP_VALIDATOR_BASE_URL: https://scratchy.adex.network:8443
         run: yarn build
 
-      - name: GH pages 404
-        run: cp ./build/index.html ./build/404.html
+      # - name: GH pages 404
+      #   run: cp ./build/404.html ./build/404.html
 
       - name: Release (staging 🧪🔬)
         if: github.ref == 'refs/heads/development'
@@ -39,5 +38,4 @@ jobs:
         with:
           branch: gh-pages
           folder: ./build
-          target-folder: ./staging
           cname: v5.adex.network

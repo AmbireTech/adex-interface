@@ -1,12 +1,21 @@
 import { Button, Text } from '@mantine/core'
 import CustomPopover from 'components/common/CustomPopover'
-import { Link } from 'react-router-dom'
+import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
+import { useCallback } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 type CreateCampaignBtnProps = {
   hasPopover: boolean
 }
 
 const CreateCampaignBtn = ({ hasPopover }: CreateCampaignBtnProps) => {
+  const { resetCampaign } = useCreateCampaignContext()
+  const navigate = useNavigate()
+
+  const handleBtnClicked = useCallback(() => {
+    resetCampaign()
+    navigate('/dashboard/create-campaign')
+  }, [resetCampaign, navigate])
   return hasPopover ? (
     <CustomPopover
       popoverContent={
@@ -21,13 +30,7 @@ const CreateCampaignBtn = ({ hasPopover }: CreateCampaignBtnProps) => {
       </Button>
     </CustomPopover>
   ) : (
-    <Button
-      variant="filled"
-      color="secondaryAccent"
-      size="md"
-      component={Link}
-      to="/dashboard/create-campaign"
-    >
+    <Button variant="filled" color="secondaryAccent" size="md" onClick={handleBtnClicked}>
       New Campaign
     </Button>
   )

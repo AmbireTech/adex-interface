@@ -1,17 +1,17 @@
 import { Alert, Grid, Text } from '@mantine/core'
 import InfoIcon from 'resources/icons/Info'
 
-import GUARDARIAN_LOGO from 'resources/payment-providers/guardarian.svg'
-import MOONPAY_LOGO from 'resources/payment-providers/moonpay.svg'
-import PAYTRIE_LOGO from 'resources/payment-providers/paytrie.svg'
-import RAMP_LOGO from 'resources/payment-providers/ramp.svg'
 import { IPaymentProviders } from 'types'
+import GuardarianLogo from 'resources/payment-providers/GuardarianLogo'
+import MoonpayLogo from 'resources/payment-providers/MoonpayLogo'
+import RampLogo from 'resources/payment-providers/RampLogo'
+import PaytrieLogo from 'resources/payment-providers/Paytrie'
 import FiatProvider from './FiatProvieder'
 
 const TopUpWithFiat = () => {
   const providers: IPaymentProviders[] = [
     {
-      logo: GUARDARIAN_LOGO,
+      logo: <GuardarianLogo />,
       name: 'Guardarian',
       type: 'Buy with Bank Transfer, Credit/Debit Card, Sell Crypto',
       fees: 'from 2%',
@@ -22,7 +22,7 @@ const TopUpWithFiat = () => {
       onClick: () => console.log('open Guardarian')
     },
     {
-      logo: MOONPAY_LOGO,
+      logo: <MoonpayLogo />,
       name: 'MoonPay',
       type: 'Credit / Debit card',
       fees: 'from 1%',
@@ -33,7 +33,7 @@ const TopUpWithFiat = () => {
       onClick: () => console.log('open Moonpay')
     },
     {
-      logo: RAMP_LOGO,
+      logo: <RampLogo />,
       name: 'Ramp',
       type: 'Bank Transfer, Credit/Debit Card, Apple Pay',
       fees: '0.49%-2.9%',
@@ -44,7 +44,7 @@ const TopUpWithFiat = () => {
       onClick: () => console.log('open Ramp')
     },
     {
-      logo: PAYTRIE_LOGO,
+      logo: <PaytrieLogo />,
       name: 'PayTrie',
       type: 'Bank Transfer',
       fees: '1% (min. $2 CAD)',
@@ -63,11 +63,11 @@ const TopUpWithFiat = () => {
           coins.
         </Alert>
       </Grid.Col>
-      <Grid.Col>
+      {/* <Grid.Col>
         <Alert icon={<InfoIcon size="1rem" />} color="attention" variant="outline">
           Note that invoices are generated in the currency in which the campaign was initiated.
         </Alert>
-      </Grid.Col>
+      </Grid.Col> */}
       <Grid.Col>
         <Text size="sm" color="secondaryText" fw="bold">
           Deposit with credit card to your account directly using one of our partners
@@ -78,7 +78,6 @@ const TopUpWithFiat = () => {
           <FiatProvider
             key={name}
             logo={logo}
-            name={name}
             type={type}
             fees={fees}
             limits={limits}

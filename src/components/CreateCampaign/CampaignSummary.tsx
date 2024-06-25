@@ -4,14 +4,14 @@ import { CREATE_CAMPAIGN_STEPS } from 'constants/createCampaign'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import LeftArrowIcon from 'resources/icons/LeftArrow'
-import { useCreateCampaignFormContext } from 'contexts/CreateCampaignFormContext'
 import useCreateCampaignData from 'hooks/useCreateCampaignData/useCreateCampaignData'
 import CampaignDetailsRow from 'components/common/CampainDetailsRow'
-import { ConfirmModal, SuccessModal } from 'components/common/Modals'
-import AttentionIcon from 'resources/icons/Attention'
-import useCampaignsData from 'hooks/useCampaignsData'
+import { LaunchCampaignModal, SuccessModal } from 'components/common/Modals'
 import useCustomNotifications from 'hooks/useCustomNotifications'
 import useAccount from 'hooks/useAccount'
+import { isValidHttpUrl } from 'helpers/validators'
+import { useNavigate } from 'react-router-dom'
+import throttle from 'lodash.throttle'
 
 const useStyles = createStyles((theme) => ({
   bg: {
@@ -27,40 +27,21 @@ const useStyles = createStyles((theme) => ({
   },
   brandColor: {
     color: theme.colors.brand[theme.fn.primaryShade()]
-  },
-  confirmModalContent: {
-    background:
-      theme.colors.attention[theme.fn.primaryShade()] + theme.other.shades.hexColorSuffix.lightest,
-    padding: theme.spacing.md,
-    border: `1px solid ${
-      theme.colors.attention[theme.fn.primaryShade()] + theme.other.shades.hexColorSuffix.lighter
-    }`,
-    borderRadius: theme.spacing.sm
-  },
-  attentionIcon: {
-    width: 25,
-    height: 25,
-    color: theme.colors.attention[theme.fn.primaryShade()]
-  },
-  iconWrapper: {
-    width: 50,
-    height: 50,
-    // TODO: Add the suffix 1A to the theme
-    background: `${theme.colors.attention[theme.fn.primaryShade()]}1A`,
-    borderRadius: '50%',
-    padding: theme.spacing.sm
   }
 }))
 
 const CampaignSummary = () => {
   const { classes, cx } = useStyles()
+  const navigate = useNavigate()
   const [opened, { open, close }] = useDisclosure(false)
   const { updateBalance } = useAccount()
   const {
-    campaign: { step, adUnits },
+    campaign: { step, adUnits, autoUTMChecked },
     updateCampaign,
     publishCampaign,
-    resetCampaign
+    resetCampaign,
+    saveToDraftCampaign,
+    addUTMToTargetURLS
   } = useCreateCampaignContext()
   const {
     formattedSelectedDevice,
@@ -70,7 +51,6 @@ const CampaignSummary = () => {
     adFormats,
     campaignBudgetFormatted
   } = useCreateCampaignData()
-  const { updateAllCampaignsData } = useCampaignsData()
   const { showNotification } = useCustomNotifications()
 
   const [isNextBtnDisabled, setIsNextBtnDisabled] = useState(false)
@@ -79,15 +59,9 @@ const CampaignSummary = () => {
     [formattedCats, formattedLocs]
   )
 
-  const hasEmptyTargetUrl = useMemo(
-    () =>
-      adUnits && adUnits.length ? adUnits.some((adUnit) => adUnit.banner?.targetUrl === '') : true,
-    [adUnits]
-  )
-
   useEffect(() => {
-    setIsNextBtnDisabled((step === 0 && hasEmptyTargetUrl) || (step === 1 && noSelectedCatsOrLogs))
-  }, [step, noSelectedCatsOrLogs, hasEmptyTargetUrl])
+    setIsNextBtnDisabled((step === 0 && !adUnits.length) || (step === 1 && noSelectedCatsOrLogs))
+  }, [step, noSelectedCatsOrLogs, adUnits])
 
   const isTheLastStep = useMemo(() => step === CREATE_CAMPAIGN_STEPS - 1, [step])
   const isFirstStep = useMemo(() => step === 0, [step])
@@ -97,7 +71,6 @@ const CampaignSummary = () => {
       const res = await publishCampaign()
 
       if (res && res.success) {
-        await updateAllCampaignsData()
         await updateBalance()
         open()
         resetCampaign()
@@ -108,30 +81,67 @@ const CampaignSummary = () => {
       console.error(err)
       showNotification('error', 'Creating campaign failed', 'Data error')
     }
-  }, [
-    publishCampaign,
-    resetCampaign,
-    open,
-    updateAllCampaignsData,
-    showNotification,
-    updateBalance
-  ])
+  }, [publishCampaign, resetCampaign, open, showNotification, updateBalance])
 
-  const form = useCreateCampaignFormContext()
+  const throttledLaunchCampaign = useMemo(
+    () => throttle(launchCampaign, 1069, { leading: true }),
+    [launchCampaign]
+  )
 
   const handleNextStepBtnClicked = useCallback(() => {
+    if (step === 0) {
+      const hasInvalidTargetUrl =
+        adUnits && adUnits.length
+          ? adUnits.some((adUnit) => !isValidHttpUrl(adUnit.banner?.targetUrl || ''))
+          : true
+
+      if (hasInvalidTargetUrl) {
+        showNotification(
+          'error',
+          'Please enter a target URL starting with https://',
+          'Invalid Target URL'
+        )
+        return
+      }
+    }
+
     if (step < CREATE_CAMPAIGN_STEPS - 1) {
       if (step === 2) {
-        form.validate()
-        const isValidForm = form.isValid()
-        if (!isValidForm) return
-        const element = document.getElementById('createCampaignSubmitBtn')
+        const element = document.getElementById('createCampaignSubmitBtn1')
         element?.click()
+        return
       }
 
       updateCampaign('step', step + 1)
     }
-  }, [step, updateCampaign, form])
+  }, [step, adUnits, updateCampaign, showNotification])
+
+  const handleSaveDraftClicked = useCallback(async () => {
+    try {
+      const res = await saveToDraftCampaign()
+
+      if (res && res.success) {
+        resetCampaign()
+        navigate('/dashboard/')
+      } else {
+        showNotification('warning', 'invalid campaign data response', 'Data error')
+      }
+    } catch (err) {
+      console.error(err)
+      showNotification('error', 'Creating campaign failed', 'Data error')
+    }
+  }, [resetCampaign, saveToDraftCampaign, showNotification, navigate])
+
+  const handleOnModalClose = useCallback(() => {
+    navigate('/dashboard/')
+    close()
+  }, [navigate, close])
+
+  useEffect(() => {
+    if (autoUTMChecked) {
+      addUTMToTargetURLS()
+    }
+  }, [autoUTMChecked, addUTMToTargetURLS])
 
   return (
     <>
@@ -179,30 +189,19 @@ const CampaignSummary = () => {
             Next Step
           </Button>
         ) : (
-          <ConfirmModal
+          <LaunchCampaignModal
             w="90%"
             size="lg"
             mt="md"
             variant="filled"
-            title="Launch Campaign"
             btnLabel="Launch Campaign"
             cancelBtnLabel="Go Back"
             confirmBtnLabel="Launch Campaign"
             onCancelClicked={() => console.log('Canceled')}
-            onConfirmClicked={launchCampaign}
-          >
-            <Flex justify="center" className={classes.confirmModalContent}>
-              <div className={classes.iconWrapper}>
-                <AttentionIcon className={classes.attentionIcon} />
-              </div>
-              <Text align="center">
-                Once you click on “Launch campaign,” any further edits to the campaign will be
-                disabled. Are you certain you wish to proceed with the launch?
-              </Text>
-            </Flex>
-          </ConfirmModal>
+            onConfirmClicked={throttledLaunchCampaign}
+          />
         )}
-        <Button w="90%" size="lg" mt="md" variant="outline">
+        <Button w="90%" size="lg" mt="md" variant="outline" onClick={handleSaveDraftClicked}>
           Save Draft
         </Button>
         <UnstyledButton
@@ -222,7 +221,11 @@ const CampaignSummary = () => {
           </Group>
         </UnstyledButton>
       </Flex>
-      <SuccessModal text="Campaign launched successfully!" opened={opened} close={close} />
+      <SuccessModal
+        text="Campaign launched successfully!"
+        opened={opened}
+        close={handleOnModalClose}
+      />
     </>
   )
 }

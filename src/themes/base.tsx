@@ -43,6 +43,7 @@ declare module '@mantine/core' {
 }
 
 const SIDE_BAR_WIDTH = 227
+const MOBILE_MAX_WIDTH_IN_PX = 475
 
 // NOTE: Put here components overrides for sizes, form, animations etc. In light/(dark) theme - only colors
 export const baseTheme: MantineThemeOverride = {
@@ -91,7 +92,7 @@ export const baseTheme: MantineThemeOverride = {
      */
     media: {
       print: '@media print',
-      mobile: '@media(max-width:475px)'
+      mobile: `@media(max-width:${MOBILE_MAX_WIDTH_IN_PX}px)`
     }
   },
   focusRing: 'never',
