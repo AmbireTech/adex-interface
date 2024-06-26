@@ -43,7 +43,7 @@ const Creatives = ({
             <Anchor href={media} target="_blank" mr="sm">
               <UrlIcon size="25px" className={classes.icon} />
             </Anchor>
-            {unitForId && <MediaThumb adUnit={unitForId} />}
+            {unitForId && <MediaThumb adUnit={unitForId} previewOnClick />}
           </Flex>
         ),
         size: unitForId?.banner
