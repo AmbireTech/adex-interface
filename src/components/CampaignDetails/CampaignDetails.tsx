@@ -283,7 +283,7 @@ const CampaignDetails = () => {
                             lineHeight="sm"
                             textSize="sm"
                             title={`${item.banner?.format.w}x${item.banner?.format.h}`}
-                            value={<MediaThumb adUnit={item} />}
+                            value={<MediaThumb adUnit={item} previewOnClick />}
                             noBorder={isLast}
                           />
                         )
