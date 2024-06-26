@@ -8,7 +8,7 @@ const CreativePreviewModal = ({
   opened,
   close
 }: {
-  hasCloseBtn?: boolean | undefined
+  hasCloseBtn?: boolean
   media: AdUnit
   opened: boolean
   close: () => void
@@ -18,8 +18,8 @@ const CreativePreviewModal = ({
       opened={opened}
       onClose={close}
       centered
-      withCloseButton={!!hasCloseBtn}
-      withOverlay={false}
+      withCloseButton={hasCloseBtn}
+      withOverlay={!!hasCloseBtn}
       size="auto"
     >
       <Media adUnit={media} width={media.banner?.format.w} height={media.banner?.format.h} />

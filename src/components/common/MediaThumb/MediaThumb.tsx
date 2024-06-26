@@ -26,17 +26,14 @@ const MediaThumb = ({
   height = 40
 }: {
   adUnit: AdUnit
-  previewOnClick?: boolean | undefined
+  previewOnClick?: boolean
   width?: number | string
   height?: number | string
 }) => {
   const [modalOpened, setModalOpened] = useState(false)
   const { classes } = useStyles({ width, height })
 
-  const handleOnClick = useCallback(
-    () => !!previewOnClick && setModalOpened(true),
-    [previewOnClick]
-  )
+  const handleOnClick = useCallback(() => previewOnClick && setModalOpened(true), [previewOnClick])
 
   const boxOptions = useMemo(
     () => ({
