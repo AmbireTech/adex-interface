@@ -122,7 +122,7 @@ const CampaignAnalytics = () => {
 
   return (
     <Container fluid>
-      <GoBack title="Campaign Analytics" />
+      <GoBack title="Dashboard" />
       <Tabs
         color="brand"
         value={activeTab}

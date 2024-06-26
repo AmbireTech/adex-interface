@@ -9,7 +9,7 @@ const GoBack = ({ title }: { title: string }) => {
   const handleClick = () => navigate(-1)
 
   return (
-    <ActionButton action={handleClick} icon={<LeftChevronIcon />} title="Campaign Analytics">
+    <ActionButton action={handleClick} icon={<LeftChevronIcon />} title={title}>
       <Text size="sm">{title}</Text>
     </ActionButton>
   )
