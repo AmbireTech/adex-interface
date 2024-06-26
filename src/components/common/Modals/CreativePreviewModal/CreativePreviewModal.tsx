@@ -19,7 +19,7 @@ const CreativePreviewModal = ({
       onClose={close}
       centered
       withCloseButton={hasCloseBtn}
-      withOverlay={!!hasCloseBtn}
+      withOverlay={!hasCloseBtn}
       size="auto"
     >
       <Media adUnit={media} width={media.banner?.format.w} height={media.banner?.format.h} />

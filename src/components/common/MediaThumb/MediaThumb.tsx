@@ -39,8 +39,8 @@ const MediaThumb = ({
     () => ({
       className: classes.thumbContainer,
       onClick: previewOnClick ? handleOnClick : undefined,
-      onMouseEnter: !previewOnClick ? () => setModalOpened(true) : undefined,
-      onMouseLeave: !previewOnClick ? () => setModalOpened(false) : undefined
+      onMouseEnter: previewOnClick ? () => setModalOpened(true) : undefined,
+      onMouseLeave: previewOnClick ? () => setModalOpened(false) : undefined
     }),
     [classes.thumbContainer, handleOnClick, previewOnClick]
   )
