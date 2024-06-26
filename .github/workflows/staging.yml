@@ -24,7 +24,7 @@ jobs:
           REACT_APP_ENV: staging
           REACT_APP_IPFS_GATEWAY: https://ipfs.adex.network/ipfs/
           REACT_APP_DAPP_NAME: "AdEx Platform"
-          REACT_APP_DAPP_ICON_PATH: https://raw.githubusercontent.com/AmbireTech/ambire-brand/main/adex-logos/Ambire_AdEx_Symbol_color.svg
+          REACT_APP_DAPP_ICON_PATH: https://raw.githubusercontent.com/AmbireTech/adex-brand/main/Logos/AdEx%20logo%20%7C%20PNG/adex_symbol_square_128px.png
           REACT_APP_BACKEND_BASE_URL: https://vhoda.adex.network
           REACT_APP_VALIDATOR_BASE_URL: https://scratchy.adex.network:8443
           REACT_APP_IS_MANUAL_DEPOSITING: true
