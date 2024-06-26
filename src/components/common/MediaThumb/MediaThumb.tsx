@@ -1,7 +1,6 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { Box, createStyles } from '@mantine/core'
 import { AdUnit } from 'adex-common/dist/types'
-import { useHover } from '@mantine/hooks'
 import { CreativePreviewModal } from '../Modals'
 import Media from '../Media'
 
@@ -31,22 +30,27 @@ const MediaThumb = ({
   width?: number | string
   height?: number | string
 }) => {
-  const { hovered, ref } = useHover()
   const [modalOpened, setModalOpened] = useState(false)
   const { classes } = useStyles({ width, height })
-
-  useEffect(() => {
-    if (!previewOnClick) setModalOpened(hovered)
-  }, [hovered, previewOnClick])
 
   const handleOnClick = useCallback(
     () => !!previewOnClick && setModalOpened(true),
     [previewOnClick]
   )
 
+  const boxOptions = useMemo(
+    () => ({
+      className: classes.thumbContainer,
+      onClick: previewOnClick ? handleOnClick : undefined,
+      onMouseEnter: !previewOnClick ? () => setModalOpened(true) : undefined,
+      onMouseLeave: !previewOnClick ? () => setModalOpened(false) : undefined
+    }),
+    [classes.thumbContainer, handleOnClick, previewOnClick]
+  )
+
   return (
     <>
-      <Box ref={ref} className={classes.thumbContainer} onClick={handleOnClick}>
+      <Box {...boxOptions}>
         <Media adUnit={adUnit} width={width} height={height} />
       </Box>
       <CreativePreviewModal
