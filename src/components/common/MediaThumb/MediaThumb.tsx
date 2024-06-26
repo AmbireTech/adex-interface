@@ -39,8 +39,8 @@ const MediaThumb = ({
     () => ({
       className: classes.thumbContainer,
       onClick: previewOnClick ? handleOnClick : undefined,
-      onMouseEnter: previewOnClick ? () => setModalOpened(true) : undefined,
-      onMouseLeave: previewOnClick ? () => setModalOpened(false) : undefined
+      onMouseEnter: previewOnClick ? undefined : () => setModalOpened(true),
+      onMouseLeave: previewOnClick ? undefined : () => setModalOpened(false)
     }),
     [classes.thumbContainer, handleOnClick, previewOnClick]
   )
@@ -51,7 +51,7 @@ const MediaThumb = ({
         <Media adUnit={adUnit} width={width} height={height} />
       </Box>
       <CreativePreviewModal
-        hasCloseBtn={previewOnClick}
+        hasCloseBtn={!!previewOnClick}
         media={adUnit}
         opened={modalOpened}
         close={() => setModalOpened(false)}
