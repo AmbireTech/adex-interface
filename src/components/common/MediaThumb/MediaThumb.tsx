@@ -1,38 +1,57 @@
-import { useEffect, useState } from 'react'
-import { createStyles } from '@mantine/core'
+import { useCallback, useMemo, useState } from 'react'
+import { Box, createStyles } from '@mantine/core'
 import { AdUnit } from 'adex-common/dist/types'
-import { useHover } from '@mantine/hooks'
 import { CreativePreviewModal } from '../Modals'
 import Media from '../Media'
 
-const useStyles = createStyles((theme) => ({
-  thumbContainer: {
-    position: 'relative',
-    maxWidth: 40,
-    maxHeight: 40,
-    overflow: 'hidden',
-    background: theme.colors.alternativeBackground[theme.fn.primaryShade()],
-    '&:hover': {
-      cursor: 'pointer'
+const useStyles = createStyles(
+  (theme, { width, height }: { width?: number | string; height?: number | string }) => ({
+    thumbContainer: {
+      position: 'relative',
+      maxWidth: width,
+      maxHeight: height,
+      overflow: 'hidden',
+      background: theme.colors.alternativeBackground[theme.fn.primaryShade()],
+      '&:hover': {
+        cursor: 'pointer'
+      }
     }
-  }
-}))
+  })
+)
 
-const MediaThumb = ({ adUnit }: { adUnit: AdUnit }) => {
-  const { hovered, ref } = useHover()
+const MediaThumb = ({
+  adUnit,
+  previewOnClick,
+  width = 40,
+  height = 40
+}: {
+  adUnit: AdUnit
+  previewOnClick?: boolean
+  width?: number | string
+  height?: number | string
+}) => {
   const [modalOpened, setModalOpened] = useState(false)
-  const { classes } = useStyles()
+  const { classes } = useStyles({ width, height })
 
-  useEffect(() => {
-    setModalOpened(hovered)
-  }, [hovered])
+  const handleOnClick = useCallback(() => previewOnClick && setModalOpened(true), [previewOnClick])
+
+  const boxOptions = useMemo(
+    () => ({
+      className: classes.thumbContainer,
+      onClick: previewOnClick ? handleOnClick : undefined,
+      onMouseEnter: previewOnClick ? undefined : () => setModalOpened(true),
+      onMouseLeave: previewOnClick ? undefined : () => setModalOpened(false)
+    }),
+    [classes.thumbContainer, handleOnClick, previewOnClick]
+  )
 
   return (
     <>
-      <div ref={ref} className={classes.thumbContainer}>
-        <Media adUnit={adUnit} />
-      </div>
+      <Box {...boxOptions}>
+        <Media adUnit={adUnit} width={width} height={height} />
+      </Box>
       <CreativePreviewModal
+        hasCloseBtn={!!previewOnClick}
         media={adUnit}
         opened={modalOpened}
         close={() => setModalOpened(false)}
