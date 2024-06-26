@@ -3,10 +3,12 @@ import { AdUnit } from 'adex-common'
 import Media from 'components/common/Media'
 
 const CreativePreviewModal = ({
+  hasCloseBtn,
   media,
   opened,
   close
 }: {
+  hasCloseBtn: boolean
   media: AdUnit
   opened: boolean
   close: () => void
@@ -16,8 +18,8 @@ const CreativePreviewModal = ({
       opened={opened}
       onClose={close}
       centered
-      withCloseButton={false}
-      withOverlay={false}
+      withCloseButton={hasCloseBtn}
+      withOverlay={hasCloseBtn}
       size="auto"
     >
       <Media adUnit={media} width={media.banner?.format.w} height={media.banner?.format.h} />
