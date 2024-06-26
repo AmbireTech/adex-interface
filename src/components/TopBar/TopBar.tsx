@@ -20,7 +20,7 @@ import LogoutIcon from 'resources/icons/Logout'
 import Blockies from 'components/common/Blockies'
 // import ValidatorsIcon from 'resources/icons/Validators'
 // import WithdrawIcon from 'resources/icons/Withdraw'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import StakingIcon from 'resources/icons/Staking'
 import { useAdExApi } from 'hooks/useAdexServices'
 import useCustomNotifications from 'hooks/useCustomNotifications'
@@ -54,30 +54,21 @@ const formatTitle = (str: string) => {
     .join(' ')
 }
 
-const isIdLike = (segment: string) => {
-  const hexPattern = /^0x[0-9a-fA-F]{64}$/ // 64-character hexadecimal string starting with 0x
-  const uuidPattern =
-    /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/ // UUID
-  const numericPattern = /^\d+$/ // Numeric string
-
-  return hexPattern.test(segment) || uuidPattern.test(segment) || numericPattern.test(segment)
-}
-
 function TopBar() {
   const { classes, cx } = useStyles()
   const { adexAccount, disconnectWallet, resetAdexAccount } = useAccount()
   const { showNotification } = useCustomNotifications()
   const location = useLocation()
+  const { id } = useParams()
   const splitPath = useMemo(() => location.pathname.split('/'), [location.pathname])
-
   const title = useMemo(
     () =>
       formatTitle(
-        isIdLike(splitPath[splitPath.length - 1])
+        id && id === splitPath[splitPath.length - 1]
           ? splitPath[splitPath.length - 2]
           : splitPath[splitPath.length - 1]
       ),
-    [splitPath]
+    [splitPath, id]
   )
 
   const [opened, setOpened] = useState<boolean>(false)
