@@ -45,14 +45,32 @@ const useStyles = createStyles((theme) => ({
   }
 }))
 
+const formatTitle = (str: string) => {
+  if (!str) return ''
+
+  return str
+    .split('-')
+    .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ')
+}
+
+const SUB_ROUTES_COUNT = 3
+
 function TopBar() {
   const { classes, cx } = useStyles()
   const { adexAccount, disconnectWallet, resetAdexAccount } = useAccount()
   const { showNotification } = useCustomNotifications()
   const location = useLocation()
   const splitPath = useMemo(() => location.pathname.split('/'), [location.pathname])
+
   const title = useMemo(
-    () => (splitPath[splitPath.length - 1] === '' ? 'dashboard' : splitPath[1]),
+    () =>
+      // Note: excludes url params from subPaths by check the count of sub paths
+      formatTitle(
+        splitPath.length > SUB_ROUTES_COUNT
+          ? splitPath[splitPath.length - 2]
+          : splitPath[splitPath.length - 1]
+      ),
     [splitPath]
   )
 
