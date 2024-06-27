@@ -11,7 +11,7 @@ import {
   UnstyledButton,
   CopyButton
 } from '@mantine/core'
-import { capitalizeFirstLetter, formatDate, maskAddress } from 'helpers/formatters'
+import { formatDate, maskAddress } from 'helpers/formatters'
 import useAccount from 'hooks/useAccount'
 import { useCallback, useMemo, useState } from 'react'
 import DownArrowIcon from 'resources/icons/DownArrow'
@@ -20,7 +20,7 @@ import LogoutIcon from 'resources/icons/Logout'
 import Blockies from 'components/common/Blockies'
 // import ValidatorsIcon from 'resources/icons/Validators'
 // import WithdrawIcon from 'resources/icons/Withdraw'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import StakingIcon from 'resources/icons/Staking'
 import { useAdExApi } from 'hooks/useAdexServices'
 import useCustomNotifications from 'hooks/useCustomNotifications'
@@ -42,18 +42,33 @@ const useStyles = createStyles((theme) => ({
       border: `1px solid ${theme.colors.decorativeBorders[theme.fn.primaryShade()]}`,
       borderRadius: theme.radius.sm
     }
+  },
+  capitalizeText: {
+    textTransform: 'capitalize'
   }
 }))
+
+const formatTitle = (str: string) => {
+  if (!str) return ''
+
+  return str.split('-').join(' ')
+}
 
 function TopBar() {
   const { classes, cx } = useStyles()
   const { adexAccount, disconnectWallet, resetAdexAccount } = useAccount()
   const { showNotification } = useCustomNotifications()
   const location = useLocation()
+  const { id } = useParams()
   const splitPath = useMemo(() => location.pathname.split('/'), [location.pathname])
   const title = useMemo(
-    () => (splitPath[splitPath.length - 1] === '' ? 'dashboard' : splitPath[1]),
-    [splitPath]
+    () =>
+      formatTitle(
+        id && id === splitPath[splitPath.length - 1]
+          ? splitPath[splitPath.length - 2]
+          : splitPath[splitPath.length - 1]
+      ),
+    [splitPath, id]
   )
 
   const [opened, setOpened] = useState<boolean>(false)
@@ -100,8 +115,8 @@ function TopBar() {
   return (
     <Flex direction="row" gap="md" justify="space-between" align="center" style={{ flexGrow: 1 }}>
       <Flex direction="column" justify="end" align="baseline">
-        <Title order={5} weight="bold">
-          {capitalizeFirstLetter(title)}
+        <Title order={5} weight="bold" className={classes.capitalizeText}>
+          {title}
         </Title>
         <Text fz="xs">{formatDate(new Date())}</Text>
       </Flex>
