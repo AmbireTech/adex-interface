@@ -42,8 +42,6 @@ export const maskAddress = (address: string) =>
     ? `${address.substring(0, 8)}...${address.substring(address.length - 6, address.length)}`
     : ''
 
-export const capitalizeFirstLetter = (str: string) => str.charAt(0).toUpperCase() + str.slice(1)
-
 export const getMonthRangeString = (date: Date): string => {
   const first = new Date(date.getFullYear(), date.getMonth(), 1)
   const last = new Date(date.getFullYear(), date.getMonth() + 1, 0)
