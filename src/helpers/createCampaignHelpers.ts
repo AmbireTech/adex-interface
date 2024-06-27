@@ -307,10 +307,10 @@ export function deepEqual<T>(obj1: T, obj2: T): boolean {
 
 const UTM_PARAMS = {
   utm_source: 'AdEx',
-  utm_medium: 'CPM'
-  // utm_term: 'none',
-  // utm_campaign: 'none',
-  // utm_content: 'none'
+  utm_medium: 'CPM',
+  utm_term: '',
+  utm_campaign: '',
+  utm_content: ''
 }
 
 export const addUrlUtmTracking = ({
@@ -326,25 +326,33 @@ export const addUrlUtmTracking = ({
 }) => {
   if (targetUrl) {
     const url = new URL(targetUrl)
-    url.search = ''
-
     const params = new URLSearchParams(url.search)
+
     Object.entries(UTM_PARAMS).forEach(([key, value]) => {
-      params.set(key, value)
+      let paramValue = ''
+      switch (key) {
+        case 'utm_campaign':
+          paramValue = params.get('utm_campaign') || campaign
+          break
+        case 'utm_content':
+          paramValue = params.get('utm_content') || content
+          break
+        case 'utm_term':
+          paramValue = params.get('utm_term') || term
+          break
+        default:
+          paramValue = params.get(key) || value
+          break
+      }
+
+      params.set(key, paramValue)
     })
 
-    if (campaign) {
-      params.set('utm_campaign', params.get('utm_campaign') || campaign)
-    }
-    if (content) {
-      params.set('utm_content', params.get('utm_content') || content)
-    }
-    if (term) {
-      params.set('utm_term', params.get('utm_term') || term)
-    }
+    const search = Array.from(params.entries())
+      .map(([key, value]) => `${key}=${encodeURIComponent(value)}`)
+      .join('&')
 
-    url.search = encodeURIComponent(params.toString())
-
+    url.search = search
     return url.toString()
   }
 
