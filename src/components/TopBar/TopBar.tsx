@@ -11,7 +11,7 @@ import {
   UnstyledButton,
   CopyButton
 } from '@mantine/core'
-import { capitalizeFirstLetter, formatDate, maskAddress } from 'helpers/formatters'
+import { formatDate, maskAddress } from 'helpers/formatters'
 import useAccount from 'hooks/useAccount'
 import { useCallback, useMemo, useState } from 'react'
 import DownArrowIcon from 'resources/icons/DownArrow'
@@ -42,16 +42,16 @@ const useStyles = createStyles((theme) => ({
       border: `1px solid ${theme.colors.decorativeBorders[theme.fn.primaryShade()]}`,
       borderRadius: theme.radius.sm
     }
+  },
+  capitalizeText: {
+    textTransform: 'capitalize'
   }
 }))
 
 const formatTitle = (str: string) => {
   if (!str) return ''
 
-  return str
-    .split('-')
-    .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-    .join(' ')
+  return str.split('-').join(' ')
 }
 
 function TopBar() {
@@ -115,8 +115,8 @@ function TopBar() {
   return (
     <Flex direction="row" gap="md" justify="space-between" align="center" style={{ flexGrow: 1 }}>
       <Flex direction="column" justify="end" align="baseline">
-        <Title order={5} weight="bold">
-          {capitalizeFirstLetter(title)}
+        <Title order={5} weight="bold" className={classes.capitalizeText}>
+          {title}
         </Title>
         <Text fz="xs">{formatDate(new Date())}</Text>
       </Flex>
