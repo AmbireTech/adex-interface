@@ -21,6 +21,7 @@ export type CampaignUI = Campaign & {
   updated?: string
   autoUTMChecked: boolean
   asapStartingDate: boolean
+  draftModified: boolean
 }
 
 export type ImageSizes = {
