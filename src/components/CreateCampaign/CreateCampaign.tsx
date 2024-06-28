@@ -3,13 +3,11 @@ import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import { useCallback, useEffect, useState } from 'react'
 import { modals } from '@mantine/modals'
 import useCustomNotifications from 'hooks/useCustomNotifications'
-import { deepEqual } from 'helpers/createCampaignHelpers'
 import type {
   unstable_Blocker as Blocker,
   unstable_BlockerFunction as BlockerFunction
 } from 'react-router-dom'
 import { unstable_useBlocker as useBlocker } from 'react-router-dom'
-import { CampaignUI } from 'types'
 import { CustomConfirmModal } from 'components/common/Modals'
 import CustomStepper from './CampaignStepper'
 import CampaignSummary from './CampaignSummary'
@@ -99,7 +97,6 @@ const CreateCampaign = () => {
     saveToDraftCampaign
   } = useCreateCampaignContext()
   const { showNotification } = useCustomNotifications()
-  const [campaignInitialState, setCampaignInitialState] = useState<CampaignUI | null>(null)
   const [openedModal, setOpenedModal] = useState(false)
 
   const blocker: Blocker = useBlocker(
@@ -133,26 +130,12 @@ const CreateCampaign = () => {
   }, [blocker.state, blockerProceed])
 
   useEffect(() => {
-    if (
-      blocker.state === 'blocked' &&
-      !!campaignInitialState &&
-      !deepEqual(campaign, campaignInitialState)
-    ) {
+    if (blocker.state === 'blocked' && campaign.draftModified) {
       setOpenedModal(true)
     } else if (blocker.state === 'blocked') {
       blockerProceed()
     }
-  }, [blocker, campaignInitialState, campaign, blockerProceed])
-
-  useEffect(() => {
-    setCampaignInitialState((p) => {
-      let next = p && { ...p }
-      if (!next) {
-        next = campaign
-      }
-      return next
-    })
-  }, []) // eslint-disable-line
+  }, [blocker, campaign, blockerProceed])
 
   return (
     <>
