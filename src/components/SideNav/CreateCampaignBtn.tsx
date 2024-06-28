@@ -1,7 +1,7 @@
-import { Button, Text } from '@mantine/core'
-import CustomPopover from 'components/common/CustomPopover'
+import { Button } from '@mantine/core'
+import TopUpAccountModal from 'components/common/TopUpAccountModal'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
-import { useCallback } from 'react'
+import { useCallback, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 type CreateCampaignBtnProps = {
@@ -11,28 +11,27 @@ type CreateCampaignBtnProps = {
 const CreateCampaignBtn = ({ hasPopover }: CreateCampaignBtnProps) => {
   const { resetCampaign } = useCreateCampaignContext()
   const navigate = useNavigate()
-
+  const [opened, setOpened] = useState(false)
+  const handleModalClicked = useCallback(() => setOpened((prev) => !prev), [])
   const handleBtnClicked = useCallback(() => {
-    resetCampaign()
-    navigate('/dashboard/create-campaign')
-  }, [resetCampaign, navigate])
-  return hasPopover ? (
-    <CustomPopover
-      popoverContent={
-        <Text size="sm">
-          Contact us on <a href="mailto: dsp@adex.network"> dsp@adex.network</a> to &quot;add
-          money&quot; / &quot;launch campaign&quot;
-        </Text>
-      }
-    >
-      <Button variant="filled" color="secondaryAccent" size="md">
+    if (hasPopover) {
+      handleModalClicked()
+    } else {
+      resetCampaign()
+      navigate('/dashboard/create-campaign')
+    }
+  }, [hasPopover, handleModalClicked, resetCampaign, navigate])
+  return (
+    <>
+      <Button variant="filled" color="secondaryAccent" size="md" onClick={handleBtnClicked}>
         New Campaign
       </Button>
-    </CustomPopover>
-  ) : (
-    <Button variant="filled" color="secondaryAccent" size="md" onClick={handleBtnClicked}>
-      New Campaign
-    </Button>
+      <TopUpAccountModal
+        onCancelClicked={handleModalClicked}
+        onConfirmClicked={handleModalClicked}
+        opened={opened}
+      />
+    </>
   )
 }
 

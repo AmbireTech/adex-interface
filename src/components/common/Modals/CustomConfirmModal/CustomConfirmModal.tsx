@@ -75,7 +75,7 @@ const CustomConfirmModal = ({
 
   return (
     <>
-      {overlayTop ? (
+      {overlayTop && opened ? (
         <Lottie animationData={AnimationData} loop autoplay className={classes.lottie} />
       ) : null}
       <Modal
@@ -95,7 +95,9 @@ const CustomConfirmModal = ({
             {/* TODO: icon should be passed as a prop */}
             <AttentionIcon className={classes.attentionIcon} />
           </div>
-          <Text w="100%">{text}</Text>
+          <Text w="100%" pt="xl">
+            {text}
+          </Text>
         </Flex>
         <Flex justify="space-between" p="xl">
           <Button size="lg" variant="outline" onClick={onCancelClicked}>
