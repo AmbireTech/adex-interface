@@ -142,10 +142,10 @@ const Deposit = () => {
         </Grid.Col>
       </Grid>
       <CustomConfirmModal
-        cancelBtnLabel="No"
-        confirmBtnLabel="Yes"
-        onCancelClicked={() => goBack()}
-        onConfirmClicked={() => goBack()}
+        cancelBtnLabel="Close"
+        confirmBtnLabel="Get in touch"
+        onCancelClicked={goBack}
+        onConfirmClicked={goBack}
         color="attention"
         text={
           <Text>
@@ -154,8 +154,8 @@ const Deposit = () => {
               contactus@adex.network
             </a>{' '}
             and send us you account ID (the address which you can find in the upper right corner of
-            your profile). We will provide you with further instructions on how to deposit funds on
-            the address.
+            your profile), company name and country of registration. We will provide you with
+            further instructions on how to deposit funds on the address.
           </Text>
         }
         opened={opened}
