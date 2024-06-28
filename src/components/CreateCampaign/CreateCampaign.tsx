@@ -1,10 +1,14 @@
-import { Grid, createStyles, Text, Flex, Button } from '@mantine/core'
+import { Grid, createStyles } from '@mantine/core'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
-import { useEffect } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { modals } from '@mantine/modals'
 import useCustomNotifications from 'hooks/useCustomNotifications'
-import { deepEqual } from 'helpers/createCampaignHelpers'
-import AttentionIcon from 'resources/icons/Attention'
+import type {
+  unstable_Blocker as Blocker,
+  unstable_BlockerFunction as BlockerFunction
+} from 'react-router-dom'
+import { unstable_useBlocker as useBlocker } from 'react-router-dom'
+import { CustomConfirmModal } from 'components/common/Modals'
 import CustomStepper from './CampaignStepper'
 import CampaignSummary from './CampaignSummary'
 import StepOne from './StepOne/StepOne'
@@ -88,106 +92,85 @@ const Wizard = ({ step }: { step: number }) => {
 const CreateCampaign = () => {
   const { classes } = useStyles()
   const {
-    setCampaign,
+    campaign,
     campaign: { step },
-    saveToDraftCampaign,
-    defaultValue
+    saveToDraftCampaign
   } = useCreateCampaignContext()
   const { showNotification } = useCustomNotifications()
+  const [openedModal, setOpenedModal] = useState(false)
+
+  const blocker: Blocker = useBlocker(
+    useCallback<BlockerFunction>(
+      ({ currentLocation, nextLocation }) => currentLocation.pathname !== nextLocation.pathname,
+      []
+    )
+  )
+
+  const blockerProceed = useCallback(() => blocker.proceed?.(), [blocker])
+
+  const handleConfirmBtnClicked = useCallback(async () => {
+    try {
+      const res = await saveToDraftCampaign(campaign)
+
+      if (res && res.success) {
+        showNotification('info', 'Draft saved')
+      } else {
+        showNotification('warning', 'invalid campaign data response', 'Data error')
+      }
+    } catch (err) {
+      console.error(err)
+      showNotification('error', 'Creating campaign failed', 'Data error')
+    }
+    modals.closeAll()
+    blockerProceed()
+  }, [showNotification, saveToDraftCampaign, blockerProceed, campaign])
+
+  const handleCancelBtnClicked = useCallback(() => {
+    if (blocker.state === 'blocked') blockerProceed()
+  }, [blocker.state, blockerProceed])
 
   useEffect(() => {
-    return () => {
-      // NOTE: because of the strict mode on dev env it invokes twice
-      if (process.env.NODE_ENV !== 'development') {
-        setCampaign((prev) => {
-          if (!deepEqual(prev, defaultValue)) {
-            modals.open({
-              withCloseButton: false,
-              closeOnClickOutside: false,
-              children: (
-                <>
-                  <Flex justify="center" className={classes.confirmModalContent}>
-                    <div className={classes.iconWrapper}>
-                      <AttentionIcon className={classes.attentionIcon} />
-                    </div>
-                    <Text w="100%">
-                      You may have unsaved changes. Do you want to save them as a draft?
-                    </Text>
-                  </Flex>
-                  <Flex justify="space-between" p="xl">
-                    <Button
-                      size="lg"
-                      variant="outline"
-                      onClick={() => {
-                        modals.closeAll()
-                        console.log('No')
-                      }}
-                    >
-                      No
-                    </Button>
-                    <Button
-                      size="lg"
-                      onClick={async () => {
-                        try {
-                          const res = await saveToDraftCampaign(prev)
-
-                          if (res && res.success) {
-                            // TODO: move this func out of the button @boklik 🤷🏼‍♂️
-                            showNotification('error', 'Draft saved')
-                          } else {
-                            showNotification(
-                              'warning',
-                              'invalid campaign data response',
-                              'Data error'
-                            )
-                          }
-                        } catch (err) {
-                          console.error(err)
-                          showNotification('error', 'Creating campaign failed', 'Data error')
-                        }
-                        modals.closeAll()
-                      }}
-                    >
-                      Yes
-                    </Button>
-                  </Flex>
-                </>
-              ),
-              classNames: {
-                body: classes.modalBody
-              }
-            })
-          }
-
-          return prev
-        })
-      }
+    if (blocker.state === 'blocked' && campaign.draftModified) {
+      setOpenedModal(true)
+    } else if (blocker.state === 'blocked') {
+      blockerProceed()
     }
-  }, []) // eslint-disable-line
+  }, [blocker, campaign, blockerProceed])
 
   return (
-    <Grid columns={24} align="flex-start" mr="xl" ml="xl" mt="md">
-      <Grid.Col sm={24} md={15} lg={18} className={classes.container} p="lg">
-        <Grid p="md">
-          <Grid.Col>
-            <CustomStepper />
-          </Grid.Col>
-          <Grid.Col>
-            <Wizard step={step} />
-          </Grid.Col>
-        </Grid>
-      </Grid.Col>
-      <Grid.Col
-        sm={24}
-        md={8}
-        lg={5}
-        offset={1}
-        className={classes.container}
-        style={{ height: 'auto', padding: 0 }}
-      >
-        <CampaignSummary />
-      </Grid.Col>
-    </Grid>
+    <>
+      <Grid columns={24} align="flex-start" mr="xl" ml="xl" mt="md">
+        <Grid.Col sm={24} md={15} lg={18} className={classes.container} p="lg">
+          <Grid p="md">
+            <Grid.Col>
+              <CustomStepper />
+            </Grid.Col>
+            <Grid.Col>
+              <Wizard step={step} />
+            </Grid.Col>
+          </Grid>
+        </Grid.Col>
+        <Grid.Col
+          sm={24}
+          md={8}
+          lg={5}
+          offset={1}
+          className={classes.container}
+          style={{ height: 'auto', padding: 0 }}
+        >
+          <CampaignSummary />
+        </Grid.Col>
+      </Grid>
+      <CustomConfirmModal
+        cancelBtnLabel="No"
+        confirmBtnLabel="Yes"
+        onCancelClicked={handleCancelBtnClicked}
+        onConfirmClicked={handleConfirmBtnClicked}
+        color="attention"
+        text="You may have unsaved changes. Do you want to save them as a draft?"
+        opened={openedModal}
+      />
+    </>
   )
 }
 
