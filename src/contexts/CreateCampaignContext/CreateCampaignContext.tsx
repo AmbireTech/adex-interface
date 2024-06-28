@@ -380,8 +380,6 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
   const publishCampaign = useCallback(() => {
     const preparedCampaign = prepareCampaignObject(campaign, balanceToken.decimals)
 
-    console.log('mappedCampaignPublish', preparedCampaign)
-
     const body = serialize(preparedCampaign).json
 
     return adexServicesRequest('backend', {
