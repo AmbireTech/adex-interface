@@ -12,7 +12,7 @@ import CampaignDetailsRow from 'components/common/CampainDetailsRow/CampaignDeta
 import { useCampaignsData } from 'hooks/useCampaignsData'
 import ActiveIcon from 'resources/icons/Active'
 import CampaignActionBtn from 'components/CampaignAnalytics/CampaignActionBtn'
-import StopIcon from 'resources/icons/Stop'
+// import StopIcon from 'resources/icons/Stop'
 import ArchivedIcon from 'resources/icons/Archived'
 import FormattedAmount from 'components/common/FormattedAmount/FormattedAmount'
 import EditIcon from 'resources/icons/Edit'
@@ -314,7 +314,7 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
                           }
                         />
                       )}
-                      {campaign.status === CampaignStatus.active && (
+                      {/* {campaign.status === CampaignStatus.active && (
                         <CampaignActionBtn
                           text="Pause"
                           icon={<StopIcon size="13px" />}
@@ -323,7 +323,7 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
                             changeCampaignStatus(CampaignStatus.paused, campaign.id)
                           }
                         />
-                      )}
+                      )} */}
                       {(campaign.status === CampaignStatus.paused ||
                         campaign.status === CampaignStatus.active) && (
                         <CampaignActionBtn
