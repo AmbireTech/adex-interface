@@ -3,11 +3,11 @@ import CustomBadge from 'components/common/CustomBadge'
 import InfoAlertMessage from 'components/common/InfoAlertMessage'
 import MediaThumb from 'components/common/MediaThumb'
 import { isValidHttpUrl } from 'helpers/validators'
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import DeleteIcon from 'resources/icons/Delete'
 import { ImageUrlInputProps } from 'types'
 
-const useStyles = createStyles((theme) => {
+const useStyles = createStyles((theme, { hasError }: { hasError: boolean }) => {
   const smallerSpacing = `${Number(theme.spacing.xs.split('rem')[0]) * 0.8}rem`
 
   return {
@@ -27,12 +27,18 @@ const useStyles = createStyles((theme) => {
       borderColor: theme.colors.decorativeBorders[theme.fn.primaryShade()],
       borderRadius: theme.radius.md,
       '&:focus-within': {
-        borderColor: theme.colors.brand[theme.fn.primaryShade()],
+        borderColor: hasError
+          ? theme.colors.warning[theme.fn.primaryShade()]
+          : theme.colors.brand[theme.fn.primaryShade()],
         [`& .${getStylesRef('mediaWrapper')}`]: {
-          borderColor: theme.colors.brand[theme.fn.primaryShade()]
+          borderColor: hasError
+            ? theme.colors.warning[theme.fn.primaryShade()]
+            : theme.colors.brand[theme.fn.primaryShade()]
         },
         [`& .${getStylesRef('inputField')}`]: {
-          color: theme.colors.brand[theme.fn.primaryShade()]
+          borderColor: hasError
+            ? theme.colors.warning[theme.fn.primaryShade()]
+            : theme.colors.brand[theme.fn.primaryShade()]
         }
       }
     },
@@ -59,8 +65,9 @@ const ImageUrlInput = ({
   preview,
   ...rest
 }: ImageUrlInputProps) => {
-  const { classes, cx } = useStyles()
   const [error, setError] = useState('')
+  const hasError: boolean = useMemo(() => !!error || !!toRemove, [error, toRemove])
+  const { classes, cx } = useStyles({ hasError })
 
   const getRightSection = useCallback(() => {
     if (preview || !onDelete) return null
@@ -79,18 +86,22 @@ const ImageUrlInput = ({
 
   const handleChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      const { value } = event.target
-
-      if (value.length > 8 && !isValidHttpUrl(value)) {
-        setError('Please enter a valid URL')
-      } else {
-        setError('')
-      }
-
       onChange?.(event)
     },
     [onChange]
   )
+
+  useEffect(() => {
+    if (
+      image.banner?.targetUrl &&
+      image.banner?.targetUrl.length > 8 &&
+      !isValidHttpUrl(image.banner?.targetUrl)
+    ) {
+      setError('Please enter a valid URL')
+    } else {
+      setError('')
+    }
+  }, [image.banner?.targetUrl])
 
   return (
     <>
@@ -103,20 +114,20 @@ const ImageUrlInput = ({
         justify="flex-start"
         align="center"
         gap="xs"
-        className={cx(classes.wrapper, { [classes.inputError]: error || toRemove })}
+        className={cx(classes.wrapper, { [classes.inputError]: hasError })}
         {...rest}
       >
         <div className={classes.mediaWrapper}>
           <MediaThumb adUnit={image} />
         </div>
         <CustomBadge
-          color={error || toRemove ? 'warning' : 'brand'}
+          color={hasError ? 'warning' : 'brand'}
           text={`${image.banner?.format.w}x${image.banner?.format.h}`}
         />
         <Input
           className={classes.inputField}
           onChange={handleChange}
-          error={toRemove}
+          error={hasError}
           disabled={toRemove || preview}
           defaultValue={image.banner?.targetUrl}
           type="url"
@@ -128,8 +139,8 @@ const ImageUrlInput = ({
             rightSection: classes.rightSection
           }}
         />
-        {error && <Text color="warning">{error}</Text>}
       </Flex>
+      {error && <Text color="warning">{error}</Text>}
     </>
   )
 }
