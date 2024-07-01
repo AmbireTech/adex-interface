@@ -1,6 +1,6 @@
 import { FormEvent, useCallback, useState, useMemo } from 'react'
-import { Button, Flex, Text, Textarea } from '@mantine/core'
-import { Campaign, CampaignStatus } from 'adex-common'
+import { Button, Flex, Text, Textarea, Badge } from '@mantine/core'
+import { Campaign, CampaignStatus, ReviewStatus } from 'adex-common'
 import throttle from 'lodash.throttle'
 import { useAdExApi } from 'hooks/useAdexServices'
 
@@ -10,7 +10,7 @@ export const AdminActions = ({ item }: { item: Campaign | null }) => {
   const [action, setAction] = useState<null | number>(null)
   const [formed, setFormed] = useState(false)
 
-  const disabledBtns = item?.status !== CampaignStatus.inReview
+  const reviewed = item?.status !== CampaignStatus.inReview
 
   const handleAction = (status: string) => {
     if (!item?.id) return
@@ -43,24 +43,42 @@ export const AdminActions = ({ item }: { item: Campaign | null }) => {
     [handleSubmit]
   )
 
+  if (reviewed) {
+    return (
+      <Flex direction="column" justify="flex-start" align="stretch">
+        {item?.reviewStatus !== undefined && (
+          <Badge size="xl" mb="md" fullWidth>
+            {ReviewStatus[item.reviewStatus]}
+          </Badge>
+        )}
+        <Text color="secondaryText">Review msg:</Text>
+        <Text>{reason}</Text>
+      </Flex>
+    )
+  }
+
   return (
     <Flex direction="column" justify="flex-start" align="stretch">
+      {item?.reviewStatus !== undefined && (
+        <Badge size="xl" mb="md" fullWidth>
+          {ReviewStatus[item.reviewStatus]}
+        </Badge>
+      )}
       {!formed ? (
         <>
           <Textarea
             label="Required"
             required
-            disabled={disabledBtns}
             defaultValue={reason}
             onChange={(e) => setReason(e.target.value)}
             placeholder="Reason..."
           />
           <Flex gap="25px" justify="flex-start" mt="15px">
-            <Button onClick={() => handleAction('approve')} color="green" disabled={disabledBtns}>
+            <Button onClick={() => handleAction('approve')} color="green">
               Approve
             </Button>
 
-            <Button onClick={() => handleAction('reject')} color="red" disabled={disabledBtns}>
+            <Button onClick={() => handleAction('reject')} color="red">
               Reject
             </Button>
           </Flex>

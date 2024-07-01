@@ -19,6 +19,7 @@ import EditIcon from 'resources/icons/Edit'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import useCustomNotifications from 'hooks/useCustomNotifications'
 import { CustomConfirmModal } from 'components/common/Modals'
+import { AdminBadge } from 'components/common/AdminBadge'
 import CatsLocsFormatted from './CatsLocsFormatted'
 import { AdminActions } from './AdminActions'
 
@@ -113,6 +114,7 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
       {campaign && (
         <>
           <Container fluid className={classes.wrapper}>
+            {isAdminPanel && <AdminBadge title="Admin Details" />}
             <Grid>
               <Grid.Col md={12} xl={6}>
                 <Text weight="bold" size="sm" pb="sm" className={classes.lighterColor}>

@@ -4,7 +4,7 @@ import {
   // CampaignType,
   EventType
 } from 'adex-common'
-import { Container, Flex, Text, Badge, Loader } from '@mantine/core'
+import { Container, Flex, Text, Loader } from '@mantine/core'
 import { useCallback, useEffect, useMemo } from 'react'
 import CustomTable from 'components/common/CustomTable'
 import { periodNumberToDate } from 'helpers'
@@ -13,7 +13,7 @@ import { useCampaignsData } from 'hooks/useCampaignsData'
 import { parseBigNumTokenAmountToDecimal } from 'helpers/balances'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import useCustomNotifications from 'hooks/useCustomNotifications'
-import UnderReviewIcon from 'resources/icons/UnderReview'
+import { AdminBadge } from 'components/common/AdminBadge'
 import BadgeStatusCampaign from './BadgeStatusCampaign'
 
 const campaignHeaders = [
@@ -225,17 +225,7 @@ const Dashboard = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
       <Flex direction="column" justify="start">
         <Flex justify="space-between" align="center">
           {isAdminPanel ? (
-            <Badge
-              variant="gradient"
-              gradient={{ from: 'violet', to: 'purple' }}
-              size="xl"
-              mb="md"
-              fullWidth
-              leftSection={<UnderReviewIcon size="13px" />}
-              rightSection={<UnderReviewIcon size="13px" />}
-            >
-              Admin Panel
-            </Badge>
+            <AdminBadge title="Admin Panel" />
           ) : (
             <Text size="sm" color="secondaryText" weight="bold" mb="md">
               All Campaigns
