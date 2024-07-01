@@ -1,4 +1,4 @@
-import { Modal } from '@mantine/core'
+import { Modal, Flex, Text } from '@mantine/core'
 import { AdUnit } from 'adex-common'
 import Media from 'components/common/Media'
 
@@ -6,11 +6,13 @@ const CreativePreviewModal = ({
   hasCloseBtn,
   media,
   opened,
+  title,
   close
 }: {
   hasCloseBtn: boolean
   media: AdUnit
   opened: boolean
+  title?: string
   close: () => void
 }) => {
   return (
@@ -22,7 +24,11 @@ const CreativePreviewModal = ({
       withOverlay={hasCloseBtn}
       size="auto"
     >
-      <Media adUnit={media} width={media.banner?.format.w} height={media.banner?.format.h} />
+      <Flex direction="column" align="center" justify="center" gap="sm">
+        <Text>{title}</Text>
+        <Media adUnit={media} width={media.banner?.format.w} height={media.banner?.format.h} />
+        <Text>{media.banner?.mediaUrl}</Text>
+      </Flex>
     </Modal>
   )
 }

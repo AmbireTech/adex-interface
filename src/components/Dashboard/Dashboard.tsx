@@ -5,8 +5,7 @@ import {
   EventType
 } from 'adex-common'
 import { Container, Flex, Text, Badge, Loader } from '@mantine/core'
-import { useCallback, useEffect, useMemo, useState } from 'react'
-import { useDisclosure } from '@mantine/hooks'
+import { useCallback, useEffect, useMemo } from 'react'
 import CustomTable from 'components/common/CustomTable'
 import { periodNumberToDate } from 'helpers'
 import { useNavigate } from 'react-router-dom'
@@ -14,8 +13,6 @@ import { useCampaignsData } from 'hooks/useCampaignsData'
 import { parseBigNumTokenAmountToDecimal } from 'helpers/balances'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import useCustomNotifications from 'hooks/useCustomNotifications'
-import { AdminCampaignModal } from 'components/common/Modals'
-import { CampaignData } from 'types'
 import UnderReviewIcon from 'resources/icons/UnderReview'
 import BadgeStatusCampaign from './BadgeStatusCampaign'
 
@@ -64,8 +61,6 @@ const getStatusOrder = (status: CampaignStatus) => {
 const Dashboard = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
   const navigate = useNavigate()
   const { campaignsData, initialDataLoading, updateAllCampaignsData } = useCampaignsData()
-  const [opened, { open, close }] = useDisclosure(false)
-  const [selectedItem, setSelectedItem] = useState<CampaignData | null>(null)
   const { updateCampaignFromDraft } = useCreateCampaignContext()
   const { showNotification } = useCustomNotifications()
   // Temporary disabled show/hide archived until no functionality implemented
@@ -163,14 +158,9 @@ const Dashboard = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
 
   const handlePreview = useCallback(
     (item: Campaign) => {
-      if (isAdminPanel) {
-        setSelectedItem(campaignsData?.get(item.id) || null)
-        open()
-      } else {
-        navigate(`/dashboard/campaign-details/${item.id}`)
-      }
+      navigate(`/dashboard/campaign-details/${item.id}`)
     },
-    [campaignsData, isAdminPanel, navigate, open]
+    [navigate]
   )
 
   const handleAnalytics = useCallback(
@@ -276,7 +266,6 @@ const Dashboard = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
           </Flex>
         )}
       </Flex>
-      <AdminCampaignModal item={selectedItem?.campaign || null} opened={opened} close={close} />
     </Container>
   )
 }

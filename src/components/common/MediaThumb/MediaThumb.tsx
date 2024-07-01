@@ -23,12 +23,14 @@ const MediaThumb = ({
   adUnit,
   previewOnClick,
   width = 40,
-  height = 40
+  height = 40,
+  title
 }: {
   adUnit: AdUnit
   previewOnClick?: boolean
   width?: number | string
   height?: number | string
+  title?: string
 }) => {
   const [modalOpened, setModalOpened] = useState(false)
   const { classes } = useStyles({ width, height })
@@ -55,6 +57,7 @@ const MediaThumb = ({
         media={adUnit}
         opened={modalOpened}
         close={() => setModalOpened(false)}
+        title={title}
       />
     </>
   )
