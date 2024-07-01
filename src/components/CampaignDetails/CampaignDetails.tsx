@@ -355,12 +355,19 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
                 </Grid>
               </Grid.Col>
 
-              {isAdminPanel && campaign.status === CampaignStatus.inReview && (
-                <Grid>
-                  <Grid.Col>
-                    <AdminActions item={campaign} />
-                  </Grid.Col>
-                </Grid>
+              {isAdminPanel && (
+                <Grid.Col md={12} xl={6} pt="xl">
+                  <Grid>
+                    <Grid.Col span={12}>
+                      <Text weight="bold" size="xl" pb="sm" color="attention">
+                        Admin actions
+                      </Text>
+                    </Grid.Col>
+                    <Grid.Col>
+                      <AdminActions item={campaign} />
+                    </Grid.Col>
+                  </Grid>
+                </Grid.Col>
               )}
             </Grid>
           </Container>
