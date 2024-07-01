@@ -39,6 +39,7 @@ const CampaignDetailsRow = ({
       className={cx({ [classes.border]: !noBorder })}
       pt={lineHeight}
       pb={lineHeight}
+      gap="sm"
     >
       <Text
         className={cx(classes.textColor, {

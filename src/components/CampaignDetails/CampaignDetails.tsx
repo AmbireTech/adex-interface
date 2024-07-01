@@ -19,7 +19,9 @@ import EditIcon from 'resources/icons/Edit'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import useCustomNotifications from 'hooks/useCustomNotifications'
 import { CustomConfirmModal } from 'components/common/Modals'
+import { AdminBadge } from 'components/common/AdminBadge'
 import CatsLocsFormatted from './CatsLocsFormatted'
+import { AdminActions } from './AdminActions'
 
 const useStyles = createStyles((theme) => ({
   wrapper: {
@@ -53,7 +55,7 @@ const useStyles = createStyles((theme) => ({
   }
 }))
 
-const CampaignDetails = () => {
+const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
   const { classes, cx } = useStyles()
   const { campaignsData, updateCampaignDataById, changeCampaignStatus } = useCampaignsData()
   const { updateCampaignFromDraft } = useCreateCampaignContext()
@@ -112,8 +114,9 @@ const CampaignDetails = () => {
       {campaign && (
         <>
           <Container fluid className={classes.wrapper}>
+            {isAdminPanel && <AdminBadge title="Admin Details" />}
             <Grid>
-              <Grid.Col span={6}>
+              <Grid.Col md={12} xl={6}>
                 <Text weight="bold" size="sm" pb="sm" className={classes.lighterColor}>
                   Overview
                 </Text>
@@ -241,7 +244,7 @@ const CampaignDetails = () => {
                   />
                 </div>
               </Grid.Col>
-              <Grid.Col span={6}>
+              <Grid.Col md={12} xl={6}>
                 <Grid>
                   <Grid.Col span={12}>
                     <Text weight="bold" size="sm" pb="sm" className={classes.lighterColor}>
@@ -283,7 +286,13 @@ const CampaignDetails = () => {
                             lineHeight="sm"
                             textSize="sm"
                             title={`${item.banner?.format.w}x${item.banner?.format.h}`}
-                            value={<MediaThumb adUnit={item} previewOnClick />}
+                            value={
+                              <MediaThumb
+                                adUnit={item}
+                                previewOnClick
+                                title={`Target URL: ${item.banner?.targetUrl}`}
+                              />
+                            }
                             noBorder={isLast}
                           />
                         )
@@ -347,6 +356,21 @@ const CampaignDetails = () => {
                   </Grid.Col>
                 </Grid>
               </Grid.Col>
+
+              {isAdminPanel && (
+                <Grid.Col md={12} xl={6} pt="xl">
+                  <Grid>
+                    <Grid.Col span={12}>
+                      <Text weight="bold" size="xl" pb="sm" color="attention">
+                        Admin actions
+                      </Text>
+                    </Grid.Col>
+                    <Grid.Col>
+                      <AdminActions item={campaign} />
+                    </Grid.Col>
+                  </Grid>
+                </Grid.Col>
+              )}
             </Grid>
           </Container>
           <CustomConfirmModal
