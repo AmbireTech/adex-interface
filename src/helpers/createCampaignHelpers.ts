@@ -238,6 +238,7 @@ export const mapCampaignUItoCampaign = (campaignUI: CampaignUI): ReducedCampaign
     ownerHashed,
     updated,
     asapStartingDate,
+    draftModified,
     ...campaign
   } = campaignUI
 

@@ -348,6 +348,7 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
       setCampaign((prevState) => {
         const updated = { ...prevState }
         updated[key] = value
+        updated.draftModified = true
         return updated
       })
     },
@@ -382,8 +383,6 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
 
   const publishCampaign = useCallback(() => {
     const preparedCampaign = prepareCampaignObject(campaign, balanceToken.decimals)
-
-    console.log('mappedCampaignPublish', preparedCampaign)
 
     const body = serialize(preparedCampaign).json
 
@@ -464,7 +463,8 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
             BigInt(Math.floor(Number(draftCampaign.campaignBudget))),
             draftCampaign.outpaceAssetDecimals
           )
-        )
+        ),
+        draftModified: false
       }
 
       setCampaign(mappedDraftCampaign)

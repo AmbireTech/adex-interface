@@ -6,6 +6,7 @@ import { RouterProvider } from 'react-router-dom'
 import { router } from 'Router'
 import { lightTheme } from 'themes'
 import { Notifications } from '@mantine/notifications'
+import ReactGA from 'react-ga4'
 
 const ENV = process.env.REACT_APP_ENV
 
@@ -34,6 +35,8 @@ const EnvBanner = () => (
     sections={[{ value: 100, color: 'pink', label: ENV }]}
   />
 )
+
+ReactGA.initialize('G-PX5B4P9KKM')
 
 function App() {
   return (
