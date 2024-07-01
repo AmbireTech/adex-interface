@@ -103,18 +103,26 @@ const CampaignSummary = () => {
         )
         return
       }
+
+      if (autoUTMChecked) {
+        addUTMToTargetURLS()
+      }
     }
 
     if (step < CREATE_CAMPAIGN_STEPS - 1) {
       if (step === 2) {
         const element = document.getElementById('createCampaignSubmitBtn1')
         element?.click()
+
+        if (autoUTMChecked) {
+          addUTMToTargetURLS()
+        }
         return
       }
 
       updateCampaign('step', step + 1)
     }
-  }, [step, adUnits, updateCampaign, showNotification])
+  }, [step, adUnits, updateCampaign, showNotification, addUTMToTargetURLS, autoUTMChecked])
 
   const handleSaveDraftClicked = useCallback(async () => {
     try {
@@ -136,12 +144,6 @@ const CampaignSummary = () => {
     navigate('/dashboard/')
     close()
   }, [navigate, close])
-
-  useEffect(() => {
-    if (autoUTMChecked) {
-      addUTMToTargetURLS()
-    }
-  }, [autoUTMChecked, addUTMToTargetURLS])
 
   return (
     <>
