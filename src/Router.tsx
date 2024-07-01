@@ -86,6 +86,7 @@ export const router = createBrowserRouter(
         },
         { path: 'campaign-analytics/:id', element: <CampaignAnalytics /> },
         { path: 'campaign-details/:id', element: <CampaignDetails /> },
+        { path: 'campaign-details/admin/:id', element: <CampaignDetails isAdminPanel /> },
         {
           path: 'billing',
           element: <Billing />

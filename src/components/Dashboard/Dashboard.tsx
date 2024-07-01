@@ -158,9 +158,9 @@ const Dashboard = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
 
   const handlePreview = useCallback(
     (item: Campaign) => {
-      navigate(`/dashboard/campaign-details/${item.id}`)
+      navigate(`/dashboard/campaign-details/${isAdminPanel ? 'admin/' : ''}${item.id}`, {})
     },
-    [navigate]
+    [isAdminPanel, navigate]
   )
 
   const handleAnalytics = useCallback(
