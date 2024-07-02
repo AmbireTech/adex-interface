@@ -333,19 +333,13 @@ export const addUrlUtmTracking = ({
       let paramValue = ''
       switch (key) {
         case 'utm_campaign':
-          paramValue =
-            params.get('utm_campaign') && params.get('utm_campaign') === campaign
-              ? (params.get('utm_campaign') as string)
-              : campaign
+          paramValue = params.get('utm_campaign') || campaign
           break
         case 'utm_content':
           paramValue = params.get('utm_content') || content
           break
         case 'utm_term':
-          paramValue =
-            params.get('utm_term') && params.get('utm_term') === term
-              ? (params.get('utm_term') as string)
-              : term
+          paramValue = params.get('utm_term') || term
           break
         default:
           paramValue = params.get(key) || value
