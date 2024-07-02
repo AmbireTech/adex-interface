@@ -1,5 +1,5 @@
 import { UnstyledButton, Flex, Text } from '@mantine/core'
-import DownloadIcon from 'resources/icons/Download'
+import MapIcon from 'resources/icons/Map'
 
 type SeeOnMapBtnProps = {
   onBtnClicked: () => void
@@ -11,8 +11,7 @@ const SeeOnMapBtn = ({ onBtnClicked }: SeeOnMapBtnProps) => (
       <Text size="sm" mr="sm">
         See on map
       </Text>
-      {/* TODO: change with map icon, when the icon is added to the design */}
-      <DownloadIcon size="24px" />
+      <MapIcon size="24px" />
     </Flex>
   </UnstyledButton>
 )

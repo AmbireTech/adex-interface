@@ -42,7 +42,7 @@ declare module '@mantine/core' {
   }
 }
 
-const SIDE_BAR_WIDTH = 227
+export const SIDE_BAR_WIDTH = 227
 const MOBILE_MAX_WIDTH_IN_PX = 475
 
 // NOTE: Put here components overrides for sizes, form, animations etc. In light/(dark) theme - only colors

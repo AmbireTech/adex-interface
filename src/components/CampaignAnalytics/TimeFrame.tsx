@@ -107,7 +107,7 @@ export const TimeFrame = ({
   }
 
   return (
-    <Grid grow>
+    <Grid p="xs">
       <Grid.Col className={classes.wrapper}>
         <Grid>
           <Grid.Col span="content">
