@@ -25,6 +25,7 @@ import { AdUnit, Campaign, Placement } from 'adex-common'
 import dayjs from 'dayjs'
 import useCustomNotifications from 'hooks/useCustomNotifications'
 import { formatDateTime } from 'helpers'
+import { isValidHttpUrl } from 'helpers/validators'
 
 const mockData = {
   appBannerFormats: [
@@ -307,6 +308,9 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
       if (autoUTMChecked) {
         adUnits.forEach((element) => {
           const elCopy = { ...element }
+          if (!isValidHttpUrl(elCopy.banner!.targetUrl)) {
+            return elCopy
+          }
 
           elCopy.banner!.targetUrl = addUrlUtmTracking({
             targetUrl: elCopy.banner!.targetUrl,
