@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { Container, Grid, createStyles, Text, Flex } from '@mantine/core'
+import { Container, Grid, createStyles, Text, Flex, Box } from '@mantine/core'
 import BadgeStatusCampaign from 'components/Dashboard/BadgeStatusCampaign'
 import { formatCatsAndLocsData } from 'helpers/createCampaignHelpers'
 import { CATEGORIES, COUNTRIES } from 'constants/createCampaign'
@@ -28,8 +28,7 @@ const useStyles = createStyles((theme) => ({
     background: theme.colors.mainBackground[theme.fn.primaryShade()],
     borderRadius: theme.radius.md,
     padding: theme.spacing.lg,
-    marginBottom: theme.spacing.md,
-    marginTop: theme.spacing.lg,
+    margin: theme.spacing.md,
     boxShadow: theme.shadows.sm
   },
   innerWrapper: {
@@ -110,7 +109,9 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
 
   return (
     <>
-      <GoBack title="Dashboard" />
+      <Box p="md">
+        <GoBack title="Dashboard" fixed />
+      </Box>
       {campaign && (
         <>
           <Container fluid className={classes.wrapper}>
