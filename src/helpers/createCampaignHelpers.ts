@@ -216,35 +216,24 @@ type ReducedCampaign = Omit<
 >
 
 export const mapCampaignUItoCampaign = (campaignUI: CampaignUI): ReducedCampaign => {
-  const {
-    step,
-    devices,
-    paymentModel,
-    autoUTMChecked,
-    startsAt,
-    endsAt,
-    currency,
-    created,
-    owner,
-    validators,
-    targetingRules,
-    status,
-    reviewStatus,
-    modified,
-    archived,
-    createdBy,
-    lastModifiedBy,
-    cpmPricingBounds,
-    ownerHashed,
-    updated,
-    asapStartingDate,
-    draftModified,
-    ...campaign
-  } = campaignUI
-
-  return {
-    ...campaign
+  const campaign: ReducedCampaign = {
+    ...(campaignUI.id ? { id: campaignUI.id } : {}),
+    type: campaignUI.type,
+    outpaceAssetAddr: campaignUI.outpaceAssetAddr,
+    outpaceAssetDecimals: campaignUI.outpaceAssetDecimals,
+    outpaceAddr: campaignUI.outpaceAddr,
+    campaignBudget: campaignUI.campaignBudget,
+    outpaceChainId: campaignUI.outpaceChainId,
+    nonce: campaignUI.nonce,
+    title: campaignUI.title,
+    adUnits: campaignUI.adUnits,
+    pricingBounds: campaignUI.pricingBounds,
+    activeFrom: campaignUI.activeFrom,
+    activeTo: campaignUI.activeTo,
+    targetingInput: campaignUI.targetingInput
   }
+
+  return campaign
 }
 
 const removeProperty = (propKey: any, { [propKey]: propValue, ...rest }) => rest
