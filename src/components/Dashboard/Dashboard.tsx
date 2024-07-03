@@ -13,7 +13,7 @@ import { useCampaignsData } from 'hooks/useCampaignsData'
 import { parseBigNumTokenAmountToDecimal } from 'helpers/balances'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import useCustomNotifications from 'hooks/useCustomNotifications'
-import { AdminBadge } from 'components/common/AdminBadge'
+
 import BadgeStatusCampaign from './BadgeStatusCampaign'
 
 const campaignHeaders = [
@@ -225,7 +225,7 @@ const Dashboard = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
       <Flex direction="column" justify="start">
         <Flex justify="space-between" align="center">
           {isAdminPanel ? (
-            <AdminBadge title="Admin Panel" />
+            ''
           ) : (
             <Text size="sm" color="secondaryText" weight="bold" mb="md">
               All Campaigns
