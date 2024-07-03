@@ -10,7 +10,7 @@ const useStyles = createStyles((theme) => ({
     top: 90,
     left: SIDE_BAR_WIDTH,
     width: '100%',
-    zIndex: 1000,
+    zIndex: 10,
     background: theme.colors.lightBackground[theme.fn.primaryShade()],
     marginLeft: theme.spacing.xl,
     padding: `${theme.spacing.md} ${theme.spacing.xs}`,

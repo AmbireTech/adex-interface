@@ -47,8 +47,8 @@ function UserPanel() {
       header={
         <Header
           height={90}
-          mr="xl"
-          ml="xl"
+          pr="xl"
+          pl="xl"
           className={classes.header}
           style={{
             display: 'flex',
