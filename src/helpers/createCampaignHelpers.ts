@@ -217,6 +217,7 @@ type ReducedCampaign = Omit<
 
 export const mapCampaignUItoCampaign = (campaignUI: CampaignUI): ReducedCampaign => {
   const campaign: ReducedCampaign = {
+    ...(campaignUI.id ? { id: campaignUI.id } : {}),
     type: campaignUI.type,
     outpaceAssetAddr: campaignUI.outpaceAssetAddr,
     outpaceAssetDecimals: campaignUI.outpaceAssetDecimals,
@@ -230,10 +231,6 @@ export const mapCampaignUItoCampaign = (campaignUI: CampaignUI): ReducedCampaign
     activeFrom: campaignUI.activeFrom,
     activeTo: campaignUI.activeTo,
     targetingInput: campaignUI.targetingInput
-  }
-
-  if (campaignUI.id) {
-    campaign.id = campaignUI.id
   }
 
   return campaign
