@@ -9,7 +9,6 @@ import CampaignDetailsRow from 'components/common/CampainDetailsRow'
 import { LaunchCampaignModal, SuccessModal } from 'components/common/Modals'
 import useCustomNotifications from 'hooks/useCustomNotifications'
 import useAccount from 'hooks/useAccount'
-import { isValidHttpUrl } from 'helpers/validators'
 import { useNavigate } from 'react-router-dom'
 import throttle from 'lodash.throttle'
 
@@ -36,12 +35,13 @@ const CampaignSummary = () => {
   const [opened, { open, close }] = useDisclosure(false)
   const { updateBalance } = useAccount()
   const {
-    campaign: { step, adUnits, autoUTMChecked },
+    campaign: { step, adUnitsExtended, autoUTMChecked },
     updateCampaign,
     publishCampaign,
     resetCampaign,
     saveToDraftCampaign,
-    addUTMToTargetURLS
+    addUTMToTargetURLS,
+    validateAdUnitTargetURL
   } = useCreateCampaignContext()
   const {
     formattedSelectedDevice,
@@ -60,8 +60,10 @@ const CampaignSummary = () => {
   )
 
   useEffect(() => {
-    setIsNextBtnDisabled((step === 0 && !adUnits.length) || (step === 1 && noSelectedCatsOrLogs))
-  }, [step, noSelectedCatsOrLogs, adUnits])
+    setIsNextBtnDisabled(
+      (step === 0 && !adUnitsExtended.length) || (step === 1 && noSelectedCatsOrLogs)
+    )
+  }, [step, noSelectedCatsOrLogs, adUnitsExtended])
 
   const isTheLastStep = useMemo(() => step === CREATE_CAMPAIGN_STEPS - 1, [step])
   const isFirstStep = useMemo(() => step === 0, [step])
@@ -90,12 +92,8 @@ const CampaignSummary = () => {
 
   const handleNextStepBtnClicked = useCallback(() => {
     if (step === 0) {
-      const hasInvalidTargetUrl =
-        adUnits && adUnits.length
-          ? adUnits.some((adUnit) => !isValidHttpUrl(adUnit.banner?.targetUrl || ''))
-          : true
-
-      if (hasInvalidTargetUrl) {
+      const isValid = validateAdUnitTargetURL()
+      if (!isValid) {
         showNotification(
           'error',
           'Please enter a target URL starting with https://',
@@ -122,7 +120,14 @@ const CampaignSummary = () => {
 
       updateCampaign('step', step + 1)
     }
-  }, [step, adUnits, updateCampaign, showNotification, addUTMToTargetURLS, autoUTMChecked])
+  }, [
+    step,
+    updateCampaign,
+    showNotification,
+    addUTMToTargetURLS,
+    autoUTMChecked,
+    validateAdUnitTargetURL
+  ])
 
   const handleSaveDraftClicked = useCallback(async () => {
     try {

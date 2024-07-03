@@ -1,8 +1,7 @@
 import { useCallback, useMemo } from 'react'
 import { Checkbox, Grid } from '@mantine/core'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
-import { AdUnit } from 'adex-common/dist/types'
-import { UploadedBannersProps } from 'types'
+import { AdUnitExtended, UploadedBannersProps } from 'types'
 import ImageUrlInput from './ImageUrlInput'
 
 const UploadedBanners = ({
@@ -12,7 +11,7 @@ const UploadedBanners = ({
   handleOnInputChange
 }: UploadedBannersProps) => {
   const {
-    campaign: { adUnits },
+    campaign: { adUnitsExtended },
     selectedBannerSizes
   } = useCreateCampaignContext()
 
@@ -22,7 +21,7 @@ const UploadedBanners = ({
   )
 
   const isMatchedTheSizes = useCallback(
-    (img: AdUnit) =>
+    (img: AdUnitExtended) =>
       allowedSizes &&
       allowedSizes.length > 0 &&
       allowedSizes.includes(`${img.banner?.format.w}x${img.banner?.format.h}`),
@@ -38,8 +37,8 @@ const UploadedBanners = ({
           onChange={(event) => updateAutoUTMChecked(event.currentTarget.checked)}
         />
       </Grid.Col>
-      {adUnits.length > 0 &&
-        adUnits.map((image: AdUnit) => {
+      {adUnitsExtended.length > 0 &&
+        adUnitsExtended.map((image: AdUnitExtended) => {
           return (
             <Grid.Col key={image.id}>
               <ImageUrlInput

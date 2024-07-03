@@ -268,39 +268,42 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
                     </div>
                   </Grid.Col>
                 </Grid>
-                <Grid>
-                  <Grid.Col span={12}>
-                    <Text weight="bold" size="sm" pb="sm" className={classes.lighterColor}>
-                      Creatives
-                    </Text>
-                  </Grid.Col>
-                </Grid>
-                <Grid>
-                  <Grid.Col span={12}>
-                    <div className={cx(classes.innerWrapper, classes.scrollableContainer)}>
-                      {campaign.adUnits.map((item: AdUnit, index) => {
-                        const isLast = index === campaign.adUnits.length - 1
-                        return (
-                          <CampaignDetailsRow
-                            key={item.id}
-                            lineHeight="sm"
-                            textSize="sm"
-                            title={`${item.banner?.format.w}x${item.banner?.format.h}`}
-                            value={
-                              <MediaThumb
-                                adUnit={item}
-                                previewOnClick
-                                title={`Target URL: ${item.banner?.targetUrl}`}
+                {campaign.adUnits.length ? (
+                  <>
+                    <Grid>
+                      <Grid.Col span={12}>
+                        <Text weight="bold" size="sm" pb="sm" className={classes.lighterColor}>
+                          Creatives
+                        </Text>
+                      </Grid.Col>
+                    </Grid>
+                    <Grid>
+                      <Grid.Col span={12}>
+                        <div className={cx(classes.innerWrapper, classes.scrollableContainer)}>
+                          {campaign.adUnits.map((item: AdUnit, index) => {
+                            const isLast = index === campaign.adUnits.length - 1
+                            return (
+                              <CampaignDetailsRow
+                                key={item.id}
+                                lineHeight="sm"
+                                textSize="sm"
+                                title={`${item.banner?.format.w}x${item.banner?.format.h}`}
+                                value={
+                                  <MediaThumb
+                                    adUnit={item}
+                                    previewOnClick
+                                    title={`Target URL: ${item.banner?.targetUrl}`}
+                                  />
+                                }
+                                noBorder={isLast}
                               />
-                            }
-                            noBorder={isLast}
-                          />
-                        )
-                      })}
-                    </div>
-                  </Grid.Col>
-                </Grid>
-
+                            )
+                          })}
+                        </div>
+                      </Grid.Col>
+                    </Grid>
+                  </>
+                ) : null}
                 <Grid>
                   <Grid.Col>
                     <Flex justify="flex-end" align="center" gap="xs" mt="xl">

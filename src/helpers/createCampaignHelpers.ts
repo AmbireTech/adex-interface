@@ -9,7 +9,8 @@ import {
   HTMLBannerDimensions,
   CampaignUI,
   SupplyStats,
-  SupplyStatsDetails
+  SupplyStatsDetails,
+  AdUnitExtended
 } from 'types'
 import dayjs from 'dayjs'
 import { parseToBigNumPrecision } from 'helpers'
@@ -278,6 +279,18 @@ export const prepareCampaignObject = (campaign: CampaignUI, decimals: number) =>
   // eslint-disable-next-line no-underscore-dangle
   if (mappedCampaign._id) {
     mappedCampaign = removeProperty('_id', mappedCampaign)
+  }
+
+  if (mappedCampaign.adUnitsExtended.length) {
+    mappedCampaign.adUnits = [
+      ...mappedCampaign.adUnitsExtended.map((item: AdUnitExtended) => ({
+        id: item.id,
+        title: item.title,
+        type: item.type,
+        banner: item.banner
+      }))
+    ]
+    mappedCampaign = removeProperty('adUnitsExtended', mappedCampaign)
   }
 
   return mappedCampaign
