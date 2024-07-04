@@ -313,7 +313,6 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
 
           if (elCopy.id === adUnitId) {
             elCopy.banner!.targetUrl = inputText
-            // TODO: check do we need to validate URL on change input?
             elCopy.error =
               elCopy.banner!.targetUrl.length > 8 && !isValidHttpUrl(elCopy.banner!.targetUrl)
                 ? 'Please enter a valid URL'
