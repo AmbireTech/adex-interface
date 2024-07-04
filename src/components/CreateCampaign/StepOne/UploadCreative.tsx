@@ -10,7 +10,7 @@ import FilesDropzone from './FilesDropzone'
 
 const UploadCreative = () => {
   const {
-    campaign: { adUnitsExtended, autoUTMChecked },
+    campaign: { adUnits, autoUTMChecked },
     removeAdUnit,
     addTargetURLToAdUnit,
     updateCampaign
@@ -51,11 +51,11 @@ const UploadCreative = () => {
         <Text color="secondaryText" size="sm" weight="bold" mb="xs">
           3. Upload creatives
         </Text>
-        <BannerSizesList adUnits={adUnitsExtended} />
+        <BannerSizesList adUnits={adUnits} />
         <FilesDropzone onDrop={onDrop} />
       </Grid.Col>
 
-      {adUnitsExtended.length ? (
+      {adUnits.length ? (
         <Grid.Col>
           <UploadedBanners
             autoUTMChecked={autoUTMChecked}

@@ -35,7 +35,7 @@ const CampaignSummary = () => {
   const [opened, { open, close }] = useDisclosure(false)
   const { updateBalance } = useAccount()
   const {
-    campaign: { step, adUnitsExtended, autoUTMChecked },
+    campaign: { step, adUnits, autoUTMChecked },
     updateCampaign,
     publishCampaign,
     resetCampaign,
@@ -60,10 +60,8 @@ const CampaignSummary = () => {
   )
 
   useEffect(() => {
-    setIsNextBtnDisabled(
-      (step === 0 && !adUnitsExtended.length) || (step === 1 && noSelectedCatsOrLogs)
-    )
-  }, [step, noSelectedCatsOrLogs, adUnitsExtended])
+    setIsNextBtnDisabled((step === 0 && !adUnits.length) || (step === 1 && noSelectedCatsOrLogs))
+  }, [step, noSelectedCatsOrLogs, adUnits])
 
   const isTheLastStep = useMemo(() => step === CREATE_CAMPAIGN_STEPS - 1, [step])
   const isFirstStep = useMemo(() => step === 0, [step])

@@ -107,7 +107,6 @@ export const CREATE_CAMPAIGN_DEFAULT_VALUE: CampaignUI = {
   createdBy: '',
   lastModifiedBy: '',
   draftModified: false,
-  adUnitsExtended: [],
   errorsTargetURLValidations: {}
 }
 

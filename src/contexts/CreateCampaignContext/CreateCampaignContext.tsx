@@ -9,14 +9,7 @@ import {
 } from 'react'
 import { CREATE_CAMPAIGN_DEFAULT_VALUE, dateNowPlusThirtyDays } from 'constants/createCampaign'
 import superjson, { serialize } from 'superjson'
-import {
-  SupplyStats,
-  CampaignUI,
-  CreateCampaignType,
-  SupplyStatsDetails,
-  Devices,
-  AdUnitExtended
-} from 'types'
+import { SupplyStats, CampaignUI, CreateCampaignType, SupplyStatsDetails, Devices } from 'types'
 import useAccount from 'hooks/useAccount'
 import { useAdExApi } from 'hooks/useAdexServices'
 import {
@@ -28,7 +21,7 @@ import {
   selectBannerSizes
 } from 'helpers/createCampaignHelpers'
 import { parseFromBigNumPrecision } from 'helpers/balances'
-import { Campaign, Placement } from 'adex-common'
+import { AdUnit, Campaign, Placement } from 'adex-common'
 import dayjs from 'dayjs'
 import useCustomNotifications from 'hooks/useCustomNotifications'
 import { formatDateTime } from 'helpers'
@@ -199,7 +192,6 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
     if (savedCampaign) {
       const parsedCampaign = superjson.parse<CampaignUI>(savedCampaign)
       if (!deepEqual(parsedCampaign, defaultValue)) {
-        // setCampaign({ ...parsedCampaign })
         setCampaign(parsedCampaign)
       }
     }
@@ -255,9 +247,9 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
   }, [])
 
   const addAdUnit = useCallback(
-    (adUnitToAdd: AdUnitExtended) => {
+    (adUnitToAdd: AdUnit) => {
       setCampaign((prev) => {
-        const updated = { ...prev, adUnitsExtended: [...prev.adUnitsExtended, adUnitToAdd] }
+        const updated = { ...prev, adUnits: [...prev.adUnits, adUnitToAdd] }
         return updated
       })
     },
@@ -269,7 +261,7 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
       setCampaign((prev) => {
         const updated = {
           ...prev,
-          adUnitsExtended: [...prev.adUnitsExtended.filter((item) => item.id !== adUnitIdToRemove)]
+          adUnits: [...prev.adUnits.filter((item) => item.id !== adUnitIdToRemove)]
         }
         return updated
       })
@@ -280,10 +272,10 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
   const validateAdUnitTargetURL = useCallback(() => {
     let isValid
     setCampaign((prev) => {
-      const { adUnitsExtended, errorsTargetURLValidations } = { ...prev }
+      const { adUnits, errorsTargetURLValidations } = { ...prev }
       // TODO: rename copy
       const copy = { ...errorsTargetURLValidations }
-      adUnitsExtended.forEach((element) => {
+      adUnits.forEach((element) => {
         const elCopy = { ...element }
         if (!isValidHttpUrl(elCopy.banner?.targetUrl || '')) {
           copy[elCopy.id] = { errMsg: 'Please enter a valid URL' }
@@ -310,10 +302,10 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
   const addTargetURLToAdUnit = useCallback(
     (inputText: string, adUnitId: string) => {
       setCampaign((prev) => {
-        const { adUnitsExtended, errorsTargetURLValidations } = { ...prev }
+        const { adUnits, errorsTargetURLValidations } = { ...prev }
         // TODO: rename copy
         const copy = { ...errorsTargetURLValidations }
-        const mappedAdUnits = adUnitsExtended.map((element) => {
+        adUnits.forEach((element) => {
           const elCopy = { ...element }
 
           if (elCopy.id === adUnitId) {
@@ -331,7 +323,7 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
 
         const updated = {
           ...prev,
-          adUnitsExtended: mappedAdUnits,
+          adUnits,
           errorsTargetURLValidations: copy
         }
         return updated
@@ -343,7 +335,7 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
   const addUTMToTargetURLS = useCallback(() => {
     setCampaign((prev) => {
       const {
-        adUnitsExtended,
+        adUnits,
         autoUTMChecked,
         title,
         targetingInput: {
@@ -356,7 +348,7 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
       } = { ...prev }
 
       if (autoUTMChecked) {
-        adUnitsExtended.forEach((element) => {
+        adUnits.forEach((element) => {
           const elCopy = { ...element }
           if (!isValidHttpUrl(elCopy.banner!.targetUrl)) {
             return elCopy
@@ -374,7 +366,7 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
 
       const updated = {
         ...prev,
-        adUnitsExtended
+        adUnits
       }
       return updated
     })
@@ -515,7 +507,6 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
           )
         ),
         draftModified: false,
-        adUnitsExtended: draftCampaign.adUnits,
         errorsTargetURLValidations: {}
       }
 

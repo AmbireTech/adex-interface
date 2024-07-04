@@ -1,7 +1,6 @@
 import { MantineStyleSystemProps } from '@mantine/core'
-import { TargetingInputApplyProp } from 'adex-common/dist/types'
+import { AdUnit, TargetingInputApplyProp } from 'adex-common/dist/types'
 import { ChangeEventHandler } from 'react'
-import { AdUnitExtended } from './createCampaignCommon'
 
 export type Sizes = {
   w: number
@@ -29,9 +28,9 @@ export type CreateCampaignOverview = {
 }
 
 export type ImageUrlInputProps = MantineStyleSystemProps & {
-  image: AdUnitExtended
+  image: AdUnit
   toRemove?: boolean
-  onDelete?: (file: AdUnitExtended) => void
+  onDelete?: (file: AdUnit) => void
   onChange?: ChangeEventHandler<HTMLInputElement> | undefined
   preview?: boolean
   error?: string
@@ -40,7 +39,7 @@ export type ImageUrlInputProps = MantineStyleSystemProps & {
 export type UploadedBannersProps = {
   updateAutoUTMChecked: (isChecked: boolean) => void
   autoUTMChecked: boolean
-  onDeleteCreativeBtnClicked: (file: AdUnitExtended) => void
+  onDeleteCreativeBtnClicked: (file: AdUnit) => void
   handleOnInputChange: (inputText: string, fileId: string) => void
 }
 

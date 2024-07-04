@@ -5,9 +5,6 @@ export type Devices = 'mobile' | 'desktop'
 export type SelectData = { value: string | Alpha3Code; label: string; group?: string }
 
 export type PaymentModelType = 'cpm' | 'cpc'
-export type AdUnitExtended = AdUnit & {
-  error?: string
-}
 
 export type ErrorTargetUrl = {
   errMsg: string
@@ -33,7 +30,6 @@ export type CampaignUI = Campaign & {
   autoUTMChecked: boolean
   asapStartingDate: boolean
   draftModified: boolean
-  adUnitsExtended: AdUnitExtended[]
   errorsTargetURLValidations: ErrorsTargetURLValidations
 }
 
