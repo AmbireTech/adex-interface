@@ -1,6 +1,7 @@
 import { Tabs } from '@mantine/core'
 import { AdminBadge } from 'components/common/AdminBadge'
 import Dashboard from 'components/Dashboard'
+import AdminAnalytics from './AdminAnalytics'
 
 const AdminPanel = () => {
   return (
@@ -19,7 +20,7 @@ const AdminPanel = () => {
         </Tabs.Panel>
 
         <Tabs.Panel value="generalAnalytics" pt="xs">
-          Analytics here
+          <AdminAnalytics />
         </Tabs.Panel>
 
         <Tabs.Panel value="Deposits" pt="xs">

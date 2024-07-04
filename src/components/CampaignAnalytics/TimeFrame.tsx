@@ -160,8 +160,8 @@ export const TimeFrame = ({
         />
         {period && (
           <Flex align="center" justify="space-between" ml="xl" mr="xl">
-            <Text className={classes.lighterGray}>Starts: {period.start.toString()}</Text>
-            <Text className={classes.lighterGray}>Ends: {period.end.toString()}</Text>
+            <Text className={classes.lighterGray}>Starts: {period.start?.toString()}</Text>
+            <Text className={classes.lighterGray}>Ends: {period.end?.toString()}</Text>
           </Flex>
         )}
       </Grid.Col>

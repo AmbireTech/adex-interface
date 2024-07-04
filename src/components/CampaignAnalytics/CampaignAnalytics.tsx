@@ -85,7 +85,7 @@ const CampaignAnalytics = () => {
     setAnalyticsKey(undefined)
 
     const checkAnalytics = async () => {
-      const key = await getAnalyticsKeyAndUpdate(campaign, activeTab)
+      const key = await getAnalyticsKeyAndUpdate(activeTab, campaign)
       setAnalyticsKey(key)
       console.log('key', key)
     }

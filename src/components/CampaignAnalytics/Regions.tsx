@@ -30,7 +30,7 @@ const Regions = ({
     console.log(totalPaid)
     return (
       regions?.map((item) => ({
-        segment: CountryData.get(item.segment),
+        segment: CountryData.get(item.segment)?.name,
         share: `${((item.paid / paid) * 100).toFixed(2)} %`,
         impressions: item.impressions,
         clicks: item.clicks,

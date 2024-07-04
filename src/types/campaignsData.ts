@@ -35,8 +35,8 @@ export type AnalyticsDataKeys = {
 }
 
 export type AnalyticsPeriod = {
-  start: Date
-  end: Date
+  start?: Date
+  end?: Date
 }
 
 export type AnalyticsDataQuery = AnalyticsDataKeys &
