@@ -270,16 +270,13 @@ export const prepareCampaignObject = (campaign: CampaignUI, decimals: number) =>
     mappedCampaign = removeProperty('_id', mappedCampaign)
   }
 
-  if (mappedCampaign.adUnitsExtended && mappedCampaign.adUnitsExtended.length) {
-    mappedCampaign.adUnits = [
-      ...mappedCampaign.adUnitsExtended.map((item: AdUnitExtended) => ({
-        id: item.id,
-        title: item.title,
-        type: item.type,
-        banner: item.banner
-      }))
-    ]
-    mappedCampaign = removeProperty('adUnitsExtended', mappedCampaign)
+  if (campaign.adUnitsExtended && campaign.adUnitsExtended.length) {
+    mappedCampaign.adUnits = campaign.adUnitsExtended.map((item: AdUnitExtended) => ({
+      id: item.id,
+      title: item.title,
+      type: item.type,
+      banner: item.banner
+    }))
   }
 
   return mappedCampaign

@@ -278,7 +278,7 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
   )
 
   const validateAdUnitTargetURL = useCallback(() => {
-    let isValid = true
+    let isValid
     setCampaign((prev) => {
       const { adUnitsExtended } = { ...prev }
       const mappedAdUnits = adUnitsExtended.map((element) => {
@@ -288,6 +288,7 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
           isValid = false
         } else {
           elCopy.error = ''
+          isValid = true
         }
 
         return elCopy
@@ -300,7 +301,7 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
       return updated
     })
 
-    return isValid
+    return !!isValid
   }, [setCampaign])
 
   const addTargetURLToAdUnit = useCallback(
