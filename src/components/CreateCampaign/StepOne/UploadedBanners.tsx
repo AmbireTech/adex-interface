@@ -11,7 +11,7 @@ const UploadedBanners = ({
   handleOnInputChange
 }: UploadedBannersProps) => {
   const {
-    campaign: { adUnitsExtended },
+    campaign: { adUnitsExtended, errorsTargetURLValidations },
     selectedBannerSizes
   } = useCreateCampaignContext()
 
@@ -43,6 +43,7 @@ const UploadedBanners = ({
             <Grid.Col key={image.id}>
               <ImageUrlInput
                 image={image}
+                error={errorsTargetURLValidations[image.id]?.errMsg}
                 toRemove={!isMatchedTheSizes(image)}
                 onDelete={onDeleteCreativeBtnClicked}
                 onChange={(e) => handleOnInputChange(e.target.value, image.id)}

@@ -34,6 +34,7 @@ export type ImageUrlInputProps = MantineStyleSystemProps & {
   onDelete?: (file: AdUnitExtended) => void
   onChange?: ChangeEventHandler<HTMLInputElement> | undefined
   preview?: boolean
+  error?: string
 }
 
 export type UploadedBannersProps = {

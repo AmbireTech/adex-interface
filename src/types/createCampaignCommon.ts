@@ -9,6 +9,14 @@ export type AdUnitExtended = AdUnit & {
   error?: string
 }
 
+export type ErrorTargetUrl = {
+  errMsg: string
+}
+
+export type ErrorsTargetURLValidations = {
+  [key: string]: ErrorTargetUrl
+}
+
 export type CampaignUI = Campaign & {
   step: number
   devices: Devices[]
@@ -26,6 +34,7 @@ export type CampaignUI = Campaign & {
   asapStartingDate: boolean
   draftModified: boolean
   adUnitsExtended: AdUnitExtended[]
+  errorsTargetURLValidations: ErrorsTargetURLValidations
 }
 
 export type ImageSizes = {

@@ -280,14 +280,17 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
   const validateAdUnitTargetURL = useCallback(() => {
     let isValid
     setCampaign((prev) => {
-      const { adUnitsExtended } = { ...prev }
-      const mappedAdUnits = adUnitsExtended.map((element) => {
+      const { adUnitsExtended, errorsTargetURLValidations } = { ...prev }
+      // TODO: rename copy
+      const copy = { ...errorsTargetURLValidations }
+      adUnitsExtended.forEach((element) => {
         const elCopy = { ...element }
         if (!isValidHttpUrl(elCopy.banner?.targetUrl || '')) {
-          elCopy.error = 'Please enter a valid URL'
+          copy[elCopy.id] = { errMsg: 'Please enter a valid URL' }
+
           isValid = false
         } else {
-          elCopy.error = ''
+          copy[elCopy.id] = { errMsg: '' }
           isValid = true
         }
 
@@ -296,7 +299,7 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
 
       const updated = {
         ...prev,
-        adUnitsExtended: mappedAdUnits
+        errorsTargetURLValidations: copy
       }
       return updated
     })
@@ -307,16 +310,20 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
   const addTargetURLToAdUnit = useCallback(
     (inputText: string, adUnitId: string) => {
       setCampaign((prev) => {
-        const { adUnitsExtended } = { ...prev }
+        const { adUnitsExtended, errorsTargetURLValidations } = { ...prev }
+        // TODO: rename copy
+        const copy = { ...errorsTargetURLValidations }
         const mappedAdUnits = adUnitsExtended.map((element) => {
           const elCopy = { ...element }
 
           if (elCopy.id === adUnitId) {
             elCopy.banner!.targetUrl = inputText
-            elCopy.error =
-              elCopy.banner!.targetUrl.length > 8 && !isValidHttpUrl(elCopy.banner!.targetUrl)
-                ? 'Please enter a valid URL'
-                : ''
+            copy[elCopy.id] = {
+              errMsg:
+                elCopy.banner!.targetUrl.length > 8 && !isValidHttpUrl(elCopy.banner!.targetUrl)
+                  ? 'Please enter a valid URL'
+                  : ''
+            }
           }
 
           return elCopy
@@ -324,7 +331,8 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
 
         const updated = {
           ...prev,
-          adUnitsExtended: mappedAdUnits
+          adUnitsExtended: mappedAdUnits,
+          errorsTargetURLValidations: copy
         }
         return updated
       })
@@ -507,7 +515,8 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
           )
         ),
         draftModified: false,
-        adUnitsExtended: draftCampaign.adUnits
+        adUnitsExtended: draftCampaign.adUnits,
+        errorsTargetURLValidations: {}
       }
 
       setCampaign(mappedDraftCampaign)

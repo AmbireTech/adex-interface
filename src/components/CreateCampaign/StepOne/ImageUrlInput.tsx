@@ -62,9 +62,10 @@ const ImageUrlInput = ({
   onDelete,
   onChange,
   preview,
+  error,
   ...rest
 }: ImageUrlInputProps) => {
-  const hasError: boolean = useMemo(() => !!image.error || !!toRemove, [image.error, toRemove])
+  const hasError: boolean = useMemo(() => !!error || !!toRemove, [error, toRemove])
   const { classes, cx } = useStyles({ hasError })
 
   const getRightSection = useCallback(() => {
@@ -126,7 +127,7 @@ const ImageUrlInput = ({
           }}
         />
       </Flex>
-      {image.error && <Text color="warning">{image.error}</Text>}
+      {error && <Text color="warning">{error}</Text>}
     </>
   )
 }
