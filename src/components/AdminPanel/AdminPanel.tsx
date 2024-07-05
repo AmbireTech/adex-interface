@@ -8,7 +8,7 @@ const AdminPanel = () => {
     <>
       {/* //TODO: move to top bar */}
       <AdminBadge title="Admin Panel" />
-      <Tabs defaultValue="campaigns">
+      <Tabs defaultValue="campaigns" keepMounted={false}>
         <Tabs.List>
           <Tabs.Tab value="campaigns">Campaigns</Tabs.Tab>
           <Tabs.Tab value="generalAnalytics">General Analytics</Tabs.Tab>

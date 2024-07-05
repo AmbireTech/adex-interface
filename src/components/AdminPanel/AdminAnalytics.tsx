@@ -2,13 +2,17 @@ import { useEffect, useState, useMemo } from 'react'
 import {
   Select,
   Container,
-  Loader
+  Loader,
+  Flex,
+  Box
   //  Flex, Loader, Tabs
 } from '@mantine/core'
 import { BaseAnalyticsData, AnalyticsPeriod, Timeframe } from 'types'
 import useCampaignAnalytics from 'hooks/useCampaignAnalytics'
 import CustomTable from 'components/common/CustomTable'
 import { CountryData } from 'helpers/countries'
+import { DatePickerInput } from '@mantine/dates'
+import dayjs from 'dayjs'
 
 const headings = [
   'Country',
@@ -37,7 +41,10 @@ const AdminAnalytics = () => {
     | undefined
   >()
 
-  const [timeframe, setTimeframe] = useState<Timeframe>('year')
+  const [timeframe, setTimeframe] = useState<Timeframe>('month')
+  const [startDate, setStartDate] = useState<Date | null>(
+    dayjs().subtract(1, 'month').startOf('month').toDate()
+  )
 
   // TODO: change campaign analytics to analytics
   const { analyticsData, getAnalyticsKeyAndUpdate, mappedAnalytics } = useCampaignAnalytics()
@@ -61,7 +68,7 @@ const AdminAnalytics = () => {
     setAnalyticsKey(undefined)
 
     const checkAnalytics = async () => {
-      const key = await getAnalyticsKeyAndUpdate('country', undefined, true, timeframe)
+      const key = await getAnalyticsKeyAndUpdate('timeframe', undefined, true, timeframe)
       setAnalyticsKey(key)
       console.log('key', key)
     }
@@ -74,35 +81,59 @@ const AdminAnalytics = () => {
     [analyticsKey, adminMappedAnalytics]
   )
 
-  const elements = useMemo(() => {
+  const data = useMemo(() => {
     const paid = adminMappedAnalytics?.reduce((sum, i) => sum + i.paid, 0) || 1
     const imps = adminMappedAnalytics?.reduce((sum, i) => sum + i.impressions, 0) || 1
-    return (
-      adminMappedAnalytics?.map((item) => ({
-        segment: CountryData.get(item.segment)?.name,
-        share: `${((item.paid / paid) * 100).toFixed(2)} %`,
-        shareImps: `${((item.impressions / imps) * 100).toFixed(2)} %`,
-        impressions: item.impressions,
-        clicks: item.clicks,
-        ctr: `${item.ctr} %`,
-        avgCpm: `${item.avgCpm}`,
-        paid: `${item.paid.toFixed(4)}`
-      })) || []
-    )
+    return {
+      paid,
+      imps,
+      elements:
+        adminMappedAnalytics?.map((item) => ({
+          segment:
+            CountryData.get(item.segment)?.name ||
+            new Date(Number(item.segment)).toLocaleString() ||
+            item.segment,
+          share: `${((item.paid / paid) * 100).toFixed(2)} %`,
+          shareImps: `${((item.impressions / imps) * 100).toFixed(2)} %`,
+          impressions: item.impressions,
+          clicks: item.clicks,
+          ctr: `${item.ctr} %`,
+          avgCpm: `${item.avgCpm}`,
+          paid: `${item.paid.toFixed(4)}`
+        })) || []
+    }
   }, [adminMappedAnalytics])
 
   return (
     <Container fluid>
-      <Select
-        value={timeframe}
-        onChange={(val) => setTimeframe(val as Timeframe)}
-        data={timeframeData}
-        mb="sm"
-      />
+      <Flex direction="row" align="centers" justify="left">
+        <Select
+          label="Period"
+          value={timeframe}
+          onChange={(val) => setTimeframe(val as Timeframe)}
+          data={timeframeData}
+          mb="sm"
+        />
+        <DatePickerInput
+          label="Start date"
+          placeholder="Start date"
+          value={startDate}
+          onChange={setStartDate}
+          mx="auto"
+          maw={400}
+        />
+      </Flex>
+
       {loading ? (
         <Loader size="xl" />
       ) : (
-        <CustomTable background headings={headings} elements={elements} />
+        <Flex direction="column">
+          <Flex direction="row" align="centers" justify="left" gap="xl" mb="md">
+            <Box>Total amount: {Number(data.paid.toFixed(2)).toLocaleString()}</Box>
+            <Box>Total impressions: {data.imps.toLocaleString()}</Box>
+          </Flex>
+          <CustomTable background headings={headings} elements={data.elements} pageSize={31} />
+        </Flex>
       )}
     </Container>
   )
