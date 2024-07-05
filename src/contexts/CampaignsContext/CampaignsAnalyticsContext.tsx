@@ -147,7 +147,8 @@ interface ICampaignsAnalyticsContext {
     analyticsType: AnalyticsType,
     campaign?: Campaign,
     forAdmin?: boolean,
-    timeframe?: Timeframe
+    timeframe?: Timeframe,
+    startFrom?: Date
   ) => Promise<{ key: string; period: AnalyticsPeriod } | undefined>
   initialAnalyticsLoading: boolean
   mappedAnalytics: Map<string, BaseAnalyticsData[]>
@@ -225,7 +226,8 @@ const CampaignsAnalyticsProvider: FC<PropsWithChildren> = ({ children }) => {
       analyticsType: AnalyticsType,
       campaign?: Campaign,
       forAdmin?: boolean,
-      selectedTimeframe?: Timeframe
+      selectedTimeframe?: Timeframe,
+      startFrom?: Date
     ): Promise<{ key: string; period: AnalyticsPeriod } | undefined> => {
       if (!analyticsType || (!forAdmin && !campaign?.id)) {
         return
@@ -233,9 +235,11 @@ const CampaignsAnalyticsProvider: FC<PropsWithChildren> = ({ children }) => {
 
       // TODO: start fro UTC date 00:00
       const maxPeriod = getTimeframeMaxPeriod(selectedTimeframe || 'year')
-      const start = campaign
-        ? new Date(getPeriodInitialEpoch(Number(campaign.activeFrom)) - 1)
-        : new Date(Date.now() - maxPeriod)
+      const start =
+        startFrom ||
+        (campaign
+          ? new Date(getPeriodInitialEpoch(Number(campaign.activeFrom)) - 1)
+          : new Date(Date.now() - maxPeriod))
 
       const period = {
         start,

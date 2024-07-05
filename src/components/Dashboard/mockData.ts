@@ -4,7 +4,6 @@ const dashboardTableElements: (CampaignData & {
   [key in AnalyticsType]: BaseAnalyticsData[]
 })[] = [
   {
-    campaignId: 'korcampaigm',
     // @ts-ignore
     campaign: {
       type: 0,

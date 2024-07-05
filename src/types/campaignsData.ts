@@ -95,7 +95,14 @@ export type EvAggrData = {
   payouts: number
 }
 
-export type AnalyticsType = 'timeframe' | 'hostname' | 'country' | 'adUnit' | 'ssp'
+export type AnalyticsType =
+  | 'timeframe'
+  | 'hostname'
+  | 'country'
+  | 'adUnit'
+  | 'ssp'
+  | 'placement'
+  | 'campaignId'
 
 export type TabType = 'placements' | 'regions' | 'creatives' | 'timeframe'
 

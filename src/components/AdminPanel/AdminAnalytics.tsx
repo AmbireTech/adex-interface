@@ -7,15 +7,15 @@ import {
   Box
   //  Flex, Loader, Tabs
 } from '@mantine/core'
-import { BaseAnalyticsData, AnalyticsPeriod, Timeframe } from 'types'
+import { BaseAnalyticsData, AnalyticsPeriod, Timeframe, AnalyticsType } from 'types'
 import useCampaignAnalytics from 'hooks/useCampaignAnalytics'
 import CustomTable from 'components/common/CustomTable'
 import { CountryData } from 'helpers/countries'
 import { DatePickerInput } from '@mantine/dates'
 import dayjs from 'dayjs'
 
-const headings = [
-  'Country',
+const headingsDefault = [
+  //   'Country',
   'Share (Spent)',
   'Share (Impressions)',
   'Impressions',
@@ -32,6 +32,35 @@ const timeframeData: Array<{ value: Timeframe; label: Timeframe }> = [
   { value: 'day', label: 'day' }
 ]
 
+const analyticsTypeData: Array<{ value: AnalyticsType; label: string }> = [
+  { value: 'country', label: 'By country' },
+  { value: 'ssp', label: 'By SSP' },
+  { value: 'adUnit', label: 'By Ad unit' },
+  { value: 'hostname', label: 'By hostname' },
+  { value: 'placement', label: 'By placement' },
+  { value: 'campaignId', label: 'By campaign id' }
+]
+
+const mapSegmentLabel = (analType: AnalyticsType, segment: string): { segementLabel: string } => {
+  let segementLabel = segment
+
+  switch (analType) {
+    case 'country':
+      segementLabel = CountryData.get(segment)?.name || segment
+      break
+    case 'timeframe':
+      segementLabel = new Date(Number(segment)).toLocaleString()
+      break
+
+    default:
+      break
+  }
+
+  return {
+    segementLabel
+  }
+}
+
 const AdminAnalytics = () => {
   const [analyticsKey, setAnalyticsKey] = useState<
     | {
@@ -42,9 +71,12 @@ const AdminAnalytics = () => {
   >()
 
   const [timeframe, setTimeframe] = useState<Timeframe>('month')
+  const [analType, setAnalType] = useState<AnalyticsType>('ssp')
   const [startDate, setStartDate] = useState<Date | null>(
     dayjs().subtract(1, 'month').startOf('month').toDate()
   )
+
+  const headings = useMemo(() => [analType.toString(), ...headingsDefault], [analType])
 
   // TODO: change campaign analytics to analytics
   const { analyticsData, getAnalyticsKeyAndUpdate, mappedAnalytics } = useCampaignAnalytics()
@@ -68,13 +100,13 @@ const AdminAnalytics = () => {
     setAnalyticsKey(undefined)
 
     const checkAnalytics = async () => {
-      const key = await getAnalyticsKeyAndUpdate('timeframe', undefined, true, timeframe)
+      const key = await getAnalyticsKeyAndUpdate(analType, undefined, true, timeframe)
       setAnalyticsKey(key)
       console.log('key', key)
     }
 
     checkAnalytics()
-  }, [getAnalyticsKeyAndUpdate, timeframe])
+  }, [analType, getAnalyticsKeyAndUpdate, timeframe])
 
   const loading = useMemo(
     () => !analyticsKey || !adminMappedAnalytics,
@@ -89,10 +121,7 @@ const AdminAnalytics = () => {
       imps,
       elements:
         adminMappedAnalytics?.map((item) => ({
-          segment:
-            CountryData.get(item.segment)?.name ||
-            new Date(Number(item.segment)).toLocaleString() ||
-            item.segment,
+          segment: mapSegmentLabel(analType, item.segment).segementLabel,
           share: `${((item.paid / paid) * 100).toFixed(2)} %`,
           shareImps: `${((item.impressions / imps) * 100).toFixed(2)} %`,
           impressions: item.impressions,
@@ -102,11 +131,18 @@ const AdminAnalytics = () => {
           paid: `${item.paid.toFixed(4)}`
         })) || []
     }
-  }, [adminMappedAnalytics])
+  }, [adminMappedAnalytics, analType])
 
   return (
     <Container fluid>
-      <Flex direction="row" align="centers" justify="left">
+      <Flex direction="row" align="centers" justify="left" gap="xl">
+        <Select
+          label="Type"
+          value={analType}
+          onChange={(val) => setAnalType(val as AnalyticsType)}
+          data={analyticsTypeData}
+          mb="sm"
+        />
         <Select
           label="Period"
           value={timeframe}
