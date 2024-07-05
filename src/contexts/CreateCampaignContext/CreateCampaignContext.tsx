@@ -9,7 +9,14 @@ import {
 } from 'react'
 import { CREATE_CAMPAIGN_DEFAULT_VALUE, dateNowPlusThirtyDays } from 'constants/createCampaign'
 import superjson, { serialize } from 'superjson'
-import { SupplyStats, CampaignUI, CreateCampaignType, SupplyStatsDetails, Devices } from 'types'
+import {
+  SupplyStats,
+  CampaignUI,
+  CreateCampaignType,
+  SupplyStatsDetails,
+  Devices,
+  ErrorsTargetURLValidations
+} from 'types'
 import useAccount from 'hooks/useAccount'
 import { useAdExApi } from 'hooks/useAdexServices'
 import {
@@ -270,26 +277,26 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
   )
 
   const validateAdUnitTargetURL = useCallback(() => {
-    let isValid = true
-
     setCampaign((prev) => {
       const adUnits = [...prev.adUnits]
-      const errorsTargetURLValidations = { ...prev.errorsTargetURLValidations }
-      let isValidInner = true
+      const errorsTargetURLValidations: ErrorsTargetURLValidations = {}
 
       const mappedAdUnits = adUnits.map((element) => {
         const elCopy = { ...element }
 
-        if (!isValidHttpUrl(elCopy.banner?.targetUrl || '')) {
-          errorsTargetURLValidations[elCopy.id] = { errMsg: 'Please enter a valid URL' }
-          isValidInner = false
+        if (elCopy.banner?.targetUrl === '') {
+          errorsTargetURLValidations[elCopy.id] = { errMsg: '', success: false }
+        } else if (elCopy.banner?.targetUrl && !isValidHttpUrl(elCopy.banner?.targetUrl)) {
+          errorsTargetURLValidations[elCopy.id] = {
+            errMsg: 'Please enter a valid URL',
+            success: false
+          }
         } else {
-          errorsTargetURLValidations[elCopy.id] = { errMsg: '' }
+          errorsTargetURLValidations[elCopy.id] = { errMsg: '', success: true }
         }
+
         return elCopy
       })
-
-      isValid = isValidInner
 
       return {
         ...prev,
@@ -297,8 +304,6 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
         errorsTargetURLValidations
       }
     })
-
-    return isValid
   }, [setCampaign])
 
   const addTargetURLToAdUnit = useCallback(
@@ -311,11 +316,16 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
 
           if (elCopy.id === adUnitId) {
             elCopy.banner!.targetUrl = inputText
-            copy[elCopy.id] = {
-              errMsg:
-                elCopy.banner!.targetUrl.length > 8 && !isValidHttpUrl(elCopy.banner!.targetUrl)
-                  ? 'Please enter a valid URL'
-                  : ''
+
+            if (elCopy.banner?.targetUrl === '') {
+              copy[elCopy.id] = { errMsg: '', success: false }
+            } else if (elCopy.banner?.targetUrl && !isValidHttpUrl(elCopy.banner?.targetUrl)) {
+              copy[elCopy.id] = {
+                errMsg: 'Please enter a valid URL',
+                success: false
+              }
+            } else {
+              copy[elCopy.id] = { errMsg: '', success: true }
             }
           }
 
