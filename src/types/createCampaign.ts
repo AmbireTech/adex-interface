@@ -2,6 +2,8 @@ import { MantineStyleSystemProps } from '@mantine/core'
 import { AdUnit, TargetingInputApplyProp } from 'adex-common/dist/types'
 import { ChangeEventHandler } from 'react'
 
+export type Devices = 'mobile' | 'desktop'
+
 export type Sizes = {
   w: number
   h: number

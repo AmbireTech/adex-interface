@@ -270,42 +270,43 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
   )
 
   const validateAdUnitTargetURL = useCallback(() => {
-    let isValid
+    let isValid = true
+
     setCampaign((prev) => {
-      const { adUnits, errorsTargetURLValidations } = { ...prev }
-      // TODO: rename copy
-      const copy = { ...errorsTargetURLValidations }
-      adUnits.forEach((element) => {
+      const adUnits = [...prev.adUnits]
+      const errorsTargetURLValidations = { ...prev.errorsTargetURLValidations }
+      let isValidInner = true
+
+      const mappedAdUnits = adUnits.map((element) => {
         const elCopy = { ...element }
+
         if (!isValidHttpUrl(elCopy.banner?.targetUrl || '')) {
-          copy[elCopy.id] = { errMsg: 'Please enter a valid URL' }
-
-          isValid = false
+          errorsTargetURLValidations[elCopy.id] = { errMsg: 'Please enter a valid URL' }
+          isValidInner = false
         } else {
-          copy[elCopy.id] = { errMsg: '' }
-          isValid = true
+          errorsTargetURLValidations[elCopy.id] = { errMsg: '' }
         }
-
         return elCopy
       })
 
-      const updated = {
+      isValid = isValidInner
+
+      return {
         ...prev,
-        errorsTargetURLValidations: copy
+        adUnits: mappedAdUnits,
+        errorsTargetURLValidations
       }
-      return updated
     })
 
-    return !!isValid
+    return isValid
   }, [setCampaign])
 
   const addTargetURLToAdUnit = useCallback(
     (inputText: string, adUnitId: string) => {
       setCampaign((prev) => {
         const { adUnits, errorsTargetURLValidations } = { ...prev }
-        // TODO: rename copy
         const copy = { ...errorsTargetURLValidations }
-        adUnits.forEach((element) => {
+        const mappedAdUnits = adUnits.map((element) => {
           const elCopy = { ...element }
 
           if (elCopy.id === adUnitId) {
@@ -323,7 +324,7 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
 
         const updated = {
           ...prev,
-          adUnits,
+          adUnits: mappedAdUnits,
           errorsTargetURLValidations: copy
         }
         return updated

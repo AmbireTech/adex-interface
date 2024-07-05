@@ -58,7 +58,6 @@ const useDropzone = () => {
               id: `${file.name.replace(/\s+/g, '')}-${Date.now().toString(16)}`,
               title: file.name,
               type: isVideoMedia(file.type) ? AdUnitType.Video : AdUnitType.Banner,
-              error: '',
               banner: {
                 format: {
                   w: 0,
