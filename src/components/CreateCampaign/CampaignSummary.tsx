@@ -35,7 +35,7 @@ const CampaignSummary = () => {
   const [opened, { open, close }] = useDisclosure(false)
   const { updateBalance } = useAccount()
   const {
-    campaign: { step, adUnits, autoUTMChecked },
+    campaign: { step, adUnits, autoUTMChecked, errorsTargetURLValidations },
     updateCampaign,
     publishCampaign,
     resetCampaign,
@@ -91,7 +91,7 @@ const CampaignSummary = () => {
   const handleNextStepBtnClicked = useCallback(() => {
     if (step === 0) {
       const isValid = validateAdUnitTargetURL()
-      if (!isValid) {
+      if (!isValid || Object.values(errorsTargetURLValidations).some((e) => e.errMsg !== '')) {
         showNotification(
           'error',
           'Please enter a target URL starting with https://',
@@ -124,7 +124,8 @@ const CampaignSummary = () => {
     showNotification,
     addUTMToTargetURLS,
     autoUTMChecked,
-    validateAdUnitTargetURL
+    validateAdUnitTargetURL,
+    errorsTargetURLValidations
   ])
 
   const handleSaveDraftClicked = useCallback(async () => {
