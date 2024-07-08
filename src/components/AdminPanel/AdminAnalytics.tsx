@@ -6,7 +6,8 @@ import {
   Flex,
   Box,
   Text,
-  Badge
+  Badge,
+  ActionIcon
 
   //  Flex, Loader, Tabs
 } from '@mantine/core'
@@ -16,6 +17,9 @@ import CustomTable from 'components/common/CustomTable'
 import { CountryData } from 'helpers/countries'
 import { DateTimePicker, DateInput } from '@mantine/dates'
 import dayjs from 'dayjs'
+import BillingIcon from 'resources/icons/Billing'
+import VisibilityIcon from 'resources/icons/Visibility'
+import CheckMarkFilledIcon from 'resources/icons/CheckMarkFilled'
 
 const headingsDefault = [
   //   'Country',
@@ -136,9 +140,11 @@ const AdminAnalytics = () => {
   const data = useMemo(() => {
     const paid = adminMappedAnalytics?.reduce((sum, i) => sum + i.paid, 0) || 1
     const imps = adminMappedAnalytics?.reduce((sum, i) => sum + i.impressions, 0) || 1
+    const clicks = adminMappedAnalytics?.reduce((sum, i) => sum + i.clicks, 0) || 1
     return {
       paid,
       imps,
+      clicks,
       elements:
         adminMappedAnalytics?.map((item) => ({
           segment: mapSegmentLabel(analType, item.segment).segementLabel,
@@ -160,20 +166,20 @@ const AdminAnalytics = () => {
         etc. (NOT the stats form received requests form the SSPs)
       </Text>
 
-      <Flex direction="row" align="centers" justify="left" gap="xl">
+      <Flex direction="row" align="center" justify="left" gap="xl" mb="md">
         <Select
           label="Type"
           value={analType}
           onChange={(val) => setAnalType(val as AnalyticsType)}
           data={analyticsTypeData}
-          mb="sm"
+          size="md"
         />
         <Select
           label="Period"
           value={timeframe}
           onChange={(val) => setTimeframe(val as Timeframe)}
           data={timeframeData}
-          mb="sm"
+          size="md"
         />
         <DateInput
           label="Start date"
@@ -181,7 +187,7 @@ const AdminAnalytics = () => {
           value={startDate}
           onChange={setStartDate}
           maxDate={maxDate}
-          //   withSeconds
+          size="md"
         />
         <DateTimePicker
           label="End date"
@@ -189,6 +195,7 @@ const AdminAnalytics = () => {
           value={endDate}
           disabled
           withSeconds
+          size="md"
         />
       </Flex>
 
@@ -196,12 +203,45 @@ const AdminAnalytics = () => {
         <Loader size="xl" variant="dots" color="violet" />
       ) : (
         <Flex direction="column">
-          <Flex direction="row" align="centers" justify="left" gap="xl" mb="md">
+          <Flex direction="row" align="center" justify="left" gap="xl" mb="md">
+            <Box>Totals: </Box>
             <Box>
-              Total amount: <Badge size="xl">{Number(data.paid.toFixed(2)).toLocaleString()}</Badge>
+              <Badge
+                leftSection={
+                  <ActionIcon size="sm" color="brand">
+                    <BillingIcon />
+                  </ActionIcon>
+                }
+                size="xl"
+              >
+                {Number(data.paid.toFixed(2)).toLocaleString()}
+              </Badge>
             </Box>
             <Box>
-              Total impressions:<Badge size="xl"> {data.imps.toLocaleString()}</Badge>
+              <Badge
+                size="xl"
+                leftSection={
+                  <ActionIcon size="sm" color="brand">
+                    <VisibilityIcon />
+                  </ActionIcon>
+                }
+              >
+                {' '}
+                {data.imps.toLocaleString()}
+              </Badge>
+            </Box>
+            <Box>
+              <Badge
+                size="xl"
+                leftSection={
+                  <ActionIcon size="sm" color="brand">
+                    <CheckMarkFilledIcon />
+                  </ActionIcon>
+                }
+              >
+                {' '}
+                {data.clicks.toLocaleString()}
+              </Badge>
             </Box>
           </Flex>
           <CustomTable background headings={headings} elements={data.elements} pageSize={10} />
