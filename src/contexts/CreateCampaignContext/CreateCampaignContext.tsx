@@ -157,7 +157,7 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
       outpaceAssetDecimals: balanceToken.decimals,
       outpaceChainId: balanceToken.chainId,
       startsAt: isPastDateTime(CREATE_CAMPAIGN_DEFAULT_VALUE.startsAt)
-        ? dayjs().add(1, 'hour').toDate()
+        ? dayjs().add(1, 'minute').toDate()
         : CREATE_CAMPAIGN_DEFAULT_VALUE.startsAt
     }),
     [adexAccount?.address, balanceToken?.address, balanceToken?.decimals, balanceToken?.chainId]
