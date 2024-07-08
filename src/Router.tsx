@@ -1,6 +1,7 @@
 import UserPanel from 'components/UserPanel'
 import LogIn from 'components/LogIn'
 import Dashboard from 'components/Dashboard'
+import AdminPanel from 'components/AdminPanel'
 import Billing from 'components/Billing'
 import GetStarted from 'components/GetStarted'
 import CampaignAnalytics from 'components/CampaignAnalytics'
@@ -108,7 +109,7 @@ export const router = createBrowserRouter(
           element: (
             <RequireAuth>
               <CampaignsDataProvider type="admin">
-                <Dashboard isAdminPanel />
+                <AdminPanel />
               </CampaignsDataProvider>
             </RequireAuth>
           )
