@@ -236,7 +236,7 @@ export const mapCampaignUItoCampaign = (campaignUI: CampaignUI): ReducedCampaign
   return campaign
 }
 
-const removeProperty = (propKey: any, { [propKey]: propValue, ...rest }) => rest
+export const removeProperty = (propKey: any, { [propKey]: propValue, ...rest }) => rest
 
 export const prepareCampaignObject = (campaign: CampaignUI, decimals: number) => {
   // TODO: fix the type

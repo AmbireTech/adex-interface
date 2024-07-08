@@ -12,7 +12,7 @@ const UploadedBanners = ({
   handleOnInputChange
 }: UploadedBannersProps) => {
   const {
-    campaign: { adUnits },
+    campaign: { adUnits, errorsTargetURLValidations },
     selectedBannerSizes
   } = useCreateCampaignContext()
 
@@ -22,10 +22,14 @@ const UploadedBanners = ({
   )
 
   const isMatchedTheSizes = useCallback(
-    (img: AdUnit) =>
-      allowedSizes &&
-      allowedSizes.length > 0 &&
-      allowedSizes.includes(`${img.banner?.format.w}x${img.banner?.format.h}`),
+    (img: AdUnit) => {
+      if (!allowedSizes || allowedSizes.length === 0) {
+        return true
+      }
+
+      const size = `${img.banner?.format.w}x${img.banner?.format.h}`
+      return allowedSizes.includes(size)
+    },
     [allowedSizes]
   )
 
@@ -44,6 +48,7 @@ const UploadedBanners = ({
             <Grid.Col key={image.id}>
               <ImageUrlInput
                 image={image}
+                error={errorsTargetURLValidations[image.id] || undefined}
                 toRemove={!isMatchedTheSizes(image)}
                 onDelete={onDeleteCreativeBtnClicked}
                 onChange={(e) => handleOnInputChange(e.target.value, image.id)}

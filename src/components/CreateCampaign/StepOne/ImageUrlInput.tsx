@@ -2,8 +2,7 @@ import { ActionIcon, Flex, Input, Text, createStyles, getStylesRef } from '@mant
 import CustomBadge from 'components/common/CustomBadge'
 import InfoAlertMessage from 'components/common/InfoAlertMessage'
 import MediaThumb from 'components/common/MediaThumb'
-import { isValidHttpUrl } from 'helpers/validators'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useMemo } from 'react'
 import DeleteIcon from 'resources/icons/Delete'
 import { ImageUrlInputProps } from 'types'
 
@@ -63,10 +62,13 @@ const ImageUrlInput = ({
   onDelete,
   onChange,
   preview,
+  error,
   ...rest
 }: ImageUrlInputProps) => {
-  const [error, setError] = useState('')
-  const hasError: boolean = useMemo(() => !!error || !!toRemove, [error, toRemove])
+  const hasError: boolean = useMemo(
+    () => (!error?.success && error?.isDirty) || (!error?.success && error?.isDirty) || !!toRemove,
+    [error, toRemove]
+  )
   const { classes, cx } = useStyles({ hasError })
 
   const getRightSection = useCallback(() => {
@@ -90,18 +92,6 @@ const ImageUrlInput = ({
     },
     [onChange]
   )
-
-  useEffect(() => {
-    if (
-      image.banner?.targetUrl &&
-      image.banner?.targetUrl.length > 8 &&
-      !isValidHttpUrl(image.banner?.targetUrl)
-    ) {
-      setError('Please enter a valid URL')
-    } else {
-      setError('')
-    }
-  }, [image.banner?.targetUrl])
 
   return (
     <>
@@ -140,7 +130,7 @@ const ImageUrlInput = ({
           }}
         />
       </Flex>
-      {error && <Text color="warning">{error}</Text>}
+      {error?.errMsg && <Text color="warning">{error?.errMsg}</Text>}
     </>
   )
 }
