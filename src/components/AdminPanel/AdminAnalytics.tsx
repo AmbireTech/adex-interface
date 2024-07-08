@@ -113,7 +113,9 @@ const AdminAnalytics = () => {
   useEffect(() => {
     setAnalyticsKey(undefined)
 
-    const end = dayjs(startDate).add(1, timeframe).subtract(1, 'ms').toDate()
+    const end = dayjs(
+      Math.min(dayjs(startDate).add(1, timeframe).subtract(1, 'ms').valueOf(), dayjs().valueOf())
+    ).toDate()
     setEndDate(end)
 
     const checkAnalytics = async () => {
