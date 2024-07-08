@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from 'react'
+import { useEffect, useState, useMemo, useCallback } from 'react'
 import {
   Select,
   Container,
@@ -17,8 +17,10 @@ import CustomTable from 'components/common/CustomTable'
 import { CountryData } from 'helpers/countries'
 import { DateTimePicker, DateInput } from '@mantine/dates'
 import dayjs from 'dayjs'
+import { useNavigate } from 'react-router-dom'
 import BillingIcon from 'resources/icons/Billing'
 import VisibilityIcon from 'resources/icons/Visibility'
+import { getHumneSrcName } from 'helpers'
 import CheckMarkFilledIcon from 'resources/icons/CheckMarkFilled'
 
 const headingsDefault = [
@@ -45,7 +47,8 @@ const analyticsTypeData: Array<{ value: AnalyticsType; label: string }> = [
   { value: 'adUnit', label: 'By Ad unit' },
   { value: 'hostname', label: 'By hostname' },
   { value: 'placement', label: 'By placement' },
-  { value: 'campaignId', label: 'By campaign id' }
+  { value: 'campaignId', label: 'By campaign id' },
+  { value: 'advertiser', label: 'By advertiser' }
 ]
 
 const mapSegmentLabel = (analType: AnalyticsType, segment: string): { segementLabel: string } => {
@@ -58,6 +61,10 @@ const mapSegmentLabel = (analType: AnalyticsType, segment: string): { segementLa
     case 'timeframe':
       segementLabel = new Date(Number(segment)).toLocaleString()
       break
+    case 'hostname':
+      // TODO: separate calls for app/site - will require more work
+      segementLabel = getHumneSrcName(segment, 'app')
+      break
 
     default:
       break
@@ -69,6 +76,8 @@ const mapSegmentLabel = (analType: AnalyticsType, segment: string): { segementLa
 }
 
 const AdminAnalytics = () => {
+  const navigate = useNavigate()
+
   const [analyticsKey, setAnalyticsKey] = useState<
     | {
         key: string
@@ -113,7 +122,9 @@ const AdminAnalytics = () => {
   useEffect(() => {
     setAnalyticsKey(undefined)
 
-    const end = dayjs(startDate).add(1, timeframe).subtract(1, 'ms').toDate()
+    const end = dayjs(
+      Math.min(dayjs(startDate).add(1, timeframe).subtract(1, 'ms').valueOf(), dayjs().valueOf())
+    ).toDate()
     setEndDate(end)
 
     const checkAnalytics = async () => {
@@ -147,6 +158,7 @@ const AdminAnalytics = () => {
       clicks,
       elements:
         adminMappedAnalytics?.map((item) => ({
+          id: item.segment.toString(),
           segment: mapSegmentLabel(analType, item.segment).segementLabel,
           share: `${((item.paid / paid) * 100).toFixed(2)} %`,
           shareImps: `${((item.impressions / imps) * 100).toFixed(2)} %`,
@@ -158,6 +170,13 @@ const AdminAnalytics = () => {
         })) || []
     }
   }, [adminMappedAnalytics, analType])
+
+  const handlePreview = useCallback(
+    (cmp: { id: string }) => {
+      return navigate(`/dashboard/campaign-details/admin/${cmp.id}`, {})
+    },
+    [navigate]
+  )
 
   return (
     <Container fluid>
@@ -244,7 +263,13 @@ const AdminAnalytics = () => {
               </Badge>
             </Box>
           </Flex>
-          <CustomTable background headings={headings} elements={data.elements} pageSize={10} />
+          <CustomTable
+            background
+            headings={headings}
+            elements={data.elements}
+            pageSize={10}
+            onPreview={analType === 'campaignId' ? handlePreview : undefined}
+          />
         </Flex>
       )}
     </Container>
