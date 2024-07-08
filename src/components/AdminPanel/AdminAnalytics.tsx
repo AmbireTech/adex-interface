@@ -4,14 +4,17 @@ import {
   Container,
   Loader,
   Flex,
-  Box
+  Box,
+  Text,
+  Badge
+
   //  Flex, Loader, Tabs
 } from '@mantine/core'
 import { BaseAnalyticsData, AnalyticsPeriod, Timeframe, AnalyticsType } from 'types'
 import useCampaignAnalytics from 'hooks/useCampaignAnalytics'
 import CustomTable from 'components/common/CustomTable'
 import { CountryData } from 'helpers/countries'
-import { DatePickerInput } from '@mantine/dates'
+import { DateTimePicker, DateInput } from '@mantine/dates'
 import dayjs from 'dayjs'
 
 const headingsDefault = [
@@ -75,6 +78,13 @@ const AdminAnalytics = () => {
   const [startDate, setStartDate] = useState<Date | null>(
     dayjs().subtract(1, 'month').startOf('month').toDate()
   )
+  const [endDate, setEndDate] = useState<Date | null>(
+    dayjs().subtract(1, 'month').endOf('month').toDate()
+  )
+
+  const maxDate = useMemo(() => {
+    return new Date()
+  }, [])
 
   const headings = useMemo(() => [analType.toString(), ...headingsDefault], [analType])
 
@@ -99,14 +109,24 @@ const AdminAnalytics = () => {
   useEffect(() => {
     setAnalyticsKey(undefined)
 
+    const end = dayjs(startDate).add(1, timeframe).subtract(1, 'ms').toDate()
+    setEndDate(end)
+
     const checkAnalytics = async () => {
-      const key = await getAnalyticsKeyAndUpdate(analType, undefined, true, timeframe)
+      const key = await getAnalyticsKeyAndUpdate(
+        analType,
+        undefined,
+        true,
+        timeframe,
+        startDate || undefined,
+        end || undefined
+      )
       setAnalyticsKey(key)
       console.log('key', key)
     }
 
     checkAnalytics()
-  }, [analType, getAnalyticsKeyAndUpdate, timeframe])
+  }, [analType, getAnalyticsKeyAndUpdate, startDate, timeframe])
 
   const loading = useMemo(
     () => !analyticsKey || !adminMappedAnalytics,
@@ -135,6 +155,11 @@ const AdminAnalytics = () => {
 
   return (
     <Container fluid>
+      <Text size="sm" mb="sm">
+        * This analytics are for the actual user campaign, representing placed impressions, clicks,
+        etc. (NOT the stats form received requests form the SSPs)
+      </Text>
+
       <Flex direction="row" align="centers" justify="left" gap="xl">
         <Select
           label="Type"
@@ -150,25 +175,36 @@ const AdminAnalytics = () => {
           data={timeframeData}
           mb="sm"
         />
-        <DatePickerInput
+        <DateInput
           label="Start date"
           placeholder="Start date"
           value={startDate}
           onChange={setStartDate}
-          mx="auto"
-          maw={400}
+          maxDate={maxDate}
+          //   withSeconds
+        />
+        <DateTimePicker
+          label="End date"
+          placeholder="Start date"
+          value={endDate}
+          disabled
+          withSeconds
         />
       </Flex>
 
       {loading ? (
-        <Loader size="xl" />
+        <Loader size="xl" variant="dots" color="violet" />
       ) : (
         <Flex direction="column">
           <Flex direction="row" align="centers" justify="left" gap="xl" mb="md">
-            <Box>Total amount: {Number(data.paid.toFixed(2)).toLocaleString()}</Box>
-            <Box>Total impressions: {data.imps.toLocaleString()}</Box>
+            <Box>
+              Total amount: <Badge size="xl">{Number(data.paid.toFixed(2)).toLocaleString()}</Badge>
+            </Box>
+            <Box>
+              Total impressions:<Badge size="xl"> {data.imps.toLocaleString()}</Badge>
+            </Box>
           </Flex>
-          <CustomTable background headings={headings} elements={data.elements} pageSize={31} />
+          <CustomTable background headings={headings} elements={data.elements} pageSize={10} />
         </Flex>
       )}
     </Container>

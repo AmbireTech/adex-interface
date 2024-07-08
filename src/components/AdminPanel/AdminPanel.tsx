@@ -11,7 +11,7 @@ const AdminPanel = () => {
       <Tabs defaultValue="campaigns" keepMounted={false}>
         <Tabs.List>
           <Tabs.Tab value="campaigns">Campaigns</Tabs.Tab>
-          <Tabs.Tab value="generalAnalytics">General Analytics</Tabs.Tab>
+          <Tabs.Tab value="generalAnalytics">Validator Analytics</Tabs.Tab>
           <Tabs.Tab value="Deposits">Deposits</Tabs.Tab>
         </Tabs.List>
 
@@ -24,7 +24,7 @@ const AdminPanel = () => {
         </Tabs.Panel>
 
         <Tabs.Panel value="Deposits" pt="xs">
-          Deposits here
+          TODO: Deposits here
         </Tabs.Panel>
       </Tabs>
     </>
