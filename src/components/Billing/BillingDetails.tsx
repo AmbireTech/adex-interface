@@ -1,6 +1,7 @@
 import { Button, Flex, Grid, TextInput, createStyles, Text } from '@mantine/core'
 import { useForm } from '@mantine/form'
 import useAccount from 'hooks/useAccount'
+import useVATValidation from 'hooks/useVATValidation'
 
 const useStyles = createStyles((theme) => ({
   container: {
@@ -18,6 +19,9 @@ const BillingDetails = () => {
     updateBillingDetails,
     adexAccount: { billingDetails }
   } = useAccount()
+
+  const { isValid } = useVATValidation('EE', 'EE101988623')
+  console.log('isvalid', isValid)
 
   const form = useForm({
     initialValues: billingDetails,
