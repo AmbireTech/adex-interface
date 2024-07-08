@@ -25,6 +25,7 @@ import {
   hasUtmCampaign,
   isPastDateTime,
   prepareCampaignObject,
+  removeProperty,
   selectBannerSizes
 } from 'helpers/createCampaignHelpers'
 import { parseFromBigNumPrecision } from 'helpers/balances'
@@ -165,7 +166,8 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
       outpaceChainId: balanceToken.chainId,
       startsAt: isPastDateTime(CREATE_CAMPAIGN_DEFAULT_VALUE.startsAt)
         ? dayjs().add(1, 'hour').toDate()
-        : CREATE_CAMPAIGN_DEFAULT_VALUE.startsAt
+        : CREATE_CAMPAIGN_DEFAULT_VALUE.startsAt,
+      errorsTargetURLValidations: {}
     }),
     [adexAccount?.address, balanceToken?.address, balanceToken?.decimals, balanceToken?.chainId]
   )
@@ -256,7 +258,17 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
   const addAdUnit = useCallback(
     (adUnitToAdd: AdUnit) => {
       setCampaign((prev) => {
-        const updated = { ...prev, adUnits: [...prev.adUnits, adUnitToAdd] }
+        const { errorsTargetURLValidations } = { ...prev }
+        errorsTargetURLValidations[adUnitToAdd.id] = {
+          errMsg: '',
+          success: false,
+          isDirty: false
+        }
+        const updated = {
+          ...prev,
+          adUnits: [...prev.adUnits, adUnitToAdd],
+          errorsTargetURLValidations
+        }
         return updated
       })
     },
@@ -266,9 +278,12 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
   const removeAdUnit = useCallback(
     (adUnitIdToRemove: string) => {
       setCampaign((prev) => {
+        let { errorsTargetURLValidations } = { ...prev }
+        errorsTargetURLValidations = removeProperty(adUnitIdToRemove, errorsTargetURLValidations)
         const updated = {
           ...prev,
-          adUnits: [...prev.adUnits.filter((item) => item.id !== adUnitIdToRemove)]
+          adUnits: [...prev.adUnits.filter((item) => item.id !== adUnitIdToRemove)],
+          errorsTargetURLValidations
         }
         return updated
       })
@@ -279,20 +294,29 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
   const validateAdUnitTargetURL = useCallback(() => {
     setCampaign((prev) => {
       const adUnits = [...prev.adUnits]
-      const errorsTargetURLValidations: ErrorsTargetURLValidations = {}
+      const errorsTargetURLValidations = { ...prev.errorsTargetURLValidations }
 
       const mappedAdUnits = adUnits.map((element) => {
         const elCopy = { ...element }
 
         if (elCopy.banner?.targetUrl === '') {
-          errorsTargetURLValidations[elCopy.id] = { errMsg: '', success: false }
+          errorsTargetURLValidations[elCopy.id] = {
+            isDirty: true,
+            errMsg: '',
+            success: false
+          }
         } else if (elCopy.banner?.targetUrl && !isValidHttpUrl(elCopy.banner?.targetUrl)) {
           errorsTargetURLValidations[elCopy.id] = {
+            isDirty: true,
             errMsg: 'Please enter a valid URL',
             success: false
           }
         } else {
-          errorsTargetURLValidations[elCopy.id] = { errMsg: '', success: true }
+          errorsTargetURLValidations[elCopy.id] = {
+            isDirty: true,
+            errMsg: '',
+            success: true
+          }
         }
 
         return elCopy
@@ -318,14 +342,15 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
             elCopy.banner!.targetUrl = inputText
 
             if (elCopy.banner?.targetUrl === '') {
-              copy[elCopy.id] = { errMsg: '', success: false }
+              copy[elCopy.id] = { errMsg: '', success: false, isDirty: true }
             } else if (elCopy.banner?.targetUrl && !isValidHttpUrl(elCopy.banner?.targetUrl)) {
               copy[elCopy.id] = {
                 errMsg: 'Please enter a valid URL',
-                success: false
+                success: false,
+                isDirty: true
               }
             } else {
-              copy[elCopy.id] = { errMsg: '', success: true }
+              copy[elCopy.id] = { errMsg: '', success: true, isDirty: true }
             }
           }
 
@@ -486,6 +511,26 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
 
   const updateCampaignFromDraft = useCallback(
     (draftCampaign: Campaign) => {
+      const errorsTargetURLValidations = draftCampaign.adUnits.reduce((acc, adUnit) => {
+        const targetUrl = adUnit.banner?.targetUrl || ''
+        const validationResult = {
+          isDirty: true,
+          errMsg: '',
+          success: false
+        }
+
+        if (targetUrl === '') {
+          validationResult.errMsg = ''
+        } else if (!isValidHttpUrl(targetUrl)) {
+          validationResult.errMsg = 'Please enter a valid URL'
+        } else {
+          validationResult.success = true
+        }
+
+        acc[adUnit.id] = validationResult
+        return acc
+      }, {} as ErrorsTargetURLValidations)
+
       const mappedDraftCampaign: CampaignUI = {
         ...draftCampaign,
         step: 0,
@@ -518,7 +563,7 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
           )
         ),
         draftModified: false,
-        errorsTargetURLValidations: {}
+        errorsTargetURLValidations
       }
 
       setCampaign(mappedDraftCampaign)

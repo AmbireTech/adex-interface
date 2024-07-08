@@ -7,6 +7,7 @@ export type Devices = 'mobile' | 'desktop'
 export type ErrorTargetUrl = {
   errMsg: string
   success: boolean
+  isDirty: boolean
 }
 
 export type Sizes = {

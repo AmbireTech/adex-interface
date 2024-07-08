@@ -65,7 +65,10 @@ const ImageUrlInput = ({
   error,
   ...rest
 }: ImageUrlInputProps) => {
-  const hasError: boolean = useMemo(() => !error?.success || !!toRemove, [error, toRemove])
+  const hasError: boolean = useMemo(
+    () => (!error?.success && error?.isDirty) || (!error?.success && error?.isDirty) || !!toRemove,
+    [error, toRemove]
+  )
   const { classes, cx } = useStyles({ hasError })
 
   const getRightSection = useCallback(() => {

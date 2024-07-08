@@ -40,7 +40,8 @@ const CampaignSummary = () => {
     publishCampaign,
     resetCampaign,
     saveToDraftCampaign,
-    addUTMToTargetURLS
+    addUTMToTargetURLS,
+    validateAdUnitTargetURL
   } = useCreateCampaignContext()
   const {
     formattedSelectedDevice,
@@ -87,14 +88,10 @@ const CampaignSummary = () => {
     [launchCampaign]
   )
 
-  const targetURLvalErrors = useMemo(
-    () => Object.values(errorsTargetURLValidations).some((e) => !e.success),
-    [errorsTargetURLValidations]
-  )
-
   const handleNextStepBtnClicked = useCallback(() => {
     if (step === 0) {
-      if (targetURLvalErrors) {
+      validateAdUnitTargetURL()
+      if (Object.values(errorsTargetURLValidations).some((e) => !e.success)) {
         showNotification(
           'error',
           'Please enter a target URL starting with https://',
@@ -127,7 +124,8 @@ const CampaignSummary = () => {
     showNotification,
     addUTMToTargetURLS,
     autoUTMChecked,
-    targetURLvalErrors
+    errorsTargetURLValidations,
+    validateAdUnitTargetURL
   ])
 
   const handleSaveDraftClicked = useCallback(async () => {

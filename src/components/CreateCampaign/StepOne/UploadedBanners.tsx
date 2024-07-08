@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo } from 'react'
+import { useCallback, useMemo } from 'react'
 import { Checkbox, Grid } from '@mantine/core'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import { AdUnit } from 'adex-common/dist/types'
@@ -13,8 +13,7 @@ const UploadedBanners = ({
 }: UploadedBannersProps) => {
   const {
     campaign: { adUnits, errorsTargetURLValidations },
-    selectedBannerSizes,
-    validateAdUnitTargetURL
+    selectedBannerSizes
   } = useCreateCampaignContext()
 
   const allowedSizes = useMemo(
@@ -23,14 +22,16 @@ const UploadedBanners = ({
   )
 
   const isMatchedTheSizes = useCallback(
-    (img: AdUnit) =>
-      allowedSizes &&
-      allowedSizes.length > 0 &&
-      allowedSizes.includes(`${img.banner?.format.w}x${img.banner?.format.h}`),
+    (img: AdUnit) => {
+      if (!allowedSizes || allowedSizes.length === 0) {
+        return true
+      }
+
+      const size = `${img.banner?.format.w}x${img.banner?.format.h}`
+      return allowedSizes.includes(size)
+    },
     [allowedSizes]
   )
-
-  useEffect(() => validateAdUnitTargetURL(), [validateAdUnitTargetURL])
 
   return (
     <Grid>
