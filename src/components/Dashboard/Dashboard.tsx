@@ -46,6 +46,7 @@ const getStatusOrder = (status: CampaignStatus) => {
     case CampaignStatus.draft:
       return statusOrder.draft
     case CampaignStatus.active:
+    case CampaignStatus.ready:
       return statusOrder.active
     case CampaignStatus.paused:
       return statusOrder.paused
