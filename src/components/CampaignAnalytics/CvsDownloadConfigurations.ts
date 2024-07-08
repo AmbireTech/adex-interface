@@ -27,6 +27,7 @@ const headersToDataProperties: IHeadersToDataProps = {
   timeframe: {},
   placement: {},
   campaignId: {},
+  advertiser: {},
   ssp: {
     SSP: 'segment',
     Share: 'share',

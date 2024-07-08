@@ -103,6 +103,7 @@ export type AnalyticsType =
   | 'ssp'
   | 'placement'
   | 'campaignId'
+  | 'advertiser'
 
 export type TabType = 'placements' | 'regions' | 'creatives' | 'timeframe'
 

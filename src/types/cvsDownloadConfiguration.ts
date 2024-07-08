@@ -42,4 +42,5 @@ export interface IHeadersToDataProps {
   ssp: SSP
   placement: object
   campaignId: object
+  advertiser: object
 }
