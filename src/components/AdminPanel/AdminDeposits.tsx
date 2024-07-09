@@ -35,7 +35,7 @@ function AdminDeposit() {
 
     validate: {
       account: matches(/^(0x)?[0-9a-fA-F]{40}$/, 'invalid account address'),
-      amount: isInRange({ min: 0, max: 1000000000000 }, 'min 0'),
+      amount: isInRange({ min: 10, max: 1000000000000 }, 'min 10'),
       token: {
         name: hasLength({ min: 1 }),
         chainId: isInRange({ min: 0, max: 999999 }),
