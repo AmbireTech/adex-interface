@@ -25,6 +25,9 @@ const headersToDataProperties: IHeadersToDataProps = {
     Spent: 'paid'
   },
   timeframe: {},
+  placement: {},
+  campaignId: {},
+  advertiser: {},
   ssp: {
     SSP: 'segment',
     Share: 'share',

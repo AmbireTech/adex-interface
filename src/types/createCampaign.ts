@@ -4,6 +4,12 @@ import { ChangeEventHandler } from 'react'
 
 export type Devices = 'mobile' | 'desktop'
 
+export type ErrorTargetUrl = {
+  errMsg: string
+  success: boolean
+  isDirty: boolean
+}
+
 export type Sizes = {
   w: number
   h: number
@@ -35,6 +41,7 @@ export type ImageUrlInputProps = MantineStyleSystemProps & {
   onDelete?: (file: AdUnit) => void
   onChange?: ChangeEventHandler<HTMLInputElement> | undefined
   preview?: boolean
+  error?: ErrorTargetUrl | undefined
 }
 
 export type UploadedBannersProps = {

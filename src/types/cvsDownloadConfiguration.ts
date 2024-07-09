@@ -40,4 +40,7 @@ export interface IHeadersToDataProps {
   adUnit: AdUnit
   timeframe: object
   ssp: SSP
+  placement: object
+  campaignId: object
+  advertiser: object
 }

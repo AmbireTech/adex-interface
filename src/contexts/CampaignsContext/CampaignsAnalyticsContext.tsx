@@ -17,9 +17,18 @@ import {
   AnalyticsDataRes,
   AnalyticsType,
   BaseAnalyticsData,
-  AnalyticsPeriod
+  AnalyticsPeriod,
+  Timeframe
 } from 'types'
-import { timeout } from 'helpers'
+import {
+  timeout,
+  getEpoch,
+  getPeriodInitialEpoch,
+  getTimeframeMaxPeriod,
+  MINUTE,
+  MONTH,
+  YEAR
+} from 'helpers'
 
 import { dashboardTableElements } from 'components/Dashboard/mockData'
 
@@ -32,26 +41,10 @@ type QueryStatusAndType = {
   analyticsType: AnalyticsType
 }
 
-const min = 60 * 1000
-const defaultRefreshQuery = 1 * min
-
-const MINUTE = 60 * 1000
-const HOUR = 60 * MINUTE
-const DAY = 24 * HOUR
-// const WEEK = 7 * DAY
-const MONTH = 30 * DAY
-const YEAR = 356 * DAY
-
-function getEpoch(timestamp: number, floor: number): number {
-  return Math.floor(timestamp / floor) * floor
-}
+const defaultRefreshQuery = 1 * MINUTE
 
 function getRefreshKey(timestamp: number): number {
   return getEpoch(timestamp, defaultRefreshQuery)
-}
-
-function getPeriodInitialEpoch(timestamp: number): number {
-  return getEpoch(timestamp, HOUR)
 }
 
 const getAnalyticsKeyFromQuery = (queryParams: AnalyticsDataQuery): string => {
@@ -151,8 +144,12 @@ interface ICampaignsAnalyticsContext {
   analyticsData: Map<string, AnalyticsData[]>
   // TODO: all campaigns event aggregations by account
   getAnalyticsKeyAndUpdate: (
-    campaign: Campaign,
-    analyticsType: AnalyticsType
+    analyticsType: AnalyticsType,
+    campaign?: Campaign,
+    forAdmin?: boolean,
+    timeframe?: Timeframe,
+    startFrom?: Date,
+    endTo?: Date
   ) => Promise<{ key: string; period: AnalyticsPeriod } | undefined>
   initialAnalyticsLoading: boolean
   mappedAnalytics: Map<string, BaseAnalyticsData[]>
@@ -178,10 +175,10 @@ const CampaignsAnalyticsProvider: FC<PropsWithChildren> = ({ children }) => {
   )
 
   const updateAnalytics = useCallback(
-    async (params: AnalyticsDataQuery, dataKey: string) => {
+    async (params: AnalyticsDataQuery, dataKey: string, forAdmin?: boolean) => {
       try {
         const analyticsDataRes = await adexServicesRequest<AnalyticsDataRes>('validator', {
-          route: '/v5_a/analytics/for-dsp-users',
+          route: `/v5_a/analytics/${forAdmin ? 'for-admin' : 'for-dsp-users'}`,
           method: 'GET',
           queryParams: Object.entries(params).reduce(
             (query: Record<string, string>, [key, value]) => {
@@ -219,46 +216,64 @@ const CampaignsAnalyticsProvider: FC<PropsWithChildren> = ({ children }) => {
   )
 
   const updateCampaignAnalyticsByQuery = useCallback(
-    (query: AnalyticsDataQuery, dataKey: string): void => {
-      updateAnalytics(query, dataKey)
+    (query: AnalyticsDataQuery, dataKey: string, forAdmin?: boolean): void => {
+      updateAnalytics(query, dataKey, forAdmin)
     },
     [updateAnalytics]
   )
 
   const getAnalyticsKeyAndUpdate = useCallback(
     async (
-      campaign: Campaign,
-      analyticsType: AnalyticsType
+      analyticsType: AnalyticsType,
+      campaign?: Campaign,
+      forAdmin?: boolean,
+      selectedTimeframe?: Timeframe,
+      startFrom?: Date,
+      endTo?: Date
     ): Promise<{ key: string; period: AnalyticsPeriod } | undefined> => {
-      if (!campaign.id || !analyticsType) {
+      if (!analyticsType || (!forAdmin && !campaign?.id)) {
         return
       }
 
+      // TODO: start fro UTC date 00:00
+      const maxPeriod = getTimeframeMaxPeriod(selectedTimeframe || 'year')
+      const start =
+        startFrom ||
+        (campaign
+          ? new Date(getPeriodInitialEpoch(Number(campaign.activeFrom)) - 1)
+          : new Date(Date.now() - maxPeriod))
+
       const period = {
-        start: new Date(getPeriodInitialEpoch(Number(campaign.activeFrom)) - 1),
-        end: new Date(Math.min(Date.now(), Number(campaign.activeTo)))
+        start,
+        end:
+          endTo ||
+          (campaign
+            ? new Date(Math.min(Date.now(), Number(campaign.activeTo)))
+            : new Date(start.getTime() + maxPeriod))
       }
 
-      const periodDiff = period.end.getTime() - period.start.getTime()
+      let timeframe: AnalyticsDataQuery['timeframe'] = selectedTimeframe || 'year'
+      if (campaign) {
+        const periodDiff = (period?.end?.getTime() || 0) - (period?.start?.getTime() || 0)
 
-      let timeframe: AnalyticsDataQuery['timeframe'] = 'year'
-      const isTimeframe = analyticsType === 'timeframe'
+        const isTimeframe = analyticsType === 'timeframe'
 
-      if (isTimeframe && periodDiff >= YEAR) {
-        timeframe = 'month'
-      } else if (isTimeframe && periodDiff > MONTH) {
-        timeframe = 'week'
-      } else if (isTimeframe) {
-        timeframe = 'day'
+        if (isTimeframe && periodDiff >= YEAR) {
+          timeframe = 'month'
+        } else if (isTimeframe && periodDiff > MONTH) {
+          timeframe = 'week'
+        } else if (isTimeframe) {
+          timeframe = 'day'
+        }
       }
 
       // TODO: alg to set the timeframe depending on campaign start/end and current date
       const baseQuery: AnalyticsDataQuery = {
-        campaignId: campaign.id,
+        ...(!forAdmin && { campaignId: campaign?.id }),
         ...period,
         metric: 'paid',
         eventType: 'CLICK',
-        limit: 10000000,
+        limit: 100000,
         timezone: 'UTC',
         timeframe,
         segmentBy: analyticsType === 'timeframe' ? undefined : analyticsType
@@ -280,7 +295,7 @@ const CampaignsAnalyticsProvider: FC<PropsWithChildren> = ({ children }) => {
         // NOTE: use in case to call the queries in some intervals
         // eslint-disable-next-line no-restricted-syntax
         for (const [i, q] of queries.entries()) {
-          updateCampaignAnalyticsByQuery(q, keys[i])
+          updateCampaignAnalyticsByQuery(q, keys[i], forAdmin)
           if (i < queries.length) {
             // eslint-disable-next-line no-await-in-loop
             await timeout(69)
