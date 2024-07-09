@@ -11,7 +11,7 @@ type ValidationResult = {
   error: string | null
 }
 
-export enum CountryCodes {
+enum CountryCodes {
   Austria = 'AT',
   Belgium = 'BE',
   Bulgaria = 'BG',
