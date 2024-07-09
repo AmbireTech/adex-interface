@@ -1,7 +1,11 @@
 import { Button, Flex, Grid, TextInput, createStyles, Text } from '@mantine/core'
 import { useForm } from '@mantine/form'
 import useAccount from 'hooks/useAccount'
+import useCustomNotifications from 'hooks/useCustomNotifications'
 import useVATValidation from 'hooks/useVATValidation'
+import { CountryCodes } from 'hooks/useVATValidation/useVATValidation'
+import { useCallback } from 'react'
+import { BillingDetailsProps } from 'types'
 
 const useStyles = createStyles((theme) => ({
   container: {
@@ -13,15 +17,19 @@ const useStyles = createStyles((theme) => ({
   }
 }))
 
+const isValidCountryCode = (code: string): code is keyof typeof CountryCodes => {
+  return code in CountryCodes
+}
+
 const BillingDetails = () => {
   const { classes } = useStyles()
   const {
     updateBillingDetails,
     adexAccount: { billingDetails }
   } = useAccount()
+  const { showNotification } = useCustomNotifications()
 
-  const { isValid } = useVATValidation('EE', 'EE101988623')
-  console.log('isvalid', isValid)
+  const { validateVAT } = useVATValidation()
 
   const form = useForm({
     initialValues: billingDetails,
@@ -45,7 +53,6 @@ const BillingDetails = () => {
         value.length < 2 ? 'Company name must have at least 2 characters' : null,
       companyNumber: (value: string) =>
         value.length === 0 ? 'Registration number is required' : null,
-      companyNumberPrim: () => null, // No validation for VAT number
       companyAddress: (value: string) =>
         value.length === 0 ? 'Company address is required' : null,
       companyCountry: (value: string) => (value.length === 0 ? 'Country is required' : null),
@@ -54,11 +61,38 @@ const BillingDetails = () => {
     }
   })
 
+  const handleSubmit = useCallback(
+    async (values: BillingDetailsProps) => {
+      try {
+        const { companyNumberPrim, companyCountry } = values
+
+        if (companyNumberPrim && companyCountry && isValidCountryCode(companyCountry)) {
+          const { isValid, error } = await validateVAT(
+            companyCountry as keyof typeof CountryCodes,
+            companyNumberPrim
+          )
+          if (!isValid) {
+            form.setFieldError('companyNumberPrim', error || 'Invalid VAT number')
+            showNotification('error', error || 'Validating VAT number', 'Validating VAT number')
+            return
+          }
+        }
+
+        updateBillingDetails(values)
+      } catch (e: any) {
+        console.error(e)
+        showNotification(
+          'error',
+          'Validating VAT number',
+          e.message || e || 'Validating VAT number'
+        )
+      }
+    },
+    [updateBillingDetails, validateVAT, form, showNotification]
+  )
+
   return (
-    <form
-      className={classes.container}
-      onSubmit={form.onSubmit((values) => updateBillingDetails(values))}
-    >
+    <form className={classes.container} onSubmit={form.onSubmit((values) => handleSubmit(values))}>
       <Grid gutter="xs">
         <Grid.Col>
           <Text size="sm" color="secondaryText" weight="bold">

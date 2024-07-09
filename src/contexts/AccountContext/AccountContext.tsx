@@ -8,7 +8,7 @@ import {
   useEffect,
   useState
 } from 'react'
-import { Account, BillingDetails, IAdExAccount } from 'types'
+import { Account, BillingDetailsProps, IAdExAccount } from 'types'
 import {
   getMessageToSign,
   isAdminToken,
@@ -68,7 +68,7 @@ interface IAccountContext {
     reqOptions: ApiRequestOptions<T>
   ) => Promise<T>
   updateBalance: () => Promise<void>
-  updateBillingDetails: (billingDetails: BillingDetails) => Promise<void>
+  updateBillingDetails: (billingDetails: BillingDetailsProps) => Promise<void>
   isLoading: boolean
 }
 
@@ -454,7 +454,7 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
   }, [adexServicesRequest, setAdexAccount, showNotification])
 
   const updateBillingDetails = useCallback(
-    async (billingDetails: BillingDetails) => {
+    async (billingDetails: BillingDetailsProps) => {
       try {
         const updated = await adexServicesRequest<unknown>('backend', {
           route: '/dsp/accounts/billing-details',

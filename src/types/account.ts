@@ -1,6 +1,6 @@
 // TODO: These types should get from adex-common
 
-export interface BillingDetails {
+export interface BillingDetailsProps {
   firstName: string
   lastName: string
   companyName: string
@@ -58,7 +58,7 @@ export interface Account {
     total: bigint
     perCampaign: CampaignRefunds[]
   }
-  billingDetails: BillingDetails
+  billingDetails: BillingDetailsProps
   created: Date
   updated: Date
   [x: string]: any
