@@ -1,6 +1,6 @@
 import {
   BaseAnalyticsData,
-  BillingDetails,
+  BillingDetailsProps,
   Deposit,
   CampaignFundsActive,
   CampaignRefunds
@@ -17,7 +17,7 @@ export interface IInvoices {
   amountSpent: string
 }
 
-export type InvoiceCompanyDetails = BillingDetails & {
+export type InvoiceCompanyDetails = BillingDetailsProps & {
   ethAddress: string
 }
 
