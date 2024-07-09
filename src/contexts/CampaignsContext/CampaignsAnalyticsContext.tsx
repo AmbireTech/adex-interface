@@ -103,11 +103,15 @@ const analyticsDataToMappedAnalytics = (
 
     nexSegment.impressions += Number(impElement.value)
     nexSegment.clicks += Number(
-      clickCounts.find((x) => x[segmentField] === impElement[segmentField])?.value || 0
+      clickCounts.find(
+        (x) => x.time === impElement.time && x[segmentField] === impElement[segmentField]
+      )?.value || 0
     )
 
     nexSegment.paid += Number(
-      impPaid.find((x) => x[segmentField] === impElement[segmentField])?.value || 0
+      impPaid.find(
+        (x) => x.time === impElement.time && x[segmentField] === impElement[segmentField]
+      )?.value || 0
     )
     //  + Number(clickPaid.find((x) => x[segmentField] === impElement[segmentField])?.value || 0)
 
