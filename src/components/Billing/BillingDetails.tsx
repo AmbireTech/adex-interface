@@ -2,10 +2,45 @@ import { Button, Flex, Grid, TextInput, createStyles, Text } from '@mantine/core
 import { useForm } from '@mantine/form'
 import useAccount from 'hooks/useAccount'
 import useCustomNotifications from 'hooks/useCustomNotifications'
-import useVATValidation from 'hooks/useVATValidation'
-import { CountryCodes } from 'hooks/useVATValidation/useVATValidation'
 import { useCallback } from 'react'
+import { fetchService } from 'services'
 import { BillingDetailsProps } from 'types'
+
+type ValidationResult = {
+  isValid: boolean
+  error: string | null
+}
+
+export enum CountryCodes {
+  Austria = 'AT',
+  Belgium = 'BE',
+  Bulgaria = 'BG',
+  Croatia = 'HR',
+  Cyprus = 'CY',
+  'Czech Republic' = 'CZ',
+  Denmark = 'DK',
+  Estonia = 'EE',
+  Finland = 'FI',
+  France = 'FR',
+  Germany = 'DE',
+  Greece = 'EL',
+  Hungary = 'HU',
+  Ireland = 'IE',
+  Italy = 'IT',
+  Latvia = 'LV',
+  Lithuania = 'LT',
+  Luxembourg = 'LU',
+  Malta = 'MT',
+  Netherlands = 'NL',
+  Poland = 'PL',
+  Portugal = 'PT',
+  Romania = 'RO',
+  Slovakia = 'SK',
+  Slovenia = 'SI',
+  Spain = 'ES',
+  Sweden = 'SE',
+  'Northern Ireland' = 'XI'
+}
 
 const useStyles = createStyles((theme) => ({
   container: {
@@ -21,6 +56,40 @@ const isValidCountryCode = (code: string): code is keyof typeof CountryCodes => 
   return code in CountryCodes
 }
 
+const validateVAT = async (
+  country: keyof typeof CountryCodes,
+  vat: string
+): Promise<ValidationResult> => {
+  if (!country || !vat) return { isValid: false, error: 'Invalid input' }
+  const countryCode = CountryCodes[country]
+  let isValid = false
+  let error = null
+
+  try {
+    const response = await fetchService({
+      url: `https://ec.europa.eu/taxation_customs/vies/rest-api/ms/${countryCode}/vat/${vat}`,
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*'
+      }
+    })
+
+    const result = await response.json()
+
+    if (!response.ok) {
+      throw new Error('Invalid response from VAT validation API')
+    }
+
+    isValid = result.valid
+  } catch (e: any) {
+    console.error(e.message || e)
+    error = e.message || e
+  }
+
+  return { isValid, error }
+}
+
 const BillingDetails = () => {
   const { classes } = useStyles()
   const {
@@ -28,12 +97,8 @@ const BillingDetails = () => {
     adexAccount: { billingDetails }
   } = useAccount()
   const { showNotification } = useCustomNotifications()
-
-  const { validateVAT } = useVATValidation()
-
   const form = useForm({
     initialValues: billingDetails,
-
     validate: {
       firstName: (value: string) => {
         if (value.length > 0 && value.length < 2) {
@@ -88,7 +153,7 @@ const BillingDetails = () => {
         )
       }
     },
-    [updateBillingDetails, validateVAT, form, showNotification]
+    [updateBillingDetails, form, showNotification]
   )
 
   return (
