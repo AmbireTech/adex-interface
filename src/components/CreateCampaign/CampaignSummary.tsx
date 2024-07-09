@@ -228,7 +228,13 @@ const CampaignSummary = () => {
         </UnstyledButton>
       </Flex>
       <SuccessModal
-        text="Campaign launched successfully!"
+        text={
+          <Text p="md">
+            Your campaign has been successfully launched and is now under review.{' '}
+            <strong>It may take up to 24 hours for your campaign to be activated</strong>. Thank you
+            for your patience!
+          </Text>
+        }
         opened={opened}
         close={handleOnModalClose}
       />
