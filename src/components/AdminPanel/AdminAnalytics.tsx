@@ -11,7 +11,7 @@ import {
 
   //  Flex, Loader, Tabs
 } from '@mantine/core'
-import { BaseAnalyticsData, AnalyticsPeriod, Timeframe, AnalyticsType } from 'types'
+import { BaseAnalyticsData, AnalyticsPeriod, Timeframe, AnalyticsType, SSPs } from 'types'
 import useCampaignAnalytics from 'hooks/useCampaignAnalytics'
 import CustomTable from 'components/common/CustomTable'
 import { CountryData } from 'helpers/countries'
@@ -30,7 +30,8 @@ const headingsDefault = [
   'Impressions',
   'Clicks',
   'CTR',
-  'Average CPM',
+  'Avg CPM',
+  'Avg CPC',
   'Spent'
 ]
 
@@ -48,7 +49,15 @@ const analyticsTypeData: Array<{ value: AnalyticsType; label: string }> = [
   { value: 'hostname', label: 'By hostname' },
   { value: 'placement', label: 'By placement' },
   { value: 'campaignId', label: 'By campaign id' },
-  { value: 'advertiser', label: 'By advertiser' }
+  { value: 'advertiser', label: 'By advertiser' },
+  { value: 'timeframe', label: 'By Timeframe' }
+]
+
+const sspsData: Array<{ value: SSPs; label: string }> = [
+  { value: '', label: 'All SSPs' },
+  { value: 'Eskimi', label: 'Eskimi' },
+  { value: 'Epom', label: 'Epom' },
+  { value: 'Qortex', label: 'Qortex' }
 ]
 
 const mapSegmentLabel = (analType: AnalyticsType, segment: string): { segementLabel: string } => {
@@ -59,7 +68,7 @@ const mapSegmentLabel = (analType: AnalyticsType, segment: string): { segementLa
       segementLabel = CountryData.get(segment)?.name || segment
       break
     case 'timeframe':
-      segementLabel = new Date(Number(segment)).toLocaleString()
+      segementLabel = new Date(Number(segment)).toUTCString()
       break
     case 'hostname':
       // TODO: separate calls for app/site - will require more work
@@ -88,6 +97,7 @@ const AdminAnalytics = () => {
 
   const [timeframe, setTimeframe] = useState<Timeframe>('month')
   const [analType, setAnalType] = useState<AnalyticsType>('ssp')
+  const [ssp, setSsp] = useState<SSPs>('')
   const [startDate, setStartDate] = useState<Date | null>(
     dayjs().subtract(1, 'month').startOf('month').toDate()
   )
@@ -134,14 +144,15 @@ const AdminAnalytics = () => {
         true,
         timeframe,
         startDate || undefined,
-        end || undefined
+        end || undefined,
+        ssp || undefined
       )
       setAnalyticsKey(key)
       console.log('key', key)
     }
 
     checkAnalytics()
-  }, [analType, getAnalyticsKeyAndUpdate, startDate, timeframe])
+  }, [analType, getAnalyticsKeyAndUpdate, ssp, startDate, timeframe])
 
   const loading = useMemo(
     () => !analyticsKey || !adminMappedAnalytics,
@@ -166,6 +177,7 @@ const AdminAnalytics = () => {
           clicks: item.clicks,
           ctr: `${item.ctr} %`,
           avgCpm: `${item.avgCpm}`,
+          avgCPC: item.clicks ? (item.paid / item.clicks).toFixed(4) : '-',
           paid: `${item.paid.toFixed(4)}`
         })) || []
     }
@@ -191,6 +203,13 @@ const AdminAnalytics = () => {
           value={analType}
           onChange={(val) => setAnalType(val as AnalyticsType)}
           data={analyticsTypeData}
+          size="md"
+        />
+        <Select
+          label="SSP"
+          value={ssp}
+          onChange={(val) => setSsp(val as SSPs)}
+          data={sspsData}
           size="md"
         />
         <Select

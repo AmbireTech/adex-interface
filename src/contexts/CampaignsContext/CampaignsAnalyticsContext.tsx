@@ -18,7 +18,8 @@ import {
   AnalyticsType,
   BaseAnalyticsData,
   AnalyticsPeriod,
-  Timeframe
+  Timeframe,
+  SSPs
 } from 'types'
 import {
   timeout,
@@ -153,7 +154,8 @@ interface ICampaignsAnalyticsContext {
     forAdmin?: boolean,
     timeframe?: Timeframe,
     startFrom?: Date,
-    endTo?: Date
+    endTo?: Date,
+    ssp?: SSPs
   ) => Promise<{ key: string; period: AnalyticsPeriod } | undefined>
   initialAnalyticsLoading: boolean
   mappedAnalytics: Map<string, BaseAnalyticsData[]>
@@ -233,7 +235,8 @@ const CampaignsAnalyticsProvider: FC<PropsWithChildren> = ({ children }) => {
       forAdmin?: boolean,
       selectedTimeframe?: Timeframe,
       startFrom?: Date,
-      endTo?: Date
+      endTo?: Date,
+      ssp?: SSPs
     ): Promise<{ key: string; period: AnalyticsPeriod } | undefined> => {
       if (!analyticsType || (!forAdmin && !campaign?.id)) {
         return
@@ -280,6 +283,7 @@ const CampaignsAnalyticsProvider: FC<PropsWithChildren> = ({ children }) => {
         limit: 100000,
         timezone: 'UTC',
         timeframe,
+        ...{ ssp },
         segmentBy: analyticsType === 'timeframe' ? undefined : analyticsType
       }
 

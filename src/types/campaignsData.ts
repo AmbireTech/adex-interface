@@ -115,3 +115,5 @@ export type BaseAnalyticsData = BaseData & {
   // TODO: need additional map to get the url from adUnit id
   mediaUri?: string
 }
+
+export type SSPs = '' | 'Eskimi' | 'Epom' | 'Qortex'
