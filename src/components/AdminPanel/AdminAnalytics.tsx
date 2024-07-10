@@ -11,7 +11,7 @@ import {
 
   //  Flex, Loader, Tabs
 } from '@mantine/core'
-import { BaseAnalyticsData, AnalyticsPeriod, Timeframe, AnalyticsType } from 'types'
+import { BaseAnalyticsData, AnalyticsPeriod, Timeframe, AnalyticsType, SSPs } from 'types'
 import useCampaignAnalytics from 'hooks/useCampaignAnalytics'
 import CustomTable from 'components/common/CustomTable'
 import { CountryData } from 'helpers/countries'
@@ -22,6 +22,7 @@ import BillingIcon from 'resources/icons/Billing'
 import VisibilityIcon from 'resources/icons/Visibility'
 import { getHumneSrcName } from 'helpers'
 import CheckMarkFilledIcon from 'resources/icons/CheckMarkFilled'
+import DownloadCSV from 'components/common/DownloadCSV'
 
 const headingsDefault = [
   //   'Country',
@@ -30,9 +31,21 @@ const headingsDefault = [
   'Impressions',
   'Clicks',
   'CTR',
-  'Average CPM',
+  'Avg CPM',
+  'Avg CPC',
   'Spent'
 ]
+
+const csvHeaders = {
+  // segment: 'segment',
+  share: 'share',
+  impressions: 'impressions',
+  clicks: 'clicks',
+  ctr: 'ctr',
+  avgCpm: 'avgCpm',
+  avgCpc: 'avgCpc',
+  paid: 'paid'
+}
 
 const timeframeData: Array<{ value: Timeframe; label: Timeframe }> = [
   { value: 'year', label: 'year' },
@@ -48,7 +61,15 @@ const analyticsTypeData: Array<{ value: AnalyticsType; label: string }> = [
   { value: 'hostname', label: 'By hostname' },
   { value: 'placement', label: 'By placement' },
   { value: 'campaignId', label: 'By campaign id' },
-  { value: 'advertiser', label: 'By advertiser' }
+  { value: 'advertiser', label: 'By advertiser' },
+  { value: 'timeframe', label: 'By Timeframe' }
+]
+
+const sspsData: Array<{ value: SSPs; label: string }> = [
+  { value: '', label: 'All SSPs' },
+  { value: 'Eskimi', label: 'Eskimi' },
+  { value: 'Epom', label: 'Epom' },
+  { value: 'Qortex', label: 'Qortex' }
 ]
 
 const mapSegmentLabel = (analType: AnalyticsType, segment: string): { segementLabel: string } => {
@@ -59,7 +80,7 @@ const mapSegmentLabel = (analType: AnalyticsType, segment: string): { segementLa
       segementLabel = CountryData.get(segment)?.name || segment
       break
     case 'timeframe':
-      segementLabel = new Date(Number(segment)).toLocaleString()
+      segementLabel = new Date(Number(segment)).toUTCString()
       break
     case 'hostname':
       // TODO: separate calls for app/site - will require more work
@@ -88,6 +109,7 @@ const AdminAnalytics = () => {
 
   const [timeframe, setTimeframe] = useState<Timeframe>('month')
   const [analType, setAnalType] = useState<AnalyticsType>('ssp')
+  const [ssp, setSsp] = useState<SSPs>('')
   const [startDate, setStartDate] = useState<Date | null>(
     dayjs().subtract(1, 'month').startOf('month').toDate()
   )
@@ -134,14 +156,15 @@ const AdminAnalytics = () => {
         true,
         timeframe,
         startDate || undefined,
-        end || undefined
+        end || undefined,
+        ssp || undefined
       )
       setAnalyticsKey(key)
       console.log('key', key)
     }
 
     checkAnalytics()
-  }, [analType, getAnalyticsKeyAndUpdate, startDate, timeframe])
+  }, [analType, getAnalyticsKeyAndUpdate, ssp, startDate, timeframe])
 
   const loading = useMemo(
     () => !analyticsKey || !adminMappedAnalytics,
@@ -149,9 +172,9 @@ const AdminAnalytics = () => {
   )
 
   const data = useMemo(() => {
-    const paid = adminMappedAnalytics?.reduce((sum, i) => sum + i.paid, 0) || 1
-    const imps = adminMappedAnalytics?.reduce((sum, i) => sum + i.impressions, 0) || 1
-    const clicks = adminMappedAnalytics?.reduce((sum, i) => sum + i.clicks, 0) || 1
+    const paid = adminMappedAnalytics?.reduce((sum, i) => sum + i.paid, 0) || 0
+    const imps = adminMappedAnalytics?.reduce((sum, i) => sum + i.impressions, 0) || 0
+    const clicks = adminMappedAnalytics?.reduce((sum, i) => sum + i.clicks, 0) || 0
     return {
       paid,
       imps,
@@ -160,12 +183,13 @@ const AdminAnalytics = () => {
         adminMappedAnalytics?.map((item) => ({
           id: item.segment.toString(),
           segment: mapSegmentLabel(analType, item.segment).segementLabel,
-          share: `${((item.paid / paid) * 100).toFixed(2)} %`,
-          shareImps: `${((item.impressions / imps) * 100).toFixed(2)} %`,
+          share: `${((item.paid / (paid || 1)) * 100).toFixed(2)} %`,
+          shareImps: `${((item.impressions / (imps || 1)) * 100).toFixed(2)} %`,
           impressions: item.impressions,
           clicks: item.clicks,
           ctr: `${item.ctr} %`,
           avgCpm: `${item.avgCpm}`,
+          avgCPC: `${item.avgCpc}`,
           paid: `${item.paid.toFixed(4)}`
         })) || []
     }
@@ -185,12 +209,19 @@ const AdminAnalytics = () => {
         etc. (NOT the stats form received requests form the SSPs)
       </Text>
 
-      <Flex direction="row" align="center" justify="left" gap="xl" mb="md">
+      <Flex direction="row" align="start" justify="left" gap="xl" mb="md">
         <Select
           label="Type"
           value={analType}
           onChange={(val) => setAnalType(val as AnalyticsType)}
           data={analyticsTypeData}
+          size="md"
+        />
+        <Select
+          label="SSP"
+          value={ssp}
+          onChange={(val) => setSsp(val as SSPs)}
+          data={sspsData}
           size="md"
         />
         <Select
@@ -224,44 +255,45 @@ const AdminAnalytics = () => {
         <Flex direction="column">
           <Flex direction="row" align="center" justify="left" gap="xl" mb="md">
             <Box>Totals: </Box>
-            <Box>
-              <Badge
-                leftSection={
-                  <ActionIcon size="sm" color="brand">
-                    <BillingIcon />
-                  </ActionIcon>
-                }
-                size="xl"
-              >
-                {Number(data.paid.toFixed(2)).toLocaleString()}
-              </Badge>
-            </Box>
-            <Box>
-              <Badge
-                size="xl"
-                leftSection={
-                  <ActionIcon size="sm" color="brand">
-                    <VisibilityIcon />
-                  </ActionIcon>
-                }
-              >
-                {' '}
-                {data.imps.toLocaleString()}
-              </Badge>
-            </Box>
-            <Box>
-              <Badge
-                size="xl"
-                leftSection={
-                  <ActionIcon size="sm" color="brand">
-                    <CheckMarkFilledIcon />
-                  </ActionIcon>
-                }
-              >
-                {' '}
-                {data.clicks.toLocaleString()}
-              </Badge>
-            </Box>
+            <Badge
+              leftSection={
+                <ActionIcon size="sm" color="brand">
+                  <BillingIcon />
+                </ActionIcon>
+              }
+              size="xl"
+            >
+              {Number(data.paid.toFixed(2)).toLocaleString()}
+            </Badge>
+
+            <Badge
+              size="xl"
+              leftSection={
+                <ActionIcon size="sm" color="brand">
+                  <VisibilityIcon />
+                </ActionIcon>
+              }
+            >
+              {data.imps.toLocaleString()}
+            </Badge>
+
+            <Badge
+              size="xl"
+              leftSection={
+                <ActionIcon size="sm" color="brand">
+                  <CheckMarkFilledIcon />
+                </ActionIcon>
+              }
+            >
+              {data.clicks.toLocaleString()}
+            </Badge>
+
+            <DownloadCSV
+              data={adminMappedAnalytics}
+              mapHeadersToDataProperties={{ [analType]: 'segment', ...csvHeaders }}
+              filename={`${analyticsKey?.key || 'admin-data-export'}.csv`}
+              disabled={loading}
+            />
           </Flex>
           <CustomTable
             background

@@ -30,7 +30,7 @@ function AdminDeposit() {
         address: '0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359',
         decimals: 6
       },
-      txHash: '0x0000000000000000000000000000000000000000000000000000000000000000'
+      txHash: ''
     },
 
     validate: {
@@ -135,7 +135,7 @@ function AdminDeposit() {
       />
       <TextInput
         label="Tx hash"
-        placeholder="tx hash"
+        placeholder="0x0000000000000000000000000000000000000000000000000000000000000000"
         withAsterisk
         mt="md"
         {...form.getInputProps('txHash')}

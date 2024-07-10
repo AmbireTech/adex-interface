@@ -8,6 +8,7 @@ export type BaseData = {
   share?: number
   // paid / impressions * 1000
   avgCpm?: number
+  avgCpc?: number
   paid: number
 }
 
@@ -115,3 +116,5 @@ export type BaseAnalyticsData = BaseData & {
   // TODO: need additional map to get the url from adUnit id
   mediaUri?: string
 }
+
+export type SSPs = '' | 'Eskimi' | 'Epom' | 'Qortex'
