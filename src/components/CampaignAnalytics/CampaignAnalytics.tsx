@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState, useMemo } from 'react'
-import { Container, Flex, Loader, Tabs } from '@mantine/core'
+import { Box, Container, Flex, Loader, Tabs } from '@mantine/core'
 import { useParams } from 'react-router-dom'
 import { AnalyticsType, BaseAnalyticsData, AnalyticsPeriod } from 'types'
 import GoBack from 'components/common/GoBack/GoBack'
@@ -85,7 +85,7 @@ const CampaignAnalytics = () => {
     setAnalyticsKey(undefined)
 
     const checkAnalytics = async () => {
-      const key = await getAnalyticsKeyAndUpdate(campaign, activeTab)
+      const key = await getAnalyticsKeyAndUpdate(activeTab, campaign)
       setAnalyticsKey(key)
       console.log('key', key)
     }
@@ -122,7 +122,9 @@ const CampaignAnalytics = () => {
 
   return (
     <Container fluid>
-      <GoBack title="Dashboard" />
+      <Box p="md">
+        <GoBack title="Dashboard" fixed />
+      </Box>
       <Tabs
         color="brand"
         value={activeTab}

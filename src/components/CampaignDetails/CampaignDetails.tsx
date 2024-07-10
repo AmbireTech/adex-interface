@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { Container, Grid, createStyles, Text, Flex } from '@mantine/core'
+import { Container, Grid, createStyles, Text, Flex, Box } from '@mantine/core'
 import BadgeStatusCampaign from 'components/Dashboard/BadgeStatusCampaign'
 import { formatCatsAndLocsData } from 'helpers/createCampaignHelpers'
 import { CATEGORIES, COUNTRIES } from 'constants/createCampaign'
@@ -28,8 +28,7 @@ const useStyles = createStyles((theme) => ({
     background: theme.colors.mainBackground[theme.fn.primaryShade()],
     borderRadius: theme.radius.md,
     padding: theme.spacing.lg,
-    marginBottom: theme.spacing.md,
-    marginTop: theme.spacing.lg,
+    margin: theme.spacing.md,
     boxShadow: theme.shadows.sm
   },
   innerWrapper: {
@@ -110,7 +109,9 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
 
   return (
     <>
-      <GoBack title="Dashboard" />
+      <Box p="md">
+        <GoBack title="Dashboard" fixed />
+      </Box>
       {campaign && (
         <>
           <Container fluid className={classes.wrapper}>
@@ -268,39 +269,42 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
                     </div>
                   </Grid.Col>
                 </Grid>
-                <Grid>
-                  <Grid.Col span={12}>
-                    <Text weight="bold" size="sm" pb="sm" className={classes.lighterColor}>
-                      Creatives
-                    </Text>
-                  </Grid.Col>
-                </Grid>
-                <Grid>
-                  <Grid.Col span={12}>
-                    <div className={cx(classes.innerWrapper, classes.scrollableContainer)}>
-                      {campaign.adUnits.map((item: AdUnit, index) => {
-                        const isLast = index === campaign.adUnits.length - 1
-                        return (
-                          <CampaignDetailsRow
-                            key={item.id}
-                            lineHeight="sm"
-                            textSize="sm"
-                            title={`${item.banner?.format.w}x${item.banner?.format.h}`}
-                            value={
-                              <MediaThumb
-                                adUnit={item}
-                                previewOnClick
-                                title={`Target URL: ${item.banner?.targetUrl}`}
+                {campaign.adUnits.length ? (
+                  <>
+                    <Grid>
+                      <Grid.Col span={12}>
+                        <Text weight="bold" size="sm" pb="sm" className={classes.lighterColor}>
+                          Creatives
+                        </Text>
+                      </Grid.Col>
+                    </Grid>
+                    <Grid>
+                      <Grid.Col span={12}>
+                        <div className={cx(classes.innerWrapper, classes.scrollableContainer)}>
+                          {campaign.adUnits.map((item: AdUnit, index) => {
+                            const isLast = index === campaign.adUnits.length - 1
+                            return (
+                              <CampaignDetailsRow
+                                key={item.id}
+                                lineHeight="sm"
+                                textSize="sm"
+                                title={`${item.banner?.format.w}x${item.banner?.format.h}`}
+                                value={
+                                  <MediaThumb
+                                    adUnit={item}
+                                    previewOnClick
+                                    title={`Target URL: ${item.banner?.targetUrl}`}
+                                  />
+                                }
+                                noBorder={isLast}
                               />
-                            }
-                            noBorder={isLast}
-                          />
-                        )
-                      })}
-                    </div>
-                  </Grid.Col>
-                </Grid>
-
+                            )
+                          })}
+                        </div>
+                      </Grid.Col>
+                    </Grid>
+                  </>
+                ) : null}
                 <Grid>
                   <Grid.Col>
                     <Flex justify="flex-end" align="center" gap="xs" mt="xl">

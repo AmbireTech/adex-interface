@@ -10,6 +10,7 @@ export interface BillingDetails {
   companyCountry: string
   companyCity: string
   companyZipCode: string
+  verified?: boolean
 }
 
 export interface Token {
@@ -40,6 +41,13 @@ export interface CampaignRefunds extends CampaignFunds {
   closeDate: Date
 }
 
+type AccountInfo = {
+  notes: string
+  email: string
+  phone: string
+  contactPerson: string
+}
+
 export interface Account {
   id: string
   name: string
@@ -61,6 +69,7 @@ export interface Account {
   billingDetails: BillingDetails
   created: Date
   updated: Date
+  info?: AccountInfo
   [x: string]: any
 }
 

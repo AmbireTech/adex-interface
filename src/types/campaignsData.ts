@@ -8,6 +8,7 @@ export type BaseData = {
   share?: number
   // paid / impressions * 1000
   avgCpm?: number
+  avgCpc?: number
   paid: number
 }
 
@@ -35,8 +36,8 @@ export type AnalyticsDataKeys = {
 }
 
 export type AnalyticsPeriod = {
-  start: Date
-  end: Date
+  start?: Date
+  end?: Date
 }
 
 export type AnalyticsDataQuery = AnalyticsDataKeys &
@@ -95,7 +96,15 @@ export type EvAggrData = {
   payouts: number
 }
 
-export type AnalyticsType = 'timeframe' | 'hostname' | 'country' | 'adUnit' | 'ssp'
+export type AnalyticsType =
+  | 'timeframe'
+  | 'hostname'
+  | 'country'
+  | 'adUnit'
+  | 'ssp'
+  | 'placement'
+  | 'campaignId'
+  | 'advertiser'
 
 export type TabType = 'placements' | 'regions' | 'creatives' | 'timeframe'
 
@@ -107,3 +116,5 @@ export type BaseAnalyticsData = BaseData & {
   // TODO: need additional map to get the url from adUnit id
   mediaUri?: string
 }
+
+export type SSPs = '' | 'Eskimi' | 'Epom' | 'Qortex'

@@ -9,7 +9,6 @@ import CampaignDetailsRow from 'components/common/CampainDetailsRow'
 import { LaunchCampaignModal, SuccessModal } from 'components/common/Modals'
 import useCustomNotifications from 'hooks/useCustomNotifications'
 import useAccount from 'hooks/useAccount'
-import { isValidHttpUrl } from 'helpers/validators'
 import { useNavigate } from 'react-router-dom'
 import throttle from 'lodash.throttle'
 
@@ -36,12 +35,13 @@ const CampaignSummary = () => {
   const [opened, { open, close }] = useDisclosure(false)
   const { updateBalance } = useAccount()
   const {
-    campaign: { step, adUnits, autoUTMChecked },
+    campaign: { step, adUnits, autoUTMChecked, errorsTargetURLValidations },
     updateCampaign,
     publishCampaign,
     resetCampaign,
     saveToDraftCampaign,
-    addUTMToTargetURLS
+    addUTMToTargetURLS,
+    validateAdUnitTargetURL
   } = useCreateCampaignContext()
   const {
     formattedSelectedDevice,
@@ -90,12 +90,8 @@ const CampaignSummary = () => {
 
   const handleNextStepBtnClicked = useCallback(() => {
     if (step === 0) {
-      const hasInvalidTargetUrl =
-        adUnits && adUnits.length
-          ? adUnits.some((adUnit) => !isValidHttpUrl(adUnit.banner?.targetUrl || ''))
-          : true
-
-      if (hasInvalidTargetUrl) {
+      validateAdUnitTargetURL()
+      if (Object.values(errorsTargetURLValidations).some((e) => !e.success)) {
         showNotification(
           'error',
           'Please enter a target URL starting with https://',
@@ -103,18 +99,34 @@ const CampaignSummary = () => {
         )
         return
       }
+
+      if (autoUTMChecked) {
+        addUTMToTargetURLS()
+      }
     }
 
     if (step < CREATE_CAMPAIGN_STEPS - 1) {
       if (step === 2) {
         const element = document.getElementById('createCampaignSubmitBtn1')
         element?.click()
+
+        if (autoUTMChecked) {
+          addUTMToTargetURLS()
+        }
         return
       }
 
       updateCampaign('step', step + 1)
     }
-  }, [step, adUnits, updateCampaign, showNotification])
+  }, [
+    step,
+    updateCampaign,
+    showNotification,
+    addUTMToTargetURLS,
+    autoUTMChecked,
+    errorsTargetURLValidations,
+    validateAdUnitTargetURL
+  ])
 
   const handleSaveDraftClicked = useCallback(async () => {
     try {
@@ -136,12 +148,6 @@ const CampaignSummary = () => {
     navigate('/dashboard/')
     close()
   }, [navigate, close])
-
-  useEffect(() => {
-    if (autoUTMChecked) {
-      addUTMToTargetURLS()
-    }
-  }, [autoUTMChecked, addUTMToTargetURLS])
 
   return (
     <>

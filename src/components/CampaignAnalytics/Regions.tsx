@@ -1,8 +1,8 @@
 import { BaseAnalyticsData } from 'types'
-import { useCallback, useMemo } from 'react'
+import { useMemo } from 'react'
 import { Grid, Modal } from '@mantine/core'
 import { useViewportSize } from '@mantine/hooks'
-import { AllCountries, Alpha3Code } from 'adex-common'
+import { CountryData } from 'helpers/countries'
 import CustomTable from 'components/common/CustomTable'
 import GeoCustom from '../common/CustomTableWithDropdown/WorldMap'
 
@@ -22,11 +22,6 @@ const Regions = ({
   onClose: () => void
 }) => {
   const { width: windowWidth, height: windowHeight } = useViewportSize()
-  const getCountryName = useCallback(
-    (segmentCode: Alpha3Code) =>
-      AllCountries.find(({ code }) => code === segmentCode)?.name || 'Unknown',
-    []
-  )
 
   // TODO: add elements types, fix custom table data
   const elements = useMemo(() => {
@@ -35,7 +30,7 @@ const Regions = ({
     console.log(totalPaid)
     return (
       regions?.map((item) => ({
-        segment: getCountryName(item.segment as Alpha3Code),
+        segment: CountryData.get(item.segment)?.name,
         share: `${((item.paid / paid) * 100).toFixed(2)} %`,
         impressions: item.impressions,
         clicks: item.clicks,
@@ -44,7 +39,7 @@ const Regions = ({
         paid: `${item.paid.toFixed(4)} ${currencyName}`
       })) || []
     )
-  }, [regions, totalPaid, currencyName, getCountryName])
+  }, [regions, totalPaid, currencyName])
 
   if (!regions?.length) {
     return <div>No regions found</div>

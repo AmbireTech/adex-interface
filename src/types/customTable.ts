@@ -5,6 +5,7 @@ export interface ICustomTableProps extends PropsWithChildren {
   background?: boolean
   headings: string[]
   elements: IInvoices[] | any[]
+  pageSize?: number
   onPreview?: (e: any) => any
   onAnalytics?: (e: any) => any
   onDuplicate?: (e: any) => any

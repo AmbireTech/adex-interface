@@ -78,7 +78,7 @@ export const InvoicesModal = ({ campaignId, opened, close }: PrintModalProps) =>
 
     const checkAnalytics = async () => {
       try {
-        const key = await getAnalyticsKeyAndUpdate(campaign, 'hostname')
+        const key = await getAnalyticsKeyAndUpdate('hostname', campaign)
         setAnalyticsKey(key)
       } catch (e) {
         console.error('Can not get Analytics key: ', e)

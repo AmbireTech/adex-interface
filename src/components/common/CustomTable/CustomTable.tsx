@@ -45,6 +45,7 @@ const CustomTable = ({
   background,
   headings,
   elements,
+  pageSize,
   onPreview,
   onAnalytics,
   onDuplicate,
@@ -61,7 +62,7 @@ const CustomTable = ({
         : [],
     [elements]
   )
-  const maxItemsPerPage = 10
+  const maxItemsPerPage = pageSize || 10
   const { maxPages, defaultPage, startIndex, endIndex, onNextPage, onPreviousPage, onChange } =
     usePagination({
       elementsLength: elements.length,
