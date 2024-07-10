@@ -208,6 +208,10 @@ const AdminAnalytics = () => {
         * This analytics are for the actual user campaign, representing placed impressions, clicks,
         etc. (NOT the stats form received requests form the SSPs)
       </Text>
+      <Text size="sm" mb="sm">
+        * Amounts include AdEx validator fees 7% (total amounts paid by the users). For amounts
+        payed to ssp divide by 1.07 (for records after 22.06.24)
+      </Text>
 
       <Flex direction="row" align="start" justify="left" gap="xl" mb="md">
         <Select
