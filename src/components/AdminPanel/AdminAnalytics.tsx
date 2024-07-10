@@ -172,9 +172,9 @@ const AdminAnalytics = () => {
   )
 
   const data = useMemo(() => {
-    const paid = adminMappedAnalytics?.reduce((sum, i) => sum + i.paid, 0) || 1
-    const imps = adminMappedAnalytics?.reduce((sum, i) => sum + i.impressions, 0) || 1
-    const clicks = adminMappedAnalytics?.reduce((sum, i) => sum + i.clicks, 0) || 1
+    const paid = adminMappedAnalytics?.reduce((sum, i) => sum + i.paid, 0) || 0
+    const imps = adminMappedAnalytics?.reduce((sum, i) => sum + i.impressions, 0) || 0
+    const clicks = adminMappedAnalytics?.reduce((sum, i) => sum + i.clicks, 0) || 0
     return {
       paid,
       imps,
@@ -183,8 +183,8 @@ const AdminAnalytics = () => {
         adminMappedAnalytics?.map((item) => ({
           id: item.segment.toString(),
           segment: mapSegmentLabel(analType, item.segment).segementLabel,
-          share: `${((item.paid / paid) * 100).toFixed(2)} %`,
-          shareImps: `${((item.impressions / imps) * 100).toFixed(2)} %`,
+          share: `${((item.paid / (paid || 1)) * 100).toFixed(2)} %`,
+          shareImps: `${((item.impressions / (imps || 1)) * 100).toFixed(2)} %`,
           impressions: item.impressions,
           clicks: item.clicks,
           ctr: `${item.ctr} %`,
