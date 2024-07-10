@@ -45,8 +45,15 @@ const AdminAnalytics = () => {
   }, [adexServicesRequest])
 
   const data = useMemo(() => {
+    if (!accounts.length) {
+      return {
+        elements: [],
+        totalDeposits: 0,
+        totalCampaignsLocked: 0
+      }
+    }
     // TODO: fix this when multy token
-    const decimals = accounts[0].balanceToken.decimals
+    const decimals = accounts[0]?.balanceToken?.decimals
     const totalDeposits = parseBigNumTokenAmountToDecimal(
       accounts?.reduce((sum, a) => sum + BigInt(a.fundsDeposited.total), 0n),
       decimals
