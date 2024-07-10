@@ -120,19 +120,14 @@ const analyticsDataToMappedAnalytics = (
   }, new Map<string, BaseAnalyticsData>())
 
   const resMap = Array.from(mapped, ([segment, value]) => {
-    const paid = value.paid
-    const clicks = value.clicks
+    const { paid, clicks, impressions } = value
+
     return {
       ...value,
       segment,
-      paid,
       analyticsType,
-      ctr:
-        value.clicks && value.impressions
-          ? Number(((value.clicks / value.impressions) * 100).toFixed(2))
-          : 0,
-      avgCpm:
-        paid && value.impressions ? Number(((paid / value.impressions) * 1000).toFixed(2)) : 0,
+      ctr: clicks && impressions ? Number(((clicks / impressions) * 100).toFixed(2)) : 0,
+      avgCpm: paid && impressions ? Number(((paid / impressions) * 1000).toFixed(2)) : 0,
       avgCpc: clicks ? Number((paid / clicks).toFixed(4)) : 0
     }
   })
