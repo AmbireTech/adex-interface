@@ -22,6 +22,7 @@ import BillingIcon from 'resources/icons/Billing'
 import VisibilityIcon from 'resources/icons/Visibility'
 import { getHumneSrcName } from 'helpers'
 import CheckMarkFilledIcon from 'resources/icons/CheckMarkFilled'
+import DownloadCSV from 'components/common/DownloadCSV'
 
 const headingsDefault = [
   //   'Country',
@@ -34,6 +35,17 @@ const headingsDefault = [
   'Avg CPC',
   'Spent'
 ]
+
+const csvHeaders = {
+  segment: 'segment',
+  share: 'share',
+  impressions: 'impressions',
+  clicks: 'clicks',
+  ctr: 'ctr',
+  avgCpm: 'avgCpm',
+  avgCpc: 'avgCpc',
+  paid: 'paid'
+}
 
 const timeframeData: Array<{ value: Timeframe; label: Timeframe }> = [
   { value: 'year', label: 'year' },
@@ -177,7 +189,7 @@ const AdminAnalytics = () => {
           clicks: item.clicks,
           ctr: `${item.ctr} %`,
           avgCpm: `${item.avgCpm}`,
-          avgCPC: item.clicks ? (item.paid / item.clicks).toFixed(4) : '-',
+          avgCPC: `${item.avgCpc}`,
           paid: `${item.paid.toFixed(4)}`
         })) || []
     }
@@ -234,6 +246,11 @@ const AdminAnalytics = () => {
           disabled
           withSeconds
           size="md"
+        />
+        <DownloadCSV
+          data={adminMappedAnalytics}
+          mapHeadersToDataProperties={csvHeaders}
+          filename={`${analyticsKey?.key || 'admin-data-export'}.csv`}
         />
       </Flex>
 

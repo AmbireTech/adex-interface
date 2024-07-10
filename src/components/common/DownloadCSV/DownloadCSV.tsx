@@ -3,9 +3,9 @@ import { AdUnit } from 'adex-common'
 import DownloadIcon from 'resources/icons/Download'
 import { BaseAnalyticsData, Country, Hostname } from 'types'
 
+type GenericHeader = { [key: string]: string }
 export type CSVDataType = BaseAnalyticsData[]
-export type CSVHeadersType = Hostname | Country | AdUnit
-
+export type CSVHeadersType = Hostname | Country | AdUnit | GenericHeader
 interface DownloadCSVProps {
   data: CSVDataType | undefined
   filename: string

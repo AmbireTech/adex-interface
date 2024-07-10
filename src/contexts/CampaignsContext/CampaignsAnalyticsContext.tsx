@@ -121,6 +121,7 @@ const analyticsDataToMappedAnalytics = (
 
   const resMap = Array.from(mapped, ([segment, value]) => {
     const paid = value.paid
+    const clicks = value.clicks
     return {
       ...value,
       segment,
@@ -130,7 +131,9 @@ const analyticsDataToMappedAnalytics = (
         value.clicks && value.impressions
           ? Number(((value.clicks / value.impressions) * 100).toFixed(2))
           : 0,
-      avgCpm: paid && value.impressions ? Number(((paid / value.impressions) * 1000).toFixed(2)) : 0
+      avgCpm:
+        paid && value.impressions ? Number(((paid / value.impressions) * 1000).toFixed(2)) : 0,
+      avgCpc: clicks ? Number((paid / clicks).toFixed(4)) : 0
     }
   })
     // TODO: remove the sort when table sorting

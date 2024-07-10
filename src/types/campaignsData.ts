@@ -8,6 +8,7 @@ export type BaseData = {
   share?: number
   // paid / impressions * 1000
   avgCpm?: number
+  avgCpc?: number
   paid: number
 }
 
