@@ -1,4 +1,4 @@
-import { Flex, Text, UnstyledButton } from '@mantine/core'
+import { Flex, Text, Button } from '@mantine/core'
 import { AdUnit } from 'adex-common'
 import DownloadIcon from 'resources/icons/Download'
 import { BaseAnalyticsData, Country, Hostname } from 'types'
@@ -10,9 +10,15 @@ interface DownloadCSVProps {
   data: CSVDataType | undefined
   filename: string
   mapHeadersToDataProperties: CSVHeadersType
+  disabled?: boolean
 }
 
-const DownloadCSV = ({ data, filename, mapHeadersToDataProperties }: DownloadCSVProps) => {
+const DownloadCSV = ({
+  data,
+  filename,
+  mapHeadersToDataProperties,
+  disabled
+}: DownloadCSVProps) => {
   const convertToCSV = (
     dataToConvert: CSVDataType | undefined,
     mappingHeaders?: CSVHeadersType | undefined
@@ -62,14 +68,19 @@ const DownloadCSV = ({ data, filename, mapHeadersToDataProperties }: DownloadCSV
     downloadCSV(data, filename, mapHeadersToDataProperties)
   }
   return (
-    <UnstyledButton onClick={handleDownload}>
+    <Button
+      onClick={handleDownload}
+      disabled={disabled}
+      color="secondaryText"
+      variant="transparent"
+    >
       <Flex align="center">
         <Text size="sm" mr="sm">
-          Download CSV
+          .CSV
         </Text>
         <DownloadIcon size="24px" />
       </Flex>
-    </UnstyledButton>
+    </Button>
   )
 }
 

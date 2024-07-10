@@ -37,7 +37,7 @@ const headingsDefault = [
 ]
 
 const csvHeaders = {
-  segment: 'segment',
+  // segment: 'segment',
   share: 'share',
   impressions: 'impressions',
   clicks: 'clicks',
@@ -209,7 +209,7 @@ const AdminAnalytics = () => {
         etc. (NOT the stats form received requests form the SSPs)
       </Text>
 
-      <Flex direction="row" align="center" justify="left" gap="xl" mb="md">
+      <Flex direction="row" align="start" justify="left" gap="xl" mb="md">
         <Select
           label="Type"
           value={analType}
@@ -247,11 +247,6 @@ const AdminAnalytics = () => {
           withSeconds
           size="md"
         />
-        <DownloadCSV
-          data={adminMappedAnalytics}
-          mapHeadersToDataProperties={csvHeaders}
-          filename={`${analyticsKey?.key || 'admin-data-export'}.csv`}
-        />
       </Flex>
 
       {loading ? (
@@ -260,44 +255,45 @@ const AdminAnalytics = () => {
         <Flex direction="column">
           <Flex direction="row" align="center" justify="left" gap="xl" mb="md">
             <Box>Totals: </Box>
-            <Box>
-              <Badge
-                leftSection={
-                  <ActionIcon size="sm" color="brand">
-                    <BillingIcon />
-                  </ActionIcon>
-                }
-                size="xl"
-              >
-                {Number(data.paid.toFixed(2)).toLocaleString()}
-              </Badge>
-            </Box>
-            <Box>
-              <Badge
-                size="xl"
-                leftSection={
-                  <ActionIcon size="sm" color="brand">
-                    <VisibilityIcon />
-                  </ActionIcon>
-                }
-              >
-                {' '}
-                {data.imps.toLocaleString()}
-              </Badge>
-            </Box>
-            <Box>
-              <Badge
-                size="xl"
-                leftSection={
-                  <ActionIcon size="sm" color="brand">
-                    <CheckMarkFilledIcon />
-                  </ActionIcon>
-                }
-              >
-                {' '}
-                {data.clicks.toLocaleString()}
-              </Badge>
-            </Box>
+            <Badge
+              leftSection={
+                <ActionIcon size="sm" color="brand">
+                  <BillingIcon />
+                </ActionIcon>
+              }
+              size="xl"
+            >
+              {Number(data.paid.toFixed(2)).toLocaleString()}
+            </Badge>
+
+            <Badge
+              size="xl"
+              leftSection={
+                <ActionIcon size="sm" color="brand">
+                  <VisibilityIcon />
+                </ActionIcon>
+              }
+            >
+              {data.imps.toLocaleString()}
+            </Badge>
+
+            <Badge
+              size="xl"
+              leftSection={
+                <ActionIcon size="sm" color="brand">
+                  <CheckMarkFilledIcon />
+                </ActionIcon>
+              }
+            >
+              {data.clicks.toLocaleString()}
+            </Badge>
+
+            <DownloadCSV
+              data={adminMappedAnalytics}
+              mapHeadersToDataProperties={{ [analType]: 'segment', ...csvHeaders }}
+              filename={`${analyticsKey?.key || 'admin-data-export'}.csv`}
+              disabled={loading}
+            />
           </Flex>
           <CustomTable
             background
