@@ -1,11 +1,12 @@
 import { useCallback, useMemo, useState } from 'react'
 import { useForm, isInRange, hasLength, matches } from '@mantine/form'
 import { Button, Group, TextInput, Box, NumberInput } from '@mantine/core'
-import { useAdExApi } from 'hooks/useAdexServices'
+import useAdmin from 'hooks/useAdmin'
 import throttle from 'lodash.throttle'
+import { useParams } from 'react-router-dom'
 
 type Deposit = {
-  account: string
+  accountId: string
   amount: number
   token: {
     name: string
@@ -16,13 +17,16 @@ type Deposit = {
   txHash: string
 }
 
-function AdminDeposit() {
-  const { adexServicesRequest } = useAdExApi()
+function AccountDetails() {
+  const { accountId } = useParams()
+  const { makeDeposit } = useAdmin()
   const [loading, setLoading] = useState(false)
+
+  console.log({ accountId })
 
   const form = useForm<Deposit>({
     initialValues: {
-      account: '',
+      accountId: accountId || '',
       amount: 0,
       token: {
         name: 'USDC',
@@ -34,7 +38,7 @@ function AdminDeposit() {
     },
 
     validate: {
-      account: matches(/^(0x)?[0-9a-fA-F]{40}$/, 'invalid account address'),
+      accountId: matches(/^(0x)?[0-9a-fA-F]{40}$/, 'invalid account address'),
       amount: isInRange({ min: 10, max: 1000000000000 }, 'min 10'),
       token: {
         name: hasLength({ min: 1 }),
@@ -47,37 +51,17 @@ function AdminDeposit() {
   })
 
   const handleSubmit = useCallback(
-    (values: Deposit) => {
-      const submit = async () => {
-        console.log({ values })
-        const { account, ...body } = values
-        body.amount *= 10 ** body.token.decimals
-        console.log({ body })
+    async (values: Deposit) => {
+      setLoading(true)
+      await makeDeposit(values, () => {
+        form.reset()
+        form.resetTouched()
+        form.resetDirty()
+      })
 
-        try {
-          const res = await adexServicesRequest('backend', {
-            route: `/dsp/admin/accounts/${account}/deposit`,
-            method: 'POST',
-            body,
-            headers: {
-              'content-type': 'application/json'
-            }
-          })
-
-          console.log({ res })
-
-          form.reset()
-          form.resetTouched()
-          form.resetDirty()
-        } catch (err) {
-          console.log({ err })
-        }
-        setLoading(false)
-      }
-
-      submit()
+      setLoading(false)
     },
-    [adexServicesRequest, form]
+    [form, makeDeposit]
   )
 
   const throttledSbm = useMemo(() => {
@@ -90,7 +74,8 @@ function AdminDeposit() {
         label="Account address"
         placeholder="0x000"
         withAsterisk
-        {...form.getInputProps('account')}
+        {...form.getInputProps('accountId')}
+        disabled
       />
       <NumberInput
         mt="sm"
@@ -150,4 +135,4 @@ function AdminDeposit() {
   )
 }
 
-export { AdminDeposit }
+export { AccountDetails }

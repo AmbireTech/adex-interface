@@ -1,4 +1,5 @@
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useCallback } from 'react'
+import { useNavigate } from 'react-router-dom'
 import {
   Container,
   Loader,
@@ -25,6 +26,7 @@ const headingsDefault = [
 ]
 
 const AdminAnalytics = () => {
+  const navigate = useNavigate()
   const { accounts, initialDataLoading, updateAccounts } = useAdmin()
   const headings = useMemo(() => [...headingsDefault], [])
 
@@ -84,12 +86,12 @@ const AdminAnalytics = () => {
     updateAccounts()
   }, [updateAccounts])
 
-  // const onDetails = useCallback(
-  //   (element: { id: string }) => {
-  //     const accountData = accounts.find((x) => x.id === element.id)
-  //   },
-  //   [accounts]
-  // )
+  const handlePreview = useCallback(
+    (item: { id: string }) => {
+      navigate(`/dashboard/admin/user-account/${item.id}`, {})
+    },
+    [navigate]
+  )
 
   return (
     <Container fluid>
@@ -109,7 +111,13 @@ const AdminAnalytics = () => {
               ({data.totalCampaignsLocked} USDC)
             </Badge>
           </Flex>
-          <CustomTable background headings={headings} elements={data.elements} pageSize={10} />
+          <CustomTable
+            background
+            headings={headings}
+            elements={data.elements}
+            pageSize={10}
+            onPreview={handlePreview}
+          />
         </Flex>
       )}
     </Container>
