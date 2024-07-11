@@ -5,6 +5,7 @@ import useAdmin from 'hooks/useAdmin'
 import throttle from 'lodash.throttle'
 import { useParams } from 'react-router-dom'
 import { FundsActivity } from './AccountDetailsElements'
+import { AccountInfo } from './AccoutInfo'
 
 type Deposit = {
   accountId: string
@@ -75,8 +76,10 @@ function AccountDetails() {
   }
 
   return (
-    <Grid>
-      <Grid.Col span={6}>{accountData.info?.contactPerson}</Grid.Col>
+    <Grid align="baseline" justify="start">
+      <Grid.Col span={6}>
+        <AccountInfo accountData={accountData} />
+      </Grid.Col>
       <Grid.Col span={6}>
         <Accordion defaultValue="deposit-form">
           <Accordion.Item value="deposit-form">
