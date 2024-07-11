@@ -1,6 +1,7 @@
 import { Global, MantineProvider, Progress } from '@mantine/core'
 import { ModalsProvider } from '@mantine/modals'
 import { AccountProvider } from 'contexts/AccountContext'
+import { AdminProvider } from 'contexts/AdminContext'
 
 import { RouterProvider } from 'react-router-dom'
 import { router } from 'Router'
@@ -41,14 +42,16 @@ ReactGA.initialize('G-PX5B4P9KKM')
 function App() {
   return (
     <AccountProvider>
-      <MantineProvider withGlobalStyles withNormalizeCSS theme={lightTheme}>
-        <ModalsProvider>
-          <GlobalStyles />
-          <Notifications />
-          {ENV && <EnvBanner />}
-          <RouterProvider router={router} />
-        </ModalsProvider>
-      </MantineProvider>
+      <AdminProvider>
+        <MantineProvider withGlobalStyles withNormalizeCSS theme={lightTheme}>
+          <ModalsProvider>
+            <GlobalStyles />
+            <Notifications />
+            {ENV && <EnvBanner />}
+            <RouterProvider router={router} />
+          </ModalsProvider>
+        </MantineProvider>
+      </AdminProvider>
     </AccountProvider>
   )
 }
