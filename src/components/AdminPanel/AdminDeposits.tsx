@@ -95,7 +95,7 @@ function AdminDeposit() {
       <NumberInput
         mt="sm"
         label="Amount"
-        type="number"
+        // type="number"
         placeholder="Amount"
         hideControls
         min={0}
@@ -141,7 +141,7 @@ function AdminDeposit() {
         {...form.getInputProps('txHash')}
       />
 
-      <Group position="right" mt="md">
+      <Group justify="right" mt="md">
         <Button type="submit" disabled={loading}>
           Submit
         </Button>

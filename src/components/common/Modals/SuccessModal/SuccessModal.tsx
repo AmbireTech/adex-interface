@@ -1,4 +1,5 @@
-import { Text, Modal, Flex, Button, createStyles } from '@mantine/core'
+import { Text, Modal, Flex, Button } from '@mantine/core'
+import { createStyles } from '@mantine/emotion'
 import Lottie from 'lottie-react'
 import AnimationData from 'resources/lotties/success-lottie.json'
 
@@ -9,8 +10,7 @@ type SuccessModalProps = {
 }
 const useStyles = createStyles((theme) => ({
   wrapper: {
-    background:
-      theme.colors.success[theme.fn.primaryShade()] + theme.other.shades.hexColorSuffix.lightest
+    background: theme.colors.success[3] + theme.other.shades.hexColorSuffix.lightest
   },
   root: {
     padding: 0

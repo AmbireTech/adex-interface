@@ -1,13 +1,7 @@
-import {
-  Flex,
-  Text,
-  Button,
-  createStyles,
-  MantineColor,
-  MantineStyleSystemProps
-} from '@mantine/core'
+import { Flex, Text, Button, MantineColor, ButtonProps } from '@mantine/core'
+import { createStyles } from '@mantine/emotion'
 
-type CampaignActionBtnProps = MantineStyleSystemProps & {
+type CampaignActionBtnProps = ButtonProps & {
   text: string
   icon: React.ReactNode
   color: MantineColor
@@ -16,12 +10,11 @@ type CampaignActionBtnProps = MantineStyleSystemProps & {
 
 const useStyles = createStyles((theme, { color }: { color: MantineColor }) => ({
   btn: {
-    background:
-      theme.colors[color][theme.fn.primaryShade()] + theme.other.shades.hexColorSuffix.lightest,
+    background: theme.colors[color][3] + theme.other.shades.hexColorSuffix.lightest,
     fontWeight: 'normal',
     textTransform: 'capitalize',
     '&:hover': {
-      background: theme.colors[color][theme.fn.primaryShade()],
+      background: theme.colors[color][3],
       color: 'white'
     }
   }

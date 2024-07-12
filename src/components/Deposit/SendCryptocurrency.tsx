@@ -1,8 +1,9 @@
-import { ActionIcon, Alert, CopyButton, Text, Grid, createStyles, Group } from '@mantine/core'
+import { ActionIcon, Alert, CopyButton, Text, Grid, Group } from '@mantine/core'
 import useAccount from 'hooks/useAccount'
 import CopyIcon from 'resources/icons/Copy'
 import InfoIcon from 'resources/icons/Info'
 import { QRCodeSVG } from 'qrcode.react'
+import { createStyles } from '@mantine/emotion'
 
 const useStyles = createStyles((theme) => ({
   center: {
@@ -13,14 +14,14 @@ const useStyles = createStyles((theme) => ({
     display: 'flex',
     border: '15px solid',
     padding: theme.spacing.sm,
-    borderColor: theme.colors.lightBackground[theme.fn.primaryShade()],
+    borderColor: theme.colors.lightBackground[3],
     borderRadius: theme.radius.md
   },
   addressWrapper: {
-    backgroundColor: theme.colors.lightBackground[theme.fn.primaryShade()],
+    backgroundColor: theme.colors.lightBackground[3],
     padding: theme.spacing.xs,
     border: '1px solid',
-    borderColor: theme.colors.decorativeBorders[theme.fn.primaryShade()],
+    borderColor: theme.colors.decorativeBorders[3],
     borderRadius: theme.radius.md
   }
 }))
@@ -42,7 +43,7 @@ const SendCryptocurrency = () => {
         <Text size="sm" mb="xs" color="brand">
           Min. campaign budget: $200
         </Text>
-        <Group position="apart" className={classes.addressWrapper}>
+        <Group justify="apart" className={classes.addressWrapper}>
           <Text>{accountAddress}</Text>
           <CopyButton value={accountAddress} timeout={2000}>
             {({ copied, copy }) => (

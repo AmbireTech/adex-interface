@@ -1,7 +1,6 @@
 import {
   Container,
   Button,
-  createStyles,
   Title,
   Group,
   Text,
@@ -11,6 +10,7 @@ import {
   useMantineTheme,
   LoadingOverlay
 } from '@mantine/core'
+import { createStyles } from '@mantine/emotion'
 import LogInBackground from 'resources/backgrounds/pattern.svg'
 import LowerShape from 'resources/backgrounds/lowerShape.svg'
 import UpperShape from 'resources/backgrounds/upperShape.svg'
@@ -56,22 +56,23 @@ function LogIn() {
   const handleGetStartedBtnClicked = useCallback(() => connectWallet(), [connectWallet])
   return (
     <Container fluid h="100vh" className={classes.container}>
-      <LoadingOverlay visible={isLoading} transitionDuration={500} overlayBlur={2} />
+      <LoadingOverlay
+        visible={isLoading}
+        transitionProps={{ transition: 'fade', duration: 500 }}
+        overlayProps={{ blur: 2 }}
+      />
       <Flex h="100%" pt="xl" pb="xl" direction="column" justify="space-around" align="center">
         <div className={classes.logoContainer}>
           <AdExLogo
-            text={
-              theme.colorScheme === 'dark'
-                ? theme.white
-                : theme.colors.brandDarker[theme.fn.primaryShade()]
-            }
+            // text={theme.colorScheme === 'dark' ? theme.white : theme.colors.brandDarker[3]}
+            text={theme.colors.brandDarker[3]}
           />
         </div>
         <div>
-          <Title align="center" order={1}>
+          <Title ta="center" order={1}>
             Welcome to AdEx
           </Title>
-          <Title className={classes.subTitle} align="center" color="secondaryText" order={2}>
+          <Title className={classes.subTitle} ta="center" c="secondaryText" order={2}>
             Reach Beyond Web3
           </Title>
         </div>
@@ -79,15 +80,15 @@ function LogIn() {
           Get Started
         </Button>
         <Flex direction="column" align="center">
-          <Group mb="sm" spacing="xs">
+          <Group mb="sm" gap="xs">
             <ThemeIcon variant="outline" size="sm" color="secondaryText" className={classes.icon}>
               <HelpIcon />
             </ThemeIcon>
-            <CustomAnchor external href="https://help.adex.network/hc/en-us" color="dimmed">
+            <CustomAnchor external href="https://help.adex.network/hc/en-us" c="dimmed">
               Help Center
             </CustomAnchor>
           </Group>
-          <Text size="sm" color="secondaryText">
+          <Text size="sm" c="secondaryText">
             ©{year} AdEx. All Rights Reserved.
           </Text>
           <Text size="sm" color="secondaryText">

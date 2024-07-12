@@ -1,5 +1,6 @@
 import { useCallback, useState } from 'react'
-import { Box, Flex, Text, createStyles } from '@mantine/core'
+import { Box, Flex, Text } from '@mantine/core'
+import { createStyles } from '@mantine/emotion'
 import InvisibilityIcon from 'resources/icons/Invisibility'
 import VisibilityIcon from 'resources/icons/Visibility'
 import InfoFilledIcon from 'resources/icons/InfoFilled'
@@ -12,11 +13,11 @@ const useStyles = createStyles((theme, { bgColor, whiteFontColor }: ChartControl
     justifyContent: 'space-between',
     width: 205,
     height: 69,
-    background: theme.colors[bgColor][theme.fn.primaryShade()],
+    background: theme.colors[bgColor][3],
     borderRadius: theme.radius.md,
     padding: theme.spacing.sm,
     cursor: 'pointer',
-    color: whiteFontColor ? theme.colors.mainBackground[theme.fn.primaryShade()] : ''
+    color: whiteFontColor ? theme.colors.mainBackground[3] : ''
   },
   iconSizeSm: {
     width: 10,
@@ -49,7 +50,7 @@ const ChartControlBtn = ({
   return (
     <Box className={classes.chartControls} onClick={handleClick}>
       <Flex direction="row" justify="space-between">
-        <Text size="md" weight="bold">
+        <Text size="md" fw="bold">
           {value}
         </Text>
         {visible ? (

@@ -1,15 +1,5 @@
-import {
-  Group,
-  Modal,
-  Text,
-  rem,
-  Grid,
-  createStyles,
-  Flex,
-  Button,
-  UnstyledButton,
-  Stack
-} from '@mantine/core'
+import { Group, Modal, Text, rem, Grid, Flex, Button, UnstyledButton, Stack } from '@mantine/core'
+import { createStyles } from '@mantine/emotion'
 import { DatePicker } from '@mantine/dates'
 import { formatDateShort } from 'helpers/formatters'
 import { useCallback, useMemo, useState } from 'react'
@@ -28,19 +18,19 @@ const useStyles = createStyles((theme) => ({
   wrapper: {
     cursor: 'pointer',
     border: '1px solid',
-    borderColor: theme.colors.decorativeBorders[theme.fn.primaryShade()]
+    borderColor: theme.colors.decorativeBorders[3]
   },
   selected: {
-    borderColor: theme.colors.brand[theme.fn.primaryShade()],
-    color: theme.colors.brand[theme.fn.primaryShade()],
-    backgroundColor: theme.colors.lightBackground[theme.fn.primaryShade()]
+    borderColor: theme.colors.brand[3],
+    color: theme.colors.brand[3],
+    backgroundColor: theme.colors.lightBackground[3]
   },
   footer: {
-    backgroundColor: theme.colors.lightBackground[theme.fn.primaryShade()],
+    backgroundColor: theme.colors.lightBackground[3],
     padding: theme.spacing.lg
   },
   month: {
-    background: theme.colors.lightBackground[theme.fn.primaryShade()],
+    background: theme.colors.lightBackground[3],
     borderRadius: theme.radius.md
   }
 }))
@@ -129,14 +119,14 @@ const CampaignPeriodModal = ({ opened, close }: { opened: boolean; close: () => 
               className={cx(classes.wrapper, { [classes.selected]: isDateTabSelected })}
               onClick={() => handleSelectDateOrTimeTabClicked('date')}
             >
-              <Group position="apart" align="center" pl="xs" pt="xs">
+              <Group justify="apart" align="center" pl="xs" pt="xs">
                 <Group>
                   <CalendarIcon />
                   <div>
-                    <Text weight="bold" size="xl">
+                    <Text fw="bold" size="xl">
                       Set Period
                     </Text>
-                    <Text color="secondaryText" size="xs">
+                    <Text c="secondaryText" size="xs">
                       Current date: {currentDate}
                     </Text>
                   </div>
@@ -149,11 +139,11 @@ const CampaignPeriodModal = ({ opened, close }: { opened: boolean; close: () => 
               className={cx(classes.wrapper, { [classes.selected]: !isDateTabSelected })}
               onClick={() => handleSelectDateOrTimeTabClicked('time')}
             >
-              <Group position="apart" align="center" pr="xs" pt="xs">
+              <Group justify="apart" align="center" pr="xs" pt="xs">
                 <Group>
                   <TimeIcon />
                   <div>
-                    <Text weight="bold" size="xl">
+                    <Text fw="bold" size="xl">
                       Set Time
                     </Text>
                     <Text color="secondaryText" size="xs">

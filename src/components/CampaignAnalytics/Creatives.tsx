@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 import CustomTable from 'components/common/CustomTable'
-import { Flex, createStyles, Anchor } from '@mantine/core'
+import { Flex, Anchor } from '@mantine/core'
+import { createStyles } from '@mantine/emotion'
 import UrlIcon from 'resources/icons/Url'
 import { BaseAnalyticsData } from 'types'
 import { formatCurrency } from 'helpers'
@@ -12,7 +13,7 @@ const IPFS_GATEWAY = process.env.REACT_APP_IPFS_GATEWAY
 
 const useStyles = createStyles((theme) => ({
   icon: {
-    color: theme.colors.brand[theme.fn.primaryShade()]
+    color: theme.colors.brand[3]
   }
 }))
 

@@ -1,4 +1,4 @@
-import { Image, Select, Text, Flex, MediaQuery } from '@mantine/core'
+import { Image, Select, Text, Flex } from '@mantine/core'
 import { DIGITS_AFTER_FLOATING_POINT } from 'constants/balances'
 import { formatCurrency } from 'helpers'
 import { parseBigNumTokenAmountToDecimal } from 'helpers/balances'
@@ -41,6 +41,8 @@ const SelectItem = forwardRef<HTMLDivElement, ItemProps>(
   )
 )
 
+console.log('SelectItem', SelectItem)
+
 const SelectCurrency = ({ defaultValue, onChange, onFocus, error }: SelectCurrencyProps) => {
   const {
     adexAccount: {
@@ -75,24 +77,24 @@ const SelectCurrency = ({ defaultValue, onChange, onFocus, error }: SelectCurren
   )
 
   return (
-    <MediaQuery
-      smallerThan="lg"
-      styles={{
-        maxWidth: '100%'
-      }}
-    >
-      <Select
-        placeholder="Select currency"
-        itemComponent={SelectItem}
-        data={mappedDeposits}
-        defaultValue={defaultValue}
-        onChange={(event) => handleSelectChange(event)}
-        onFocus={onFocus}
-        maw="50%"
-        maxDropdownHeight={400}
-        error={error && <Text size="sm">{error}</Text>}
-      />
-    </MediaQuery>
+    // <MediaQuery
+    //   smallerThan="lg"
+    //   styles={{
+    //     maxWidth: '100%'
+    //   }}
+    // >
+    <Select
+      placeholder="Select currency"
+      // itemComponent={SelectItem}
+      data={mappedDeposits}
+      defaultValue={defaultValue}
+      onChange={(event) => handleSelectChange(event)}
+      onFocus={onFocus}
+      maw="50%"
+      maxDropdownHeight={400}
+      error={error && <Text size="sm">{error}</Text>}
+    />
+    // </MediaQuery>
   )
 }
 

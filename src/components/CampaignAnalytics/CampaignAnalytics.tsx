@@ -102,9 +102,10 @@ const CampaignAnalytics = () => {
     }
   }, [activeTab, campaignMappedAnalytics])
 
-  const handleTabChange = useCallback((value: AnalyticsType) => {
+  const handleTabChange = useCallback((value: string | null) => {
     // TODO: validate value if it is in AnalyticsType
-    setActiveTab(value)
+    if (!value) return
+    setActiveTab(value as AnalyticsType)
   }, [])
 
   // TODO: there is delay when updated analytics table is displayed after the tab is switched - add loading bars or something
@@ -128,10 +129,10 @@ const CampaignAnalytics = () => {
       <Tabs
         color="brand"
         value={activeTab}
-        onTabChange={handleTabChange}
-        styles={() => ({
-          tabsList: { border: 'none', padding: '20px 0' }
-        })}
+        onChange={handleTabChange}
+        // styles={() => ({
+        //   tabsList: { border: 'none', padding: '20px 0' }
+        // })}
         keepMounted={false}
       >
         <Flex justify="space-between" align="baseline">

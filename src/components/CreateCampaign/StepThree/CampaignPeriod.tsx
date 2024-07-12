@@ -1,4 +1,5 @@
-import { ActionIcon, Flex, MediaQuery, Text, createStyles } from '@mantine/core'
+import { ActionIcon, Flex, Text } from '@mantine/core'
+import { createStyles } from '@mantine/emotion'
 import { useDisclosure } from '@mantine/hooks'
 import { CampaignPeriodModal } from 'components/common/Modals'
 import { formatDateTime } from 'helpers/formatters'
@@ -8,9 +9,9 @@ import CalendarIcon from 'resources/icons/Calendar'
 
 const useStyles = createStyles((theme) => ({
   wrapper: {
-    backgroundColor: theme.colors.lightBackground[theme.fn.primaryShade()],
+    backgroundColor: theme.colors.lightBackground[3],
     border: '1px solid',
-    borderColor: theme.colors.decorativeBorders[theme.fn.primaryShade()],
+    borderColor: theme.colors.decorativeBorders[3],
     borderRadius: theme.radius.md,
     padding: theme.spacing.sm
   }
@@ -28,38 +29,38 @@ const CampaignPeriod = () => {
   const [opened, { open, close }] = useDisclosure(false)
 
   return (
-    <MediaQuery
-      smallerThan="lg"
-      styles={{
-        maxWidth: '100%'
-      }}
+    // <MediaQuery
+    //   smallerThan="lg"
+    //   styles={{
+    //     maxWidth: '100%'
+    //   }}
+    // >
+    <Flex
+      wrap="wrap"
+      direction="row"
+      justify="space-between"
+      maw="50%"
+      align="center"
+      className={classes.wrapper}
     >
-      <Flex
-        wrap="wrap"
-        direction="row"
-        justify="space-between"
-        maw="50%"
-        align="center"
-        className={classes.wrapper}
-      >
-        <Flex direction="column">
-          <Text color="secondaryText" size="xs">
-            Start Date
-          </Text>
-          <Text size="md">{startDateTime}</Text>
-        </Flex>
-        <Flex direction="column">
-          <Text color="secondaryText" size="xs">
-            End Date
-          </Text>
-          <Text size="md">{endDateTime}</Text>
-        </Flex>
-        <ActionIcon size={24} onClick={() => open()}>
-          <CalendarIcon color="mainText" />
-        </ActionIcon>
-        <CampaignPeriodModal opened={opened} close={close} />
+      <Flex direction="column">
+        <Text color="secondaryText" size="xs">
+          Start Date
+        </Text>
+        <Text size="md">{startDateTime}</Text>
       </Flex>
-    </MediaQuery>
+      <Flex direction="column">
+        <Text color="secondaryText" size="xs">
+          End Date
+        </Text>
+        <Text size="md">{endDateTime}</Text>
+      </Flex>
+      <ActionIcon size={24} onClick={() => open()}>
+        <CalendarIcon color="mainText" />
+      </ActionIcon>
+      <CampaignPeriodModal opened={opened} close={close} />
+    </Flex>
+    // </MediaQuery>
   )
 }
 

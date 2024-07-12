@@ -1,12 +1,22 @@
 import {
   MantineThemeOverride,
   DEFAULT_THEME,
-  Tuple,
   DefaultMantineColor,
-  ButtonStylesParams,
   rem,
-  AlertStylesParams
+  Alert,
+  Button,
+  createTheme,
+  mergeMantineTheme,
+  MantineTheme,
+  ButtonProps,
+  AlertProps,
+  Modal,
+  Input,
+  Flex,
+  lighten
+  // alpha
 } from '@mantine/core'
+import { Dropzone } from '@mantine/dropzone'
 import DownArrowIcon from 'resources/icons/DownArrow'
 
 type ExtendedCustomColors =
@@ -36,18 +46,25 @@ type ExtendedCustomColors =
   | 'paused'
   | DefaultMantineColor
 
+type Tuple<T, N extends number> = [T, ...T[]] & { length: N }
+
 declare module '@mantine/core' {
   export interface MantineThemeColorsOverride {
     colors: Record<ExtendedCustomColors, Tuple<string, 10>>
   }
 }
 
+// const getPrimaryShadeIndex = (theme) => {
+//   const colorScheme = theme.colorScheme || 'light'; // Fallback to 'light' if not available
+//   return theme.primaryShade[colorScheme];
+// };
+
 export const SIDE_BAR_WIDTH = 227
 const MOBILE_MAX_WIDTH_IN_PX = 475
 
 // NOTE: Put here components overrides for sizes, form, animations etc. In light/(dark) theme - only colors
-export const baseTheme: MantineThemeOverride = {
-  ...DEFAULT_THEME,
+// const themeOverride: MantineThemeOverride = createTheme({
+const themeOverride: MantineThemeOverride = createTheme({
   /**
    * Custom properties
    * Add here some useful non default theme stuff
@@ -93,7 +110,8 @@ export const baseTheme: MantineThemeOverride = {
     media: {
       print: '@media print',
       mobile: `@media(max-width:${MOBILE_MAX_WIDTH_IN_PX}px)`
-    }
+    },
+    transitionTimingFunction: 'ease-out'
   },
   focusRing: 'never',
   defaultRadius: 'md',
@@ -111,33 +129,33 @@ export const baseTheme: MantineThemeOverride = {
       // ...
     }
   },
-  transitionTimingFunction: 'ease-out',
+  // transitionTimingFunction: 'ease-out',
   components: {
-    Alert: {
-      styles: (theme, { color }: AlertStylesParams, { variant }) => {
+    Alert: Alert.extend({
+      styles: (theme, { color }: AlertProps, { variant }: any) => {
         const custom = variant === 'outline'
         return {
           root: {
             background: custom
-              ? theme.fn.lighten(
-                  theme.colors[color][theme.fn.primaryShade()],
+              ? lighten(
+                  theme.colors[color || theme.primaryColor][3],
                   theme.other.shades.lighten.lightest
                 )
               : '',
-            borderColor: custom ? theme.colors[color][theme.fn.primaryShade()] : '',
+            borderColor: custom ? theme.colors[color || theme.primaryColor][3] : '',
             svg: {
-              color: custom ? theme.colors[color][theme.fn.primaryShade()] : '',
+              color: custom ? theme.colors[color || theme.primaryColor][3] : '',
               marginTop: custom ? theme.spacing.md : '',
               width: rem(30),
               height: rem(30)
             }
           },
           message: {
-            color: custom ? theme.colors.mainText[theme.fn.primaryShade()] : ''
+            color: custom ? theme.colors.mainText[3] : ''
           }
         }
       }
-    },
+    }),
     Select: {
       defaultProps: {
         size: 'md',
@@ -148,28 +166,28 @@ export const baseTheme: MantineThemeOverride = {
         rightSection: { pointerEvents: 'none' }
       })
     },
-    Button: {
+    Button: Button.extend({
       defaultProps: {
         radius: 'xl'
       },
-      styles: (theme, params: ButtonStylesParams, { variant }) => {
-        const outlineHoverBgColor = theme.fn.rgba(
-          theme.colors[params.color || theme.primaryColor][theme.fn.primaryShade()],
-          theme.other.shades.rgba.lightest
-        )
+      // TODO: Fix the type of the variant
+      styles: (theme: MantineTheme, params: ButtonProps, { variant }: any) => {
+        // const outlineHoverBgColor = alpha(
+        //   theme.colors[params.color || theme.primaryColor][3],
+        //   theme.other.shades.rgba.lightest
+        // )
 
-        const outlineHoverBgGradient = theme.fn.radialGradient(
-          outlineHoverBgColor,
-          outlineHoverBgColor
-        )
+        // const outlineHoverBgGradient = theme.fn.radialGradient(
+        //   outlineHoverBgColor,
+        //   outlineHoverBgColor
+        // )
 
-        const filledHoverBgColor =
-          theme.colors[params.color || theme.primaryColor][theme.fn.primaryShade() + 1]
+        // const filledHoverBgColor = theme.colors[params.color || theme.primaryColor][3 + 1]
 
-        const filledHoverBgGradient = theme.fn.radialGradient(
-          filledHoverBgColor,
-          filledHoverBgColor
-        )
+        // const filledHoverBgGradient = theme.fn.radialGradient(
+        //   filledHoverBgColor,
+        //   filledHoverBgColor
+        // )
 
         const customHover = variant === 'outline' || variant === 'filled'
 
@@ -178,21 +196,23 @@ export const baseTheme: MantineThemeOverride = {
             // background:
             //   variant === 'outline'
             //     ? theme.fn.rgba(
-            //         theme.colors[params.color || theme.primaryColor][theme.fn.primaryShade()],
+            //         theme.colors[params.color || theme.primaryColor][3],
             //         theme.other.shades.rgba.lightest
             //       )
             //     : '',
-            backgroundImage:
-              // eslint-disable-next-line no-nested-ternary
-              variant === 'outline'
-                ? outlineHoverBgGradient
-                : variant === 'filled'
-                ? filledHoverBgGradient
-                : '',
+            // backgroundImage:
+            //   // eslint-disable-next-line no-nested-ternary
+            //   variant === 'outline'
+            //     ? outlineHoverBgGradient
+            //     : variant === 'filled'
+            //     ? filledHoverBgGradient
+            //     : '',
             backgroundSize: customHover ? '0% 100%' : '',
             backgroundPosition: customHover ? '50% 50%' : '',
             backgroundRepeat: 'no-repeat',
-            transition: customHover ? `background-size ${theme.transitionTimingFunction}` : '',
+            transition: customHover
+              ? `background-size ${theme.other.transitionTimingFunction}`
+              : '',
             borderWidth: variant === 'filled' ? 0 : 2,
             // TODO: active etc.
             '&:hover': {
@@ -206,15 +226,13 @@ export const baseTheme: MantineThemeOverride = {
               //     : '',
               backgroundSize: '100% 100%',
               backgroundColor:
-                variant === 'filled'
-                  ? theme.colors[params.color || theme.primaryColor][theme.fn.primaryShade()]
-                  : ''
+                variant === 'filled' ? theme.colors[params.color || theme.primaryColor][3] : ''
             }
           }
         }
       }
-    },
-    Modal: {
+    }),
+    Modal: Modal.extend({
       styles: (theme) => ({
         root: {
           [theme.other.media.print]: {
@@ -236,37 +254,39 @@ export const baseTheme: MantineThemeOverride = {
           }
         }
       })
-    },
-    Navbar: {
-      defaultProps: {
-        width: { sm: SIDE_BAR_WIDTH }
-      }
-    },
-    Input: {
+    }),
+    // Navbar: {
+    //   defaultProps: {
+    //     width: { sm: SIDE_BAR_WIDTH }
+    //   }
+    // },
+    Input: Input.extend({
       styles: (theme) => ({
         input: {
-          backgroundColor: theme.colors.lightBackground[theme.fn.primaryShade()],
-          borderColor: theme.colors.nonDecorativeBorders[theme.fn.primaryShade()],
+          backgroundColor: theme.colors.lightBackground[3],
+          borderColor: theme.colors.nonDecorativeBorders[3],
           borderRadius: theme.radius.md
         },
         icon: {
           borderRight: '1px solid',
-          borderColor: theme.colors.nonDecorativeBorders[theme.fn.primaryShade()]
+          borderColor: theme.colors.nonDecorativeBorders[3]
         }
       })
-    },
-    Dropzone: {
+    }),
+    Dropzone: Dropzone.extend({
       styles: (theme) => ({
         root: {
-          backgroundColor: theme.colors.lightBackground[theme.fn.primaryShade()]
+          backgroundColor: theme.colors.lightBackground[3]
         }
       })
-    },
-    Flex: {
+    }),
+    Flex: Flex.extend({
       defaultProps: {
         wrap: 'wrap'
       }
-    }
+    })
   },
   primaryShade: { light: 3, dark: 4 }
-}
+})
+
+export const baseTheme = mergeMantineTheme(DEFAULT_THEME, themeOverride)

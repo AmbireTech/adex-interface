@@ -1,4 +1,4 @@
-import { useMantineTheme } from '@mantine/core'
+import { lighten, useMantineTheme } from '@mantine/core'
 import { useCallback, useMemo, useState } from 'react'
 import { XYChartTheme, buildChartTheme } from '@visx/xychart'
 import { GlyphProps } from '@visx/xychart/lib/types'
@@ -64,10 +64,10 @@ const ChartControls = ({ children, data, metricsToShow }: ControlsProps) => {
   const colors = useMemo(
     () =>
       [
-        metricsToShow.impressions && appTheme.colors.chartColorOne[appTheme.fn.primaryShade()],
-        metricsToShow.clicks && appTheme.colors.chartColorTwo[appTheme.fn.primaryShade()],
-        metricsToShow.avgCpm && appTheme.colors.chartColorThree[appTheme.fn.primaryShade()],
-        metricsToShow.paid && appTheme.colors.chartColorFour[appTheme.fn.primaryShade()]
+        metricsToShow.impressions && appTheme.colors.chartColorOne[3],
+        metricsToShow.clicks && appTheme.colors.chartColorTwo[3],
+        metricsToShow.avgCpm && appTheme.colors.chartColorThree[3],
+        metricsToShow.paid && appTheme.colors.chartColorFour[3]
       ].map((x) => x?.toString() || ''),
     [
       metricsToShow.impressions,
@@ -77,26 +77,21 @@ const ChartControls = ({ children, data, metricsToShow }: ControlsProps) => {
       appTheme.colors.chartColorOne,
       appTheme.colors.chartColorTwo,
       appTheme.colors.chartColorThree,
-      appTheme.colors.chartColorFour,
-      appTheme.fn
+      appTheme.colors.chartColorFour
     ]
   )
 
   const gridColor = useMemo(
-    () =>
-      appTheme.fn.lighten(
-        appTheme.colors.mainText[appTheme.fn.primaryShade()],
-        appTheme.other.shades.lighten.lighter
-      ),
-    [appTheme.colors.mainText, appTheme.fn, appTheme.other.shades.lighten.lighter]
+    () => lighten(appTheme.colors.mainText[3], appTheme.other.shades.lighten.lighter),
+    [appTheme.colors.mainText, appTheme.other.shades.lighten.lighter]
   )
 
   const theme = buildChartTheme({
-    backgroundColor: appTheme.colors.mainBackground[appTheme.fn.primaryShade()],
+    backgroundColor: appTheme.colors.mainBackground[3],
     colors,
     gridColor,
     gridColorDark: gridColor,
-    svgLabelBig: { fill: appTheme.colors.mainBackground[appTheme.fn.primaryShade()] },
+    svgLabelBig: { fill: appTheme.colors.mainBackground[3] },
     tickLength: 8
   }) as XYChartTheme
   const [showGridRows, showGridColumns] = [true, false]

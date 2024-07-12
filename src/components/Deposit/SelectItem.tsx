@@ -6,7 +6,7 @@ const SelectItem = forwardRef<HTMLDivElement, ItemProps>(
   ({ image, label, ...others }: ItemProps, ref) => {
     return (
       <div ref={ref} {...others}>
-        <Group noWrap>
+        <Group wrap="nowrap">
           {image}
           <div>
             <Text size="sm">{label}</Text>

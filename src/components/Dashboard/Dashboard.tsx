@@ -228,7 +228,7 @@ const Dashboard = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
           {isAdminPanel ? (
             ''
           ) : (
-            <Text size="sm" color="secondaryText" weight="bold" mb="md">
+            <Text size="sm" c="secondaryText" fw="bold" mb="md">
               All Campaigns
             </Text>
           )}

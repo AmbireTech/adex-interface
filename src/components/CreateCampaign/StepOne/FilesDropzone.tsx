@@ -33,7 +33,7 @@ const FilesDropzone = ({ onDrop }: FilesDropzoneProps) => {
         'application/zip': ['.zip']
       }}
     >
-      <Group align="center" position="center" p="sm" style={{ pointerEvents: 'none' }}>
+      <Group align="center" justify="center" p="sm" style={{ pointerEvents: 'none' }}>
         <Dropzone.Accept>
           {/* <IconUpload
               style={{
@@ -65,7 +65,7 @@ const FilesDropzone = ({ onDrop }: FilesDropzoneProps) => {
             /> */}
         </Dropzone.Idle>
         <div>
-          <Group position="center" mb="sm">
+          <Group justify="center" mb="sm">
             <ImageIcon size="20px" />
             <HtmlIcon size="20px" />
           </Group>

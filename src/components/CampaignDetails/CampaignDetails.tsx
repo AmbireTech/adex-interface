@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { Container, Grid, createStyles, Text, Flex, Box } from '@mantine/core'
+import { Container, Grid, Text, Flex, Box } from '@mantine/core'
+import { createStyles } from '@mantine/emotion'
 import BadgeStatusCampaign from 'components/Dashboard/BadgeStatusCampaign'
 import { formatCatsAndLocsData } from 'helpers/createCampaignHelpers'
 import { CATEGORIES, COUNTRIES } from 'constants/createCampaign'
@@ -25,31 +26,29 @@ import { AdminActions } from './AdminActions'
 
 const useStyles = createStyles((theme) => ({
   wrapper: {
-    background: theme.colors.mainBackground[theme.fn.primaryShade()],
+    background: theme.colors.mainBackground[3],
     borderRadius: theme.radius.md,
     padding: theme.spacing.lg,
     margin: theme.spacing.md,
     boxShadow: theme.shadows.sm
   },
   innerWrapper: {
-    background: theme.colors.lightBackground[theme.fn.primaryShade()],
+    background: theme.colors.lightBackground[3],
     border: '1px solid',
     borderRadius: theme.radius.md,
-    borderColor: theme.colors.decorativeBorders[theme.fn.primaryShade()],
+    borderColor: theme.colors.decorativeBorders[3],
     maxWidth: '100%',
     padding: `${theme.spacing.xs} ${theme.spacing.md}`
   },
   lighterColor: {
-    color:
-      theme.colors.secondaryText[theme.fn.primaryShade()] +
-      theme.other.shades.hexColorSuffix.lighter
+    color: theme.colors.secondaryText[3] + theme.other.shades.hexColorSuffix.lighter
   },
   scrollableContainer: {
     maxHeight: 300,
     overflowY: 'auto'
   },
   separator: {
-    borderBottom: `1px dashed ${theme.colors.decorativeBorders[theme.fn.primaryShade()]}`,
+    borderBottom: `1px dashed ${theme.colors.decorativeBorders[3]}`,
     margin: `${theme.spacing.sm} 0`
   }
 }))
@@ -117,8 +116,8 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
           <Container fluid className={classes.wrapper}>
             {isAdminPanel && <AdminBadge title="Admin Details" />}
             <Grid>
-              <Grid.Col md={12} xl={6}>
-                <Text weight="bold" size="sm" pb="sm" className={classes.lighterColor}>
+              <Grid.Col span={{ md: 12, xl: 6 }}>
+                <Text fw="bold" size="sm" pb="sm" className={classes.lighterColor}>
                   Overview
                 </Text>
                 <div className={classes.innerWrapper}>
@@ -245,10 +244,10 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
                   />
                 </div>
               </Grid.Col>
-              <Grid.Col md={12} xl={6}>
+              <Grid.Col span={{ md: 12, xl: 6 }}>
                 <Grid>
                   <Grid.Col span={12}>
-                    <Text weight="bold" size="sm" pb="sm" className={classes.lighterColor}>
+                    <Text fw="bold" size="sm" pb="sm" className={classes.lighterColor}>
                       Targeting
                     </Text>
                     <div className={classes.innerWrapper}>
@@ -273,7 +272,7 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
                   <>
                     <Grid>
                       <Grid.Col span={12}>
-                        <Text weight="bold" size="sm" pb="sm" className={classes.lighterColor}>
+                        <Text fw="bold" size="sm" pb="sm" className={classes.lighterColor}>
                           Creatives
                         </Text>
                       </Grid.Col>
@@ -362,10 +361,10 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
               </Grid.Col>
 
               {isAdminPanel && (
-                <Grid.Col md={12} xl={6} pt="xl">
+                <Grid.Col span={{ md: 12, xl: 6 }} pt="xl">
                   <Grid>
                     <Grid.Col span={12}>
-                      <Text weight="bold" size="xl" pb="sm" color="attention">
+                      <Text fw="bold" size="xl" pb="sm" c="attention">
                         Admin actions
                       </Text>
                     </Grid.Col>

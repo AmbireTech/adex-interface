@@ -1,4 +1,5 @@
-import { UnstyledButton, Group, Text, createStyles } from '@mantine/core'
+import { UnstyledButton, Group, Text, lighten } from '@mantine/core'
+import { createStyles } from '@mantine/emotion'
 import { Link, LinkProps } from 'react-router-dom'
 import CustomPopover from 'components/common/CustomPopover'
 
@@ -11,17 +12,14 @@ const useStyles = createStyles((theme) => {
       padding: theme.spacing.xs,
       borderRadius: 'none',
       position: 'relative',
-      color: theme.fn.lighten(
-        theme.colors.mainText[theme.fn.primaryShade()],
-        theme.other.shades.lighten.lighter
-      ),
+      color: lighten(theme.colors.mainText[3], theme.other.shades.lighten.lighter),
       '&:hover': {
-        background: theme.colors.lightBackground[theme.fn.primaryShade()]
+        background: theme.colors.lightBackground[3]
       }
     },
     active: {
       // backgroundColor: theme.fn.primaryColor() + theme.other.shades.hexColorSuffix.lightest,
-      color: theme.fn.primaryColor(),
+      color: theme.primaryColor,
       fontWeight: theme.other.fontWeights.regular,
       opacity: 1,
       '&:before': {
@@ -31,7 +29,7 @@ const useStyles = createStyles((theme) => {
         top: 0,
         bottom: 0,
         width: 5,
-        backgroundColor: theme.fn.primaryColor()
+        backgroundColor: theme.primaryColor
       }
     },
     icon: {
@@ -67,7 +65,7 @@ function NavLink({
   const { classes, cx } = useStyles()
   return hasPopover ? (
     <CustomPopover popoverContent={popoverContent}>
-      <UnstyledButton className={classes.button} px="xl">
+      <UnstyledButton className={classes.button} px="md">
         <Group>
           <span className={classes.icon}>{icon}</span>
           <Text size="md">{label}</Text>
@@ -81,7 +79,7 @@ function NavLink({
       title={label}
       onClick={action}
       className={cx(classes.button, { [classes.active]: active })}
-      px="xl"
+      px="md"
       {...rest}
     >
       <Group>

@@ -1,4 +1,5 @@
-import { Accordion, Flex, Text, createStyles } from '@mantine/core'
+import { Accordion, Flex, Text } from '@mantine/core'
+import { createStyles } from '@mantine/emotion'
 import { useCallback, useMemo } from 'react'
 
 type CatsLocsFormattedProps = {
@@ -8,12 +9,10 @@ type CatsLocsFormattedProps = {
 
 const useStyles = createStyles((theme) => ({
   lighterColor: {
-    color:
-      theme.colors.secondaryText[theme.fn.primaryShade()] +
-      theme.other.shades.hexColorSuffix.lighter
+    color: theme.colors.secondaryText[3] + theme.other.shades.hexColorSuffix.lighter
   },
   warningColor: {
-    color: theme.colors.warning[theme.fn.primaryShade()]
+    color: theme.colors.warning[3]
   },
   firstLineLabels: {
     whiteSpace: 'nowrap',

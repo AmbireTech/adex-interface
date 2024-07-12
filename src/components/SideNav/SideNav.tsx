@@ -1,13 +1,13 @@
 import {
-  Navbar,
   ScrollArea,
   Box,
   UnstyledButton,
   Text,
   useMantineTheme,
-  createStyles,
-  rem
+  rem,
+  AppShell
 } from '@mantine/core'
+import { createStyles } from '@mantine/emotion'
 import { useMatch, useLocation, useResolvedPath, Link } from 'react-router-dom'
 import useAccount from 'hooks/useAccount'
 import DashboardIcon from 'resources/icons/Dashboard'
@@ -31,7 +31,7 @@ const useStyles = createStyles((theme) => ({
     marginBottom: theme.spacing.md
   },
   balance: {
-    borderBottom: `1px solid ${theme.colors.decorativeBorders[theme.fn.primaryShade()]}`,
+    borderBottom: `1px solid ${theme.colors.decorativeBorders[3]}`,
     paddingTop: theme.spacing.sm,
     paddingBottom: theme.spacing.sm
   },
@@ -63,24 +63,26 @@ function SideNav() {
 
   return (
     <>
-      <Navbar.Section>
+      <AppShell.Section>
         <UnstyledButton component={Link} to="" className={classes.logo}>
           <AdExLogo
             text={
-              theme.colorScheme === 'dark'
-                ? theme.white
-                : theme.colors.brandDarker[theme.fn.primaryShade()]
+              // TODO: fix it
+              theme.colors.brandDarker[3]
+              // theme.colorScheme === 'dark'
+              //   ? theme.white
+              //   : theme.colors.brandDarker[3]
             }
           />
         </UnstyledButton>
-      </Navbar.Section>
-      <Navbar.Section className={classes.balance}>
+      </AppShell.Section>
+      <AppShell.Section className={classes.balance}>
         <Balance />
-      </Navbar.Section>
-      <Navbar.Section className={classes.newCampaign}>
+      </AppShell.Section>
+      <AppShell.Section className={classes.newCampaign}>
         <CreateCampaignBtn hasPopover={isManualDepositing && !hasAvailableBalance} />
-      </Navbar.Section>
-      <Navbar.Section mx="-xs" grow component={ScrollArea}>
+      </AppShell.Section>
+      <AppShell.Section mx="-xs" grow component={ScrollArea}>
         <Box>
           <NavLink
             to="/dashboard"
@@ -117,18 +119,18 @@ function SideNav() {
             />
           )}
         </Box>
-      </Navbar.Section>
-      <Navbar.Section mx="xs" mt="xl">
-        <Text color="secondaryText" size="sm">
+      </AppShell.Section>
+      <AppShell.Section mx="xs" mt="xl">
+        <Text c="secondaryText" size="sm">
           ©{year} AdEx.
         </Text>
-        <Text color="secondaryText" size="sm">
+        <Text c="secondaryText" size="sm">
           All Rights Reserved.
         </Text>
-        <Text color="secondaryText" size="sm">
+        <Text c="secondaryText" size="sm">
           V.{appVersion}-beta
         </Text>
-      </Navbar.Section>
+      </AppShell.Section>
     </>
   )
 }

@@ -9,9 +9,10 @@ function NotFound404() {
     <Box>
       <AdExLogo
         text={
-          theme.colorScheme === 'dark'
-            ? theme.white
-            : theme.colors.brandDarker[theme.fn.primaryShade()]
+          // theme.colorScheme === 'dark'
+          //   ? theme.white
+          //   : // TODO: fix that
+          theme.colors.brandDarker[3]
         }
       />
       404

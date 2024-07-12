@@ -1,4 +1,5 @@
-import { Container, createStyles } from '@mantine/core'
+import { Container } from '@mantine/core'
+import { createStyles } from '@mantine/emotion'
 import CampaignDetailsRow from 'components/common/CampainDetailsRow/CampaignDetailsRow'
 import useCreateCampaignData from 'hooks/useCreateCampaignData/useCreateCampaignData'
 import { useMemo } from 'react'
@@ -6,10 +7,10 @@ import { CreateCampaignOverview } from 'types'
 
 const useStyles = createStyles((theme) => ({
   wrapper: {
-    background: theme.colors.lightBackground[theme.fn.primaryShade()],
+    background: theme.colors.lightBackground[3],
     border: '1px solid',
     borderRadius: theme.radius.md,
-    borderColor: theme.colors.decorativeBorders[theme.fn.primaryShade()],
+    borderColor: theme.colors.decorativeBorders[3],
     maxWidth: '100%'
   }
 }))

@@ -1,4 +1,5 @@
-import { Button, ButtonProps, Flex, MantineColor, Modal, Text, createStyles } from '@mantine/core'
+import { Button, ButtonProps, Flex, MantineColor, Modal, Text } from '@mantine/core'
+import { createStyles } from '@mantine/emotion'
 import Lottie from 'lottie-react'
 import { PropsWithChildren } from 'react'
 import { LinkProps } from 'react-router-dom'
@@ -8,21 +9,20 @@ import AnimationData from 'resources/lotties/Arrow-up-data.json'
 const useStyles = createStyles(
   (theme, { color, overlayTop }: { color: MantineColor; overlayTop: boolean | undefined }) => ({
     confirmModalContent: {
-      background:
-        theme.colors[color][theme.fn.primaryShade()] + theme.other.shades.hexColorSuffix.lightest,
+      background: theme.colors[color][3] + theme.other.shades.hexColorSuffix.lightest,
       padding: theme.spacing.xl
     },
     iconWrapper: {
       width: 50,
       height: 50,
-      background: `${theme.colors[color][theme.fn.primaryShade()]}1A`,
+      background: `${theme.colors[color][3]}1A`,
       borderRadius: '50%',
       padding: theme.spacing.sm
     },
     attentionIcon: {
       width: 25,
       height: 25,
-      color: theme.colors.attention[theme.fn.primaryShade()]
+      color: theme.colors.attention[3]
     },
     root: {
       padding: 0

@@ -1,4 +1,5 @@
-import { Grid, createStyles } from '@mantine/core'
+import { Grid, lighten } from '@mantine/core'
+import { createStyles } from '@mantine/emotion'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import { useCallback, useEffect, useState } from 'react'
 import { modals } from '@mantine/modals'
@@ -20,22 +21,19 @@ const useStyles = createStyles((theme) => {
   return {
     // TODO: Think about the idea to add the common container styles in the theme
     container: {
-      backgroundColor: theme.colors.mainBackground[theme.fn.primaryShade()],
+      backgroundColor: theme.colors.mainBackground[3],
       borderRadius: theme.radius.md,
       boxShadow: theme.shadows.xs
       // padding: theme.spacing.lg
     },
     lightGray: {
-      color: theme.fn.lighten(
-        theme.colors.secondaryText[theme.fn.primaryShade()],
-        theme.other.shades.lighten.lighter
-      )
+      color: lighten(theme.colors.secondaryText[3], theme.other.shades.lighten.lighter)
     },
     dropZone: {
-      backgroundColor: theme.colors.lightBackground[theme.fn.primaryShade()],
+      backgroundColor: theme.colors.lightBackground[3],
       border: '1px solid',
       borderRadius: theme.radius.sm,
-      borderColor: theme.colors.decorativeBorders[theme.fn.primaryShade()],
+      borderColor: theme.colors.decorativeBorders[3],
       height: 112
     },
     decorativeBorder: {
@@ -45,28 +43,24 @@ const useStyles = createStyles((theme) => {
       borderRadius: theme.radius.sm
     },
     body: {
-      background:
-        theme.colors.attention[theme.fn.primaryShade()] +
-        theme.other.shades.hexColorSuffix.lightest,
+      background: theme.colors.attention[3] + theme.other.shades.hexColorSuffix.lightest,
       padding: theme.spacing.xl
     },
     confirmModalContent: {
-      background:
-        theme.colors.attention[theme.fn.primaryShade()] +
-        theme.other.shades.hexColorSuffix.lightest,
+      background: theme.colors.attention[3] + theme.other.shades.hexColorSuffix.lightest,
       padding: theme.spacing.xl
     },
     iconWrapper: {
       width: 50,
       height: 50,
-      background: `${theme.colors.attention[theme.fn.primaryShade()]}1A`,
+      background: `${theme.colors.attention[3]}1A`,
       borderRadius: '50%',
       padding: theme.spacing.sm
     },
     attentionIcon: {
       width: 25,
       height: 25,
-      color: theme.colors.attention[theme.fn.primaryShade()]
+      color: theme.colors.attention[3]
     },
     modalBody: {
       padding: 0
@@ -140,7 +134,7 @@ const CreateCampaign = () => {
   return (
     <>
       <Grid columns={24} align="flex-start" mr="xl" ml="xl" mt="md">
-        <Grid.Col sm={24} md={15} lg={18} className={classes.container} p="lg">
+        <Grid.Col span={{ sm: 24, md: 15, lg: 18 }} className={classes.container} p="lg">
           <Grid p="md">
             <Grid.Col>
               <CustomStepper />
@@ -151,9 +145,7 @@ const CreateCampaign = () => {
           </Grid>
         </Grid.Col>
         <Grid.Col
-          sm={24}
-          md={8}
-          lg={5}
+          span={{ sm: 24, md: 8, lg: 5 }}
           offset={1}
           className={classes.container}
           style={{ height: 'auto', padding: 0 }}

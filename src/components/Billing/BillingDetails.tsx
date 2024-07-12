@@ -1,10 +1,11 @@
-import { Button, Flex, Grid, TextInput, createStyles, Text } from '@mantine/core'
+import { Button, Flex, Grid, TextInput, Text } from '@mantine/core'
+import { createStyles } from '@mantine/emotion'
 import { useForm } from '@mantine/form'
 import useAccount from 'hooks/useAccount'
 
 const useStyles = createStyles((theme) => ({
   container: {
-    backgroundColor: theme.colors.mainBackground[theme.fn.primaryShade()],
+    backgroundColor: theme.colors.mainBackground[3],
     borderRadius: theme.radius.sm,
     boxShadow: theme.shadows.xs,
     overflow: 'hidden',
@@ -57,7 +58,7 @@ const BillingDetails = () => {
     >
       <Grid gutter="xs">
         <Grid.Col>
-          <Text size="sm" color="secondaryText" weight="bold">
+          <Text size="sm" c="secondaryText" fw="bold">
             Company details
           </Text>
         </Grid.Col>
@@ -104,7 +105,7 @@ const BillingDetails = () => {
           />
         </Grid.Col>
         <Grid.Col>
-          <Text size="sm" color="secondaryText" weight="bold">
+          <Text size="sm" c="secondaryText" fw="bold">
             Company address
           </Text>
         </Grid.Col>

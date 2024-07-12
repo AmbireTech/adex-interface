@@ -51,7 +51,7 @@ const UploadedBanners = ({
                 error={errorsTargetURLValidations[image.id] || undefined}
                 toRemove={!isMatchedTheSizes(image)}
                 onDelete={onDeleteCreativeBtnClicked}
-                onChange={(e) => handleOnInputChange(e.target.value, image.id)}
+                onChange={(e: any) => handleOnInputChange(e.target.value, image.id)}
               />
             </Grid.Col>
           )

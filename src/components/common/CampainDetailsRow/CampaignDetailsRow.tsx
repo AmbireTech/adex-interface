@@ -1,15 +1,15 @@
-import { Flex, Text, createStyles } from '@mantine/core'
+import { Flex, Text } from '@mantine/core'
+import { createStyles } from '@mantine/emotion'
 import { CampaignDetailsRowProps } from 'types'
 
 const useStyles = createStyles((theme, { lighterColor }: { lighterColor: boolean }) => ({
   border: {
-    borderBottom: `1px dashed ${theme.colors.decorativeBorders[theme.fn.primaryShade()]}`
+    borderBottom: `1px dashed ${theme.colors.decorativeBorders[3]}`
   },
   textColor: {
     color: !lighterColor
-      ? theme.colors.secondaryText[theme.fn.primaryShade()]
-      : theme.colors.secondaryText[theme.fn.primaryShade()] +
-        theme.other.shades.hexColorSuffix.lighter
+      ? theme.colors.secondaryText[3]
+      : theme.colors.secondaryText[3] + theme.other.shades.hexColorSuffix.lighter
   },
   fullWidth: {
     width: '100%'
@@ -46,7 +46,7 @@ const CampaignDetailsRow = ({
           [classes.fullWidth]: column,
           [classes.marginBottom]: column
         })}
-        weight="bold"
+        fw="bold"
         size={textSize}
       >
         {title}

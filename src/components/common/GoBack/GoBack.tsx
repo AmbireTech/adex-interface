@@ -1,4 +1,5 @@
-import { Text, createStyles } from '@mantine/core'
+import { Text } from '@mantine/core'
+import { createStyles } from '@mantine/emotion'
 import ActionButton from 'components/common/CustomTable/ActionButton/ActionButton'
 import LeftChevronIcon from 'resources/icons/LeftChevron'
 import { useNavigate } from 'react-router-dom'
@@ -11,12 +12,12 @@ const useStyles = createStyles((theme) => ({
     left: SIDE_BAR_WIDTH,
     width: '100%',
     zIndex: 10,
-    background: theme.colors.lightBackground[theme.fn.primaryShade()],
+    background: theme.colors.lightBackground[3],
     marginLeft: theme.spacing.xl,
-    padding: `${theme.spacing.md} ${theme.spacing.xs}`,
-    [theme.fn.smallerThan('sm')]: {
-      left: 0
-    }
+    padding: `${theme.spacing.md} ${theme.spacing.xs}`
+    // [theme.fn.smallerThan('sm')]: {
+    //   left: 0
+    // }
   }
 }))
 

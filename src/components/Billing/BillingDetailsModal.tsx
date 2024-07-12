@@ -1,5 +1,6 @@
 import { PropsWithChildren } from 'react'
-import { Button, Flex, Group, Loader, Modal, createStyles } from '@mantine/core'
+import { Button, Flex, Group, Loader, Modal } from '@mantine/core'
+import { createStyles } from '@mantine/emotion'
 
 type DetailsProps = PropsWithChildren & {
   title: string
@@ -12,11 +13,11 @@ const useStyles = createStyles((theme) => ({
   wrapper: {
     border: '1px solid',
     borderRadius: theme.radius.sm,
-    borderColor: theme.colors.decorativeBorders[theme.fn.primaryShade()]
+    borderColor: theme.colors.decorativeBorders[3]
     // padding: theme.spacing.lg
   },
   header: {
-    backgroundColor: theme.colors.lightBackground[theme.fn.primaryShade()],
+    backgroundColor: theme.colors.lightBackground[3],
     padding: theme.spacing.xl
   },
   title: {
@@ -24,7 +25,7 @@ const useStyles = createStyles((theme) => ({
     fontWeight: theme.other.fontWeights.bold
   },
   close: {
-    color: theme.colors.mainText[theme.fn.primaryShade()]
+    color: theme.colors.mainText[3]
   },
   printable: {
     [theme.other.media.print]: {
@@ -63,7 +64,7 @@ export const BillingDetailsModal = ({ children, loading, title, opened, close }:
           </Flex>
         ) : (
           <>
-            <Group position="right">
+            <Group justify="right">
               <Button mt="md" mb="md" onClick={() => window.print()}>
                 Print
               </Button>

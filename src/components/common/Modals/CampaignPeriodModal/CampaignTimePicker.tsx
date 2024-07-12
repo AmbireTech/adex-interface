@@ -1,27 +1,28 @@
-import { Box, createStyles } from '@mantine/core'
+import { Box } from '@mantine/core'
+import { createStyles } from '@mantine/emotion'
 import { TimeInput } from '@mantine/dates'
 
 const useStyles = createStyles((theme) => ({
   timeWrapper: {
     display: 'flex',
     alignItems: 'center',
-    background: theme.colors.lightBackground[theme.fn.primaryShade()],
+    background: theme.colors.lightBackground[3],
     height: 284,
     width: '100%',
     borderRadius: theme.radius.md
   },
   input: {
-    background: theme.colors.mainBackground[theme.fn.primaryShade()],
+    background: theme.colors.mainBackground[3],
     border: '1px solid',
-    borderColor: theme.colors.decorativeBorders[theme.fn.primaryShade()],
-    color: theme.colors.mainText[theme.fn.primaryShade()],
+    borderColor: theme.colors.decorativeBorders[3],
+    color: theme.colors.mainText[3],
     fontSize: 50,
     lineHeight: 'inherit',
     fontFamily: 'monospace',
     padding: '2.5rem',
     '&:focus': {
-      borderColor: theme.colors.brand[theme.fn.primaryShade()],
-      color: theme.colors.brand[theme.fn.primaryShade()]
+      borderColor: theme.colors.brand[3],
+      color: theme.colors.brand[3]
     }
   }
 }))

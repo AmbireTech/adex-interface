@@ -1,4 +1,4 @@
-import { Flex, MediaQuery, TextInput, Text } from '@mantine/core'
+import { Flex, TextInput, Text } from '@mantine/core'
 import InfoAlertMessage from 'components/common/InfoAlertMessage'
 import { parseBigNumTokenAmountToDecimal } from 'helpers/balances'
 import { MIN_CAMPAIGN_BUDGET_VALUE, MIN_CAMPAIGN_BUDGET_VALUE_ADMIN } from 'helpers/validators'
@@ -57,26 +57,26 @@ const CampaignBudget = ({
 
   return (
     <Flex justify="space-between" align="flex-start">
-      <MediaQuery
+      {/* <MediaQuery
         smallerThan="lg"
         styles={{
           maxWidth: '100%'
         }}
-      >
-        <TextInput
-          size="md"
-          maw="50%"
-          placeholder="Campaign Budget"
-          // TODO: Should get/calculate estimated fee
-          // description={`Estimated fee: 0.15 ${balanceToken.name}`}
-          inputWrapperOrder={['input', 'description', 'error']}
-          defaultValue={defaultValue}
-          name="campaignBudget"
-          onChange={(event) => handleOnChange(event)}
-          onFocus={onFocus}
-          error={err && <Text size="sm">{err}</Text>}
-        />
-      </MediaQuery>
+      > */}
+      <TextInput
+        size="md"
+        maw="50%"
+        placeholder="Campaign Budget"
+        // TODO: Should get/calculate estimated fee
+        // description={`Estimated fee: 0.15 ${balanceToken.name}`}
+        inputWrapperOrder={['input', 'description', 'error']}
+        defaultValue={defaultValue}
+        name="campaignBudget"
+        onChange={(event) => handleOnChange(event)}
+        onFocus={onFocus}
+        error={err && <Text size="sm">{err}</Text>}
+      />
+      {/* </MediaQuery> */}
       {budgetIsGreaterThanBalance && (
         <InfoAlertMessage
           w="40%"

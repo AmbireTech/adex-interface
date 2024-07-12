@@ -1,16 +1,17 @@
-import { Grid, Title, Text, createStyles } from '@mantine/core'
+import { Grid, Title, Text } from '@mantine/core'
+import { createStyles } from '@mantine/emotion'
 import { IFiatProviderProps } from 'types'
 
 const useStyles = createStyles((theme) => ({
   wrapper: {
-    backgroundColor: theme.colors.lightBackground[theme.fn.primaryShade()],
+    backgroundColor: theme.colors.lightBackground[3],
     border: '1px solid',
-    borderColor: theme.colors.decorativeBorders[theme.fn.primaryShade()],
+    borderColor: theme.colors.decorativeBorders[3],
     borderRadius: theme.radius.sm,
     padding: theme.spacing.xs,
     cursor: 'pointer',
     '&:hover': {
-      borderColor: theme.colors.brand[theme.fn.primaryShade()],
+      borderColor: theme.colors.brand[3],
       boxShadow: theme.shadows.md
     }
   },

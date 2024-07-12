@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { Grid, Title, createStyles, Flex, Text } from '@mantine/core'
+import { Grid, Title, Flex, Text, lighten } from '@mantine/core'
+import { createStyles } from '@mantine/emotion'
 import TimeFrameChart from 'components/common/Chart/TimeFrameChart'
 import { BaseAnalyticsData, AnalyticsPeriod, FilteredAnalytics, MetricsToShow } from 'types'
 import { formatCurrency } from 'helpers'
@@ -8,17 +9,14 @@ import ChartControlBtn from './ChartControlBtn'
 
 const useStyles = createStyles((theme) => ({
   wrapper: {
-    background: theme.colors.mainBackground[theme.fn.primaryShade()],
+    background: theme.colors.mainBackground[3],
     borderRadius: theme.radius.md,
     padding: theme.spacing.lg,
     marginBottom: theme.spacing.md,
     boxShadow: theme.shadows.sm
   },
   lighterGray: {
-    color: theme.fn.lighten(
-      theme.colors.mainText[theme.fn.primaryShade()],
-      theme.other.shades.lighten.lighter
-    ),
+    color: lighten(theme.colors.mainText[3], theme.other.shades.lighten.lighter),
     fontSize: theme.fontSizes.sm
   }
 }))

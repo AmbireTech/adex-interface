@@ -1,5 +1,6 @@
 import { useCallback, useMemo, useState } from 'react'
-import { Box, createStyles } from '@mantine/core'
+import { Box } from '@mantine/core'
+import { createStyles } from '@mantine/emotion'
 import { AdUnit } from 'adex-common/dist/types'
 import { CreativePreviewModal } from '../Modals'
 import Media from '../Media'
@@ -11,7 +12,7 @@ const useStyles = createStyles(
       maxWidth: width,
       maxHeight: height,
       overflow: 'hidden',
-      background: theme.colors.alternativeBackground[theme.fn.primaryShade()],
+      background: theme.colors.alternativeBackground[3],
       '&:hover': {
         cursor: 'pointer'
       }

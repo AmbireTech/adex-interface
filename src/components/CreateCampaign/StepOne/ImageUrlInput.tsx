@@ -1,4 +1,5 @@
-import { ActionIcon, Flex, Input, Text, createStyles, getStylesRef } from '@mantine/core'
+import { ActionIcon, Flex, Input, Text } from '@mantine/core'
+import { createStyles, getStylesRef } from '@mantine/emotion'
 import CustomBadge from 'components/common/CustomBadge'
 import InfoAlertMessage from 'components/common/InfoAlertMessage'
 import MediaThumb from 'components/common/MediaThumb'
@@ -17,41 +18,35 @@ const useStyles = createStyles((theme, { hasError }: { hasError: boolean }) => {
     mediaWrapper: {
       ref: getStylesRef('mediaWrapper'),
       borderRight: '1px solid',
-      borderColor: theme.colors.decorativeBorders[theme.fn.primaryShade()],
+      borderColor: theme.colors.decorativeBorders[3],
       padding: smallerSpacing
     },
     wrapper: {
-      backgroundColor: theme.colors.lightBackground[theme.fn.primaryShade()],
+      backgroundColor: theme.colors.lightBackground[3],
       border: '1px solid',
-      borderColor: theme.colors.decorativeBorders[theme.fn.primaryShade()],
+      borderColor: theme.colors.decorativeBorders[3],
       borderRadius: theme.radius.md,
       '&:focus-within': {
-        borderColor: hasError
-          ? theme.colors.warning[theme.fn.primaryShade()]
-          : theme.colors.brand[theme.fn.primaryShade()],
+        borderColor: hasError ? theme.colors.warning[3] : theme.colors.brand[3],
         [`& .${getStylesRef('mediaWrapper')}`]: {
-          borderColor: hasError
-            ? theme.colors.warning[theme.fn.primaryShade()]
-            : theme.colors.brand[theme.fn.primaryShade()]
+          borderColor: hasError ? theme.colors.warning[3] : theme.colors.brand[3]
         },
         [`& .${getStylesRef('inputField')}`]: {
-          borderColor: hasError
-            ? theme.colors.warning[theme.fn.primaryShade()]
-            : theme.colors.brand[theme.fn.primaryShade()]
+          borderColor: hasError ? theme.colors.warning[3] : theme.colors.brand[3]
         }
       }
     },
     inputError: {
-      borderColor: theme.colors.warning[theme.fn.primaryShade()],
+      borderColor: theme.colors.warning[3],
       [`& .${getStylesRef('mediaWrapper')}`]: {
-        borderColor: theme.colors.warning[theme.fn.primaryShade()]
+        borderColor: theme.colors.warning[3]
       }
     },
     infoError: {
       padding: theme.spacing.xs
     },
     rightSection: {
-      backgroundColor: theme.colors.lightBackground[theme.fn.primaryShade()]
+      backgroundColor: theme.colors.lightBackground[3]
     }
   }
 })
@@ -126,7 +121,7 @@ const ImageUrlInput = ({
           size="md"
           rightSection={getRightSection()}
           classNames={{
-            rightSection: classes.rightSection
+            section: classes.rightSection
           }}
         />
       </Flex>

@@ -1,19 +1,20 @@
-import { ActionIcon, Flex, Group, Pagination, Table, createStyles } from '@mantine/core'
+import { ActionIcon, Flex, Group, Pagination, Table } from '@mantine/core'
 import { ICustomTableProps } from 'types'
 import usePagination from 'hooks/usePagination'
 import React, { useCallback, useMemo, useState } from 'react'
 import DownChevronIcon from 'resources/icons/DownChevron'
+import { createStyles } from '@mantine/emotion'
 
 const useStyles = createStyles((theme) => ({
   header: {
-    backgroundColor: theme.colors.alternativeBackground[theme.fn.primaryShade()]
+    backgroundColor: theme.colors.alternativeBackground[3]
   },
   border: {
     borderRadius: theme.radius.md,
     overflow: 'hidden'
   },
   background: {
-    backgroundColor: theme.colors.mainBackground[theme.fn.primaryShade()],
+    backgroundColor: theme.colors.mainBackground[3],
     boxShadow: theme.shadows.xs
   }
 }))
@@ -107,7 +108,7 @@ const CustomTableWithDropdown = ({ background, headings, elements }: ICustomTabl
         </thead>
         <tbody>{rows}</tbody>
       </Table>
-      <Group w="100%" position="right" mt="xl">
+      <Group w="100%" justify="right" mt="xl">
         <Pagination
           total={maxPages}
           boundaries={1}

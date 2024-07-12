@@ -1,4 +1,5 @@
-import { Container, Grid, Select, createStyles, Text } from '@mantine/core'
+import { Container, Grid, Select, Text } from '@mantine/core'
+import { createStyles } from '@mantine/emotion'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import EthereumIcon from 'resources/networks/Ethereum'
 import PolygonIcon from 'resources/networks/Polygon'
@@ -9,13 +10,13 @@ import CustomCard from 'components/common/CustomCard'
 import { IS_MANUAL_DEPOSITING } from 'constants/balances'
 import { useNavigate } from 'react-router-dom'
 import TopUpAccountModal from 'components/common/TopUpAccountModal'
-import SelectItem from './SelectItem'
+// import SelectItem from './SelectItem'
 import SendCryptocurrency from './SendCryptocurrency'
 import TopUpWithFiat from './TopUpWithFiat'
 
 const useStyles = createStyles((theme) => ({
   container: {
-    background: theme.colors.mainBackground[theme.fn.primaryShade()],
+    background: theme.colors.mainBackground[3],
     boxShadow: theme.shadows.sm,
     borderRadius: theme.radius.sm,
     marginTop: theme.spacing.xl
@@ -25,21 +26,20 @@ const useStyles = createStyles((theme) => ({
     justifyContent: 'center'
   },
   confirmModalContent: {
-    background:
-      theme.colors.attention[theme.fn.primaryShade()] + theme.other.shades.hexColorSuffix.lightest,
+    background: theme.colors.attention[3] + theme.other.shades.hexColorSuffix.lightest,
     padding: theme.spacing.xl
   },
   iconWrapper: {
     width: 50,
     height: 50,
-    background: `${theme.colors.attention[theme.fn.primaryShade()]}1A`,
+    background: `${theme.colors.attention[3]}1A`,
     borderRadius: '50%',
     padding: theme.spacing.sm
   },
   attentionIcon: {
     width: 25,
     height: 25,
-    color: theme.colors.attention[theme.fn.primaryShade()]
+    color: theme.colors.attention[3]
   },
   root: {
     padding: 0
@@ -74,7 +74,7 @@ const Deposit = () => {
   const { classes } = useStyles()
   const [network, setNetwork] = useState(data[0].value)
   const [selectedTab, setSelectedTab] = useState<DepositMethods | null>(null)
-  const icon = useMemo(() => data.find(({ value }) => value === network)?.image, [network])
+  // const icon = useMemo(() => data.find(({ value }) => value === network)?.image, [network])
 
   const isManualDepositing = useMemo(() => IS_MANUAL_DEPOSITING === 'true', [])
   const [opened, setOpened] = useState(false)
@@ -101,10 +101,10 @@ const Deposit = () => {
           <Select
             variant="filled"
             data={data}
-            itemComponent={SelectItem}
+            // itemComponent={SelectItem}
             value={network}
-            onChange={(value: string) => setNetwork(value)}
-            icon={icon}
+            onChange={(value: string | null) => value && setNetwork(value)}
+            // icon={icon}
           />
         </Grid.Col>
         <Grid.Col>

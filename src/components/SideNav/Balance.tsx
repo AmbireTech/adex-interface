@@ -1,4 +1,5 @@
-import { Flex, createStyles, rem, Image, Text } from '@mantine/core'
+import { Flex, rem, Image, Text } from '@mantine/core'
+import { createStyles } from '@mantine/emotion'
 import { useMemo, useState } from 'react'
 import DownArrowIcon from 'resources/icons/DownArrow'
 import { formatCurrency } from 'helpers'
@@ -15,7 +16,7 @@ const useStyles = createStyles((theme) => ({
     cursor: 'pointer'
   },
   secondaryColor: {
-    color: theme.colors.secondaryText[theme.fn.primaryShade()]
+    color: theme.colors.secondaryText[3]
   }
 }))
 
@@ -38,10 +39,10 @@ const FormattedBalance = ({ balance, iconUrl }: { balance: number; iconUrl: stri
     <Flex direction="row" align="center" justify="flex-start">
       <Image src={iconUrl} alt="token_icon" width={18} height={18} />
       <Flex direction="row" align="baseline" justify="flex-start">
-        <Text size="lg" weight="bold" ml="xs">
+        <Text size="lg" fw="bold" ml="xs">
           {integerPart}
         </Text>
-        <Text size="sm" weight="bold">
+        <Text size="sm" fw="bold">
           {decimalPart}
         </Text>
       </Flex>
@@ -71,7 +72,7 @@ const Balance = () => {
   )
   return (
     <>
-      <Text size="sm" color="mainText" weight="bold">
+      <Text size="sm" c="mainText" fw="bold">
         Balance
       </Text>
       <Flex direction="row" align="center" justify="space-between">

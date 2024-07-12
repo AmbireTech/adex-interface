@@ -26,8 +26,8 @@ const MultiSelectAndRadioButtons = ({
   const [selectedCategories, setSelectedCategories] = useState<string[]>([])
   const [selectedValue, setSelectedValue] = useState<string[]>(defaultSelectValue)
 
-  const handleRadioChange = useCallback((value: TargetingInputApplyProp) => {
-    setSelectedRadio(value)
+  const handleRadioChange = useCallback((value: string) => {
+    setSelectedRadio(value as TargetingInputApplyProp)
     setSelectedCategories([])
     setSelectedValue([])
   }, [])
@@ -69,13 +69,13 @@ const MultiSelectAndRadioButtons = ({
   return (
     <>
       <Radio.Group value={selectedRadio} onChange={handleRadioChange} mb="md">
-        <Stack spacing="xs">
+        <Stack gap="xs">
           <Radio label="Select All" value="all" />
           <Radio label={`Select ${label}`} value="in" />
           <Radio label={`Select All ${label} Except`} value="nin" />
         </Stack>
       </Radio.Group>
-      <Text color="secondaryText" size="sm" weight="bold" mb="xs">
+      <Text c="secondaryText" size="sm" fw="bold" mb="xs">
         {labelText}
       </Text>
       <MultiSelect
@@ -90,23 +90,14 @@ const MultiSelectAndRadioButtons = ({
         placeholder={`Select ${label}`}
         styles={(theme) => ({
           input: {
-            borderColor:
-              selectedRadio === 'nin'
-                ? theme.colors.warning[theme.fn.primaryShade()]
-                : theme.colors.brand[theme.fn.primaryShade()],
-            backgroundColor: theme.colors.mainBackground[theme.fn.primaryShade()],
+            borderColor: selectedRadio === 'nin' ? theme.colors.warning[3] : theme.colors.brand[3],
+            backgroundColor: theme.colors.mainBackground[3],
             boxShadow: theme.shadows.md
           },
           value: {
             border: '1px solid',
-            borderColor:
-              selectedRadio === 'nin'
-                ? theme.colors.warning[theme.fn.primaryShade()]
-                : theme.colors.brand[theme.fn.primaryShade()],
-            color:
-              selectedRadio === 'nin'
-                ? theme.colors.warning[theme.fn.primaryShade()]
-                : theme.colors.brand[theme.fn.primaryShade()]
+            borderColor: selectedRadio === 'nin' ? theme.colors.warning[3] : theme.colors.brand[3],
+            color: selectedRadio === 'nin' ? theme.colors.warning[3] : theme.colors.brand[3]
           }
         })}
       />

@@ -1,5 +1,5 @@
-import { createStyles } from '@mantine/core'
 import { Accessors, XYChartProps, BaseAnalyticsData, MetricsToShow } from 'types'
+import { createStyles } from '@mantine/emotion'
 import ChartControls from './Chart'
 
 const useStyles = createStyles((theme) => ({
@@ -8,7 +8,7 @@ const useStyles = createStyles((theme) => ({
     justifyContent: 'start',
     alignItems: 'center',
     fontWeight: 'normal',
-    color: theme.colors.mainText[theme.fn.primaryShade()]
+    color: theme.colors.mainText[3]
   },
   dot: {
     height: 6,

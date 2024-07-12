@@ -48,7 +48,7 @@ const UploadCreative = () => {
   return (
     <Grid>
       <Grid.Col>
-        <Text color="secondaryText" size="sm" weight="bold" mb="xs">
+        <Text c="secondaryText" size="sm" fw="bold" mb="xs">
           3. Upload creatives
         </Text>
         <BannerSizesList adUnits={adUnits} />

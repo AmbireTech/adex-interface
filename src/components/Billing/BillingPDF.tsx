@@ -1,4 +1,5 @@
-import { Flex, Grid, Space, Table, createStyles, Text } from '@mantine/core'
+import { Flex, Grid, Space, Table, Text } from '@mantine/core'
+import { createStyles } from '@mantine/emotion'
 import { Placement } from 'adex-common'
 import {
   formatDate,
@@ -39,7 +40,7 @@ const formatTokenAmount = (amount: bigint, token: OperationEntry['token']): stri
 
 const useStyles = createStyles((theme) => ({
   wrapper: {
-    color: theme.colors.secondaryText[theme.fn.primaryShade()],
+    color: theme.colors.secondaryText[3],
     fontSize: theme.fontSizes.xs,
     span: {
       display: 'block',
@@ -55,7 +56,7 @@ const useStyles = createStyles((theme) => ({
   },
   bold: {
     fontWeight: theme.other.fontWeights.bold,
-    color: theme.colors.mainText[theme.fn.primaryShade()]
+    color: theme.colors.mainText[3]
   },
   italic: {
     fontStyle: 'italic'
@@ -84,13 +85,13 @@ const useStyles = createStyles((theme) => ({
   },
   footer: {
     borderTop: '1px solid',
-    borderColor: theme.colors.decorativeBorders[theme.fn.primaryShade()]
+    borderColor: theme.colors.decorativeBorders[3]
   },
   tableHeader: {
-    backgroundColor: theme.colors.alternativeBackground[theme.fn.primaryShade()]
+    backgroundColor: theme.colors.alternativeBackground[3]
   },
   tableBody: {
-    backgroundColor: theme.colors.lightBackground[theme.fn.primaryShade()]
+    backgroundColor: theme.colors.lightBackground[3]
   },
   tableWrapper: {
     borderRadius: theme.radius.sm,
@@ -108,7 +109,8 @@ const BillingBlank = ({ children, header, seller, buyer, title }: DetailsProps) 
           <div className={classes.logo}>
             <AdExLogo text="white" />
           </div>
-          <Text size={64} weight="bold">
+          {/* TODO: fix the size to be without px */}
+          <Text size="64px" fw="bold">
             {title}
           </Text>
         </Flex>
@@ -189,18 +191,18 @@ export const InvoicesPDF = ({ invoiceDetails, placement }: InvoicesPDFProps) => 
             className={cx(classes.tableHeader, classes.tableWrapper, classes.wrap)}
             p="xs"
           >
-            <Text color="secondaryText">Invoice No.:</Text>
-            <Text weight="bold">{invoiceDetails.invoiceId}</Text>
+            <Text c="secondaryText">Invoice No.:</Text>
+            <Text fw="bold">{invoiceDetails.invoiceId}</Text>
           </Flex>
           <Flex justify="space-between" pl="xs" pr="xs">
-            <Text color="secondaryText">Invoice Date:</Text>
-            <Text color="secondaryText">
+            <Text c="secondaryText">Invoice Date:</Text>
+            <Text c="secondaryText">
               {invoiceDetails.invoiceDate ? formatDate(invoiceDetails.invoiceDate) : 'N/A'}
             </Text>
           </Flex>
           <Flex justify="space-between" pl="xs" pr="xs">
-            <Text color="secondaryText">Payment Date:</Text>
-            <Text color="secondaryText">
+            <Text c="secondaryText">Payment Date:</Text>
+            <Text c="secondaryText">
               {invoiceDetails.paymentDate ? formatDate(invoiceDetails.paymentDate) : 'N/A'}
             </Text>
           </Flex>
@@ -208,7 +210,8 @@ export const InvoicesPDF = ({ invoiceDetails, placement }: InvoicesPDFProps) => 
       }
     >
       <>
-        <Table fontSize="xs" verticalSpacing="xs" w="100%" className={classes.tableWrapper}>
+        {/* <Table fontSize="xs" verticalSpacing="xs" w="100%" className={classes.tableWrapper}> */}
+        <Table verticalSpacing="xs" w="100%" className={classes.tableWrapper}>
           <thead className={classes.tableHeader}>
             <tr>
               <th>No.</th>
@@ -293,26 +296,26 @@ export const StatementsPDF = ({ statement, seller, buyer }: StatementsPDFProps) 
             className={cx(classes.tableHeader, classes.tableWrapper)}
             p="xs"
           >
-            <Text color="secondaryText">Statement Period:</Text>
-            <Text weight="bold">
+            <Text c="secondaryText">Statement Period:</Text>
+            <Text fw="bold">
               {getMonthRangeString(monthPeriodIndexToDate(statement.periodIndex))}
             </Text>
           </Flex>
           <Flex justify="space-between" pl="xs" pr="xs">
-            <Text color="secondaryText">Currency / Token:</Text>
-            <Text color="secondaryText">
+            <Text c="secondaryText">Currency / Token:</Text>
+            <Text c="secondaryText">
               {statement.token.name} (chain: {networks[statement.token.chainId]})
             </Text>
           </Flex>
           <Flex justify="space-between" pl="xs" pr="xs">
-            <Text color="secondaryText">Start balance:</Text>
-            <Text color="secondaryText">
+            <Text c="secondaryText">Start balance:</Text>
+            <Text c="secondaryText">
               {formatTokenAmount(statement.startBalance, statement.token)}
             </Text>
           </Flex>
           <Flex justify="space-between" pl="xs" pr="xs">
-            <Text color="secondaryText">End balance:</Text>
-            <Text color="secondaryText">
+            <Text c="secondaryText">End balance:</Text>
+            <Text c="secondaryText">
               {formatTokenAmount(statement.endBalance, statement.token)}
             </Text>
           </Flex>
@@ -320,7 +323,8 @@ export const StatementsPDF = ({ statement, seller, buyer }: StatementsPDFProps) 
       }
     >
       <>
-        <Table fontSize="xs" verticalSpacing="xs" w="100%" className={classes.tableWrapper}>
+        {/* <Table fontSize="xs" verticalSpacing="xs" w="100%" className={classes.tableWrapper}> */}
+        <Table verticalSpacing="xs" w="100%" className={classes.tableWrapper}>
           <thead className={classes.tableHeader}>
             <tr>
               <th>#</th>

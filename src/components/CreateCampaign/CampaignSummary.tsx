@@ -1,4 +1,4 @@
-import { Button, Flex, Group, Text, UnstyledButton, createStyles } from '@mantine/core'
+import { Button, Flex, Group, Text, UnstyledButton } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
 import { CREATE_CAMPAIGN_STEPS } from 'constants/createCampaign'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
@@ -11,21 +11,21 @@ import useCustomNotifications from 'hooks/useCustomNotifications'
 import useAccount from 'hooks/useAccount'
 import { useNavigate } from 'react-router-dom'
 import throttle from 'lodash.throttle'
+import { createStyles } from '@mantine/emotion'
 
 const useStyles = createStyles((theme) => ({
   bg: {
-    background:
-      theme.colors.warning[theme.fn.primaryShade()] + theme.other.shades.hexColorSuffix.lightest
+    background: theme.colors.warning[3] + theme.other.shades.hexColorSuffix.lightest
   },
   icon: {
     width: 14,
     height: 14
   },
   lightestBrandColor: {
-    color: theme.colors.brand[theme.fn.primaryShade()] + theme.other.shades.hexColorSuffix.lighter
+    color: theme.colors.brand[3] + theme.other.shades.hexColorSuffix.lighter
   },
   brandColor: {
-    color: theme.colors.brand[theme.fn.primaryShade()]
+    color: theme.colors.brand[3]
   }
 }))
 
@@ -177,10 +177,10 @@ const CampaignSummary = () => {
       </Flex>
       {/* Temporary disabled */}
       {/* <Flex justify="space-between" className={classes.bg} p="lg">
-        <Text color="secondaryText" weight="bold">
+        <Text c="secondaryText" fw="bold">
           Estimated Daily Impressions
         </Text>
-        <Text color="secondaryText">0</Text>
+        <Text c="secondaryText">0</Text>
       </Flex> */}
       <Flex direction="column" justify="space-between" align="center">
         {!isTheLastStep ? (
@@ -217,11 +217,11 @@ const CampaignSummary = () => {
           disabled={isFirstStep}
           className={cx(classes.brandColor, { [classes.lightestBrandColor]: isFirstStep })}
         >
-          <Group position="center" align="center" spacing="xs" h={50}>
+          <Group justify="center" align="center" gap="xs" h={50}>
             <span>
               <LeftArrowIcon className={classes.icon} />
             </span>
-            <Text size="lg" weight="bold" underline>
+            <Text size="lg" fw="bold" td="underline">
               Go Back
             </Text>
           </Group>

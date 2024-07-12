@@ -1,4 +1,5 @@
-import { Image, createStyles } from '@mantine/core'
+import { Image } from '@mantine/core'
+import { createStyles } from '@mantine/emotion'
 import { AdUnit } from 'adex-common/dist/types'
 import { getMediaUrlWithProvider, isVideoMedia } from 'helpers/createCampaignHelpers'
 import { useMemo } from 'react'
@@ -12,7 +13,7 @@ const useStyles = createStyles(
       maxWidth: width,
       maxHeight: height,
       overflow: 'hidden',
-      background: theme.colors.alternativeBackground[theme.fn.primaryShade()]
+      background: theme.colors.alternativeBackground[3]
     }
   })
 )

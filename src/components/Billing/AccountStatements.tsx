@@ -153,7 +153,7 @@ const Statements = () => {
           />
         )}
       </BillingDetailsModal>
-      <CustomTable headings={columnTitles} elements={elements} onPreview={onPreview} />
+      <CustomTable background headings={columnTitles} elements={elements} onPreview={onPreview} />
     </>
   )
 }

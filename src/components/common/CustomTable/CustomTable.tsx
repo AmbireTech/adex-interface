@@ -1,4 +1,5 @@
-import { Flex, Group, Pagination, Table, createStyles, Grid, Divider, Text } from '@mantine/core'
+import { Flex, Group, Pagination, Table, Grid, Divider, Text } from '@mantine/core'
+import { createStyles } from '@mantine/emotion'
 import { useMediaQuery } from '@mantine/hooks'
 import VisibilityIcon from 'resources/icons/Visibility'
 import { ICustomTableProps } from 'types'
@@ -13,14 +14,14 @@ import ActionButton from './ActionButton/ActionButton'
 
 const useStyles = createStyles((theme) => ({
   header: {
-    backgroundColor: theme.colors.alternativeBackground[theme.fn.primaryShade()]
+    backgroundColor: theme.colors.alternativeBackground[3]
   },
   border: {
     borderRadius: theme.radius.md,
     overflow: 'hidden'
   },
   background: {
-    backgroundColor: theme.colors.mainBackground[theme.fn.primaryShade()],
+    backgroundColor: theme.colors.mainBackground[3],
     boxShadow: theme.shadows.xs
   },
   tableWrapper: {
@@ -29,10 +30,10 @@ const useStyles = createStyles((theme) => ({
     overflowX: 'auto'
   },
   mobileTableWrapper: {
-    borderBottom: `1px solid ${theme.colors.decorativeBorders[theme.fn.primaryShade()]}`,
+    borderBottom: `1px solid ${theme.colors.decorativeBorders[3]}`,
     textAlign: 'center'
   },
-  gridRow: { borderBottom: `1px solid ${theme.colors.decorativeBorders[theme.fn.primaryShade()]}` },
+  gridRow: { borderBottom: `1px solid ${theme.colors.decorativeBorders[3]}` },
   cell: {
     overflow: 'hidden',
     whiteSpace: 'nowrap',
@@ -80,7 +81,7 @@ const CustomTable = ({
             {heading}
           </Grid.Col>
         ) : (
-          <th key={heading}>{heading}</th>
+          <Table.Th key={heading}>{heading}</Table.Th>
         )
       ),
     [isMobile, headings]
@@ -152,18 +153,18 @@ const CustomTable = ({
     return list.map((e) => {
       const isDraftCampaign = e.status?.value === CampaignStatus.draft
       return (
-        <tr key={e.id}>
+        <Table.Tr key={e.id}>
           {columns.map((column: string) => {
             const columnParsed = column === 'status' ? e[column].element : e[column]
 
             return (
-              <td key={column} className={classes.cell}>
+              <Table.Td key={column} className={classes.cell}>
                 {columnParsed}
-              </td>
+              </Table.Td>
             )
           })}
           {hasAction && (
-            <td>
+            <Table.Td>
               <Group>
                 {!!onPreview && (
                   <ActionButton
@@ -201,9 +202,9 @@ const CustomTable = ({
                   />
                 )}
               </Group>
-            </td>
+            </Table.Td>
           )}
-        </tr>
+        </Table.Tr>
       )
     })
   }, [
@@ -240,17 +241,17 @@ const CustomTable = ({
             verticalSpacing={15}
             className={cx(classes.border, { [classes.background]: background })}
           >
-            <thead className={classes.header}>
-              <tr>
+            <Table.Thead className={classes.header}>
+              <Table.Tr>
                 {head}
-                {hasAction && <th key="Action">Action</th>}
-              </tr>
-            </thead>
-            <tbody>{rows}</tbody>
+                {hasAction && <Table.Th key="Action">Action</Table.Th>}
+              </Table.Tr>
+            </Table.Thead>
+            <Table.Tbody>{rows}</Table.Tbody>
           </Table>
         </div>
       )}
-      <Group w="100%" position="right" mt="xl">
+      <Group w="100%" justify="right" mt="xl">
         <Pagination
           total={maxPages}
           boundaries={1}

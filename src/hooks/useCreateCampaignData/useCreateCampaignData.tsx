@@ -63,12 +63,11 @@ const useCreateCampaignData = () => {
         </Flex>
       )
     }
-    return <Text align="end">N/A</Text>
+    return <Text ta="end">N/A</Text>
   }, [selectedDevices])
 
   const formattedSelectedPlacement = useMemo(() => {
-    if (placement)
-      return <Text align="end">{placement === 'app' ? 'Applications' : 'Websites'}</Text>
+    if (placement) return <Text ta="end">{placement === 'app' ? 'Applications' : 'Websites'}</Text>
     return null
   }, [placement])
 
@@ -103,18 +102,18 @@ const useCreateCampaignData = () => {
     const [key, labels] = formatCatsAndLocsData(inputValues, lib)
     if (!key) return
     if (key === 'all') {
-      return <Text align="end">All</Text>
+      return <Text ta="end">All</Text>
     }
     if (key === 'in') {
-      return <Text align="end">{labels}</Text>
+      return <Text ta="end">{labels}</Text>
     }
     if (key === 'nin') {
       return (
         <>
-          <Text align="end" color="warning">
+          <Text ta="end" color="warning">
             All except:{' '}
           </Text>
-          <Text align="end">{labels}</Text>
+          <Text ta="end">{labels}</Text>
         </>
       )
     }
@@ -137,15 +136,15 @@ const useCreateCampaignData = () => {
   const adFormats = useMemo(
     () =>
       uniqueSizesWithCount.map((size) => (
-        <Text align="end" key={`${size.count}${size.value}`}>{`${size.count}x ${size.value}`}</Text>
+        <Text ta="end" key={`${size.count}${size.value}`}>{`${size.count}x ${size.value}`}</Text>
       )),
     [uniqueSizesWithCount]
   )
   const campaignBudgetFormatted = useMemo(
-    () => <Text align="end">{campaignBudget.toString()}</Text>,
+    () => <Text ta="end">{campaignBudget.toString()}</Text>,
     [campaignBudget]
   )
-  const campaignNameFormatted = useMemo(() => <Text align="end">{title}</Text>, [title])
+  const campaignNameFormatted = useMemo(() => <Text ta="end">{title}</Text>, [title])
   const adUnitsFormatted = useMemo(
     () =>
       adUnits.map((image: AdUnit) => {
