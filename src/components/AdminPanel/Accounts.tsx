@@ -1,4 +1,5 @@
-import { useEffect, useState, useMemo } from 'react'
+import { useEffect, useMemo, useCallback } from 'react'
+import { useNavigate } from 'react-router-dom'
 import {
   Container,
   Loader,
@@ -10,68 +11,56 @@ import {
 } from '@mantine/core'
 
 import CustomTable from 'components/common/CustomTable'
-import { useAdExApi } from 'hooks/useAdexServices'
-import { Account } from 'types'
+import useAdmin from 'hooks/useAdmin'
+
 import { parseBigNumTokenAmountToDecimal } from 'helpers/balances'
 
-const headingsDefault = ['Id', 'email', 'balance', 'campaigns launched', 'total spend', 'created']
+const headingsDefault = [
+  'Id',
+  'verified billing',
+  'email',
+  'balance',
+  'campaigns launched',
+  'total spend',
+  'created'
+]
 
 const AdminAnalytics = () => {
-  const { adexServicesRequest } = useAdExApi()
-  const [loading, setLoading] = useState(true)
-  const [accounts, setAccounts] = useState<Array<Account>>([])
+  const navigate = useNavigate()
+  const { accounts, initialDataLoading, updateAccounts } = useAdmin()
   const headings = useMemo(() => [...headingsDefault], [])
 
-  useEffect(() => {
-    const getData = async () => {
-      try {
-        const res = await adexServicesRequest<Array<Account>>('backend', {
-          route: '/dsp/admin/accounts/all',
-          method: 'GET',
-          headers: {
-            'content-type': 'application/json'
-          }
-        })
-
-        console.log({ res })
-        setAccounts(res)
-      } catch (err) {
-        console.log({ err })
-      }
-      setLoading(false)
-    }
-
-    getData()
-  }, [adexServicesRequest])
-
   const data = useMemo(() => {
-    if (!accounts.length) {
+    if (!accounts.size) {
       return {
         elements: [],
         totalDeposits: 0,
         totalCampaignsLocked: 0
       }
     }
+
+    const accArr = Array.from(accounts.values())
     // TODO: fix this when multy token
-    const decimals = accounts[0]?.balanceToken?.decimals
+    const decimals = accArr[0].balanceToken?.decimals
     const totalDeposits = parseBigNumTokenAmountToDecimal(
-      accounts?.reduce((sum, a) => sum + BigInt(a.fundsDeposited.total), 0n),
+      accArr.reduce((sum, a) => sum + BigInt(a.fundsDeposited.total), 0n),
       decimals
     ).toLocaleString()
     const totalCampaignsLocked = parseBigNumTokenAmountToDecimal(
-      accounts?.reduce(
+      accArr.reduce(
         (sum, a) => sum + BigInt(a.fundsOnCampaigns.total - a.refundsFromCampaigns.total),
         0n
       ),
       decimals
     ).toLocaleString()
 
-    const elements = accounts
+    const elements = accArr
       .sort((a, b) => Number(b.availableBalance) - Number(a.availableBalance))
       .map((a) => {
         return {
           id: a.id,
-          accountId: a.id,
+          accountId: a.name || a.id,
+          verified: a?.billingDetails?.verified ? '✅' : '❌',
           email: a.info?.email,
           balance: parseBigNumTokenAmountToDecimal(
             a.availableBalance,
@@ -93,9 +82,20 @@ const AdminAnalytics = () => {
     }
   }, [accounts])
 
+  useEffect(() => {
+    updateAccounts()
+  }, [updateAccounts])
+
+  const handlePreview = useCallback(
+    (item: { id: string }) => {
+      navigate(`/dashboard/admin/user-account/${item.id}`, {})
+    },
+    [navigate]
+  )
+
   return (
     <Container fluid>
-      {loading ? (
+      {initialDataLoading ? (
         <Loader size="xl" variant="dots" color="violet" />
       ) : (
         <Flex direction="column">
@@ -111,7 +111,13 @@ const AdminAnalytics = () => {
               ({data.totalCampaignsLocked} USDC)
             </Badge>
           </Flex>
-          <CustomTable background headings={headings} elements={data.elements} pageSize={10} />
+          <CustomTable
+            background
+            headings={headings}
+            elements={data.elements}
+            pageSize={10}
+            onPreview={handlePreview}
+          />
         </Flex>
       )}
     </Container>

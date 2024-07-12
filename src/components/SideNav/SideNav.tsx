@@ -110,7 +110,7 @@ function SideNav() {
           />
           {isAdmin && (
             <NavLink
-              to="/dashboard/admin"
+              to="/dashboard/admin/campaigns"
               // icon={<BillingIcon />}
               label="Admin Panel"
               active={useResolvedPath('admin').pathname === match?.pathname}
