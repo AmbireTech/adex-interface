@@ -15,6 +15,7 @@ import { CreateCampaignContextProvider } from 'contexts/CreateCampaignContext/Cr
 import { CampaignsDataProvider, CampaignsAnalyticsProvider } from 'contexts/CampaignsContext'
 import NotFound404 from 'components/404/404'
 // import AdminPanel from './admin/Admin'
+import { AccountDetails } from 'components/AdminPanel/AccountDetails'
 import CampaignDetails from './components/CampaignDetails'
 
 function ErrorBoundary() {
@@ -105,14 +106,20 @@ export const router = createBrowserRouter(
           element: <CreateCampaign />
         },
         {
-          path: 'admin',
+          path: 'admin/:tabValue',
           element: (
             <RequireAuth>
               <CampaignsDataProvider type="admin">
                 <AdminPanel />
               </CampaignsDataProvider>
             </RequireAuth>
-          )
+          ),
+          children: [
+            {
+              path: ':accountId',
+              element: <AccountDetails />
+            }
+          ]
         }
       ]
     },
