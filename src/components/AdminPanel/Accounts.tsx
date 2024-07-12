@@ -59,7 +59,7 @@ const AdminAnalytics = () => {
       .map((a) => {
         return {
           id: a.id,
-          accountId: a.id,
+          accountId: a.name || a.id,
           verified: a?.billingDetails?.verified ? '✅' : '❌',
           email: a.info?.email,
           balance: parseBigNumTokenAmountToDecimal(

@@ -1,25 +1,45 @@
+import { useMemo, useCallback, useState } from 'react'
 import { useForm } from '@mantine/form'
 import { Button, Group, TextInput, Box, NumberInput, Text, Switch, Textarea } from '@mantine/core'
+import throttle from 'lodash.throttle'
 
 import { Account } from 'types'
+import useAdmin from 'hooks/useAdmin/useAdmin'
 
 function AccountInfo({ accountData }: { accountData: Account }) {
+  const { updateAccountInfo } = useAdmin()
+  const [loading, setLoading] = useState(false)
   const form = useForm<Account>({
-    initialValues: accountData,
-    validate: {}
+    initialValues: accountData
+    // validate: {}
   })
 
+  const handleSubmit = useCallback(
+    async (values: Account) => {
+      setLoading(true)
+      await updateAccountInfo(values, () => {
+        form.reset()
+        form.resetTouched()
+        form.resetDirty()
+      })
+
+      setLoading(false)
+    },
+    [form, updateAccountInfo]
+  )
+
+  const throttledSbm = useMemo(() => {
+    return throttle(handleSubmit, 3000, { leading: true })
+  }, [handleSubmit])
+
   return (
-    <Box
-      component="form"
-      //   onSubmit={form.onSubmit(throttledSbm)}
-    >
+    <Box component="form" onSubmit={form.onSubmit(throttledSbm)}>
       <TextInput
         label="Account name"
         placeholder="0x000"
         withAsterisk
         {...form.getInputProps('name')}
-        disabled
+        // disabled
       />
       <NumberInput
         mt="md"
@@ -86,10 +106,7 @@ function AccountInfo({ accountData }: { accountData: Account }) {
       </Group>
 
       <Group position="left" mt="md">
-        <Button
-          type="submit"
-          //   disabled={loading}
-        >
+        <Button type="submit" disabled={loading}>
           Submit
         </Button>
       </Group>
