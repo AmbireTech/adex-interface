@@ -27,7 +27,7 @@ const AdminPanel = () => {
           {/* <Tabs.Tab value="deposits">Deposits</Tabs.Tab> */}
           <Tabs.Tab value="accounts">Accounts</Tabs.Tab>
           <Tabs.Tab value="user-account" hidden>
-            User Info
+            Account details
           </Tabs.Tab>
         </Tabs.List>
 

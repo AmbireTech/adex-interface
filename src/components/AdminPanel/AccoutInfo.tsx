@@ -12,9 +12,6 @@ function AccountInfo({ accountData }: { accountData: Account }) {
   return (
     <Box
       component="form"
-      maw={400}
-      mx="auto"
-
       //   onSubmit={form.onSubmit(throttledSbm)}
     >
       <TextInput
@@ -25,7 +22,8 @@ function AccountInfo({ accountData }: { accountData: Account }) {
         disabled
       />
       <NumberInput
-        mt="sm"
+        mt="md"
+        label="Available balance"
         type="number"
         placeholder="Amount"
         hideControls
@@ -35,7 +33,7 @@ function AccountInfo({ accountData }: { accountData: Account }) {
       <Text size="sm" weight={500} mt="md">
         Billing details
       </Text>
-      <Group mt="md" position="apart">
+      <Group mt="md" position="left" align="baseline">
         <TextInput
           label="First name"
           disabled
@@ -69,7 +67,7 @@ function AccountInfo({ accountData }: { accountData: Account }) {
           {...form.getInputProps('billingDetails.companyCity')}
         />
         <TextInput
-          label="Company ZIP cosde"
+          label="Company ZIP code"
           disabled
           {...form.getInputProps('billingDetails.companyZipCode')}
         />
@@ -80,14 +78,14 @@ function AccountInfo({ accountData }: { accountData: Account }) {
         Additional info
       </Text>
 
-      <Group mt="md" position="apart">
+      <Group mt="md" position="left" align="baseline">
         <TextInput label="Contact email" {...form.getInputProps('info.email')} />
         <TextInput label="Contact phone" {...form.getInputProps('info.phone')} />
         <TextInput label="Contact person" {...form.getInputProps('info.contactPerson')} />
-        <Textarea label="Additional notes" {...form.getInputProps('info.notes')} />
+        <Textarea label="Additional notes" w="100%" {...form.getInputProps('info.notes')} />
       </Group>
 
-      <Group position="right" mt="md">
+      <Group position="left" mt="md">
         <Button
           type="submit"
           //   disabled={loading}
