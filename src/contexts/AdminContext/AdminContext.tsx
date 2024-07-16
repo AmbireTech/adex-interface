@@ -1,6 +1,7 @@
 import { createContext, FC, PropsWithChildren, useMemo, useState, useCallback } from 'react'
 import { Account } from 'types'
 import { useAdExApi } from 'hooks/useAdexServices'
+import { removeOptionalEmptyStringProps } from 'helpers'
 
 type Deposit = {
   accountId: string
@@ -108,8 +109,10 @@ const AdminProvider: FC<PropsWithChildren> = ({ children }) => {
 
         const body = {
           ...{ name },
-          ...{ info },
-          ...(billingDetails.verified !== undefined && { billingDetails: billingDetails.verified })
+          ...{ info: removeOptionalEmptyStringProps(info) },
+          ...(billingDetails.verified !== undefined && {
+            billingDetails: { verified: billingDetails.verified }
+          })
         }
 
         console.log({ body })

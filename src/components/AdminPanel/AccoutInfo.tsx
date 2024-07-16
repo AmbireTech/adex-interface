@@ -1,6 +1,6 @@
 import { useMemo, useCallback, useState } from 'react'
 import { useForm } from '@mantine/form'
-import { Button, Group, TextInput, Box, NumberInput, Text, Switch, Textarea } from '@mantine/core'
+import { Button, Group, TextInput, Box, NumberInput, Text, Textarea, Switch } from '@mantine/core'
 import throttle from 'lodash.throttle'
 
 import { Account } from 'types'
@@ -91,7 +91,10 @@ function AccountInfo({ accountData }: { accountData: Account }) {
           disabled
           {...form.getInputProps('billingDetails.companyZipCode')}
         />
-        <Switch label="Verified by admin" {...form.getInputProps('billingDetails.verified')} />
+        <Switch
+          label="Verified by admin"
+          {...form.getInputProps('billingDetails.verified', { type: 'checkbox' })}
+        />
       </Group>
 
       <Text size="sm" weight={500} mt="md">
