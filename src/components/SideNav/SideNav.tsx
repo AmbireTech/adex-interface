@@ -5,7 +5,8 @@ import {
   Text,
   useMantineTheme,
   rem,
-  AppShell
+  AppShell,
+  MantineTheme
 } from '@mantine/core'
 import { createStyles } from '@mantine/emotion'
 import { useMatch, useLocation, useResolvedPath, Link } from 'react-router-dom'
@@ -22,7 +23,7 @@ import NavLink from './NavLink'
 import Balance from './Balance'
 import CreateCampaignBtn from './CreateCampaignBtn'
 
-const useStyles = createStyles((theme) => ({
+const useStyles = createStyles((theme: MantineTheme) => ({
   logo: {
     display: 'block',
     width: rem(103),

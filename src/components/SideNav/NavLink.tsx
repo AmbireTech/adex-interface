@@ -1,9 +1,9 @@
-import { UnstyledButton, Group, Text, lighten } from '@mantine/core'
+import { UnstyledButton, Group, Text, lighten, MantineTheme } from '@mantine/core'
 import { createStyles } from '@mantine/emotion'
 import { Link, LinkProps } from 'react-router-dom'
 import CustomPopover from 'components/common/CustomPopover'
 
-const useStyles = createStyles((theme) => {
+const useStyles = createStyles((theme: MantineTheme) => {
   return {
     button: {
       display: 'block',
@@ -18,8 +18,8 @@ const useStyles = createStyles((theme) => {
       }
     },
     active: {
-      // backgroundColor: theme.fn.primaryColor() + theme.other.shades.hexColorSuffix.lightest,
-      color: theme.primaryColor,
+      backgroundColor: lighten(theme.colors.brand[3], theme.other.shades.lighten.lightest),
+      color: theme.colors.brand[3],
       fontWeight: theme.other.fontWeights.regular,
       opacity: 1,
       '&:before': {
@@ -29,7 +29,7 @@ const useStyles = createStyles((theme) => {
         top: 0,
         bottom: 0,
         width: 5,
-        backgroundColor: theme.primaryColor
+        backgroundColor: theme.colors.brand[3]
       }
     },
     icon: {
