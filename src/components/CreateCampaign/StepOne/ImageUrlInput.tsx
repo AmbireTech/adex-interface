@@ -1,5 +1,5 @@
-import { ActionIcon, Flex, Input, Text } from '@mantine/core'
-import { createStyles, getStylesRef } from '@mantine/emotion'
+import { ActionIcon, Flex, Input, MantineTheme, Text } from '@mantine/core'
+import { createStyles } from '@mantine/emotion'
 import CustomBadge from 'components/common/CustomBadge'
 import InfoAlertMessage from 'components/common/InfoAlertMessage'
 import MediaThumb from 'components/common/MediaThumb'
@@ -7,19 +7,18 @@ import { useCallback, useMemo } from 'react'
 import DeleteIcon from 'resources/icons/Delete'
 import { ImageUrlInputProps } from 'types'
 
-const useStyles = createStyles((theme, { hasError }: { hasError: boolean }) => {
-  const smallerSpacing = `${Number(theme.spacing.xs.split('rem')[0]) * 0.8}rem`
-
+const useStyles = createStyles((theme: MantineTheme, { hasError }: { hasError: boolean }) => {
   return {
     inputField: {
-      ref: getStylesRef('inputField'),
       flexGrow: 1
     },
+    input: {
+      border: 'none'
+    },
     mediaWrapper: {
-      ref: getStylesRef('mediaWrapper'),
       borderRight: '1px solid',
-      borderColor: theme.colors.decorativeBorders[3],
-      padding: smallerSpacing
+      padding: theme.spacing.xs,
+      borderColor: hasError ? theme.colors.warning[3] : theme.colors.brand[3]
     },
     wrapper: {
       backgroundColor: theme.colors.lightBackground[3],
@@ -28,17 +27,14 @@ const useStyles = createStyles((theme, { hasError }: { hasError: boolean }) => {
       borderRadius: theme.radius.md,
       '&:focus-within': {
         borderColor: hasError ? theme.colors.warning[3] : theme.colors.brand[3],
-        [`& .${getStylesRef('mediaWrapper')}`]: {
-          borderColor: hasError ? theme.colors.warning[3] : theme.colors.brand[3]
-        },
-        [`& .${getStylesRef('inputField')}`]: {
+        '#mediaWrapper': {
           borderColor: hasError ? theme.colors.warning[3] : theme.colors.brand[3]
         }
       }
     },
     inputError: {
       borderColor: theme.colors.warning[3],
-      [`& .${getStylesRef('mediaWrapper')}`]: {
+      '#mediaWrapper': {
         borderColor: theme.colors.warning[3]
       }
     },
@@ -102,7 +98,7 @@ const ImageUrlInput = ({
         className={cx(classes.wrapper, { [classes.inputError]: hasError })}
         {...rest}
       >
-        <div className={classes.mediaWrapper}>
+        <div id="mediaWrapper" className={classes.mediaWrapper}>
           <MediaThumb adUnit={image} />
         </div>
         <CustomBadge
@@ -121,7 +117,8 @@ const ImageUrlInput = ({
           size="md"
           rightSection={getRightSection()}
           classNames={{
-            section: classes.rightSection
+            section: classes.rightSection,
+            input: classes.input
           }}
         />
       </Flex>
