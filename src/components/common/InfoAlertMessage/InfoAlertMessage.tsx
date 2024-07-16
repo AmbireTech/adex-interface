@@ -1,4 +1,4 @@
-import { Grid, Text, GridProps } from '@mantine/core'
+import { Grid, Text, GridProps, MantineTheme, lighten } from '@mantine/core'
 import { createStyles } from '@mantine/emotion'
 import InfoCurlyBorder from 'resources/icons/InfoCurlyBorder'
 
@@ -6,7 +6,7 @@ type InfoAlertMessageProps = GridProps & {
   message: string
 }
 
-const useStyles = createStyles((theme) => ({
+const useStyles = createStyles((theme: MantineTheme) => ({
   errorWrapper: {
     alignItems: 'center',
     border: '1px solid',
@@ -14,7 +14,7 @@ const useStyles = createStyles((theme) => ({
     boxShadow: theme.shadows.sm,
     borderRadius: theme.radius.md,
     marginBottom: theme.spacing.xs,
-    background: theme.colors.warning[3] + theme.other.shades.hexColorSuffix.lightest
+    background: lighten(theme.colors.warning[3], theme.other.shades.lighten.lightest)
   },
   errorIcon: {
     display: 'flex',

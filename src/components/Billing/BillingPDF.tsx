@@ -1,4 +1,4 @@
-import { Flex, Grid, Space, Table, Text } from '@mantine/core'
+import { Flex, Grid, MantineTheme, Space, Table, Text } from '@mantine/core'
 import { createStyles } from '@mantine/emotion'
 import { Placement } from 'adex-common'
 import {
@@ -38,7 +38,7 @@ const formatTokenAmount = (amount: bigint, token: OperationEntry['token']): stri
   }`
 }
 
-const useStyles = createStyles((theme) => ({
+const useStyles = createStyles((theme: MantineTheme) => ({
   wrapper: {
     color: theme.colors.secondaryText[3],
     fontSize: theme.fontSizes.xs,
@@ -211,40 +211,46 @@ export const InvoicesPDF = ({ invoiceDetails, placement }: InvoicesPDFProps) => 
     >
       <>
         {/* <Table fontSize="xs" verticalSpacing="xs" w="100%" className={classes.tableWrapper}> */}
-        <Table verticalSpacing="xs" w="100%" className={classes.tableWrapper}>
-          <thead className={classes.tableHeader}>
-            <tr>
-              <th>No.</th>
-              <th>{placement === 'app' ? 'App' : 'Website'}</th>
-              <th>Impressions</th>
-              <th>Clicks</th>
-              <th>CTR %</th>
-              <th>
+        <Table fs="xs" verticalSpacing="xs" w="100%" className={classes.tableWrapper}>
+          <Table.Thead className={classes.tableHeader}>
+            <Table.Tr>
+              <Table.Th>No.</Table.Th>
+              <Table.Th>{placement === 'app' ? 'App' : 'Website'}</Table.Th>
+              <Table.Th>Impressions</Table.Th>
+              <Table.Th>Clicks</Table.Th>
+              <Table.Th>CTR %</Table.Th>
+              <Table.Th>
                 <span>Average CPM</span>
                 <br />
                 <span>({invoiceDetails.currencyName})</span>
-              </th>
-              <th>
+              </Table.Th>
+              <Table.Th>
                 <span>Spent</span>
                 <br />
                 <span>({invoiceDetails.currencyName})</span>
-              </th>
-            </tr>
-          </thead>
-          <tbody className={classes.tableBody}>
+              </Table.Th>
+            </Table.Tr>
+          </Table.Thead>
+          <Table.Tbody className={classes.tableBody}>
             {invoiceDetails.invoiceData.map((e, index) => (
               // eslint-disable-next-line
-              <tr key={index}>
-                <td>{index + 1}</td>
-                <td className={classes.wrap}>{getHumneSrcName(e.segment, placement)}</td>
-                <td className={classes.rightAlignedText}>{e.impressions.toLocaleString()}</td>
-                <td className={classes.rightAlignedText}>{e.clicks.toLocaleString()}</td>
-                <td className={classes.rightAlignedText}>{e.ctr}</td>
-                <td className={classes.rightAlignedText}>{e.avgCpm}</td>
-                <td className={classes.rightAlignedText}>{e.paid.toFixed(4)}</td>
-              </tr>
+              <Table.Tr key={index}>
+                <Table.Td>{index + 1}</Table.Td>
+                <Table.Td className={classes.wrap}>
+                  {getHumneSrcName(e.segment, placement)}
+                </Table.Td>
+                <Table.Td className={classes.rightAlignedText}>
+                  {e.impressions.toLocaleString()}
+                </Table.Td>
+                <Table.Td className={classes.rightAlignedText}>
+                  {e.clicks.toLocaleString()}
+                </Table.Td>
+                <Table.Td className={classes.rightAlignedText}>{e.ctr}</Table.Td>
+                <Table.Td className={classes.rightAlignedText}>{e.avgCpm}</Table.Td>
+                <Table.Td className={classes.rightAlignedText}>{e.paid.toFixed(4)}</Table.Td>
+              </Table.Tr>
             ))}
-          </tbody>
+          </Table.Tbody>
         </Table>
         <Grid.Col span={12}>
           <Grid justify="end">
@@ -324,34 +330,34 @@ export const StatementsPDF = ({ statement, seller, buyer }: StatementsPDFProps) 
     >
       <>
         {/* <Table fontSize="xs" verticalSpacing="xs" w="100%" className={classes.tableWrapper}> */}
-        <Table verticalSpacing="xs" w="100%" className={classes.tableWrapper}>
-          <thead className={classes.tableHeader}>
-            <tr>
-              <th>#</th>
-              <th>Date</th>
-              <th>Type</th>
-              <th>Description</th>
-              <th>amount</th>
-            </tr>
-          </thead>
-          <tbody className={classes.tableBody}>
+        <Table fs="xs" verticalSpacing="xs" w="100%" className={classes.tableWrapper}>
+          <Table.Thead className={classes.tableHeader}>
+            <Table.Tr>
+              <Table.Th>#</Table.Th>
+              <Table.Th>Date</Table.Th>
+              <Table.Th>Type</Table.Th>
+              <Table.Th>Description</Table.Th>
+              <Table.Th>amount</Table.Th>
+            </Table.Tr>
+          </Table.Thead>
+          <Table.Tbody className={classes.tableBody}>
             {statement.operations.map((e, index) => (
               // eslint-disable-next-line
-              <tr key={index}>
-                <td>{index + 1}</td>
-                <td>{e.date.toLocaleDateString()}</td>
-                <td>{e.type}</td>
-                <td className={classes.wrap}>{e.id}</td>
-                <td className={cx(classes.rightAlignedText, classes.noWrap)}>
+              <Table.Tr key={index}>
+                <Table.Td>{index + 1}</Table.Td>
+                <Table.Td>{e.date.toLocaleDateString()}</Table.Td>
+                <Table.Td>{e.type}</Table.Td>
+                <Table.Td className={classes.wrap}>{e.id}</Table.Td>
+                <Table.Td className={cx(classes.rightAlignedText, classes.noWrap)}>
                   {' '}
                   {`${e.type === 'campaign' ? '-' : '+'}   ${formatTokenAmount(
                     e.amount,
                     statement.token
                   )}`}
-                </td>
-              </tr>
+                </Table.Td>
+              </Table.Tr>
             ))}
-          </tbody>
+          </Table.Tbody>
         </Table>
         <Grid.Col span={12}>
           <Space h="xl" />
