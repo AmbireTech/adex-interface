@@ -19,11 +19,15 @@ interface IAdminContext {
   accounts: Map<string, Account>
   updateAccounts: () => void
   initialDataLoading: boolean
-  makeDeposit: (values: Deposit, onSuccess?: () => void, onError?: () => void) => Promise<void>
+  makeDeposit: (
+    values: Deposit,
+    onSuccess?: () => void,
+    onError?: (err: string) => void
+  ) => Promise<void>
   updateAccountInfo: (
     account: Account,
     onSuccess?: () => void,
-    onError?: () => void
+    onError?: (err: string) => void
   ) => Promise<void>
 }
 
@@ -72,7 +76,7 @@ const AdminProvider: FC<PropsWithChildren> = ({ children }) => {
   }, [adexServicesRequest])
 
   const makeDeposit = useCallback(
-    async (values: Deposit) => {
+    async (values: Deposit, onSuccess?: () => void, onErr?: (err: string) => void) => {
       const submit = async () => {
         console.log({ values })
         const { accountId, ...body } = values
@@ -90,10 +94,11 @@ const AdminProvider: FC<PropsWithChildren> = ({ children }) => {
           })
 
           console.log({ res })
+          onSuccess && onSuccess()
         } catch (err) {
           console.log({ err })
+          onErr && onErr(err?.toString() || '')
         }
-        setLoading(false)
       }
 
       await submit()
@@ -102,7 +107,7 @@ const AdminProvider: FC<PropsWithChildren> = ({ children }) => {
   )
 
   const updateAccountInfo = useCallback(
-    async (account: Account) => {
+    async (account: Account, onSuccess?: () => void, onErr?: (err: string) => void) => {
       const submit = async () => {
         console.log({ account })
         const { id, name, info, billingDetails } = account
@@ -128,10 +133,11 @@ const AdminProvider: FC<PropsWithChildren> = ({ children }) => {
           })
 
           console.log({ res })
+          onSuccess && onSuccess()
         } catch (err) {
           console.log({ err })
+          onErr && onErr(err?.toString() || '')
         }
-        setLoading(false)
       }
 
       await submit()

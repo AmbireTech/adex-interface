@@ -4,6 +4,7 @@ import { Button, Group, TextInput, Box, NumberInput } from '@mantine/core'
 import useAdmin from 'hooks/useAdmin'
 import throttle from 'lodash.throttle'
 import { Account } from 'types'
+import useCustomNotifications from 'hooks/useCustomNotifications'
 
 type Deposit = {
   accountId: string
@@ -18,6 +19,7 @@ type Deposit = {
 }
 
 function AdminDeposit({ accountData }: { accountData: Account }) {
+  const { showNotification } = useCustomNotifications()
   const { makeDeposit } = useAdmin()
   const [loading, setLoading] = useState(false)
 
@@ -50,15 +52,22 @@ function AdminDeposit({ accountData }: { accountData: Account }) {
   const handleSubmit = useCallback(
     async (values: Deposit) => {
       setLoading(true)
-      await makeDeposit(values, () => {
-        form.reset()
-        form.resetTouched()
-        form.resetDirty()
-      })
+      await makeDeposit(
+        values,
+        () => {
+          form.resetTouched()
+          form.resetDirty()
+          form.reset()
+          showNotification('info', `Deposit to ${form.values.accountId} success!`)
+        },
+        (err) => {
+          showNotification('error', err, `Error depositing to ${form.values.accountId}`)
+        }
+      )
 
       setLoading(false)
     },
-    [form, makeDeposit]
+    [form, makeDeposit, showNotification]
   )
 
   const throttledSbm = useMemo(() => {
@@ -121,8 +130,8 @@ function AdminDeposit({ accountData }: { accountData: Account }) {
       </Group>
 
       <Group position="left" mt="md">
-        <Button type="submit" disabled={loading}>
-          Submit
+        <Button type="submit" loading={loading} disabled={loading || !form.isDirty()}>
+          Make deposit
         </Button>
       </Group>
     </Box>
