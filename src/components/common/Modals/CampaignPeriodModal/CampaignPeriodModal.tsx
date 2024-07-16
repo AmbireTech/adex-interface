@@ -1,4 +1,14 @@
-import { Group, Modal, Text, rem, Grid, Flex, Button, UnstyledButton, Stack } from '@mantine/core'
+import {
+  Group,
+  Modal,
+  Text,
+  Grid,
+  Flex,
+  Button,
+  UnstyledButton,
+  Stack,
+  MantineTheme
+} from '@mantine/core'
 import { createStyles } from '@mantine/emotion'
 import { DatePicker } from '@mantine/dates'
 import { formatDateShort } from 'helpers/formatters'
@@ -14,7 +24,7 @@ import CampaignTimePicker from './CampaignTimePicker'
 
 type DateOrTime = 'date' | 'time'
 
-const useStyles = createStyles((theme) => ({
+const useStyles = createStyles((theme: MantineTheme) => ({
   wrapper: {
     cursor: 'pointer',
     border: '1px solid',
@@ -110,16 +120,17 @@ const CampaignPeriodModal = ({ opened, close }: { opened: boolean; close: () => 
   }, [updateCampaign, mergedEndDateTime, mergedStartDateTime, close])
 
   return (
-    <Modal centered size={736} padding={0} opened={opened} withCloseButton={false} onClose={close}>
+    <Modal centered size={736} opened={opened} withCloseButton={false} onClose={close}>
       <Grid grow m={0}>
         <Grid.Col p={0}>
           <Grid>
             <Grid.Col
+              p={0}
               span={6}
               className={cx(classes.wrapper, { [classes.selected]: isDateTabSelected })}
               onClick={() => handleSelectDateOrTimeTabClicked('date')}
             >
-              <Group justify="apart" align="center" pl="xs" pt="xs">
+              <Flex justify="space-between" align="center" p="xs">
                 <Group>
                   <CalendarIcon />
                   <div>
@@ -131,15 +142,16 @@ const CampaignPeriodModal = ({ opened, close }: { opened: boolean; close: () => 
                     </Text>
                   </div>
                 </Group>
-                <DownArrowIcon size={rem(10)} style={{ transform: 'rotate(-90deg)' }} />
-              </Group>
+                <DownArrowIcon size="10px" style={{ transform: 'rotate(-90deg)' }} />
+              </Flex>
             </Grid.Col>
             <Grid.Col
+              p={0}
               span={6}
               className={cx(classes.wrapper, { [classes.selected]: !isDateTabSelected })}
               onClick={() => handleSelectDateOrTimeTabClicked('time')}
             >
-              <Group justify="apart" align="center" pr="xs" pt="xs">
+              <Flex justify="space-between" align="center" p="xs">
                 <Group>
                   <TimeIcon />
                   <div>
@@ -151,8 +163,8 @@ const CampaignPeriodModal = ({ opened, close }: { opened: boolean; close: () => 
                     </Text>
                   </div>
                 </Group>
-                <DownArrowIcon size={rem(10)} style={{ transform: 'rotate(-90deg)' }} />
-              </Group>
+                <DownArrowIcon size="10px" style={{ transform: 'rotate(-90deg)' }} />
+              </Flex>
             </Grid.Col>
           </Grid>
         </Grid.Col>
@@ -174,7 +186,7 @@ const CampaignPeriodModal = ({ opened, close }: { opened: boolean; close: () => 
             <Grid grow>
               <Grid.Col span={6}>
                 <Stack align="center">
-                  <Text color="secondaryText" size="md" p="xs">
+                  <Text c="secondaryText" size="md" p="xs">
                     Start time
                   </Text>
                   <CampaignTimePicker
@@ -185,7 +197,7 @@ const CampaignPeriodModal = ({ opened, close }: { opened: boolean; close: () => 
               </Grid.Col>
               <Grid.Col span={6}>
                 <Stack align="center">
-                  <Text color="secondaryText" size="md" p="xs">
+                  <Text c="secondaryText" size="md" p="xs">
                     End time
                   </Text>
                   <CampaignTimePicker

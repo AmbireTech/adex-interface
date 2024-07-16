@@ -18,7 +18,7 @@ const useStyles = createStyles((theme: MantineTheme, { hasError }: { hasError: b
     mediaWrapper: {
       borderRight: '1px solid',
       padding: theme.spacing.xs,
-      borderColor: hasError ? theme.colors.warning[3] : theme.colors.brand[3]
+      borderColor: hasError ? theme.colors.warning[3] : theme.colors.decorativeBorders[3]
     },
     wrapper: {
       backgroundColor: theme.colors.lightBackground[3],

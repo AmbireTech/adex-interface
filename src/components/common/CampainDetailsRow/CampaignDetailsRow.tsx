@@ -1,24 +1,26 @@
-import { Flex, Text } from '@mantine/core'
+import { Flex, MantineTheme, Text } from '@mantine/core'
 import { createStyles } from '@mantine/emotion'
 import { CampaignDetailsRowProps } from 'types'
 
-const useStyles = createStyles((theme, { lighterColor }: { lighterColor: boolean }) => ({
-  border: {
-    borderBottom: `1px dashed ${theme.colors.decorativeBorders[3]}`
-  },
-  textColor: {
-    color: !lighterColor
-      ? theme.colors.secondaryText[3]
-      : theme.colors.secondaryText[3] + theme.other.shades.hexColorSuffix.lighter
-  },
-  fullWidth: {
-    width: '100%'
-  },
-  marginBottom: {
-    marginBottom: theme.spacing.sm
-  },
-  text: { whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }
-}))
+const useStyles = createStyles(
+  (theme: MantineTheme, { lighterColor }: { lighterColor: boolean }) => ({
+    border: {
+      borderBottom: `1px dashed ${theme.colors.decorativeBorders[3]}`
+    },
+    textColor: {
+      color: !lighterColor
+        ? theme.colors.secondaryText[3]
+        : theme.colors.secondaryText[3] + theme.other.shades.hexColorSuffix.lighter
+    },
+    fullWidth: {
+      width: '100%'
+    },
+    marginBottom: {
+      marginBottom: theme.spacing.sm
+    },
+    text: { whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }
+  })
+)
 
 const CampaignDetailsRow = ({
   title,
@@ -51,7 +53,7 @@ const CampaignDetailsRow = ({
       >
         {title}
       </Text>
-      <Text className={cx({ [classes.fullWidth]: column, [classes.text]: !!nowrap })}>{value}</Text>
+      <div className={cx({ [classes.fullWidth]: column, [classes.text]: !!nowrap })}>{value}</div>
     </Flex>
   )
 }

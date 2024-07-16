@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState, useMemo } from 'react'
 import { Box, Container, Flex, Loader, Tabs } from '@mantine/core'
+import { createStyles } from '@mantine/emotion'
 import { useParams } from 'react-router-dom'
 import { AnalyticsType, BaseAnalyticsData, AnalyticsPeriod } from 'types'
 import GoBack from 'components/common/GoBack/GoBack'
@@ -16,7 +17,12 @@ import { TimeFrame } from './TimeFrame'
 import { generateCVSData } from './CvsDownloadConfigurations'
 import SeeOnMapBtn from './SeeOnMapBtn'
 
+const useStyles = createStyles(() => ({
+  tabsList: { border: 'none' }
+}))
+
 const CampaignAnalytics = () => {
+  const { classes } = useStyles()
   const { id } = useParams()
 
   const [activeTab, setActiveTab] = useState<AnalyticsType>('timeframe')
@@ -130,9 +136,10 @@ const CampaignAnalytics = () => {
         color="brand"
         value={activeTab}
         onChange={handleTabChange}
-        // styles={() => ({
-        //   tabsList: { border: 'none', padding: '20px 0' }
-        // })}
+        py="sm"
+        classNames={{
+          list: classes.tabsList
+        }}
         keepMounted={false}
       >
         <Flex justify="space-between" align="baseline">

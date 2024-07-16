@@ -1,4 +1,4 @@
-import { ActionIcon, Flex, Text } from '@mantine/core'
+import { ActionIcon, Flex, MantineTheme, Text } from '@mantine/core'
 import { createStyles } from '@mantine/emotion'
 import { useDisclosure } from '@mantine/hooks'
 import { CampaignPeriodModal } from 'components/common/Modals'
@@ -7,7 +7,7 @@ import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import { useMemo } from 'react'
 import CalendarIcon from 'resources/icons/Calendar'
 
-const useStyles = createStyles((theme) => ({
+const useStyles = createStyles((theme: MantineTheme) => ({
   wrapper: {
     backgroundColor: theme.colors.lightBackground[3],
     border: '1px solid',
@@ -55,7 +55,8 @@ const CampaignPeriod = () => {
         </Text>
         <Text size="md">{endDateTime}</Text>
       </Flex>
-      <ActionIcon size={24} onClick={() => open()}>
+      {/* TODO: Fix the ActionIcon */}
+      <ActionIcon color="none" size={24} onClick={() => open()}>
         <CalendarIcon color="mainText" />
       </ActionIcon>
       <CampaignPeriodModal opened={opened} close={close} />

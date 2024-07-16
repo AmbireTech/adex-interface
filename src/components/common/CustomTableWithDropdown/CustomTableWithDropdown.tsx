@@ -36,7 +36,7 @@ const CustomTableWithDropdown = ({ background, headings, elements }: ICustomTabl
   }, [elements, startIndex, endIndex])
 
   const head = useMemo(
-    () => headings.map((heading) => <th key={heading}>{heading}</th>),
+    () => headings.map((heading) => <Table.Th key={heading}>{heading}</Table.Th>),
     [headings]
   )
 
@@ -58,10 +58,10 @@ const CustomTableWithDropdown = ({ background, headings, elements }: ICustomTabl
       list.map((e) => {
         return (
           <React.Fragment key={e.id}>
-            <tr>
+            <Table.Tr>
               {columns.map((column: string, index) => {
                 return (
-                  <td key={column}>
+                  <Table.Td key={column}>
                     <Flex align="center">
                       {index === 0 && (
                         <ActionIcon
@@ -79,16 +79,16 @@ const CustomTableWithDropdown = ({ background, headings, elements }: ICustomTabl
                         ? `${e[column].from} - ${e[column].to}`
                         : e[column]}
                     </Flex>
-                  </td>
+                  </Table.Td>
                 )
               })}
-            </tr>
+            </Table.Tr>
             {expandedRows.includes(e.id.toString()) && (
-              <tr>
-                <td colSpan={headings.length} height={600}>
+              <Table.Tr>
+                <Table.Td colSpan={headings.length} height={600}>
                   {/* content here */}
-                </td>
-              </tr>
+                </Table.Td>
+              </Table.Tr>
             )}
           </React.Fragment>
         )
@@ -103,10 +103,10 @@ const CustomTableWithDropdown = ({ background, headings, elements }: ICustomTabl
         verticalSpacing={15}
         className={cx(classes.border, { [classes.background]: background })}
       >
-        <thead className={classes.header}>
-          <tr>{head}</tr>
-        </thead>
-        <tbody>{rows}</tbody>
+        <Table.Thead className={classes.header}>
+          <Table.Tr>{head}</Table.Tr>
+        </Table.Thead>
+        <Table.Tbody>{rows}</Table.Tbody>
       </Table>
       <Group w="100%" justify="right" mt="xl">
         <Pagination

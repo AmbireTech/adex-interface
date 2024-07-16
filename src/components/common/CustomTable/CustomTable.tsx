@@ -1,4 +1,4 @@
-import { Flex, Group, Pagination, Table, Grid, Divider, Text } from '@mantine/core'
+import { Flex, Group, Pagination, Table, Grid, Divider, Text, MantineTheme } from '@mantine/core'
 import { createStyles } from '@mantine/emotion'
 import { useMediaQuery } from '@mantine/hooks'
 import VisibilityIcon from 'resources/icons/Visibility'
@@ -12,7 +12,7 @@ import { CampaignStatus } from 'adex-common'
 import EditIcon from 'resources/icons/Edit'
 import ActionButton from './ActionButton/ActionButton'
 
-const useStyles = createStyles((theme) => ({
+const useStyles = createStyles((theme: MantineTheme) => ({
   header: {
     backgroundColor: theme.colors.alternativeBackground[3]
   },
