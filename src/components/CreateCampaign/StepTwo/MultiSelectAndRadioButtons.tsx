@@ -13,13 +13,22 @@ const MultiSelectAndRadioButtons = ({
   groups
 }: MultiSelectAndRadioButtonsProps) => {
   const extendedData = useMemo(() => {
-    const regions = Object.keys(groups).map((region) => ({
-      label: capitalize(region),
-      value: region,
-      group: 'Groups'
-    }))
-    return [...regions, ...multiSelectData]
-  }, [multiSelectData, groups])
+    const groupsArr = [
+      {
+        group: 'Groups',
+        items: Object.keys(groups).map((region) => ({
+          label: capitalize(region),
+          value: region
+        }))
+      },
+      {
+        group: label,
+        items: [...multiSelectData]
+      }
+    ]
+
+    return [...groupsArr]
+  }, [multiSelectData, groups, label])
 
   const data = useMemo(() => [...extendedData], [extendedData])
   const [selectedRadio, setSelectedRadio] = useState<TargetingInputApplyProp>(defaultRadioValue)
@@ -94,7 +103,7 @@ const MultiSelectAndRadioButtons = ({
             backgroundColor: theme.colors.mainBackground[3],
             boxShadow: theme.shadows.md
           },
-          value: {
+          pill: {
             border: '1px solid',
             borderColor: selectedRadio === 'nin' ? theme.colors.warning[3] : theme.colors.brand[3],
             color: selectedRadio === 'nin' ? theme.colors.warning[3] : theme.colors.brand[3]

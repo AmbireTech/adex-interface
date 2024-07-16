@@ -14,9 +14,8 @@ function StyledStepper(props: StepperProps) {
         },
         stepIcon: {
           borderWidth: rem(1),
-          height: rem(20),
-          minWidth: rem(20),
-          width: rem(20),
+          height: rem(10),
+          width: rem(10),
           svg: {
             width: rem(10)
           }
