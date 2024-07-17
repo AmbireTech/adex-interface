@@ -1,6 +1,7 @@
 import { createContext, FC, PropsWithChildren, useMemo, useState, useCallback } from 'react'
 import { Account } from 'types'
 import { useAdExApi } from 'hooks/useAdexServices'
+import { removeOptionalEmptyStringProps } from 'helpers'
 
 type Deposit = {
   accountId: string
@@ -18,11 +19,15 @@ interface IAdminContext {
   accounts: Map<string, Account>
   updateAccounts: () => void
   initialDataLoading: boolean
-  makeDeposit: (values: Deposit, onSuccess?: () => void, onError?: () => void) => Promise<void>
+  makeDeposit: (
+    values: Deposit,
+    onSuccess?: () => void,
+    onError?: (err: string) => void
+  ) => Promise<void>
   updateAccountInfo: (
     account: Account,
     onSuccess?: () => void,
-    onError?: () => void
+    onError?: (err: string) => void
   ) => Promise<void>
 }
 
@@ -42,8 +47,6 @@ const AdminProvider: FC<PropsWithChildren> = ({ children }) => {
           'content-type': 'application/json'
         }
       })
-
-      console.log({ res })
 
       if (Array.isArray(res)) {
         setAccounts((prev) => {
@@ -71,15 +74,12 @@ const AdminProvider: FC<PropsWithChildren> = ({ children }) => {
   }, [adexServicesRequest])
 
   const makeDeposit = useCallback(
-    async (values: Deposit) => {
+    async (values: Deposit, onSuccess?: () => void, onErr?: (err: string) => void) => {
       const submit = async () => {
-        console.log({ values })
-        const { accountId, ...body } = values
-        body.amount *= 10 ** body.token.decimals
-        console.log({ body })
-
         try {
-          const res = await adexServicesRequest('backend', {
+          const { accountId, ...body } = values
+
+          await adexServicesRequest('backend', {
             route: `/dsp/admin/accounts/${accountId}/deposit`,
             method: 'POST',
             body,
@@ -88,11 +88,11 @@ const AdminProvider: FC<PropsWithChildren> = ({ children }) => {
             }
           })
 
-          console.log({ res })
+          onSuccess && onSuccess()
         } catch (err) {
           console.log({ err })
+          onErr && onErr(err?.toString() || '')
         }
-        setLoading(false)
       }
 
       await submit()
@@ -101,21 +101,22 @@ const AdminProvider: FC<PropsWithChildren> = ({ children }) => {
   )
 
   const updateAccountInfo = useCallback(
-    async (account: Account) => {
+    async (account: Account, onSuccess?: () => void, onErr?: (err: string) => void) => {
       const submit = async () => {
-        console.log({ account })
-        const { id, name, info, billingDetails } = account
-
-        const body = {
-          ...{ name },
-          ...{ info },
-          ...(billingDetails.verified !== undefined && { billingDetails: billingDetails.verified })
-        }
-
-        console.log({ body })
-
         try {
-          const res = await adexServicesRequest('backend', {
+          const { id, name, info, billingDetails } = account
+
+          const body = {
+            ...{ name },
+            ...{ info: removeOptionalEmptyStringProps(info) },
+            ...(billingDetails?.verified !== undefined && {
+              billingDetails: { verified: billingDetails.verified }
+            })
+          }
+
+          console.log({ body })
+
+          await adexServicesRequest('backend', {
             route: `/dsp/admin/accounts/${id}/info`,
             method: 'PUT',
             body,
@@ -124,11 +125,11 @@ const AdminProvider: FC<PropsWithChildren> = ({ children }) => {
             }
           })
 
-          console.log({ res })
+          onSuccess && onSuccess()
         } catch (err) {
           console.log({ err })
+          onErr && onErr(err?.toString() || '')
         }
-        setLoading(false)
       }
 
       await submit()

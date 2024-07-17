@@ -1,9 +1,11 @@
 import { isInRange, hasLength, matches, useForm } from '@mantine/form'
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useMemo, useState, FormEvent } from 'react'
 import { Button, Group, TextInput, Box, NumberInput } from '@mantine/core'
+import { CustomConfirmModal } from 'components/common/Modals'
 import useAdmin from 'hooks/useAdmin'
 import throttle from 'lodash.throttle'
 import { Account } from 'types'
+import useCustomNotifications from 'hooks/useCustomNotifications'
 
 type Deposit = {
   accountId: string
@@ -18,8 +20,10 @@ type Deposit = {
 }
 
 function AdminDeposit({ accountData }: { accountData: Account }) {
-  const { makeDeposit } = useAdmin()
+  const { showNotification } = useCustomNotifications()
+  const { makeDeposit, updateAccounts } = useAdmin()
   const [loading, setLoading] = useState(false)
+  const [opened, setOpened] = useState(false)
 
   const form = useForm<Deposit>({
     initialValues: {
@@ -49,24 +53,43 @@ function AdminDeposit({ accountData }: { accountData: Account }) {
 
   const handleSubmit = useCallback(
     async (values: Deposit) => {
+      console.log({ values })
       setLoading(true)
-      await makeDeposit(values, () => {
-        form.reset()
-        form.resetTouched()
-        form.resetDirty()
-      })
+      await makeDeposit(
+        values,
+        () => {
+          form.resetTouched()
+          form.resetDirty()
+          form.reset()
+          updateAccounts()
+          showNotification('info', `Deposit to ${form.values.accountId} success!`)
+          setOpened(false)
+        },
+        (err) => {
+          showNotification('error', err, `Error depositing to ${form.values.accountId}`)
+        }
+      )
 
       setLoading(false)
     },
-    [form, makeDeposit]
+    [form, makeDeposit, showNotification, updateAccounts]
   )
 
-  const throttledSbm = useMemo(() => {
-    return throttle(handleSubmit, 3000, { leading: true })
-  }, [handleSubmit])
+  const throttledSbm = useMemo(
+    () => throttle(handleSubmit, 3000, { leading: true }),
+    [handleSubmit]
+  )
+
+  const onSubmit = useCallback(
+    (e: FormEvent) => {
+      e.preventDefault()
+      !form.validate().hasErrors && setOpened(true)
+    },
+    [form]
+  )
 
   return (
-    <Box component="form" onSubmit={form.onSubmit(throttledSbm)}>
+    <Box component="form">
       <TextInput
         label="Account address"
         placeholder="0x000"
@@ -121,10 +144,28 @@ function AdminDeposit({ accountData }: { accountData: Account }) {
       </Group>
 
       <Group position="left" mt="md">
-        <Button type="submit" disabled={loading}>
-          Submit
+        <Button
+          type="submit"
+          loading={loading}
+          disabled={loading || !form.isDirty()}
+          onClick={onSubmit}
+        >
+          Make deposit
         </Button>
       </Group>
+      <CustomConfirmModal
+        cancelBtnLabel="No"
+        confirmBtnLabel="Yes Sir"
+        onCancelClicked={() => setOpened(false)}
+        onConfirmClicked={() => {
+          console.log('yes sir')
+          console.log({ form })
+          form.onSubmit(throttledSbm)()
+        }}
+        color="attention"
+        text={`Are you sure you want to deposit ${form.values.amount}  ${form.values.token.name} to ${form.values.accountId}?`}
+        opened={opened}
+      />
     </Box>
   )
 }

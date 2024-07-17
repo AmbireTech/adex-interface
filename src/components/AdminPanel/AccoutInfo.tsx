@@ -1,31 +1,55 @@
 import { useMemo, useCallback, useState } from 'react'
-import { useForm } from '@mantine/form'
-import { Button, Group, TextInput, Box, NumberInput, Text, Switch, Textarea } from '@mantine/core'
+import { hasLength, matches, useForm, isEmail } from '@mantine/form'
+
+import { Button, Group, TextInput, Box, NumberInput, Text, Textarea, Switch } from '@mantine/core'
 import throttle from 'lodash.throttle'
 
 import { Account } from 'types'
 import useAdmin from 'hooks/useAdmin/useAdmin'
+import useCustomNotifications from 'hooks/useCustomNotifications'
 
 function AccountInfo({ accountData }: { accountData: Account }) {
+  const { showNotification } = useCustomNotifications()
   const { updateAccountInfo } = useAdmin()
   const [loading, setLoading] = useState(false)
   const form = useForm<Account>({
-    initialValues: accountData
-    // validate: {}
+    initialValues: accountData,
+    validate: {
+      name: (val) => (val ? hasLength({ min: 1 })(val) : null),
+      info: {
+        contactPerson: (val) => (val ? hasLength({ min: 1 })(val) : null),
+        phone: (val) =>
+          val
+            ? matches(
+                /^([+]?[\s0-9]+)?(\d{3}|[(]?[0-9]+[)])?([-]?[\s]?[0-9])+$/,
+                'Invalid phone number'
+              )(val)
+            : null,
+        email: (val) => (val ? isEmail('invalid Email')(val) : null)
+      }
+    },
+    validateInputOnBlur: true
   })
 
   const handleSubmit = useCallback(
     async (values: Account) => {
       setLoading(true)
-      await updateAccountInfo(values, () => {
-        form.reset()
-        form.resetTouched()
-        form.resetDirty()
-      })
+      await updateAccountInfo(
+        values,
+        () => {
+          //   form.reset()
+          form.resetTouched()
+          form.resetDirty()
+          showNotification('info', 'Account data updated!')
+        },
+        (err) => {
+          showNotification('error', err, 'Error on account Account data updated!')
+        }
+      )
 
       setLoading(false)
     },
-    [form, updateAccountInfo]
+    [form, showNotification, updateAccountInfo]
   )
 
   const throttledSbm = useMemo(() => {
@@ -91,7 +115,10 @@ function AccountInfo({ accountData }: { accountData: Account }) {
           disabled
           {...form.getInputProps('billingDetails.companyZipCode')}
         />
-        <Switch label="Verified by admin" {...form.getInputProps('billingDetails.verified')} />
+        <Switch
+          label="Verified by admin"
+          {...form.getInputProps('billingDetails.verified', { type: 'checkbox' })}
+        />
       </Group>
 
       <Text size="sm" weight={500} mt="md">
@@ -106,8 +133,8 @@ function AccountInfo({ accountData }: { accountData: Account }) {
       </Group>
 
       <Group position="left" mt="md">
-        <Button type="submit" disabled={loading}>
-          Submit
+        <Button type="submit" loading={loading} disabled={loading || !form.isDirty()}>
+          Update account data
         </Button>
       </Group>
     </Box>

@@ -1,7 +1,8 @@
 import { useMemo } from 'react'
 import {
   SimpleGrid,
-  Box
+  Box,
+  Title
   // Accordion
 } from '@mantine/core'
 import useAdmin from 'hooks/useAdmin'
@@ -24,15 +25,30 @@ function AccountDetails() {
       <SimpleGrid
         cols={2}
         breakpoints={[
-          { maxWidth: 'xl', cols: 2, spacing: 'md' },
-          { maxWidth: 'md', cols: 1, spacing: 'md' }
+          { maxWidth: 'xl', cols: 2, spacing: 'xl' },
+          { maxWidth: 'md', cols: 1, spacing: 'xl' }
         ]}
       >
-        <AccountInfo accountData={accountData} />
-        <AdminDeposit accountData={accountData} />
+        <Box>
+          <Title order={5} color="brand">
+            Account info form
+          </Title>
+          <AccountInfo accountData={accountData} />
+        </Box>
+        <Box>
+          <Title order={5} color="brand">
+            Deposit form
+          </Title>
+          <AdminDeposit accountData={accountData} />
+        </Box>
       </SimpleGrid>
-      <SimpleGrid spacing="md" mt="md">
-        <FundsActivity accountData={accountData} />
+      <SimpleGrid spacing="xl" mt="xl">
+        <Box>
+          <Title order={5} color="brand">
+            Account activity
+          </Title>
+          <FundsActivity accountData={accountData} />
+        </Box>
       </SimpleGrid>
     </Box>
   )
