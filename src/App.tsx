@@ -46,7 +46,7 @@ function App() {
         <MantineProvider withGlobalStyles withNormalizeCSS theme={lightTheme}>
           <ModalsProvider>
             <GlobalStyles />
-            <Notifications />
+            <Notifications position="top-right" />
             {ENV && <EnvBanner />}
             <RouterProvider router={router} />
           </ModalsProvider>
