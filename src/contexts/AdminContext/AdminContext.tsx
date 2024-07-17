@@ -48,8 +48,6 @@ const AdminProvider: FC<PropsWithChildren> = ({ children }) => {
         }
       })
 
-      console.log({ res })
-
       if (Array.isArray(res)) {
         setAccounts((prev) => {
           const next = new Map(prev)
@@ -78,12 +76,10 @@ const AdminProvider: FC<PropsWithChildren> = ({ children }) => {
   const makeDeposit = useCallback(
     async (values: Deposit, onSuccess?: () => void, onErr?: (err: string) => void) => {
       const submit = async () => {
-        console.log({ values })
-        const { accountId, ...body } = values
-        console.log({ body })
-
         try {
-          const res = await adexServicesRequest('backend', {
+          const { accountId, ...body } = values
+
+          await adexServicesRequest('backend', {
             route: `/dsp/admin/accounts/${accountId}/deposit`,
             method: 'POST',
             body,
@@ -92,7 +88,6 @@ const AdminProvider: FC<PropsWithChildren> = ({ children }) => {
             }
           })
 
-          console.log({ res })
           onSuccess && onSuccess()
         } catch (err) {
           console.log({ err })
@@ -108,21 +103,20 @@ const AdminProvider: FC<PropsWithChildren> = ({ children }) => {
   const updateAccountInfo = useCallback(
     async (account: Account, onSuccess?: () => void, onErr?: (err: string) => void) => {
       const submit = async () => {
-        console.log({ account })
-        const { id, name, info, billingDetails } = account
-
-        const body = {
-          ...{ name },
-          ...{ info: removeOptionalEmptyStringProps(info) },
-          ...(billingDetails.verified !== undefined && {
-            billingDetails: { verified: billingDetails.verified }
-          })
-        }
-
-        console.log({ body })
-
         try {
-          const res = await adexServicesRequest('backend', {
+          const { id, name, info, billingDetails } = account
+
+          const body = {
+            ...{ name },
+            ...{ info: removeOptionalEmptyStringProps(info) },
+            ...(billingDetails?.verified !== undefined && {
+              billingDetails: { verified: billingDetails.verified }
+            })
+          }
+
+          console.log({ body })
+
+          await adexServicesRequest('backend', {
             route: `/dsp/admin/accounts/${id}/info`,
             method: 'PUT',
             body,
@@ -131,7 +125,6 @@ const AdminProvider: FC<PropsWithChildren> = ({ children }) => {
             }
           })
 
-          console.log({ res })
           onSuccess && onSuccess()
         } catch (err) {
           console.log({ err })

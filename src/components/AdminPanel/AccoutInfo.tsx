@@ -15,16 +15,20 @@ function AccountInfo({ accountData }: { accountData: Account }) {
   const form = useForm<Account>({
     initialValues: accountData,
     validate: {
-      name: hasLength({ min: 0 }),
+      name: (val) => (val ? hasLength({ min: 1 })(val) : null),
       info: {
-        contactPerson: hasLength({ min: 0 }),
-        phone: matches(
-          /^([+]?[\s0-9]+)?(\d{3}|[(]?[0-9]+[)])?([-]?[\s]?[0-9])+$/,
-          'Invalid phone number'
-        ),
-        email: isEmail('invalid Email')
+        contactPerson: (val) => (val ? hasLength({ min: 1 })(val) : null),
+        phone: (val) =>
+          val
+            ? matches(
+                /^([+]?[\s0-9]+)?(\d{3}|[(]?[0-9]+[)])?([-]?[\s]?[0-9])+$/,
+                'Invalid phone number'
+              )(val)
+            : null,
+        email: (val) => (val ? isEmail('invalid Email')(val) : null)
       }
-    }
+    },
+    validateInputOnBlur: true
   })
 
   const handleSubmit = useCallback(
@@ -39,7 +43,7 @@ function AccountInfo({ accountData }: { accountData: Account }) {
           showNotification('info', 'Account data updated!')
         },
         (err) => {
-          showNotification('error', err, 'Errot on account Account data updated!')
+          showNotification('error', err, 'Error on account Account data updated!')
         }
       )
 
