@@ -1,25 +1,30 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { Grid, Title, Flex, Text, lighten } from '@mantine/core'
+import { Grid, Title, Flex, Text, lighten, MantineTheme, getPrimaryShade } from '@mantine/core'
 import { createStyles } from '@mantine/emotion'
 import TimeFrameChart from 'components/common/Chart/TimeFrameChart'
 import { BaseAnalyticsData, AnalyticsPeriod, FilteredAnalytics, MetricsToShow } from 'types'
 import { formatCurrency } from 'helpers'
-import { useViewportSize } from '@mantine/hooks'
+import { useViewportSize, useColorScheme } from '@mantine/hooks'
 import ChartControlBtn from './ChartControlBtn'
 
-const useStyles = createStyles((theme) => ({
-  wrapper: {
-    background: theme.colors.mainBackground[3],
-    borderRadius: theme.radius.md,
-    padding: theme.spacing.lg,
-    marginBottom: theme.spacing.md,
-    boxShadow: theme.shadows.sm
-  },
-  lighterGray: {
-    color: lighten(theme.colors.mainText[3], theme.other.shades.lighten.lighter),
-    fontSize: theme.fontSizes.sm
+const useStyles = createStyles((theme: MantineTheme) => {
+  const colorScheme = useColorScheme()
+  const primaryShade = getPrimaryShade(theme, colorScheme)
+
+  return {
+    wrapper: {
+      background: theme.colors.mainBackground[primaryShade],
+      borderRadius: theme.radius.md,
+      padding: theme.spacing.lg,
+      marginBottom: theme.spacing.md,
+      boxShadow: theme.shadows.sm
+    },
+    lighterGray: {
+      color: lighten(theme.colors.mainText[primaryShade], theme.other.shades.lighten.lighter),
+      fontSize: theme.fontSizes.sm
+    }
   }
-}))
+})
 
 function sumArrayProperties(analytics: BaseAnalyticsData[]) {
   const sums = analytics.reduce(

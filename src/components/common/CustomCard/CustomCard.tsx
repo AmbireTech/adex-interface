@@ -1,68 +1,87 @@
-import { Box, Flex, rem, Title, Group, lighten } from '@mantine/core'
+import { Box, Flex, rem, Title, Group, lighten, MantineTheme, getPrimaryShade } from '@mantine/core'
 import { createStyles } from '@mantine/emotion'
+import { useColorScheme } from '@mantine/hooks'
 import CheckMarkIcon from 'resources/icons/CheckMark'
 import CheckMarkFilledIcon from 'resources/icons/CheckMarkFilled'
 import { ICustomCardProps, ICustomCardStyleProps } from 'types'
 
 const useStyles = createStyles(
-  (theme, { color, width, height, border, shadow }: ICustomCardStyleProps) => ({
-    wrapper: {
-      transitionTimingFunction: theme.other.transitionTimingFunction,
-      transition: 'all 0.3s',
-      textAlign: 'center',
-      borderRadius: theme.radius.md,
-      height: typeof height === 'string' ? height : rem(height),
-      width: typeof width === 'string' ? width : rem(width),
-      border: border ? `1px solid ${theme.colors.decorativeBorders[3]}` : 'transparent',
-      boxShadow: !border ? theme.shadows.xs : undefined,
-      cursor: shadow || border ? 'pointer' : undefined,
-      backgroundColor: border ? theme.colors.lightBackground[3] : theme.colors.mainBackground[3],
-      textDecoration: 'none',
-      '&:hover': {
-        backgroundColor: border ? theme.colors.mainBackground[3] : 'none',
-        boxShadow: theme.shadows.md,
-        border: `1px solid ${lighten(theme.colors[color][3], theme.other.shades.lighten.lighter)}`,
+  (theme: MantineTheme, { color, width, height, border, shadow }: ICustomCardStyleProps) => {
+    const colorScheme = useColorScheme()
+    const primaryShade = getPrimaryShade(theme, colorScheme)
+
+    return {
+      wrapper: {
+        transitionTimingFunction: theme.other.transitionTimingFunction,
+        transition: 'all 0.3s',
+        textAlign: 'center',
+        borderRadius: theme.radius.md,
+        height: typeof height === 'string' ? height : rem(height),
+        width: typeof width === 'string' ? width : rem(width),
+        border: border
+          ? `1px solid ${theme.colors.decorativeBorders[primaryShade]}`
+          : 'transparent',
+        boxShadow: !border ? theme.shadows.xs : undefined,
+        cursor: shadow || border ? 'pointer' : undefined,
+        backgroundColor: border
+          ? theme.colors.lightBackground[primaryShade]
+          : theme.colors.mainBackground[primaryShade],
+        textDecoration: 'none',
+        '&:hover': {
+          backgroundColor: border ? theme.colors.mainBackground[primaryShade] : 'none',
+          boxShadow: theme.shadows.md,
+          border: `1px solid ${lighten(
+            theme.colors[color][primaryShade],
+            theme.other.shades.lighten.lighter
+          )}`,
+          svg: {
+            color: border ? theme.colors[color][primaryShade] : undefined,
+            transform: !shadow && !border ? 'scale(1.5)' : 'scale(1)'
+          },
+          '#text': {
+            color: border ? theme.colors.brand[primaryShade] : undefined
+          }
+        }
+      },
+      iconWrapper: {
+        marginTop: theme.spacing.sm,
+        marginBottom: theme.spacing.sm
+      },
+      icon: {
+        display: 'flex',
+        alignItems: 'center',
+        color:
+          !shadow && !border
+            ? theme.colors[color][primaryShade]
+            : theme.colors.secondaryText[primaryShade],
         svg: {
-          color: border ? theme.colors[color][3] : undefined,
-          transform: !shadow && !border ? 'scale(1.5)' : 'scale(1)'
+          transitionTimingFunction: theme.other.transitionTimingFunction,
+          transition: 'transform 0.3s'
+        }
+      },
+      text: {
+        display: 'flex',
+        maxWidth: !shadow ? '70%' : undefined,
+        gap: theme.spacing.md,
+        fontSize: !shadow && !border ? theme.fontSizes.xl : undefined,
+        color: theme.colors.secondaryText[primaryShade]
+      },
+      active: {
+        backgroundColor: border ? theme.colors.mainBackground[primaryShade] : '',
+        boxShadow: theme.shadows.md,
+        border: `1px solid ${lighten(
+          theme.colors[color][primaryShade],
+          theme.other.shades.lighten.lighter
+        )}`,
+        svg: {
+          color: theme.colors[color][primaryShade]
         },
         '#text': {
-          color: border ? theme.colors.brand[3] : undefined
+          color: border ? theme.colors.brand[primaryShade] : undefined
         }
       }
-    },
-    iconWrapper: {
-      marginTop: theme.spacing.sm,
-      marginBottom: theme.spacing.sm
-    },
-    icon: {
-      display: 'flex',
-      alignItems: 'center',
-      color: !shadow && !border ? theme.colors[color][3] : theme.colors.secondaryText[3],
-      svg: {
-        transitionTimingFunction: theme.other.transitionTimingFunction,
-        transition: 'transform 0.3s'
-      }
-    },
-    text: {
-      display: 'flex',
-      maxWidth: !shadow ? '70%' : undefined,
-      gap: theme.spacing.md,
-      fontSize: !shadow && !border ? theme.fontSizes.xl : undefined,
-      color: theme.colors.secondaryText[3]
-    },
-    active: {
-      backgroundColor: border ? theme.colors.mainBackground[3] : '',
-      boxShadow: theme.shadows.md,
-      border: `1px solid ${lighten(theme.colors[color][3], theme.other.shades.lighten.lighter)}`,
-      svg: {
-        color: theme.colors[color][3]
-      },
-      '#text': {
-        color: border ? theme.colors.brand[3] : undefined
-      }
     }
-  })
+  }
 )
 
 const CustomCard = ({

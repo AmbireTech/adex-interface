@@ -1,4 +1,4 @@
-import { Flex, rem, Image, Text } from '@mantine/core'
+import { Flex, rem, Image, Text, MantineTheme, getPrimaryShade } from '@mantine/core'
 import { createStyles } from '@mantine/emotion'
 import { useMemo, useState } from 'react'
 import DownArrowIcon from 'resources/icons/DownArrow'
@@ -7,18 +7,24 @@ import { parseBigNumTokenAmountToDecimal } from 'helpers/balances'
 import useAccount from 'hooks/useAccount'
 import { getTokenIcon, networks } from 'lib/Icons'
 import { DIGITS_AFTER_FLOATING_POINT } from 'constants/balances'
+import { useColorScheme } from '@mantine/hooks'
 
-const useStyles = createStyles((theme) => ({
-  rotateUpsideDown: {
-    transform: 'scale(-1)'
-  },
-  pointer: {
-    cursor: 'pointer'
-  },
-  secondaryColor: {
-    color: theme.colors.secondaryText[3]
+const useStyles = createStyles((theme: MantineTheme) => {
+  const colorScheme = useColorScheme()
+  const primaryShade = getPrimaryShade(theme, colorScheme)
+
+  return {
+    rotateUpsideDown: {
+      transform: 'scale(-1)'
+    },
+    pointer: {
+      cursor: 'pointer'
+    },
+    secondaryColor: {
+      color: theme.colors.secondaryText[primaryShade]
+    }
   }
-}))
+})
 
 const FormattedBalance = ({ balance, iconUrl }: { balance: number; iconUrl: string }) => {
   const formattedBalance = useMemo(

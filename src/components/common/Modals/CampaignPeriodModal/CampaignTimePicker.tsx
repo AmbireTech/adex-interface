@@ -1,31 +1,37 @@
-import { Box } from '@mantine/core'
+import { Box, MantineTheme, getPrimaryShade } from '@mantine/core'
 import { createStyles } from '@mantine/emotion'
 import { TimeInput } from '@mantine/dates'
+import { useColorScheme } from '@mantine/hooks'
 
-const useStyles = createStyles((theme) => ({
-  timeWrapper: {
-    display: 'flex',
-    alignItems: 'center',
-    background: theme.colors.lightBackground[3],
-    height: 284,
-    width: '100%',
-    borderRadius: theme.radius.md
-  },
-  input: {
-    background: theme.colors.mainBackground[3],
-    border: '1px solid',
-    borderColor: theme.colors.decorativeBorders[3],
-    color: theme.colors.mainText[3],
-    fontSize: 50,
-    lineHeight: 'inherit',
-    fontFamily: 'monospace',
-    padding: '2.5rem',
-    '&:focus': {
-      borderColor: theme.colors.brand[3],
-      color: theme.colors.brand[3]
+const useStyles = createStyles((theme: MantineTheme) => {
+  const colorScheme = useColorScheme()
+  const primaryShade = getPrimaryShade(theme, colorScheme)
+
+  return {
+    timeWrapper: {
+      display: 'flex',
+      alignItems: 'center',
+      background: theme.colors.lightBackground[primaryShade],
+      height: 284,
+      width: '100%',
+      borderRadius: theme.radius.md
+    },
+    input: {
+      background: theme.colors.mainBackground[primaryShade],
+      border: '1px solid',
+      borderColor: theme.colors.decorativeBorders[primaryShade],
+      color: theme.colors.mainText[primaryShade],
+      fontSize: 50,
+      lineHeight: 'inherit',
+      fontFamily: 'monospace',
+      padding: '2.5rem',
+      '&:focus': {
+        borderColor: theme.colors.brand[primaryShade],
+        color: theme.colors.brand[primaryShade]
+      }
     }
   }
-}))
+})
 
 function CampaignTimePicker({
   defaultValue,

@@ -1,5 +1,6 @@
-import { Accordion, Flex, Text } from '@mantine/core'
+import { Accordion, Flex, MantineTheme, Text, getPrimaryShade, lighten } from '@mantine/core'
 import { createStyles } from '@mantine/emotion'
+import { useColorScheme } from '@mantine/hooks'
 import { useCallback, useMemo } from 'react'
 
 type CatsLocsFormattedProps = {
@@ -7,19 +8,24 @@ type CatsLocsFormattedProps = {
   arr: (string | null)[]
 }
 
-const useStyles = createStyles((theme) => ({
-  lighterColor: {
-    color: theme.colors.secondaryText[3] + theme.other.shades.hexColorSuffix.lighter
-  },
-  warningColor: {
-    color: theme.colors.warning[3]
-  },
-  firstLineLabels: {
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis'
+const useStyles = createStyles((theme: MantineTheme) => {
+  const colorScheme = useColorScheme()
+  const primaryShade = getPrimaryShade(theme, colorScheme)
+
+  return {
+    lighterColor: {
+      color: lighten(theme.colors.secondaryText[primaryShade], theme.other.shades.lighten.lighter)
+    },
+    warningColor: {
+      color: theme.colors.warning[primaryShade]
+    },
+    firstLineLabels: {
+      whiteSpace: 'nowrap',
+      overflow: 'hidden',
+      textOverflow: 'ellipsis'
+    }
   }
-}))
+})
 
 const CatsLocsFormatted = ({ title, arr }: CatsLocsFormattedProps) => {
   const { classes } = useStyles()

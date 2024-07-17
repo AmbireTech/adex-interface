@@ -1,6 +1,16 @@
-import { Flex, Group, Pagination, Table, Grid, Divider, Text, MantineTheme } from '@mantine/core'
+import {
+  Flex,
+  Group,
+  Pagination,
+  Table,
+  Grid,
+  Divider,
+  Text,
+  MantineTheme,
+  getPrimaryShade
+} from '@mantine/core'
 import { createStyles } from '@mantine/emotion'
-import { useMediaQuery } from '@mantine/hooks'
+import { useMediaQuery, useColorScheme } from '@mantine/hooks'
 import VisibilityIcon from 'resources/icons/Visibility'
 import { ICustomTableProps } from 'types'
 import usePagination from 'hooks/usePagination'
@@ -12,35 +22,40 @@ import { CampaignStatus } from 'adex-common'
 import EditIcon from 'resources/icons/Edit'
 import ActionButton from './ActionButton/ActionButton'
 
-const useStyles = createStyles((theme: MantineTheme) => ({
-  header: {
-    backgroundColor: theme.colors.alternativeBackground[3]
-  },
-  border: {
-    borderRadius: theme.radius.md,
-    overflow: 'hidden'
-  },
-  background: {
-    backgroundColor: theme.colors.mainBackground[3],
-    boxShadow: theme.shadows.xs
-  },
-  tableWrapper: {
-    width: '100%',
-    overflow: 'hidden',
-    overflowX: 'auto'
-  },
-  mobileTableWrapper: {
-    borderBottom: `1px solid ${theme.colors.decorativeBorders[3]}`,
-    textAlign: 'center'
-  },
-  gridRow: { borderBottom: `1px solid ${theme.colors.decorativeBorders[3]}` },
-  cell: {
-    overflow: 'hidden',
-    whiteSpace: 'nowrap',
-    textOverflow: 'ellipsis',
-    maxWidth: 200
+const useStyles = createStyles((theme: MantineTheme) => {
+  const colorScheme = useColorScheme()
+  const primaryShade = getPrimaryShade(theme, colorScheme)
+
+  return {
+    header: {
+      backgroundColor: theme.colors.alternativeBackground[primaryShade]
+    },
+    border: {
+      borderRadius: theme.radius.md,
+      overflow: 'hidden'
+    },
+    background: {
+      backgroundColor: theme.colors.mainBackground[primaryShade],
+      boxShadow: theme.shadows.xs
+    },
+    tableWrapper: {
+      width: '100%',
+      overflow: 'hidden',
+      overflowX: 'auto'
+    },
+    mobileTableWrapper: {
+      borderBottom: `1px solid ${theme.colors.decorativeBorders[primaryShade]}`,
+      textAlign: 'center'
+    },
+    gridRow: { borderBottom: `1px solid ${theme.colors.decorativeBorders[primaryShade]}` },
+    cell: {
+      overflow: 'hidden',
+      whiteSpace: 'nowrap',
+      textOverflow: 'ellipsis',
+      maxWidth: 200
+    }
   }
-}))
+})
 
 const CustomTable = ({
   background,

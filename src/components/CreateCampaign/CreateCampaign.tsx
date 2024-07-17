@@ -1,5 +1,6 @@
-import { Grid, lighten } from '@mantine/core'
+import { Grid, MantineTheme, getPrimaryShade, lighten } from '@mantine/core'
 import { createStyles } from '@mantine/emotion'
+import { useColorScheme } from '@mantine/hooks'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import { useCallback, useEffect, useState } from 'react'
 import { modals } from '@mantine/modals'
@@ -17,23 +18,26 @@ import StepTwo from './StepTwo/StepTwo'
 import StepThree from './StepThree/StepThree'
 import StepFour from './StepFour/StepFour'
 
-const useStyles = createStyles((theme) => {
+const useStyles = createStyles((theme: MantineTheme) => {
+  const colorScheme = useColorScheme()
+  const primaryShade = getPrimaryShade(theme, colorScheme)
+
   return {
     // TODO: Think about the idea to add the common container styles in the theme
     container: {
-      backgroundColor: theme.colors.mainBackground[3],
+      backgroundColor: theme.colors.mainBackground[primaryShade],
       borderRadius: theme.radius.md,
       boxShadow: theme.shadows.xs
       // padding: theme.spacing.lg
     },
     lightGray: {
-      color: lighten(theme.colors.secondaryText[3], theme.other.shades.lighten.lighter)
+      color: lighten(theme.colors.secondaryText[primaryShade], theme.other.shades.lighten.lighter)
     },
     dropZone: {
-      backgroundColor: theme.colors.lightBackground[3],
+      backgroundColor: theme.colors.lightBackground[primaryShade],
       border: '1px solid',
       borderRadius: theme.radius.sm,
-      borderColor: theme.colors.decorativeBorders[3],
+      borderColor: theme.colors.decorativeBorders[primaryShade],
       height: 112
     },
     decorativeBorder: {
@@ -43,24 +47,30 @@ const useStyles = createStyles((theme) => {
       borderRadius: theme.radius.sm
     },
     body: {
-      background: theme.colors.attention[3] + theme.other.shades.hexColorSuffix.lightest,
+      background: lighten(
+        theme.colors.attention[primaryShade],
+        theme.other.shades.lighten.lightest
+      ),
       padding: theme.spacing.xl
     },
     confirmModalContent: {
-      background: theme.colors.attention[3] + theme.other.shades.hexColorSuffix.lightest,
+      background: lighten(
+        theme.colors.attention[primaryShade],
+        theme.other.shades.lighten.lightest
+      ),
       padding: theme.spacing.xl
     },
     iconWrapper: {
       width: 50,
       height: 50,
-      background: `${theme.colors.attention[3]}1A`,
+      background: `${theme.colors.attention[primaryShade]}1A`,
       borderRadius: '50%',
       padding: theme.spacing.sm
     },
     attentionIcon: {
       width: 25,
       height: 25,
-      color: theme.colors.attention[3]
+      color: theme.colors.attention[primaryShade]
     },
     modalBody: {
       padding: 0

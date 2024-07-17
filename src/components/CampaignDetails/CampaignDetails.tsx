@@ -1,6 +1,16 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { Container, Grid, Text, Flex, Box } from '@mantine/core'
+import {
+  Container,
+  Grid,
+  Text,
+  Flex,
+  Box,
+  MantineTheme,
+  getPrimaryShade,
+  lighten
+} from '@mantine/core'
+import { useColorScheme } from '@mantine/hooks'
 import { createStyles } from '@mantine/emotion'
 import BadgeStatusCampaign from 'components/Dashboard/BadgeStatusCampaign'
 import { formatCatsAndLocsData } from 'helpers/createCampaignHelpers'
@@ -24,34 +34,39 @@ import { AdminBadge } from 'components/common/AdminBadge'
 import CatsLocsFormatted from './CatsLocsFormatted'
 import { AdminActions } from './AdminActions'
 
-const useStyles = createStyles((theme) => ({
-  wrapper: {
-    background: theme.colors.mainBackground[3],
-    borderRadius: theme.radius.md,
-    padding: theme.spacing.lg,
-    margin: theme.spacing.md,
-    boxShadow: theme.shadows.sm
-  },
-  innerWrapper: {
-    background: theme.colors.lightBackground[3],
-    border: '1px solid',
-    borderRadius: theme.radius.md,
-    borderColor: theme.colors.decorativeBorders[3],
-    maxWidth: '100%',
-    padding: `${theme.spacing.xs} ${theme.spacing.md}`
-  },
-  lighterColor: {
-    color: theme.colors.secondaryText[3] + theme.other.shades.hexColorSuffix.lighter
-  },
-  scrollableContainer: {
-    maxHeight: 300,
-    overflowY: 'auto'
-  },
-  separator: {
-    borderBottom: `1px dashed ${theme.colors.decorativeBorders[3]}`,
-    margin: `${theme.spacing.sm} 0`
+const useStyles = createStyles((theme: MantineTheme) => {
+  const colorScheme = useColorScheme()
+  const primaryShade = getPrimaryShade(theme, colorScheme)
+
+  return {
+    wrapper: {
+      background: theme.colors.mainBackground[primaryShade],
+      borderRadius: theme.radius.md,
+      padding: theme.spacing.lg,
+      margin: theme.spacing.md,
+      boxShadow: theme.shadows.sm
+    },
+    innerWrapper: {
+      background: theme.colors.lightBackground[primaryShade],
+      border: '1px solid',
+      borderRadius: theme.radius.md,
+      borderColor: theme.colors.decorativeBorders[primaryShade],
+      maxWidth: '100%',
+      padding: `${theme.spacing.xs} ${theme.spacing.md}`
+    },
+    lighterColor: {
+      color: lighten(theme.colors.secondaryText[primaryShade], theme.other.shades.lighten.lighter)
+    },
+    scrollableContainer: {
+      maxHeight: 300,
+      overflowY: 'auto'
+    },
+    separator: {
+      borderBottom: `1px dashed ${theme.colors.decorativeBorders[primaryShade]}`,
+      margin: `${theme.spacing.sm} 0`
+    }
   }
-}))
+})
 
 const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
   const { classes, cx } = useStyles()

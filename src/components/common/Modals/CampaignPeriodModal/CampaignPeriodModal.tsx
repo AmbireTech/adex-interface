@@ -7,10 +7,12 @@ import {
   Button,
   UnstyledButton,
   Stack,
-  MantineTheme
+  MantineTheme,
+  getPrimaryShade
 } from '@mantine/core'
 import { createStyles } from '@mantine/emotion'
 import { DatePicker } from '@mantine/dates'
+import { useColorScheme } from '@mantine/hooks'
 import { formatDateShort } from 'helpers/formatters'
 import { useCallback, useMemo, useState } from 'react'
 import CalendarIcon from 'resources/icons/Calendar'
@@ -24,26 +26,31 @@ import CampaignTimePicker from './CampaignTimePicker'
 
 type DateOrTime = 'date' | 'time'
 
-const useStyles = createStyles((theme: MantineTheme) => ({
-  wrapper: {
-    cursor: 'pointer',
-    border: '1px solid',
-    borderColor: theme.colors.decorativeBorders[3]
-  },
-  selected: {
-    borderColor: theme.colors.brand[3],
-    color: theme.colors.brand[3],
-    backgroundColor: theme.colors.lightBackground[3]
-  },
-  footer: {
-    backgroundColor: theme.colors.lightBackground[3],
-    padding: theme.spacing.lg
-  },
-  month: {
-    background: theme.colors.lightBackground[3],
-    borderRadius: theme.radius.md
+const useStyles = createStyles((theme: MantineTheme) => {
+  const colorScheme = useColorScheme()
+  const primaryShade = getPrimaryShade(theme, colorScheme)
+
+  return {
+    wrapper: {
+      cursor: 'pointer',
+      border: '1px solid',
+      borderColor: theme.colors.decorativeBorders[primaryShade]
+    },
+    selected: {
+      borderColor: theme.colors.brand[primaryShade],
+      color: theme.colors.brand[primaryShade],
+      backgroundColor: theme.colors.lightBackground[primaryShade]
+    },
+    footer: {
+      backgroundColor: theme.colors.lightBackground[primaryShade],
+      padding: theme.spacing.lg
+    },
+    month: {
+      background: theme.colors.lightBackground[primaryShade],
+      borderRadius: theme.radius.md
+    }
   }
-}))
+})
 
 const CampaignPeriodModal = ({ opened, close }: { opened: boolean; close: () => void }) => {
   const allLocales = useMemo(() => initAllLocales(), [])

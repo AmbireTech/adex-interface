@@ -1,5 +1,16 @@
-import { Button, ButtonProps, Flex, MantineColor, Modal, Text } from '@mantine/core'
+import {
+  Button,
+  ButtonProps,
+  Flex,
+  MantineColor,
+  MantineTheme,
+  Modal,
+  Text,
+  getPrimaryShade,
+  lighten
+} from '@mantine/core'
 import { createStyles } from '@mantine/emotion'
+import { useColorScheme } from '@mantine/hooks'
 import Lottie from 'lottie-react'
 import { PropsWithChildren } from 'react'
 import { LinkProps } from 'react-router-dom'
@@ -7,39 +18,47 @@ import AttentionIcon from 'resources/icons/Attention'
 import AnimationData from 'resources/lotties/Arrow-up-data.json'
 
 const useStyles = createStyles(
-  (theme, { color, overlayTop }: { color: MantineColor; overlayTop: boolean | undefined }) => ({
-    confirmModalContent: {
-      background: theme.colors[color][3] + theme.other.shades.hexColorSuffix.lightest,
-      padding: theme.spacing.xl
-    },
-    iconWrapper: {
-      width: 50,
-      height: 50,
-      background: `${theme.colors[color][3]}1A`,
-      borderRadius: '50%',
-      padding: theme.spacing.sm
-    },
-    attentionIcon: {
-      width: 25,
-      height: 25,
-      color: theme.colors.attention[3]
-    },
-    root: {
-      padding: 0
-    },
-    overlay: {
-      marginTop: overlayTop ? 90 : undefined
-    },
-    lottie: {
-      zIndex: 9999,
-      width: 100,
-      height: 100,
-      position: 'absolute',
-      top: 95,
-      right: 180,
-      transform: 'rotate(180deg)'
+  (
+    theme: MantineTheme,
+    { color, overlayTop }: { color: MantineColor; overlayTop: boolean | undefined }
+  ) => {
+    const colorScheme = useColorScheme()
+    const primaryShade = getPrimaryShade(theme, colorScheme)
+
+    return {
+      confirmModalContent: {
+        background: lighten(theme.colors[color][primaryShade], theme.other.shades.lighten.lightest),
+        padding: theme.spacing.xl
+      },
+      iconWrapper: {
+        width: 50,
+        height: 50,
+        background: `${theme.colors[color][primaryShade]}1A`,
+        borderRadius: '50%',
+        padding: theme.spacing.sm
+      },
+      attentionIcon: {
+        width: 25,
+        height: 25,
+        color: theme.colors.attention[primaryShade]
+      },
+      root: {
+        padding: 0
+      },
+      overlay: {
+        marginTop: overlayTop ? 90 : undefined
+      },
+      lottie: {
+        zIndex: 9999,
+        width: 100,
+        height: 100,
+        position: 'absolute',
+        top: 95,
+        right: 180,
+        transform: 'rotate(180deg)'
+      }
     }
-  })
+  }
 )
 
 type ConfirmModalProps = ButtonProps &

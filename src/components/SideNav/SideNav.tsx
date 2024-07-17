@@ -6,9 +6,12 @@ import {
   useMantineTheme,
   rem,
   AppShell,
-  MantineTheme
+  MantineTheme,
+  getPrimaryShade,
+  MantineColorShade
 } from '@mantine/core'
 import { createStyles } from '@mantine/emotion'
+import { useColorScheme } from '@mantine/hooks'
 import { useMatch, useLocation, useResolvedPath, Link } from 'react-router-dom'
 import useAccount from 'hooks/useAccount'
 import DashboardIcon from 'resources/icons/Dashboard'
@@ -23,27 +26,31 @@ import NavLink from './NavLink'
 import Balance from './Balance'
 import CreateCampaignBtn from './CreateCampaignBtn'
 
-const useStyles = createStyles((theme: MantineTheme) => ({
-  logo: {
-    display: 'block',
-    width: rem(103),
-    height: rem(40),
-    marginTop: theme.spacing.md,
-    marginBottom: theme.spacing.md
-  },
-  balance: {
-    borderBottom: `1px solid ${theme.colors.decorativeBorders[3]}`,
-    paddingTop: theme.spacing.sm,
-    paddingBottom: theme.spacing.sm
-  },
-  newCampaign: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: theme.spacing.xl,
-    marginBottom: theme.spacing.xl
+const useStyles = createStyles(
+  (theme: MantineTheme, { primaryShade }: { primaryShade: MantineColorShade }) => {
+    return {
+      logo: {
+        display: 'block',
+        width: rem(103),
+        height: rem(40),
+        marginTop: theme.spacing.md,
+        marginBottom: theme.spacing.md
+      },
+      balance: {
+        borderBottom: `1px solid ${theme.colors.decorativeBorders[primaryShade]}`,
+        paddingTop: theme.spacing.sm,
+        paddingBottom: theme.spacing.sm
+      },
+      newCampaign: {
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginTop: theme.spacing.xl,
+        marginBottom: theme.spacing.xl
+      }
+    }
   }
-}))
+)
 
 function SideNav() {
   const {
@@ -54,8 +61,10 @@ function SideNav() {
   const location = useLocation()
   const match = useMatch(location.pathname)
   const year = useMemo(() => new Date().getFullYear(), [])
+  const colorScheme = useColorScheme()
   const theme = useMantineTheme()
-  const { classes } = useStyles()
+  const primaryShade = getPrimaryShade(theme, colorScheme)
+  const { classes } = useStyles({ primaryShade })
 
   const hasAvailableBalance = useMemo(
     () => availableBalance && availableBalance > 0,
@@ -66,15 +75,8 @@ function SideNav() {
     <>
       <AppShell.Section>
         <UnstyledButton component={Link} to="" className={classes.logo}>
-          <AdExLogo
-            text={
-              // TODO: fix it
-              theme.colors.brandDarker[3]
-              // theme.colorScheme === 'dark'
-              //   ? theme.white
-              //   : theme.colors.brandDarker[3]
-            }
-          />
+          {/* <AdExLogo text={colorScheme === 'dark' ? theme.white : theme.colors.brandDarker[primaryShade]} /> */}
+          <AdExLogo text={theme.colors.brandDarker[primaryShade]} />
         </UnstyledButton>
       </AppShell.Section>
       <AppShell.Section className={classes.balance}>

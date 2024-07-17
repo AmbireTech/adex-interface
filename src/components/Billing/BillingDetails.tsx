@@ -1,17 +1,23 @@
-import { Button, Flex, Grid, TextInput, Text } from '@mantine/core'
+import { Button, Flex, Grid, TextInput, Text, MantineTheme, getPrimaryShade } from '@mantine/core'
 import { createStyles } from '@mantine/emotion'
 import { useForm } from '@mantine/form'
+import { useColorScheme } from '@mantine/hooks'
 import useAccount from 'hooks/useAccount'
 
-const useStyles = createStyles((theme) => ({
-  container: {
-    backgroundColor: theme.colors.mainBackground[3],
-    borderRadius: theme.radius.sm,
-    boxShadow: theme.shadows.xs,
-    overflow: 'hidden',
-    padding: theme.spacing.lg
+const useStyles = createStyles((theme: MantineTheme) => {
+  const colorScheme = useColorScheme()
+  const primaryShade = getPrimaryShade(theme, colorScheme)
+
+  return {
+    container: {
+      backgroundColor: theme.colors.mainBackground[primaryShade],
+      borderRadius: theme.radius.sm,
+      boxShadow: theme.shadows.xs,
+      overflow: 'hidden',
+      padding: theme.spacing.lg
+    }
   }
-}))
+})
 
 const BillingDetails = () => {
   const { classes } = useStyles()

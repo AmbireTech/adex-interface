@@ -1,5 +1,6 @@
-import { ActionIcon, Flex, Input, MantineTheme, Text } from '@mantine/core'
+import { ActionIcon, Flex, Input, MantineTheme, Text, getPrimaryShade } from '@mantine/core'
 import { createStyles } from '@mantine/emotion'
+import { useColorScheme } from '@mantine/hooks'
 import CustomBadge from 'components/common/CustomBadge'
 import InfoAlertMessage from 'components/common/InfoAlertMessage'
 import MediaThumb from 'components/common/MediaThumb'
@@ -8,6 +9,9 @@ import DeleteIcon from 'resources/icons/Delete'
 import { ImageUrlInputProps } from 'types'
 
 const useStyles = createStyles((theme: MantineTheme, { hasError }: { hasError: boolean }) => {
+  const colorScheme = useColorScheme()
+  const primaryShade = getPrimaryShade(theme, colorScheme)
+
   return {
     inputField: {
       flexGrow: 1
@@ -18,31 +22,37 @@ const useStyles = createStyles((theme: MantineTheme, { hasError }: { hasError: b
     mediaWrapper: {
       borderRight: '1px solid',
       padding: theme.spacing.xs,
-      borderColor: hasError ? theme.colors.warning[3] : theme.colors.decorativeBorders[3]
+      borderColor: hasError
+        ? theme.colors.warning[primaryShade]
+        : theme.colors.decorativeBorders[primaryShade]
     },
     wrapper: {
-      backgroundColor: theme.colors.lightBackground[3],
+      backgroundColor: theme.colors.lightBackground[primaryShade],
       border: '1px solid',
-      borderColor: theme.colors.decorativeBorders[3],
+      borderColor: theme.colors.decorativeBorders[primaryShade],
       borderRadius: theme.radius.md,
       '&:focus-within': {
-        borderColor: hasError ? theme.colors.warning[3] : theme.colors.brand[3],
+        borderColor: hasError
+          ? theme.colors.warning[primaryShade]
+          : theme.colors.brand[primaryShade],
         '#mediaWrapper': {
-          borderColor: hasError ? theme.colors.warning[3] : theme.colors.brand[3]
+          borderColor: hasError
+            ? theme.colors.warning[primaryShade]
+            : theme.colors.brand[primaryShade]
         }
       }
     },
     inputError: {
-      borderColor: theme.colors.warning[3],
+      borderColor: theme.colors.warning[primaryShade],
       '#mediaWrapper': {
-        borderColor: theme.colors.warning[3]
+        borderColor: theme.colors.warning[primaryShade]
       }
     },
     infoError: {
       padding: theme.spacing.xs
     },
     rightSection: {
-      backgroundColor: theme.colors.lightBackground[3]
+      backgroundColor: theme.colors.lightBackground[primaryShade]
     }
   }
 })

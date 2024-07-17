@@ -1,22 +1,27 @@
-import { AppShell, Burger } from '@mantine/core'
+import { AppShell, Burger, MantineTheme, getPrimaryShade } from '@mantine/core'
 import { createStyles } from '@mantine/emotion'
+import { useColorScheme } from '@mantine/hooks'
 import SideNav from 'components/SideNav'
 import TopBar from 'components/TopBar'
 import { useState } from 'react'
 import { Outlet } from 'react-router-dom'
 import { SIDE_BAR_WIDTH } from 'themes/base'
 
-const useStyles = createStyles((theme) => ({
-  main: {
-    backgroundColor: theme.colors.lightBackground[3]
-    // theme.colorScheme === 'dark'
-    //   ? theme.colors.darkBackground[3]
-    //   : theme.colors.lightBackground[3]
-  },
-  header: {
-    backgroundColor: 'inherit'
+const useStyles = createStyles((theme: MantineTheme) => {
+  const colorScheme = useColorScheme()
+  const primaryShade = getPrimaryShade(theme, colorScheme)
+  return {
+    main: {
+      backgroundColor: theme.colors.lightBackground[primaryShade]
+      // colorScheme === 'dark'
+      //   ? theme.colors.darkBackground[primaryShade]
+      //   : theme.colors.lightBackground[primaryShade]
+    },
+    header: {
+      backgroundColor: 'inherit'
+    }
   }
-}))
+})
 
 function UserPanel() {
   const { classes } = useStyles()

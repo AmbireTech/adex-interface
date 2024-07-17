@@ -1,23 +1,37 @@
-import { ActionIcon, Flex, Group, Pagination, Table } from '@mantine/core'
+import {
+  ActionIcon,
+  Flex,
+  Group,
+  MantineTheme,
+  Pagination,
+  Table,
+  getPrimaryShade
+} from '@mantine/core'
 import { ICustomTableProps } from 'types'
 import usePagination from 'hooks/usePagination'
 import React, { useCallback, useMemo, useState } from 'react'
 import DownChevronIcon from 'resources/icons/DownChevron'
 import { createStyles } from '@mantine/emotion'
+import { useColorScheme } from '@mantine/hooks'
 
-const useStyles = createStyles((theme) => ({
-  header: {
-    backgroundColor: theme.colors.alternativeBackground[3]
-  },
-  border: {
-    borderRadius: theme.radius.md,
-    overflow: 'hidden'
-  },
-  background: {
-    backgroundColor: theme.colors.mainBackground[3],
-    boxShadow: theme.shadows.xs
+const useStyles = createStyles((theme: MantineTheme) => {
+  const colorScheme = useColorScheme()
+  const primaryShade = getPrimaryShade(theme, colorScheme)
+
+  return {
+    header: {
+      backgroundColor: theme.colors.alternativeBackground[primaryShade]
+    },
+    border: {
+      borderRadius: theme.radius.md,
+      overflow: 'hidden'
+    },
+    background: {
+      backgroundColor: theme.colors.mainBackground[primaryShade],
+      boxShadow: theme.shadows.xs
+    }
   }
-}))
+})
 
 const CustomTableWithDropdown = ({ background, headings, elements }: ICustomTableProps) => {
   const { classes, cx } = useStyles()

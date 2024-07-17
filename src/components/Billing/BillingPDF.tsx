@@ -1,4 +1,4 @@
-import { Flex, Grid, MantineTheme, Space, Table, Text } from '@mantine/core'
+import { Flex, Grid, MantineTheme, Space, Table, Text, getPrimaryShade } from '@mantine/core'
 import { createStyles } from '@mantine/emotion'
 import { Placement } from 'adex-common'
 import {
@@ -15,6 +15,7 @@ import { useMemo, PropsWithChildren, ReactNode } from 'react'
 import AdExLogo from 'resources/logos/AdExLogo'
 import { IInvoiceDetails, InvoiceCompanyDetails, OperationEntry, StatementData } from 'types'
 import { networks } from 'lib/Icons'
+import { useColorScheme } from '@mantine/hooks'
 
 type InvoicesPDFProps = { invoiceDetails: IInvoiceDetails; placement: Placement }
 type SidesDetails = {
@@ -38,66 +39,70 @@ const formatTokenAmount = (amount: bigint, token: OperationEntry['token']): stri
   }`
 }
 
-const useStyles = createStyles((theme: MantineTheme) => ({
-  wrapper: {
-    color: theme.colors.secondaryText[3],
-    fontSize: theme.fontSizes.xs,
-    span: {
-      display: 'block',
+const useStyles = createStyles((theme: MantineTheme) => {
+  const colorScheme = useColorScheme()
+  const primaryShade = getPrimaryShade(theme, colorScheme)
+  return {
+    wrapper: {
+      color: theme.colors.secondaryText[primaryShade],
+      fontSize: theme.fontSizes.xs,
+      span: {
+        display: 'block',
+        wordBreak: 'break-word'
+      }
+    },
+    title: {
+      fontSize: theme.fontSizes.sm,
+      fontWeight: theme.other.fontWeights.bold
+    },
+    right: {
+      textAlign: 'end'
+    },
+    bold: {
+      fontWeight: theme.other.fontWeights.bold,
+      color: theme.colors.mainText[primaryShade]
+    },
+    italic: {
+      fontStyle: 'italic'
+    },
+    wrap: {
       wordBreak: 'break-word'
+    },
+    noWrap: {
+      whiteSpace: 'nowrap'
+    },
+    smallFontSize: {
+      fontSize: theme.fontSizes.xs
+    },
+    borderBottom: { borderBottom: '1px solid black', width: '100%', height: '70%' },
+    signature: { display: 'flex', justifyContent: 'center', fontSize: theme.fontSizes.xs },
+    rightAlignedText: {
+      textAlign: 'end'
+    },
+    head: {
+      background: theme.black,
+      padding: theme.spacing.xl,
+      color: 'white'
+    },
+    logo: {
+      width: 200
+    },
+    footer: {
+      borderTop: '1px solid',
+      borderColor: theme.colors.decorativeBorders[primaryShade]
+    },
+    tableHeader: {
+      backgroundColor: theme.colors.alternativeBackground[primaryShade]
+    },
+    tableBody: {
+      backgroundColor: theme.colors.lightBackground[primaryShade]
+    },
+    tableWrapper: {
+      borderRadius: theme.radius.sm,
+      overflow: 'hidden'
     }
-  },
-  title: {
-    fontSize: theme.fontSizes.sm,
-    fontWeight: theme.other.fontWeights.bold
-  },
-  right: {
-    textAlign: 'end'
-  },
-  bold: {
-    fontWeight: theme.other.fontWeights.bold,
-    color: theme.colors.mainText[3]
-  },
-  italic: {
-    fontStyle: 'italic'
-  },
-  wrap: {
-    wordBreak: 'break-word'
-  },
-  noWrap: {
-    whiteSpace: 'nowrap'
-  },
-  smallFontSize: {
-    fontSize: theme.fontSizes.xs
-  },
-  borderBottom: { borderBottom: '1px solid black', width: '100%', height: '70%' },
-  signature: { display: 'flex', justifyContent: 'center', fontSize: theme.fontSizes.xs },
-  rightAlignedText: {
-    textAlign: 'end'
-  },
-  head: {
-    background: theme.black,
-    padding: theme.spacing.xl,
-    color: 'white'
-  },
-  logo: {
-    width: 200
-  },
-  footer: {
-    borderTop: '1px solid',
-    borderColor: theme.colors.decorativeBorders[3]
-  },
-  tableHeader: {
-    backgroundColor: theme.colors.alternativeBackground[3]
-  },
-  tableBody: {
-    backgroundColor: theme.colors.lightBackground[3]
-  },
-  tableWrapper: {
-    borderRadius: theme.radius.sm,
-    overflow: 'hidden'
   }
-}))
+})
 
 const BillingBlank = ({ children, header, seller, buyer, title }: DetailsProps) => {
   const { classes, cx } = useStyles()

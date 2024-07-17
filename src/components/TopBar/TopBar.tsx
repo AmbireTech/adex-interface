@@ -8,7 +8,9 @@ import {
   Menu,
   rem,
   UnstyledButton,
-  CopyButton
+  CopyButton,
+  MantineTheme,
+  getPrimaryShade
 } from '@mantine/core'
 import { createStyles } from '@mantine/emotion'
 import { formatDate, maskAddress } from 'helpers/formatters'
@@ -25,28 +27,34 @@ import StakingIcon from 'resources/icons/Staking'
 import { useAdExApi } from 'hooks/useAdexServices'
 import useCustomNotifications from 'hooks/useCustomNotifications'
 import CopyIcon from 'resources/icons/Copy'
+import { useColorScheme } from '@mantine/hooks'
 
-const useStyles = createStyles((theme) => ({
-  rotateUpsideDown: {
-    transform: 'scale(-1)'
-  },
-  menu: {
-    cursor: 'pointer'
-  },
-  icon: {
-    width: rem(14),
-    height: rem(14)
-  },
-  item: {
-    '&:hover': {
-      border: `1px solid ${theme.colors.decorativeBorders[3]}`,
-      borderRadius: theme.radius.sm
+const useStyles = createStyles((theme: MantineTheme) => {
+  const colorScheme = useColorScheme()
+  const primaryShade = getPrimaryShade(theme, colorScheme)
+
+  return {
+    rotateUpsideDown: {
+      transform: 'scale(-1)'
+    },
+    menu: {
+      cursor: 'pointer'
+    },
+    icon: {
+      width: rem(14),
+      height: rem(14)
+    },
+    item: {
+      '&:hover': {
+        border: `1px solid ${theme.colors.decorativeBorders[primaryShade]}`,
+        borderRadius: theme.radius.sm
+      }
+    },
+    capitalizeText: {
+      textTransform: 'capitalize'
     }
-  },
-  capitalizeText: {
-    textTransform: 'capitalize'
   }
-}))
+})
 
 const formatTitle = (str: string) => {
   if (!str) return ''

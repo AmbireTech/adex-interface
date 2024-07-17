@@ -1,8 +1,39 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { MultiSelect, Radio, Stack, Text } from '@mantine/core'
+import { MantineTheme, MultiSelect, Radio, Stack, Text, getPrimaryShade } from '@mantine/core'
 import { TargetingInputApplyProp } from 'adex-common/dist/types'
 import { MultiSelectAndRadioButtonsProps } from 'types'
 import { capitalize } from 'helpers/createCampaignHelpers'
+import { useColorScheme } from '@mantine/hooks'
+import { createStyles } from '@mantine/emotion'
+
+const useStyles = createStyles(
+  (theme: MantineTheme, { selectedRadio }: { selectedRadio: TargetingInputApplyProp }) => {
+    const colorScheme = useColorScheme()
+    const primaryShade = getPrimaryShade(theme, colorScheme)
+
+    return {
+      input: {
+        borderColor:
+          selectedRadio === 'nin'
+            ? theme.colors.warning[primaryShade]
+            : theme.colors.brand[primaryShade],
+        backgroundColor: theme.colors.mainBackground[primaryShade],
+        boxShadow: theme.shadows.md
+      },
+      pill: {
+        border: '1px solid',
+        borderColor:
+          selectedRadio === 'nin'
+            ? theme.colors.warning[primaryShade]
+            : theme.colors.brand[primaryShade],
+        color:
+          selectedRadio === 'nin'
+            ? theme.colors.warning[primaryShade]
+            : theme.colors.brand[primaryShade]
+      }
+    }
+  }
+)
 
 const MultiSelectAndRadioButtons = ({
   multiSelectData,
@@ -34,6 +65,7 @@ const MultiSelectAndRadioButtons = ({
   const [selectedRadio, setSelectedRadio] = useState<TargetingInputApplyProp>(defaultRadioValue)
   const [selectedCategories, setSelectedCategories] = useState<string[]>([])
   const [selectedValue, setSelectedValue] = useState<string[]>(defaultSelectValue)
+  const { classes } = useStyles({ selectedRadio })
 
   const handleRadioChange = useCallback((value: string) => {
     setSelectedRadio(value as TargetingInputApplyProp)
@@ -97,18 +129,10 @@ const MultiSelectAndRadioButtons = ({
         data={data}
         onChange={handleSelectChange}
         placeholder={`Select ${label}`}
-        styles={(theme) => ({
-          input: {
-            borderColor: selectedRadio === 'nin' ? theme.colors.warning[3] : theme.colors.brand[3],
-            backgroundColor: theme.colors.mainBackground[3],
-            boxShadow: theme.shadows.md
-          },
-          pill: {
-            border: '1px solid',
-            borderColor: selectedRadio === 'nin' ? theme.colors.warning[3] : theme.colors.brand[3],
-            color: selectedRadio === 'nin' ? theme.colors.warning[3] : theme.colors.brand[3]
-          }
-        })}
+        classNames={{
+          input: classes.input,
+          pill: classes.pill
+        }}
       />
     </>
   )

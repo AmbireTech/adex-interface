@@ -3,7 +3,7 @@ import '@mantine/dates/styles.css'
 import '@mantine/notifications/styles.css'
 import '@mantine/dropzone/styles.css'
 
-import { MantineProvider, Progress } from '@mantine/core'
+import { ColorSchemeScript, MantineProvider, MantineTheme, Progress } from '@mantine/core'
 import { ModalsProvider } from '@mantine/modals'
 import { AccountProvider } from 'contexts/AccountContext'
 
@@ -13,14 +13,14 @@ import { lightTheme } from 'themes'
 import { Notifications } from '@mantine/notifications'
 import ReactGA from 'react-ga4'
 import { Global, MantineEmotionProvider, emotionTransform } from '@mantine/emotion'
-import { emotionCache } from './emotion'
+// import { emotionCache } from './emotion'
 
 const ENV = process.env.REACT_APP_ENV
 
 function GlobalStyles() {
   return (
     <Global
-      styles={(theme) => ({
+      styles={(theme: MantineTheme) => ({
         [theme.other.media.print]: {
           body: {
             visibility: 'hidden'
@@ -51,11 +51,12 @@ ReactGA.initialize('G-PX5B4P9KKM')
 function App() {
   return (
     <AccountProvider>
-      <MantineEmotionProvider cache={emotionCache}>
+      <MantineEmotionProvider>
+        <ColorSchemeScript forceColorScheme="light" />
         <MantineProvider
           theme={lightTheme}
           stylesTransform={emotionTransform}
-          defaultColorScheme="light"
+          forceColorScheme="light"
         >
           <ModalsProvider>
             <GlobalStyles />

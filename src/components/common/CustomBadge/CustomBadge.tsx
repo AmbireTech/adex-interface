@@ -1,14 +1,29 @@
-import { Badge, BadgeProps, Flex, MantineColor, Text } from '@mantine/core'
+import {
+  Badge,
+  BadgeProps,
+  Flex,
+  MantineColor,
+  MantineTheme,
+  Text,
+  getPrimaryShade,
+  lighten
+} from '@mantine/core'
 import { createStyles } from '@mantine/emotion'
+import { useColorScheme } from '@mantine/hooks'
 import { ReactNode } from 'react'
 
-const useStyles = createStyles((theme, { color }: { color: string }) => ({
-  wrapper: {
-    background: theme.colors[color][3] + theme.other.shades.hexColorSuffix.lightest,
-    fontWeight: 'normal',
-    textTransform: 'capitalize'
+const useStyles = createStyles((theme: MantineTheme, { color }: { color: string }) => {
+  const colorScheme = useColorScheme()
+  const primaryShade = getPrimaryShade(theme, colorScheme)
+
+  return {
+    wrapper: {
+      background: lighten(theme.colors[color][primaryShade], theme.other.shades.lighten.lightest),
+      fontWeight: 'normal',
+      textTransform: 'capitalize'
+    }
   }
-}))
+})
 
 type CustomBadgeProps = BadgeProps & {
   color: MantineColor

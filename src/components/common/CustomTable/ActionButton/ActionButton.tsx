@@ -1,14 +1,19 @@
-import { ActionIcon, Flex } from '@mantine/core'
+import { ActionIcon, Flex, MantineTheme, getPrimaryShade } from '@mantine/core'
 import { createStyles } from '@mantine/emotion'
+import { useColorScheme } from '@mantine/hooks'
 import { IActionButtonProps } from 'types'
 
-const useStyles = createStyles((theme) => ({
-  actionIcon: {
-    '&:hover': {
-      color: theme.colors.brand[3]
+const useStyles = createStyles((theme: MantineTheme) => {
+  const colorScheme = useColorScheme()
+  const primaryShade = getPrimaryShade(theme, colorScheme)
+  return {
+    actionIcon: {
+      '&:hover': {
+        color: theme.colors.brand[primaryShade]
+      }
     }
   }
-}))
+})
 
 const ActionButton = ({ action, icon, title, children }: IActionButtonProps) => {
   const { classes } = useStyles()

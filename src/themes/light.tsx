@@ -1,5 +1,5 @@
 import {
-  MantineColorShade,
+  // MantineColorShade,
   MantineThemeOverride,
   createTheme,
   mergeMantineTheme
@@ -296,7 +296,7 @@ const theme: MantineThemeOverride = createTheme({
     to: 'secondary',
     deg: 90
   },
-  primaryShade: 3 as MantineColorShade
+  primaryShade: 3
 })
 
 export const lightTheme = mergeMantineTheme(baseTheme, theme)

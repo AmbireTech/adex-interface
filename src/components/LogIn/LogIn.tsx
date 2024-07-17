@@ -8,7 +8,8 @@ import {
   Flex,
   rem,
   useMantineTheme,
-  LoadingOverlay
+  LoadingOverlay,
+  getPrimaryShade
 } from '@mantine/core'
 import { createStyles } from '@mantine/emotion'
 import LogInBackground from 'resources/backgrounds/pattern.svg'
@@ -21,6 +22,7 @@ import CustomAnchor from 'components/common/customAnchor/CustomAnchor'
 import { useNavigate } from 'react-router-dom'
 import useAccount from 'hooks/useAccount'
 import { appVersion } from 'helpers'
+import { useColorScheme } from '@mantine/hooks'
 
 const useStyles = createStyles(() => {
   return {
@@ -48,6 +50,8 @@ function LogIn() {
   const year = useMemo(() => new Date().getFullYear(), [])
   const theme = useMantineTheme()
   const navigate = useNavigate()
+  const colorScheme = useColorScheme()
+  const primaryShade = getPrimaryShade(theme, colorScheme)
 
   useEffect(() => {
     if (authenticated) navigate('/dashboard', { replace: true })
@@ -64,8 +68,8 @@ function LogIn() {
       <Flex h="100%" pt="xl" pb="xl" direction="column" justify="space-around" align="center">
         <div className={classes.logoContainer}>
           <AdExLogo
-            // text={theme.colorScheme === 'dark' ? theme.white : theme.colors.brandDarker[3]}
-            text={theme.colors.brandDarker[3]}
+            // text={colorScheme === 'dark' ? theme.white : theme.colors.brandDarker[primaryShade]}
+            text={theme.colors.brandDarker[primaryShade]}
           />
         </div>
         <div>

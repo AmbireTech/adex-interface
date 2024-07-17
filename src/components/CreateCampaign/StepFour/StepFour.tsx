@@ -1,19 +1,25 @@
-import { Container } from '@mantine/core'
+import { Container, MantineTheme, getPrimaryShade } from '@mantine/core'
 import { createStyles } from '@mantine/emotion'
+import { useColorScheme } from '@mantine/hooks'
 import CampaignDetailsRow from 'components/common/CampainDetailsRow/CampaignDetailsRow'
 import useCreateCampaignData from 'hooks/useCreateCampaignData/useCreateCampaignData'
 import { useMemo } from 'react'
 import { CreateCampaignOverview } from 'types'
 
-const useStyles = createStyles((theme) => ({
-  wrapper: {
-    background: theme.colors.lightBackground[3],
-    border: '1px solid',
-    borderRadius: theme.radius.md,
-    borderColor: theme.colors.decorativeBorders[3],
-    maxWidth: '100%'
+const useStyles = createStyles((theme: MantineTheme) => {
+  const colorScheme = useColorScheme()
+  const primaryShade = getPrimaryShade(theme, colorScheme)
+
+  return {
+    wrapper: {
+      background: theme.colors.lightBackground[primaryShade],
+      border: '1px solid',
+      borderRadius: theme.radius.md,
+      borderColor: theme.colors.decorativeBorders[primaryShade],
+      maxWidth: '100%'
+    }
   }
-}))
+})
 
 const StepFour = () => {
   const { classes } = useStyles()

@@ -1,25 +1,31 @@
-import { Flex, MantineTheme, Text } from '@mantine/core'
+import { Flex, MantineTheme, Text, getPrimaryShade, lighten } from '@mantine/core'
 import { createStyles } from '@mantine/emotion'
+import { useColorScheme } from '@mantine/hooks'
 import { CampaignDetailsRowProps } from 'types'
 
 const useStyles = createStyles(
-  (theme: MantineTheme, { lighterColor }: { lighterColor: boolean }) => ({
-    border: {
-      borderBottom: `1px dashed ${theme.colors.decorativeBorders[3]}`
-    },
-    textColor: {
-      color: !lighterColor
-        ? theme.colors.secondaryText[3]
-        : theme.colors.secondaryText[3] + theme.other.shades.hexColorSuffix.lighter
-    },
-    fullWidth: {
-      width: '100%'
-    },
-    marginBottom: {
-      marginBottom: theme.spacing.sm
-    },
-    text: { whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }
-  })
+  (theme: MantineTheme, { lighterColor }: { lighterColor: boolean }) => {
+    const colorScheme = useColorScheme()
+    const primaryShade = getPrimaryShade(theme, colorScheme)
+
+    return {
+      border: {
+        borderBottom: `1px dashed ${theme.colors.decorativeBorders[primaryShade]}`
+      },
+      textColor: {
+        color: !lighterColor
+          ? theme.colors.secondaryText[primaryShade]
+          : lighten(theme.colors.secondaryText[primaryShade], theme.other.shades.lighten.lighter)
+      },
+      fullWidth: {
+        width: '100%'
+      },
+      marginBottom: {
+        marginBottom: theme.spacing.sm
+      },
+      text: { whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }
+    }
+  }
 )
 
 const CampaignDetailsRow = ({

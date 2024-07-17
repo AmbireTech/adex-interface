@@ -1,5 +1,6 @@
-import { Image } from '@mantine/core'
+import { Image, MantineTheme, getPrimaryShade } from '@mantine/core'
 import { createStyles } from '@mantine/emotion'
+import { useColorScheme } from '@mantine/hooks'
 import { AdUnit } from 'adex-common/dist/types'
 import { getMediaUrlWithProvider, isVideoMedia } from 'helpers/createCampaignHelpers'
 import { useMemo } from 'react'
@@ -7,15 +8,23 @@ import { useMemo } from 'react'
 const IPFS_GATEWAY = process.env.REACT_APP_IPFS_GATEWAY
 
 const useStyles = createStyles(
-  (theme, { width, height }: { width?: number | string; height?: number | string }) => ({
-    container: {
-      position: 'relative',
-      maxWidth: width,
-      maxHeight: height,
-      overflow: 'hidden',
-      background: theme.colors.alternativeBackground[3]
+  (
+    theme: MantineTheme,
+    { width, height }: { width?: number | string; height?: number | string }
+  ) => {
+    const colorScheme = useColorScheme()
+    const primaryShade = getPrimaryShade(theme, colorScheme)
+
+    return {
+      container: {
+        position: 'relative',
+        maxWidth: width,
+        maxHeight: height,
+        overflow: 'hidden',
+        background: theme.colors.alternativeBackground[primaryShade]
+      }
     }
-  })
+  }
 )
 
 const Media = ({

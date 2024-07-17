@@ -1,19 +1,25 @@
-import { Flex, Text, Indicator } from '@mantine/core'
+import { Flex, Text, Indicator, MantineTheme, getPrimaryShade } from '@mantine/core'
 import { createStyles } from '@mantine/emotion'
+import { useColorScheme } from '@mantine/hooks'
 
-const useStyles = createStyles((theme, { active }: { active: boolean }) => ({
-  wrapper: {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    width: 72,
-    height: 62,
-    background: theme.colors.lightBackground[3],
-    border: '1px solid',
-    borderColor: active ? 'blue' : theme.colors.decorativeBorders[3],
-    borderRadius: theme.radius.sm
+const useStyles = createStyles((theme: MantineTheme, { active }: { active: boolean }) => {
+  const colorScheme = useColorScheme()
+  const primaryShade = getPrimaryShade(theme, colorScheme)
+
+  return {
+    wrapper: {
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      width: 72,
+      height: 62,
+      background: theme.colors.lightBackground[primaryShade],
+      border: '1px solid',
+      borderColor: active ? 'blue' : theme.colors.decorativeBorders[primaryShade],
+      borderRadius: theme.radius.sm
+    }
   }
-}))
+})
 
 const BannerSizeMock = ({
   variant,

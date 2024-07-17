@@ -13,8 +13,9 @@ import {
   Modal,
   Input,
   Flex,
-  lighten
-  // alpha
+  lighten,
+  alpha,
+  MantineColorShade
 } from '@mantine/core'
 import { Dropzone } from '@mantine/dropzone'
 import DownArrowIcon from 'resources/icons/DownArrow'
@@ -53,11 +54,6 @@ declare module '@mantine/core' {
     colors: Record<ExtendedCustomColors, Tuple<string, 10>>
   }
 }
-
-// const getPrimaryShadeIndex = (theme) => {
-//   const colorScheme = theme.colorScheme || 'light'; // Fallback to 'light' if not available
-//   return theme.primaryShade[colorScheme];
-// };
 
 export const SIDE_BAR_WIDTH = 227
 const MOBILE_MAX_WIDTH_IN_PX = 475
@@ -172,41 +168,38 @@ const themeOverride: MantineThemeOverride = createTheme({
       },
       // TODO: Fix the type of the variant
       styles: (theme: MantineTheme, params: ButtonProps, { variant }: any) => {
-        // const outlineHoverBgColor = alpha(
-        //   theme.colors[params.color || theme.primaryColor][3],
-        //   theme.other.shades.rgba.lightest
-        // )
+        const outlineHoverBgColor = alpha(
+          theme.colors[params.color || theme.primaryColor][theme.primaryShade as MantineColorShade],
+          theme.other.shades.rgba.lightest
+        )
 
         // const outlineHoverBgGradient = theme.fn.radialGradient(
         //   outlineHoverBgColor,
         //   outlineHoverBgColor
         // )
 
-        // const filledHoverBgColor = theme.colors[params.color || theme.primaryColor][3 + 1]
+        const filledHoverBgColor = theme.colors[params.color || theme.primaryColor][3 + 1]
 
-        // const filledHoverBgGradient = theme.fn.radialGradient(
-        //   filledHoverBgColor,
-        //   filledHoverBgColor
-        // )
+        // const filledHoverBgGradient = getGradient(filledHoverBgColor, filledHoverBgColor)
 
         const customHover = variant === 'outline' || variant === 'filled'
 
         return {
           root: {
-            // background:
-            //   variant === 'outline'
-            //     ? theme.fn.rgba(
-            //         theme.colors[params.color || theme.primaryColor][3],
-            //         theme.other.shades.rgba.lightest
-            //       )
-            //     : '',
-            // backgroundImage:
-            //   // eslint-disable-next-line no-nested-ternary
-            //   variant === 'outline'
-            //     ? outlineHoverBgGradient
-            //     : variant === 'filled'
-            //     ? filledHoverBgGradient
-            //     : '',
+            background:
+              variant === 'outline'
+                ? alpha(
+                    theme.colors[params.color || theme.primaryColor][3],
+                    theme.other.shades.rgba.lightest
+                  )
+                : '',
+            backgroundImage:
+              // eslint-disable-next-line no-nested-ternary
+              variant === 'outline'
+                ? `radial-gradient(circle, ${outlineHoverBgColor}, ${outlineHoverBgColor})`
+                : variant === 'filled'
+                ? `radial-gradient(circle, ${filledHoverBgColor}, ${filledHoverBgColor})`
+                : '',
             backgroundSize: customHover ? '0% 100%' : '',
             backgroundPosition: customHover ? '50% 50%' : '',
             backgroundRepeat: 'no-repeat',
@@ -255,16 +248,12 @@ const themeOverride: MantineThemeOverride = createTheme({
         }
       })
     }),
-    // Navbar: {
-    //   defaultProps: {
-    //     width: { sm: SIDE_BAR_WIDTH }
-    //   }
-    // },
     Input: Input.extend({
       styles: (theme) => ({
         input: {
           backgroundColor: theme.colors.lightBackground[3],
-          borderColor: theme.colors.nonDecorativeBorders[3],
+          // TODO: check how to override it properly
+          // borderColor: theme.colors.nonDecorativeBorders[3],
           borderRadius: theme.radius.md
         },
         icon: {
@@ -274,7 +263,7 @@ const themeOverride: MantineThemeOverride = createTheme({
       })
     }),
     Dropzone: Dropzone.extend({
-      styles: (theme) => ({
+      styles: (theme: MantineTheme) => ({
         root: {
           backgroundColor: theme.colors.lightBackground[3]
         }

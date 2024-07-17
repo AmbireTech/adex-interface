@@ -1,30 +1,45 @@
-import { ActionIcon, Alert, CopyButton, Text, Grid, Group } from '@mantine/core'
+import {
+  ActionIcon,
+  Alert,
+  CopyButton,
+  Text,
+  Grid,
+  Group,
+  MantineTheme,
+  getPrimaryShade
+} from '@mantine/core'
 import useAccount from 'hooks/useAccount'
 import CopyIcon from 'resources/icons/Copy'
 import InfoIcon from 'resources/icons/Info'
 import { QRCodeSVG } from 'qrcode.react'
 import { createStyles } from '@mantine/emotion'
+import { useColorScheme } from '@mantine/hooks'
 
-const useStyles = createStyles((theme) => ({
-  center: {
-    display: 'flex',
-    justifyContent: 'center'
-  },
-  qrCodeWrapper: {
-    display: 'flex',
-    border: '15px solid',
-    padding: theme.spacing.sm,
-    borderColor: theme.colors.lightBackground[3],
-    borderRadius: theme.radius.md
-  },
-  addressWrapper: {
-    backgroundColor: theme.colors.lightBackground[3],
-    padding: theme.spacing.xs,
-    border: '1px solid',
-    borderColor: theme.colors.decorativeBorders[3],
-    borderRadius: theme.radius.md
+const useStyles = createStyles((theme: MantineTheme) => {
+  const colorScheme = useColorScheme()
+  const primaryShade = getPrimaryShade(theme, colorScheme)
+
+  return {
+    center: {
+      display: 'flex',
+      justifyContent: 'center'
+    },
+    qrCodeWrapper: {
+      display: 'flex',
+      border: '15px solid',
+      padding: theme.spacing.sm,
+      borderColor: theme.colors.lightBackground[primaryShade],
+      borderRadius: theme.radius.md
+    },
+    addressWrapper: {
+      backgroundColor: theme.colors.lightBackground[primaryShade],
+      padding: theme.spacing.xs,
+      border: '1px solid',
+      borderColor: theme.colors.decorativeBorders[primaryShade],
+      borderRadius: theme.radius.md
+    }
   }
-}))
+})
 
 const SendCryptocurrency = () => {
   const { classes } = useStyles()

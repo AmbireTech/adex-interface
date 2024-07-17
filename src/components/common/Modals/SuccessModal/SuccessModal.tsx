@@ -1,5 +1,6 @@
-import { Text, Modal, Flex, Button } from '@mantine/core'
+import { Text, Modal, Flex, Button, MantineTheme, getPrimaryShade, lighten } from '@mantine/core'
 import { createStyles } from '@mantine/emotion'
+import { useColorScheme } from '@mantine/hooks'
 import Lottie from 'lottie-react'
 import AnimationData from 'resources/lotties/success-lottie.json'
 
@@ -8,14 +9,18 @@ type SuccessModalProps = {
   opened: boolean
   close: () => void
 }
-const useStyles = createStyles((theme) => ({
-  wrapper: {
-    background: theme.colors.success[3] + theme.other.shades.hexColorSuffix.lightest
-  },
-  root: {
-    padding: 0
+const useStyles = createStyles((theme: MantineTheme) => {
+  const colorScheme = useColorScheme()
+  const primaryShade = getPrimaryShade(theme, colorScheme)
+  return {
+    wrapper: {
+      background: lighten(theme.colors.success[primaryShade], theme.other.shades.lighten.lightest)
+    },
+    root: {
+      padding: 0
+    }
   }
-}))
+})
 
 const SuccessModal = ({ text, opened, close }: SuccessModalProps) => {
   const { classes } = useStyles()

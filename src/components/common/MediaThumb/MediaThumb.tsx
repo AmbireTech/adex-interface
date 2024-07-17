@@ -1,23 +1,31 @@
 import { useCallback, useMemo, useState } from 'react'
-import { Box } from '@mantine/core'
+import { Box, MantineTheme, getPrimaryShade } from '@mantine/core'
 import { createStyles } from '@mantine/emotion'
+import { useColorScheme } from '@mantine/hooks'
 import { AdUnit } from 'adex-common/dist/types'
 import { CreativePreviewModal } from '../Modals'
 import Media from '../Media'
 
 const useStyles = createStyles(
-  (theme, { width, height }: { width?: number | string; height?: number | string }) => ({
-    thumbContainer: {
-      position: 'relative',
-      maxWidth: width,
-      maxHeight: height,
-      overflow: 'hidden',
-      background: theme.colors.alternativeBackground[3],
-      '&:hover': {
-        cursor: 'pointer'
+  (
+    theme: MantineTheme,
+    { width, height }: { width?: number | string; height?: number | string }
+  ) => {
+    const colorScheme = useColorScheme()
+    const primaryShade = getPrimaryShade(theme, colorScheme)
+    return {
+      thumbContainer: {
+        position: 'relative',
+        maxWidth: width,
+        maxHeight: height,
+        overflow: 'hidden',
+        background: theme.colors.alternativeBackground[primaryShade],
+        '&:hover': {
+          cursor: 'pointer'
+        }
       }
     }
-  })
+  }
 )
 
 const MediaThumb = ({

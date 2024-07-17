@@ -1,5 +1,14 @@
-import { Container, Grid, Select, Text } from '@mantine/core'
+import {
+  Container,
+  Grid,
+  MantineTheme,
+  Select,
+  Text,
+  getPrimaryShade,
+  lighten
+} from '@mantine/core'
 import { createStyles } from '@mantine/emotion'
+import { useColorScheme } from '@mantine/hooks'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import EthereumIcon from 'resources/networks/Ethereum'
 import PolygonIcon from 'resources/networks/Polygon'
@@ -14,37 +23,44 @@ import TopUpAccountModal from 'components/common/TopUpAccountModal'
 import SendCryptocurrency from './SendCryptocurrency'
 import TopUpWithFiat from './TopUpWithFiat'
 
-const useStyles = createStyles((theme) => ({
-  container: {
-    background: theme.colors.mainBackground[3],
-    boxShadow: theme.shadows.sm,
-    borderRadius: theme.radius.sm,
-    marginTop: theme.spacing.xl
-  },
-  center: {
-    display: 'flex',
-    justifyContent: 'center'
-  },
-  confirmModalContent: {
-    background: theme.colors.attention[3] + theme.other.shades.hexColorSuffix.lightest,
-    padding: theme.spacing.xl
-  },
-  iconWrapper: {
-    width: 50,
-    height: 50,
-    background: `${theme.colors.attention[3]}1A`,
-    borderRadius: '50%',
-    padding: theme.spacing.sm
-  },
-  attentionIcon: {
-    width: 25,
-    height: 25,
-    color: theme.colors.attention[3]
-  },
-  root: {
-    padding: 0
+const useStyles = createStyles((theme: MantineTheme) => {
+  const colorScheme = useColorScheme()
+  const primaryShade = getPrimaryShade(theme, colorScheme)
+  return {
+    container: {
+      background: theme.colors.mainBackground[primaryShade],
+      boxShadow: theme.shadows.sm,
+      borderRadius: theme.radius.sm,
+      marginTop: theme.spacing.xl
+    },
+    center: {
+      display: 'flex',
+      justifyContent: 'center'
+    },
+    confirmModalContent: {
+      background: lighten(
+        theme.colors.attention[primaryShade],
+        theme.other.shades.lighten.lightest
+      ),
+      padding: theme.spacing.xl
+    },
+    iconWrapper: {
+      width: 50,
+      height: 50,
+      background: `${theme.colors.attention[primaryShade]}1A`,
+      borderRadius: '50%',
+      padding: theme.spacing.sm
+    },
+    attentionIcon: {
+      width: 25,
+      height: 25,
+      color: theme.colors.attention[primaryShade]
+    },
+    root: {
+      padding: 0
+    }
   }
-}))
+})
 
 const data = [
   {

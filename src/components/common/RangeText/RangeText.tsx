@@ -1,13 +1,19 @@
-import { Text, Group, MantineTheme } from '@mantine/core'
+import { Text, Group, MantineTheme, getPrimaryShade } from '@mantine/core'
 import { createStyles } from '@mantine/emotion'
+import { useColorScheme } from '@mantine/hooks'
 import { RangeTextProps } from 'types'
 
-const useStyles = createStyles((theme: MantineTheme) => ({
-  borderLeft: {
-    borderLeft: '1px solid',
-    borderColor: theme.colors.decorativeBorders[3]
+const useStyles = createStyles((theme: MantineTheme) => {
+  const colorScheme = useColorScheme()
+  const primaryShade = getPrimaryShade(theme, colorScheme)
+
+  return {
+    borderLeft: {
+      borderLeft: '1px solid',
+      borderColor: theme.colors.decorativeBorders[primaryShade]
+    }
   }
-}))
+})
 
 const RangeText = ({ labelOne, valueOne, labelTwo, valueTwo }: RangeTextProps) => {
   const { classes } = useStyles()
