@@ -10,6 +10,13 @@ export const CREATE_CAMPAIGN_STEPS = 4
 export const CAMPAIGN_CATEGORIES_INPUT = 'targetingInput.inputs.categories'
 export const CAMPAIGN_LOCATION_INPUT = 'targetingInput.inputs.location'
 export const CAMPAIGN_PLACEMENTS_INPUT = 'targetingInput.inputs.placements.in'
+export const CAMPAIGN_INCLUDE_INCENTIVIZED_INPUT =
+  'targetingInput.inputs.advanced.includeIncentivized'
+export const CAMPAIGN_DISABLE_FREQUENCY_CAPPING_INPUT =
+  'targetingInput.inputs.advanced.disableFrequencyCapping'
+export const CAMPAIGN_LIMIT_DAILY_AVERAGE_SPENDING_INPUT =
+  'targetingInput.inputs.advanced.limitDailyAverageSpending'
+
 const THIRTY_DAYS_IN_MILLISECONDS = 2592000000
 
 export const dateNowPlusThirtyDays = () => {
