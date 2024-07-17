@@ -80,7 +80,6 @@ const AdminProvider: FC<PropsWithChildren> = ({ children }) => {
       const submit = async () => {
         console.log({ values })
         const { accountId, ...body } = values
-        body.amount *= 10 ** body.token.decimals
         console.log({ body })
 
         try {
