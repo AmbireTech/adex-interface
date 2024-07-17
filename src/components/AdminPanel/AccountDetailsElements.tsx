@@ -8,7 +8,7 @@ import { parseBigNumTokenAmountToDecimal } from 'helpers/balances'
 export const FundsActivity = ({ accountData }: { accountData: Account }) => {
   const elements = useMemo(() => {
     const data = accountData.fundsDeposited.deposits
-      .sort((a, b) => Number(b.created) - Number(a.created))
+      .sort((a, b) => new Date(b.created).getTime() - new Date(a.created).getTime())
       .map((x) => {
         return {
           id: x.created?.toString() || '',
