@@ -73,7 +73,7 @@ const analyticsDataToMappedAnalytics = (
   // const clickPaid = analyticsData[3]
 
   // On development env using mock data
-  if (process.env.NODE_ENV === 'development') {
+  if (process.env.NODE_ENV === 'development' && !analyticsData.length) {
     const mockedData = dashboardTableElements[0][analyticsType].map((x) => ({
       ...x,
       ctr: Number(((x.clicks / x.impressions) * 100).toFixed(4)),
