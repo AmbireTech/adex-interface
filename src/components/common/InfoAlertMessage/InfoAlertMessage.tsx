@@ -1,9 +1,9 @@
-import { Grid, Text, GridProps, MantineTheme, lighten, getPrimaryShade } from '@mantine/core'
+import { Text, MantineTheme, lighten, getPrimaryShade, Flex, FlexProps } from '@mantine/core'
 import { createStyles } from '@mantine/emotion'
 import { useColorScheme } from '@mantine/hooks'
 import InfoCurlyBorder from 'resources/icons/InfoCurlyBorder'
 
-type InfoAlertMessageProps = GridProps & {
+type InfoAlertMessageProps = FlexProps & {
   message: string
 }
 
@@ -18,7 +18,6 @@ const useStyles = createStyles((theme: MantineTheme) => {
       borderColor: theme.colors.decorativeBorders[primaryShade],
       boxShadow: theme.shadows.sm,
       borderRadius: theme.radius.md,
-      marginBottom: theme.spacing.xs,
       background: lighten(theme.colors.warning[primaryShade], theme.other.shades.lighten.lightest)
     },
     errorIcon: {
@@ -26,14 +25,18 @@ const useStyles = createStyles((theme: MantineTheme) => {
       alignItems: 'center',
       justifyContent: 'center',
       width: 50,
+      height: '100%',
       borderTopLeftRadius: theme.radius.md,
       borderBottomLeftRadius: theme.radius.md,
-      color: theme.colors.warning[primaryShade]
+      color: theme.colors.warning[primaryShade],
+      padding: theme.spacing.sm
     },
     text: {
+      flexGrow: 3,
       background: theme.colors.mainBackground[primaryShade],
       borderTopRightRadius: theme.radius.md,
-      borderBottomRightRadius: theme.radius.md
+      borderBottomRightRadius: theme.radius.md,
+      padding: theme.spacing.md
     }
   }
 })
@@ -41,16 +44,20 @@ const useStyles = createStyles((theme: MantineTheme) => {
 const InfoAlertMessage = ({ message, ...rest }: InfoAlertMessageProps) => {
   const { classes } = useStyles()
   return (
-    <Grid className={classes.errorWrapper} {...rest}>
-      <Grid.Col span="content" className={classes.errorIcon} p={0}>
+    <Flex
+      direction="row"
+      justify="space-between"
+      className={classes.errorWrapper}
+      wrap="nowrap"
+      {...rest}
+    >
+      <div className={classes.errorIcon}>
         <InfoCurlyBorder size="24px" />
-      </Grid.Col>
-      <Grid.Col span="auto" className={classes.text} p={0}>
-        <Text size="sm" m="md">
-          {message}
-        </Text>
-      </Grid.Col>
-    </Grid>
+      </div>
+      <div className={classes.text}>
+        <Text size="sm">{message}</Text>
+      </div>
+    </Flex>
   )
 }
 

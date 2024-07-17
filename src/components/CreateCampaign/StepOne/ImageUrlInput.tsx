@@ -49,7 +49,7 @@ const useStyles = createStyles((theme: MantineTheme, { hasError }: { hasError: b
       }
     },
     infoError: {
-      padding: theme.spacing.xs
+      paddingBottom: theme.spacing.xs
     },
     rightSection: {
       backgroundColor: theme.colors.lightBackground[primaryShade]
@@ -71,21 +71,6 @@ const ImageUrlInput = ({
     [error, toRemove]
   )
   const { classes, cx } = useStyles({ hasError })
-
-  const getRightSection = useCallback(() => {
-    if (preview || !onDelete) return null
-
-    return (
-      <ActionIcon
-        title="Remove"
-        color="secondaryText"
-        variant="transparent"
-        onClick={() => onDelete(image)}
-      >
-        <DeleteIcon size="24px" />
-      </ActionIcon>
-    )
-  }, [image, preview, onDelete])
 
   const handleChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -125,12 +110,22 @@ const ImageUrlInput = ({
           variant="unstyled"
           placeholder="Please enter a target URL starting with https://"
           size="md"
-          rightSection={getRightSection()}
           classNames={{
             section: classes.rightSection,
             input: classes.input
           }}
         />
+        {(!preview || onDelete) && (
+          <ActionIcon
+            mr="sm"
+            title="Remove"
+            color="secondaryText"
+            variant="transparent"
+            onClick={() => onDelete && onDelete(image)}
+          >
+            <DeleteIcon size="24px" />
+          </ActionIcon>
+        )}
       </Flex>
       {error?.errMsg && <Text color="warning">{error?.errMsg}</Text>}
     </>
