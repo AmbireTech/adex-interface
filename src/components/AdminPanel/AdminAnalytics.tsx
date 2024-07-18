@@ -7,7 +7,8 @@ import {
   Box,
   Text,
   Badge,
-  ActionIcon
+  ActionIcon,
+  Paper
 
   //  Flex, Loader, Tabs
 } from '@mantine/core'
@@ -256,57 +257,60 @@ const AdminAnalytics = () => {
       {loading ? (
         <Loader size="xl" variant="dots" color="violet" />
       ) : (
-        <Flex direction="column">
-          <Flex direction="row" align="center" justify="left" gap="xl" mb="md">
-            <Box>Totals: </Box>
-            <Badge
-              leftSection={
-                <ActionIcon size="sm" color="brand">
-                  <BillingIcon />
-                </ActionIcon>
-              }
-              size="xl"
-            >
-              {Number(data.paid.toFixed(2)).toLocaleString()}
-            </Badge>
+        <Paper p="sm" withBorder>
+          <Flex direction="column">
+            <Flex direction="row" align="center" justify="left" gap="xl" mb="md">
+              <Box>Totals: </Box>
+              <Badge
+                leftSection={
+                  <ActionIcon size="sm" color="brand">
+                    <BillingIcon />
+                  </ActionIcon>
+                }
+                size="xl"
+              >
+                {Number(data.paid.toFixed(2)).toLocaleString()}
+              </Badge>
 
-            <Badge
-              size="xl"
-              leftSection={
-                <ActionIcon size="sm" color="brand">
-                  <VisibilityIcon />
-                </ActionIcon>
-              }
-            >
-              {data.imps.toLocaleString()}
-            </Badge>
+              <Badge
+                size="xl"
+                leftSection={
+                  <ActionIcon size="sm" color="brand">
+                    <VisibilityIcon />
+                  </ActionIcon>
+                }
+              >
+                {data.imps.toLocaleString()}
+              </Badge>
 
-            <Badge
-              size="xl"
-              leftSection={
-                <ActionIcon size="sm" color="brand">
-                  <CheckMarkFilledIcon />
-                </ActionIcon>
-              }
-            >
-              {data.clicks.toLocaleString()}
-            </Badge>
+              <Badge
+                size="xl"
+                leftSection={
+                  <ActionIcon size="sm" color="brand">
+                    <CheckMarkFilledIcon />
+                  </ActionIcon>
+                }
+              >
+                {data.clicks.toLocaleString()}
+              </Badge>
 
-            <DownloadCSV
-              data={adminMappedAnalytics}
-              mapHeadersToDataProperties={{ [analType]: 'segment', ...csvHeaders }}
-              filename={`${analyticsKey?.key || 'admin-data-export'}.csv`}
-              disabled={loading}
+              <DownloadCSV
+                data={adminMappedAnalytics}
+                mapHeadersToDataProperties={{ [analType]: 'segment', ...csvHeaders }}
+                filename={`${analyticsKey?.key || 'admin-data-export'}.csv`}
+                disabled={loading}
+              />
+            </Flex>
+
+            <CustomTable
+              background
+              headings={headings}
+              elements={data.elements}
+              pageSize={10}
+              onPreview={analType === 'campaignId' ? handlePreview : undefined}
             />
           </Flex>
-          <CustomTable
-            background
-            headings={headings}
-            elements={data.elements}
-            pageSize={10}
-            onPreview={analType === 'campaignId' ? handlePreview : undefined}
-          />
-        </Flex>
+        </Paper>
       )}
     </Container>
   )

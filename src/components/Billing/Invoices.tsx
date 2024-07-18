@@ -10,7 +10,7 @@ import useAccount from 'hooks/useAccount'
 import { formatDateShort } from 'helpers'
 import { InvoicesModal } from './InvoicesModal'
 
-const columnTitles = ['Company Name', 'Campaign Period']
+const columnTitles = ['Company Name', 'Campaign', 'Campaign Period']
 
 const Invoices = () => {
   const [opened, { open, close }] = useDisclosure(false)
@@ -37,6 +37,7 @@ const Invoices = () => {
           return {
             id: campaign.campaignId,
             companyName,
+            campaign: campaign.campaign.title,
             campaignPeriod: (
               <span>
                 <span>{formatDateShort(new Date(Number(campaign.campaign.activeFrom)))} </span>

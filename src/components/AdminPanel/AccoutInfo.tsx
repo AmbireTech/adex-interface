@@ -74,9 +74,10 @@ function AccountInfo({ accountData }: { accountData: Account }) {
         disabled
         {...form.getInputProps('availableBalance')}
       />
-      <Text size="sm" weight={500} mt="md">
+      <Text size="sm" weight={500} mt="xl">
         Billing details
       </Text>
+      <Text size="xs">* Just for info, users can edit, admins can verify only</Text>
       <Group mt="md" position="left" align="baseline">
         <TextInput
           label="First name"
@@ -121,9 +122,10 @@ function AccountInfo({ accountData }: { accountData: Account }) {
         />
       </Group>
 
-      <Text size="sm" weight={500} mt="md">
+      <Text size="sm" weight={500} mt="xl">
         Additional info
       </Text>
+      <Text size="xs">* can be seen and edited only by admins</Text>
 
       <Group mt="md" position="left" align="baseline">
         <TextInput label="Contact email" {...form.getInputProps('info.email')} />
