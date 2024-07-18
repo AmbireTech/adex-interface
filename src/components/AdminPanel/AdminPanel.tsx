@@ -27,7 +27,7 @@ const AdminPanel = () => {
           <Tabs.Tab value="validatorAnalytics">Validator Analytics</Tabs.Tab>
           <Tabs.Tab value="sspStats">SSP stats</Tabs.Tab>
           <Tabs.Tab value="accounts">Accounts</Tabs.Tab>
-          <Tabs.Tab value="user-account" hidden>
+          <Tabs.Tab value="user-account" disabled>
             Account details
           </Tabs.Tab>
         </Tabs.List>
