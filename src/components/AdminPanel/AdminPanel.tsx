@@ -4,6 +4,7 @@ import { AdminBadge } from 'components/common/AdminBadge'
 import Dashboard from 'components/Dashboard'
 import AdminAnalytics from './AdminAnalytics'
 import Accounts from './Accounts'
+import { SspStats } from './SspStats'
 // import { AccountDetails } from './AccountDetails'
 
 const AdminPanel = () => {
@@ -23,8 +24,8 @@ const AdminPanel = () => {
       >
         <Tabs.List>
           <Tabs.Tab value="campaigns">Campaigns</Tabs.Tab>
-          <Tabs.Tab value="generalAnalytics">Validator Analytics</Tabs.Tab>
-          {/* <Tabs.Tab value="deposits">Deposits</Tabs.Tab> */}
+          <Tabs.Tab value="validatorAnalytics">Validator Analytics</Tabs.Tab>
+          <Tabs.Tab value="sspStats">SSP stats</Tabs.Tab>
           <Tabs.Tab value="accounts">Accounts</Tabs.Tab>
           <Tabs.Tab value="user-account" hidden>
             Account details
@@ -35,13 +36,13 @@ const AdminPanel = () => {
           <Dashboard isAdminPanel />
         </Tabs.Panel>
 
-        <Tabs.Panel value="generalAnalytics" pt="xs">
+        <Tabs.Panel value="validatorAnalytics" pt="xs">
           <AdminAnalytics />
         </Tabs.Panel>
 
-        {/* <Tabs.Panel value="deposits" pt="xs">
-          <AccountDetails />
-        </Tabs.Panel> */}
+        <Tabs.Panel value="sspStats" pt="xs">
+          <SspStats />
+        </Tabs.Panel>
 
         <Tabs.Panel value="accounts" pt="xs">
           <Accounts />
