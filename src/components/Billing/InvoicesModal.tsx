@@ -1,10 +1,10 @@
 import { InvoicesPDF } from 'components/Billing/BillingPDF'
 import { ADEX_COMPANY_DETAILS } from 'constants/adexCompanyDetatils'
 import useAccount from 'hooks/useAccount'
-import useCampaignAnalytics from 'hooks/useCampaignAnalytics'
 import { useCampaignsData } from 'hooks/useCampaignsData'
-import { useEffect, useMemo, useState } from 'react'
-import { AnalyticsPeriod, BaseAnalyticsData, IInvoiceDetails } from 'types'
+import { useMemo } from 'react'
+import { IInvoiceDetails } from 'types'
+import { parseBigNumTokenAmountToDecimal } from 'helpers'
 import { BillingDetailsModal } from './BillingDetailsModal'
 
 type PrintModalProps = {
@@ -23,14 +23,6 @@ export const InvoicesModal = ({ campaignId, opened, close }: PrintModalProps) =>
       fundsOnCampaigns: { perCampaign: openings }
     }
   } = useAccount()
-  const { getAnalyticsKeyAndUpdate, mappedAnalytics } = useCampaignAnalytics()
-  const [analyticsKey, setAnalyticsKey] = useState<
-    | {
-        key: string
-        period: AnalyticsPeriod
-      }
-    | undefined
-  >()
 
   const campaignData = useMemo(
     () => campaignsData.get(campaignId),
@@ -39,88 +31,105 @@ export const InvoicesModal = ({ campaignId, opened, close }: PrintModalProps) =>
   )
 
   const campaign = useMemo(() => campaignData?.campaign, [campaignData])
-  const currencyName = useMemo(
-    () => (campaign?.id ? openings.find((item) => item.id === campaign?.id)?.token.name || '' : ''),
-    [campaign?.id, openings]
-  )
 
-  const actualPeriod = useMemo(() => {
+  const invoiceData = useMemo(() => {
     const to = Number(campaign?.activeTo || 0)
+
+    const campaignOpenData = openings.find((item) => item.id === campaign?.id)
+    const campaignCloseData = refunds.find((item) => item.id === campaign?.id)
+    const currencyName = campaignOpenData?.token.name || ''
+    const decimals = campaignOpenData?.token.decimals || 6
 
     // NOTE: the actual payment is when the campaign is started (openings -> start dates, activeFrom is fallback)
     // The question is: Is that ok from accounting stand point
     // TODO: Should we have invoices for the full amount and credit notes for the refunds (on stop or expire with no full budget used)
     const start = new Date(
-      openings.find((item) => item.id === campaign?.id)?.startDate ||
-        Number(campaign?.activeFrom) ||
-        0
+      campaignOpenData?.startDate || Number(campaign?.activeFrom) || 0
     ).getTime()
 
-    const end = new Date(
-      refunds.find((item) => item.id === campaign?.id)?.closeDate || to
-    ).getTime()
+    const end = new Date(campaignCloseData?.closeDate || to).getTime()
 
     // TODO: discuss the payment and invoice date
+
+    const amount = parseBigNumTokenAmountToDecimal(
+      BigInt(campaignOpenData?.amount || campaign?.campaignBudget || 0) -
+        BigInt(campaignCloseData?.amount || 0),
+      decimals
+    )
     return {
       invoiceDate: Math.min(end, to),
-      paymentDate: start
+      paymentDate: start,
+      amount,
+      currencyName
     }
-  }, [campaign?.activeFrom, campaign?.activeTo, campaign?.id, openings, refunds])
+  }, [
+    campaign?.activeFrom,
+    campaign?.activeTo,
+    campaign?.campaignBudget,
+    campaign?.id,
+    openings,
+    refunds
+  ])
 
-  const campaignMappedAnalytics: BaseAnalyticsData[] | undefined = useMemo(
-    () => mappedAnalytics.get(analyticsKey?.key || ''),
-    [analyticsKey, mappedAnalytics]
-  )
+  // const campaignMappedAnalytics: BaseAnalyticsData[] | undefined = useMemo(
+  //   () => mappedAnalytics.get(analyticsKey?.key || ''),
+  //   [analyticsKey, mappedAnalytics]
+  // )
 
-  useEffect(() => {
-    if (!campaign) return
-    setAnalyticsKey(undefined)
+  // useEffect(() => {
+  //   if (!campaign) return
+  //   setAnalyticsKey(undefined)
 
-    const checkAnalytics = async () => {
-      try {
-        const key = await getAnalyticsKeyAndUpdate('hostname', campaign)
-        setAnalyticsKey(key)
-      } catch (e) {
-        console.error('Can not get Analytics key: ', e)
-      }
-    }
+  //   const checkAnalytics = async () => {
+  //     try {
+  //       const key = await getAnalyticsKeyAndUpdate('hostname', campaign)
+  //       setAnalyticsKey(key)
+  //     } catch (e) {
+  //       console.error('Can not get Analytics key: ', e)
+  //     }
+  //   }
 
-    checkAnalytics()
-  }, [campaign, getAnalyticsKeyAndUpdate])
+  //   checkAnalytics()
+  // }, [campaign, getAnalyticsKeyAndUpdate])
 
   const elements: IInvoiceDetails = useMemo(() => {
+    const impressions = campaignData?.impressions || 0
+    const clicks = campaignData?.clicks || 0
+
     return {
       invoiceId: campaign?.id || '',
-      invoiceDate: new Date(actualPeriod.invoiceDate),
-      paymentDate: new Date(actualPeriod.paymentDate),
+      invoiceDate: new Date(invoiceData.invoiceDate),
+      paymentDate: new Date(invoiceData.paymentDate),
       seller: ADEX_COMPANY_DETAILS,
       buyer: {
         ...billingDetails,
         ethAddress: address
       },
-      invoiceData:
-        campaignMappedAnalytics && campaignMappedAnalytics.length ? campaignMappedAnalytics : [],
       // TODO: Check if the value of VAT% should be greater than 0
       vatPercentageInUSD: 0,
-      currencyName
+      currencyName: invoiceData.currencyName,
+      impressions,
+      amount: Number(invoiceData.amount),
+      clicks,
+      ctr: campaignData?.ctr || 0,
+      avgCpm: campaignData?.avgCpm || 0
     }
   }, [
+    campaignData?.impressions,
+    campaignData?.clicks,
+    campaignData?.ctr,
+    campaignData?.avgCpm,
+    invoiceData.amount,
+    invoiceData.invoiceDate,
+    invoiceData.paymentDate,
+    invoiceData.currencyName,
     campaign?.id,
-    actualPeriod.invoiceDate,
-    actualPeriod.paymentDate,
     billingDetails,
-    address,
-    campaignMappedAnalytics,
-    currencyName
+    address
   ])
 
   return (
-    <BillingDetailsModal
-      title="Invoice"
-      loading={!analyticsKey || !campaignMappedAnalytics}
-      opened={opened}
-      close={close}
-    >
+    <BillingDetailsModal title="Invoice" loading={!campaignsData} opened={opened} close={close}>
       <InvoicesPDF
         invoiceDetails={elements}
         placement={campaign?.targetingInput.inputs.placements.in[0] || 'site'}
