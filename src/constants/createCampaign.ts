@@ -101,7 +101,7 @@ export const CREATE_CAMPAIGN_DEFAULT_VALUE: CampaignUI = {
       publishers: DEFAULT_CATS_LOCS_VALUE,
       placements: DEFAULT_PLACEMENTS_VALUE,
       advanced: {
-        includeIncentivized: true,
+        includeIncentivized: false,
         disableFrequencyCapping: false,
         limitDailyAverageSpending: false
       }
