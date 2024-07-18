@@ -6,7 +6,8 @@ import {
   Flex,
   Box,
   Badge,
-  TextInput
+  TextInput,
+  Paper
 
   //  Flex, Loader, Tabs
 } from '@mantine/core'
@@ -123,35 +124,37 @@ const AdminAnalytics = () => {
       {initialDataLoading ? (
         <Loader size="xl" variant="dots" color="violet" />
       ) : (
-        <Flex direction="column">
-          <Flex direction="row" align="center" justify="left" gap="xl" mb="md" wrap="wrap">
-            <Box>Totals: </Box>
-            <Badge leftSection="Accounts" size="xl">
-              ({data.totalAccounts})
-            </Badge>
-            <Badge leftSection="Deposits" size="xl">
-              ({data.totalDeposits} USDC)
-            </Badge>
-            <Badge leftSection="Campaigns" size="xl">
-              ({data.totalCampaignsLocked} USDC)
-            </Badge>
-            <Flex>
-              <TextInput
-                placeholder="Search by id, name, info, billing data etc."
-                value={search}
-                onChange={(e) => setSearch(e.currentTarget.value)}
-                miw={420}
-              />
+        <Paper p="sm" withBorder>
+          <Flex direction="column">
+            <Flex direction="row" align="center" justify="left" gap="xl" mb="md" wrap="wrap">
+              <Box>Totals: </Box>
+              <Badge leftSection="Accounts" size="xl">
+                ({data.totalAccounts})
+              </Badge>
+              <Badge leftSection="Deposits" size="xl">
+                ({data.totalDeposits} USDC)
+              </Badge>
+              <Badge leftSection="Campaigns" size="xl">
+                ({data.totalCampaignsLocked} USDC)
+              </Badge>
+              <Flex>
+                <TextInput
+                  placeholder="Search by id, name, info, billing data etc."
+                  value={search}
+                  onChange={(e) => setSearch(e.currentTarget.value)}
+                  miw={420}
+                />
+              </Flex>
             </Flex>
+            <CustomTable
+              background
+              headings={headings}
+              elements={data.elements}
+              pageSize={10}
+              onPreview={handlePreview}
+            />
           </Flex>
-          <CustomTable
-            background
-            headings={headings}
-            elements={data.elements}
-            pageSize={10}
-            onPreview={handlePreview}
-          />
-        </Flex>
+        </Paper>
       )}
     </Container>
   )
