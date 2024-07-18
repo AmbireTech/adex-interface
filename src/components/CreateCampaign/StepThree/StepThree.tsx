@@ -279,7 +279,7 @@ const StepThree = () => {
         </Grid.Col>
         <Grid.Col mb="md">
           <Text color="secondaryText" size="sm" weight="bold">
-            7. Additional options
+            7. Advanced options
           </Text>
           <Group my="sm">
             <Checkbox
