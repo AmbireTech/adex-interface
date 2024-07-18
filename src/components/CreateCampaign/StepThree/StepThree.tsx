@@ -319,7 +319,12 @@ const StepThree = () => {
           </Group>
         </Grid.Col>
       </Grid>
-      <Button type="button" onClick={submitForm} style={{ display: 'none' }} />
+      <Button
+        type="button"
+        onClick={submitForm}
+        style={{ display: 'none' }}
+        id="createCampaignSubmitBtn1"
+      />
     </>
   )
 }
