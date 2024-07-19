@@ -204,61 +204,61 @@ const AdminAnalytics = () => {
   )
 
   return (
-    <Container fluid>
-      <Text size="sm" mb="sm">
-        * This analytics are for the actual user campaign, representing placed impressions, clicks,
-        etc. (NOT the stats form received requests form the SSPs)
-      </Text>
-      <Text size="sm" mb="sm">
-        * Amounts include AdEx validator fees 7% (total amounts paid by the users). For amounts
-        payed to ssp divide by 1.07 (for records after 22.06.24)
-      </Text>
+    <Container fluid px={0}>
+      <Paper p="sm" withBorder>
+        <Text size="sm">
+          * This analytics are for the actual user campaign, representing placed impressions,
+          clicks, etc. (NOT the stats form received requests form the SSPs)
+        </Text>
+        <Text size="sm" mb="md">
+          * Amounts include AdEx validator fees 7% (total amounts paid by the users). For amounts
+          payed to ssp divide by 1.07 (for records after 22.06.24)
+        </Text>
 
-      <Flex direction="row" align="start" justify="left" gap="xl" mb="md">
-        <Select
-          label="Type"
-          value={analType}
-          onChange={(val) => setAnalType(val as AnalyticsType)}
-          data={analyticsTypeData}
-          size="md"
-        />
-        <Select
-          label="SSP"
-          value={ssp}
-          onChange={(val) => setSsp(val as SSPs)}
-          data={sspsData}
-          size="md"
-        />
-        <Select
-          label="Period"
-          value={timeframe}
-          onChange={(val) => setTimeframe(val as Timeframe)}
-          data={timeframeData}
-          size="md"
-        />
-        <DateInput
-          label="Start date"
-          placeholder="Start date"
-          value={startDate}
-          onChange={setStartDate}
-          maxDate={maxDate}
-          size="md"
-        />
-        <DateTimePicker
-          label="End date"
-          placeholder="Start date"
-          value={endDate}
-          disabled
-          withSeconds
-          size="md"
-        />
-      </Flex>
+        <Flex direction="row" align="start" justify="left" gap="xl" mb="md">
+          <Select
+            label="Type"
+            value={analType}
+            onChange={(val) => setAnalType(val as AnalyticsType)}
+            data={analyticsTypeData}
+            size="md"
+          />
+          <Select
+            label="SSP"
+            value={ssp}
+            onChange={(val) => setSsp(val as SSPs)}
+            data={sspsData}
+            size="md"
+          />
+          <Select
+            label="Period"
+            value={timeframe}
+            onChange={(val) => setTimeframe(val as Timeframe)}
+            data={timeframeData}
+            size="md"
+          />
+          <DateInput
+            label="Start date"
+            placeholder="Start date"
+            value={startDate}
+            onChange={setStartDate}
+            maxDate={maxDate}
+            size="md"
+          />
+          <DateTimePicker
+            label="End date"
+            placeholder="Start date"
+            value={endDate}
+            disabled
+            withSeconds
+            size="md"
+          />
+        </Flex>
 
-      {loading ? (
-        <Loader size="xl" variant="dots" color="violet" />
-      ) : (
-        <Paper p="sm" withBorder>
-          <Flex direction="column">
+        {loading ? (
+          <Loader size="xl" variant="dots" color="violet" />
+        ) : (
+          <Flex direction="column" mt="xl">
             <Flex direction="row" align="center" justify="left" gap="xl" mb="md">
               <Box>Totals: </Box>
               <Badge
@@ -310,8 +310,8 @@ const AdminAnalytics = () => {
               onPreview={analType === 'campaignId' ? handlePreview : undefined}
             />
           </Flex>
-        </Paper>
-      )}
+        )}
+      </Paper>
     </Container>
   )
 }

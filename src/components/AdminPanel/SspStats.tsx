@@ -80,18 +80,16 @@ function SspStats() {
 
   return (
     <Box>
-      <Tabs keepMounted={false} defaultValue="app">
+      <Tabs keepMounted={false} defaultValue="app" orientation="vertical">
         <Tabs.List>
-          <Tabs.Tab value="app">Apps {loading && <Loader size="sm" variant="dots" />}</Tabs.Tab>
-          <Tabs.Tab value="mobile">
-            Mobile sites {loading && <Loader size="sm" variant="dots" />}
-          </Tabs.Tab>
-          <Tabs.Tab value="desktop">
-            Desktop sites {loading && <Loader size="sm" variant="dots" />}
-          </Tabs.Tab>
+          <Tabs.Tab value="app">Apps </Tabs.Tab>
+          <Tabs.Tab value="mobile">Mobile sites</Tabs.Tab>
+          <Tabs.Tab value="desktop">Desktop sites</Tabs.Tab>
         </Tabs.List>
 
-        <Tabs.Panel value="app" pt="xs">
+        <Tabs.Panel value="app" pl="xs">
+          {loading && <Loader size="sm" variant="dots" />}
+
           <SimpleGrid
             cols={2}
             breakpoints={[
@@ -108,7 +106,9 @@ function SspStats() {
           </SimpleGrid>
         </Tabs.Panel>
 
-        <Tabs.Panel value="mobile" pt="xs">
+        <Tabs.Panel value="mobile" pl="xs">
+          {loading && <Loader size="sm" variant="dots" />}
+
           <SimpleGrid
             cols={2}
             breakpoints={[
@@ -125,7 +125,9 @@ function SspStats() {
           </SimpleGrid>
         </Tabs.Panel>
 
-        <Tabs.Panel value="desktop" pt="xs">
+        <Tabs.Panel value="desktop" pl="xs">
+          {loading && <Loader size="sm" variant="dots" />}
+
           <SimpleGrid
             cols={2}
             breakpoints={[

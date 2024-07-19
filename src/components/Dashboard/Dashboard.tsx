@@ -33,10 +33,7 @@ const campaignHeaders = [
 const statusOrder = {
   inReview: 0,
   draft: 1,
-  active: 2,
-  paused: 3,
-  stopped: 4,
-  completed: 5
+  other: 2
 }
 
 const getStatusOrder = (status: CampaignStatus) => {
@@ -45,21 +42,12 @@ const getStatusOrder = (status: CampaignStatus) => {
       return statusOrder.inReview
     case CampaignStatus.draft:
       return statusOrder.draft
-    case CampaignStatus.active:
-    case CampaignStatus.ready:
-      return statusOrder.active
-    case CampaignStatus.paused:
-      return statusOrder.paused
-    case CampaignStatus.closedByUser:
-    case CampaignStatus.expired:
-    case CampaignStatus.exhausted:
-      return statusOrder.stopped
     default:
-      return statusOrder.completed
+      return statusOrder.other
   }
 }
 
-const Dashboard = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
+const Dashboard = ({ isAdminPanel, accountId }: { isAdminPanel?: boolean; accountId?: string }) => {
   const navigate = useNavigate()
   const { campaignsData, initialDataLoading, updateAllCampaignsData } = useCampaignsData()
   const { updateCampaignFromDraft } = useCreateCampaignContext()
@@ -75,14 +63,20 @@ const Dashboard = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
     //       )
     //     : []
     // }
-    return Array.from(campaignsData.values()).sort((a, b) => {
-      const statusOrderDiff = getStatusOrder(a.campaign.status) - getStatusOrder(b.campaign.status)
-      if (statusOrderDiff !== 0) {
-        return statusOrderDiff
-      }
-      return Number(b.campaign.created) - Number(a.campaign.created)
-    })
-  }, [campaignsData])
+
+    return Array.from(campaignsData.values())
+      .filter((x) =>
+        accountId ? x.campaign.owner.toLowerCase() === accountId.toLowerCase() : true
+      )
+      .sort((a, b) => {
+        const statusOrderDiff =
+          getStatusOrder(a.campaign.status) - getStatusOrder(b.campaign.status)
+        if (statusOrderDiff !== 0) {
+          return statusOrderDiff
+        }
+        return Number(b.campaign.created) - Number(a.campaign.created)
+      })
+  }, [campaignsData, accountId])
 
   const elements = useMemo(
     () =>
@@ -212,10 +206,10 @@ const Dashboard = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
 
   // NOTE: redirect to get-started page id no campaigns found
   useEffect(() => {
-    if (!filteredCampaignData.length && !initialDataLoading) {
+    if (!accountId && !filteredCampaignData.length && !initialDataLoading) {
       navigate('/dashboard/get-started', { replace: true })
     }
-  }, [filteredCampaignData, initialDataLoading, navigate])
+  }, [accountId, filteredCampaignData, initialDataLoading, navigate])
 
   useEffect(() => {
     updateAllCampaignsData(true)
