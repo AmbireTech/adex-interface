@@ -78,7 +78,7 @@ const AdminAnalytics = () => {
           (x.billingDetails?.lastName || '')
         )
           .toLowerCase()
-          .includes(search.toLowerCase())
+          .includes(search.toLowerCase().trim())
       )
       .sort((a, b) => Number(b.availableBalance) - Number(a.availableBalance))
       .map((a) => {
