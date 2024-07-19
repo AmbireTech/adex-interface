@@ -21,6 +21,7 @@ const useCreateCampaignData = () => {
       devices,
       targetingInput: {
         inputs: {
+          advanced,
           location,
           categories,
           placements: {
@@ -160,6 +161,7 @@ const useCreateCampaignData = () => {
     formattedCats,
     formattedLocs,
     adFormats,
+    advancedTargeInput: advanced,
     campaignBudgetFormatted,
     campaignNameFormatted,
     adUnitsFormatted,

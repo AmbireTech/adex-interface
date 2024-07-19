@@ -21,6 +21,7 @@ const StepFour = () => {
     priceBoundsFormatted,
     formattedCats,
     formattedLocs,
+    advancedTargeInput,
     adFormats,
     campaignBudgetFormatted,
     campaignNameFormatted,
@@ -40,7 +41,22 @@ const StepFour = () => {
       { count: 7, title: 'Ad Format', value: adFormats },
       { count: 8, title: 'Creatives', value: adUnitsFormatted },
       { count: 9, title: 'Selected Categories', value: formattedCats },
-      { count: 10, title: 'Selected Countries', value: formattedLocs }
+      { count: 10, title: 'Selected Countries', value: formattedLocs },
+      {
+        count: 11,
+        title: 'Include incentivized traffic',
+        value: advancedTargeInput.includeIncentivized ? 'Yes' : 'No'
+      },
+      {
+        count: 12,
+        title: 'Disable frequency capping',
+        value: advancedTargeInput.disableFrequencyCapping ? 'Yes' : 'No'
+      },
+      {
+        count: 13,
+        title: 'Limit average daily spending',
+        value: advancedTargeInput.limitDailyAverageSpending ? 'Yes' : 'No'
+      }
     ],
     [
       formattedSelectedDevice,

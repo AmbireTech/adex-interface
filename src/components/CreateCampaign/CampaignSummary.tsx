@@ -49,7 +49,8 @@ const CampaignSummary = () => {
     formattedCats,
     formattedLocs,
     adFormats,
-    campaignBudgetFormatted
+    campaignBudgetFormatted,
+    advancedTargeInput
   } = useCreateCampaignData()
   const { showNotification } = useCustomNotifications()
 
@@ -167,12 +168,32 @@ const CampaignSummary = () => {
         />
         <CampaignDetailsRow lighterColor title="Ad Format" value={adFormats} textSize="sm" />
         <CampaignDetailsRow lighterColor title="Categories" value={formattedCats} textSize="sm" />
+        <CampaignDetailsRow lighterColor title="Countries" value={formattedLocs} textSize="sm" />
         <CampaignDetailsRow
+          mt="md"
           lighterColor
-          title="Countries"
-          value={formattedLocs}
+          lineHeight="xs"
+          title="Include incentivized traffic"
+          value={advancedTargeInput.includeIncentivized ? 'Yes' : 'No'}
           textSize="sm"
           noBorder
+        />
+        <CampaignDetailsRow
+          lighterColor
+          lineHeight="xs"
+          title="Disable frequency capping"
+          value={advancedTargeInput.disableFrequencyCapping ? 'Yes' : 'No'}
+          textSize="sm"
+          noBorder
+        />
+        <CampaignDetailsRow
+          lighterColor
+          lineHeight="xs"
+          title="Limit average daily spending"
+          value={advancedTargeInput.limitDailyAverageSpending ? 'Yes' : 'No'}
+          textSize="sm"
+          noBorder
+          mb="xs"
         />
       </Flex>
       {/* Temporary disabled */}
