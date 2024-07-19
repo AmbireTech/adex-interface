@@ -120,7 +120,7 @@ const AdminAnalytics = () => {
   )
 
   return (
-    <Container fluid>
+    <Container fluid px={0}>
       {initialDataLoading ? (
         <Loader size="xl" variant="dots" color="violet" />
       ) : (
