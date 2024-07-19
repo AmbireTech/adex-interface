@@ -4,8 +4,8 @@ import InfoFilledIcon from 'resources/icons/InfoFilled'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import useAccount from 'hooks/useAccount'
 import {
-  CAMPAIGN_DISABLE_FREQUENCY_CAPPING_INPUT,
-  CAMPAIGN_INCLUDE_INCENTIVIZED_INPUT,
+  // CAMPAIGN_DISABLE_FREQUENCY_CAPPING_INPUT,
+  // CAMPAIGN_INCLUDE_INCENTIVIZED_INPUT,
   CAMPAIGN_LIMIT_DAILY_AVERAGE_SPENDING_INPUT
 } from 'constants/createCampaign'
 import {
@@ -19,6 +19,7 @@ import {
 import { CampaignUI } from 'types'
 import { parseRange } from 'helpers/createCampaignHelpers'
 import InfoIcon from 'resources/icons/Info'
+import DefaultCustomAnchor from 'components/common/customAnchor'
 import CampaignPeriod from './CampaignPeriod'
 import PaymentModel from './PaymentModel'
 import SelectCurrency from './SelectCurrency'
@@ -56,7 +57,11 @@ const StepThree = () => {
       asapStartingDate,
       targetingInput: {
         inputs: {
-          advanced: { disableFrequencyCapping, includeIncentivized, limitDailyAverageSpending }
+          advanced: {
+            // disableFrequencyCapping,
+            //  includeIncentivized,
+            limitDailyAverageSpending
+          }
         }
       }
     },
@@ -136,13 +141,14 @@ const StepThree = () => {
 
     const currencyValidation = validateCurrency(currency)
     if (!currencyValidation.isValid) newErrors.currency = currencyValidation.errMsg
-    console.log({ isAdmin })
     const campaignBudgetValidation = validateCampaignBudget(
       campaignBudget,
       availableBalance,
       balanceToken.decimals,
       isAdmin
     )
+
+    console.log({ campaignBudgetValidation })
     if (!campaignBudgetValidation.isValid)
       newErrors.campaignBudget = campaignBudgetValidation.errMsg
 
@@ -183,6 +189,8 @@ const StepThree = () => {
       updatePartOfCampaign(updatedProps)
     }
   }, [validateFields, step, updatePartOfCampaign])
+
+  console.log({ errors })
 
   return (
     <>
@@ -240,6 +248,26 @@ const StepThree = () => {
             error={errors.campaignBudget}
             isAdmin={isAdmin}
           />
+          <Group my="sm">
+            <Checkbox
+              checked={limitDailyAverageSpending}
+              label="Limit average daily spending"
+              onChange={(event) =>
+                handleTargetInputAdvanced(
+                  CAMPAIGN_LIMIT_DAILY_AVERAGE_SPENDING_INPUT,
+                  event.currentTarget.checked
+                )
+              }
+            />
+            <DefaultCustomAnchor
+              href="https://help.adex.network/hc/en-us/articles/15014607423260-How-to-limit-your-average-daily-spend"
+              external
+              color="blue"
+              size="sm"
+            >
+              (learn more)
+            </DefaultCustomAnchor>
+          </Group>
         </Grid.Col>
         <Grid.Col mb="md">
           <Group mb="xs" spacing="xs">
@@ -277,7 +305,7 @@ const StepThree = () => {
             error={errors.title}
           />
         </Grid.Col>
-        <Grid.Col mb="md">
+        {/* <Grid.Col mb="md">
           <Text color="secondaryText" size="sm" weight="bold">
             7. Advanced options
           </Text>
@@ -317,7 +345,7 @@ const StepThree = () => {
               }
             />
           </Group>
-        </Grid.Col>
+        </Grid.Col> */}
       </Grid>
       <Button
         type="button"

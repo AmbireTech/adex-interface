@@ -42,14 +42,14 @@ const StepFour = () => {
       { title: 'Creatives', value: adUnitsFormatted },
       { title: 'Selected Categories', value: formattedCats },
       { title: 'Selected Countries', value: formattedLocs },
-      {
-        title: 'Include incentivized traffic',
-        value: advancedTargeInput.includeIncentivized ? 'Yes' : 'No'
-      },
-      {
-        title: 'Disable frequency capping',
-        value: advancedTargeInput.disableFrequencyCapping ? 'Yes' : 'No'
-      },
+      // {
+      //   title: 'Include incentivized traffic',
+      //   value: advancedTargeInput.includeIncentivized ? 'Yes' : 'No'
+      // },
+      // {
+      //   title: 'Disable frequency capping',
+      //   value: advancedTargeInput.disableFrequencyCapping ? 'Yes' : 'No'
+      // },
       {
         title: 'Limit average daily spending',
         value: advancedTargeInput.limitDailyAverageSpending ? 'Yes' : 'No'
@@ -66,8 +66,6 @@ const StepFour = () => {
       adUnitsFormatted,
       formattedCats,
       formattedLocs,
-      advancedTargeInput.includeIncentivized,
-      advancedTargeInput.disableFrequencyCapping,
       advancedTargeInput.limitDailyAverageSpending
     ]
   )
