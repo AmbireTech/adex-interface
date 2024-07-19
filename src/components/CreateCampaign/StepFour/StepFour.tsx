@@ -59,16 +59,19 @@ const StepFour = () => {
       }
     ],
     [
-      formattedSelectedDevice,
+      campaignNameFormatted,
+      campaignBudgetFormatted,
       priceBoundsFormatted,
+      campaignPeriodFormatted,
+      formattedSelectedPlacement,
+      formattedSelectedDevice,
+      adFormats,
+      adUnitsFormatted,
       formattedCats,
       formattedLocs,
-      adFormats,
-      campaignBudgetFormatted,
-      campaignNameFormatted,
-      adUnitsFormatted,
-      campaignPeriodFormatted,
-      formattedSelectedPlacement
+      advancedTargeInput.includeIncentivized,
+      advancedTargeInput.disableFrequencyCapping,
+      advancedTargeInput.limitDailyAverageSpending
     ]
   )
 
