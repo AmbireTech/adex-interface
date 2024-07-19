@@ -169,7 +169,7 @@ const CampaignSummary = () => {
         <CampaignDetailsRow lighterColor title="Ad Format" value={adFormats} textSize="sm" />
         <CampaignDetailsRow lighterColor title="Categories" value={formattedCats} textSize="sm" />
         <CampaignDetailsRow lighterColor title="Countries" value={formattedLocs} textSize="sm" />
-        <CampaignDetailsRow
+        {/* <CampaignDetailsRow
           mt="md"
           lighterColor
           lineHeight="xs"
@@ -185,7 +185,7 @@ const CampaignSummary = () => {
           value={advancedTargeInput.disableFrequencyCapping ? 'Yes' : 'No'}
           textSize="sm"
           noBorder
-        />
+        /> */}
         <CampaignDetailsRow
           lighterColor
           lineHeight="xs"
