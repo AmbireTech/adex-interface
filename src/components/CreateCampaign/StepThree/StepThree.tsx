@@ -19,6 +19,7 @@ import {
 import { CampaignUI } from 'types'
 import { parseRange } from 'helpers/createCampaignHelpers'
 import InfoIcon from 'resources/icons/Info'
+import DefaultCustomAnchor from 'components/common/customAnchor'
 import CampaignPeriod from './CampaignPeriod'
 import PaymentModel from './PaymentModel'
 import SelectCurrency from './SelectCurrency'
@@ -258,6 +259,14 @@ const StepThree = () => {
                 )
               }
             />
+            <DefaultCustomAnchor
+              href="https://help.adex.network/hc/en-us/articles/15014607423260-How-to-limit-your-average-daily-spend"
+              external
+              color="blue"
+              size="sm"
+            >
+              (learn more)
+            </DefaultCustomAnchor>
           </Group>
         </Grid.Col>
         <Grid.Col mb="md">
