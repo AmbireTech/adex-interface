@@ -4,6 +4,11 @@ import InfoFilledIcon from 'resources/icons/InfoFilled'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import useAccount from 'hooks/useAccount'
 import {
+  CAMPAIGN_DISABLE_FREQUENCY_CAPPING_INPUT,
+  CAMPAIGN_INCLUDE_INCENTIVIZED_INPUT,
+  CAMPAIGN_LIMIT_DAILY_AVERAGE_SPENDING_INPUT
+} from 'constants/createCampaign'
+import {
   validateCPMMax,
   validateCPMMin,
   validateCampaignBudget,
@@ -48,13 +53,18 @@ const StepThree = () => {
       campaignBudget,
       cpmPricingBounds: { min, max },
       title,
-      asapStartingDate
+      asapStartingDate,
+      targetingInput: {
+        inputs: {
+          advanced: { disableFrequencyCapping, includeIncentivized, limitDailyAverageSpending }
+        }
+      }
     },
     updatePartOfCampaign,
     updateCampaign,
+    updateCampaignWithPrevStateNested,
     selectedBidFloors
   } = useCreateCampaignContext()
-
   const {
     adexAccount: { availableBalance, balanceToken },
     isAdmin
@@ -69,6 +79,13 @@ const StepThree = () => {
 
     return rangeUnparsed ? parseRange(rangeUnparsed) : { min: 'N/A', max: 'N/A' }
   }, [selectedBidFloors])
+
+  const handleTargetInputAdvanced = useCallback(
+    (key: string, value: boolean) => {
+      updateCampaignWithPrevStateNested(key, value)
+    },
+    [updateCampaignWithPrevStateNested]
+  )
 
   const handleChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
@@ -259,6 +276,47 @@ const StepThree = () => {
             onFocus={() => handleOnFocus('title')}
             error={errors.title}
           />
+        </Grid.Col>
+        <Grid.Col mb="md">
+          <Text color="secondaryText" size="sm" weight="bold">
+            7. Advanced options
+          </Text>
+          <Group my="sm">
+            <Checkbox
+              checked={includeIncentivized}
+              label="Include incentivized traffic"
+              onChange={(event) =>
+                handleTargetInputAdvanced(
+                  CAMPAIGN_INCLUDE_INCENTIVIZED_INPUT,
+                  event.currentTarget.checked
+                )
+              }
+            />
+          </Group>
+          <Group my="sm">
+            <Checkbox
+              checked={disableFrequencyCapping}
+              label="Disable frequency capping"
+              onChange={(event) =>
+                handleTargetInputAdvanced(
+                  CAMPAIGN_DISABLE_FREQUENCY_CAPPING_INPUT,
+                  event.currentTarget.checked
+                )
+              }
+            />
+          </Group>
+          <Group my="sm">
+            <Checkbox
+              checked={limitDailyAverageSpending}
+              label="Limit average daily spending"
+              onChange={(event) =>
+                handleTargetInputAdvanced(
+                  CAMPAIGN_LIMIT_DAILY_AVERAGE_SPENDING_INPUT,
+                  event.currentTarget.checked
+                )
+              }
+            />
+          </Group>
         </Grid.Col>
       </Grid>
       <Button
