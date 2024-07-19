@@ -32,28 +32,25 @@ const StepFour = () => {
 
   const campaignOverview: CreateCampaignOverview[] = useMemo(
     () => [
-      { count: 1, title: 'Campaign Name', value: campaignNameFormatted },
-      { count: 2, title: 'Campaign Budget', value: campaignBudgetFormatted },
-      { count: 3, title: 'CPM', value: priceBoundsFormatted },
-      { count: 4, title: 'Campaign Period', value: campaignPeriodFormatted },
-      { count: 5, title: 'Placements', value: formattedSelectedPlacement },
-      { count: 6, title: 'Device Type', value: formattedSelectedDevice },
-      { count: 7, title: 'Ad Format', value: adFormats },
-      { count: 8, title: 'Creatives', value: adUnitsFormatted },
-      { count: 9, title: 'Selected Categories', value: formattedCats },
-      { count: 10, title: 'Selected Countries', value: formattedLocs },
+      { title: 'Campaign Name', value: campaignNameFormatted },
+      { title: 'Campaign Budget', value: campaignBudgetFormatted },
+      { title: 'CPM', value: priceBoundsFormatted },
+      { title: 'Campaign Period', value: campaignPeriodFormatted },
+      { title: 'Placements', value: formattedSelectedPlacement },
+      { title: 'Device Type', value: formattedSelectedDevice },
+      { title: 'Ad Format', value: adFormats },
+      { title: 'Creatives', value: adUnitsFormatted },
+      { title: 'Selected Categories', value: formattedCats },
+      { title: 'Selected Countries', value: formattedLocs },
       {
-        count: 11,
         title: 'Include incentivized traffic',
         value: advancedTargeInput.includeIncentivized ? 'Yes' : 'No'
       },
       {
-        count: 12,
         title: 'Disable frequency capping',
         value: advancedTargeInput.disableFrequencyCapping ? 'Yes' : 'No'
       },
       {
-        count: 13,
         title: 'Limit average daily spending',
         value: advancedTargeInput.limitDailyAverageSpending ? 'Yes' : 'No'
       }
@@ -77,10 +74,10 @@ const StepFour = () => {
 
   const rows = useMemo(
     () =>
-      campaignOverview.map((item: CreateCampaignOverview) => {
+      campaignOverview.map((item: CreateCampaignOverview, i) => {
         const isLast = item === campaignOverview[campaignOverview.length - 1]
         const isColumn = item.title === 'Creatives'
-        const fullTitle = `${item.count}. ${item.title}`
+        const fullTitle = `${i + 1}. ${item.title}`
 
         return (
           <CampaignDetailsRow
