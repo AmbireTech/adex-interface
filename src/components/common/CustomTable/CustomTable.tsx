@@ -1,4 +1,14 @@
-import { Flex, Group, Pagination, Table, createStyles, Grid, Divider, Text } from '@mantine/core'
+import {
+  Flex,
+  Group,
+  Pagination,
+  Table,
+  createStyles,
+  Divider,
+  Text,
+  SimpleGrid,
+  Center
+} from '@mantine/core'
 import { useMediaQuery } from '@mantine/hooks'
 import VisibilityIcon from 'resources/icons/Visibility'
 import { ICustomTableProps } from 'types'
@@ -24,10 +34,6 @@ const useStyles = createStyles((theme) => ({
     overflow: 'hidden',
     overflowX: 'auto',
     borderRadius: theme.radius.md
-  },
-  mobileTableWrapper: {
-    borderBottom: `1px solid ${theme.colors.decorativeBorders[theme.fn.primaryShade()]}`,
-    textAlign: 'center'
   },
   gridRow: { borderBottom: `1px solid ${theme.colors.decorativeBorders[theme.fn.primaryShade()]}` },
   cell: {
@@ -69,20 +75,6 @@ const CustomTable = ({
   const list = useMemo(() => {
     return elements.slice(startIndex, endIndex)
   }, [elements, startIndex, endIndex])
-
-  const head = useMemo(
-    () =>
-      headings.map((heading) =>
-        isMobile ? (
-          <Grid.Col span={6} key={heading}>
-            {heading}
-          </Grid.Col>
-        ) : (
-          <th key={heading}>{heading}</th>
-        )
-      ),
-    [isMobile, headings]
-  )
 
   const hasAction = !!onPreview || !!onAnalytics || !!onDuplicate || !!onDelete || !!onEdit
 
@@ -126,64 +118,65 @@ const CustomTable = ({
         </Group>
       )
 
+      const cols = columns.map((column, i) => {
+        const columnParsed = column === 'status' ? e[column].element : e[column]
+        return isMobile ? (
+          <>
+            <Group key={column} grow>
+              <Center>{headings[i]}</Center>
+              <Center>
+                <Text truncate>{columnParsed}</Text>
+              </Center>
+            </Group>
+            <Divider />
+          </>
+        ) : (
+          <td key={column} className={classes.cell}>
+            {columnParsed}
+          </td>
+        )
+      })
+
       if (isMobile) {
         return (
-          <>
-            <Divider bg="#EBEEFA" m="1px 0" w="100%" p="15px" />
-            {columns.map((column, i) => {
-              const columnParsed = column === 'status' ? e[column].element : e[column]
-              return (
-                <Grid className={classes.gridRow} m="1px 0" w="100%" key={column}>
-                  {head[i]}
-
-                  <Grid.Col span={6}>{columnParsed}</Grid.Col>
-                </Grid>
-              )
-            })}
+          <SimpleGrid cols={1} verticalSpacing="xs" w="100%">
+            <Divider bg="#EBEEFA" w="100%" p="10px" />
+            {cols}
             {actions}
-          </>
+          </SimpleGrid>
         )
       }
       return (
         <tr key={e.id}>
-          {columns.map((column: string) => {
-            const columnParsed = column === 'status' ? e[column].element : e[column]
-
-            return (
-              <td key={column} className={classes.cell}>
-                {columnParsed}
-              </td>
-            )
-          })}
+          {cols}
           {actions && <td>{actions}</td>}
         </tr>
       )
     })
   }, [
-    isMobile,
     list,
-    columns,
     hasAction,
+    isMobile,
     onPreview,
     onAnalytics,
     onDuplicate,
     onDelete,
     onEdit,
-    classes.gridRow,
+    columns,
     classes.cell,
-    head
+    headings
   ])
 
   if (!elements.length) return <Text>No data found</Text>
   return (
     <Flex h="100%" w="100%" justify="space-between" direction="column" align="center">
       {isMobile ? (
-        <Grid mt="xs" className={classes.mobileTableWrapper}>
+        <SimpleGrid verticalSpacing="md" cols={1} w="100%">
           {rows.map((row, idx) => (
             // eslint-disable-next-line react/no-array-index-key
             <Fragment key={idx}>{row}</Fragment>
           ))}
-        </Grid>
+        </SimpleGrid>
       ) : (
         <div className={classes.tableWrapper}>
           <Table
@@ -196,7 +189,9 @@ const CustomTable = ({
           >
             <thead className={classes.header}>
               <tr>
-                {head}
+                {headings.map((h) => (
+                  <th key={h}>{h}</th>
+                ))}
                 {hasAction && <th key="Action">Action</th>}
               </tr>
             </thead>
