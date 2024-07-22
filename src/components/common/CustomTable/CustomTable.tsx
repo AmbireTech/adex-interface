@@ -139,7 +139,7 @@ const CustomTable = ({
 
       if (isMobile) {
         return (
-          <SimpleGrid cols={1} verticalSpacing="xs" w="100%">
+          <SimpleGrid key={e.id} cols={1} verticalSpacing="xs" w="100%">
             <Divider bg="#EBEEFA" w="100%" p="10px" />
             {cols}
             {actions}
