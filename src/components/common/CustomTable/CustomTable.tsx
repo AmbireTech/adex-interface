@@ -15,10 +15,6 @@ const useStyles = createStyles((theme) => ({
   header: {
     backgroundColor: theme.colors.alternativeBackground[theme.fn.primaryShade()]
   },
-  border: {
-    borderRadius: theme.radius.md,
-    overflow: 'hidden'
-  },
   background: {
     backgroundColor: theme.colors.mainBackground[theme.fn.primaryShade()],
     boxShadow: theme.shadows.xs
@@ -26,7 +22,8 @@ const useStyles = createStyles((theme) => ({
   tableWrapper: {
     width: '100%',
     overflow: 'hidden',
-    overflowX: 'auto'
+    overflowX: 'auto',
+    borderRadius: theme.radius.md
   },
   mobileTableWrapper: {
     borderBottom: `1px solid ${theme.colors.decorativeBorders[theme.fn.primaryShade()]}`,
@@ -50,7 +47,8 @@ const CustomTable = ({
   onAnalytics,
   onDuplicate,
   onDelete,
-  onEdit
+  onEdit,
+  ...tableProps
 }: ICustomTableProps) => {
   const isMobile = useMediaQuery('(max-width: 75rem)')
 
@@ -89,9 +87,46 @@ const CustomTable = ({
   const hasAction = !!onPreview || !!onAnalytics || !!onDuplicate || !!onDelete || !!onEdit
 
   const rows = useMemo(() => {
-    if (isMobile)
-      return list.map((e) => {
-        const isDraftCampaign = e.status?.value === CampaignStatus.draft
+    return list.map((e) => {
+      const isDraftCampaign = e.status?.value === CampaignStatus.draft
+
+      const actions = hasAction && (
+        <Group position={isMobile ? 'center' : 'left'} w="100%">
+          {!!onPreview && (
+            <ActionButton
+              title="View PDF"
+              icon={<VisibilityIcon size="20px" />}
+              action={() => onPreview(e)}
+            />
+          )}
+          {!!onAnalytics && !isDraftCampaign && (
+            <ActionButton
+              title="View Analytics"
+              icon={<AnalyticsIcon size="20px" />}
+              action={() => onAnalytics(e)}
+            />
+          )}
+          {!!onDuplicate && (
+            <ActionButton
+              title="Duplicate"
+              icon={<DuplicateIcon size="20px" />}
+              action={() => onDuplicate(e)}
+            />
+          )}
+          {!!onDelete && (
+            <ActionButton
+              title="Delete"
+              icon={<DeleteIcon size="20px" />}
+              action={() => onDelete(e)}
+            />
+          )}
+          {!!onEdit && isDraftCampaign && (
+            <ActionButton title="Edit" icon={<EditIcon size="20px" />} action={() => onEdit(e)} />
+          )}
+        </Group>
+      )
+
+      if (isMobile) {
         return (
           <>
             <Divider bg="#EBEEFA" m="1px 0" w="100%" p="15px" />
@@ -105,52 +140,10 @@ const CustomTable = ({
                 </Grid>
               )
             })}
-            {hasAction && (
-              <Grid.Col span={12}>
-                <Flex justify="center" mb="2rem">
-                  {!!onPreview && (
-                    <ActionButton
-                      title="View PDF"
-                      icon={<VisibilityIcon size="20px" />}
-                      action={() => onPreview(e)}
-                    />
-                  )}
-                  {!!onAnalytics && !isDraftCampaign && (
-                    <ActionButton
-                      title="View Analytics"
-                      icon={<AnalyticsIcon size="20px" />}
-                      action={() => onAnalytics(e)}
-                    />
-                  )}
-                  {!!onDuplicate && (
-                    <ActionButton
-                      title="Duplicate"
-                      icon={<DuplicateIcon size="20px" />}
-                      action={() => onDuplicate(e)}
-                    />
-                  )}
-                  {!!onDelete && (
-                    <ActionButton
-                      title="Delete"
-                      icon={<DeleteIcon size="20px" />}
-                      action={() => onDelete(e)}
-                    />
-                  )}
-                  {!!onEdit && isDraftCampaign && (
-                    <ActionButton
-                      title="Edit"
-                      icon={<EditIcon size="20px" />}
-                      action={() => onEdit(e)}
-                    />
-                  )}
-                </Flex>
-              </Grid.Col>
-            )}
+            {actions}
           </>
         )
-      })
-    return list.map((e) => {
-      const isDraftCampaign = e.status?.value === CampaignStatus.draft
+      }
       return (
         <tr key={e.id}>
           {columns.map((column: string) => {
@@ -162,47 +155,7 @@ const CustomTable = ({
               </td>
             )
           })}
-          {hasAction && (
-            <td>
-              <Group>
-                {!!onPreview && (
-                  <ActionButton
-                    title="View PDF"
-                    icon={<VisibilityIcon size="20px" />}
-                    action={() => onPreview(e)}
-                  />
-                )}
-                {!!onAnalytics && !isDraftCampaign && (
-                  <ActionButton
-                    title="View Analytics"
-                    icon={<AnalyticsIcon size="20px" />}
-                    action={() => onAnalytics(e)}
-                  />
-                )}
-                {!!onDuplicate && (
-                  <ActionButton
-                    title="Duplicate"
-                    icon={<DuplicateIcon size="20px" />}
-                    action={() => onDuplicate(e)}
-                  />
-                )}
-                {!!onDelete && (
-                  <ActionButton
-                    title="Delete"
-                    icon={<DeleteIcon size="20px" />}
-                    action={() => onDelete(e)}
-                  />
-                )}
-                {!!onEdit && isDraftCampaign && (
-                  <ActionButton
-                    title="Edit"
-                    icon={<EditIcon size="20px" />}
-                    action={() => onEdit(e)}
-                  />
-                )}
-              </Group>
-            </td>
-          )}
+          {actions && <td>{actions}</td>}
         </tr>
       )
     })
@@ -234,11 +187,12 @@ const CustomTable = ({
       ) : (
         <div className={classes.tableWrapper}>
           <Table
+            {...tableProps}
             miw="max-content"
             w="100%"
             highlightOnHover
             verticalSpacing={15}
-            className={cx(classes.border, { [classes.background]: background })}
+            className={cx({ [classes.background]: background })}
           >
             <thead className={classes.header}>
               <tr>
