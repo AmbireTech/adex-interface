@@ -1,6 +1,13 @@
 import { useMemo } from 'react'
-import { Account, Token, CampaignFundsActive, CampaignRefunds, Deposit } from 'types'
-import { Box } from '@mantine/core'
+import {
+  Account,
+  Token,
+  CampaignFundsActive,
+  CampaignRefunds,
+  Deposit,
+  ICustomTableProps
+} from 'types'
+import { Box, Text, MantineColor } from '@mantine/core'
 
 import CustomTable from 'components/common/CustomTable'
 import { parseBigNumTokenAmountToDecimal } from 'helpers/balances'
@@ -10,6 +17,7 @@ type ActivityElementType = 'deposit' | 'campaignOpen' | 'campaignRefund'
 type ActivityElement = {
   id: string
   type: ActivityElementType
+  name: string
   date: Date
   amount: bigint
   token: Token
@@ -21,6 +29,7 @@ const toActivityEntry = (
 ) => {
   let date = new Date()
   let id = ''
+  let name: string = type
 
   switch (type) {
     case 'deposit':
@@ -30,10 +39,12 @@ const toActivityEntry = (
     case 'campaignOpen':
       date = (el as CampaignFundsActive).startDate
       id = (el as CampaignFundsActive).id
+      name = 'campaign open'
       break
     case 'campaignRefund':
       date = (el as CampaignRefunds).closeDate
       id = (el as CampaignRefunds).id
+      name = 'refund from campaign'
       break
     default:
       break
@@ -43,6 +54,7 @@ const toActivityEntry = (
 
   const ae: ActivityElement = {
     id: id || date.getTime().toString(),
+    name,
     type,
     amount: el.amount,
     token: el.token,
@@ -54,7 +66,7 @@ const toActivityEntry = (
 
 export const FundsActivity = ({ accountData }: { accountData: Account }) => {
   const elements = useMemo(() => {
-    const data = [
+    const data: ICustomTableProps['elements'] = [
       ...accountData.fundsDeposited.deposits.map((x) => toActivityEntry('deposit', x)),
       ...accountData.fundsOnCampaigns.perCampaign.map((x) => toActivityEntry('campaignOpen', x)),
       ...accountData.refundsFromCampaigns.perCampaign.map((x) =>
@@ -65,10 +77,20 @@ export const FundsActivity = ({ accountData }: { accountData: Account }) => {
 
       .map((x) => {
         const sign = x.type === 'campaignOpen' ? '-' : '+'
+        const color: MantineColor = sign === '-' ? 'darkred' : 'darkgreen'
         return {
-          type: `${sign} ${x.type}`,
+          name: (
+            <Text color={color} transform="capitalize" weight="bold">{`${sign} ${x.name}`}</Text>
+          ),
           date: x.date?.toLocaleDateString() || '',
-          amount: `${sign} ${parseBigNumTokenAmountToDecimal(x.amount, x.token.decimals)}`,
+          amount: (
+            <Text
+              color={color}
+              transform="capitalize"
+              weight="bold"
+            >{`${sign} ${parseBigNumTokenAmountToDecimal(x.amount, x.token.decimals)}`}</Text>
+          ),
+
           token: x.token.name,
           actionId: x.id
         }

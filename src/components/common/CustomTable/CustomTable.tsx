@@ -1,19 +1,9 @@
-import {
-  Flex,
-  Group,
-  Pagination,
-  Table,
-  createStyles,
-  Divider,
-  Text,
-  SimpleGrid,
-  Center
-} from '@mantine/core'
+import { Flex, Group, Pagination, Table, createStyles, Divider, Text, Stack } from '@mantine/core'
 import { useMediaQuery } from '@mantine/hooks'
 import VisibilityIcon from 'resources/icons/Visibility'
 import { ICustomTableProps } from 'types'
 import usePagination from 'hooks/usePagination'
-import { Fragment, useMemo } from 'react'
+import { useMemo } from 'react'
 import AnalyticsIcon from 'resources/icons/Analytics'
 import DuplicateIcon from 'resources/icons/Duplicate'
 import DeleteIcon from 'resources/icons/Delete'
@@ -62,7 +52,7 @@ const CustomTable = ({
   const columns: string[] = useMemo(
     () =>
       typeof elements[0] === 'object'
-        ? Object.keys(elements[0]).filter((e: string) => e !== 'id')
+        ? Object.keys(elements[0]).filter((e: string) => e !== 'id' && e !== 'rowColor')
         : [],
     [elements]
   )
@@ -79,7 +69,7 @@ const CustomTable = ({
   const hasAction = !!onPreview || !!onAnalytics || !!onDuplicate || !!onDelete || !!onEdit
 
   const rows = useMemo(() => {
-    return list.map((e) => {
+    return list.map((e, i) => {
       const isDraftCampaign = e.status?.value === CampaignStatus.draft
 
       const actions = hasAction && (
@@ -118,36 +108,42 @@ const CustomTable = ({
         </Group>
       )
 
-      const cols = columns.map((column, i) => {
+      const color = e.rowColor
+      const rowKey = e.id || i
+
+      const cols = columns.map((column, cidx) => {
         const columnParsed = column === 'status' ? e[column].element : e[column]
         return isMobile ? (
-          <>
-            <Group key={column} grow>
-              <Center>{headings[i]}</Center>
-              <Center>
-                <Text truncate>{columnParsed}</Text>
-              </Center>
+          <Stack key={rowKey + column} align="stretch" justify="center" spacing="xs">
+            <Group grow>
+              <Text align="center">{headings[cidx]}</Text>
+
+              <Text align="center" truncate color={color}>
+                {columnParsed}
+              </Text>
             </Group>
             <Divider />
-          </>
+          </Stack>
         ) : (
           <td key={column} className={classes.cell}>
-            {columnParsed}
+            <Text color={color} truncate>
+              {columnParsed}
+            </Text>
           </td>
         )
       })
 
       if (isMobile) {
         return (
-          <SimpleGrid key={e.id} cols={1} verticalSpacing="xs" w="100%">
+          <Stack key={rowKey} spacing="xs" align="stretch" justify="center">
             <Divider bg="#EBEEFA" w="100%" p="10px" />
             {cols}
             {actions}
-          </SimpleGrid>
+          </Stack>
         )
       }
       return (
-        <tr key={e.id}>
+        <tr key={rowKey}>
           {cols}
           {actions && <td>{actions}</td>}
         </tr>
@@ -169,14 +165,9 @@ const CustomTable = ({
 
   if (!elements.length) return <Text>No data found</Text>
   return (
-    <Flex h="100%" w="100%" justify="space-between" direction="column" align="center">
+    <Flex h="100%" w="100%" justify="space-between" direction="column" align="stretch">
       {isMobile ? (
-        <SimpleGrid verticalSpacing="md" cols={1} w="100%">
-          {rows.map((row, idx) => (
-            // eslint-disable-next-line react/no-array-index-key
-            <Fragment key={idx}>{row}</Fragment>
-          ))}
-        </SimpleGrid>
+        <Stack spacing="xl">{rows}</Stack>
       ) : (
         <div className={classes.tableWrapper}>
           <Table
