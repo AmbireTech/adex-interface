@@ -30,10 +30,14 @@ export interface IInvoiceDetails {
   ctr?: number
 }
 
+export type OperationEntryType = 'deposit' | 'campaignOpen' | 'campaignRefund'
+
 export type OperationEntry = (Deposit | CampaignFundsActive | CampaignRefunds) & {
-  date: Date
-  type: 'deposit' | 'campaign' | 'refund'
   id: string
+  type: OperationEntryType
+  name: string
+  date: Date
+  amount: bigint
 }
 
 export type StatementData = {

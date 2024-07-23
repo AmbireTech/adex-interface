@@ -109,7 +109,7 @@ const CustomTable = ({
       )
 
       const color = e.rowColor
-      const rowKey = e.id || i
+      const rowKey = e.id?.toString() || i
 
       const cols = columns.map((column, cidx) => {
         const columnParsed = column === 'status' ? e[column].element : e[column]

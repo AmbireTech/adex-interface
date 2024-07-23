@@ -345,7 +345,7 @@ export const StatementsPDF = ({ statement, seller, buyer }: StatementsPDFProps) 
                 <td className={classes.wrap}>{e.id}</td>
                 <td className={cx(classes.rightAlignedText, classes.noWrap)}>
                   {' '}
-                  {`${e.type === 'campaign' ? '-' : '+'}   ${formatTokenAmount(
+                  {`${e.type === 'campaignOpen' ? '-' : '+'}   ${formatTokenAmount(
                     e.amount,
                     statement.token
                   )}`}
