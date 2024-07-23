@@ -166,7 +166,7 @@ const Dashboard = ({ isAdminPanel, accountId }: { isAdminPanel?: boolean; accoun
   )
 
   const handleEdit = useCallback(
-    (item: Campaign) => {
+    (item: Campaign, isDuplicate?: boolean) => {
       if (isAdminPanel) {
         return
       }
@@ -175,13 +175,23 @@ const Dashboard = ({ isAdminPanel, accountId }: { isAdminPanel?: boolean; accoun
       )?.campaign
 
       if (selectedCampaign) {
-        updateCampaignFromDraft(selectedCampaign)
+        updateCampaignFromDraft({
+          ...selectedCampaign,
+          ...(isDuplicate && { id: '', title: `Copy - ${selectedCampaign.title}` })
+        })
         navigate('/dashboard/create-campaign', { replace: true })
       } else {
         showNotification('error', 'Editing draft campaign failed', 'Editing draft campaign failed')
       }
     },
     [isAdminPanel, filteredCampaignData, updateCampaignFromDraft, navigate, showNotification]
+  )
+
+  const handleDuplicate = useCallback(
+    (item: Campaign) => {
+      return handleEdit(item, true)
+    },
+    [handleEdit]
   )
 
   // const handleDelete = useCallback((item: Campaign) => {
@@ -236,7 +246,7 @@ const Dashboard = ({ isAdminPanel, accountId }: { isAdminPanel?: boolean; accoun
             onPreview={handlePreview}
             onAnalytics={handleAnalytics}
             onEdit={!isAdminPanel ? handleEdit : undefined}
-            onDuplicate={!isAdminPanel ? handleEdit : undefined}
+            onDuplicate={!isAdminPanel ? handleDuplicate : undefined}
             // onDelete={handleDelete}
           />
         ) : (
