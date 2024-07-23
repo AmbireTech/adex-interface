@@ -88,7 +88,7 @@ const CustomTable = ({
               action={() => onAnalytics(e)}
             />
           )}
-          {!!onDuplicate && (
+          {!!onDuplicate && !isDraftCampaign && (
             <ActionButton
               title="Duplicate"
               icon={<DuplicateIcon size="20px" />}
