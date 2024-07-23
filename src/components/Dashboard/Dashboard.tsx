@@ -176,18 +176,13 @@ const Dashboard = ({ isAdminPanel, accountId }: { isAdminPanel?: boolean; accoun
 
       if (selectedCampaign) {
         updateCampaignFromDraft(selectedCampaign)
-        navigate('/dashboard/create-campaign')
+        navigate('/dashboard/create-campaign', { replace: true })
       } else {
         showNotification('error', 'Editing draft campaign failed', 'Editing draft campaign failed')
       }
     },
     [isAdminPanel, filteredCampaignData, updateCampaignFromDraft, navigate, showNotification]
   )
-
-  // const handleDuplicate = useCallback((item: Campaign) => {
-  //   // TODO: Implement duplication logic
-  //   console.log('item', item)
-  // }, [])
 
   // const handleDelete = useCallback((item: Campaign) => {
   //   // TODO: Implement deletion logic
@@ -240,9 +235,8 @@ const Dashboard = ({ isAdminPanel, accountId }: { isAdminPanel?: boolean; accoun
             elements={elements}
             onPreview={handlePreview}
             onAnalytics={handleAnalytics}
-            onEdit={handleEdit}
-            // Temporary disabled until no functionality implemented
-            // onDuplicate={handleDuplicate}
+            onEdit={!isAdminPanel ? handleEdit : undefined}
+            onDuplicate={!isAdminPanel ? handleEdit : undefined}
             // onDelete={handleDelete}
           />
         ) : (

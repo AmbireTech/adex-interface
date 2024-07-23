@@ -234,7 +234,7 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
                         : 'No'
                     }
                   />
-                  <CampaignDetailsRow
+                  {/* <CampaignDetailsRow
                     lineHeight="sm"
                     textSize="sm"
                     title="Disable frequency capping"
@@ -242,7 +242,7 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
                       campaign.targetingInput.inputs.advanced.disableFrequencyCapping ? 'Yes' : 'No'
                     }
                     noBorder
-                  />
+                  /> */}
                 </div>
               </Grid.Col>
               <Grid.Col md={12} xl={6}>

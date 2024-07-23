@@ -3,14 +3,18 @@ import { Button, Flex, Text, Textarea, Badge } from '@mantine/core'
 import { Campaign, CampaignStatus, ReviewStatus } from 'adex-common'
 import throttle from 'lodash.throttle'
 import { useAdExApi } from 'hooks/useAdexServices'
+import { useCampaignsData } from 'hooks/useCampaignsData'
+import useCustomNotifications from 'hooks/useCustomNotifications'
 
 export const AdminActions = ({ item }: { item: Campaign | null }) => {
+  const { showNotification } = useCustomNotifications()
   const { adexServicesRequest } = useAdExApi()
+  const { updateCampaignDataById } = useCampaignsData()
   const [reason, setReason] = useState(item?.reviewMessage || '')
   const [action, setAction] = useState<null | number>(null)
   const [formed, setFormed] = useState(false)
 
-  const reviewed = item?.status !== CampaignStatus.inReview
+  const reviewed = useMemo(() => item?.status !== CampaignStatus.inReview, [item?.status])
 
   const handleAction = (status: string) => {
     if (!item?.id) return
@@ -19,23 +23,30 @@ export const AdminActions = ({ item }: { item: Campaign | null }) => {
   }
 
   const handleSubmit = useCallback(
-    (e: FormEvent) => {
-      e.preventDefault()
+    async (ev: FormEvent) => {
+      ev.preventDefault()
       if (!item?.id) return
-      adexServicesRequest('backend', {
-        route: `/dsp/admin/campaigns/${item.id}`,
-        method: 'PUT',
-        body: {
-          reviewStatus: action,
-          reviewMessage: reason
-        },
-        headers: {
-          'content-type': 'application/json'
-        }
-      }).catch(console.log)
+
+      try {
+        await adexServicesRequest('backend', {
+          route: `/dsp/admin/campaigns/${item.id}`,
+          method: 'PUT',
+          body: {
+            reviewStatus: action,
+            reviewMessage: reason
+          },
+          headers: {
+            'content-type': 'application/json'
+          }
+        })
+        showNotification('info', `Campaign ${item.id} status update success!`)
+        await updateCampaignDataById(item.id)
+      } catch (err) {
+        console.log(err)
+      }
       setFormed(false)
     },
-    [action, adexServicesRequest, item?.id, reason]
+    [action, adexServicesRequest, item?.id, reason, showNotification, updateCampaignDataById]
   )
 
   const throttledSbm = useMemo(
