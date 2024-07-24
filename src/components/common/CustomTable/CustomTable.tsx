@@ -43,6 +43,7 @@ const CustomTable = ({
   onAnalytics,
   onDuplicate,
   onDelete,
+  onArchive,
   onEdit,
   ...tableProps
 }: ICustomTableProps) => {
@@ -95,7 +96,7 @@ const CustomTable = ({
               action={() => onDuplicate(e)}
             />
           )}
-          {isDraftCampaign && !!onDelete && (
+          {!!onDelete && isDraftCampaign && (
             <ActionButton
               title="Delete"
               icon={<DeleteIcon size="20px" />}
@@ -105,6 +106,19 @@ const CustomTable = ({
           {!!onEdit && isDraftCampaign && (
             <ActionButton title="Edit" icon={<EditIcon size="20px" />} action={() => onEdit(e)} />
           )}
+          {!!onArchive &&
+            [
+              CampaignStatus.closedByUser,
+              CampaignStatus.exhausted,
+              CampaignStatus.expired,
+              CampaignStatus.rejected
+            ].includes(e.status?.value) && (
+              <ActionButton
+                title="Delete"
+                icon={<DeleteIcon size="20px" />}
+                action={() => onArchive(e)}
+              />
+            )}
         </Group>
       )
 
@@ -158,9 +172,10 @@ const CustomTable = ({
     onDuplicate,
     onDelete,
     onEdit,
+    onArchive,
     columns,
-    classes.cell,
-    headings
+    headings,
+    classes.cell
   ])
 
   if (!elements.length) return <Text>No data found</Text>

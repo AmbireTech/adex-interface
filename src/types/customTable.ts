@@ -17,5 +17,6 @@ export type ICustomTableProps = PropsWithChildren &
     onAnalytics?: (e: any) => any
     onDuplicate?: (e: any) => any
     onDelete?: (e: any) => any
+    onArchive?: (e: any) => any
     onEdit?: (e: any) => any
   }

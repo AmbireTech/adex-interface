@@ -1,11 +1,10 @@
 import {
-  Campaign,
   CampaignStatus,
   // CampaignType,
   EventType
 } from 'adex-common'
-import { Container, Flex, Text, Loader } from '@mantine/core'
-import { useCallback, useEffect, useMemo } from 'react'
+import { Container, Flex, Text, Loader, UnstyledButton } from '@mantine/core'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import CustomTable from 'components/common/CustomTable'
 import { periodNumberToDate } from 'helpers'
 import { useNavigate } from 'react-router-dom'
@@ -48,14 +47,38 @@ const getStatusOrder = (status: CampaignStatus) => {
   }
 }
 
+type TableElement = {
+  rowColor: string | undefined
+  id: string
+  title: string
+  placement: string
+  status: {
+    value: CampaignStatus
+    element: JSX.Element
+  }
+  served: string
+  budget: string
+  impressions: number
+  clicks: number
+  ctr: string
+  period: JSX.Element
+  cpm: JSX.Element
+}
+
 const Dashboard = ({ isAdminPanel, accountId }: { isAdminPanel?: boolean; accountId?: string }) => {
   const navigate = useNavigate()
-  const { campaignsData, initialDataLoading, updateAllCampaignsData } = useCampaignsData()
-  const { updateCampaignFromDraft, deleteDraftCampaign } = useCreateCampaignContext()
+  const {
+    campaignsData,
+    initialDataLoading,
+    updateAllCampaignsData,
+    deleteDraftCampaign,
+    toggleArchived
+  } = useCampaignsData()
+  const { updateCampaignFromDraft } = useCreateCampaignContext()
   const { showNotification } = useCustomNotifications()
 
   // Temporary disabled show/hide archived until no functionality implemented
-  // const [showArchived, setShowArchived] = useState(false)
+  const [showArchived, setShowArchived] = useState(true)
   const filteredCampaignData = useMemo(() => {
     // if (!showArchived) {
     //   // TODO: change 'CampaignStatus.expired' to 'CampaignStatus.archived' when has been added to the model
@@ -67,8 +90,10 @@ const Dashboard = ({ isAdminPanel, accountId }: { isAdminPanel?: boolean; accoun
     // }
 
     return Array.from(campaignsData.values())
-      .filter((x) =>
-        accountId ? x.campaign.owner.toLowerCase() === accountId.toLowerCase() : true
+      .filter(
+        (x) =>
+          (accountId ? x.campaign.owner.toLowerCase() === accountId.toLowerCase() : true) &&
+          (!x.campaign.archived || showArchived)
       )
       .sort((a, b) => {
         const statusOrderDiff =
@@ -78,9 +103,9 @@ const Dashboard = ({ isAdminPanel, accountId }: { isAdminPanel?: boolean; accoun
         }
         return Number(b.campaign.created) - Number(a.campaign.created)
       })
-  }, [campaignsData, accountId])
+  }, [campaignsData, accountId, showArchived])
 
-  const elements = useMemo(
+  const elements: TableElement[] = useMemo(
     () =>
       filteredCampaignData.length
         ? filteredCampaignData.map((cmpData) => {
@@ -91,8 +116,9 @@ const Dashboard = ({ isAdminPanel, accountId }: { isAdminPanel?: boolean; accoun
             )
 
             return {
+              rowColor: cmpData.campaign.archived ? 'red' : undefined,
               id: cmpData.campaignId,
-              title: cmpData.campaign.title,
+              title: `${cmpData.campaign.archived ? 'Archived - ' : ''}${cmpData.campaign.title}`,
               // type: CampaignType[cmpData.campaign.type],
               placement:
                 cmpData.campaign.targetingInput.inputs.placements.in[0] === 'app'
@@ -154,21 +180,21 @@ const Dashboard = ({ isAdminPanel, accountId }: { isAdminPanel?: boolean; accoun
   )
 
   const handlePreview = useCallback(
-    (item: Campaign) => {
+    (item: TableElement) => {
       navigate(`/dashboard/campaign-details/${isAdminPanel ? 'admin/' : ''}${item.id}`, {})
     },
     [isAdminPanel, navigate]
   )
 
   const handleAnalytics = useCallback(
-    (item: Campaign) => {
+    (item: TableElement) => {
       navigate(`/dashboard/campaign-analytics/${item.id}`)
     },
     [navigate]
   )
 
   const handleEdit = useCallback(
-    (item: Campaign, isDuplicate?: boolean) => {
+    (item: TableElement, isDuplicate?: boolean) => {
       if (isAdminPanel) {
         return
       }
@@ -194,34 +220,48 @@ const Dashboard = ({ isAdminPanel, accountId }: { isAdminPanel?: boolean; accoun
   )
 
   const handleDuplicate = useCallback(
-    (item: Campaign) => {
-      return handleEdit(item, true)
+    (el: TableElement) => {
+      return handleEdit(el, true)
     },
     [handleEdit]
   )
 
   // NOTE: @Maskln - this is how confirm dialog should work - not to handle the state everywhere is used ... it can be customized to match the design https://v6.mantine.dev/others/modals/#context-modals
   const handleDelete = useCallback(
-    (cmp: Campaign) =>
+    (el: TableElement) =>
       modals.openConfirmModal({
         title: 'Delete draft',
-        children: <Text size="sm">Are you sure want to delete draft {cmp.title}</Text>,
+        children: <Text size="sm">Are you sure want to delete draft {el.title}</Text>,
         labels: { confirm: 'Delete', cancel: 'Cancel' },
         confirmProps: { color: 'red' },
-        onConfirm: () => deleteDraftCampaign(cmp)
+        onConfirm: () => deleteDraftCampaign(el.id)
       }),
     [deleteDraftCampaign]
   )
 
-  // const toggleShowArchived = useCallback(() => {
-  //   setShowArchived((prevShowArchived) => !prevShowArchived)
-  // }, [])
+  const handleArchive = useCallback(
+    (el: TableElement) => {
+      const cmp = campaignsData.get(el.id)?.campaign
+      const confirm = cmp?.archived ? 'Unarchive' : 'Archive'
 
-  // useEffect(() => {
-  //   if (filteredCampaignData.length === 0) {
-  //     navigate('/dashboard/get-started', { replace: true })
-  //   }
-  // }, [navigate, filteredCampaignData.length])
+      return modals.openConfirmModal({
+        title: `${confirm} Campaign`,
+        children: (
+          <Text size="sm">
+            Are you sure want to {confirm} campaign {cmp?.title}
+          </Text>
+        ),
+        labels: { confirm, cancel: 'Cancel' },
+        confirmProps: { color: cmp?.archived ? 'blue' : 'red' },
+        onConfirm: () => toggleArchived(cmp?.id || '')
+      })
+    },
+    [campaignsData, toggleArchived]
+  )
+
+  const toggleShowArchived = useCallback(() => {
+    setShowArchived((prevShowArchived) => !prevShowArchived)
+  }, [])
 
   // NOTE: redirect to get-started page id no campaigns found
   useEffect(() => {
@@ -245,12 +285,11 @@ const Dashboard = ({ isAdminPanel, accountId }: { isAdminPanel?: boolean; accoun
               All Campaigns
             </Text>
           )}
-          {/* Temporary disabled show/hide archived until no functionality implemented */}
-          {/* <UnstyledButton onClick={toggleShowArchived}>
+          <UnstyledButton onClick={toggleShowArchived}>
             <Text size="sm" underline color="secondaryText">
               {showArchived ? 'Hide Archived' : 'Show Archived'}
             </Text>
-          </UnstyledButton> */}
+          </UnstyledButton>
         </Flex>
         {!initialDataLoading ? (
           <CustomTable
@@ -262,6 +301,7 @@ const Dashboard = ({ isAdminPanel, accountId }: { isAdminPanel?: boolean; accoun
             onEdit={!isAdminPanel ? handleEdit : undefined}
             onDuplicate={!isAdminPanel ? handleDuplicate : undefined}
             onDelete={!isAdminPanel ? handleDelete : undefined}
+            onArchive={!isAdminPanel ? handleArchive : undefined}
           />
         ) : (
           <Flex justify="center" align="center" h="60vh">
