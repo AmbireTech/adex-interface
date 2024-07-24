@@ -11,6 +11,7 @@ import { Button } from '@mantine/core'
 import useAccount from 'hooks/useAccount'
 import Deposit from 'components/Deposit'
 import CreateCampaign from 'components/CreateCampaign'
+import EditCampaign from 'components/EditCampaign'
 import { CreateCampaignContextProvider } from 'contexts/CreateCampaignContext/CreateCampaignContext'
 import { CampaignsDataProvider, CampaignsAnalyticsProvider } from 'contexts/CampaignsContext'
 import NotFound404 from 'components/404/404'
@@ -105,6 +106,7 @@ export const router = createBrowserRouter(
           path: 'create-campaign',
           element: <CreateCampaign />
         },
+        { path: 'edit-campaign/:id', element: <EditCampaign /> },
         {
           path: 'admin/:tabValue',
           element: (

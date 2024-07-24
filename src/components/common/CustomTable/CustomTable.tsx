@@ -136,7 +136,7 @@ const CustomTable = ({
                       action={() => onDelete(e)}
                     />
                   )}
-                  {!!onEdit && isDraftCampaign && (
+                  {!!onEdit && !isDraftCampaign && (
                     <ActionButton
                       title="Edit"
                       icon={<EditIcon size="20px" />}
@@ -193,7 +193,7 @@ const CustomTable = ({
                     action={() => onDelete(e)}
                   />
                 )}
-                {!!onEdit && isDraftCampaign && (
+                {!!onEdit && !isDraftCampaign && (
                   <ActionButton
                     title="Edit"
                     icon={<EditIcon size="20px" />}

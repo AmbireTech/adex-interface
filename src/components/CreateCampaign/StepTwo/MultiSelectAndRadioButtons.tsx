@@ -10,7 +10,8 @@ const MultiSelectAndRadioButtons = ({
   defaultSelectValue = [],
   defaultRadioValue = 'all',
   onCategoriesChange,
-  groups
+  groups,
+  error
 }: MultiSelectAndRadioButtonsProps) => {
   const extendedData = useMemo(() => {
     const regions = Object.keys(groups).map((region) => ({
@@ -88,6 +89,7 @@ const MultiSelectAndRadioButtons = ({
         data={data}
         onChange={handleSelectChange}
         placeholder={`Select ${label}`}
+        error={error && <Text size="sm">{error}</Text>}
         styles={(theme) => ({
           input: {
             borderColor:

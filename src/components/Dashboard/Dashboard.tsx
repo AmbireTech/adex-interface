@@ -176,16 +176,8 @@ const Dashboard = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
       if (isAdminPanel) {
         return
       }
-      const selectedCampaign = filteredCampaignData.find(
-        (campaign) => campaign.campaignId === item.id
-      )?.campaign
 
-      if (selectedCampaign) {
-        updateCampaignFromDraft(selectedCampaign)
-        navigate('/dashboard/create-campaign')
-      } else {
-        showNotification('error', 'Editing draft campaign failed', 'Editing draft campaign failed')
-      }
+      navigate(`/dashboard/edit-campaign/${item.id}`)
     },
     [isAdminPanel, filteredCampaignData, updateCampaignFromDraft, navigate, showNotification]
   )
