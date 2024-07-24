@@ -73,4 +73,5 @@ export type CreateCampaignType = {
   addUTMToTargetURLS: () => void
   selectedBidFloors: SupplyStatsDetails[] | SupplyStatsDetails[][]
   validateAdUnitTargetURL: () => void
+  deleteDraftCampaign: (cmp: Campaign) => void
 }

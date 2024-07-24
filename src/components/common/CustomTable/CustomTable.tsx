@@ -95,7 +95,7 @@ const CustomTable = ({
               action={() => onDuplicate(e)}
             />
           )}
-          {!!onDelete && (
+          {isDraftCampaign && !!onDelete && (
             <ActionButton
               title="Delete"
               icon={<DeleteIcon size="20px" />}

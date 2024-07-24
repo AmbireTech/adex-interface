@@ -473,6 +473,20 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
     [balanceToken.name]
   )
 
+  const deleteDraftCampaign = useCallback(
+    (cmp: Campaign) => {
+      return adexServicesRequest('backend', {
+        route: `/dsp/campaigns/draft/${cmp.id}`,
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        onErrMsg: `Can not delete ${cmp.title}`
+      })
+    },
+    [adexServicesRequest]
+  )
+
   const contextValue = useMemo(
     () => ({
       campaign,
@@ -491,7 +505,8 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
       defaultValue,
       addUTMToTargetURLS,
       selectedBidFloors,
-      validateAdUnitTargetURL
+      validateAdUnitTargetURL,
+      deleteDraftCampaign
     }),
     [
       campaign,
@@ -510,7 +525,8 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
       defaultValue,
       addUTMToTargetURLS,
       selectedBidFloors,
-      validateAdUnitTargetURL
+      validateAdUnitTargetURL,
+      deleteDraftCampaign
     ]
   )
 

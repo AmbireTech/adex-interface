@@ -13,6 +13,7 @@ import { useCampaignsData } from 'hooks/useCampaignsData'
 import { parseBigNumTokenAmountToDecimal } from 'helpers/balances'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import useCustomNotifications from 'hooks/useCustomNotifications'
+import { modals } from '@mantine/modals'
 
 import BadgeStatusCampaign from './BadgeStatusCampaign'
 
@@ -50,8 +51,9 @@ const getStatusOrder = (status: CampaignStatus) => {
 const Dashboard = ({ isAdminPanel, accountId }: { isAdminPanel?: boolean; accountId?: string }) => {
   const navigate = useNavigate()
   const { campaignsData, initialDataLoading, updateAllCampaignsData } = useCampaignsData()
-  const { updateCampaignFromDraft } = useCreateCampaignContext()
+  const { updateCampaignFromDraft, deleteDraftCampaign } = useCreateCampaignContext()
   const { showNotification } = useCustomNotifications()
+
   // Temporary disabled show/hide archived until no functionality implemented
   // const [showArchived, setShowArchived] = useState(false)
   const filteredCampaignData = useMemo(() => {
@@ -177,7 +179,11 @@ const Dashboard = ({ isAdminPanel, accountId }: { isAdminPanel?: boolean; accoun
       if (selectedCampaign) {
         updateCampaignFromDraft({
           ...selectedCampaign,
-          ...(isDuplicate && { id: '', title: `Copy - ${selectedCampaign.title}` })
+          ...(isDuplicate && {
+            id: '',
+            title: `Copy - ${selectedCampaign.title}`,
+            status: CampaignStatus.created
+          })
         })
         navigate('/dashboard/create-campaign', { replace: true })
       } else {
@@ -194,10 +200,18 @@ const Dashboard = ({ isAdminPanel, accountId }: { isAdminPanel?: boolean; accoun
     [handleEdit]
   )
 
-  // const handleDelete = useCallback((item: Campaign) => {
-  //   // TODO: Implement deletion logic
-  //   console.log('item', item)
-  // }, [])
+  // NOTE: @Maskln - this is how confirm dialog should work - not to handle the state everywhere is used ... it can be customized to match the design https://v6.mantine.dev/others/modals/#context-modals
+  const handleDelete = useCallback(
+    (cmp: Campaign) =>
+      modals.openConfirmModal({
+        title: 'Delete draft',
+        children: <Text size="sm">Are you sure want to delete draft {cmp.title}</Text>,
+        labels: { confirm: 'Delete', cancel: 'Cancel' },
+        confirmProps: { color: 'red' },
+        onConfirm: () => deleteDraftCampaign(cmp)
+      }),
+    [deleteDraftCampaign]
+  )
 
   // const toggleShowArchived = useCallback(() => {
   //   setShowArchived((prevShowArchived) => !prevShowArchived)
@@ -247,7 +261,7 @@ const Dashboard = ({ isAdminPanel, accountId }: { isAdminPanel?: boolean; accoun
             onAnalytics={handleAnalytics}
             onEdit={!isAdminPanel ? handleEdit : undefined}
             onDuplicate={!isAdminPanel ? handleDuplicate : undefined}
-            // onDelete={handleDelete}
+            onDelete={!isAdminPanel ? handleDelete : undefined}
           />
         ) : (
           <Flex justify="center" align="center" h="60vh">
