@@ -326,7 +326,8 @@ const Dashboard = ({ isAdminPanel, accountId }: { isAdminPanel?: boolean; accoun
           },
           {
             action: handleArchive,
-            label: 'Archive Campaign',
+            label: (ada: DashboardTableElement['actionData']) =>
+              `${ada.campaign.archived ? 'Unarchive' : 'Archive'}  Campaign`,
             icon: <DeleteIcon />,
             disabled: (ada: DashboardTableElement['actionData']) => !ada.canArchive
           }
