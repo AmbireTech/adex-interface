@@ -85,7 +85,11 @@ const mapSegmentLabel = (analType: AnalyticsType, segment: string): { segementLa
       break
     case 'hostname':
       // TODO: separate calls for app/site - will require more work
-      segementLabel = getHumneSrcName(segment, 'app')
+      segementLabel = `${getHumneSrcName(segment, 'app')} (${getHumneSrcName(
+        segment,
+        'app',
+        true
+      )})`
       break
 
     default:
