@@ -112,7 +112,6 @@ export const CustomTable = ({
   const rows = useMemo(() => {
     return list.map((e, i) => {
       const activeActions = [...(actions || [])].filter((a) => !a.hide?.(e.actionData))
-      console.log(activeActions)
 
       const actionsMenu = activeActions?.length && (
         <Group position={isMobile ? 'center' : 'right'} w="100%" spacing="xl">
