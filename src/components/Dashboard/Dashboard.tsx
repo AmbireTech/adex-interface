@@ -77,24 +77,21 @@ const Dashboard = ({ isAdminPanel, accountId }: { isAdminPanel?: boolean; accoun
   const { updateCampaignFromDraft } = useCreateCampaignContext()
   const { showNotification } = useCustomNotifications()
 
-  // Temporary disabled show/hide archived until no functionality implemented
   const [showArchived, setShowArchived] = useState(true)
   const filteredCampaignData = useMemo(() => {
-    // if (!showArchived) {
-    //   // TODO: change 'CampaignStatus.expired' to 'CampaignStatus.archived' when has been added to the model
-    //   return campaignsData && Array.from(campaignsData.values()).length > 0
-    //     ? Array.from(campaignsData.values()).filter(
-    //         (campaign) => campaign.campaign.status !== CampaignStatus.expired
-    //       )
-    //     : []
-    // }
+    let archivedCount = 0
+    const campaignData = Array.from(campaignsData.values())
+      .filter((x) => {
+        const matchFilter =
+          isAdminPanel && accountId
+            ? x.campaign.owner.toLowerCase() === accountId.toLowerCase()
+            : true
 
-    return Array.from(campaignsData.values())
-      .filter(
-        (x) =>
-          (accountId ? x.campaign.owner.toLowerCase() === accountId.toLowerCase() : true) &&
-          (!x.campaign.archived || showArchived)
-      )
+        const isArchived = x.campaign.archived
+        if (isArchived) archivedCount++
+
+        return matchFilter && (!isArchived || showArchived)
+      })
       .sort((a, b) => {
         const statusOrderDiff =
           getStatusOrder(a.campaign.status) - getStatusOrder(b.campaign.status)
@@ -103,12 +100,17 @@ const Dashboard = ({ isAdminPanel, accountId }: { isAdminPanel?: boolean; accoun
         }
         return Number(b.campaign.created) - Number(a.campaign.created)
       })
-  }, [campaignsData, accountId, showArchived])
+
+    return {
+      archivedCount,
+      campaignData
+    }
+  }, [campaignsData, isAdminPanel, accountId, showArchived])
 
   const elements: TableElement[] = useMemo(
     () =>
-      filteredCampaignData.length
-        ? filteredCampaignData.map((cmpData) => {
+      filteredCampaignData.campaignData.length
+        ? filteredCampaignData.campaignData.map((cmpData) => {
             const decimals = cmpData.campaign.outpaceAssetDecimals
             const budget = parseBigNumTokenAmountToDecimal(
               cmpData.campaign.campaignBudget,
@@ -198,7 +200,7 @@ const Dashboard = ({ isAdminPanel, accountId }: { isAdminPanel?: boolean; accoun
       if (isAdminPanel) {
         return
       }
-      const selectedCampaign = filteredCampaignData.find(
+      const selectedCampaign = filteredCampaignData.campaignData.find(
         (campaign) => campaign.campaignId === item.id
       )?.campaign
 
@@ -265,7 +267,7 @@ const Dashboard = ({ isAdminPanel, accountId }: { isAdminPanel?: boolean; accoun
 
   // NOTE: redirect to get-started page id no campaigns found
   useEffect(() => {
-    if (!accountId && !filteredCampaignData.length && !initialDataLoading) {
+    if (!accountId && !filteredCampaignData.campaignData.length && !initialDataLoading) {
       navigate('/dashboard/get-started', { replace: true })
     }
   }, [accountId, filteredCampaignData, initialDataLoading, navigate])
@@ -285,11 +287,14 @@ const Dashboard = ({ isAdminPanel, accountId }: { isAdminPanel?: boolean; accoun
               All Campaigns
             </Text>
           )}
-          <UnstyledButton onClick={toggleShowArchived}>
-            <Text size="sm" underline color="secondaryText">
-              {showArchived ? 'Hide Archived' : 'Show Archived'}
-            </Text>
-          </UnstyledButton>
+          {!!filteredCampaignData.archivedCount && (
+            <UnstyledButton onClick={toggleShowArchived}>
+              <Text size="sm" underline color="secondaryText">
+                {showArchived ? 'Hide Archived' : 'Show Archived'} (
+                {filteredCampaignData.archivedCount})
+              </Text>
+            </UnstyledButton>
+          )}
         </Flex>
         {!initialDataLoading ? (
           <CustomTable
