@@ -1,13 +1,13 @@
 import { useMemo } from 'react'
-import { Account, ICustomTableProps } from 'types'
+import { Account } from 'types'
 import { Box, Text, MantineColor } from '@mantine/core'
 
-import CustomTable from 'components/common/CustomTable'
+import CustomTable, { TableElement } from 'components/common/CustomTable'
 import { parseBigNumTokenAmountToDecimal, toOperationEntry } from 'helpers'
 
 export const FundsActivity = ({ accountData }: { accountData: Account }) => {
   const elements = useMemo(() => {
-    const data: ICustomTableProps['elements'] = [
+    const data: TableElement['elements'] = [
       ...accountData.fundsDeposited.deposits.map((x) => toOperationEntry('deposit', x)),
       ...accountData.fundsOnCampaigns.perCampaign.map((x) => toOperationEntry('campaignOpen', x)),
       ...accountData.refundsFromCampaigns.perCampaign.map((x) =>

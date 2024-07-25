@@ -1,19 +1,10 @@
 import { useEffect, useMemo, useCallback, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import {
-  Container,
-  Loader,
-  Flex,
-  Box,
-  Badge,
-  TextInput,
-  Paper
-
-  //  Flex, Loader, Tabs
-} from '@mantine/core'
+import { Container, Loader, Flex, Box, Badge, TextInput, Paper } from '@mantine/core'
 
 import CustomTable from 'components/common/CustomTable'
 import useAdmin from 'hooks/useAdmin'
+import VisibilityIcon from 'resources/icons/Visibility'
 
 import { parseBigNumTokenAmountToDecimal } from 'helpers/balances'
 
@@ -119,6 +110,16 @@ const AdminAnalytics = () => {
     [navigate]
   )
 
+  const actions = useMemo(() => {
+    return [
+      {
+        action: handlePreview,
+        label: 'Show Account Details',
+        icon: <VisibilityIcon />
+      }
+    ]
+  }, [handlePreview])
+
   return (
     <Container fluid px={0}>
       {initialDataLoading ? (
@@ -151,7 +152,7 @@ const AdminAnalytics = () => {
               headings={headings}
               elements={data.elements}
               pageSize={10}
-              onPreview={handlePreview}
+              actions={actions}
             />
           </Flex>
         </Paper>
