@@ -313,18 +313,27 @@ const CampaignsDataProvider: FC<PropsWithChildren & { type: 'user' | 'admin' }> 
   // TODO: move to separate context delete and archive
   const deleteDraftCampaign = useCallback(
     async (id: string) => {
-      await adexServicesRequest('backend', {
-        route: `/dsp/campaigns/draft/${id}`,
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        onErrMsg: `Can not delete ${id}`
-      })
+      try {
+        await adexServicesRequest('backend', {
+          route: `/dsp/campaigns/draft/${id}`,
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          onErrMsg: `Can not delete ${id}`
+        })
 
-      updateCampaignDataById(id)
+        setCampaignData((prev) => {
+          const next = new Map(prev)
+          next.delete(id)
+
+          return next
+        })
+      } catch (err) {
+        console.log(err)
+      }
     },
-    [adexServicesRequest, updateCampaignDataById]
+    [adexServicesRequest]
   )
 
   const toggleArchived = useCallback(
