@@ -28,6 +28,7 @@ export type TableElement = {
 export type TableRowAction = {
   action: (e: TableElement['actionData']) => any
   label: ((e: TableElement['actionData']) => string) | string
+  color?: MantineColor
   icon: ReactNode
   disabled?: (e?: TableElement['actionData']) => boolean
 }
@@ -111,18 +112,19 @@ export const CustomTable = ({
     return list.map((e, i) => {
       const actionsMenu = actions?.length && (
         <Group position={isMobile ? 'center' : 'right'} w="100%" spacing="xl">
-          {actions.slice(0, 3).map((x) => {
-            const label = getLabel(x.label, e.actionData)
+          {actions.slice(0, 3).map((a) => {
+            const label = getLabel(a.label, e.actionData)
             return (
               <Tooltip key={label} label={label}>
                 <ActionIcon
+                  size="23px"
                   variant="transparent"
-                  color="dark"
-                  onClick={() => x.action(e.actionData || e)}
+                  color={a.color || 'dark'}
                   className={classes.action}
-                  disabled={x.disabled?.(e.actionData || e)}
+                  onClick={() => a.action(e.actionData || e)}
+                  disabled={a.disabled?.(e.actionData || e)}
                 >
-                  {x.icon}
+                  {a.icon}
                 </ActionIcon>
               </Tooltip>
             )
@@ -130,21 +132,37 @@ export const CustomTable = ({
           {actions.length > 3 && (
             <Menu shadow="md" width={200}>
               <Menu.Target>
-                <ActionIcon variant="transparent" color="dark" className={classes.action}>
-                  <Dots size="20px" />
+                <ActionIcon
+                  size="23px"
+                  variant="transparent"
+                  color="dark"
+                  className={classes.action}
+                >
+                  <Dots />
                 </ActionIcon>
               </Menu.Target>
 
               <Menu.Dropdown>
-                <Menu.Label>More actions</Menu.Label>
-                {actions.slice(3).map((x) => {
-                  const label = getLabel(x.label, e.actionData)
+                {actions.slice(3).map((a) => {
+                  const label = getLabel(a.label, e.actionData)
+                  const disabled = a.disabled?.(e.actionData || e)
                   return (
                     <Menu.Item
+                      color={a.color || 'dark'}
                       key={label}
-                      icon={x.icon}
-                      onClick={() => x.action(e.actionData || e)}
-                      disabled={x.disabled?.(e.actionData || e)}
+                      icon={
+                        <ActionIcon
+                          size="23px"
+                          variant="transparent"
+                          color={a.color || 'dark'}
+                          className={classes.action}
+                          disabled={disabled}
+                        >
+                          {a.icon}
+                        </ActionIcon>
+                      }
+                      onClick={() => a.action(e.actionData || e)}
+                      disabled={disabled}
                       className={classes.action}
                     >
                       <Text size="md">{label}</Text>

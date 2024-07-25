@@ -246,7 +246,9 @@ const Dashboard = ({ isAdminPanel, accountId }: { isAdminPanel?: boolean; accoun
     (data: DashboardTableElement['actionData']) =>
       modals.openConfirmModal({
         title: 'Delete draft',
-        children: <Text size="sm">Are you sure want to delete draft {data.campaign.title}</Text>,
+        children: (
+          <Text size="sm">{`Are you sure want to delete draft "${data.campaign.title}"`}</Text>
+        ),
         labels: { confirm: 'Delete', cancel: 'Cancel' },
         confirmProps: { color: 'red' },
         onConfirm: () => deleteDraftCampaign(data.campaign.id)
@@ -262,9 +264,7 @@ const Dashboard = ({ isAdminPanel, accountId }: { isAdminPanel?: boolean; accoun
       return modals.openConfirmModal({
         title: `${confirm} Campaign`,
         children: (
-          <Text size="sm">
-            Are you sure want to {confirm} campaign {cmp?.title}
-          </Text>
+          <Text size="sm">{`Are you sure want to ${confirm} campaign "${cmp?.title}"`}</Text>
         ),
         labels: { confirm, cancel: 'Cancel' },
         confirmProps: { color: cmp?.archived ? 'blue' : 'red' },
@@ -315,14 +315,8 @@ const Dashboard = ({ isAdminPanel, accountId }: { isAdminPanel?: boolean; accoun
           },
           {
             action: handleDuplicate,
-            label: 'Clone and edit',
+            label: 'Clone and create new',
             icon: <DuplicateIcon />
-          },
-          {
-            action: handleDelete,
-            label: 'Delete Draft',
-            icon: <DeleteIcon />,
-            disabled: (ada: DashboardTableElement['actionData']) => !ada.isDraft
           },
           {
             action: handleArchive,
@@ -330,6 +324,13 @@ const Dashboard = ({ isAdminPanel, accountId }: { isAdminPanel?: boolean; accoun
               `${ada.campaign.archived ? 'Unarchive' : 'Archive'}  Campaign`,
             icon: <DeleteIcon />,
             disabled: (ada: DashboardTableElement['actionData']) => !ada.canArchive
+          },
+          {
+            action: handleDelete,
+            label: 'Delete Draft',
+            icon: <DeleteIcon />,
+            color: 'red',
+            disabled: (ada: DashboardTableElement['actionData']) => !ada.isDraft
           }
         ]
       )
