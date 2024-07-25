@@ -198,7 +198,7 @@ export const CustomTable = ({
         </tr>
       )
     })
-  }, [list, actions, isMobile, columns, headings, classes.cell])
+  }, [list, actions, isMobile, classes.action, classes.cell, columns, headings])
 
   if (!elements.length) return <Text>No data found</Text>
   return (
