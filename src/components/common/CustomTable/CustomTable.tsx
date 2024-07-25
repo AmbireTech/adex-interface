@@ -16,7 +16,7 @@ import {
 import { useMediaQuery } from '@mantine/hooks'
 import usePagination from 'hooks/usePagination'
 import { useMemo, PropsWithChildren, ReactNode } from 'react'
-// import ActionButton from './ActionButton/ActionButton'
+import Dots from 'resources/icons/TreeDotsMenu'
 
 export type TableElement = {
   id?: string
@@ -130,8 +130,8 @@ export const CustomTable = ({
           {actions.length > 3 && (
             <Menu shadow="md" width={200}>
               <Menu.Target>
-                <ActionIcon color="dark" className={classes.action}>
-                  ...
+                <ActionIcon variant="transparent" color="dark" className={classes.action}>
+                  <Dots size="20px" />
                 </ActionIcon>
               </Menu.Target>
 
@@ -147,7 +147,7 @@ export const CustomTable = ({
                       disabled={x.disabled?.(e.actionData || e)}
                       className={classes.action}
                     >
-                      {label}
+                      <Text size="md">{label}</Text>
                     </Menu.Item>
                   )
                 })}
