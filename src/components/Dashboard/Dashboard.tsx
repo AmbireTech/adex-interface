@@ -323,14 +323,14 @@ const Dashboard = ({ isAdminPanel, accountId }: { isAdminPanel?: boolean; accoun
             label: (ada: DashboardTableElement['actionData']) =>
               `${ada.campaign.archived ? 'Unarchive' : 'Archive'}  Campaign`,
             icon: <DeleteIcon />,
-            disabled: (ada: DashboardTableElement['actionData']) => !ada.canArchive
+            hide: (ada: DashboardTableElement['actionData']) => !ada.canArchive
           },
           {
             action: handleDelete,
             label: 'Delete Draft',
             icon: <DeleteIcon />,
             color: 'red',
-            disabled: (ada: DashboardTableElement['actionData']) => !ada.isDraft
+            hide: (ada: DashboardTableElement['actionData']) => !ada.isDraft
           }
         ]
       )

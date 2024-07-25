@@ -31,6 +31,7 @@ export type TableRowAction = {
   color?: MantineColor
   icon: ReactNode
   disabled?: (e?: TableElement['actionData']) => boolean
+  hide?: (e?: TableElement['actionData']) => boolean
 }
 
 export type CustomTableProps = PropsWithChildren &
@@ -110,9 +111,12 @@ export const CustomTable = ({
 
   const rows = useMemo(() => {
     return list.map((e, i) => {
-      const actionsMenu = actions?.length && (
+      const activeActions = [...(actions || [])].filter((a) => !a.hide?.(e.actionData))
+      console.log(activeActions)
+
+      const actionsMenu = activeActions?.length && (
         <Group position={isMobile ? 'center' : 'right'} w="100%" spacing="xl">
-          {actions.slice(0, 3).map((a) => {
+          {activeActions.slice(0, 3).map((a) => {
             const label = getLabel(a.label, e.actionData)
             return (
               <Tooltip key={label} label={label}>
@@ -129,7 +133,7 @@ export const CustomTable = ({
               </Tooltip>
             )
           })}
-          {actions.length > 3 && (
+          {activeActions.length > 3 && (
             <Menu shadow="md" width={200}>
               <Menu.Target>
                 <ActionIcon
@@ -137,13 +141,14 @@ export const CustomTable = ({
                   variant="transparent"
                   color="dark"
                   className={classes.action}
+                  component="div"
                 >
                   <Dots />
                 </ActionIcon>
               </Menu.Target>
 
               <Menu.Dropdown>
-                {actions.slice(3).map((a) => {
+                {activeActions.slice(3).map((a) => {
                   const label = getLabel(a.label, e.actionData)
                   const disabled = a.disabled?.(e.actionData || e)
                   return (
