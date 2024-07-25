@@ -11,6 +11,7 @@ import {
   monthPeriodIndexToDate,
   toOperationEntry
 } from 'helpers'
+import VisibilityIcon from 'resources/icons/Visibility'
 import { BillingDetailsModal } from './BillingDetailsModal'
 import { StatementsPDF } from './BillingPDF'
 
@@ -109,7 +110,7 @@ const Statements = () => {
   const elements = useMemo(() => {
     return statements
       .map((st, index) => ({
-        id: index,
+        id: index.toString(),
         date: getMonthRangeString(monthPeriodIndexToDate(st.periodIndex)),
         token: st.operations[0].token.name
       }))
@@ -123,6 +124,16 @@ const Statements = () => {
     },
     [open]
   )
+
+  const actions = useMemo(() => {
+    return [
+      {
+        action: onPreview,
+        label: 'View statement',
+        icon: <VisibilityIcon />
+      }
+    ]
+  }, [onPreview])
 
   if (!statements) {
     return <Title order={4}>No AccountStatements found.</Title>
@@ -139,7 +150,7 @@ const Statements = () => {
           />
         )}
       </BillingDetailsModal>
-      <CustomTable headings={columnTitles} elements={elements} onPreview={onPreview} />
+      <CustomTable headings={columnTitles} elements={elements} actions={actions} />
     </>
   )
 }

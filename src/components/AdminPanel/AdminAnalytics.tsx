@@ -203,6 +203,16 @@ const AdminAnalytics = () => {
     [navigate]
   )
 
+  const actions = useMemo(() => {
+    return [
+      {
+        action: handlePreview,
+        label: 'Show campaign details',
+        icon: <VisibilityIcon />
+      }
+    ]
+  }, [handlePreview])
+
   return (
     <Container fluid px={0}>
       <Paper p="sm" withBorder>
@@ -307,7 +317,7 @@ const AdminAnalytics = () => {
               headings={headings}
               elements={data.elements}
               pageSize={10}
-              onPreview={analType === 'campaignId' ? handlePreview : undefined}
+              actions={analType === 'campaignId' ? actions : undefined}
             />
           </Flex>
         )}

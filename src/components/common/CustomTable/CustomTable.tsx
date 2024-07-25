@@ -1,15 +1,45 @@
-import { Flex, Group, Pagination, Table, createStyles, Divider, Text, Stack } from '@mantine/core'
+import {
+  Flex,
+  Group,
+  Pagination,
+  Table,
+  createStyles,
+  Divider,
+  Text,
+  Stack,
+  Menu,
+  ActionIcon,
+  TableProps,
+  MantineColor,
+  Tooltip
+} from '@mantine/core'
 import { useMediaQuery } from '@mantine/hooks'
-import VisibilityIcon from 'resources/icons/Visibility'
-import { ICustomTableProps } from 'types'
 import usePagination from 'hooks/usePagination'
-import { useMemo } from 'react'
-import AnalyticsIcon from 'resources/icons/Analytics'
-import DuplicateIcon from 'resources/icons/Duplicate'
-import DeleteIcon from 'resources/icons/Delete'
-import { CampaignStatus } from 'adex-common'
-import EditIcon from 'resources/icons/Edit'
-import ActionButton from './ActionButton/ActionButton'
+import { useMemo, PropsWithChildren, ReactNode } from 'react'
+// import ActionButton from './ActionButton/ActionButton'
+
+export type TableElement = {
+  id?: string
+  rowColor?: MantineColor
+  actionData?: any
+  [index: string]: any
+}
+
+export type TableRowAction = {
+  action: (e: TableElement['actionData']) => any
+  label: string
+  icon: ReactNode
+  disabled?: (e?: TableElement['actionData']) => boolean
+}
+
+export type CustomTableProps = PropsWithChildren &
+  TableProps & {
+    background?: boolean
+    headings: string[]
+    elements: Array<TableElement>
+    pageSize?: number
+    actions?: TableRowAction[]
+  }
 
 const useStyles = createStyles((theme) => ({
   header: {
@@ -31,29 +61,31 @@ const useStyles = createStyles((theme) => ({
     whiteSpace: 'nowrap',
     textOverflow: 'ellipsis',
     maxWidth: 200
+  },
+  action: {
+    '&:hover': {
+      color: theme.colors.brand[theme.fn.primaryShade()]
+    }
   }
 }))
 
-const CustomTable = ({
+export const CustomTable = ({
   background,
   headings,
   elements,
   pageSize,
-  onPreview,
-  onAnalytics,
-  onDuplicate,
-  onDelete,
-  onArchive,
-  onEdit,
+  actions,
   ...tableProps
-}: ICustomTableProps) => {
+}: CustomTableProps) => {
   const isMobile = useMediaQuery('(max-width: 75rem)')
 
   const { classes, cx } = useStyles()
   const columns: string[] = useMemo(
     () =>
       typeof elements[0] === 'object'
-        ? Object.keys(elements[0]).filter((e: string) => e !== 'id' && e !== 'rowColor')
+        ? Object.keys(elements[0]).filter(
+            (e: string) => e !== 'id' && e !== 'rowColor' && e !== 'actionData'
+          )
         : [],
     [elements]
   )
@@ -67,58 +99,47 @@ const CustomTable = ({
     return elements.slice(startIndex, endIndex)
   }, [elements, startIndex, endIndex])
 
-  const hasAction = !!onPreview || !!onAnalytics || !!onDuplicate || !!onDelete || !!onEdit
-
   const rows = useMemo(() => {
     return list.map((e, i) => {
-      const isDraftCampaign = e.status?.value === CampaignStatus.draft
+      const actionsMenu = actions?.length && (
+        <Group position={isMobile ? 'center' : 'right'} w="100%" spacing="xl">
+          {actions.slice(0, 3).map((x) => (
+            <Tooltip key={x.label} label={x.label || ''}>
+              <ActionIcon
+                variant="transparent"
+                color="dark"
+                onClick={() => x.action(e.actionData || e)}
+                className={classes.action}
+                disabled={x.disabled?.(e.actionData || e)}
+              >
+                {x.icon}
+              </ActionIcon>
+            </Tooltip>
+          ))}
+          {actions.length > 3 && (
+            <Menu shadow="md" width={200}>
+              <Menu.Target>
+                <ActionIcon color="dark" className={classes.action}>
+                  ...
+                </ActionIcon>
+              </Menu.Target>
 
-      const actions = hasAction && (
-        <Group position={isMobile ? 'center' : 'left'} w="100%">
-          {!!onPreview && (
-            <ActionButton
-              title="View PDF"
-              icon={<VisibilityIcon size="20px" />}
-              action={() => onPreview(e)}
-            />
+              <Menu.Dropdown>
+                <Menu.Label>More actions</Menu.Label>
+                {actions.slice(3).map((x) => (
+                  <Menu.Item
+                    key={x.label}
+                    icon={x.icon}
+                    onClick={() => x.action(e.actionData || e)}
+                    disabled={x.disabled?.(e.actionData || e)}
+                    className={classes.action}
+                  >
+                    {x.label}
+                  </Menu.Item>
+                ))}
+              </Menu.Dropdown>
+            </Menu>
           )}
-          {!!onAnalytics && !isDraftCampaign && (
-            <ActionButton
-              title="View Analytics"
-              icon={<AnalyticsIcon size="20px" />}
-              action={() => onAnalytics(e)}
-            />
-          )}
-          {!!onDuplicate && !isDraftCampaign && (
-            <ActionButton
-              title="Duplicate"
-              icon={<DuplicateIcon size="20px" />}
-              action={() => onDuplicate(e)}
-            />
-          )}
-          {!!onDelete && isDraftCampaign && (
-            <ActionButton
-              title="Delete"
-              icon={<DeleteIcon size="20px" />}
-              action={() => onDelete(e)}
-            />
-          )}
-          {!!onEdit && isDraftCampaign && (
-            <ActionButton title="Edit" icon={<EditIcon size="20px" />} action={() => onEdit(e)} />
-          )}
-          {!!onArchive &&
-            [
-              CampaignStatus.closedByUser,
-              CampaignStatus.exhausted,
-              CampaignStatus.expired,
-              CampaignStatus.rejected
-            ].includes(e.status?.value) && (
-              <ActionButton
-                title="Delete"
-                icon={<DeleteIcon size="20px" />}
-                action={() => onArchive(e)}
-              />
-            )}
         </Group>
       )
 
@@ -152,31 +173,18 @@ const CustomTable = ({
           <Stack key={rowKey} spacing="xs" align="stretch" justify="center">
             <Divider bg="#EBEEFA" w="100%" p="10px" />
             {cols}
-            {actions}
+            {actionsMenu}
           </Stack>
         )
       }
       return (
         <tr key={rowKey}>
           {cols}
-          {actions && <td>{actions}</td>}
+          {actionsMenu && <td>{actionsMenu}</td>}
         </tr>
       )
     })
-  }, [
-    list,
-    hasAction,
-    isMobile,
-    onPreview,
-    onAnalytics,
-    onDuplicate,
-    onDelete,
-    onEdit,
-    onArchive,
-    columns,
-    headings,
-    classes.cell
-  ])
+  }, [list, actions, isMobile, columns, headings, classes.cell])
 
   if (!elements.length) return <Text>No data found</Text>
   return (
@@ -198,7 +206,7 @@ const CustomTable = ({
                 {headings.map((h) => (
                   <th key={h}>{h}</th>
                 ))}
-                {hasAction && <th key="Action">Action</th>}
+                {!!actions?.length && <th key="Action">Actions</th>}
               </tr>
             </thead>
             <tbody>{rows}</tbody>
@@ -218,5 +226,3 @@ const CustomTable = ({
     </Flex>
   )
 }
-
-export default CustomTable
