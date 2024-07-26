@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
-import { Container, Grid, createStyles, Text, Flex, Box } from '@mantine/core'
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
+import { Container, Grid, createStyles, Text, Flex, Box, Button, Paper } from '@mantine/core'
 import BadgeStatusCampaign from 'components/Dashboard/BadgeStatusCampaign'
 import { formatCatsAndLocsData } from 'helpers/createCampaignHelpers'
 import { CATEGORIES, COUNTRIES } from 'constants/createCampaign'
@@ -11,15 +11,17 @@ import GoBack from 'components/common/GoBack'
 import CampaignDetailsRow from 'components/common/CampainDetailsRow/CampaignDetailsRow'
 import { useCampaignsData } from 'hooks/useCampaignsData'
 import ActiveIcon from 'resources/icons/Active'
-import CampaignActionBtn from 'components/CampaignAnalytics/CampaignActionBtn'
 import StopIcon from 'resources/icons/Stop'
 import ArchivedIcon from 'resources/icons/Archived'
 import FormattedAmount from 'components/common/FormattedAmount/FormattedAmount'
+import PausedIcon from 'resources/icons/Paused'
 import EditIcon from 'resources/icons/Edit'
-import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
-import useCustomNotifications from 'hooks/useCustomNotifications'
+import ActionButton from 'components/common/CustomTable/ActionButton/ActionButton'
+import AnalyticsIcon from 'resources/icons/Analytics'
+// import useCustomNotifications from 'hooks/useCustomNotifications'
 import { CustomConfirmModal } from 'components/common/Modals'
 import { AdminBadge } from 'components/common/AdminBadge'
+import EditCampaign from 'components/EditCampaign'
 import CatsLocsFormatted from './CatsLocsFormatted'
 import { AdminActions } from './AdminActions'
 
@@ -51,38 +53,83 @@ const useStyles = createStyles((theme) => ({
   separator: {
     borderBottom: `1px dashed ${theme.colors.decorativeBorders[theme.fn.primaryShade()]}`,
     margin: `${theme.spacing.sm} 0`
+  },
+  actionIcons: {
+    color: theme.colors.secondaryText[3],
+    margin: '3px',
+    padding: '0 15px',
+    '&.active': {
+      '&:hover': {
+        color: theme.colors.success[3]
+      },
+      '&.selected': {
+        color: theme.colors.success[3],
+        background: theme.fn.lighten(theme.colors.success[3], theme.other.shades.lighten.lightest)
+      }
+    },
+    '&.paused': {
+      '&:hover': {
+        color: theme.colors.paused[3]
+      },
+      '&.selected': {
+        color: theme.colors.paused[3],
+        background: theme.fn.lighten(theme.colors.paused[3], theme.other.shades.lighten.lightest)
+      }
+    },
+    '&.stopped': {
+      '&:hover': {
+        color: theme.colors.stopped[3]
+      },
+      '&.selected': {
+        color: theme.colors.stopped[3],
+        background: theme.fn.lighten(theme.colors.stopped[3], theme.other.shades.lighten.lightest)
+      }
+    },
+    '&.archived': {
+      '&:hover': {
+        color: theme.colors.mainText[3]
+      },
+      '&.selected': {
+        color: theme.colors.mainText[3],
+        background: theme.fn.lighten(theme.colors.mainText[3], theme.other.shades.lighten.lightest)
+      }
+    },
+    '&.edit': {
+      '&:hover': {
+        color: theme.colors.mainText[3]
+      },
+      '&.selected': {
+        color: theme.colors.mainText[3],
+        background: theme.fn.lighten(theme.colors.mainText[3], theme.other.shades.lighten.lightest)
+      }
+    }
   }
 }))
 
 const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
   const { classes, cx } = useStyles()
   const { campaignsData, updateCampaignDataById, changeCampaignStatus } = useCampaignsData()
-  const { updateCampaignFromDraft } = useCreateCampaignContext()
+  // const { showNotification } = useCustomNotifications()
   const navigate = useNavigate()
-  const { showNotification } = useCustomNotifications()
-
+  const [params, setParams] = useSearchParams()
   const { id } = useParams()
 
   if (!id) {
     return <div>Missing ID</div>
   }
 
-  const campaignData = useMemo(
-    () => campaignsData.get(id),
-
-    [id, campaignsData]
-  )
+  const campaignData = useMemo(() => campaignsData.get(id), [id, campaignsData])
 
   const campaign = useMemo(() => campaignData?.campaign, [campaignData])
 
-  const handleEdit = useCallback(() => {
-    if (campaign) {
-      updateCampaignFromDraft(campaign)
-      navigate('/dashboard/create-campaign')
-    } else {
-      showNotification('error', 'Editing draft campaign failed', 'Editing draft campaign failed')
-    }
-  }, [updateCampaignFromDraft, navigate, showNotification, campaign])
+  // const handleEdit = useCallback(() => {
+  //   if (campaign) {
+  //     updateCampaignFromDraft(campaign)
+  //     navigate('/dashboard/create-campaign')
+  //   } else {
+  //     showNotification('error', 'Editing draft campaign failed', 'Editing draft campaign failed')
+  //   }
+  // }, [updateCampaignFromDraft, navigate, showNotification, campaign])
 
   useEffect(() => {
     if (id) {
@@ -92,28 +139,109 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
 
   const [open, setOpen] = useState(false)
 
-  const updateOpenState = useCallback(() => setOpen((prev) => !prev), [])
-
-  const handleActionBtnClicked = useCallback(() => {
-    updateOpenState()
-  }, [updateOpenState])
+  const updateOpenState = useCallback(
+    () => campaign?.status !== CampaignStatus.closedByUser && setOpen((prev) => !prev),
+    [campaign]
+  )
 
   const handleConfirmBtnClicked = useCallback(() => {
     campaign && changeCampaignStatus(CampaignStatus.closedByUser, campaign?.id)
     updateOpenState()
   }, [changeCampaignStatus, updateOpenState, campaign])
 
-  useEffect(() => {
-    console.log({ campaignsData })
-  }, [campaignsData])
+  const onAfterEditSubmit = () => updateCampaignDataById(id)
 
+  if (!campaign) return <div>Invalid Campaign Id</div>
   return (
     <>
       <Box p="md">
-        <GoBack title="Dashboard" fixed />
+        <Flex direction={{ base: 'column', md: 'row' }} align="flex-start">
+          <GoBack fixed title="Dashboard">
+            <Paper mx="auto" shadow="xs" radius="lg">
+              <Flex>
+                <Button
+                  className={cx(classes.actionIcons, 'active', {
+                    selected: campaign.status === CampaignStatus.active
+                  })}
+                  rightIcon={<ActiveIcon size="15px" />}
+                  onClick={() =>
+                    campaign.status !== CampaignStatus.active &&
+                    changeCampaignStatus(CampaignStatus.active, campaign.id)
+                  }
+                  disabled={isAdminPanel}
+                  variant="subtle"
+                >
+                  Activate
+                </Button>
+                <Button
+                  className={cx(classes.actionIcons, 'paused', {
+                    selected: campaign.status === CampaignStatus.paused
+                  })}
+                  rightIcon={<PausedIcon size="15px" />}
+                  onClick={() =>
+                    campaign.status !== CampaignStatus.paused &&
+                    changeCampaignStatus(CampaignStatus.paused, campaign.id)
+                  }
+                  variant="subtle"
+                >
+                  Pause
+                </Button>
+                <Button
+                  className={cx(classes.actionIcons, 'stopped', {
+                    selected: campaign.status === CampaignStatus.closedByUser
+                  })}
+                  rightIcon={<StopIcon size="15px" />}
+                  // onClick={updateOpenState}
+                  disabled={!isAdminPanel}
+                  variant="subtle"
+                >
+                  Stop
+                </Button>
+                <Button
+                  className={cx(classes.actionIcons, 'archived', {
+                    selected: campaign.status === CampaignStatus.exhausted
+                  })}
+                  rightIcon={<ArchivedIcon size="15px" />}
+                  disabled
+                  variant="subtle"
+                >
+                  Archive
+                </Button>
+                <Button
+                  disabled={campaign.status === CampaignStatus.draft}
+                  className={cx(classes.actionIcons, 'edit', {
+                    selected: params.get('edit') && campaign.status !== CampaignStatus.draft
+                  })}
+                  rightIcon={<EditIcon size="15px" />}
+                  variant="subtle"
+                  onClick={() =>
+                    setParams(
+                      params.get('edit') && campaign.status !== CampaignStatus.draft
+                        ? ''
+                        : 'edit=true',
+                      { replace: true }
+                    )
+                  }
+                >
+                  Edit
+                </Button>
+              </Flex>
+            </Paper>
+            <Flex align="center" gap="xs">
+              Campaign Analytics
+              <ActionButton
+                title="View Analytics"
+                icon={<AnalyticsIcon size="32px" />}
+                action={() => navigate(`/dashboard/campaign-analytics/${campaign.id}`)}
+              />
+            </Flex>
+          </GoBack>
+        </Flex>
       </Box>
-      {campaign && (
-        <>
+      <Box mt="xl">
+        {params.get('edit') && campaign.status !== CampaignStatus.draft ? (
+          <EditCampaign campaign={campaign} onAfterSubmit={onAfterEditSubmit} />
+        ) : (
           <Container fluid className={classes.wrapper}>
             {isAdminPanel && <AdminBadge title="Admin Details" />}
             <Grid>
@@ -305,60 +433,6 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
                     </Grid>
                   </>
                 ) : null}
-                <Grid>
-                  <Grid.Col>
-                    <Flex justify="flex-end" align="center" gap="xs" mt="xl">
-                      {campaign.status === CampaignStatus.paused && (
-                        <CampaignActionBtn
-                          text="Activate"
-                          icon={<ActiveIcon size="13px" />}
-                          color="success"
-                          onBtnClicked={() =>
-                            changeCampaignStatus(CampaignStatus.active, campaign.id)
-                          }
-                        />
-                      )}
-                      {campaign.status === CampaignStatus.active && (
-                        <CampaignActionBtn
-                          text="Pause"
-                          icon={<StopIcon size="13px" />}
-                          color="paused"
-                          onBtnClicked={() =>
-                            changeCampaignStatus(CampaignStatus.paused, campaign.id)
-                          }
-                        />
-                      )}
-                      {(campaign.status === CampaignStatus.paused ||
-                        campaign.status === CampaignStatus.active) && (
-                        <CampaignActionBtn
-                          text="Close"
-                          icon={<ArchivedIcon size="13px" />}
-                          color="secondaryText"
-                          onBtnClicked={() => handleActionBtnClicked()}
-                        />
-                      )}
-                      {campaign.status === CampaignStatus.draft && (
-                        <CampaignActionBtn
-                          text="Edit"
-                          icon={<EditIcon size="13px" />}
-                          color="draft"
-                          onBtnClicked={handleEdit}
-                        />
-                      )}
-                      {campaign.status === CampaignStatus.inReview && (
-                        <CampaignActionBtn
-                          text="Cancel"
-                          icon={<ArchivedIcon size="13px" />}
-                          color="secondaryText"
-                          // onBtnClicked={() =>
-                          //   changeCampaignStatus(CampaignStatus.closedByUser, campaign.id)
-                          // }
-                          onBtnClicked={() => handleActionBtnClicked()}
-                        />
-                      )}
-                    </Flex>
-                  </Grid.Col>
-                </Grid>
               </Grid.Col>
 
               {isAdminPanel && (
@@ -377,17 +451,17 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
               )}
             </Grid>
           </Container>
-          <CustomConfirmModal
-            cancelBtnLabel="No"
-            confirmBtnLabel="Yes"
-            onCancelClicked={() => updateOpenState()}
-            onConfirmClicked={() => handleConfirmBtnClicked()}
-            color="attention"
-            text="Are you sure you want to stop or cancel the campaign?"
-            opened={open}
-          />
-        </>
-      )}
+        )}
+      </Box>
+      <CustomConfirmModal
+        cancelBtnLabel="No"
+        confirmBtnLabel="Yes"
+        onCancelClicked={() => updateOpenState()}
+        onConfirmClicked={() => handleConfirmBtnClicked()}
+        color="attention"
+        text="Are you sure you want to stop or cancel the campaign?"
+        opened={open}
+      />
     </>
   )
 }

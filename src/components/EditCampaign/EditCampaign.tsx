@@ -7,8 +7,8 @@ import {
   Tooltip,
   ActionIcon,
   Checkbox,
-  TextInput,
-  Flex
+  Flex,
+  NumberInput
 } from '@mantine/core'
 import { useForm } from '@mantine/form'
 import { modals } from '@mantine/modals'
@@ -18,7 +18,6 @@ import {
   TargetingInputApplyProp,
   TargetingInputSingle
 } from 'adex-common'
-import GoBack from 'components/common/GoBack'
 import { CustomConfirmModal } from 'components/common/Modals'
 import MultiSelectAndRadioButtons from 'components/CreateCampaign/StepTwo/MultiSelectAndRadioButtons'
 import { CAT_GROUPS, CATEGORIES, COUNTRIES, REGION_GROUPS } from 'constants/createCampaign'
@@ -30,14 +29,13 @@ import {
 } from 'helpers/createCampaignHelpers'
 import useAccount from 'hooks/useAccount'
 import { useAdExApi } from 'hooks/useAdexServices'
-import { useCampaignsData } from 'hooks/useCampaignsData'
 import useCustomNotifications from 'hooks/useCustomNotifications'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import type {
   unstable_Blocker as Blocker,
   unstable_BlockerFunction as BlockerFunction
 } from 'react-router-dom'
-import { useParams, unstable_useBlocker as useBlocker } from 'react-router-dom'
+import { unstable_useBlocker as useBlocker } from 'react-router-dom'
 import InfoFilledIcon from 'resources/icons/InfoFilled'
 
 const useStyles = createStyles((theme) => ({
@@ -67,11 +65,16 @@ type FormProps = {
   targetingInput: TargetingInputEdit
 }
 
-const EditCampaign = () => {
+const EditCampaign = ({
+  campaign,
+  onAfterSubmit
+}: {
+  campaign: Campaign
+  onAfterSubmit?: () => void
+}) => {
   const { adexServicesRequest } = useAdExApi()
   const { showNotification } = useCustomNotifications()
   const { classes } = useStyles()
-  const { campaignsData } = useCampaignsData()
   const {
     adexAccount: { balanceToken }
   } = useAccount()
@@ -80,7 +83,9 @@ const EditCampaign = () => {
 
   const blocker: Blocker = useBlocker(
     useCallback<BlockerFunction>(
-      ({ currentLocation, nextLocation }) => currentLocation.pathname !== nextLocation.pathname,
+      ({ currentLocation, nextLocation }) =>
+        currentLocation.pathname !== nextLocation.pathname ||
+        currentLocation.search !== nextLocation.search,
       []
     )
   )
@@ -90,49 +95,26 @@ const EditCampaign = () => {
   const handleConfirmBtnClicked = useCallback(async () => {
     modals.closeAll()
     blockerProceed()
-  }, [showNotification, blockerProceed])
+  }, [blockerProceed])
 
   const handleCancelBtnClicked = useCallback(() => {
     modals.closeAll()
   }, [])
 
-  const { id } = useParams()
   const [openedModal, setOpenedModal] = useState(false)
-  const [initialContent, setInitialContent] = useState('')
-
-  if (!id) return <div>Missing ID</div>
-
-  const campaign: Campaign | undefined = useMemo(
-    () => (id ? campaignsData.get(id)?.campaign : undefined),
-    [id, campaignsData]
-  )
-
   const form = useForm<FormProps>({
     initialValues: {
       pricingBounds: {
-        CLICK: { min: 0, max: 0 },
-        IMPRESSION: { min: 0, max: 0 }
-      },
-      targetingInput: {
-        version: '1',
-        inputs: {
-          advanced: {
-            disableFrequencyCapping: false,
-            includeIncentivized: false,
-            limitDailyAverageSpending: false
-          },
-          categories: {
-            apply: 'all',
-            in: [] as string[],
-            nin: [] as string[]
-          },
-          location: {
-            apply: 'all',
-            in: [] as string[],
-            nin: [] as string[]
-          }
+        CLICK: {
+          min: Number(campaign.pricingBounds.CLICK?.min) / 1000,
+          max: Number(campaign.pricingBounds.CLICK?.max) / 1000
+        },
+        IMPRESSION: {
+          min: Number(campaign.pricingBounds.IMPRESSION?.min) / 1000,
+          max: Number(campaign.pricingBounds.IMPRESSION?.max) / 1000
         }
-      }
+      },
+      targetingInput: campaign.targetingInput
     },
     validate: {
       pricingBounds: {
@@ -140,40 +122,43 @@ const EditCampaign = () => {
           min: (value, values) => {
             if (!value) return 'CPM Minimum cannot be empty.'
             if (value < 0) return 'Minimum CPM must be greater than or equal to 0'
-            if (value > values.pricingBounds.IMPRESSION.max)
+            if (value > Number(values.pricingBounds.IMPRESSION?.max))
               return 'Minimum CPM cannot be greater than maximum CPM'
             return null
           },
           max: (value, values) => {
             if (!value) return 'CPM Maximum cannot be empty.'
             if (value < 0) return 'Maximum CPM must be greater than or equal to 0'
-            if (value < values.pricingBounds.IMPRESSION.min)
+            if (value < Number(values.pricingBounds.IMPRESSION?.min))
               return 'Maximum CPM cannot be lower than minimum CPM'
-            return null
-          }
-        },
-        CLICK: {
-          min: (value, values) => {
-            if (value < 0) return 'Minimum click must be greater than or equal to 0'
-            if (value > values.pricingBounds.CLICK.max)
-              return 'Minimum click cannot be greater than maximum click'
-            return null
-          },
-          max: (value, values) => {
-            if (value < 0) return 'Maximum click must be greater than or equal to 0'
-            if (value < values.pricingBounds.CLICK.min)
-              return 'Maximum click cannot be lower than minimum click'
             return null
           }
         }
       },
       targetingInput: {
-        version: (value) => (value ? null : 'Version is required'),
         inputs: {
-          location: (value) =>
-            value === null || value === undefined ? 'Location is required' : null,
-          categories: (value) =>
-            value === null || value === undefined ? 'Categories are required' : null,
+          location: ({ apply, in: isin, nin }) => {
+            if (apply === 'in') {
+              if (!isin.length) return 'Countries list cannot be empty'
+              return null
+            }
+            if (apply === 'nin') {
+              if (!nin.length) return 'Countries list cannot be empty'
+              return null
+            }
+            return null
+          },
+          categories: ({ apply, in: isin, nin }) => {
+            if (apply === 'in') {
+              if (!isin.length) return 'Categories list cannot be empty'
+              return null
+            }
+            if (apply === 'nin') {
+              if (!nin.length) return 'Categories list cannot be empty'
+              return null
+            }
+            return null
+          },
           advanced: {
             includeIncentivized: (value) => (typeof value !== 'boolean' ? 'Invalid value' : null),
             disableFrequencyCapping: (value) =>
@@ -187,49 +172,12 @@ const EditCampaign = () => {
   })
 
   useEffect(() => {
-    if (blocker.state === 'blocked' && initialContent !== JSON.stringify(form.values)) {
+    if (blocker.state === 'blocked' && form.isDirty()) {
       setOpenedModal(true)
       return
     }
     blockerProceed()
   }, [blocker, blockerProceed])
-
-  useEffect(() => {
-    if (!campaign) return
-    const minImpression = (Number(campaign.pricingBounds.IMPRESSION?.min) || 0) / 1000
-    const maxImpression = (Number(campaign.pricingBounds.IMPRESSION?.max) || 0) / 1000
-    const values = {
-      pricingBounds: {
-        CLICK: { min: 0, max: 0 },
-        IMPRESSION: { min: minImpression, max: maxImpression }
-      },
-      targetingInput: {
-        version: '1',
-        inputs: {
-          advanced: {
-            disableFrequencyCapping:
-              campaign.targetingInput.inputs.advanced.disableFrequencyCapping || false,
-            includeIncentivized:
-              campaign.targetingInput.inputs.advanced.includeIncentivized || false,
-            limitDailyAverageSpending:
-              campaign.targetingInput.inputs.advanced.limitDailyAverageSpending || false
-          },
-          categories: campaign.targetingInput.inputs.categories || {
-            apply: 'all',
-            in: [] as string[],
-            nin: [] as string[]
-          },
-          location: campaign.targetingInput.inputs.location || {
-            apply: 'all',
-            in: [] as string[],
-            nin: [] as string[]
-          }
-        }
-      }
-    }
-    setInitialContent(JSON.stringify(values))
-    form.setValues(values)
-  }, [campaign])
 
   const catSelectedRadioAndValuesArray = useMemo(
     () => campaign && findArrayWithLengthInObjectAsValue(campaign.targetingInput.inputs.categories),
@@ -247,6 +195,7 @@ const EditCampaign = () => {
         'targetingInput.inputs.categories',
         updateCatsLocsObject(selectedRadio, categoriesValue)
       )
+      form.validateField('targetingInput.inputs.categories')
     },
     [campaign]
   )
@@ -257,6 +206,7 @@ const EditCampaign = () => {
         'targetingInput.inputs.location',
         updateCatsLocsObject(selectedRadio, locationsValue)
       )
+      form.validateField('targetingInput.inputs.location')
     },
     [campaign]
   )
@@ -265,13 +215,13 @@ const EditCampaign = () => {
     const impression = {
       min: Number(
         parseToBigNumPrecision(
-          Number(values.pricingBounds.IMPRESSION.min) / 1000,
+          Number(values.pricingBounds.IMPRESSION?.min) / 1000,
           balanceToken.decimals
         )
       ),
       max: Number(
         parseToBigNumPrecision(
-          Number(values.pricingBounds.IMPRESSION.max) / 1000,
+          Number(values.pricingBounds.IMPRESSION?.max) / 1000,
           balanceToken.decimals
         )
       )
@@ -283,7 +233,7 @@ const EditCampaign = () => {
         IMPRESSION: impression
       },
       targetingInput: {
-        version: '1', // TODO
+        version: '1',
         inputs: {
           categories: values.targetingInput.inputs.categories,
           location: values.targetingInput.inputs.location,
@@ -298,22 +248,24 @@ const EditCampaign = () => {
     }
 
     return adexServicesRequest('backend', {
-      route: `/dsp/campaigns/edit/${id}`,
+      route: `/dsp/campaigns/edit/${campaign.id}`,
       method: 'PUT',
       body,
       headers: {
         'Content-Type': 'application/json'
       }
     })
+      .then(() => {
+        showNotification('info', 'Successfully updated Campaign data!')
+        onAfterSubmit && onAfterSubmit()
+      })
+      .catch(() => showNotification('error', "Couldn't update the Campaign data!"))
   }, [])
 
   if (!campaign) return <div>Invalid Campaign ID</div>
   return (
     <>
-      <Grid mx="lg" mt="sm">
-        <Flex>
-          <GoBack title="Edit Campaign" />
-        </Flex>
+      <Grid mx="lg" my="sm">
         <form onSubmit={form.onSubmit(editCampaign)}>
           <Grid mt="xl" gutter="xl" className={classes.container}>
             <Grid.Col mb="md">
@@ -331,7 +283,8 @@ const EditCampaign = () => {
                 </Tooltip>
               </Group>
               <Flex mb="md" gap="md">
-                <TextInput
+                <NumberInput
+                  w="196px"
                   size="md"
                   placeholder="CPM min"
                   rightSection={
@@ -344,7 +297,8 @@ const EditCampaign = () => {
                   {...form.getInputProps('pricingBounds.IMPRESSION.min')}
                   onBlur={() => form.validateField('pricingBounds.IMPRESSION.min')}
                 />
-                <TextInput
+                <NumberInput
+                  w="196px"
                   size="md"
                   placeholder="CPM max"
                   inputWrapperOrder={['input', 'description', 'error']}
@@ -361,6 +315,9 @@ const EditCampaign = () => {
               </Flex>
             </Grid.Col>
             <Grid.Col mb="md">
+              <Text color="secondaryText" size="sm" weight="bold" mb="xs">
+                Advanced
+              </Text>
               <Group my="sm">
                 <Checkbox
                   label="Include incentivized traffic"
@@ -389,7 +346,7 @@ const EditCampaign = () => {
                 />
               </Group>
             </Grid.Col>
-            <Grid.Col>
+            <Grid.Col onBlur={() => form.validateField('targetingInput.inputs.categories')}>
               <Text color="secondaryText" size="sm" weight="bold" mb="xs">
                 Categories
               </Text>
@@ -405,9 +362,10 @@ const EditCampaign = () => {
                 }
                 groups={CAT_GROUPS}
                 label="Categories"
+                error={form.errors['targetingInput.inputs.categories']?.toString()}
               />
             </Grid.Col>
-            <Grid.Col>
+            <Grid.Col onBlur={() => form.validateField('targetingInput.inputs.location')}>
               <Text color="secondaryText" size="sm" weight="bold" mb="xs">
                 Countries
               </Text>
@@ -423,22 +381,29 @@ const EditCampaign = () => {
                 multiSelectData={COUNTRIES}
                 groups={REGION_GROUPS}
                 label="Countries"
+                error={form.errors['targetingInput.inputs.location']?.toString()}
               />
             </Grid.Col>
 
             <Group mt="lg">
-              <Button type="submit">Save Changes</Button>
+              <Button size="lg" type="submit">
+                Save Changes
+              </Button>
             </Group>
           </Grid>
         </form>
       </Grid>
       <CustomConfirmModal
         cancelBtnLabel="Cancel"
-        confirmBtnLabel="Go to Dashboard"
+        confirmBtnLabel="Go back"
         onCancelClicked={handleCancelBtnClicked}
         onConfirmClicked={handleConfirmBtnClicked}
         color="attention"
-        text="You did not saved your changes. Are you sure you want to go back to the dashboard page?"
+        text={
+          <div style={{ textAlign: 'center' }}>
+            You did not save your changes. Are you sure you want to leave this page?
+          </div>
+        }
         opened={openedModal}
       />
     </>

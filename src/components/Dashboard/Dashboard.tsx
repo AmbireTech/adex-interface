@@ -177,7 +177,7 @@ const Dashboard = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
         return
       }
 
-      navigate(`/dashboard/edit-campaign/${item.id}`)
+      navigate(`/dashboard/campaign-details/${item.id}?edit=true`)
     },
     [isAdminPanel, filteredCampaignData, updateCampaignFromDraft, navigate, showNotification]
   )
