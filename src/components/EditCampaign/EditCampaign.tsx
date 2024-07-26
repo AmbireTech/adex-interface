@@ -21,7 +21,7 @@ import {
 import { CustomConfirmModal } from 'components/common/Modals'
 import MultiSelectAndRadioButtons from 'components/CreateCampaign/StepTwo/MultiSelectAndRadioButtons'
 import { CAT_GROUPS, CATEGORIES, COUNTRIES, REGION_GROUPS } from 'constants/createCampaign'
-import { parseToBigNumPrecision } from 'helpers'
+import { parseBigNumTokenAmountToDecimal, parseToBigNumPrecision } from 'helpers'
 
 import {
   findArrayWithLengthInObjectAsValue,
@@ -106,12 +106,28 @@ const EditCampaign = ({
     initialValues: {
       pricingBounds: {
         CLICK: {
-          min: Number(campaign.pricingBounds.CLICK?.min) / 1000,
-          max: Number(campaign.pricingBounds.CLICK?.max) / 1000
+          min:
+            parseBigNumTokenAmountToDecimal(
+              campaign.pricingBounds.CLICK?.min || 0n,
+              campaign.outpaceAssetDecimals
+            ) * 1000,
+          max:
+            parseBigNumTokenAmountToDecimal(
+              campaign.pricingBounds.CLICK?.max || 0n,
+              campaign.outpaceAssetDecimals
+            ) * 1000
         },
         IMPRESSION: {
-          min: Number(campaign.pricingBounds.IMPRESSION?.min) / 1000,
-          max: Number(campaign.pricingBounds.IMPRESSION?.max) / 1000
+          min:
+            parseBigNumTokenAmountToDecimal(
+              campaign.pricingBounds.IMPRESSION?.min || 0n,
+              campaign.outpaceAssetDecimals
+            ) * 1000,
+          max:
+            parseBigNumTokenAmountToDecimal(
+              campaign.pricingBounds.IMPRESSION?.max || 0n,
+              campaign.outpaceAssetDecimals
+            ) * 1000
         }
       },
       targetingInput: campaign.targetingInput
