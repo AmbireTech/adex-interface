@@ -409,7 +409,7 @@ const EditCampaign = ({
             </Grid.Col>
 
             <Group mt="lg">
-              <Button size="lg" type="submit">
+              <Button disabled={!form.isDirty()} size="lg" type="submit">
                 Save Changes
               </Button>
             </Group>
