@@ -1,7 +1,6 @@
 export * from './account'
 export * from './actionButton'
 export * from './badgeStatusCampaign'
-export * from './customTable'
 export * from './customCard'
 export * from './customAnchor'
 export * from './createCampaignCommon'

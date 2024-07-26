@@ -31,9 +31,7 @@ type DetailsProps = PropsWithChildren &
   }
 
 const formatTokenAmount = (amount: bigint, token: OperationEntry['token']): string => {
-  return `${formatCurrency(parseBigNumTokenAmountToDecimal(amount, token.decimals), 2)} ${
-    token.name
-  }`
+  return `${formatCurrency(parseBigNumTokenAmountToDecimal(amount, token.decimals), 2)}`
 }
 
 const useStyles = createStyles((theme) => ({
@@ -332,7 +330,7 @@ export const StatementsPDF = ({ statement, seller, buyer }: StatementsPDFProps) 
               <th>Date</th>
               <th>Type</th>
               <th>Description</th>
-              <th>amount</th>
+              <th>amount ({statement.token.name})</th>
             </tr>
           </thead>
           <tbody className={classes.tableBody}>
@@ -341,11 +339,12 @@ export const StatementsPDF = ({ statement, seller, buyer }: StatementsPDFProps) 
               <tr key={index}>
                 <td>{index + 1}</td>
                 <td>{e.date.toLocaleDateString()}</td>
-                <td>{e.type}</td>
+                <td>
+                  <Text transform="capitalize">{e.name}</Text>
+                </td>
                 <td className={classes.wrap}>{e.id}</td>
                 <td className={cx(classes.rightAlignedText, classes.noWrap)}>
-                  {' '}
-                  {`${e.type === 'campaign' ? '-' : '+'}   ${formatTokenAmount(
+                  {`${e.type === 'campaignOpen' ? '-' : '+'}   ${formatTokenAmount(
                     e.amount,
                     statement.token
                   )}`}

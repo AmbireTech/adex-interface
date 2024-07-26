@@ -28,7 +28,8 @@ const CampaignDetailsRow = ({
   noBorder = false,
   column = false,
   lineHeight = 'lg',
-  nowrap = false
+  nowrap = false,
+  ...rest
 }: CampaignDetailsRowProps) => {
   const { classes, cx } = useStyles({ lighterColor: !!lighterColor })
   return (
@@ -40,6 +41,7 @@ const CampaignDetailsRow = ({
       pt={lineHeight}
       pb={lineHeight}
       gap="sm"
+      {...rest}
     >
       <Text
         className={cx(classes.textColor, {

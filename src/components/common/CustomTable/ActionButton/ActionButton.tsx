@@ -1,4 +1,4 @@
-import { ActionIcon, Flex, createStyles } from '@mantine/core'
+import { ActionIcon, Flex, createStyles, Tooltip } from '@mantine/core'
 import { IActionButtonProps } from 'types'
 
 const useStyles = createStyles((theme) => ({
@@ -12,19 +12,21 @@ const useStyles = createStyles((theme) => ({
 const ActionButton = ({ action, icon, title, children }: IActionButtonProps) => {
   const { classes } = useStyles()
   return (
-    <Flex align="center">
-      <ActionIcon
-        title={title}
-        color="secondaryText"
-        variant="transparent"
-        onClick={action}
-        className={classes.actionIcon}
-        mr="md"
-      >
-        {icon}
-      </ActionIcon>
-      {children}
-    </Flex>
+    <Tooltip label={title}>
+      <Flex align="center">
+        <ActionIcon
+          title={title}
+          color="secondaryText"
+          variant="transparent"
+          onClick={action}
+          className={classes.actionIcon}
+          mr="md"
+        >
+          {icon}
+        </ActionIcon>
+        {children}
+      </Flex>
+    </Tooltip>
   )
 }
 

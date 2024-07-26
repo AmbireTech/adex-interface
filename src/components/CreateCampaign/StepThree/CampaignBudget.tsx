@@ -55,6 +55,12 @@ const CampaignBudget = ({
     setErr(currentError)
   }, [value, defaultValue, isAdmin])
 
+  // TODO: fix the entire form validation and flow - it's not acceptable at the moment
+  // NOTE: tem fix to show err on "next step" when there is no value for budget
+  useEffect(() => {
+    setErr(error)
+  }, [error])
+
   return (
     <Flex justify="space-between" align="flex-start">
       <MediaQuery

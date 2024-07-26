@@ -118,6 +118,8 @@ interface ICampaignsDataContext {
   // updateEventAggregates: (params: Campaign['id']) => void
   initialDataLoading: boolean
   changeCampaignStatus: (status: CampaignStatus, campaignId: Campaign['id']) => void
+  deleteDraftCampaign: (id: string) => void
+  toggleArchived: (id: string) => void
 }
 
 const CampaignsDataContext = createContext<ICampaignsDataContext | null>(null)
@@ -308,20 +310,65 @@ const CampaignsDataProvider: FC<PropsWithChildren & { type: 'user' | 'admin' }> 
     }
   }, [updateAllCampaignsData, authenticated])
 
+  // TODO: move to separate context delete and archive
+  const deleteDraftCampaign = useCallback(
+    async (id: string) => {
+      try {
+        await adexServicesRequest('backend', {
+          route: `/dsp/campaigns/draft/${id}`,
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          onErrMsg: `Can not delete ${id}`
+        })
+
+        setCampaignData((prev) => {
+          const next = new Map(prev)
+          next.delete(id)
+
+          return next
+        })
+      } catch (err) {
+        console.log(err)
+      }
+    },
+    [adexServicesRequest]
+  )
+
+  const toggleArchived = useCallback(
+    async (id: string) => {
+      await adexServicesRequest('backend', {
+        route: `/dsp/campaigns/togglearchive/${id}`,
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        onErrMsg: `Can not toggle archive ${id}`
+      })
+      updateCampaignDataById(id)
+    },
+    [adexServicesRequest, updateCampaignDataById]
+  )
+
   const contextValue = useMemo(
     () => ({
       campaignsData,
       updateCampaignDataById,
       updateAllCampaignsData,
       initialDataLoading,
-      changeCampaignStatus
+      changeCampaignStatus,
+      deleteDraftCampaign,
+      toggleArchived
     }),
     [
       campaignsData,
       updateCampaignDataById,
       updateAllCampaignsData,
       initialDataLoading,
-      changeCampaignStatus
+      changeCampaignStatus,
+      deleteDraftCampaign,
+      toggleArchived
     ]
   )
 

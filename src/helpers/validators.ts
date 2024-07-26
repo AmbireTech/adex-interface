@@ -37,7 +37,7 @@ export const validateCampaignBudget = (
   decimals: number,
   isAdmin: boolean
 ) => {
-  if (Number(value) === 0 || Number.isNaN(Number(value))) {
+  if (!value || Number(value) === 0 || Number.isNaN(Number(value))) {
     return { isValid: false, errMsg: 'Enter campaign budget or a valid number' }
   }
 

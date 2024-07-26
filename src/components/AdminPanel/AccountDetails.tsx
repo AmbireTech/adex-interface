@@ -2,6 +2,7 @@ import { useMemo } from 'react'
 import { SimpleGrid, Box, Title, Paper } from '@mantine/core'
 import useAdmin from 'hooks/useAdmin'
 import { useParams } from 'react-router-dom'
+import Dashboard from 'components/Dashboard'
 import { FundsActivity } from './AccountDetailsElements'
 import { AccountInfo } from './AccoutInfo'
 import { AdminDeposit } from './AdminDeposit'
@@ -40,9 +41,17 @@ function AccountDetails() {
       <SimpleGrid spacing="xl" mt="xl">
         <Paper p="sm" withBorder>
           <Title order={5} color="brand">
-            Account activity
+            Activity
           </Title>
           <FundsActivity accountData={accountData} />
+        </Paper>
+      </SimpleGrid>
+      <SimpleGrid spacing="xl" mt="xl">
+        <Paper p="sm" withBorder>
+          <Title order={5} color="brand">
+            Campaigns
+          </Title>
+          <Dashboard isAdminPanel accountId={accountId} />
         </Paper>
       </SimpleGrid>
     </Box>

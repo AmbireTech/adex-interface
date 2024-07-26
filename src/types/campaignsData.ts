@@ -10,6 +10,7 @@ export type BaseData = {
   avgCpm?: number
   avgCpc?: number
   paid: number
+  served?: number
 }
 
 export type CampaignData = BaseData & {
