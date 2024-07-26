@@ -273,6 +273,7 @@ const EditCampaign = ({
     })
       .then(() => {
         showNotification('info', 'Successfully updated Campaign data!')
+        form.resetDirty()
         onAfterSubmit && onAfterSubmit()
       })
       .catch(() => showNotification('error', "Couldn't update the Campaign data!"))
