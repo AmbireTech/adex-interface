@@ -95,7 +95,7 @@ const Dashboard = ({ isAdminPanel, accountId }: { isAdminPanel?: boolean; accoun
         const isArchived = x.campaign.archived
         if (isArchived) archivedCount++
 
-        return matchFilter && (!isArchived || showArchived)
+        return matchFilter && ((!showArchived && !isArchived) || (showArchived && isArchived))
       })
       .sort((a, b) => {
         const statusOrderDiff =
