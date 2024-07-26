@@ -78,6 +78,7 @@ const EditCampaign = ({
   const {
     adexAccount: { balanceToken }
   } = useAccount()
+  const [openedModal, setOpenedModal] = useState(false)
 
   const recommendedPaymentBounds = { min: '0.10', max: '0.5' }
 
@@ -95,13 +96,14 @@ const EditCampaign = ({
   const handleConfirmBtnClicked = useCallback(async () => {
     modals.closeAll()
     blockerProceed()
-  }, [blockerProceed])
+  }, [blockerProceed, modals])
 
   const handleCancelBtnClicked = useCallback(() => {
     modals.closeAll()
-  }, [])
+    blocker.reset?.()
+    setOpenedModal(false)
+  }, [blocker, modals])
 
-  const [openedModal, setOpenedModal] = useState(false)
   const form = useForm<FormProps>({
     initialValues: {
       pricingBounds: {
@@ -190,19 +192,20 @@ const EditCampaign = ({
   useEffect(() => {
     if (blocker.state === 'blocked' && form.isDirty()) {
       setOpenedModal(true)
-      return
+      console.log('modal why', form.isDirty(), blocker.state)
+    } else {
+      blockerProceed()
     }
-    blockerProceed()
-  }, [blocker, blockerProceed])
+  }, [blocker.state, form, blockerProceed])
 
   const catSelectedRadioAndValuesArray = useMemo(
     () => campaign && findArrayWithLengthInObjectAsValue(campaign.targetingInput.inputs.categories),
-    [campaign]
+    [campaign, findArrayWithLengthInObjectAsValue]
   )
 
   const locSelectedRadioAndValuesArray = useMemo(
     () => campaign && findArrayWithLengthInObjectAsValue(campaign.targetingInput.inputs.location),
-    [campaign]
+    [campaign, findArrayWithLengthInObjectAsValue]
   )
 
   const handleCategories = useCallback(
@@ -213,7 +216,7 @@ const EditCampaign = ({
       )
       form.validateField('targetingInput.inputs.categories')
     },
-    [campaign]
+    [campaign, updateCatsLocsObject]
   )
 
   const handleCountries = useCallback(
@@ -224,60 +227,66 @@ const EditCampaign = ({
       )
       form.validateField('targetingInput.inputs.location')
     },
-    [campaign]
+    [campaign, updateCatsLocsObject]
   )
 
-  const editCampaign = useCallback((values: FormProps) => {
-    const impression = {
-      min: Number(
-        parseToBigNumPrecision(
-          Number(values.pricingBounds.IMPRESSION?.min) / 1000,
-          balanceToken.decimals
+  const editCampaign = useCallback(
+    (values: FormProps) => {
+      const impression = {
+        min: Number(
+          parseToBigNumPrecision(
+            Number(values.pricingBounds.IMPRESSION?.min) / 1000,
+            balanceToken.decimals
+          )
+        ),
+        max: Number(
+          parseToBigNumPrecision(
+            Number(values.pricingBounds.IMPRESSION?.max) / 1000,
+            balanceToken.decimals
+          )
         )
-      ),
-      max: Number(
-        parseToBigNumPrecision(
-          Number(values.pricingBounds.IMPRESSION?.max) / 1000,
-          balanceToken.decimals
-        )
-      )
-    }
+      }
 
-    const body: FormProps = {
-      pricingBounds: {
-        CLICK: { min: 0, max: 0 },
-        IMPRESSION: impression
-      },
-      targetingInput: {
-        version: '1',
-        inputs: {
-          categories: values.targetingInput.inputs.categories,
-          location: values.targetingInput.inputs.location,
-          advanced: {
-            disableFrequencyCapping: values.targetingInput.inputs.advanced.disableFrequencyCapping,
-            includeIncentivized: values.targetingInput.inputs.advanced.includeIncentivized,
-            limitDailyAverageSpending:
-              values.targetingInput.inputs.advanced.limitDailyAverageSpending
+      const body: FormProps = {
+        pricingBounds: {
+          CLICK: { min: 0, max: 0 },
+          IMPRESSION: impression
+        },
+        targetingInput: {
+          version: '1',
+          inputs: {
+            categories: values.targetingInput.inputs.categories,
+            location: values.targetingInput.inputs.location,
+            advanced: {
+              disableFrequencyCapping:
+                values.targetingInput.inputs.advanced.disableFrequencyCapping,
+              includeIncentivized: values.targetingInput.inputs.advanced.includeIncentivized,
+              limitDailyAverageSpending:
+                values.targetingInput.inputs.advanced.limitDailyAverageSpending
+            }
           }
         }
       }
-    }
 
-    return adexServicesRequest('backend', {
-      route: `/dsp/campaigns/edit/${campaign.id}`,
-      method: 'PUT',
-      body,
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    })
-      .then(() => {
-        showNotification('info', 'Successfully updated Campaign data!')
-        form.resetDirty()
-        onAfterSubmit && onAfterSubmit()
+      return adexServicesRequest('backend', {
+        route: `/dsp/campaigns/edit/${campaign.id}`,
+        method: 'PUT',
+        body,
+        headers: {
+          'Content-Type': 'application/json'
+        }
       })
-      .catch(() => showNotification('error', "Couldn't update the Campaign data!"))
-  }, [])
+        .then(() => {
+          console.log(form.isDirty())
+          form.resetDirty()
+          showNotification('info', 'Successfully updated Campaign data!')
+          onAfterSubmit && onAfterSubmit()
+          console.log(form.isDirty())
+        })
+        .catch(() => showNotification('error', "Couldn't update the Campaign data!"))
+    },
+    [adexServicesRequest, parseToBigNumPrecision, form]
+  )
 
   if (!campaign) return <div>Invalid Campaign ID</div>
   return (

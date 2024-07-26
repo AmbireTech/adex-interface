@@ -168,7 +168,7 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
                     campaign.status !== CampaignStatus.active &&
                     changeCampaignStatus(CampaignStatus.active, campaign.id)
                   }
-                  disabled={isAdminPanel}
+                  disabled={isAdminPanel || campaign.status === CampaignStatus.closedByUser}
                   variant="subtle"
                 >
                   Activate
@@ -183,6 +183,7 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
                     changeCampaignStatus(CampaignStatus.paused, campaign.id)
                   }
                   variant="subtle"
+                  disabled={campaign.status === CampaignStatus.closedByUser}
                 >
                   Pause
                 </Button>
@@ -191,8 +192,8 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
                     selected: campaign.status === CampaignStatus.closedByUser
                   })}
                   rightIcon={<StopIcon size="15px" />}
-                  // onClick={updateOpenState}
-                  disabled={!isAdminPanel}
+                  onClick={updateOpenState}
+                  disabled={campaign.status === CampaignStatus.closedByUser}
                   variant="subtle"
                 >
                   Stop
@@ -208,7 +209,10 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
                   Archive
                 </Button>
                 <Button
-                  disabled={campaign.status === CampaignStatus.draft}
+                  disabled={
+                    campaign.status === CampaignStatus.draft ||
+                    campaign.status === CampaignStatus.closedByUser
+                  }
                   className={cx(classes.actionIcons, 'edit', {
                     selected: params.get('edit') && campaign.status !== CampaignStatus.draft
                   })}
@@ -239,7 +243,9 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
         </Flex>
       </Box>
       <Box mt="xl">
-        {params.get('edit') && campaign.status !== CampaignStatus.draft ? (
+        {campaign.status !== CampaignStatus.closedByUser &&
+        campaign.status !== CampaignStatus.draft &&
+        params.get('edit') ? (
           <EditCampaign campaign={campaign} onAfterSubmit={onAfterEditSubmit} />
         ) : (
           <Container fluid className={classes.wrapper}>
