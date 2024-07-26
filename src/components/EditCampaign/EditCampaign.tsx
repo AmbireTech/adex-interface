@@ -192,11 +192,10 @@ const EditCampaign = ({
   useEffect(() => {
     if (blocker.state === 'blocked' && form.isDirty()) {
       setOpenedModal(true)
-      console.log('modal why', form.isDirty(), blocker.state)
-    } else {
-      blockerProceed()
+      return
     }
-  }, [blocker.state, form, blockerProceed])
+    blockerProceed()
+  }, [blocker, form, blockerProceed])
 
   const catSelectedRadioAndValuesArray = useMemo(
     () => campaign && findArrayWithLengthInObjectAsValue(campaign.targetingInput.inputs.categories),
@@ -277,11 +276,9 @@ const EditCampaign = ({
         }
       })
         .then(() => {
-          console.log(form.isDirty())
           form.resetDirty()
           showNotification('info', 'Successfully updated Campaign data!')
           onAfterSubmit && onAfterSubmit()
-          console.log(form.isDirty())
         })
         .catch(() => showNotification('error', "Couldn't update the Campaign data!"))
     },
