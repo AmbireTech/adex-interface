@@ -2,7 +2,11 @@ import { Placement } from 'adex-common'
 
 const unknownSrc = '🤷🏼‍♂'
 
-export const getHumneSrcName = (indexString: string, placement: Placement): string => {
+export const getHumneSrcName = (
+  indexString: string,
+  placement: Placement,
+  getBundleId?: boolean
+): string => {
   const split = indexString.split('|')
   if (split.length < 4) {
     return indexString
@@ -12,16 +16,19 @@ export const getHumneSrcName = (indexString: string, placement: Placement): stri
   const domain = split[2].replace('d::', '')
   const bundle = split[3].replace('b::', '')
 
-  let humne = ''
-  switch (placement) {
-    case 'app':
-      humne = name || bundle || domain || id || indexString || unknownSrc
-      break
-    case 'site':
-      humne = domain || name || id || unknownSrc
-      break
-    default:
-      humne = name || domain || id || bundle || unknownSrc
+  let humne = bundle || domain || id || name
+
+  if (!getBundleId) {
+    switch (placement) {
+      case 'app':
+        humne = name || bundle || domain || id || indexString || unknownSrc
+        break
+      case 'site':
+        humne = domain || name || id || unknownSrc
+        break
+      default:
+        humne = name || domain || id || bundle || unknownSrc
+    }
   }
 
   return humne.replaceAll('__', '.').replaceAll('-_-', ' ')

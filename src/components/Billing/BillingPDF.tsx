@@ -2,7 +2,6 @@ import { Flex, Grid, Space, Table, createStyles, Text } from '@mantine/core'
 import { Placement } from 'adex-common'
 import {
   formatDate,
-  getHumneSrcName,
   getMonthRangeString,
   monthPeriodIndexToDate,
   parseBigNumTokenAmountToDecimal,
@@ -10,7 +9,7 @@ import {
 } from 'helpers'
 // TODO: delete mock data
 // import { invoiceDetails } from 'components/Billing/mockedData'
-import { useMemo, PropsWithChildren, ReactNode } from 'react'
+import { PropsWithChildren, ReactNode } from 'react'
 import AdExLogo from 'resources/logos/AdExLogo'
 import { IInvoiceDetails, InvoiceCompanyDetails, OperationEntry, StatementData } from 'types'
 import { networks } from 'lib/Icons'
@@ -32,9 +31,7 @@ type DetailsProps = PropsWithChildren &
   }
 
 const formatTokenAmount = (amount: bigint, token: OperationEntry['token']): string => {
-  return `${formatCurrency(parseBigNumTokenAmountToDecimal(amount, token.decimals), 2)} ${
-    token.name
-  }`
+  return `${formatCurrency(parseBigNumTokenAmountToDecimal(amount, token.decimals), 2)}`
 }
 
 const useStyles = createStyles((theme) => ({
@@ -72,12 +69,13 @@ const useStyles = createStyles((theme) => ({
   borderBottom: { borderBottom: '1px solid black', width: '100%', height: '70%' },
   signature: { display: 'flex', justifyContent: 'center', fontSize: theme.fontSizes.xs },
   rightAlignedText: {
-    textAlign: 'end'
+    // textAlign: 'end'
   },
   head: {
     background: theme.black,
     padding: theme.spacing.xl,
-    color: 'white'
+    color: 'white',
+    textAlign: 'end'
   },
   logo: {
     width: 200
@@ -171,12 +169,8 @@ const BillingBlank = ({ children, header, seller, buyer, title }: DetailsProps) 
 export const InvoicesPDF = ({ invoiceDetails, placement }: InvoicesPDFProps) => {
   const { classes, cx } = useStyles()
 
-  const calculateTotal = useMemo(() => {
-    return invoiceDetails.invoiceData.map((item) => item.paid).reduce((a, b) => a + b, 0)
-  }, [invoiceDetails.invoiceData])
-
-  const calculatedVatValue = calculateTotal * (invoiceDetails.vatPercentageInUSD / 100)
-  const invoiceTotal = calculateTotal + calculatedVatValue
+  const calculatedVatValue = invoiceDetails.amount * (invoiceDetails.vatPercentageInUSD / 100)
+  const invoiceTotal = invoiceDetails.amount + calculatedVatValue
   return (
     <BillingBlank
       title="Invoice"
@@ -208,13 +202,18 @@ export const InvoicesPDF = ({ invoiceDetails, placement }: InvoicesPDFProps) => 
       }
     >
       <>
-        <Table fontSize="xs" verticalSpacing="xs" w="100%" className={classes.tableWrapper}>
+        <Table
+          fontSize="xs"
+          verticalSpacing="xs"
+          w="100%"
+          className={classes.tableWrapper}
+          withColumnBorders
+        >
           <thead className={classes.tableHeader}>
             <tr>
-              <th>No.</th>
-              <th>{placement === 'app' ? 'App' : 'Website'}</th>
-              <th>Impressions</th>
-              <th>Clicks</th>
+              <th>Placement</th>
+              <th className={classes.rightAlignedText}>Impressions</th>
+              <th className={classes.rightAlignedText}>Clicks</th>
               <th>CTR %</th>
               <th>
                 <span>Average CPM</span>
@@ -229,18 +228,16 @@ export const InvoicesPDF = ({ invoiceDetails, placement }: InvoicesPDFProps) => 
             </tr>
           </thead>
           <tbody className={classes.tableBody}>
-            {invoiceDetails.invoiceData.map((e, index) => (
-              // eslint-disable-next-line
-              <tr key={index}>
-                <td>{index + 1}</td>
-                <td className={classes.wrap}>{getHumneSrcName(e.segment, placement)}</td>
-                <td className={classes.rightAlignedText}>{e.impressions.toLocaleString()}</td>
-                <td className={classes.rightAlignedText}>{e.clicks.toLocaleString()}</td>
-                <td className={classes.rightAlignedText}>{e.ctr}</td>
-                <td className={classes.rightAlignedText}>{e.avgCpm}</td>
-                <td className={classes.rightAlignedText}>{e.paid.toFixed(4)}</td>
-              </tr>
-            ))}
+            <tr>
+              <td className={classes.wrap}>{placement}</td>
+              <td className={classes.rightAlignedText}>
+                {invoiceDetails.impressions.toLocaleString()}
+              </td>
+              <td className={classes.rightAlignedText}>{invoiceDetails.clicks.toLocaleString()}</td>
+              <td className={classes.rightAlignedText}>{invoiceDetails.ctr}</td>
+              <td className={classes.rightAlignedText}>{invoiceDetails.avgCpm}</td>
+              <td className={classes.rightAlignedText}>{invoiceDetails.amount.toFixed(4)}</td>
+            </tr>
           </tbody>
         </Table>
         <Grid.Col span={12}>
@@ -249,7 +246,7 @@ export const InvoicesPDF = ({ invoiceDetails, placement }: InvoicesPDFProps) => 
               Subtotal
             </Grid.Col>
             <Grid.Col span={2} className={cx(classes.right)}>
-              {calculateTotal.toFixed(2)}
+              {invoiceDetails.amount.toFixed(2)}
             </Grid.Col>
             <Grid.Col span={10} className={cx(classes.right)}>
               {`VAT ${invoiceDetails.vatPercentageInUSD} %`}
@@ -320,14 +317,20 @@ export const StatementsPDF = ({ statement, seller, buyer }: StatementsPDFProps) 
       }
     >
       <>
-        <Table fontSize="xs" verticalSpacing="xs" w="100%" className={classes.tableWrapper}>
+        <Table
+          fontSize="xs"
+          verticalSpacing="xs"
+          w="100%"
+          className={classes.tableWrapper}
+          withColumnBorders
+        >
           <thead className={classes.tableHeader}>
             <tr>
               <th>#</th>
               <th>Date</th>
               <th>Type</th>
               <th>Description</th>
-              <th>amount</th>
+              <th>amount ({statement.token.name})</th>
             </tr>
           </thead>
           <tbody className={classes.tableBody}>
@@ -336,11 +339,12 @@ export const StatementsPDF = ({ statement, seller, buyer }: StatementsPDFProps) 
               <tr key={index}>
                 <td>{index + 1}</td>
                 <td>{e.date.toLocaleDateString()}</td>
-                <td>{e.type}</td>
+                <td>
+                  <Text transform="capitalize">{e.name}</Text>
+                </td>
                 <td className={classes.wrap}>{e.id}</td>
                 <td className={cx(classes.rightAlignedText, classes.noWrap)}>
-                  {' '}
-                  {`${e.type === 'campaign' ? '-' : '+'}   ${formatTokenAmount(
+                  {`${e.type === 'campaignOpen' ? '-' : '+'}   ${formatTokenAmount(
                     e.amount,
                     statement.token
                   )}`}

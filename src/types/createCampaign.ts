@@ -30,7 +30,6 @@ export type ValidationRegExBanner = {
 }
 
 export type CreateCampaignOverview = {
-  count: number
   title: string
   value: any
 }

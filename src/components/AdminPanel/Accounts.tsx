@@ -1,17 +1,10 @@
-import { useEffect, useMemo, useCallback } from 'react'
+import { useEffect, useMemo, useCallback, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import {
-  Container,
-  Loader,
-  Flex,
-  Box,
-  Badge
-
-  //  Flex, Loader, Tabs
-} from '@mantine/core'
+import { Container, Loader, Flex, Box, Badge, TextInput, Paper } from '@mantine/core'
 
 import CustomTable from 'components/common/CustomTable'
 import useAdmin from 'hooks/useAdmin'
+import VisibilityIcon from 'resources/icons/Visibility'
 
 import { parseBigNumTokenAmountToDecimal } from 'helpers/balances'
 
@@ -29,6 +22,7 @@ const AdminAnalytics = () => {
   const navigate = useNavigate()
   const { accounts, initialDataLoading, updateAccounts } = useAdmin()
   const headings = useMemo(() => [...headingsDefault], [])
+  const [search, setSearch] = useState('')
 
   const data = useMemo(() => {
     if (!accounts.size) {
@@ -53,8 +47,30 @@ const AdminAnalytics = () => {
       ),
       decimals
     ).toLocaleString()
+    const totalAccounts = accArr.length
 
     const elements = accArr
+      .filter((x) =>
+        (
+          x.name +
+          x.id +
+          (x.info?.contactPerson || '') +
+          (x.info?.email || '') +
+          (x.info?.notes || '') +
+          (x.info?.phone || '') +
+          (x.billingDetails?.companyAddress || '') +
+          (x.billingDetails?.companyCity || '') +
+          (x.billingDetails?.companyCountry || '') +
+          (x.billingDetails?.companyName || '') +
+          (x.billingDetails?.companyNumber || '') +
+          (x.billingDetails?.companyNumberPrim || '') +
+          (x.billingDetails?.companyZipCode || '') +
+          (x.billingDetails?.firstName || '') +
+          (x.billingDetails?.lastName || '')
+        )
+          .toLowerCase()
+          .includes(search.toLowerCase().trim())
+      )
       .sort((a, b) => Number(b.availableBalance) - Number(a.availableBalance))
       .map((a) => {
         return {
@@ -77,10 +93,11 @@ const AdminAnalytics = () => {
 
     return {
       elements,
+      totalAccounts,
       totalDeposits,
       totalCampaignsLocked
     }
-  }, [accounts])
+  }, [accounts, search])
 
   useEffect(() => {
     updateAccounts()
@@ -93,32 +110,52 @@ const AdminAnalytics = () => {
     [navigate]
   )
 
+  const actions = useMemo(() => {
+    return [
+      {
+        action: handlePreview,
+        label: 'Show Account Details',
+        icon: <VisibilityIcon />
+      }
+    ]
+  }, [handlePreview])
+
   return (
-    <Container fluid>
+    <Container fluid px={0}>
       {initialDataLoading ? (
         <Loader size="xl" variant="dots" color="violet" />
       ) : (
-        <Flex direction="column">
-          <Flex direction="row" align="center" justify="left" gap="xl" mb="md">
-            <Box>Totals: </Box>
-            <Badge leftSection="Accounts" size="xl">
-              ({data.elements.length})
-            </Badge>
-            <Badge leftSection="Deposits" size="xl">
-              ({data.totalDeposits} USDC)
-            </Badge>
-            <Badge leftSection="Campaigns" size="xl">
-              ({data.totalCampaignsLocked} USDC)
-            </Badge>
+        <Paper p="sm" withBorder>
+          <Flex direction="column">
+            <Flex direction="row" align="center" justify="left" gap="xl" mb="md" wrap="wrap">
+              <Box>Totals: </Box>
+              <Badge leftSection="Accounts" size="xl">
+                ({data.totalAccounts})
+              </Badge>
+              <Badge leftSection="Deposits" size="xl">
+                ({data.totalDeposits} USDC)
+              </Badge>
+              <Badge leftSection="Campaigns" size="xl">
+                ({data.totalCampaignsLocked} USDC)
+              </Badge>
+              <Flex>
+                <TextInput
+                  placeholder="Search by id, name, info, billing data etc."
+                  value={search}
+                  onChange={(e) => setSearch(e.currentTarget.value)}
+                  miw={420}
+                />
+              </Flex>
+            </Flex>
+            <CustomTable
+              background
+              headings={headings}
+              elements={data.elements}
+              pageSize={10}
+              actions={actions}
+            />
           </Flex>
-          <CustomTable
-            background
-            headings={headings}
-            elements={data.elements}
-            pageSize={10}
-            onPreview={handlePreview}
-          />
-        </Flex>
+        </Paper>
       )}
     </Container>
   )

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
-import { Container, Grid, createStyles, Text, Flex, Box, Button, Paper } from '@mantine/core'
+import { Container, Grid, createStyles, Text, Flex, Box, Button, Paper, Stack } from '@mantine/core'
 import BadgeStatusCampaign from 'components/Dashboard/BadgeStatusCampaign'
 import { formatCatsAndLocsData } from 'helpers/createCampaignHelpers'
 import { CATEGORIES, COUNTRIES } from 'constants/createCampaign'
@@ -280,7 +280,7 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
                     lineHeight="sm"
                     textSize="sm"
                     title="Served"
-                    // value={campaignDetails?.served}
+                    // value={campaignData?.share}
                     value=""
                   />
                   {/* TODO: Add data for it */}
@@ -365,11 +365,16 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
                   <CampaignDetailsRow
                     lineHeight="sm"
                     textSize="sm"
-                    title="Disable frequency capping"
-                    value={
-                      campaign.targetingInput.inputs.advanced.disableFrequencyCapping ? 'Yes' : 'No'
-                    }
+                    title="Last modified by"
                     noBorder
+                    value={
+                      <Stack spacing="xs" align="end">
+                        <Text size="sm">{campaign.lastModifiedBy}</Text>
+                        <Text size="xs" color="dimmed">
+                          {new Date(Number(campaign.modified)).toLocaleString()}
+                        </Text>
+                      </Stack>
+                    }
                   />
                 </div>
               </Grid.Col>
