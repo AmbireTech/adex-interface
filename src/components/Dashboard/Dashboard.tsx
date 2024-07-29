@@ -19,7 +19,7 @@ import AnalyticsIcon from 'resources/icons/Analytics'
 import DuplicateIcon from 'resources/icons/Duplicate'
 import DeleteIcon from 'resources/icons/Delete'
 import EditIcon from 'resources/icons/Edit'
-
+import { CustomConfirmModalBody } from 'components/common/Modals/CustomConfirmModal/CustomConfirmModalBody'
 import BadgeStatusCampaign from './BadgeStatusCampaign'
 
 const campaignHeaders = [
@@ -211,7 +211,7 @@ const Dashboard = ({ isAdminPanel, accountId }: { isAdminPanel?: boolean; accoun
     [navigate]
   )
 
-  const handleEdit = useCallback(
+  const handleEditDraft = useCallback(
     (data: DashboardTableElement['actionData'], isDuplicate?: boolean) => {
       if (isAdminPanel) {
         return
@@ -234,20 +234,27 @@ const Dashboard = ({ isAdminPanel, accountId }: { isAdminPanel?: boolean; accoun
     [isAdminPanel, updateCampaignFromDraft, navigate, showNotification]
   )
 
-  const handleDuplicate = useCallback(
-    (campaign: DashboardTableElement['actionDta']) => {
-      return handleEdit(campaign, true)
-    },
-    [handleEdit]
+  const handleEdit = useCallback(
+    (data: DashboardTableElement['actionData']) =>
+      navigate(`/dashboard/campaign-details/${data.campaign.id}?edit=true`),
+    [navigate]
   )
 
-  // NOTE: @Maskln - this is how confirm dialog should work - not to handle the state everywhere is used ... it can be customized to match the design https://v6.mantine.dev/others/modals/#context-modals
+  const handleDuplicate = useCallback(
+    (campaign: DashboardTableElement['actionDta']) => {
+      return handleEditDraft(campaign, true)
+    },
+    [handleEditDraft]
+  )
+
   const handleDelete = useCallback(
     (data: DashboardTableElement['actionData']) =>
       modals.openConfirmModal({
         title: 'Delete draft',
         children: (
-          <Text size="sm">{`Are you sure want to delete draft "${data.campaign.title}"`}</Text>
+          <CustomConfirmModalBody
+            text={`Are you sure want to delete draft "${data.campaign.title}"`}
+          />
         ),
         labels: { confirm: 'Delete', cancel: 'Cancel' },
         confirmProps: { color: 'red' },
@@ -264,7 +271,9 @@ const Dashboard = ({ isAdminPanel, accountId }: { isAdminPanel?: boolean; accoun
       return modals.openConfirmModal({
         title: `${confirm} Campaign`,
         children: (
-          <Text size="sm">{`Are you sure want to ${confirm} campaign "${cmp?.title}"`}</Text>
+          <CustomConfirmModalBody
+            text={`Are you sure want to ${confirm} campaign "${cmp?.title}"`}
+          />
         ),
         labels: { confirm, cancel: 'Cancel' },
         confirmProps: { color: cmp?.archived ? 'blue' : 'red' },
@@ -308,10 +317,18 @@ const Dashboard = ({ isAdminPanel, accountId }: { isAdminPanel?: boolean; accoun
       dashboardActions.push(
         ...[
           {
-            action: handleEdit,
-            label: 'Edit Draft',
+            action: handleEditDraft,
+            label: 'Continue Edit',
             icon: <EditIcon />,
-            disabled: (ada: DashboardTableElement['actionData']) => !ada.isDraft
+            hide: (ada: DashboardTableElement['actionData']) => !ada.isDraft
+          },
+          {
+            action: handleEdit,
+            disabled: (ada: DashboardTableElement['actionData']) =>
+              ada.campaign.status === CampaignStatus.closedByUser,
+            label: 'Edit',
+            icon: <EditIcon />,
+            hide: (ada: DashboardTableElement['actionData']) => ada.isDraft
           },
           {
             action: handleDuplicate,
@@ -343,6 +360,7 @@ const Dashboard = ({ isAdminPanel, accountId }: { isAdminPanel?: boolean; accoun
     handleDelete,
     handleDuplicate,
     handleEdit,
+    handleEditDraft,
     handlePreview,
     isAdminPanel
   ])
