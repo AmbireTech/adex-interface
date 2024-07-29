@@ -161,7 +161,7 @@ function TopBar() {
                   {/* <Text fw="bold" size="xs">
                     John Doe
                   </Text> */}
-                  <Text color="secondaryText" size="xs">
+                  <Text c="secondaryText" size="xs">
                     {maskAddress(adexAccount.address)}
                   </Text>
                 </div>

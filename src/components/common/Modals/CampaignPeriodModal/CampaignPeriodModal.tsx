@@ -165,7 +165,7 @@ const CampaignPeriodModal = ({ opened, close }: { opened: boolean; close: () => 
                     <Text fw="bold" size="xl">
                       Set Time
                     </Text>
-                    <Text color="secondaryText" size="xs">
+                    <Text c="secondaryText" size="xs">
                       Current time: <Clock />
                     </Text>
                   </div>
@@ -225,7 +225,7 @@ const CampaignPeriodModal = ({ opened, close }: { opened: boolean; close: () => 
             className={classes.footer}
           >
             <Flex direction="column">
-              <Text color="secondaryText" size="xs">
+              <Text c="secondaryText" size="xs">
                 Start Date
               </Text>
               <Text size="md">
@@ -233,7 +233,7 @@ const CampaignPeriodModal = ({ opened, close }: { opened: boolean; close: () => 
               </Text>
             </Flex>
             <Flex direction="column">
-              <Text color="secondaryText" size="xs">
+              <Text c="secondaryText" size="xs">
                 End Date
               </Text>
               <Text size="md">

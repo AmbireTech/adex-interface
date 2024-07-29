@@ -51,7 +51,7 @@ export const AdminActions = ({ item }: { item: Campaign | null }) => {
             {ReviewStatus[item.reviewStatus]}
           </Badge>
         )}
-        <Text color="secondaryText">Review msg:</Text>
+        <Text c="secondaryText">Review msg:</Text>
         <Text>{reason}</Text>
       </Flex>
     )

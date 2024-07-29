@@ -109,7 +109,7 @@ const Deposit = () => {
     <Container size="xs" className={classes.container} pt="lg" pb="lg">
       <Grid grow align="center">
         <Grid.Col>
-          <Text size="sm" color="secondaryText" fw="bold">
+          <Text size="sm" c="secondaryText" fw="bold">
             Select Network
           </Text>
         </Grid.Col>
@@ -124,7 +124,7 @@ const Deposit = () => {
           />
         </Grid.Col>
         <Grid.Col>
-          <Text size="sm" color="secondaryText" fw="bold">
+          <Text size="sm" c="secondaryText" fw="bold">
             Choose Method
           </Text>
         </Grid.Col>

@@ -48,13 +48,13 @@ const CampaignPeriod = () => {
       className={classes.wrapper}
     >
       <Flex direction="column">
-        <Text color="secondaryText" size="xs">
+        <Text c="secondaryText" size="xs">
           Start Date
         </Text>
         <Text size="md">{startDateTime}</Text>
       </Flex>
       <Flex direction="column">
-        <Text color="secondaryText" size="xs">
+        <Text c="secondaryText" size="xs">
           End Date
         </Text>
         <Text size="md">{endDateTime}</Text>

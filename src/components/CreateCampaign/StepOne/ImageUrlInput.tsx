@@ -127,7 +127,7 @@ const ImageUrlInput = ({
           </ActionIcon>
         )}
       </Flex>
-      {error?.errMsg && <Text color="warning">{error?.errMsg}</Text>}
+      {error?.errMsg && <Text c="warning">{error?.errMsg}</Text>}
     </>
   )
 }

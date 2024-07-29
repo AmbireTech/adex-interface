@@ -38,7 +38,7 @@ const CpmMinMax = ({
         // description="Approx. ~ $0.10"
         inputWrapperOrder={['input', 'description', 'error']}
         rightSection={
-          <Text color="brand" mr="sm" size="sm">
+          <Text c="brand" mr="sm" size="sm">
             Min
           </Text>
         }
@@ -57,7 +57,7 @@ const CpmMinMax = ({
         // description="Approx. ~ $0.50"
         inputWrapperOrder={['input', 'description', 'error']}
         rightSection={
-          <Text color="brand" mr="sm" size="sm">
+          <Text c="brand" mr="sm" size="sm">
             Max
           </Text>
         }

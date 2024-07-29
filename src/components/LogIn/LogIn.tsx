@@ -95,7 +95,7 @@ function LogIn() {
           <Text size="sm" c="secondaryText">
             ©{year} AdEx. All Rights Reserved.
           </Text>
-          <Text size="sm" color="secondaryText">
+          <Text size="sm" c="secondaryText">
             V.{appVersion}-beta
           </Text>
         </Flex>

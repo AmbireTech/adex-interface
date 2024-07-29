@@ -234,7 +234,7 @@ const Dashboard = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
           )}
           {/* Temporary disabled show/hide archived until no functionality implemented */}
           {/* <UnstyledButton onClick={toggleShowArchived}>
-            <Text size="sm" underline color="secondaryText">
+            <Text size="sm" underline c="secondaryText">
               {showArchived ? 'Hide Archived' : 'Show Archived'}
             </Text>
           </UnstyledButton> */}

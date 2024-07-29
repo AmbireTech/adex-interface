@@ -110,7 +110,7 @@ const useCreateCampaignData = () => {
     if (key === 'nin') {
       return (
         <>
-          <Text ta="end" color="warning">
+          <Text ta="end" c="warning">
             All except:{' '}
           </Text>
           <Text ta="end">{labels}</Text>

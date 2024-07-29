@@ -76,7 +76,7 @@ const FilesDropzone = ({ onDrop }: FilesDropzoneProps) => {
             Accepted format: jpeg, png and for html banners zip file. Max size: 1MB.
           </Text>
           {rejectedFiles.length > 0 && (
-            <Text size="xs" color="red" inline mt={7}>
+            <Text size="xs" c="red" inline mt={7}>
               Rejected files: {rejectedFiles[0].errors[0].message}
             </Text>
           )}
