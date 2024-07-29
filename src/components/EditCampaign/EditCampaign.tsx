@@ -343,22 +343,6 @@ const EditCampaign = ({
               </Text>
               <Group my="sm">
                 <Checkbox
-                  label="Include incentivized traffic"
-                  {...form.getInputProps('targetingInput.inputs.advanced.includeIncentivized', {
-                    type: 'checkbox'
-                  })}
-                />
-              </Group>
-              <Group my="sm">
-                <Checkbox
-                  label="Disable frequency capping"
-                  {...form.getInputProps('targetingInput.inputs.advanced.disableFrequencyCapping', {
-                    type: 'checkbox'
-                  })}
-                />
-              </Group>
-              <Group my="sm">
-                <Checkbox
                   label="Limit average daily spending"
                   {...form.getInputProps(
                     'targetingInput.inputs.advanced.limitDailyAverageSpending',
