@@ -1,6 +1,7 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo } from 'react'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { Container, Grid, createStyles, Text, Flex, Box, Button, Paper, Stack } from '@mantine/core'
+import { modals } from '@mantine/modals'
 import BadgeStatusCampaign from 'components/Dashboard/BadgeStatusCampaign'
 import { formatCatsAndLocsData } from 'helpers/createCampaignHelpers'
 import { CATEGORIES, COUNTRIES } from 'constants/createCampaign'
@@ -18,10 +19,11 @@ import PausedIcon from 'resources/icons/Paused'
 import EditIcon from 'resources/icons/Edit'
 import ActionButton from 'components/common/CustomTable/ActionButton/ActionButton'
 import AnalyticsIcon from 'resources/icons/Analytics'
-// import useCustomNotifications from 'hooks/useCustomNotifications'
-import { CustomConfirmModal } from 'components/common/Modals'
+import useCustomNotifications from 'hooks/useCustomNotifications'
 import { AdminBadge } from 'components/common/AdminBadge'
 import EditCampaign from 'components/EditCampaign'
+import { CustomConfirmModalBody } from 'components/common/Modals/CustomConfirmModal/CustomConfirmModalBody'
+import DeleteIcon from 'resources/icons/Delete'
 import CatsLocsFormatted from './CatsLocsFormatted'
 import { AdminActions } from './AdminActions'
 
@@ -59,19 +61,15 @@ const useStyles = createStyles((theme) => ({
     margin: '3px',
     padding: '0 15px',
     '&.active': {
+      color: theme.colors.success[3],
       '&:hover': {
-        color: theme.colors.success[3]
-      },
-      '&.selected': {
         color: theme.colors.success[3],
         background: theme.fn.lighten(theme.colors.success[3], theme.other.shades.lighten.lightest)
       }
     },
     '&.paused': {
+      color: theme.colors.paused[3],
       '&:hover': {
-        color: theme.colors.paused[3]
-      },
-      '&.selected': {
         color: theme.colors.paused[3],
         background: theme.fn.lighten(theme.colors.paused[3], theme.other.shades.lighten.lightest)
       }
@@ -108,8 +106,14 @@ const useStyles = createStyles((theme) => ({
 
 const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
   const { classes, cx } = useStyles()
-  const { campaignsData, updateCampaignDataById, changeCampaignStatus } = useCampaignsData()
-  // const { showNotification } = useCustomNotifications()
+  const {
+    campaignsData,
+    updateCampaignDataById,
+    changeCampaignStatus,
+    toggleArchived,
+    deleteDraftCampaign
+  } = useCampaignsData()
+  const { showNotification } = useCustomNotifications()
   const navigate = useNavigate()
   const [params, setParams] = useSearchParams()
   const { id } = useParams()
@@ -122,14 +126,79 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
 
   const campaign = useMemo(() => campaignData?.campaign, [campaignData])
 
-  // const handleEdit = useCallback(() => {
-  //   if (campaign) {
-  //     updateCampaignFromDraft(campaign)
-  //     navigate('/dashboard/create-campaign')
-  //   } else {
-  //     showNotification('error', 'Editing draft campaign failed', 'Editing draft campaign failed')
-  //   }
-  // }, [updateCampaignFromDraft, navigate, showNotification, campaign])
+  const handleArchive = useCallback(() => {
+    if (!campaign?.id) {
+      return
+    }
+
+    const confirm = campaign?.archived ? 'Unarchive' : 'Archive'
+
+    return modals.openConfirmModal({
+      title: `${confirm} Campaign`,
+      children: (
+        <CustomConfirmModalBody
+          text={`Are you sure want to ${confirm} campaign "${campaign?.title}"`}
+        />
+      ),
+      labels: { confirm, cancel: 'Cancel' },
+      confirmProps: { color: campaign?.archived ? 'blue' : 'red' },
+      onConfirm: () => {
+        toggleArchived(campaign?.id || '')
+        updateCampaignDataById(campaign?.id)
+        showNotification('info', `Campaign ${campaign?.archived ? 'Unarchived' : 'Archived'}`)
+      }
+    })
+  }, [
+    campaign?.archived,
+    campaign?.id,
+    campaign?.title,
+    showNotification,
+    toggleArchived,
+    updateCampaignDataById
+  ])
+
+  const handleStopOrDelete = useCallback(() => {
+    if (!campaign?.id || !campaign?.status) {
+      return
+    }
+
+    const isDraft = campaign?.status === CampaignStatus.draft
+
+    const confirm = isDraft ? 'Delete Draft' : 'Stop'
+    const onConfirm = isDraft
+      ? () => {
+          deleteDraftCampaign(campaign.id)
+          showNotification('info', 'Draft campaign deleted!')
+          navigate('/dashboard')
+        }
+      : () => {
+          changeCampaignStatus(CampaignStatus.closedByUser, campaign.id)
+          updateCampaignDataById(campaign?.id)
+          showNotification('info', 'Campaign stopped!')
+        }
+
+    return modals.openConfirmModal({
+      title: `${confirm} Campaign`,
+      children: (
+        <CustomConfirmModalBody
+          text={`Are you sure want to ${confirm} campaign "${campaign?.title}. This action is irreversible!"`}
+        />
+      ),
+      labels: { confirm: 'Yes', cancel: 'Cancel' },
+      confirmProps: { color: campaign?.archived ? 'blue' : 'red' },
+      onConfirm
+    })
+  }, [
+    campaign?.archived,
+    campaign?.id,
+    campaign?.status,
+    campaign?.title,
+    changeCampaignStatus,
+    deleteDraftCampaign,
+    navigate,
+    showNotification,
+    updateCampaignDataById
+  ])
 
   useEffect(() => {
     if (id) {
@@ -137,19 +206,36 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
     }
   }, [id, updateCampaignDataById])
 
-  const [open, setOpen] = useState(false)
-
-  const updateOpenState = useCallback(
-    () => campaign?.status !== CampaignStatus.closedByUser && setOpen((prev) => !prev),
-    [campaign]
-  )
-
-  const handleConfirmBtnClicked = useCallback(() => {
-    campaign && changeCampaignStatus(CampaignStatus.closedByUser, campaign?.id)
-    updateOpenState()
-  }, [changeCampaignStatus, updateOpenState, campaign])
-
   const onAfterEditSubmit = () => updateCampaignDataById(id)
+
+  const canArchive = useMemo(() => {
+    return (
+      !isAdminPanel &&
+      campaign?.status &&
+      [
+        CampaignStatus.closedByUser,
+        CampaignStatus.exhausted,
+        CampaignStatus.expired,
+        CampaignStatus.rejected
+      ].includes(campaign?.status)
+    )
+  }, [campaign?.status, isAdminPanel])
+
+  const canStop = useMemo(() => {
+    return (
+      campaign?.status && [CampaignStatus.active, CampaignStatus.paused].includes(campaign?.status)
+    )
+  }, [campaign?.status])
+
+  const canActivate = useMemo(() => {
+    return campaign?.status === CampaignStatus.paused
+  }, [campaign?.status])
+
+  const canEdit = useMemo(() => {
+    return (
+      campaign?.status && [CampaignStatus.active, CampaignStatus.paused].includes(campaign?.status)
+    )
+  }, [campaign?.status])
 
   if (!campaign) return <div>Invalid Campaign Id</div>
   return (
@@ -160,22 +246,22 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
             <Paper mx="auto" shadow="xs" radius="lg">
               <Flex>
                 <Button
-                  className={cx(classes.actionIcons, 'active', {
-                    selected: campaign.status === CampaignStatus.active
+                  className={cx(classes.actionIcons, {
+                    active: canActivate
                   })}
                   rightIcon={<ActiveIcon size="15px" />}
                   onClick={() =>
-                    campaign.status !== CampaignStatus.active &&
-                    changeCampaignStatus(CampaignStatus.active, campaign.id)
+                    canActivate && changeCampaignStatus(CampaignStatus.active, campaign.id)
                   }
-                  disabled={isAdminPanel || campaign.status === CampaignStatus.closedByUser}
+                  disabled={!canActivate}
                   variant="subtle"
                 >
                   Activate
                 </Button>
+
                 <Button
-                  className={cx(classes.actionIcons, 'paused', {
-                    selected: campaign.status === CampaignStatus.paused
+                  className={cx(classes.actionIcons, {
+                    paused: campaign.status === CampaignStatus.active
                   })}
                   rightIcon={<PausedIcon size="15px" />}
                   onClick={() =>
@@ -183,42 +269,57 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
                     changeCampaignStatus(CampaignStatus.paused, campaign.id)
                   }
                   variant="subtle"
-                  disabled={campaign.status === CampaignStatus.closedByUser}
+                  disabled={campaign.status !== CampaignStatus.active}
                 >
                   Pause
                 </Button>
+
                 <Button
-                  className={cx(classes.actionIcons, 'stopped', {
-                    selected: campaign.status === CampaignStatus.closedByUser
+                  className={cx(classes.actionIcons, {
+                    stopped: canStop
                   })}
                   rightIcon={<StopIcon size="15px" />}
-                  onClick={updateOpenState}
-                  disabled={campaign.status === CampaignStatus.closedByUser}
+                  onClick={handleStopOrDelete}
+                  disabled={!canStop}
                   variant="subtle"
                 >
                   Stop
                 </Button>
+
+                {campaign.status === CampaignStatus.draft ? (
+                  <Button
+                    className={cx(classes.actionIcons, {
+                      archived: true
+                    })}
+                    rightIcon={<DeleteIcon size="15px" />}
+                    onClick={handleStopOrDelete}
+                    variant="subtle"
+                  >
+                    Delete draft
+                  </Button>
+                ) : (
+                  <Button
+                    className={cx(classes.actionIcons, 'archived', {
+                      selected: canArchive
+                    })}
+                    rightIcon={<ArchivedIcon size="15px" />}
+                    onClick={handleArchive}
+                    disabled={!canArchive}
+                    variant="subtle"
+                  >
+                    {campaign.archived ? 'Unarchive' : 'Archive'}
+                  </Button>
+                )}
+
                 <Button
-                  className={cx(classes.actionIcons, 'archived', {
-                    selected: campaign.status === CampaignStatus.exhausted
-                  })}
-                  rightIcon={<ArchivedIcon size="15px" />}
-                  disabled
-                  variant="subtle"
-                >
-                  Archive
-                </Button>
-                <Button
-                  disabled={
-                    campaign.status === CampaignStatus.draft ||
-                    campaign.status === CampaignStatus.closedByUser
-                  }
+                  disabled={!canEdit}
                   className={cx(classes.actionIcons, 'edit', {
                     selected: params.get('edit') && campaign.status !== CampaignStatus.draft
                   })}
                   rightIcon={<EditIcon size="15px" />}
                   variant="subtle"
                   onClick={() =>
+                    canEdit &&
                     setParams(
                       params.get('edit') && campaign.status !== CampaignStatus.draft
                         ? ''
@@ -464,15 +565,6 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
           </Container>
         )}
       </Box>
-      <CustomConfirmModal
-        cancelBtnLabel="No"
-        confirmBtnLabel="Yes"
-        onCancelClicked={() => updateOpenState()}
-        onConfirmClicked={() => handleConfirmBtnClicked()}
-        color="attention"
-        text="Are you sure you want to stop or cancel the campaign?"
-        opened={open}
-      />
     </>
   )
 }
