@@ -43,13 +43,8 @@ const useStyles = createStyles((theme) => ({
     maxWidth: '100%',
     padding: `${theme.spacing.xs} ${theme.spacing.md}`
   },
-  lighterColor: {
-    color:
-      theme.colors.secondaryText[theme.fn.primaryShade()] +
-      theme.other.shades.hexColorSuffix.lighter
-  },
   scrollableContainer: {
-    maxHeight: 300,
+    maxHeight: 420,
     overflowY: 'auto'
   },
   separator: {
@@ -252,7 +247,7 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
         <Flex direction={{ base: 'column', md: 'row' }} align="flex-start">
           <GoBack fixed title="Dashboard">
             <Paper mx="auto" shadow="xs" radius="lg">
-              <Flex>
+              <Flex direction="row">
                 <Button
                   className={cx(classes.actionIcons, {
                     active: canActivate
@@ -356,214 +351,202 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
         ) : (
           <Container fluid className={classes.wrapper}>
             {isAdminPanel && <AdminBadge title="Admin Details" />}
-            <Grid>
+            <Grid grow gutter="md">
               <Grid.Col md={12} xl={6}>
-                <Text weight="bold" size="sm" pb="sm" className={classes.lighterColor}>
-                  Overview
-                </Text>
-                <div className={classes.innerWrapper}>
-                  <CampaignDetailsRow
-                    lineHeight="sm"
-                    textSize="sm"
-                    title="Title"
-                    value={campaign?.title}
-                  />
-                  <CampaignDetailsRow
-                    lineHeight="sm"
-                    textSize="sm"
-                    title="Id"
-                    nowrap
-                    value={campaign?.id}
-                  />
-                  <CampaignDetailsRow
-                    lineHeight="sm"
-                    textSize="sm"
-                    title="Status"
-                    value={
-                      <span>
-                        {campaign?.status === CampaignStatus.rejected &&
-                          `${campaign.reviewMessage} `}
-                        <BadgeStatusCampaign type={campaign?.status as number} />
-                      </span>
-                    }
-                  />
-                  {/* TODO: Add data for it */}
-                  <CampaignDetailsRow
-                    lineHeight="sm"
-                    textSize="sm"
-                    title="Served"
-                    // value={campaignData?.share}
-                    value=""
-                  />
-                  {/* TODO: Add data for it */}
-                  <CampaignDetailsRow
-                    lineHeight="sm"
-                    textSize="sm"
-                    title="Budget"
-                    value={
-                      <FormattedAmount
-                        chainId={campaign.outpaceChainId}
-                        tokenAddress={campaign.outpaceAssetAddr}
-                        amount={campaign.campaignBudget}
-                        tokenDecimals={campaign.outpaceAssetDecimals}
-                      />
-                    }
-                  />
-                  <CampaignDetailsRow
-                    lineHeight="sm"
-                    title="Created"
-                    value={formatDateTime(new Date(Number(campaign.created)))}
-                  />
-                  <CampaignDetailsRow
-                    lineHeight="sm"
-                    textSize="sm"
-                    title="Starts"
-                    value={
-                      campaign.activeFrom
-                        ? formatDateTime(new Date(Number(campaign.activeFrom)))
-                        : 'N/A'
-                    }
-                  />
-                  <CampaignDetailsRow
-                    lineHeight="sm"
-                    textSize="sm"
-                    title="Ends"
-                    value={
-                      campaign.activeTo
-                        ? formatDateTime(new Date(Number(campaign.activeTo)))
-                        : 'N/A'
-                    }
-                  />
-                  <CampaignDetailsRow
-                    lineHeight="sm"
-                    title="CPM min"
-                    value={
-                      campaign.pricingBounds.IMPRESSION?.min && (
+                <Stack>
+                  <Text weight="bold" size="sm" color="dimmed">
+                    Overview
+                  </Text>
+                  <Box className={classes.innerWrapper}>
+                    <CampaignDetailsRow
+                      lineHeight="sm"
+                      textSize="sm"
+                      title="Title"
+                      value={campaign?.title}
+                    />
+                    <CampaignDetailsRow
+                      lineHeight="sm"
+                      textSize="sm"
+                      title="Id"
+                      nowrap
+                      value={campaign?.id}
+                    />
+                    <CampaignDetailsRow
+                      lineHeight="sm"
+                      textSize="sm"
+                      title="Status"
+                      value={
+                        <span>
+                          {campaign?.status === CampaignStatus.rejected &&
+                            `${campaign.reviewMessage} `}
+                          <BadgeStatusCampaign type={campaign?.status as number} />
+                        </span>
+                      }
+                    />
+                    {/* TODO: Add data for it */}
+                    <CampaignDetailsRow
+                      lineHeight="sm"
+                      textSize="sm"
+                      title="Served"
+                      // value={campaignData?.share}
+                      value=""
+                    />
+                    {/* TODO: Add data for it */}
+                    <CampaignDetailsRow
+                      lineHeight="sm"
+                      textSize="sm"
+                      title="Budget"
+                      value={
                         <FormattedAmount
                           chainId={campaign.outpaceChainId}
                           tokenAddress={campaign.outpaceAssetAddr}
-                          amount={campaign.pricingBounds.IMPRESSION.min}
+                          amount={campaign.campaignBudget}
                           tokenDecimals={campaign.outpaceAssetDecimals}
-                          isCPMAmount
                         />
-                      )
-                    }
-                  />
-                  <CampaignDetailsRow
-                    lineHeight="sm"
-                    title="CPM max"
-                    value={
-                      campaign.pricingBounds.IMPRESSION?.max && (
-                        <FormattedAmount
-                          chainId={campaign.outpaceChainId}
-                          tokenAddress={campaign.outpaceAssetAddr}
-                          amount={campaign.pricingBounds.IMPRESSION.max}
-                          tokenDecimals={campaign.outpaceAssetDecimals}
-                          isCPMAmount
-                        />
-                      )
-                    }
-                  />
-                  <CampaignDetailsRow
-                    lineHeight="sm"
-                    textSize="sm"
-                    title="Limit average daily spending"
-                    value={
-                      campaign.targetingInput.inputs.advanced.limitDailyAverageSpending
-                        ? 'Yes'
-                        : 'No'
-                    }
-                  />
-                  <CampaignDetailsRow
-                    lineHeight="sm"
-                    textSize="sm"
-                    title="Last modified by"
-                    noBorder
-                    value={
-                      <Stack spacing="xs" align="end">
-                        <Text size="sm">{campaign.lastModifiedBy}</Text>
-                        <Text size="xs" color="dimmed">
-                          {new Date(Number(campaign.modified)).toLocaleString()}
-                        </Text>
-                      </Stack>
-                    }
-                  />
-                </div>
+                      }
+                    />
+                    <CampaignDetailsRow
+                      lineHeight="sm"
+                      title="Created"
+                      value={formatDateTime(new Date(Number(campaign.created)))}
+                    />
+                    <CampaignDetailsRow
+                      lineHeight="sm"
+                      textSize="sm"
+                      title="Starts"
+                      value={
+                        campaign.activeFrom
+                          ? formatDateTime(new Date(Number(campaign.activeFrom)))
+                          : 'N/A'
+                      }
+                    />
+                    <CampaignDetailsRow
+                      lineHeight="sm"
+                      textSize="sm"
+                      title="Ends"
+                      value={
+                        campaign.activeTo
+                          ? formatDateTime(new Date(Number(campaign.activeTo)))
+                          : 'N/A'
+                      }
+                    />
+                    <CampaignDetailsRow
+                      lineHeight="sm"
+                      title="CPM min"
+                      value={
+                        campaign.pricingBounds.IMPRESSION?.min && (
+                          <FormattedAmount
+                            chainId={campaign.outpaceChainId}
+                            tokenAddress={campaign.outpaceAssetAddr}
+                            amount={campaign.pricingBounds.IMPRESSION.min}
+                            tokenDecimals={campaign.outpaceAssetDecimals}
+                            isCPMAmount
+                          />
+                        )
+                      }
+                    />
+                    <CampaignDetailsRow
+                      lineHeight="sm"
+                      title="CPM max"
+                      value={
+                        campaign.pricingBounds.IMPRESSION?.max && (
+                          <FormattedAmount
+                            chainId={campaign.outpaceChainId}
+                            tokenAddress={campaign.outpaceAssetAddr}
+                            amount={campaign.pricingBounds.IMPRESSION.max}
+                            tokenDecimals={campaign.outpaceAssetDecimals}
+                            isCPMAmount
+                          />
+                        )
+                      }
+                    />
+                    <CampaignDetailsRow
+                      lineHeight="sm"
+                      textSize="sm"
+                      title="Limit average daily spending"
+                      value={
+                        campaign.targetingInput.inputs.advanced.limitDailyAverageSpending
+                          ? 'Yes'
+                          : 'No'
+                      }
+                    />
+                    <CampaignDetailsRow
+                      lineHeight="sm"
+                      textSize="sm"
+                      title="Last modified by"
+                      noBorder
+                      value={
+                        <Stack spacing="xs" align="end">
+                          <Text size="sm">{campaign.lastModifiedBy}</Text>
+                          <Text size="xs" color="dimmed">
+                            {new Date(Number(campaign.modified)).toLocaleString()}
+                          </Text>
+                        </Stack>
+                      }
+                    />
+                  </Box>
+                </Stack>
               </Grid.Col>
               <Grid.Col md={12} xl={6}>
-                <Grid>
-                  <Grid.Col span={12}>
-                    <Text weight="bold" size="sm" pb="sm" className={classes.lighterColor}>
-                      Targeting
-                    </Text>
-                    <div className={classes.innerWrapper}>
-                      <CatsLocsFormatted
-                        title="Selected Categories"
-                        arr={formatCatsAndLocsData(
-                          campaign.targetingInput.inputs.categories,
-                          CATEGORIES
-                        )}
-                      />
-                      <CatsLocsFormatted
-                        title="Selected Countries"
-                        arr={formatCatsAndLocsData(
-                          campaign.targetingInput.inputs.location,
-                          COUNTRIES
-                        )}
-                      />
-                    </div>
-                  </Grid.Col>
-                </Grid>
-                {campaign.adUnits.length ? (
-                  <>
-                    <Grid>
-                      <Grid.Col span={12}>
-                        <Text weight="bold" size="sm" pb="sm" className={classes.lighterColor}>
-                          Creatives
-                        </Text>
-                      </Grid.Col>
-                    </Grid>
-                    <Grid>
-                      <Grid.Col span={12}>
-                        <div className={cx(classes.innerWrapper, classes.scrollableContainer)}>
-                          {campaign.adUnits.map((item: AdUnit, index) => {
-                            const isLast = index === campaign.adUnits.length - 1
-                            return (
-                              <CampaignDetailsRow
-                                key={item.id}
-                                lineHeight="sm"
-                                textSize="sm"
-                                title={`${item.banner?.format.w}x${item.banner?.format.h}`}
-                                value={
-                                  <MediaThumb
-                                    adUnit={item}
-                                    previewOnClick
-                                    title={`Target URL: ${item.banner?.targetUrl}`}
-                                  />
-                                }
-                                noBorder={isLast}
-                              />
-                            )
-                          })}
-                        </div>
-                      </Grid.Col>
-                    </Grid>
-                  </>
-                ) : null}
+                <Stack>
+                  <Text weight="bold" size="sm" color="dimmed">
+                    Targeting
+                  </Text>
+                  <Box className={classes.innerWrapper}>
+                    <CatsLocsFormatted
+                      title="Selected Categories"
+                      arr={formatCatsAndLocsData(
+                        campaign.targetingInput.inputs.categories,
+                        CATEGORIES
+                      )}
+                    />
+                    <CatsLocsFormatted
+                      title="Selected Countries"
+                      arr={formatCatsAndLocsData(
+                        campaign.targetingInput.inputs.location,
+                        COUNTRIES
+                      )}
+                    />
+                  </Box>
+                  {!!campaign.adUnits.length && (
+                    <Stack>
+                      <Text weight="bold" size="sm" color="dimmed">
+                        Creatives
+                      </Text>
+                      <Box className={cx(classes.innerWrapper, classes.scrollableContainer)}>
+                        {campaign.adUnits.map((item: AdUnit, index) => {
+                          const isLast = index === campaign.adUnits.length - 1
+                          return (
+                            <CampaignDetailsRow
+                              key={item.id}
+                              lineHeight="sm"
+                              textSize="sm"
+                              title={`${item.banner?.format.w}x${item.banner?.format.h}`}
+                              value={
+                                <MediaThumb
+                                  adUnit={item}
+                                  previewOnClick
+                                  title={`Target URL: ${item.banner?.targetUrl}`}
+                                />
+                              }
+                              noBorder={isLast}
+                            />
+                          )
+                        })}
+                      </Box>
+                    </Stack>
+                  )}
+                </Stack>
               </Grid.Col>
 
               {isAdminPanel && (
                 <Grid.Col md={12} xl={6} pt="xl">
-                  <Grid>
-                    <Grid.Col span={12}>
-                      <Text weight="bold" size="xl" pb="sm" color="attention">
-                        Admin actions
-                      </Text>
-                    </Grid.Col>
-                    <Grid.Col>
-                      <AdminActions item={campaign} />
-                    </Grid.Col>
-                  </Grid>
+                  <Stack>
+                    <Text weight="bold" size="xl" pb="sm" color="attention">
+                      Admin actions
+                    </Text>
+                    <AdminActions item={campaign} />
+                  </Stack>
                 </Grid.Col>
               )}
             </Grid>
