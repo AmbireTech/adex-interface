@@ -123,8 +123,9 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
   }
 
   const campaignData = useMemo(() => campaignsData.get(id), [id, campaignsData])
-
   const campaign = useMemo(() => campaignData?.campaign, [campaignData])
+
+  const isEditMode = useMemo(() => params.get('edit'), [params])
 
   const handleArchive = useCallback(() => {
     if (!campaign?.id) {
@@ -210,6 +211,7 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
 
   const canArchive = useMemo(() => {
     return (
+      !isEditMode &&
       !isAdminPanel &&
       campaign?.status &&
       [
@@ -219,17 +221,23 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
         CampaignStatus.rejected
       ].includes(campaign?.status)
     )
-  }, [campaign?.status, isAdminPanel])
+  }, [campaign?.status, isAdminPanel, isEditMode])
 
   const canStop = useMemo(() => {
     return (
-      campaign?.status && [CampaignStatus.active, CampaignStatus.paused].includes(campaign?.status)
+      !isEditMode &&
+      campaign?.status &&
+      [CampaignStatus.active, CampaignStatus.paused].includes(campaign?.status)
     )
-  }, [campaign?.status])
+  }, [campaign?.status, isEditMode])
 
   const canActivate = useMemo(() => {
-    return campaign?.status === CampaignStatus.paused
-  }, [campaign?.status])
+    return !isEditMode && campaign?.status === CampaignStatus.paused
+  }, [campaign?.status, isEditMode])
+
+  const canPause = useMemo(() => {
+    return !isEditMode && campaign?.status === CampaignStatus.active
+  }, [campaign?.status, isEditMode])
 
   const canEdit = useMemo(() => {
     return (
@@ -261,15 +269,14 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
 
                 <Button
                   className={cx(classes.actionIcons, {
-                    paused: campaign.status === CampaignStatus.active
+                    paused: canPause
                   })}
                   rightIcon={<PausedIcon size="15px" />}
                   onClick={() =>
-                    campaign.status !== CampaignStatus.paused &&
-                    changeCampaignStatus(CampaignStatus.paused, campaign.id)
+                    canPause && changeCampaignStatus(CampaignStatus.paused, campaign.id)
                   }
                   variant="subtle"
-                  disabled={campaign.status !== CampaignStatus.active}
+                  disabled={!canPause}
                 >
                   Pause
                 </Button>
@@ -344,9 +351,7 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
         </Flex>
       </Box>
       <Box mt="xl">
-        {campaign.status !== CampaignStatus.closedByUser &&
-        campaign.status !== CampaignStatus.draft &&
-        params.get('edit') ? (
+        {isEditMode ? (
           <EditCampaign campaign={campaign} onAfterSubmit={onAfterEditSubmit} />
         ) : (
           <Container fluid className={classes.wrapper}>
