@@ -63,7 +63,6 @@ const EditCampaign = ({
 }) => {
   const { adexServicesRequest } = useAdExApi()
   const { showNotification } = useCustomNotifications()
-  // const { classes } = useStyles()
   const {
     adexAccount: { balanceToken }
   } = useAccount()
@@ -281,97 +280,109 @@ const EditCampaign = ({
       <Paper p="md">
         <form onSubmit={form.onSubmit(editCampaign)}>
           <Stack spacing="xl">
-            <Group spacing="xs">
+            <Stack spacing="xs">
+              <Group spacing="xs">
+                <Text color="secondaryText" size="sm" weight="bold">
+                  CPM
+                </Text>
+                <Tooltip
+                  label={`Recommended CPM: Min - ${recommendedPaymentBounds.min}; Max - ${recommendedPaymentBounds.max}`}
+                  ml="sm"
+                >
+                  <ActionIcon color="secondaryText" size="xs">
+                    <InfoFilledIcon />
+                  </ActionIcon>
+                </Tooltip>
+              </Group>
+
+              <Group align="baseline">
+                <NumberInput
+                  w="196px"
+                  size="md"
+                  placeholder="CPM min"
+                  rightSection={
+                    <Text color="brand" mr="sm" size="sm">
+                      Min
+                    </Text>
+                  }
+                  rightSectionWidth="auto"
+                  name="cpmPricingBoundsMin"
+                  precision={2}
+                  {...form.getInputProps('pricingBounds.IMPRESSION.min')}
+                />
+                <NumberInput
+                  w="196px"
+                  size="md"
+                  placeholder="CPM max"
+                  inputWrapperOrder={['input', 'description', 'error']}
+                  rightSection={
+                    <Text color="brand" mr="sm" size="sm">
+                      Max
+                    </Text>
+                  }
+                  rightSectionWidth="md"
+                  name="cpmPricingBoundsMax"
+                  precision={2}
+                  {...form.getInputProps('pricingBounds.IMPRESSION.max')}
+                />
+              </Group>
+            </Stack>
+            <Stack spacing="xs">
               <Text color="secondaryText" size="sm" weight="bold">
-                CPM
+                Advanced
               </Text>
-              <Tooltip
-                label={`Recommended CPM: Min - ${recommendedPaymentBounds.min}; Max - ${recommendedPaymentBounds.max}`}
-                ml="sm"
-              >
-                <ActionIcon color="secondaryText" size="xs">
-                  <InfoFilledIcon />
-                </ActionIcon>
-              </Tooltip>
-            </Group>
+              <Group>
+                <Checkbox
+                  label="Limit average daily spending"
+                  {...form.getInputProps(
+                    'targetingInput.inputs.advanced.limitDailyAverageSpending',
+                    {
+                      type: 'checkbox'
+                    }
+                  )}
+                />
+              </Group>
+            </Stack>
 
-            <Group align="baseline">
-              <NumberInput
-                w="196px"
-                size="md"
-                placeholder="CPM min"
-                rightSection={
-                  <Text color="brand" mr="sm" size="sm">
-                    Min
-                  </Text>
+            <Stack spacing="xs">
+              <Text color="secondaryText" size="sm" weight="bold">
+                Categories
+              </Text>
+              <MultiSelectAndRadioButtons
+                onCategoriesChange={handleCategories}
+                multiSelectData={CATEGORIES}
+                defaultRadioValue={
+                  catSelectedRadioAndValuesArray &&
+                  (catSelectedRadioAndValuesArray[0] as TargetingInputApplyProp)
                 }
-                rightSectionWidth="auto"
-                name="cpmPricingBoundsMin"
-                {...form.getInputProps('pricingBounds.IMPRESSION.min')}
-              />
-              <NumberInput
-                w="196px"
-                size="md"
-                placeholder="CPM max"
-                inputWrapperOrder={['input', 'description', 'error']}
-                rightSection={
-                  <Text color="brand" mr="sm" size="sm">
-                    Max
-                  </Text>
+                defaultSelectValue={
+                  catSelectedRadioAndValuesArray && (catSelectedRadioAndValuesArray[1] as string[])
                 }
-                rightSectionWidth="md"
-                name="cpmPricingBoundsMax"
-                {...form.getInputProps('pricingBounds.IMPRESSION.max')}
+                groups={CAT_GROUPS}
+                label="Categories"
+                error={form.errors['targetingInput.inputs.categories']?.toString()}
               />
-            </Group>
+            </Stack>
 
-            <Text color="secondaryText" size="sm" weight="bold">
-              Advanced
-            </Text>
-            <Group>
-              <Checkbox
-                label="Limit average daily spending"
-                {...form.getInputProps('targetingInput.inputs.advanced.limitDailyAverageSpending', {
-                  type: 'checkbox'
-                })}
+            <Stack spacing="xs">
+              <Text color="secondaryText" size="sm" weight="bold">
+                Countries
+              </Text>
+              <MultiSelectAndRadioButtons
+                onCategoriesChange={handleCountries}
+                defaultRadioValue={
+                  locSelectedRadioAndValuesArray &&
+                  (locSelectedRadioAndValuesArray[0] as TargetingInputApplyProp)
+                }
+                defaultSelectValue={
+                  locSelectedRadioAndValuesArray && (locSelectedRadioAndValuesArray[1] as string[])
+                }
+                multiSelectData={COUNTRIES}
+                groups={REGION_GROUPS}
+                label="Countries"
+                error={form.errors['targetingInput.inputs.location']?.toString()}
               />
-            </Group>
-
-            <Text color="secondaryText" size="sm" weight="bold">
-              Categories
-            </Text>
-            <MultiSelectAndRadioButtons
-              onCategoriesChange={handleCategories}
-              multiSelectData={CATEGORIES}
-              defaultRadioValue={
-                catSelectedRadioAndValuesArray &&
-                (catSelectedRadioAndValuesArray[0] as TargetingInputApplyProp)
-              }
-              defaultSelectValue={
-                catSelectedRadioAndValuesArray && (catSelectedRadioAndValuesArray[1] as string[])
-              }
-              groups={CAT_GROUPS}
-              label="Categories"
-              error={form.errors['targetingInput.inputs.categories']?.toString()}
-            />
-
-            <Text color="secondaryText" size="sm" weight="bold">
-              Countries
-            </Text>
-            <MultiSelectAndRadioButtons
-              onCategoriesChange={handleCountries}
-              defaultRadioValue={
-                locSelectedRadioAndValuesArray &&
-                (locSelectedRadioAndValuesArray[0] as TargetingInputApplyProp)
-              }
-              defaultSelectValue={
-                locSelectedRadioAndValuesArray && (locSelectedRadioAndValuesArray[1] as string[])
-              }
-              multiSelectData={COUNTRIES}
-              groups={REGION_GROUPS}
-              label="Countries"
-              error={form.errors['targetingInput.inputs.location']?.toString()}
-            />
+            </Stack>
 
             <Group mt="lg">
               <Button disabled={!form.isDirty()} size="lg" type="submit">
