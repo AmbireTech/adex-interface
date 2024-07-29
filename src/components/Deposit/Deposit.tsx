@@ -1,12 +1,4 @@
-import {
-  Container,
-  Grid,
-  MantineTheme,
-  Select,
-  Text,
-  getPrimaryShade,
-  lighten
-} from '@mantine/core'
+import { Container, Grid, MantineTheme, Text, getPrimaryShade, lighten } from '@mantine/core'
 import { createStyles } from '@mantine/emotion'
 import { useColorScheme } from '@mantine/hooks'
 import { useCallback, useEffect, useMemo, useState } from 'react'
@@ -19,7 +11,7 @@ import CustomCard from 'components/common/CustomCard'
 import { IS_MANUAL_DEPOSITING } from 'constants/balances'
 import { useNavigate } from 'react-router-dom'
 import TopUpAccountModal from 'components/common/TopUpAccountModal'
-// import SelectItem from './SelectItem'
+import CustomCombobox from 'components/CustomCombobox'
 import SendCryptocurrency from './SendCryptocurrency'
 import TopUpWithFiat from './TopUpWithFiat'
 
@@ -64,12 +56,12 @@ const useStyles = createStyles((theme: MantineTheme) => {
 
 const data = [
   {
-    image: <EthereumIcon size="30px" />,
+    image: <EthereumIcon size="24px" />,
     label: 'Ethereum',
     value: 'ethereum'
   },
   {
-    image: <PolygonIcon size="30px" />,
+    image: <PolygonIcon size="24px" />,
     label: 'Polygon',
     value: 'polygon'
   }
@@ -90,7 +82,6 @@ const Deposit = () => {
   const { classes } = useStyles()
   const [network, setNetwork] = useState(data[0].value)
   const [selectedTab, setSelectedTab] = useState<DepositMethods | null>(null)
-  // const icon = useMemo(() => data.find(({ value }) => value === network)?.image, [network])
 
   const isManualDepositing = useMemo(() => IS_MANUAL_DEPOSITING === 'true', [])
   const [opened, setOpened] = useState(false)
@@ -114,13 +105,12 @@ const Deposit = () => {
           </Text>
         </Grid.Col>
         <Grid.Col span={12}>
-          <Select
-            variant="filled"
-            data={data}
-            // itemComponent={SelectItem}
-            value={network}
-            onChange={(value: string | null) => value && setNetwork(value)}
-            // icon={icon}
+          <CustomCombobox
+            items={data}
+            defaultValue={network}
+            onChange={(event) => event.target.value && setNetwork(event.target.value)}
+            placeholder="Select Network"
+            error=""
           />
         </Grid.Col>
         <Grid.Col>
