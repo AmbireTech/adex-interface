@@ -1,14 +1,13 @@
 import {
-  Grid,
+  Stack,
   Button,
-  createStyles,
   Group,
   Text,
   Tooltip,
   ActionIcon,
   Checkbox,
-  Flex,
-  NumberInput
+  NumberInput,
+  Paper
 } from '@mantine/core'
 import { useForm } from '@mantine/form'
 import { modals } from '@mantine/modals'
@@ -30,23 +29,13 @@ import {
 import useAccount from 'hooks/useAccount'
 import { useAdExApi } from 'hooks/useAdexServices'
 import useCustomNotifications from 'hooks/useCustomNotifications'
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import type {
   unstable_Blocker as Blocker,
   unstable_BlockerFunction as BlockerFunction
 } from 'react-router-dom'
 import { unstable_useBlocker as useBlocker } from 'react-router-dom'
 import InfoFilledIcon from 'resources/icons/InfoFilled'
-
-const useStyles = createStyles((theme) => ({
-  container: {
-    backgroundColor: theme.colors.mainBackground[theme.fn.primaryShade()],
-    borderRadius: theme.radius.sm,
-    boxShadow: theme.shadows.xs,
-    overflow: 'hidden',
-    padding: theme.spacing.lg
-  }
-}))
 
 type TargetingInputEdit = {
   version: string
@@ -74,7 +63,7 @@ const EditCampaign = ({
 }) => {
   const { adexServicesRequest } = useAdExApi()
   const { showNotification } = useCustomNotifications()
-  const { classes } = useStyles()
+  // const { classes } = useStyles()
   const {
     adexAccount: { balanceToken }
   } = useAccount()
@@ -134,6 +123,7 @@ const EditCampaign = ({
       },
       targetingInput: campaign.targetingInput
     },
+    validateInputOnBlur: true,
     validate: {
       pricingBounds: {
         IMPRESSION: {
@@ -288,118 +278,109 @@ const EditCampaign = ({
   if (!campaign) return <div>Invalid Campaign ID</div>
   return (
     <>
-      <Grid mx="lg" my="sm">
+      <Paper p="md">
         <form onSubmit={form.onSubmit(editCampaign)}>
-          <Grid mt="xl" gutter="xl" className={classes.container}>
-            <Grid.Col mb="md">
-              <Group mb="xs" spacing="xs">
-                <Text color="secondaryText" size="sm" weight="bold">
-                  CPM
-                </Text>
-                <Tooltip
-                  label={`Recommended CPM: Min - ${recommendedPaymentBounds.min}; Max - ${recommendedPaymentBounds.max}`}
-                  ml="sm"
-                >
-                  <ActionIcon color="secondaryText" size="xs">
-                    <InfoFilledIcon />
-                  </ActionIcon>
-                </Tooltip>
-              </Group>
-              <Flex mb="md" gap="md">
-                <NumberInput
-                  w="196px"
-                  size="md"
-                  placeholder="CPM min"
-                  rightSection={
-                    <Text color="brand" mr="sm" size="sm">
-                      Min
-                    </Text>
-                  }
-                  rightSectionWidth="auto"
-                  name="cpmPricingBoundsMin"
-                  {...form.getInputProps('pricingBounds.IMPRESSION.min')}
-                  onBlur={() => form.validateField('pricingBounds.IMPRESSION.min')}
-                />
-                <NumberInput
-                  w="196px"
-                  size="md"
-                  placeholder="CPM max"
-                  inputWrapperOrder={['input', 'description', 'error']}
-                  rightSection={
-                    <Text color="brand" mr="sm" size="sm">
-                      Max
-                    </Text>
-                  }
-                  rightSectionWidth="md"
-                  name="cpmPricingBoundsMax"
-                  {...form.getInputProps('pricingBounds.IMPRESSION.max')}
-                  onBlur={() => form.validateField('pricingBounds.IMPRESSION.max')}
-                />
-              </Flex>
-            </Grid.Col>
-            <Grid.Col mb="md">
-              <Text color="secondaryText" size="sm" weight="bold" mb="xs">
-                Advanced
+          <Stack spacing="xl">
+            <Group spacing="xs">
+              <Text color="secondaryText" size="sm" weight="bold">
+                CPM
               </Text>
-              <Group my="sm">
-                <Checkbox
-                  label="Limit average daily spending"
-                  {...form.getInputProps(
-                    'targetingInput.inputs.advanced.limitDailyAverageSpending',
-                    {
-                      type: 'checkbox'
-                    }
-                  )}
-                />
-              </Group>
-            </Grid.Col>
-            <Grid.Col onBlur={() => form.validateField('targetingInput.inputs.categories')}>
-              <Text color="secondaryText" size="sm" weight="bold" mb="xs">
-                Categories
-              </Text>
-              <MultiSelectAndRadioButtons
-                onCategoriesChange={handleCategories}
-                multiSelectData={CATEGORIES}
-                defaultRadioValue={
-                  catSelectedRadioAndValuesArray &&
-                  (catSelectedRadioAndValuesArray[0] as TargetingInputApplyProp)
+              <Tooltip
+                label={`Recommended CPM: Min - ${recommendedPaymentBounds.min}; Max - ${recommendedPaymentBounds.max}`}
+                ml="sm"
+              >
+                <ActionIcon color="secondaryText" size="xs">
+                  <InfoFilledIcon />
+                </ActionIcon>
+              </Tooltip>
+            </Group>
+
+            <Group align="baseline">
+              <NumberInput
+                w="196px"
+                size="md"
+                placeholder="CPM min"
+                rightSection={
+                  <Text color="brand" mr="sm" size="sm">
+                    Min
+                  </Text>
                 }
-                defaultSelectValue={
-                  catSelectedRadioAndValuesArray && (catSelectedRadioAndValuesArray[1] as string[])
-                }
-                groups={CAT_GROUPS}
-                label="Categories"
-                error={form.errors['targetingInput.inputs.categories']?.toString()}
+                rightSectionWidth="auto"
+                name="cpmPricingBoundsMin"
+                {...form.getInputProps('pricingBounds.IMPRESSION.min')}
               />
-            </Grid.Col>
-            <Grid.Col onBlur={() => form.validateField('targetingInput.inputs.location')}>
-              <Text color="secondaryText" size="sm" weight="bold" mb="xs">
-                Countries
-              </Text>
-              <MultiSelectAndRadioButtons
-                onCategoriesChange={handleCountries}
-                defaultRadioValue={
-                  locSelectedRadioAndValuesArray &&
-                  (locSelectedRadioAndValuesArray[0] as TargetingInputApplyProp)
+              <NumberInput
+                w="196px"
+                size="md"
+                placeholder="CPM max"
+                inputWrapperOrder={['input', 'description', 'error']}
+                rightSection={
+                  <Text color="brand" mr="sm" size="sm">
+                    Max
+                  </Text>
                 }
-                defaultSelectValue={
-                  locSelectedRadioAndValuesArray && (locSelectedRadioAndValuesArray[1] as string[])
-                }
-                multiSelectData={COUNTRIES}
-                groups={REGION_GROUPS}
-                label="Countries"
-                error={form.errors['targetingInput.inputs.location']?.toString()}
+                rightSectionWidth="md"
+                name="cpmPricingBoundsMax"
+                {...form.getInputProps('pricingBounds.IMPRESSION.max')}
               />
-            </Grid.Col>
+            </Group>
+
+            <Text color="secondaryText" size="sm" weight="bold">
+              Advanced
+            </Text>
+            <Group>
+              <Checkbox
+                label="Limit average daily spending"
+                {...form.getInputProps('targetingInput.inputs.advanced.limitDailyAverageSpending', {
+                  type: 'checkbox'
+                })}
+              />
+            </Group>
+
+            <Text color="secondaryText" size="sm" weight="bold">
+              Categories
+            </Text>
+            <MultiSelectAndRadioButtons
+              onCategoriesChange={handleCategories}
+              multiSelectData={CATEGORIES}
+              defaultRadioValue={
+                catSelectedRadioAndValuesArray &&
+                (catSelectedRadioAndValuesArray[0] as TargetingInputApplyProp)
+              }
+              defaultSelectValue={
+                catSelectedRadioAndValuesArray && (catSelectedRadioAndValuesArray[1] as string[])
+              }
+              groups={CAT_GROUPS}
+              label="Categories"
+              error={form.errors['targetingInput.inputs.categories']?.toString()}
+            />
+
+            <Text color="secondaryText" size="sm" weight="bold">
+              Countries
+            </Text>
+            <MultiSelectAndRadioButtons
+              onCategoriesChange={handleCountries}
+              defaultRadioValue={
+                locSelectedRadioAndValuesArray &&
+                (locSelectedRadioAndValuesArray[0] as TargetingInputApplyProp)
+              }
+              defaultSelectValue={
+                locSelectedRadioAndValuesArray && (locSelectedRadioAndValuesArray[1] as string[])
+              }
+              multiSelectData={COUNTRIES}
+              groups={REGION_GROUPS}
+              label="Countries"
+              error={form.errors['targetingInput.inputs.location']?.toString()}
+            />
 
             <Group mt="lg">
               <Button disabled={!form.isDirty()} size="lg" type="submit">
                 Save Changes
               </Button>
             </Group>
-          </Grid>
+          </Stack>
         </form>
-      </Grid>
+      </Paper>
       <CustomConfirmModal
         cancelBtnLabel="Cancel"
         confirmBtnLabel="Go back"
