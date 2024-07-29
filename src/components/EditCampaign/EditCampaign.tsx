@@ -84,13 +84,13 @@ const EditCampaign = ({
   const handleConfirmBtnClicked = useCallback(async () => {
     modals.closeAll()
     blockerProceed()
-  }, [blockerProceed, modals])
+  }, [blockerProceed])
 
   const handleCancelBtnClicked = useCallback(() => {
     modals.closeAll()
     blocker.reset?.()
     setOpenedModal(false)
-  }, [blocker, modals])
+  }, [blocker])
 
   const form = useForm<FormProps>({
     initialValues: {
@@ -188,12 +188,12 @@ const EditCampaign = ({
 
   const catSelectedRadioAndValuesArray = useMemo(
     () => campaign && findArrayWithLengthInObjectAsValue(campaign.targetingInput.inputs.categories),
-    [campaign, findArrayWithLengthInObjectAsValue]
+    [campaign]
   )
 
   const locSelectedRadioAndValuesArray = useMemo(
     () => campaign && findArrayWithLengthInObjectAsValue(campaign.targetingInput.inputs.location),
-    [campaign, findArrayWithLengthInObjectAsValue]
+    [campaign]
   )
 
   const handleCategories = useCallback(
@@ -204,7 +204,7 @@ const EditCampaign = ({
       )
       form.validateField('targetingInput.inputs.categories')
     },
-    [campaign, updateCatsLocsObject]
+    [form]
   )
 
   const handleCountries = useCallback(
@@ -215,7 +215,7 @@ const EditCampaign = ({
       )
       form.validateField('targetingInput.inputs.location')
     },
-    [campaign, updateCatsLocsObject]
+    [form]
   )
 
   const editCampaign = useCallback(
@@ -271,7 +271,7 @@ const EditCampaign = ({
         })
         .catch(() => showNotification('error', "Couldn't update the Campaign data!"))
     },
-    [adexServicesRequest, parseToBigNumPrecision, form]
+    [balanceToken.decimals, adexServicesRequest, campaign.id, form, showNotification, onAfterSubmit]
   )
 
   if (!campaign) return <div>Invalid Campaign ID</div>
