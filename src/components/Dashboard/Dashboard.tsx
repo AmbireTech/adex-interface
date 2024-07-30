@@ -226,7 +226,7 @@ const Dashboard = ({ isAdminPanel, accountId }: { isAdminPanel?: boolean; accoun
             status: CampaignStatus.created
           })
         })
-        navigate('/dashboard/create-campaign', { replace: true })
+        navigate('/dashboard/create-campaign', {})
       } else {
         showNotification('error', 'Editing draft campaign failed', 'Editing draft campaign failed')
       }
@@ -236,7 +236,7 @@ const Dashboard = ({ isAdminPanel, accountId }: { isAdminPanel?: boolean; accoun
 
   const handleEdit = useCallback(
     (data: DashboardTableElement['actionData']) =>
-      navigate(`/dashboard/campaign-details/${data.campaign.id}?edit=true`, { replace: true }),
+      navigate(`/dashboard/campaign-details/${data.campaign.id}?edit=true`, {}),
     [navigate]
   )
 
