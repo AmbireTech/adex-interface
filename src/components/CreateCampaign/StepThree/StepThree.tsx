@@ -233,7 +233,7 @@ const StepThree = () => {
               label={`Recommended CPM in USD: Min - ${recommendedPaymentBounds.min}; Max - ${recommendedPaymentBounds.max}`}
               ml="sm"
             >
-              <ActionIcon color="secondaryText" size="xs">
+              <ActionIcon variant="transparent" color="secondaryText" size="xs">
                 <InfoFilledIcon />
               </ActionIcon>
             </Tooltip>

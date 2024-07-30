@@ -53,9 +53,8 @@ const CampaignPeriod = () => {
         </Text>
         <Text size="md">{endDateTime}</Text>
       </Flex>
-      {/* TODO: Fix the ActionIcon */}
-      <ActionIcon color="none" size={24} onClick={() => open()}>
-        <CalendarIcon color="mainText" />
+      <ActionIcon variant="transparent" size="lg" onClick={open}>
+        <CalendarIcon size="24px" color="mainText" />
       </ActionIcon>
       <CampaignPeriodModal opened={opened} close={close} />
     </Flex>
