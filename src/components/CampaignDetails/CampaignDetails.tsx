@@ -232,105 +232,102 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
   return (
     <>
       <Box p="md">
-        <Flex direction={{ base: 'column', md: 'row' }} align="flex-start">
-          <GoBack fixed title="Dashboard">
-            <Paper mx="auto" shadow="xs" radius="lg">
-              <Flex direction="row">
-                <Button
-                  className={cx(classes.actionIcons, {
-                    active: canActivate
-                  })}
-                  rightIcon={<ActiveIcon size="15px" />}
-                  onClick={() =>
-                    canActivate && changeCampaignStatus(CampaignStatus.active, campaign.id)
-                  }
-                  disabled={!canActivate}
-                  variant="subtle"
-                >
-                  Activate
-                </Button>
+        <Flex direction={{ base: 'column', md: 'row' }} align="center">
+          <GoBack title="Dashboard" />
+          <Paper mx="auto" shadow="md" radius="xl">
+            <Flex direction="row">
+              <Button
+                className={cx(classes.actionIcons, {
+                  active: canActivate
+                })}
+                rightIcon={<ActiveIcon size="15px" />}
+                onClick={() =>
+                  canActivate && changeCampaignStatus(CampaignStatus.active, campaign.id)
+                }
+                disabled={!canActivate}
+                variant="subtle"
+              >
+                Activate
+              </Button>
 
-                <Button
-                  className={cx(classes.actionIcons, {
-                    paused: canPause
-                  })}
-                  rightIcon={<PausedIcon size="15px" />}
-                  onClick={() =>
-                    canPause && changeCampaignStatus(CampaignStatus.paused, campaign.id)
-                  }
-                  variant="subtle"
-                  disabled={!canPause}
-                >
-                  Pause
-                </Button>
+              <Button
+                className={cx(classes.actionIcons, {
+                  paused: canPause
+                })}
+                rightIcon={<PausedIcon size="15px" />}
+                onClick={() => canPause && changeCampaignStatus(CampaignStatus.paused, campaign.id)}
+                variant="subtle"
+                disabled={!canPause}
+              >
+                Pause
+              </Button>
 
+              <Button
+                className={cx(classes.actionIcons, {
+                  stopped: canStop
+                })}
+                rightIcon={<StopIcon size="15px" />}
+                onClick={handleStopOrDelete}
+                disabled={!canStop}
+                variant="subtle"
+              >
+                Stop
+              </Button>
+
+              {campaign.status === CampaignStatus.draft ? (
                 <Button
                   className={cx(classes.actionIcons, {
-                    stopped: canStop
+                    archived: true
                   })}
-                  rightIcon={<StopIcon size="15px" />}
+                  rightIcon={<DeleteIcon size="15px" />}
                   onClick={handleStopOrDelete}
-                  disabled={!canStop}
                   variant="subtle"
                 >
-                  Stop
+                  Delete draft
                 </Button>
-
-                {campaign.status === CampaignStatus.draft ? (
-                  <Button
-                    className={cx(classes.actionIcons, {
-                      archived: true
-                    })}
-                    rightIcon={<DeleteIcon size="15px" />}
-                    onClick={handleStopOrDelete}
-                    variant="subtle"
-                  >
-                    Delete draft
-                  </Button>
-                ) : (
-                  <Button
-                    className={cx(classes.actionIcons, 'archived', {
-                      selected: canArchive
-                    })}
-                    rightIcon={<ArchivedIcon size="15px" />}
-                    onClick={handleArchive}
-                    disabled={!canArchive}
-                    variant="subtle"
-                  >
-                    {campaign.archived ? 'Unarchive' : 'Archive'}
-                  </Button>
-                )}
-
+              ) : (
                 <Button
-                  disabled={!canEdit}
-                  className={cx(classes.actionIcons, 'edit', {
-                    selected: params.get('edit') && campaign.status !== CampaignStatus.draft
+                  className={cx(classes.actionIcons, 'archived', {
+                    selected: canArchive
                   })}
-                  rightIcon={<EditIcon size="15px" />}
+                  rightIcon={<ArchivedIcon size="15px" />}
+                  onClick={handleArchive}
+                  disabled={!canArchive}
                   variant="subtle"
-                  onClick={() =>
-                    canEdit &&
-                    setParams(
-                      params.get('edit') && campaign.status !== CampaignStatus.draft
-                        ? ''
-                        : 'edit=true',
-                      { replace: true }
-                    )
-                  }
                 >
-                  Edit
+                  {campaign.archived ? 'Unarchive' : 'Archive'}
                 </Button>
-              </Flex>
-            </Paper>
-            <Flex align="center" gap="xs">
-              Campaign Analytics
-              <ActionButton
-                title="View Analytics"
-                icon={<AnalyticsIcon size="32px" />}
-                action={() => navigate(`/dashboard/campaign-analytics/${campaign.id}`)}
-              />
+              )}
+
+              <Button
+                disabled={!canEdit}
+                className={cx(classes.actionIcons, 'edit', {
+                  selected: params.get('edit') && campaign.status !== CampaignStatus.draft
+                })}
+                rightIcon={<EditIcon size="15px" />}
+                variant="subtle"
+                onClick={() =>
+                  canEdit &&
+                  setParams(
+                    params.get('edit') && campaign.status !== CampaignStatus.draft
+                      ? ''
+                      : 'edit=true',
+                    { replace: true }
+                  )
+                }
+              >
+                Edit
+              </Button>
             </Flex>
-          </GoBack>
+          </Paper>
+          <Flex align="center" gap="xs">
+            Campaign Analytics
+            <ActionButton
+              title="View Analytics"
+              icon={<AnalyticsIcon size="32px" />}
+              action={() => navigate(`/dashboard/campaign-analytics/${campaign.id}`)}
+            />
+          </Flex>
         </Flex>
       </Box>
       <Box mt="xl">
