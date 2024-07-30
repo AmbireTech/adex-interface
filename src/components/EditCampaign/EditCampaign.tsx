@@ -17,25 +17,28 @@ import {
   TargetingInputApplyProp,
   TargetingInputSingle
 } from 'adex-common'
-import { CustomConfirmModal } from 'components/common/Modals'
 import MultiSelectAndRadioButtons from 'components/CreateCampaign/StepTwo/MultiSelectAndRadioButtons'
 import { CAT_GROUPS, CATEGORIES, COUNTRIES, REGION_GROUPS } from 'constants/createCampaign'
 import { parseBigNumTokenAmountToDecimal, parseToBigNumPrecision } from 'helpers'
 
 import {
   findArrayWithLengthInObjectAsValue,
-  updateCatsLocsObject
+  updateCatsLocsObject,
+  getRecommendedCPMRange
 } from 'helpers/createCampaignHelpers'
 import useAccount from 'hooks/useAccount'
 import { useAdExApi } from 'hooks/useAdexServices'
 import useCustomNotifications from 'hooks/useCustomNotifications'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo } from 'react'
+import { useCampaignsData } from 'hooks/useCampaignsData'
 import type {
   unstable_Blocker as Blocker,
   unstable_BlockerFunction as BlockerFunction
 } from 'react-router-dom'
 import { unstable_useBlocker as useBlocker } from 'react-router-dom'
 import InfoFilledIcon from 'resources/icons/InfoFilled'
+import throttle from 'lodash.throttle'
+import { CustomConfirmModalBody } from 'components/common/Modals/CustomConfirmModal/CustomConfirmModalBody'
 
 type TargetingInputEdit = {
   version: string
@@ -54,43 +57,18 @@ type FormProps = {
   targetingInput: TargetingInputEdit
 }
 
-const EditCampaign = ({
-  campaign,
-  onAfterSubmit
-}: {
-  campaign: Campaign
-  onAfterSubmit?: () => void
-}) => {
+const EditCampaign = ({ campaign }: { campaign: Campaign }) => {
   const { adexServicesRequest } = useAdExApi()
   const { showNotification } = useCustomNotifications()
   const {
     adexAccount: { balanceToken }
   } = useAccount()
-  const [openedModal, setOpenedModal] = useState(false)
+  const { updateCampaignDataById, supplyStats } = useCampaignsData()
 
-  const recommendedPaymentBounds = { min: '0.10', max: '0.5' }
-
-  const blocker: Blocker = useBlocker(
-    useCallback<BlockerFunction>(
-      ({ currentLocation, nextLocation }) =>
-        currentLocation.pathname !== nextLocation.pathname ||
-        currentLocation.search !== nextLocation.search,
-      []
-    )
+  const recommendedPaymentBounds = useMemo(
+    () => getRecommendedCPMRange(supplyStats, campaign),
+    [campaign, supplyStats]
   )
-
-  const blockerProceed = useCallback(() => blocker.proceed?.(), [blocker])
-
-  const handleConfirmBtnClicked = useCallback(async () => {
-    modals.closeAll()
-    blockerProceed()
-  }, [blockerProceed])
-
-  const handleCancelBtnClicked = useCallback(() => {
-    modals.closeAll()
-    blocker.reset?.()
-    setOpenedModal(false)
-  }, [blocker])
 
   const form = useForm<FormProps>({
     initialValues: {
@@ -145,24 +123,20 @@ const EditCampaign = ({
       targetingInput: {
         inputs: {
           location: ({ apply, in: isin, nin }) => {
-            if (apply === 'in') {
-              if (!isin.length) return 'Countries list cannot be empty'
-              return null
+            if (apply === 'in' && !isin.length) {
+              return 'Countries list cannot be empty'
             }
-            if (apply === 'nin') {
-              if (!nin.length) return 'Countries list cannot be empty'
-              return null
+            if (apply === 'nin' && !nin.length) {
+              return 'Countries list cannot be empty'
             }
             return null
           },
           categories: ({ apply, in: isin, nin }) => {
-            if (apply === 'in') {
-              if (!isin.length) return 'Categories list cannot be empty'
-              return null
+            if (apply === 'in' && !isin.length) {
+              return 'Categories list cannot be empty'
             }
-            if (apply === 'nin') {
-              if (!nin.length) return 'Categories list cannot be empty'
-              return null
+            if (apply === 'nin' && !nin.length) {
+              return 'Categories list cannot be empty'
             }
             return null
           },
@@ -178,13 +152,34 @@ const EditCampaign = ({
     }
   })
 
+  const shouldBlock = useCallback<BlockerFunction>(
+    ({ currentLocation, nextLocation }) =>
+      form.isDirty() &&
+      (currentLocation.pathname !== nextLocation.pathname ||
+        currentLocation.search !== nextLocation.search),
+    [form]
+  )
+
+  const blocker: Blocker = useBlocker(shouldBlock)
+
   useEffect(() => {
-    if (blocker.state === 'blocked' && form.isDirty()) {
-      setOpenedModal(true)
-      return
+    if (blocker.state === 'blocked') {
+      return modals.openConfirmModal({
+        title: 'Unsaved changes!',
+        children: (
+          <CustomConfirmModalBody text="You did not save your changes. Are you sure you want to leave this page?" />
+        ),
+        labels: { confirm: 'Leave the page', cancel: 'Cancel' },
+        confirmProps: { color: 'warning' },
+        onConfirm: () => {
+          blocker.proceed()
+        },
+        onAbort: () => {
+          blocker.reset()
+        }
+      })
     }
-    blockerProceed()
-  }, [blocker, form, blockerProceed])
+  }, [blocker])
 
   const catSelectedRadioAndValuesArray = useMemo(
     () => campaign && findArrayWithLengthInObjectAsValue(campaign.targetingInput.inputs.categories),
@@ -204,7 +199,9 @@ const EditCampaign = ({
       )
       form.validateField('targetingInput.inputs.categories')
     },
-    [form]
+    // TODO: fic this  and countries update
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
   )
 
   const handleCountries = useCallback(
@@ -215,11 +212,12 @@ const EditCampaign = ({
       )
       form.validateField('targetingInput.inputs.location')
     },
-    [form]
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
   )
 
   const editCampaign = useCallback(
-    (values: FormProps) => {
+    async (values: FormProps) => {
       const impression = {
         min: Number(
           parseToBigNumPrecision(
@@ -256,28 +254,40 @@ const EditCampaign = ({
         }
       }
 
-      return adexServicesRequest('backend', {
-        route: `/dsp/campaigns/edit/${campaign.id}`,
-        method: 'PUT',
-        body,
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      })
-        .then(() => {
-          form.resetDirty()
-          showNotification('info', 'Successfully updated Campaign data!')
-          onAfterSubmit && onAfterSubmit()
+      try {
+        await adexServicesRequest('backend', {
+          route: `/dsp/campaigns/edit/${campaign.id}`,
+          method: 'PUT',
+          body,
+          headers: {
+            'Content-Type': 'application/json'
+          }
         })
-        .catch(() => showNotification('error', "Couldn't update the Campaign data!"))
+        form.resetDirty()
+        showNotification('info', 'Successfully updated Campaign data!')
+        updateCampaignDataById(campaign.id)
+      } catch {
+        return showNotification('error', "Couldn't update the Campaign data!")
+      }
     },
-    [balanceToken.decimals, adexServicesRequest, campaign.id, form, showNotification, onAfterSubmit]
+    [
+      balanceToken.decimals,
+      adexServicesRequest,
+      campaign.id,
+      form,
+      showNotification,
+      updateCampaignDataById
+    ]
   )
+
+  const throttledSbm = useMemo(() => {
+    return throttle(editCampaign, 3000, { leading: true })
+  }, [editCampaign])
 
   if (!campaign) return <div>Invalid Campaign ID</div>
   return (
     <Paper p="md">
-      <form onSubmit={form.onSubmit(editCampaign)}>
+      <form onSubmit={form.onSubmit(throttledSbm)}>
         <Stack spacing="xl">
           <Stack spacing="xs">
             <Group spacing="xs">
@@ -385,19 +395,6 @@ const EditCampaign = ({
           </Button>
         </Stack>
       </form>
-      <CustomConfirmModal
-        cancelBtnLabel="Cancel"
-        confirmBtnLabel="Go back"
-        onCancelClicked={handleCancelBtnClicked}
-        onConfirmClicked={handleConfirmBtnClicked}
-        color="attention"
-        text={
-          <div style={{ textAlign: 'center' }}>
-            You did not save your changes. Are you sure you want to leave this page?
-          </div>
-        }
-        opened={openedModal}
-      />
     </Paper>
   )
 }

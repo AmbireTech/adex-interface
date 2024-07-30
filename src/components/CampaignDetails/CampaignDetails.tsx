@@ -1,6 +1,16 @@
 import { useCallback, useEffect, useMemo } from 'react'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
-import { Container, Grid, createStyles, Text, Flex, Box, Button, Paper, Stack } from '@mantine/core'
+import {
+  Container,
+  Grid,
+  createStyles,
+  Text,
+  Box,
+  Button,
+  Paper,
+  Stack,
+  Group
+} from '@mantine/core'
 import { modals } from '@mantine/modals'
 import BadgeStatusCampaign from 'components/Dashboard/BadgeStatusCampaign'
 import { formatCatsAndLocsData } from 'helpers/createCampaignHelpers'
@@ -140,18 +150,10 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
       confirmProps: { color: campaign?.archived ? 'blue' : 'red' },
       onConfirm: () => {
         toggleArchived(campaign?.id || '')
-        updateCampaignDataById(campaign?.id)
         showNotification('info', `Campaign ${campaign?.archived ? 'Unarchived' : 'Archived'}`)
       }
     })
-  }, [
-    campaign?.archived,
-    campaign?.id,
-    campaign?.title,
-    showNotification,
-    toggleArchived,
-    updateCampaignDataById
-  ])
+  }, [campaign?.archived, campaign?.id, campaign?.title, showNotification, toggleArchived])
 
   const handleStopOrDelete = useCallback(() => {
     if (!campaign?.id || !campaign?.status) {
@@ -169,7 +171,6 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
         }
       : () => {
           changeCampaignStatus(CampaignStatus.closedByUser, campaign.id)
-          updateCampaignDataById(campaign?.id)
           showNotification('info', 'Campaign stopped!')
         }
 
@@ -192,8 +193,7 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
     changeCampaignStatus,
     deleteDraftCampaign,
     navigate,
-    showNotification,
-    updateCampaignDataById
+    showNotification
   ])
 
   useEffect(() => {
@@ -201,8 +201,6 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
       updateCampaignDataById(id)
     }
   }, [id, updateCampaignDataById])
-
-  const onAfterEditSubmit = () => updateCampaignDataById(id)
 
   const canArchive = useMemo(() => {
     return (
@@ -244,110 +242,110 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
   return (
     <>
       <Box p="md">
-        <Flex direction={{ base: 'column', md: 'row' }} align="flex-start">
-          <GoBack fixed title="Dashboard">
-            <Paper mx="auto" shadow="xs" radius="lg">
-              <Flex direction="row">
-                <Button
-                  className={cx(classes.actionIcons, {
-                    active: canActivate
-                  })}
-                  rightIcon={<ActiveIcon size="15px" />}
-                  onClick={() =>
-                    canActivate && changeCampaignStatus(CampaignStatus.active, campaign.id)
-                  }
-                  disabled={!canActivate}
-                  variant="subtle"
-                >
-                  Activate
-                </Button>
+        <Group position="center">
+          <GoBack title="Dashboard" />
+          <Paper mx="auto" my="xs" shadow="md" radius="xl">
+            <Group spacing={2} p={2} position="center">
+              <Button
+                className={cx(classes.actionIcons, {
+                  active: canActivate
+                })}
+                rightIcon={<ActiveIcon size="15px" />}
+                onClick={() =>
+                  canActivate && changeCampaignStatus(CampaignStatus.active, campaign.id)
+                }
+                disabled={!canActivate}
+                variant="subtle"
+              >
+                Activate
+              </Button>
 
-                <Button
-                  className={cx(classes.actionIcons, {
-                    paused: canPause
-                  })}
-                  rightIcon={<PausedIcon size="15px" />}
-                  onClick={() =>
-                    canPause && changeCampaignStatus(CampaignStatus.paused, campaign.id)
-                  }
-                  variant="subtle"
-                  disabled={!canPause}
-                >
-                  Pause
-                </Button>
+              <Button
+                className={cx(classes.actionIcons, {
+                  paused: canPause
+                })}
+                rightIcon={<PausedIcon size="15px" />}
+                onClick={() => canPause && changeCampaignStatus(CampaignStatus.paused, campaign.id)}
+                variant="subtle"
+                disabled={!canPause}
+              >
+                Pause
+              </Button>
 
+              <Button
+                className={cx(classes.actionIcons, {
+                  stopped: canStop
+                })}
+                rightIcon={<StopIcon size="15px" />}
+                onClick={handleStopOrDelete}
+                disabled={!canStop}
+                variant="subtle"
+              >
+                Stop
+              </Button>
+
+              {campaign.status === CampaignStatus.draft ? (
                 <Button
                   className={cx(classes.actionIcons, {
-                    stopped: canStop
+                    archived: true
                   })}
-                  rightIcon={<StopIcon size="15px" />}
+                  rightIcon={<DeleteIcon size="15px" />}
                   onClick={handleStopOrDelete}
-                  disabled={!canStop}
+                  disabled={isAdminPanel}
                   variant="subtle"
                 >
-                  Stop
+                  Delete draft
                 </Button>
-
-                {campaign.status === CampaignStatus.draft ? (
-                  <Button
-                    className={cx(classes.actionIcons, {
-                      archived: true
-                    })}
-                    rightIcon={<DeleteIcon size="15px" />}
-                    onClick={handleStopOrDelete}
-                    variant="subtle"
-                  >
-                    Delete draft
-                  </Button>
-                ) : (
-                  <Button
-                    className={cx(classes.actionIcons, 'archived', {
-                      selected: canArchive
-                    })}
-                    rightIcon={<ArchivedIcon size="15px" />}
-                    onClick={handleArchive}
-                    disabled={!canArchive}
-                    variant="subtle"
-                  >
-                    {campaign.archived ? 'Unarchive' : 'Archive'}
-                  </Button>
-                )}
-
+              ) : (
                 <Button
-                  disabled={!canEdit}
-                  className={cx(classes.actionIcons, 'edit', {
-                    selected: params.get('edit') && campaign.status !== CampaignStatus.draft
+                  className={cx(classes.actionIcons, 'archived', {
+                    selected: canArchive
                   })}
-                  rightIcon={<EditIcon size="15px" />}
+                  rightIcon={<ArchivedIcon size="15px" />}
+                  onClick={handleArchive}
+                  disabled={!canArchive}
                   variant="subtle"
-                  onClick={() =>
-                    canEdit &&
-                    setParams(
-                      params.get('edit') && campaign.status !== CampaignStatus.draft
-                        ? ''
-                        : 'edit=true',
-                      { replace: true }
-                    )
-                  }
                 >
-                  Edit
+                  {campaign.archived ? 'Unarchive' : 'Archive'}
                 </Button>
-              </Flex>
-            </Paper>
-            <Flex align="center" gap="xs">
-              Campaign Analytics
-              <ActionButton
-                title="View Analytics"
-                icon={<AnalyticsIcon size="32px" />}
-                action={() => navigate(`/dashboard/campaign-analytics/${campaign.id}`)}
-              />
-            </Flex>
-          </GoBack>
-        </Flex>
+              )}
+
+              <Button
+                disabled={!canEdit}
+                className={cx(classes.actionIcons, 'edit', {
+                  selected: params.get('edit') && campaign.status !== CampaignStatus.draft
+                })}
+                rightIcon={<EditIcon size="15px" />}
+                variant="subtle"
+                onClick={() =>
+                  canEdit &&
+                  setParams(
+                    params.get('edit') && campaign.status !== CampaignStatus.draft
+                      ? ''
+                      : 'edit=true',
+                    { replace: true }
+                  )
+                }
+              >
+                Edit
+              </Button>
+            </Group>
+          </Paper>
+          <Group spacing="sm" position="center">
+            <Text weight="bold" size="sm">
+              Campaign Analytics{' '}
+            </Text>
+            <ActionButton
+              title="View Analytics"
+              icon={<AnalyticsIcon size="32px" />}
+              action={() => navigate(`/dashboard/campaign-analytics/${campaign.id}`)}
+            />
+          </Group>
+        </Group>
       </Box>
       <Box mt="xl">
         {isEditMode ? (
-          <EditCampaign campaign={campaign} onAfterSubmit={onAfterEditSubmit} />
+          <EditCampaign campaign={campaign} />
         ) : (
           <Container fluid className={classes.wrapper}>
             {isAdminPanel && <AdminBadge title="Admin Details" />}

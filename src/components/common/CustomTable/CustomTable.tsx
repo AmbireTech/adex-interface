@@ -209,14 +209,14 @@ export const CustomTable = ({
           <Stack key={rowKey} spacing="xs" align="stretch" justify="center">
             <Divider bg="#EBEEFA" w="100%" p="10px" />
             {cols}
-            {actionsMenu}
+            {!!actionsMenu}
           </Stack>
         )
       }
       return (
         <tr key={rowKey}>
           {cols}
-          {actionsMenu && <td>{actionsMenu}</td>}
+          {!!actionsMenu && <td>{actionsMenu}</td>}
         </tr>
       )
     })

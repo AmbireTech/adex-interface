@@ -24,11 +24,12 @@ const useStyles = createStyles((theme) => ({
 const GoBack = ({
   title,
   fixed,
+  path,
   children
-}: { title: string; fixed?: boolean } & PropsWithChildren) => {
+}: { title: string; fixed?: boolean; path?: string } & PropsWithChildren) => {
   const { classes, cx } = useStyles()
   const navigate = useNavigate()
-  const handleClick = () => navigate(-1)
+  const handleClick = () => (path ? navigate(path, { replace: true }) : navigate(-1))
 
   return (
     <Flex align="center" className={cx({ [classes.sticky]: !!fixed })}>

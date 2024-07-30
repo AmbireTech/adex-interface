@@ -1,57 +1,24 @@
-import { useCallback, useState, useEffect, useMemo } from 'react'
+import { useMemo } from 'react'
 import { SimpleGrid, Box, Tabs, Paper, Loader } from '@mantine/core'
-import { useAdExApi } from 'hooks/useAdexServices'
-import useCustomNotifications from 'hooks/useCustomNotifications'
-
-import { SupplyStats, SupplyStatsDetails } from 'types'
+import { useCampaignsData } from 'hooks/useCampaignsData'
+import { SupplyStatsDetails } from 'types'
 import CustomTable from 'components/common/CustomTable'
+import { parseRange } from 'helpers/createCampaignHelpers'
 
-const supplyStatsDefaultValue = {
-  appBannerFormats: [],
-  siteBannerFormatsDesktop: [],
-  siteBannerFormatsMobile: [],
-  appBidFloors: [],
-  siteDesktopBidFloors: [],
-  siteMobileBidFloors: []
-}
-const toTableDta = (stats: SupplyStatsDetails[], title: string) => {
+const toTableDta = (stats: SupplyStatsDetails[], title: string, isCpmRange?: boolean) => {
   return {
     headings: [title, 'count'],
-    elements: stats
-      .slice(0, 200)
-      .map(({ value, count }) => ({ value, count: count.toLocaleString() }))
+    elements: stats.slice(0, 200).map(({ value, count }) => ({
+      value: isCpmRange
+        ? JSON.stringify(parseRange(value), null, 4).replace(/\{|\}|"/g, '')
+        : value,
+      count: count.toLocaleString()
+    }))
   }
 }
 
 function SspStats() {
-  const { adexServicesRequest } = useAdExApi()
-  const { showNotification } = useCustomNotifications()
-  const [supplyStats, setSupplyStats] = useState<SupplyStats>(supplyStatsDefaultValue)
-
-  const getSupplyStats = useCallback(async () => {
-    let result
-
-    try {
-      result = await adexServicesRequest('backend', {
-        route: '/dsp/stats/common',
-        method: 'GET'
-      })
-
-      if (!result) {
-        throw new Error('Getting banner sizes failed.')
-      }
-
-      setSupplyStats(result as SupplyStats)
-    } catch (e) {
-      console.error(e)
-      showNotification('error', 'Error getting supply stats')
-    }
-  }, [adexServicesRequest, showNotification])
-
-  useEffect(() => {
-    getSupplyStats()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  const { supplyStats } = useCampaignsData()
 
   const data = useMemo(() => {
     const {
@@ -67,9 +34,9 @@ function SspStats() {
       appBannerFormats: toTableDta(appBannerFormats, 'App Format'),
       siteBannerFormatsMobile: toTableDta(siteBannerFormatsMobile, 'Mobile site Format'),
       siteBannerFormatsDesktop: toTableDta(siteBannerFormatsDesktop, 'Desktop site Format'),
-      appBidFloors: toTableDta(appBidFloors, 'App Bid Floor'),
-      siteDesktopBidFloors: toTableDta(siteDesktopBidFloors, 'Desktop site  bid floor'),
-      siteMobileBidFloors: toTableDta(siteMobileBidFloors, 'Mobil site bid floor')
+      appBidFloors: toTableDta(appBidFloors, 'App Bid Floor', true),
+      siteDesktopBidFloors: toTableDta(siteDesktopBidFloors, 'Desktop site  bid floor', true),
+      siteMobileBidFloors: toTableDta(siteMobileBidFloors, 'Mobil site bid floor', true)
     }
   }, [supplyStats])
 
