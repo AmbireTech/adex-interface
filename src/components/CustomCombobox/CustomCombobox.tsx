@@ -13,14 +13,14 @@ import { DIGITS_AFTER_FLOATING_POINT } from 'constants/balances'
 import { formatCurrency } from 'helpers'
 import { parseBigNumTokenAmountToDecimal } from 'helpers/balances'
 import { getTokenIcon, networks } from 'lib/Icons'
-import { ChangeEvent, FocusEventHandler, ReactNode, useCallback, useMemo, useState } from 'react'
+import { ChangeEvent, ReactNode, useCallback, useMemo, useState } from 'react'
 
 type CustomComboboxProps = ComboboxProps &
   InputBaseProps & {
     items: ItemProps[]
     defaultValue: string
     onChange: (event: ChangeEvent<HTMLInputElement>) => void
-    onFocus?: FocusEventHandler<HTMLInputElement>
+    onFocus?: () => void | undefined
     error?: string
     placeholder: string
   }
@@ -109,6 +109,11 @@ const CustomCombobox = ({
     </Combobox.Option>
   ))
 
+  const handleBtnOnClicked = useCallback(() => {
+    combobox.toggleDropdown()
+    onFocus && onFocus()
+  }, [combobox, onFocus])
+
   return (
     <Combobox store={combobox} withinPortal={false} onOptionSubmit={handleOptionSubmit} {...props}>
       <Combobox.Target>
@@ -117,7 +122,7 @@ const CustomCombobox = ({
           type="button"
           pointer
           rightSection={<Combobox.Chevron />}
-          onClick={() => combobox.toggleDropdown()}
+          onClick={handleBtnOnClicked}
           rightSectionPointerEvents="none"
           maw={props.maw}
           size="md"

@@ -1,11 +1,11 @@
-import { ChangeEvent, FocusEventHandler, useMemo } from 'react'
+import { ChangeEvent, useMemo } from 'react'
 import useAccount from 'hooks/useAccount'
 import CustomCombobox from 'components/CustomCombobox'
 
 type SelectCurrencyProps = {
   defaultValue: string
   onChange: (event: ChangeEvent<HTMLInputElement>) => void
-  onFocus: FocusEventHandler<HTMLInputElement>
+  onFocus: () => void
   error: string
 }
 
