@@ -66,17 +66,6 @@ const EditCampaign = ({ campaign }: { campaign: Campaign }) => {
 
   const recommendedPaymentBounds = { min: '0.10', max: '0.5' }
 
-  const blocker: Blocker = useBlocker(
-    useCallback<BlockerFunction>(
-      ({ currentLocation, nextLocation }) =>
-        currentLocation.pathname !== nextLocation.pathname ||
-        currentLocation.search !== nextLocation.search,
-      []
-    )
-  )
-
-  const blockerProceed = useCallback(() => blocker.proceed?.(), [blocker])
-
   const form = useForm<FormProps>({
     initialValues: {
       pricingBounds: {
@@ -159,8 +148,18 @@ const EditCampaign = ({ campaign }: { campaign: Campaign }) => {
     }
   })
 
+  const shouldBlock = useCallback<BlockerFunction>(
+    ({ currentLocation, nextLocation }) =>
+      form.isDirty() &&
+      (currentLocation.pathname !== nextLocation.pathname ||
+        currentLocation.search !== nextLocation.search),
+    [form]
+  )
+
+  const blocker: Blocker = useBlocker(shouldBlock)
+
   useEffect(() => {
-    if (blocker.state === 'blocked' && form.isDirty()) {
+    if (blocker.state === 'blocked') {
       return modals.openConfirmModal({
         title: 'Unsaved changes!',
         children: (
@@ -169,13 +168,14 @@ const EditCampaign = ({ campaign }: { campaign: Campaign }) => {
         labels: { confirm: 'Leave the page', cancel: 'Cancel' },
         confirmProps: { color: 'warning' },
         onConfirm: () => {
-          console.log('confirm')
-          blockerProceed()
+          blocker.proceed()
         },
-        onAbort: () => blocker.reset?.()
+        onAbort: () => {
+          blocker.reset()
+        }
       })
     }
-  }, [blocker, form, blockerProceed])
+  }, [blocker])
 
   const catSelectedRadioAndValuesArray = useMemo(
     () => campaign && findArrayWithLengthInObjectAsValue(campaign.targetingInput.inputs.categories),
