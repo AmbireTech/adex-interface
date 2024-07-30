@@ -11,14 +11,10 @@ import {
 import { useAdExApi } from 'hooks/useAdexServices'
 import useAccount from 'hooks/useAccount'
 import useCustomNotifications from 'hooks/useCustomNotifications'
-import {
-  BaseData,
-  CampaignData,
-  //  EventAggregatesDataRes,
-  EvAggrData
-} from 'types/campaignsData'
+import { BaseData, CampaignData, EvAggrData, SupplyStats } from 'types'
 import { CREATE_CAMPAIGN_DEFAULT_VALUE } from 'constants/createCampaign'
 import { parseBigNumTokenAmountToDecimal } from 'helpers/balances'
+import { defaultSupplyStats } from './defaultData'
 
 const defaultCampaignData: CampaignData = {
   campaignId: '',
@@ -111,10 +107,12 @@ const getURLSubRouteByCampaignStatus = (status: CampaignStatus) => {
 }
 interface ICampaignsDataContext {
   campaignsData: Map<string, CampaignData>
+  supplyStats: SupplyStats
   // TODO: all campaigns event aggregations by account
   // eventAggregates: Map<Campaign['id'], EvAggrData>
   updateCampaignDataById: (params: Campaign['id']) => void
   updateAllCampaignsData: (updateAdvanced?: boolean) => void
+  updateSupplyStats: () => void
   // updateEventAggregates: (params: Campaign['id']) => void
   initialDataLoading: boolean
   changeCampaignStatus: (status: CampaignStatus, campaignId: Campaign['id']) => void
@@ -133,6 +131,7 @@ const CampaignsDataProvider: FC<PropsWithChildren & { type: 'user' | 'admin' }> 
 
   const { authenticated } = useAccount()
   const [initialDataLoading, setInitialDataLoading] = useState(true)
+  const [supplyStats, setSupplyStats] = useState<SupplyStats>(defaultSupplyStats)
 
   const [campaignsData, setCampaignData] = useState<ICampaignsDataContext['campaignsData']>(
     new Map<Campaign['id'], CampaignData>()
@@ -292,9 +291,37 @@ const CampaignsDataProvider: FC<PropsWithChildren & { type: 'user' | 'admin' }> 
     [adexServicesRequest, showNotification, type]
   )
 
+  const updateSupplyStats = useCallback(async () => {
+    let result
+
+    try {
+      result = await adexServicesRequest('backend', {
+        route: '/dsp/stats/common',
+        method: 'GET'
+      })
+
+      if (!result) {
+        throw new Error('Getting banner sizes failed.')
+      }
+
+      const hasEmptyValueResponse = Object.values(result).every(
+        (value) => Array.isArray(value) && value.length === 0
+      )
+
+      if (hasEmptyValueResponse) {
+        throw new Error('Supply stats cna not available')
+      }
+
+      setSupplyStats(result as SupplyStats)
+    } catch (e) {
+      console.error(e)
+      showNotification('error', 'Getting banner sizes failed', 'Getting banner sizes failed')
+    }
+  }, [adexServicesRequest, showNotification])
+
   useEffect(() => {
-    console.log({ type })
-  }, [type])
+    updateSupplyStats()
+  }, [updateSupplyStats])
 
   useEffect(() => {
     if (authenticated) {
@@ -354,21 +381,25 @@ const CampaignsDataProvider: FC<PropsWithChildren & { type: 'user' | 'admin' }> 
   const contextValue = useMemo(
     () => ({
       campaignsData,
+      supplyStats,
       updateCampaignDataById,
       updateAllCampaignsData,
       initialDataLoading,
       changeCampaignStatus,
       deleteDraftCampaign,
-      toggleArchived
+      toggleArchived,
+      updateSupplyStats
     }),
     [
       campaignsData,
+      supplyStats,
       updateCampaignDataById,
       updateAllCampaignsData,
       initialDataLoading,
       changeCampaignStatus,
       deleteDraftCampaign,
-      toggleArchived
+      toggleArchived,
+      updateSupplyStats
     ]
   )
 
