@@ -140,18 +140,10 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
       confirmProps: { color: campaign?.archived ? 'blue' : 'red' },
       onConfirm: () => {
         toggleArchived(campaign?.id || '')
-        updateCampaignDataById(campaign?.id)
         showNotification('info', `Campaign ${campaign?.archived ? 'Unarchived' : 'Archived'}`)
       }
     })
-  }, [
-    campaign?.archived,
-    campaign?.id,
-    campaign?.title,
-    showNotification,
-    toggleArchived,
-    updateCampaignDataById
-  ])
+  }, [campaign?.archived, campaign?.id, campaign?.title, showNotification, toggleArchived])
 
   const handleStopOrDelete = useCallback(() => {
     if (!campaign?.id || !campaign?.status) {
@@ -169,7 +161,6 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
         }
       : () => {
           changeCampaignStatus(CampaignStatus.closedByUser, campaign.id)
-          updateCampaignDataById(campaign?.id)
           showNotification('info', 'Campaign stopped!')
         }
 
@@ -192,8 +183,7 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
     changeCampaignStatus,
     deleteDraftCampaign,
     navigate,
-    showNotification,
-    updateCampaignDataById
+    showNotification
   ])
 
   useEffect(() => {
@@ -201,8 +191,6 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
       updateCampaignDataById(id)
     }
   }, [id, updateCampaignDataById])
-
-  const onAfterEditSubmit = () => updateCampaignDataById(id)
 
   const canArchive = useMemo(() => {
     return (
@@ -347,7 +335,7 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
       </Box>
       <Box mt="xl">
         {isEditMode ? (
-          <EditCampaign campaign={campaign} onAfterSubmit={onAfterEditSubmit} />
+          <EditCampaign campaign={campaign} />
         ) : (
           <Container fluid className={classes.wrapper}>
             {isAdminPanel && <AdminBadge title="Admin Details" />}
