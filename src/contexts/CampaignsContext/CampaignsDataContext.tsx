@@ -309,7 +309,7 @@ const CampaignsDataProvider: FC<PropsWithChildren & { type: 'user' | 'admin' }> 
       )
 
       if (hasEmptyValueResponse) {
-        throw new Error('Supply stats cna not available')
+        throw new Error('Supply stats not available')
       }
 
       setSupplyStats(result as SupplyStats)
@@ -320,8 +320,10 @@ const CampaignsDataProvider: FC<PropsWithChildren & { type: 'user' | 'admin' }> 
   }, [adexServicesRequest, showNotification])
 
   useEffect(() => {
+    console.log('updateSupplyStats')
     updateSupplyStats()
-  }, [updateSupplyStats])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   useEffect(() => {
     if (authenticated) {

@@ -291,6 +291,7 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
                   })}
                   rightIcon={<DeleteIcon size="15px" />}
                   onClick={handleStopOrDelete}
+                  disabled={isAdminPanel}
                   variant="subtle"
                 >
                   Delete draft
