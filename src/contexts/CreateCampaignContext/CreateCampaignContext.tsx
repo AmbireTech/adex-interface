@@ -10,7 +10,6 @@ import {
 import { CREATE_CAMPAIGN_DEFAULT_VALUE, dateNowPlusThirtyDays } from 'constants/createCampaign'
 import superjson, { serialize } from 'superjson'
 import {
-  SupplyStats,
   CampaignUI,
   CreateCampaignType,
   SupplyStatsDetails,
@@ -31,25 +30,15 @@ import {
 import { parseFromBigNumPrecision } from 'helpers/balances'
 import { AdUnit, Campaign, Placement } from 'adex-common'
 import dayjs from 'dayjs'
-import useCustomNotifications from 'hooks/useCustomNotifications'
 import { formatDateTime } from 'helpers'
 import { isValidHttpUrl } from 'helpers/validators'
-import { mockData } from './defaultData'
-
-const supplyStatsDefaultValue = {
-  appBannerFormats: [],
-  siteBannerFormatsDesktop: [],
-  siteBannerFormatsMobile: [],
-  appBidFloors: [],
-  siteDesktopBidFloors: [],
-  siteMobileBidFloors: []
-}
+import { useCampaignsData } from 'hooks/useCampaignsData'
 
 const CreateCampaignContext = createContext<CreateCampaignType | null>(null)
 
 const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
   const { adexServicesRequest } = useAdExApi()
-  const { showNotification } = useCustomNotifications()
+  const { supplyStats, updateSupplyStats } = useCampaignsData()
   // TODO: the address will be fixed and will always has a default value
   const {
     adexAccount,
@@ -75,7 +64,6 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
   )
 
   const [campaign, setCampaign] = useState<CampaignUI>(defaultValue)
-  const [supplyStats, setSupplyStats] = useState<SupplyStats>(supplyStatsDefaultValue)
   const [selectedBannerSizes, setSelectedBannerSizes] = useState<
     SupplyStatsDetails[] | SupplyStatsDetails[][]
   >([])
@@ -108,39 +96,8 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
     }
   }, [defaultValue])
 
-  const getSupplyStats = useCallback(async () => {
-    let result
-
-    try {
-      result = await adexServicesRequest('backend', {
-        route: '/dsp/stats/common',
-        method: 'GET'
-      })
-
-      if (!result) {
-        throw new Error('Getting banner sizes failed.')
-      }
-
-      const hasEmptyValueResponse = Object.values(result).every(
-        (value) => Array.isArray(value) && value.length === 0
-      )
-
-      if (hasEmptyValueResponse) {
-        result = mockData
-      }
-
-      setSupplyStats(result as SupplyStats)
-    } catch (e) {
-      console.error(e)
-      showNotification('error', 'Getting banner sizes failed', 'Getting banner sizes failed')
-      // TODO: add fallback or just use mock data
-      result = mockData
-      setSupplyStats(result)
-    }
-  }, [adexServicesRequest, showNotification])
-
   useEffect(() => {
-    getSupplyStats()
+    updateSupplyStats()
   }, []) // eslint-disable-line
 
   useEffect(() => {

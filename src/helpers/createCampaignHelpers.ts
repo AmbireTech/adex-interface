@@ -365,12 +365,36 @@ export const parseRange = (str: string): { min: number; max: number } => {
   const pattern = /^(\d+)_(\d+)-(\d+)_(\d+)$/
   const match = str.match(pattern)
 
-  if (!match) {
-    throw new Error('Invalid input format. Expected format: "0_20-0_30"')
-  }
+  // if (!match) {
+  //   throw new Error('Invalid input format. Expected format: "0_20-0_30"')
+  // }
 
-  const min = parseFloat(`${match[1]}.${match[2]}`)
-  const max = parseFloat(`${match[3]}.${match[4]}`)
+  const min = parseFloat(`${match?.[1]}.${match?.[2]}`)
+  const max = parseFloat(`${match?.[3]}.${match?.[4]}`)
 
   return { min, max }
+}
+
+export const getRecommendedCPMRange = (supplyStats: SupplyStats, campaign: Campaign) => {
+  if (!supplyStats || !campaign) {
+    return { min: 0, max: 0 }
+  }
+  const mostRequests = campaign.targetingInput.inputs.placements.in
+    .map((placement) => {
+      switch (placement) {
+        case 'app':
+          return supplyStats.appBidFloors
+
+        case 'site':
+          return [...supplyStats.siteDesktopBidFloors, ...supplyStats.siteMobileBidFloors]
+        default:
+          return []
+      }
+    })
+    .flat()
+    .sort((a, b) => b.count - a.count)?.[0]
+
+  return {
+    ...parseRange(mostRequests?.value || '0_42-0_69')
+  }
 }

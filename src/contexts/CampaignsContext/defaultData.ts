@@ -1,4 +1,4 @@
-export const mockData = {
+export const defaultSupplyStats = {
   appBannerFormats: [
     {
       value: '320x50',
