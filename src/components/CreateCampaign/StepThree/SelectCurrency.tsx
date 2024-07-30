@@ -30,7 +30,7 @@ const SelectCurrency = ({ defaultValue, onChange, onFocus, error }: SelectCurren
       onFocus={onFocus}
       error={error}
       placeholder="Select Currency"
-      maw="50%"
+      maw={{ sm: '100%', lg: '50%' }}
     />
   )
 }

@@ -23,13 +23,7 @@ const CpmMinMax = ({
   onFocusMax
 }: CpmMinMaxtProps) => {
   return (
-    // <MediaQuery
-    //   smallerThan="lg"
-    //   styles={{
-    //     maxWidth: '100%'
-    //   }}
-    // >
-    <Flex wrap="nowrap" justify="space-between" maw="50%">
+    <Flex wrap="nowrap" justify="space-between" maw={{ sm: '100%', lg: '50%' }}>
       <TextInput
         size="md"
         w="45%"
@@ -47,7 +41,7 @@ const CpmMinMax = ({
         defaultValue={defaultValueMin}
         onChange={(event) => onChangeMin(event)}
         onFocus={onFocusMin}
-        error={errorMin && <Text size="sm">{errorMin}</Text>}
+        error={errorMin && errorMin}
       />
       <TextInput
         size="md"
@@ -66,10 +60,9 @@ const CpmMinMax = ({
         defaultValue={defaultValueMax}
         onChange={(event) => onChangeMax(event)}
         onFocus={onFocusMax}
-        error={errorMax && <Text size="sm">{errorMax}</Text>}
+        error={errorMax && errorMax}
       />
     </Flex>
-    // </MediaQuery>
   )
 }
 

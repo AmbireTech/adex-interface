@@ -33,17 +33,11 @@ const CampaignPeriod = () => {
   const [opened, { open, close }] = useDisclosure(false)
 
   return (
-    // <MediaQuery
-    //   smallerThan="lg"
-    //   styles={{
-    //     maxWidth: '100%'
-    //   }}
-    // >
     <Flex
       wrap="wrap"
       direction="row"
       justify="space-between"
-      maw="50%"
+      maw={{ sm: '100%', lg: '50%' }}
       align="center"
       className={classes.wrapper}
     >
@@ -65,7 +59,6 @@ const CampaignPeriod = () => {
       </ActionIcon>
       <CampaignPeriodModal opened={opened} close={close} />
     </Flex>
-    // </MediaQuery>
   )
 }
 
