@@ -236,7 +236,7 @@ const Dashboard = ({ isAdminPanel, accountId }: { isAdminPanel?: boolean; accoun
 
   const handleEdit = useCallback(
     (data: DashboardTableElement['actionData']) =>
-      navigate(`/dashboard/campaign-details/${data.campaign.id}?edit=true`),
+      navigate(`/dashboard/campaign-details/${data.campaign.id}?edit=true`, { replace: true }),
     [navigate]
   )
 
@@ -325,7 +325,7 @@ const Dashboard = ({ isAdminPanel, accountId }: { isAdminPanel?: boolean; accoun
           {
             action: handleEdit,
             disabled: (ada: DashboardTableElement['actionData']) =>
-              ada.campaign.status === CampaignStatus.closedByUser,
+              ![CampaignStatus.active, CampaignStatus.paused].includes(ada.campaign.status),
             label: 'Edit',
             icon: <EditIcon />,
             hide: (ada: DashboardTableElement['actionData']) => ada.isDraft
