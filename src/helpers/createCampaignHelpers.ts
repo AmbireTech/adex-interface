@@ -365,12 +365,12 @@ export const parseRange = (str: string): { min: number; max: number } => {
   const pattern = /^(\d+)_(\d+)-(\d+)_(\d+)$/
   const match = str.match(pattern)
 
-  if (!match) {
-    throw new Error('Invalid input format. Expected format: "0_20-0_30"')
-  }
+  // if (!match) {
+  //   throw new Error('Invalid input format. Expected format: "0_20-0_30"')
+  // }
 
-  const min = parseFloat(`${match[1]}.${match[2]}`)
-  const max = parseFloat(`${match[3]}.${match[4]}`)
+  const min = parseFloat(`${match?.[1]}.${match?.[2]}`)
+  const max = parseFloat(`${match?.[3]}.${match?.[4]}`)
 
   return { min, max }
 }
