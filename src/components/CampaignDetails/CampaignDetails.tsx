@@ -1,6 +1,16 @@
 import { useCallback, useEffect, useMemo } from 'react'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
-import { Container, Grid, createStyles, Text, Flex, Box, Button, Paper, Stack } from '@mantine/core'
+import {
+  Container,
+  Grid,
+  createStyles,
+  Text,
+  Box,
+  Button,
+  Paper,
+  Stack,
+  Group
+} from '@mantine/core'
 import { modals } from '@mantine/modals'
 import BadgeStatusCampaign from 'components/Dashboard/BadgeStatusCampaign'
 import { formatCatsAndLocsData } from 'helpers/createCampaignHelpers'
@@ -232,10 +242,10 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
   return (
     <>
       <Box p="md">
-        <Flex direction={{ base: 'column', md: 'row' }} align="center">
+        <Group position="center">
           <GoBack title="Dashboard" />
-          <Paper mx="auto" shadow="md" radius="xl">
-            <Flex direction="row">
+          <Paper mx="auto" my="xs" shadow="md" radius="xl">
+            <Group spacing={2} p={2} position="center">
               <Button
                 className={cx(classes.actionIcons, {
                   active: canActivate
@@ -318,17 +328,19 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
               >
                 Edit
               </Button>
-            </Flex>
+            </Group>
           </Paper>
-          <Flex align="center" gap="xs">
-            Campaign Analytics
+          <Group spacing="sm" position="center">
+            <Text weight="bold" size="sm">
+              Campaign Analytics{' '}
+            </Text>
             <ActionButton
               title="View Analytics"
               icon={<AnalyticsIcon size="32px" />}
               action={() => navigate(`/dashboard/campaign-analytics/${campaign.id}`)}
             />
-          </Flex>
-        </Flex>
+          </Group>
+        </Group>
       </Box>
       <Box mt="xl">
         {isEditMode ? (
