@@ -23,7 +23,8 @@ import { parseBigNumTokenAmountToDecimal, parseToBigNumPrecision } from 'helpers
 
 import {
   findArrayWithLengthInObjectAsValue,
-  updateCatsLocsObject
+  updateCatsLocsObject,
+  getRecommendedCPMRange
 } from 'helpers/createCampaignHelpers'
 import useAccount from 'hooks/useAccount'
 import { useAdExApi } from 'hooks/useAdexServices'
@@ -62,9 +63,12 @@ const EditCampaign = ({ campaign }: { campaign: Campaign }) => {
   const {
     adexAccount: { balanceToken }
   } = useAccount()
-  const { updateCampaignDataById } = useCampaignsData()
+  const { updateCampaignDataById, supplyStats } = useCampaignsData()
 
-  const recommendedPaymentBounds = { min: '0.10', max: '0.5' }
+  const recommendedPaymentBounds = useMemo(
+    () => getRecommendedCPMRange(supplyStats, campaign),
+    [campaign, supplyStats]
+  )
 
   const form = useForm<FormProps>({
     initialValues: {

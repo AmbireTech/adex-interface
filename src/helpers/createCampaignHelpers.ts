@@ -374,3 +374,27 @@ export const parseRange = (str: string): { min: number; max: number } => {
 
   return { min, max }
 }
+
+export const getRecommendedCPMRange = (supplyStats: SupplyStats, campaign: Campaign) => {
+  if (!supplyStats || !campaign) {
+    return { min: 0, max: 0 }
+  }
+  const mostRequests = campaign.targetingInput.inputs.placements.in
+    .map((placement) => {
+      switch (placement) {
+        case 'app':
+          return supplyStats.appBidFloors
+
+        case 'site':
+          return [...supplyStats.siteDesktopBidFloors, ...supplyStats.siteMobileBidFloors]
+        default:
+          return []
+      }
+    })
+    .flat()
+    .sort((a, b) => b.count - a.count)?.[0]
+
+  return {
+    ...parseRange(mostRequests?.value || '0_42-0_69')
+  }
+}
