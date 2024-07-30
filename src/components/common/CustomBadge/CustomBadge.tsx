@@ -36,7 +36,9 @@ const CustomBadge = ({ color, text, icon, ...rest }: CustomBadgeProps) => {
   return (
     <Badge size="lg" variant="outline" color={color} className={classes.wrapper} {...rest}>
       <Flex align="center" wrap="nowrap">
-        <Text mr={icon ? 'xs' : undefined}>{text}</Text>
+        <Text size="xs" mr={icon ? 'xs' : undefined}>
+          {text}
+        </Text>
         {icon}
       </Flex>
     </Badge>

@@ -128,7 +128,7 @@ const themeOverride: MantineThemeOverride = createTheme({
   // transitionTimingFunction: 'ease-out',
   components: {
     Alert: Alert.extend({
-      styles: (theme, { color }: AlertProps, { variant }: any) => {
+      styles: (theme, { color, variant }: AlertProps) => {
         const custom = variant === 'outline'
         return {
           root: {

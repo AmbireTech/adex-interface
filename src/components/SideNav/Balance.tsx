@@ -1,4 +1,4 @@
-import { Flex, rem, Image, Text, MantineTheme, getPrimaryShade } from '@mantine/core'
+import { Flex, Image, Text, MantineTheme, getPrimaryShade } from '@mantine/core'
 import { createStyles } from '@mantine/emotion'
 import { useMemo, useState } from 'react'
 import DownArrowIcon from 'resources/icons/DownArrow'
@@ -87,7 +87,7 @@ const Balance = () => {
         {/* {!!deposits.length && ( */}
         {false && (
           <DownArrowIcon
-            size={rem(10)}
+            size="16px"
             className={cx(classes.pointer, { [classes.rotateUpsideDown]: opened })}
             onClick={() => setOpened((prevState) => !prevState)}
           />
