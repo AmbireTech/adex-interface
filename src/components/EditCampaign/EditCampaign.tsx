@@ -197,11 +197,8 @@ const EditCampaign = ({ campaign }: { campaign: Campaign }) => {
         'targetingInput.inputs.categories',
         updateCatsLocsObject(selectedRadio, categoriesValue)
       )
-      form.validateField('targetingInput.inputs.categories')
     },
-    // TODO: fic this  and countries update
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
+    [form]
   )
 
   const handleCountries = useCallback(
@@ -210,10 +207,8 @@ const EditCampaign = ({ campaign }: { campaign: Campaign }) => {
         'targetingInput.inputs.location',
         updateCatsLocsObject(selectedRadio, locationsValue)
       )
-      form.validateField('targetingInput.inputs.location')
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
+    [form]
   )
 
   const editCampaign = useCallback(
