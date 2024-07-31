@@ -129,9 +129,9 @@ const useCreateCampaignData = () => {
   const campaignNameFormatted = useMemo(() => title, [title])
   const adUnitsFormatted = useMemo(
     () => (
-      <Stack>
+      <Stack spacing="xs">
         {adUnits.map((image: AdUnit) => {
-          return <ImageUrlInput key={image.id} image={image} mb="sm" preview />
+          return <ImageUrlInput key={image.id} image={image} preview />
         })}
       </Stack>
     ),
