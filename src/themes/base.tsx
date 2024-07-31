@@ -133,20 +133,26 @@ const themeOverride: MantineThemeOverride = createTheme({
           root: {
             background: custom
               ? lighten(
-                  theme.colors[color || theme.primaryColor][3],
+                  theme.colors[color || theme.primaryColor][
+                    theme.primaryShade as MantineColorShade
+                  ],
                   theme.other.shades.lighten.lightest
                 )
               : '',
-            borderColor: custom ? theme.colors[color || theme.primaryColor][3] : '',
+            borderColor: custom
+              ? theme.colors[color || theme.primaryColor][theme.primaryShade as MantineColorShade]
+              : '',
             svg: {
-              color: custom ? theme.colors[color || theme.primaryColor][3] : '',
+              color: custom
+                ? theme.colors[color || theme.primaryColor][theme.primaryShade as MantineColorShade]
+                : '',
               marginTop: custom ? theme.spacing.md : '',
               width: rem(30),
               height: rem(30)
             }
           },
           message: {
-            color: custom ? theme.colors.mainText[3] : ''
+            color: custom ? theme.colors.mainText[theme.primaryShade as MantineColorShade] : ''
           }
         }
       }
@@ -155,7 +161,7 @@ const themeOverride: MantineThemeOverride = createTheme({
       defaultProps: {
         size: 'md',
         rightSectionWidth: 30,
-        rightSection: <DownArrowIcon size={rem(10)} />
+        rightSection: <DownArrowIcon size="10px" />
       },
       styles: () => ({
         rightSection: { pointerEvents: 'none' }
@@ -166,12 +172,16 @@ const themeOverride: MantineThemeOverride = createTheme({
         radius: 'xl'
       },
       styles: (theme: MantineTheme, params: ButtonProps) => {
+        console.log('theme.primaryShade', theme.primaryShade)
         const outlineHoverBgColor = alpha(
           theme.colors[params.color || theme.primaryColor][theme.primaryShade as MantineColorShade],
           theme.other.shades.rgba.lightest
         )
 
-        const filledHoverBgColor = theme.colors[params.color || theme.primaryColor][3 + 1]
+        const filledHoverBgColor =
+          theme.colors[params.color || theme.primaryColor][
+            (theme.primaryShade as MantineColorShade) + 1
+          ]
 
         const customHover = params.variant === 'outline' || params.variant === 'filled'
 
@@ -180,7 +190,9 @@ const themeOverride: MantineThemeOverride = createTheme({
             background:
               params.variant === 'outline'
                 ? alpha(
-                    theme.colors[params.color || theme.primaryColor][3],
+                    theme.colors[params.color || theme.primaryColor][
+                      theme.primaryShade as MantineColorShade
+                    ],
                     theme.other.shades.rgba.lightest
                   )
                 : '',
@@ -202,7 +214,9 @@ const themeOverride: MantineThemeOverride = createTheme({
               backgroundSize: '100% 100%',
               backgroundColor:
                 params.variant === 'filled'
-                  ? theme.colors[params.color || theme.primaryColor][3]
+                  ? theme.colors[params.color || theme.primaryColor][
+                      theme.primaryShade as MantineColorShade
+                    ]
                   : ''
             }
           }
@@ -235,21 +249,21 @@ const themeOverride: MantineThemeOverride = createTheme({
     Input: Input.extend({
       styles: (theme) => ({
         input: {
-          backgroundColor: theme.colors.lightBackground[3],
+          backgroundColor: theme.colors.lightBackground[theme.primaryShade as MantineColorShade],
           // TODO: check how to override it properly
-          // borderColor: theme.colors.nonDecorativeBorders[3],
+          // borderColor: theme.colors.nonDecorativeBorders[theme.primaryShade as MantineColorShade],
           borderRadius: theme.radius.md
         },
         icon: {
           borderRight: '1px solid',
-          borderColor: theme.colors.nonDecorativeBorders[3]
+          borderColor: theme.colors.nonDecorativeBorders[theme.primaryShade as MantineColorShade]
         }
       })
     }),
     Dropzone: Dropzone.extend({
       styles: (theme: MantineTheme) => ({
         root: {
-          backgroundColor: theme.colors.lightBackground[3]
+          backgroundColor: theme.colors.lightBackground[theme.primaryShade as MantineColorShade]
         }
       })
     }),
