@@ -7,11 +7,12 @@ import {
   Box,
   Text,
   Badge,
-  ActionIcon
+  ActionIcon,
+  Paper
 
   //  Flex, Loader, Tabs
 } from '@mantine/core'
-import { BaseAnalyticsData, AnalyticsPeriod, Timeframe, AnalyticsType } from 'types'
+import { BaseAnalyticsData, AnalyticsPeriod, Timeframe, AnalyticsType, SSPs } from 'types'
 import useCampaignAnalytics from 'hooks/useCampaignAnalytics'
 import CustomTable from 'components/common/CustomTable'
 import { CountryData } from 'helpers/countries'
@@ -22,6 +23,7 @@ import BillingIcon from 'resources/icons/Billing'
 import VisibilityIcon from 'resources/icons/Visibility'
 import { getHumneSrcName } from 'helpers'
 import CheckMarkFilledIcon from 'resources/icons/CheckMarkFilled'
+import DownloadCSV from 'components/common/DownloadCSV'
 
 const headingsDefault = [
   //   'Country',
@@ -30,9 +32,21 @@ const headingsDefault = [
   'Impressions',
   'Clicks',
   'CTR',
-  'Average CPM',
+  'Avg CPM',
+  'Avg CPC',
   'Spent'
 ]
+
+const csvHeaders = {
+  // segment: 'segment',
+  share: 'share',
+  impressions: 'impressions',
+  clicks: 'clicks',
+  ctr: 'ctr',
+  avgCpm: 'avgCpm',
+  avgCpc: 'avgCpc',
+  paid: 'paid'
+}
 
 const timeframeData: Array<{ value: Timeframe; label: Timeframe }> = [
   { value: 'year', label: 'year' },
@@ -48,7 +62,15 @@ const analyticsTypeData: Array<{ value: AnalyticsType; label: string }> = [
   { value: 'hostname', label: 'By hostname' },
   { value: 'placement', label: 'By placement' },
   { value: 'campaignId', label: 'By campaign id' },
-  { value: 'advertiser', label: 'By advertiser' }
+  { value: 'advertiser', label: 'By advertiser' },
+  { value: 'timeframe', label: 'By Timeframe' }
+]
+
+const sspsData: Array<{ value: SSPs; label: string }> = [
+  { value: '', label: 'All SSPs' },
+  { value: 'Eskimi', label: 'Eskimi' },
+  { value: 'Epom', label: 'Epom' },
+  { value: 'Qortex', label: 'Qortex' }
 ]
 
 const mapSegmentLabel = (analType: AnalyticsType, segment: string): { segementLabel: string } => {
@@ -59,11 +81,15 @@ const mapSegmentLabel = (analType: AnalyticsType, segment: string): { segementLa
       segementLabel = CountryData.get(segment)?.name || segment
       break
     case 'timeframe':
-      segementLabel = new Date(Number(segment)).toLocaleString()
+      segementLabel = new Date(Number(segment)).toUTCString()
       break
     case 'hostname':
       // TODO: separate calls for app/site - will require more work
-      segementLabel = getHumneSrcName(segment, 'app')
+      segementLabel = `${getHumneSrcName(segment, 'app')} (${getHumneSrcName(
+        segment,
+        'app',
+        true
+      )})`
       break
 
     default:
@@ -88,6 +114,7 @@ const AdminAnalytics = () => {
 
   const [timeframe, setTimeframe] = useState<Timeframe>('month')
   const [analType, setAnalType] = useState<AnalyticsType>('ssp')
+  const [ssp, setSsp] = useState<SSPs>('')
   const [startDate, setStartDate] = useState<Date | null>(
     dayjs().subtract(1, 'month').startOf('month').toDate()
   )
@@ -134,14 +161,15 @@ const AdminAnalytics = () => {
         true,
         timeframe,
         startDate || undefined,
-        end || undefined
+        end || undefined,
+        ssp || undefined
       )
       setAnalyticsKey(key)
       console.log('key', key)
     }
 
     checkAnalytics()
-  }, [analType, getAnalyticsKeyAndUpdate, startDate, timeframe])
+  }, [analType, getAnalyticsKeyAndUpdate, ssp, startDate, timeframe])
 
   const loading = useMemo(
     () => !analyticsKey || !adminMappedAnalytics,
@@ -149,9 +177,9 @@ const AdminAnalytics = () => {
   )
 
   const data = useMemo(() => {
-    const paid = adminMappedAnalytics?.reduce((sum, i) => sum + i.paid, 0) || 1
-    const imps = adminMappedAnalytics?.reduce((sum, i) => sum + i.impressions, 0) || 1
-    const clicks = adminMappedAnalytics?.reduce((sum, i) => sum + i.clicks, 0) || 1
+    const paid = adminMappedAnalytics?.reduce((sum, i) => sum + i.paid, 0) || 0
+    const imps = adminMappedAnalytics?.reduce((sum, i) => sum + i.impressions, 0) || 0
+    const clicks = adminMappedAnalytics?.reduce((sum, i) => sum + i.clicks, 0) || 0
     return {
       paid,
       imps,
@@ -160,12 +188,13 @@ const AdminAnalytics = () => {
         adminMappedAnalytics?.map((item) => ({
           id: item.segment.toString(),
           segment: mapSegmentLabel(analType, item.segment).segementLabel,
-          share: `${((item.paid / paid) * 100).toFixed(2)} %`,
-          shareImps: `${((item.impressions / imps) * 100).toFixed(2)} %`,
+          share: `${((item.paid / (paid || 1)) * 100).toFixed(2)} %`,
+          shareImps: `${((item.impressions / (imps || 1)) * 100).toFixed(2)} %`,
           impressions: item.impressions,
           clicks: item.clicks,
           ctr: `${item.ctr} %`,
           avgCpm: `${item.avgCpm}`,
+          avgCPC: `${item.avgCpc}`,
           paid: `${item.paid.toFixed(4)}`
         })) || []
     }
@@ -178,53 +207,74 @@ const AdminAnalytics = () => {
     [navigate]
   )
 
+  const actions = useMemo(() => {
+    return [
+      {
+        action: handlePreview,
+        label: 'Show campaign details',
+        icon: <VisibilityIcon />
+      }
+    ]
+  }, [handlePreview])
+
   return (
-    <Container fluid>
-      <Text size="sm" mb="sm">
-        * This analytics are for the actual user campaign, representing placed impressions, clicks,
-        etc. (NOT the stats form received requests form the SSPs)
-      </Text>
+    <Container fluid px={0}>
+      <Paper p="sm" withBorder>
+        <Text size="sm">
+          * This analytics are for the actual user campaign, representing placed impressions,
+          clicks, etc. (NOT the stats form received requests form the SSPs)
+        </Text>
+        <Text size="sm" mb="md">
+          * Amounts include AdEx validator fees 7% (total amounts paid by the users). For amounts
+          payed to ssp divide by 1.07 (for records after 22.06.24)
+        </Text>
 
-      <Flex direction="row" align="center" justify="left" gap="xl" mb="md">
-        <Select
-          label="Type"
-          value={analType}
-          onChange={(val) => setAnalType(val as AnalyticsType)}
-          data={analyticsTypeData}
-          size="md"
-        />
-        <Select
-          label="Period"
-          value={timeframe}
-          onChange={(val) => setTimeframe(val as Timeframe)}
-          data={timeframeData}
-          size="md"
-        />
-        <DateInput
-          label="Start date"
-          placeholder="Start date"
-          value={startDate}
-          onChange={setStartDate}
-          maxDate={maxDate}
-          size="md"
-        />
-        <DateTimePicker
-          label="End date"
-          placeholder="Start date"
-          value={endDate}
-          disabled
-          withSeconds
-          size="md"
-        />
-      </Flex>
+        <Flex direction="row" align="start" justify="left" gap="xl" mb="md">
+          <Select
+            label="Type"
+            value={analType}
+            onChange={(val) => setAnalType(val as AnalyticsType)}
+            data={analyticsTypeData}
+            size="md"
+          />
+          <Select
+            label="SSP"
+            value={ssp}
+            onChange={(val) => setSsp(val as SSPs)}
+            data={sspsData}
+            size="md"
+          />
+          <Select
+            label="Period"
+            value={timeframe}
+            onChange={(val) => setTimeframe(val as Timeframe)}
+            data={timeframeData}
+            size="md"
+          />
+          <DateInput
+            label="Start date"
+            placeholder="Start date"
+            value={startDate}
+            onChange={setStartDate}
+            maxDate={maxDate}
+            size="md"
+          />
+          <DateTimePicker
+            label="End date"
+            placeholder="Start date"
+            value={endDate}
+            disabled
+            withSeconds
+            size="md"
+          />
+        </Flex>
 
-      {loading ? (
-        <Loader size="xl" variant="dots" color="violet" />
-      ) : (
-        <Flex direction="column">
-          <Flex direction="row" align="center" justify="left" gap="xl" mb="md">
-            <Box>Totals: </Box>
-            <Box>
+        {loading ? (
+          <Loader size="xl" variant="dots" color="violet" />
+        ) : (
+          <Flex direction="column" mt="xl">
+            <Flex direction="row" align="center" justify="left" gap="xl" mb="md">
+              <Box>Totals: </Box>
               <Badge
                 leftSection={
                   <ActionIcon size="sm" color="brand">
@@ -235,8 +285,7 @@ const AdminAnalytics = () => {
               >
                 {Number(data.paid.toFixed(2)).toLocaleString()}
               </Badge>
-            </Box>
-            <Box>
+
               <Badge
                 size="xl"
                 leftSection={
@@ -245,11 +294,9 @@ const AdminAnalytics = () => {
                   </ActionIcon>
                 }
               >
-                {' '}
                 {data.imps.toLocaleString()}
               </Badge>
-            </Box>
-            <Box>
+
               <Badge
                 size="xl"
                 leftSection={
@@ -258,20 +305,27 @@ const AdminAnalytics = () => {
                   </ActionIcon>
                 }
               >
-                {' '}
                 {data.clicks.toLocaleString()}
               </Badge>
-            </Box>
+
+              <DownloadCSV
+                data={adminMappedAnalytics}
+                mapHeadersToDataProperties={{ [analType]: 'segment', ...csvHeaders }}
+                filename={`${analyticsKey?.key || 'admin-data-export'}.csv`}
+                disabled={loading}
+              />
+            </Flex>
+
+            <CustomTable
+              background
+              headings={headings}
+              elements={data.elements}
+              pageSize={10}
+              actions={analType === 'campaignId' ? actions : undefined}
+            />
           </Flex>
-          <CustomTable
-            background
-            headings={headings}
-            elements={data.elements}
-            pageSize={10}
-            onPreview={analType === 'campaignId' ? handlePreview : undefined}
-          />
-        </Flex>
-      )}
+        )}
+      </Paper>
     </Container>
   )
 }

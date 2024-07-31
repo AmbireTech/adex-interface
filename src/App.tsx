@@ -6,6 +6,7 @@ import '@mantine/dropzone/styles.css'
 import { ColorSchemeScript, MantineProvider, MantineTheme, Progress } from '@mantine/core'
 import { ModalsProvider } from '@mantine/modals'
 import { AccountProvider } from 'contexts/AccountContext'
+import { AdminProvider } from 'contexts/AdminContext'
 
 import { RouterProvider } from 'react-router-dom'
 import { router } from 'Router'
@@ -51,21 +52,23 @@ ReactGA.initialize('G-PX5B4P9KKM')
 function App() {
   return (
     <AccountProvider>
-      <MantineEmotionProvider>
-        <ColorSchemeScript forceColorScheme="light" />
-        <MantineProvider
-          theme={lightTheme}
-          stylesTransform={emotionTransform}
-          forceColorScheme="light"
-        >
-          <ModalsProvider>
-            <GlobalStyles />
-            <Notifications />
-            {ENV && <EnvBanner />}
-            <RouterProvider router={router} />
-          </ModalsProvider>
-        </MantineProvider>
-      </MantineEmotionProvider>
+      <AdminProvider>
+        <MantineEmotionProvider>
+          <ColorSchemeScript forceColorScheme="light" />
+          <MantineProvider
+            theme={lightTheme}
+            stylesTransform={emotionTransform}
+            forceColorScheme="light"
+          >
+            <ModalsProvider>
+              <GlobalStyles />
+              <Notifications />
+              {ENV && <EnvBanner />}
+              <RouterProvider router={router} />
+            </ModalsProvider>
+          </MantineProvider>
+        </MantineEmotionProvider>
+      </AdminProvider>
     </AccountProvider>
   )
 }

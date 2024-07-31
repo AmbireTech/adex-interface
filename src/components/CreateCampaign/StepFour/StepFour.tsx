@@ -1,33 +1,16 @@
-import { Container, MantineTheme, getPrimaryShade } from '@mantine/core'
-import { createStyles } from '@mantine/emotion'
-import { useColorScheme } from '@mantine/hooks'
+import { Paper } from '@mantine/core'
 import CampaignDetailsRow from 'components/common/CampainDetailsRow/CampaignDetailsRow'
 import useCreateCampaignData from 'hooks/useCreateCampaignData/useCreateCampaignData'
 import { useMemo } from 'react'
 import { CreateCampaignOverview } from 'types'
 
-const useStyles = createStyles((theme: MantineTheme) => {
-  const colorScheme = useColorScheme()
-  const primaryShade = getPrimaryShade(theme, colorScheme)
-
-  return {
-    wrapper: {
-      background: theme.colors.lightBackground[primaryShade],
-      border: '1px solid',
-      borderRadius: theme.radius.md,
-      borderColor: theme.colors.decorativeBorders[primaryShade],
-      maxWidth: '100%'
-    }
-  }
-})
-
 const StepFour = () => {
-  const { classes } = useStyles()
   const {
     formattedSelectedDevice,
     priceBoundsFormatted,
     formattedCats,
     formattedLocs,
+    advancedTargeInput,
     adFormats,
     campaignBudgetFormatted,
     campaignNameFormatted,
@@ -38,37 +21,49 @@ const StepFour = () => {
 
   const campaignOverview: CreateCampaignOverview[] = useMemo(
     () => [
-      { count: 1, title: 'Campaign Name', value: campaignNameFormatted },
-      { count: 2, title: 'Campaign Budget', value: campaignBudgetFormatted },
-      { count: 3, title: 'CPM', value: priceBoundsFormatted },
-      { count: 4, title: 'Campaign Period', value: campaignPeriodFormatted },
-      { count: 5, title: 'Placements', value: formattedSelectedPlacement },
-      { count: 6, title: 'Device Type', value: formattedSelectedDevice },
-      { count: 7, title: 'Ad Format', value: adFormats },
-      { count: 8, title: 'Creatives', value: adUnitsFormatted },
-      { count: 9, title: 'Selected Categories', value: formattedCats },
-      { count: 10, title: 'Selected Countries', value: formattedLocs }
+      { title: 'Campaign Name', value: campaignNameFormatted },
+      { title: 'Campaign Budget', value: campaignBudgetFormatted },
+      { title: 'CPM', value: priceBoundsFormatted },
+      { title: 'Campaign Period', value: campaignPeriodFormatted },
+      { title: 'Placements', value: formattedSelectedPlacement },
+      { title: 'Device Type', value: formattedSelectedDevice },
+      { title: 'Ad Format', value: adFormats },
+      { title: 'Creatives', value: adUnitsFormatted, isColumn: true },
+      { title: 'Selected Categories', value: formattedCats, isColumn: true },
+      { title: 'Selected Countries', value: formattedLocs, isColumn: true },
+      // {
+      //   title: 'Include incentivized traffic',
+      //   value: advancedTargeInput.includeIncentivized ? 'Yes' : 'No'
+      // },
+      // {
+      //   title: 'Disable frequency capping',
+      //   value: advancedTargeInput.disableFrequencyCapping ? 'Yes' : 'No'
+      // },
+      {
+        title: 'Limit average daily spending',
+        value: advancedTargeInput.limitDailyAverageSpending ? 'Yes' : 'No'
+      }
     ],
     [
-      formattedSelectedDevice,
+      campaignNameFormatted,
+      campaignBudgetFormatted,
       priceBoundsFormatted,
+      campaignPeriodFormatted,
+      formattedSelectedPlacement,
+      formattedSelectedDevice,
+      adFormats,
+      adUnitsFormatted,
       formattedCats,
       formattedLocs,
-      adFormats,
-      campaignBudgetFormatted,
-      campaignNameFormatted,
-      adUnitsFormatted,
-      campaignPeriodFormatted,
-      formattedSelectedPlacement
+      advancedTargeInput.limitDailyAverageSpending
     ]
   )
 
   const rows = useMemo(
     () =>
-      campaignOverview.map((item: CreateCampaignOverview) => {
+      campaignOverview.map((item: CreateCampaignOverview, i) => {
         const isLast = item === campaignOverview[campaignOverview.length - 1]
-        const isColumn = item.title === 'Creatives'
-        const fullTitle = `${item.count}. ${item.title}`
+        const fullTitle = `${i + 1}. ${item.title}`
 
         return (
           <CampaignDetailsRow
@@ -78,14 +73,18 @@ const StepFour = () => {
             value={item.value}
             textSize="sm"
             noBorder={isLast}
-            column={isColumn}
+            column={item.isColumn}
           />
         )
       }),
     [campaignOverview]
   )
 
-  return <Container className={classes.wrapper}>{rows}</Container>
+  return (
+    <Paper p="md" withBorder bg="lightBackground">
+      {rows}
+    </Paper>
+  )
 }
 
 export default StepFour

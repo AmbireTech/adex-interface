@@ -11,14 +11,10 @@ import {
 import { useAdExApi } from 'hooks/useAdexServices'
 import useAccount from 'hooks/useAccount'
 import useCustomNotifications from 'hooks/useCustomNotifications'
-import {
-  BaseData,
-  CampaignData,
-  //  EventAggregatesDataRes,
-  EvAggrData
-} from 'types/campaignsData'
+import { BaseData, CampaignData, EvAggrData, SupplyStats } from 'types'
 import { CREATE_CAMPAIGN_DEFAULT_VALUE } from 'constants/createCampaign'
 import { parseBigNumTokenAmountToDecimal } from 'helpers/balances'
+import { defaultSupplyStats } from './defaultData'
 
 const defaultCampaignData: CampaignData = {
   campaignId: '',
@@ -111,13 +107,17 @@ const getURLSubRouteByCampaignStatus = (status: CampaignStatus) => {
 }
 interface ICampaignsDataContext {
   campaignsData: Map<string, CampaignData>
+  supplyStats: SupplyStats
   // TODO: all campaigns event aggregations by account
   // eventAggregates: Map<Campaign['id'], EvAggrData>
   updateCampaignDataById: (params: Campaign['id']) => void
   updateAllCampaignsData: (updateAdvanced?: boolean) => void
+  updateSupplyStats: () => void
   // updateEventAggregates: (params: Campaign['id']) => void
   initialDataLoading: boolean
   changeCampaignStatus: (status: CampaignStatus, campaignId: Campaign['id']) => void
+  deleteDraftCampaign: (id: string) => void
+  toggleArchived: (id: string) => void
 }
 
 const CampaignsDataContext = createContext<ICampaignsDataContext | null>(null)
@@ -131,6 +131,7 @@ const CampaignsDataProvider: FC<PropsWithChildren & { type: 'user' | 'admin' }> 
 
   const { authenticated } = useAccount()
   const [initialDataLoading, setInitialDataLoading] = useState(true)
+  const [supplyStats, setSupplyStats] = useState<SupplyStats>(defaultSupplyStats)
 
   const [campaignsData, setCampaignData] = useState<ICampaignsDataContext['campaignsData']>(
     new Map<Campaign['id'], CampaignData>()
@@ -290,9 +291,39 @@ const CampaignsDataProvider: FC<PropsWithChildren & { type: 'user' | 'admin' }> 
     [adexServicesRequest, showNotification, type]
   )
 
+  const updateSupplyStats = useCallback(async () => {
+    let result
+
+    try {
+      result = await adexServicesRequest('backend', {
+        route: '/dsp/stats/common',
+        method: 'GET'
+      })
+
+      if (!result) {
+        throw new Error('Getting banner sizes failed.')
+      }
+
+      const hasEmptyValueResponse = Object.values(result).every(
+        (value) => Array.isArray(value) && value.length === 0
+      )
+
+      if (hasEmptyValueResponse) {
+        throw new Error('Supply stats not available')
+      }
+
+      setSupplyStats(result as SupplyStats)
+    } catch (e) {
+      console.error(e)
+      showNotification('error', 'Getting banner sizes failed', 'Getting banner sizes failed')
+    }
+  }, [adexServicesRequest, showNotification])
+
   useEffect(() => {
-    console.log({ type })
-  }, [type])
+    console.log('updateSupplyStats')
+    updateSupplyStats()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   useEffect(() => {
     if (authenticated) {
@@ -308,20 +339,69 @@ const CampaignsDataProvider: FC<PropsWithChildren & { type: 'user' | 'admin' }> 
     }
   }, [updateAllCampaignsData, authenticated])
 
+  // TODO: move to separate context delete and archive
+  const deleteDraftCampaign = useCallback(
+    async (id: string) => {
+      try {
+        await adexServicesRequest('backend', {
+          route: `/dsp/campaigns/draft/${id}`,
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          onErrMsg: `Can not delete ${id}`
+        })
+
+        setCampaignData((prev) => {
+          const next = new Map(prev)
+          next.delete(id)
+
+          return next
+        })
+      } catch (err) {
+        console.log(err)
+      }
+    },
+    [adexServicesRequest]
+  )
+
+  const toggleArchived = useCallback(
+    async (id: string) => {
+      await adexServicesRequest('backend', {
+        route: `/dsp/campaigns/togglearchive/${id}`,
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        onErrMsg: `Can not toggle archive ${id}`
+      })
+      updateCampaignDataById(id)
+    },
+    [adexServicesRequest, updateCampaignDataById]
+  )
+
   const contextValue = useMemo(
     () => ({
       campaignsData,
+      supplyStats,
       updateCampaignDataById,
       updateAllCampaignsData,
       initialDataLoading,
-      changeCampaignStatus
+      changeCampaignStatus,
+      deleteDraftCampaign,
+      toggleArchived,
+      updateSupplyStats
     }),
     [
       campaignsData,
+      supplyStats,
       updateCampaignDataById,
       updateAllCampaignsData,
       initialDataLoading,
-      changeCampaignStatus
+      changeCampaignStatus,
+      deleteDraftCampaign,
+      toggleArchived,
+      updateSupplyStats
     ]
   )
 

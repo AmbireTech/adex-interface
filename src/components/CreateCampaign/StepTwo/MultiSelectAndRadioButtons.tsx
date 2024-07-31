@@ -1,8 +1,7 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { MantineTheme, MultiSelect, Radio, Stack, Text, getPrimaryShade } from '@mantine/core'
 import { TargetingInputApplyProp } from 'adex-common/dist/types'
 import { MultiSelectAndRadioButtonsProps } from 'types'
-import { capitalize } from 'helpers/createCampaignHelpers'
 import { useColorScheme } from '@mantine/hooks'
 import { createStyles } from '@mantine/emotion'
 
@@ -13,6 +12,7 @@ const useStyles = createStyles(
 
     return {
       input: {
+        textTransform: 'capitalize',
         borderColor:
           selectedRadio === 'nin'
             ? theme.colors.warning[primaryShade]
@@ -21,6 +21,7 @@ const useStyles = createStyles(
         boxShadow: theme.shadows.md
       },
       pill: {
+        textTransform: 'capitalize',
         border: '1px solid',
         borderColor:
           selectedRadio === 'nin'
@@ -41,14 +42,15 @@ const MultiSelectAndRadioButtons = ({
   defaultSelectValue = [],
   defaultRadioValue = 'all',
   onCategoriesChange,
-  groups
+  groups,
+  error
 }: MultiSelectAndRadioButtonsProps) => {
   const extendedData = useMemo(() => {
     const groupsArr = [
       {
         group: 'Groups',
         items: Object.keys(groups).map((region) => ({
-          label: capitalize(region),
+          label: region,
           value: region
         }))
       },
@@ -63,33 +65,38 @@ const MultiSelectAndRadioButtons = ({
 
   const data = useMemo(() => [...extendedData], [extendedData])
   const [selectedRadio, setSelectedRadio] = useState<TargetingInputApplyProp>(defaultRadioValue)
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([])
   const [selectedValue, setSelectedValue] = useState<string[]>(defaultSelectValue)
   const { classes } = useStyles({ selectedRadio })
 
   const handleRadioChange = useCallback((value: string) => {
     setSelectedRadio(value as TargetingInputApplyProp)
-    setSelectedCategories([])
     setSelectedValue([])
   }, [])
 
   const handleSelectChange = useCallback(
     (value: string[]) => {
-      const newSelectedValues = new Set<string>()
+      const nexVal: Array<string> = []
 
-      value.forEach((val) => {
-        if (groups[val]) {
-          groups[val].forEach((item) => {
-            newSelectedValues.add(item)
-          })
-        } else {
-          newSelectedValues.add(val)
-        }
-      })
+      if (selectedRadio !== 'all') {
+        const newSelectedValues = new Set<string>()
 
-      setSelectedValue(Array.from(newSelectedValues))
+        value.forEach((val) => {
+          if (groups[val]) {
+            groups[val].forEach((item) => {
+              newSelectedValues.add(item)
+            })
+          } else {
+            newSelectedValues.add(val)
+          }
+        })
+
+        nexVal.push(...Array.from(newSelectedValues))
+      }
+
+      setSelectedValue(nexVal)
+      onCategoriesChange(selectedRadio, nexVal)
     },
-    [groups]
+    [groups, onCategoriesChange, selectedRadio]
   )
 
   const labelText = useMemo(() => {
@@ -97,15 +104,6 @@ const MultiSelectAndRadioButtons = ({
     if (selectedRadio === 'nin') return `Select ${label} to exclude`
     return ''
   }, [selectedRadio, label])
-
-  useEffect(() => {
-    if (selectedRadio === 'all') setSelectedCategories([])
-    else setSelectedCategories(selectedValue)
-  }, [selectedRadio, selectedValue])
-
-  useEffect(() => {
-    onCategoriesChange(selectedRadio, selectedCategories)
-  }, [onCategoriesChange, selectedRadio, selectedCategories])
 
   return (
     <>
@@ -129,6 +127,7 @@ const MultiSelectAndRadioButtons = ({
         data={data}
         onChange={handleSelectChange}
         placeholder={`Select ${label}`}
+        error={error && error}
         classNames={{
           input: classes.input,
           pill: classes.pill

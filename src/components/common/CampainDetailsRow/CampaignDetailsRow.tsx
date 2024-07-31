@@ -16,14 +16,7 @@ const useStyles = createStyles(
         color: !lighterColor
           ? theme.colors.secondaryText[primaryShade]
           : lighten(theme.colors.secondaryText[primaryShade], theme.other.shades.lighten.lighter)
-      },
-      fullWidth: {
-        width: '100%'
-      },
-      marginBottom: {
-        marginBottom: theme.spacing.sm
-      },
-      text: { whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }
+      }
     }
   }
 )
@@ -35,31 +28,31 @@ const CampaignDetailsRow = ({
   textSize = 'md',
   noBorder = false,
   column = false,
-  lineHeight = 'lg',
-  nowrap = false
+  lineHeight = 'md',
+  ...rest
 }: CampaignDetailsRowProps) => {
   const { classes, cx } = useStyles({ lighterColor: !!lighterColor })
   return (
     <Flex
-      justify={column ? 'flex-start' : 'space-between'}
       direction={column ? 'column' : 'row'}
-      align="center"
+      justify={column ? 'center' : 'space-between'}
+      align={column ? 'stretch' : 'center'}
       className={cx({ [classes.border]: !noBorder })}
       pt={lineHeight}
       pb={lineHeight}
-      gap="sm"
+      gap="xs"
+      {...rest}
     >
-      <Text
-        className={cx(classes.textColor, {
-          [classes.fullWidth]: column,
-          [classes.marginBottom]: column
-        })}
-        fw="bold"
-        size={textSize}
-      >
+      <Text span fw="bold" size={textSize}>
         {title}
       </Text>
-      <div className={cx({ [classes.fullWidth]: column, [classes.text]: !!nowrap })}>{value}</div>
+      {typeof value === 'string' ? (
+        <Text ta="end" span={!column} w={column ? '100%' : 'auto'}>
+          {value}
+        </Text>
+      ) : (
+        value
+      )}
     </Flex>
   )
 }

@@ -1,7 +1,7 @@
 import { parseBigNumTokenAmountToDecimal } from './balances'
 
 export const MIN_CAMPAIGN_BUDGET_VALUE_ADMIN = 20
-export const MIN_CAMPAIGN_BUDGET_VALUE = 1500
+export const MIN_CAMPAIGN_BUDGET_VALUE = 300
 const MIN_CPM_VALUE = 0.1
 
 export const isValidHttpUrl = (inputURL: string) => {
@@ -37,7 +37,7 @@ export const validateCampaignBudget = (
   decimals: number,
   isAdmin: boolean
 ) => {
-  if (Number(value) === 0 || Number.isNaN(Number(value))) {
+  if (!value || Number(value) === 0 || Number.isNaN(Number(value))) {
     return { isValid: false, errMsg: 'Enter campaign budget or a valid number' }
   }
 

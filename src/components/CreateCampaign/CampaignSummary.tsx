@@ -1,8 +1,8 @@
 import {
   Button,
-  Flex,
   Group,
   MantineTheme,
+  Stack,
   Text,
   UnstyledButton,
   getPrimaryShade,
@@ -63,7 +63,8 @@ const CampaignSummary = () => {
     formattedCats,
     formattedLocs,
     adFormats,
-    campaignBudgetFormatted
+    campaignBudgetFormatted,
+    advancedTargeInput
   } = useCreateCampaignData()
   const { showNotification } = useCustomNotifications()
 
@@ -165,7 +166,7 @@ const CampaignSummary = () => {
 
   return (
     <>
-      <Flex direction="column" pl="md" pr="md">
+      <Stack align="stretch">
         <CampaignDetailsRow
           lighterColor
           title="Budget"
@@ -180,15 +181,47 @@ const CampaignSummary = () => {
           value={formattedSelectedDevice}
         />
         <CampaignDetailsRow lighterColor title="Ad Format" value={adFormats} textSize="sm" />
-        <CampaignDetailsRow lighterColor title="Categories" value={formattedCats} textSize="sm" />
+        <CampaignDetailsRow
+          lighterColor
+          title="Categories"
+          value={formattedCats}
+          textSize="sm"
+          column
+        />
         <CampaignDetailsRow
           lighterColor
           title="Countries"
           value={formattedLocs}
           textSize="sm"
+          column
+        />
+        {/* <CampaignDetailsRow
+          mt="md"
+          lighterColor
+          lineHeight="xs"
+          title="Include incentivized traffic"
+          value={advancedTargeInput.includeIncentivized ? 'Yes' : 'No'}
+          textSize="sm"
           noBorder
         />
-      </Flex>
+        <CampaignDetailsRow
+          lighterColor
+          lineHeight="xs"
+          title="Disable frequency capping"
+          value={advancedTargeInput.disableFrequencyCapping ? 'Yes' : 'No'}
+          textSize="sm"
+          noBorder
+        /> */}
+        <CampaignDetailsRow
+          lighterColor
+          lineHeight="xs"
+          title="Limit average daily spending"
+          value={advancedTargeInput.limitDailyAverageSpending ? 'Yes' : 'No'}
+          textSize="sm"
+          noBorder
+          mb="xs"
+        />
+      </Stack>
       {/* Temporary disabled */}
       {/* <Flex justify="space-between" className={classes.bg} p="lg">
         <Text c="secondaryText" fw="bold">
@@ -196,13 +229,12 @@ const CampaignSummary = () => {
         </Text>
         <Text c="secondaryText">0</Text>
       </Flex> */}
-      <Flex direction="column" justify="space-between" align="center">
+      <Stack align="center" justify="space-between" gap="sm" mt="xl">
         {!isTheLastStep ? (
           <Button
             w="90%"
             disabled={isNextBtnDisabled}
             size="lg"
-            mt="md"
             variant="filled"
             onClick={handleNextStepBtnClicked}
           >
@@ -212,7 +244,6 @@ const CampaignSummary = () => {
           <LaunchCampaignModal
             w="90%"
             size="lg"
-            mt="md"
             variant="filled"
             btnLabel="Launch Campaign"
             cancelBtnLabel="Go Back"
@@ -221,12 +252,11 @@ const CampaignSummary = () => {
             onConfirmClicked={throttledLaunchCampaign}
           />
         )}
-        <Button w="90%" size="lg" mt="md" variant="outline" onClick={handleSaveDraftClicked}>
+        <Button w="90%" size="lg" variant="outline" onClick={handleSaveDraftClicked}>
           Save Draft
         </Button>
         <UnstyledButton
           variant="underlined"
-          mt="sm"
           onClick={() => updateCampaign('step', step - 1)}
           disabled={isFirstStep}
           className={cx(classes.brandColor, { [classes.lightestBrandColor]: isFirstStep })}
@@ -240,9 +270,15 @@ const CampaignSummary = () => {
             </Text>
           </Group>
         </UnstyledButton>
-      </Flex>
+      </Stack>
       <SuccessModal
-        text="Campaign launched successfully!"
+        text={
+          <Text p="md">
+            Your campaign has been successfully launched and is now under review.{' '}
+            <strong>It may take up to 24 hours for your campaign to be activated</strong>. Thank you
+            for your patience!
+          </Text>
+        }
         opened={opened}
         close={handleOnModalClose}
       />

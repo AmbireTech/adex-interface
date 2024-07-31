@@ -1,10 +1,4 @@
-import {
-  BaseAnalyticsData,
-  BillingDetails,
-  Deposit,
-  CampaignFundsActive,
-  CampaignRefunds
-} from 'types'
+import { BillingDetails, Deposit, CampaignFundsActive, CampaignRefunds } from 'types'
 
 export interface IInvoices {
   [index: string]: any
@@ -27,15 +21,23 @@ export interface IInvoiceDetails {
   paymentDate: Date
   seller: InvoiceCompanyDetails & { email: string; website: string }
   buyer: InvoiceCompanyDetails
-  invoiceData: BaseAnalyticsData[]
   vatPercentageInUSD: number
   currencyName: string
+  amount: number
+  impressions: number
+  clicks: number
+  avgCpm?: number
+  ctr?: number
 }
 
+export type OperationEntryType = 'deposit' | 'campaignOpen' | 'campaignRefund'
+
 export type OperationEntry = (Deposit | CampaignFundsActive | CampaignRefunds) & {
-  date: Date
-  type: 'deposit' | 'campaign' | 'refund'
   id: string
+  type: OperationEntryType
+  name: string
+  date: Date
+  amount: bigint
 }
 
 export type StatementData = {

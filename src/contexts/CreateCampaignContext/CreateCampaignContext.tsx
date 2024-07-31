@@ -10,7 +10,6 @@ import {
 import { CREATE_CAMPAIGN_DEFAULT_VALUE, dateNowPlusThirtyDays } from 'constants/createCampaign'
 import superjson, { serialize } from 'superjson'
 import {
-  SupplyStats,
   CampaignUI,
   CreateCampaignType,
   SupplyStatsDetails,
@@ -31,123 +30,15 @@ import {
 import { parseFromBigNumPrecision } from 'helpers/balances'
 import { AdUnit, Campaign, Placement } from 'adex-common'
 import dayjs from 'dayjs'
-import useCustomNotifications from 'hooks/useCustomNotifications'
 import { formatDateTime } from 'helpers'
 import { isValidHttpUrl } from 'helpers/validators'
-
-const mockData = {
-  appBannerFormats: [
-    {
-      value: '320x50',
-      count: 5583960
-    },
-    {
-      value: '300x50',
-      count: 3862456
-    },
-    {
-      value: '250x50',
-      count: 2240770
-    },
-    {
-      value: '728x90',
-      count: 1735665
-    },
-    {
-      value: '300x250',
-      count: 1136181
-    }
-  ],
-  siteBannerFormatsDesktop: [
-    {
-      value: '300x250',
-      count: 727348
-    },
-    {
-      value: '728x90',
-      count: 689367
-    },
-    {
-      value: '300x50',
-      count: 657506
-    },
-    {
-      value: '160x90',
-      count: 630174
-    }
-  ],
-  siteBannerFormatsMobile: [
-    {
-      value: '300x250',
-      count: 1432677
-    },
-    {
-      value: '320x50',
-      count: 863368
-    },
-    {
-      value: '300x50',
-      count: 819345
-    }
-  ],
-  appBidFloors: [
-    {
-      value: '0_20-0_30',
-      count: 2355568
-    },
-    {
-      value: '0_50-1_00',
-      count: 425406
-    },
-    {
-      value: '1_00-2_00',
-      count: 339714
-    },
-    {
-      value: '0_30-0_50',
-      count: 333687
-    }
-  ],
-  siteDesktopBidFloors: [
-    {
-      value: '1_00-2_00',
-      count: 101983
-    },
-    {
-      value: '0_50-1_00',
-      count: 95211
-    },
-    {
-      value: '0_20-0_30',
-      count: 77664
-    }
-  ],
-  siteMobileBidFloors: [
-    {
-      value: '1_00-2_00',
-      count: 94638
-    },
-    {
-      value: '0_50-1_00',
-      count: 93996
-    }
-  ]
-}
-
-const supplyStatsDefaultValue = {
-  appBannerFormats: [],
-  siteBannerFormatsDesktop: [],
-  siteBannerFormatsMobile: [],
-  appBidFloors: [],
-  siteDesktopBidFloors: [],
-  siteMobileBidFloors: []
-}
+import { useCampaignsData } from 'hooks/useCampaignsData'
 
 const CreateCampaignContext = createContext<CreateCampaignType | null>(null)
 
 const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
   const { adexServicesRequest } = useAdExApi()
-  const { showNotification } = useCustomNotifications()
+  const { supplyStats, updateSupplyStats } = useCampaignsData()
   // TODO: the address will be fixed and will always has a default value
   const {
     adexAccount,
@@ -173,7 +64,6 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
   )
 
   const [campaign, setCampaign] = useState<CampaignUI>(defaultValue)
-  const [supplyStats, setSupplyStats] = useState<SupplyStats>(supplyStatsDefaultValue)
   const [selectedBannerSizes, setSelectedBannerSizes] = useState<
     SupplyStatsDetails[] | SupplyStatsDetails[][]
   >([])
@@ -206,39 +96,8 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
     }
   }, [defaultValue])
 
-  const getSupplyStats = useCallback(async () => {
-    let result
-
-    try {
-      result = await adexServicesRequest('backend', {
-        route: '/dsp/stats/common',
-        method: 'GET'
-      })
-
-      if (!result) {
-        throw new Error('Getting banner sizes failed.')
-      }
-
-      const hasEmptyValueResponse = Object.values(result).every(
-        (value) => Array.isArray(value) && value.length === 0
-      )
-
-      if (hasEmptyValueResponse) {
-        result = mockData
-      }
-
-      setSupplyStats(result as SupplyStats)
-    } catch (e) {
-      console.error(e)
-      showNotification('error', 'Getting banner sizes failed', 'Getting banner sizes failed')
-      // TODO: add fallback or just use mock data
-      result = mockData
-      setSupplyStats(result)
-    }
-  }, [adexServicesRequest, showNotification])
-
   useEffect(() => {
-    getSupplyStats()
+    updateSupplyStats()
   }, []) // eslint-disable-line
 
   useEffect(() => {

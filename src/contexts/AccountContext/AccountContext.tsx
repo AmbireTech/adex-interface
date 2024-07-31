@@ -52,6 +52,7 @@ type AdExService = 'backend' | 'validator'
 type ApiRequestOptions<T> = Omit<RequestOptions<T>, 'url'> & {
   route: string
   noAuth?: boolean
+  onErrMsg?: string
 }
 
 interface IAccountContext {
@@ -279,11 +280,12 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
       return fetchService(req)
         .then(processResponse)
         .catch((err) => {
+          console.log(err)
           // TODO: better check
           if (err && err.message && err.message.includes(UNAUTHORIZED_ERR_STR)) {
             resetAdexAccount()
           }
-          showNotification('error', err.message, 'Data error')
+          showNotification('error', err.message, reqOptions.onErrMsg || 'Data error')
         })
     },
     [adexAccount.accessToken, resetAdexAccount, showNotification, updateAccessToken]

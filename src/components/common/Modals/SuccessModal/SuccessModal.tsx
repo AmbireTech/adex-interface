@@ -1,11 +1,12 @@
-import { Text, Modal, Flex, Button, MantineTheme, getPrimaryShade, lighten } from '@mantine/core'
+import { Modal, Flex, Button, MantineTheme, getPrimaryShade, lighten } from '@mantine/core'
 import { createStyles } from '@mantine/emotion'
 import { useColorScheme } from '@mantine/hooks'
 import Lottie from 'lottie-react'
+import { ReactNode } from 'react'
 import AnimationData from 'resources/lotties/success-lottie.json'
 
 type SuccessModalProps = {
-  text: string
+  text: ReactNode
   opened: boolean
   close: () => void
 }
@@ -37,7 +38,7 @@ const SuccessModal = ({ text, opened, close }: SuccessModalProps) => {
       <>
         <Flex direction="row" justify="center" className={classes.wrapper}>
           <Lottie animationData={AnimationData} loop={false} autoplay />
-          <Text p="md">{text}</Text>
+          {text}
         </Flex>
         <Flex gap={25} justify="center" m="xl">
           <Button onClick={close} color="brand" variant="outline" size="lg">

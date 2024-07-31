@@ -1,9 +1,10 @@
-import { MantineTheme, Text, getPrimaryShade } from '@mantine/core'
+import { MantineTheme, Text, getPrimaryShade, Flex } from '@mantine/core'
 import { createStyles } from '@mantine/emotion'
 import ActionButton from 'components/common/CustomTable/ActionButton/ActionButton'
 import LeftChevronIcon from 'resources/icons/LeftChevron'
 import { useNavigate } from 'react-router-dom'
 import { SIDE_BAR_WIDTH } from 'themes/base'
+import { PropsWithChildren } from 'react'
 import { useColorScheme } from '@mantine/hooks'
 
 const useStyles = createStyles((theme: MantineTheme) => {
@@ -15,7 +16,7 @@ const useStyles = createStyles((theme: MantineTheme) => {
       position: 'fixed',
       top: 90,
       left: SIDE_BAR_WIDTH,
-      width: '100%',
+      width: `calc(100% - ${SIDE_BAR_WIDTH}px)`,
       zIndex: 10,
       background: theme.colors.lightBackground[primaryShade],
       marginLeft: theme.spacing.xl,
@@ -28,17 +29,25 @@ const useStyles = createStyles((theme: MantineTheme) => {
   }
 })
 
-const GoBack = ({ title, fixed }: { title: string; fixed?: boolean }) => {
+const GoBack = ({
+  title,
+  fixed,
+  path,
+  children
+}: { title: string; fixed?: boolean; path?: string } & PropsWithChildren) => {
   const { classes, cx } = useStyles()
   const navigate = useNavigate()
-  const handleClick = () => navigate(-1)
+  const handleClick = () => (path ? navigate(path, { replace: true }) : navigate(-1))
 
   return (
-    <div className={cx({ [classes.sticky]: !!fixed })}>
+    <Flex align="center" className={cx({ [classes.sticky]: !!fixed })}>
       <ActionButton action={handleClick} icon={<LeftChevronIcon />} title={title}>
-        <Text size="sm">{title}</Text>
+        <Text fw="bold" size="sm">
+          {title}
+        </Text>
       </ActionButton>
-    </div>
+      {children}
+    </Flex>
   )
 }
 

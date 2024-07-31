@@ -1,3 +1,5 @@
-import CustomTable from './CustomTable'
+import { CustomTable } from './CustomTable'
+
+export * from './CustomTable'
 
 export default CustomTable

@@ -18,7 +18,8 @@ import {
   AnalyticsType,
   BaseAnalyticsData,
   AnalyticsPeriod,
-  Timeframe
+  Timeframe,
+  SSPs
 } from 'types'
 import {
   timeout,
@@ -119,17 +120,15 @@ const analyticsDataToMappedAnalytics = (
   }, new Map<string, BaseAnalyticsData>())
 
   const resMap = Array.from(mapped, ([segment, value]) => {
-    const paid = value.paid
+    const { paid, clicks, impressions } = value
+
     return {
       ...value,
       segment,
-      paid,
       analyticsType,
-      ctr:
-        value.clicks && value.impressions
-          ? Number(((value.clicks / value.impressions) * 100).toFixed(2))
-          : 0,
-      avgCpm: paid && value.impressions ? Number(((paid / value.impressions) * 1000).toFixed(2)) : 0
+      ctr: clicks && impressions ? Number(((clicks / impressions) * 100).toFixed(2)) : 0,
+      avgCpm: paid && impressions ? Number(((paid / impressions) * 1000).toFixed(2)) : 0,
+      avgCpc: clicks ? Number((paid / clicks).toFixed(4)) : 0
     }
   })
     // TODO: remove the sort when table sorting
@@ -153,7 +152,8 @@ interface ICampaignsAnalyticsContext {
     forAdmin?: boolean,
     timeframe?: Timeframe,
     startFrom?: Date,
-    endTo?: Date
+    endTo?: Date,
+    ssp?: SSPs
   ) => Promise<{ key: string; period: AnalyticsPeriod } | undefined>
   initialAnalyticsLoading: boolean
   mappedAnalytics: Map<string, BaseAnalyticsData[]>
@@ -233,7 +233,8 @@ const CampaignsAnalyticsProvider: FC<PropsWithChildren> = ({ children }) => {
       forAdmin?: boolean,
       selectedTimeframe?: Timeframe,
       startFrom?: Date,
-      endTo?: Date
+      endTo?: Date,
+      ssp?: SSPs
     ): Promise<{ key: string; period: AnalyticsPeriod } | undefined> => {
       if (!analyticsType || (!forAdmin && !campaign?.id)) {
         return
@@ -280,6 +281,7 @@ const CampaignsAnalyticsProvider: FC<PropsWithChildren> = ({ children }) => {
         limit: 100000,
         timezone: 'UTC',
         timeframe,
+        ...{ ssp },
         segmentBy: analyticsType === 'timeframe' ? undefined : analyticsType
       }
 

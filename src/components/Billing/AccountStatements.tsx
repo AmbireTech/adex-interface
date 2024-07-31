@@ -3,9 +3,15 @@ import { Title } from '@mantine/core'
 import CustomTable from 'components/common/CustomTable'
 import { useDisclosure } from '@mantine/hooks'
 import useAccount from 'hooks/useAccount'
-import { Deposit, CampaignFundsActive, CampaignRefunds, OperationEntry, StatementData } from 'types'
+import { OperationEntry, StatementData } from 'types'
 import { ADEX_COMPANY_DETAILS } from 'constants/adexCompanyDetatils'
-import { getMonthRangeString, monthPeriodIndex, monthPeriodIndexToDate } from 'helpers'
+import {
+  getMonthRangeString,
+  monthPeriodIndex,
+  monthPeriodIndexToDate,
+  toOperationEntry
+} from 'helpers'
+import VisibilityIcon from 'resources/icons/Visibility'
 import { BillingDetailsModal } from './BillingDetailsModal'
 import { StatementsPDF } from './BillingPDF'
 
@@ -20,24 +26,6 @@ type ByPeriodAndToken = {
 const getTokenIndex = (token: OperationEntry['token']): string =>
   `${token.chainId}-${token.address}`
 
-const toOpEntry = (
-  x: Deposit | CampaignFundsActive | CampaignRefunds,
-  type: OperationEntry['type']
-): OperationEntry => {
-  // TODO: type
-  // @ts-ignore
-  const date: Date = new Date(x.created || x.startDate || x.closeDate)
-
-  return {
-    ...x,
-    amount: BigInt(x.amount),
-    date,
-    type,
-    // @ts-ignore
-    id: x.id || x.txHash
-  }
-}
-
 const Statements = () => {
   const [opened, { open, close }] = useDisclosure(false)
   const {
@@ -45,14 +33,16 @@ const Statements = () => {
   } = useAccount()
 
   const statements = useMemo(() => {
-    const deposits: OperationEntry[] = fundsDeposited.deposits.map((x) => toOpEntry(x, 'deposit'))
+    const deposits: OperationEntry[] = fundsDeposited.deposits.map((x) =>
+      toOperationEntry('deposit', x)
+    )
 
     const campaigns: OperationEntry[] = fundsOnCampaigns.perCampaign.map((x) =>
-      toOpEntry(x, 'campaign')
+      toOperationEntry('campaignOpen', x)
     )
 
     const refunds: OperationEntry[] = refundsFromCampaigns.perCampaign.map((x) =>
-      toOpEntry(x, 'refund')
+      toOperationEntry('campaignRefund', x)
     )
 
     const currentPeriodIndex = monthPeriodIndex(new Date())
@@ -87,7 +77,7 @@ const Statements = () => {
         const endBalance = current.operations.reduce((bal, el) => {
           let nextBal = bal
 
-          if (el.type === 'campaign') {
+          if (el.type === 'campaignOpen') {
             nextBal -= el.amount
           } else {
             nextBal += el.amount
@@ -108,9 +98,6 @@ const Statements = () => {
         return nextAggr
       }, [] as StatementData[])
 
-    console.log(byPeriodAndToken)
-    console.log(withBalances)
-
     return withBalances
   }, [fundsDeposited, fundsOnCampaigns, refundsFromCampaigns])
 
@@ -123,7 +110,7 @@ const Statements = () => {
   const elements = useMemo(() => {
     return statements
       .map((st, index) => ({
-        id: index,
+        id: index.toString(),
         date: getMonthRangeString(monthPeriodIndexToDate(st.periodIndex)),
         token: st.operations[0].token.name
       }))
@@ -137,6 +124,16 @@ const Statements = () => {
     },
     [open]
   )
+
+  const actions = useMemo(() => {
+    return [
+      {
+        action: onPreview,
+        label: 'View statement',
+        icon: <VisibilityIcon />
+      }
+    ]
+  }, [onPreview])
 
   if (!statements) {
     return <Title order={4}>No AccountStatements found.</Title>
@@ -153,7 +150,7 @@ const Statements = () => {
           />
         )}
       </BillingDetailsModal>
-      <CustomTable background headings={columnTitles} elements={elements} onPreview={onPreview} />
+      <CustomTable background headings={columnTitles} elements={elements} actions={actions} />
     </>
   )
 }

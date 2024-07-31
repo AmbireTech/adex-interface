@@ -30,9 +30,9 @@ export type ValidationRegExBanner = {
 }
 
 export type CreateCampaignOverview = {
-  count: number
   title: string
   value: any
+  isColumn?: boolean
 }
 
 export type ImageUrlInputProps = FlexProps & {
@@ -58,6 +58,7 @@ export type MultiSelectAndRadioButtonsProps = {
   defaultRadioValue?: TargetingInputApplyProp
   onCategoriesChange: (selectedRadio: TargetingInputApplyProp, categories: string[]) => void
   groups: { [key: string]: string[] }
+  error?: string
 }
 
 export type RangeTextProps = {
