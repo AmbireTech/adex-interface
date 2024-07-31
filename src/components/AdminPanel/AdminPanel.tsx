@@ -19,7 +19,7 @@ const AdminPanel = () => {
       <AdminBadge title="Admin Panel" />
       <Tabs
         value={tabValue}
-        onTabChange={(value) => navigate(`/dashboard/admin/${value}`)}
+        onChange={(value) => navigate(`/dashboard/admin/${value}`)}
         keepMounted={false}
       >
         <Tabs.List>

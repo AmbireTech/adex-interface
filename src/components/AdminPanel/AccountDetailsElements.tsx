@@ -20,16 +20,13 @@ export const FundsActivity = ({ accountData }: { accountData: Account }) => {
         const sign = x.type === 'campaignOpen' ? '-' : '+'
         const color: MantineColor = sign === '-' ? 'darkred' : 'darkgreen'
         return {
-          name: (
-            <Text color={color} transform="capitalize" weight="bold">{`${sign} ${x.name}`}</Text>
-          ),
+          name: <Text c={color} tt="capitalize" fw="bold">{`${sign} ${x.name}`}</Text>,
           date: x.date?.toLocaleDateString() || '',
           amount: (
-            <Text
-              color={color}
-              transform="capitalize"
-              weight="bold"
-            >{`${sign} ${parseBigNumTokenAmountToDecimal(x.amount, x.token.decimals)}`}</Text>
+            <Text c={color} tt="capitalize" fw="bold">{`${sign} ${parseBigNumTokenAmountToDecimal(
+              x.amount,
+              x.token.decimals
+            )}`}</Text>
           ),
 
           token: x.token.name,

@@ -1,29 +1,46 @@
-import { ButtonProps, Flex, MantineColor, Text, createStyles } from '@mantine/core'
+import {
+  ButtonProps,
+  Flex,
+  MantineColor,
+  MantineTheme,
+  Text,
+  getPrimaryShade,
+  lighten
+} from '@mantine/core'
+import { createStyles } from '@mantine/emotion'
+import { useColorScheme } from '@mantine/hooks'
 import { PropsWithChildren } from 'react'
 import AttentionIcon from 'resources/icons/Attention'
 
-const useStyles = createStyles((theme, { color }: { color: MantineColor }) => ({
-  confirmModalContent: {
-    background:
-      theme.colors[color][theme.fn.primaryShade()] + theme.other.shades.hexColorSuffix.lightest,
-    padding: theme.spacing.xl
-  },
-  iconWrapper: {
-    width: 50,
-    height: 50,
-    background: `${theme.colors[color][theme.fn.primaryShade()]}1A`,
-    borderRadius: '50%',
-    padding: theme.spacing.sm
-  },
-  attentionIcon: {
-    width: 25,
-    height: 25,
-    color: theme.colors.attention[theme.fn.primaryShade()]
-  },
-  root: {
-    padding: 0
+const useStyles = createStyles((theme: MantineTheme, { color }: { color: MantineColor }) => {
+  const colorScheme = useColorScheme()
+  const primaryShade = getPrimaryShade(theme, colorScheme)
+
+  return {
+    confirmModalContent: {
+      background: lighten(
+        theme.colors[color][primaryShade],
+        theme.other.shades.hexColorSuffix.lightest
+      ),
+      padding: theme.spacing.xl
+    },
+    iconWrapper: {
+      width: 50,
+      height: 50,
+      background: `${theme.colors[color][primaryShade]}1A`,
+      borderRadius: '50%',
+      padding: theme.spacing.sm
+    },
+    attentionIcon: {
+      width: 25,
+      height: 25,
+      color: theme.colors.attention[primaryShade]
+    },
+    root: {
+      padding: 0
+    }
   }
-}))
+})
 
 type ConfirmModalProps = ButtonProps &
   PropsWithChildren & {

@@ -283,10 +283,10 @@ const EditCampaign = ({ campaign }: { campaign: Campaign }) => {
   return (
     <Paper p="md">
       <form onSubmit={form.onSubmit(throttledSbm)}>
-        <Stack spacing="xl">
-          <Stack spacing="xs">
-            <Group spacing="xs">
-              <Text color="secondaryText" size="sm" weight="bold">
+        <Stack gap="xl">
+          <Stack gap="xs">
+            <Group gap="xs">
+              <Text color="secondaryText" size="sm" fw="bold">
                 CPM
               </Text>
               <Tooltip
@@ -310,7 +310,7 @@ const EditCampaign = ({ campaign }: { campaign: Campaign }) => {
                 }
                 rightSectionWidth="auto"
                 name="cpmPricingBoundsMin"
-                precision={2}
+                decimalScale={2}
                 {...form.getInputProps('pricingBounds.IMPRESSION.min')}
               />
               <NumberInput
@@ -325,14 +325,14 @@ const EditCampaign = ({ campaign }: { campaign: Campaign }) => {
                 }
                 rightSectionWidth="md"
                 name="cpmPricingBoundsMax"
-                precision={2}
+                decimalScale={2}
                 {...form.getInputProps('pricingBounds.IMPRESSION.max')}
               />
             </Group>
           </Stack>
 
-          <Stack spacing="xs">
-            <Text color="secondaryText" size="sm" weight="bold">
+          <Stack gap="xs">
+            <Text c="secondaryText" size="sm" fw="bold">
               Advanced
             </Text>
             <Group>
@@ -345,8 +345,8 @@ const EditCampaign = ({ campaign }: { campaign: Campaign }) => {
             </Group>
           </Stack>
 
-          <Stack spacing="xs">
-            <Text color="secondaryText" size="sm" weight="bold">
+          <Stack gap="xs">
+            <Text c="secondaryText" size="sm" fw="bold">
               Categories
             </Text>
             <MultiSelectAndRadioButtons
@@ -365,8 +365,8 @@ const EditCampaign = ({ campaign }: { campaign: Campaign }) => {
             />
           </Stack>
 
-          <Stack spacing="xs">
-            <Text color="secondaryText" size="sm" weight="bold">
+          <Stack gap="xs">
+            <Text c="secondaryText" size="sm" fw="bold">
               Countries
             </Text>
             <MultiSelectAndRadioButtons

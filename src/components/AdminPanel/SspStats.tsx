@@ -58,11 +58,13 @@ function SspStats() {
           {loading && <Loader size="sm" variant="dots" />}
 
           <SimpleGrid
-            cols={2}
-            breakpoints={[
-              { maxWidth: 'xl', cols: 2, spacing: 'xl' },
-              { maxWidth: 'md', cols: 1, spacing: 'xl' }
-            ]}
+            cols={{ md: 1, xl: 2 }}
+            spacing="xl"
+            // cols={2}
+            // breakpoints={[
+            //   { maxWidth: 'xl', cols: 2, spacing: 'xl' },
+            //   { maxWidth: 'md', cols: 1, spacing: 'xl' }
+            // ]}
           >
             <Paper p="sm" withBorder>
               <CustomTable pageSize={10} {...data.appBannerFormats} />
@@ -77,11 +79,13 @@ function SspStats() {
           {loading && <Loader size="sm" variant="dots" />}
 
           <SimpleGrid
-            cols={2}
-            breakpoints={[
-              { maxWidth: 'xl', cols: 2, spacing: 'xl' },
-              { maxWidth: 'md', cols: 1, spacing: 'xl' }
-            ]}
+            cols={{ md: 1, xl: 2 }}
+            spacing="xl"
+            // cols={2}
+            // breakpoints={[
+            //   { maxWidth: 'xl', cols: 2, spacing: 'xl' },
+            //   { maxWidth: 'md', cols: 1, spacing: 'xl' }
+            // ]}
           >
             <Paper p="sm" withBorder>
               <CustomTable pageSize={10} {...data.siteBannerFormatsMobile} />
@@ -96,11 +100,13 @@ function SspStats() {
           {loading && <Loader size="sm" variant="dots" />}
 
           <SimpleGrid
-            cols={2}
-            breakpoints={[
-              { maxWidth: 'xl', cols: 2, spacing: 'xl' },
-              { maxWidth: 'md', cols: 1, spacing: 'xl' }
-            ]}
+            cols={{ md: 1, xl: 2 }}
+            spacing="xl"
+            // cols={2}
+            // breakpoints={[
+            //   { maxWidth: 'xl', cols: 2, spacing: 'xl' },
+            //   { maxWidth: 'md', cols: 1, spacing: 'xl' }
+            // ]}
           >
             <Paper p="sm" withBorder>
               <CustomTable pageSize={10} {...data.siteBannerFormatsDesktop} />
