@@ -2,7 +2,6 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { MultiSelect, Radio, Stack, Text } from '@mantine/core'
 import { TargetingInputApplyProp } from 'adex-common/dist/types'
 import { MultiSelectAndRadioButtonsProps } from 'types'
-import { capitalize } from 'helpers/createCampaignHelpers'
 
 const MultiSelectAndRadioButtons = ({
   multiSelectData,
@@ -15,7 +14,7 @@ const MultiSelectAndRadioButtons = ({
 }: MultiSelectAndRadioButtonsProps) => {
   const extendedData = useMemo(() => {
     const regions = Object.keys(groups).map((region) => ({
-      label: capitalize(region),
+      label: region,
       value: region,
       group: 'Groups'
     }))
@@ -91,7 +90,11 @@ const MultiSelectAndRadioButtons = ({
         placeholder={`Select ${label}`}
         error={error && <Text size="sm">{error}</Text>}
         styles={(theme) => ({
+          item: {
+            textTransform: 'capitalize'
+          },
           input: {
+            textTransform: 'capitalize',
             borderColor:
               selectedRadio === 'nin'
                 ? theme.colors.warning[theme.fn.primaryShade()]
