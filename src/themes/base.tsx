@@ -125,7 +125,6 @@ const themeOverride: MantineThemeOverride = createTheme({
       // ...
     }
   },
-  // transitionTimingFunction: 'ease-out',
   components: {
     Alert: Alert.extend({
       styles: (theme, { color, variant }: AlertProps) => {
@@ -166,28 +165,20 @@ const themeOverride: MantineThemeOverride = createTheme({
       defaultProps: {
         radius: 'xl'
       },
-      // TODO: Fix the type of the variant
-      styles: (theme: MantineTheme, params: ButtonProps, { variant }: any) => {
+      styles: (theme: MantineTheme, params: ButtonProps) => {
         const outlineHoverBgColor = alpha(
           theme.colors[params.color || theme.primaryColor][theme.primaryShade as MantineColorShade],
           theme.other.shades.rgba.lightest
         )
 
-        // const outlineHoverBgGradient = theme.fn.radialGradient(
-        //   outlineHoverBgColor,
-        //   outlineHoverBgColor
-        // )
-
         const filledHoverBgColor = theme.colors[params.color || theme.primaryColor][3 + 1]
 
-        // const filledHoverBgGradient = getGradient(filledHoverBgColor, filledHoverBgColor)
-
-        const customHover = variant === 'outline' || variant === 'filled'
+        const customHover = params.variant === 'outline' || params.variant === 'filled'
 
         return {
           root: {
             background:
-              variant === 'outline'
+              params.variant === 'outline'
                 ? alpha(
                     theme.colors[params.color || theme.primaryColor][3],
                     theme.other.shades.rgba.lightest
@@ -195,31 +186,24 @@ const themeOverride: MantineThemeOverride = createTheme({
                 : '',
             backgroundImage:
               // eslint-disable-next-line no-nested-ternary
-              variant === 'outline'
-                ? `radial-gradient(circle, ${outlineHoverBgColor}, ${outlineHoverBgColor})`
-                : variant === 'filled'
-                ? `radial-gradient(circle, ${filledHoverBgColor}, ${filledHoverBgColor})`
+              params.variant === 'outline'
+                ? `radial-gradient(${outlineHoverBgColor}, ${outlineHoverBgColor})`
+                : params.variant === 'filled'
+                ? `radial-gradient(${filledHoverBgColor}, ${filledHoverBgColor})`
                 : '',
             backgroundSize: customHover ? '0% 100%' : '',
             backgroundPosition: customHover ? '50% 50%' : '',
             backgroundRepeat: 'no-repeat',
-            transition: customHover
-              ? `background-size ${theme.other.transitionTimingFunction}`
-              : '',
-            borderWidth: variant === 'filled' ? 0 : 2,
+            transition: customHover ? 'background-size 0.3s ease-out' : '',
+            borderWidth: params.variant === 'filled' ? 0 : 1,
             // TODO: active etc.
             '&:hover': {
-              // color:
-              //   variant === 'outline'
-              //     ? theme.fn.variant({
-              //         color: params.color,
-              //         variant: 'filled',
-              //         gradient: params.gradient
-              //       }).color
-              //     : '',
+              color: params.color,
               backgroundSize: '100% 100%',
               backgroundColor:
-                variant === 'filled' ? theme.colors[params.color || theme.primaryColor][3] : ''
+                params.variant === 'filled'
+                  ? theme.colors[params.color || theme.primaryColor][3]
+                  : ''
             }
           }
         }
