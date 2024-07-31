@@ -29,8 +29,8 @@ const StepFour = () => {
       { title: 'Device Type', value: formattedSelectedDevice },
       { title: 'Ad Format', value: adFormats },
       { title: 'Creatives', value: adUnitsFormatted, isColumn: true },
-      { title: 'Selected Categories', value: formattedCats, isColumn: true },
-      { title: 'Selected Countries', value: formattedLocs, isColumn: true },
+      { title: 'Selected Categories', value: formattedCats },
+      { title: 'Selected Countries', value: formattedLocs },
       // {
       //   title: 'Include incentivized traffic',
       //   value: advancedTargeInput.includeIncentivized ? 'Yes' : 'No'
