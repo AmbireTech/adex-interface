@@ -9,7 +9,7 @@ type CatsLocsFormattedProps = {
 const CatsLocsFormatted = ({ title, arr }: CatsLocsFormattedProps) => {
   if (!arr) return null
   const [itemKey, items] = useMemo(() => arr, [arr])
-  const values = useMemo(() => items && items?.split(','), [items])
+  const values = useMemo(() => (items && items?.split(',')) || ['*'], [items])
 
   const formatPrefix = useCallback((key: string | undefined) => {
     let prefix = ''
@@ -33,10 +33,10 @@ const CatsLocsFormatted = ({ title, arr }: CatsLocsFormattedProps) => {
     )
   }, [])
 
-  return values ? (
+  return (
     <Accordion w="100%">
       <Accordion.Item value={values[0]} key={values[0]} style={{ border: 0 }}>
-        <Accordion.Control px="xs">
+        <Accordion.Control px="xs" chevron={values.length < 2 ? <div /> : undefined}>
           {title && (
             <Text size="sm" color="dimmed">
               {title}
@@ -44,17 +44,16 @@ const CatsLocsFormatted = ({ title, arr }: CatsLocsFormattedProps) => {
           )}
           <Text size="md" truncate>
             {formatPrefix(itemKey!)}
-            {`${values.join(', ')}...`}
+            {`${values.join(', ')}`}
           </Text>
         </Accordion.Control>
-        {values.length > 3 && (
-          <Accordion.Panel px={0}>
-            <Text>{values.join(', ')}</Text>
-          </Accordion.Panel>
-        )}
+
+        <Accordion.Panel px={0}>
+          <Text>{values.join(', ')}</Text>
+        </Accordion.Panel>
       </Accordion.Item>
     </Accordion>
-  ) : null
+  )
 }
 
 export default CatsLocsFormatted
