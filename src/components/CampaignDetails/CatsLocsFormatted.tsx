@@ -34,9 +34,9 @@ const CatsLocsFormatted = ({ title, arr }: CatsLocsFormattedProps) => {
   }, [])
 
   return values ? (
-    <Accordion>
-      <Accordion.Item value={values[0]} key={values[0]}>
-        <Accordion.Control>
+    <Accordion w="100%">
+      <Accordion.Item value={values[0]} key={values[0]} style={{ border: 0 }}>
+        <Accordion.Control px="xs">
           {title && (
             <Text size="sm" color="dimmed">
               {title}
@@ -48,7 +48,7 @@ const CatsLocsFormatted = ({ title, arr }: CatsLocsFormattedProps) => {
           </Text>
         </Accordion.Control>
         {values.length > 3 && (
-          <Accordion.Panel>
+          <Accordion.Panel px={0}>
             <Text>{values.join(', ')}</Text>
           </Accordion.Panel>
         )}
