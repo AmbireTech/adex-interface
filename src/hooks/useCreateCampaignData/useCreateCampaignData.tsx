@@ -1,10 +1,6 @@
 import { useMemo } from 'react'
 import { Flex, Text, Stack } from '@mantine/core'
-import {
-  checkSelectedDevices,
-  findDuplicates,
-  formatCatsAndLocsData
-} from 'helpers/createCampaignHelpers'
+import { checkSelectedDevices, findDuplicates } from 'helpers/createCampaignHelpers'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import DesktopIcon from 'resources/icons/Desktop'
 import MobileIcon from 'resources/icons/Mobile'
@@ -101,11 +97,11 @@ const useCreateCampaignData = () => {
   )
 
   const formattedCats = useMemo(
-    () => <CatsLocsFormatted arr={formatCatsAndLocsData(categories, CATEGORIES)} />,
+    () => <CatsLocsFormatted inputValues={categories} selectData={CATEGORIES} align="end" />,
     [categories]
   )
   const formattedLocs = useMemo(
-    () => <CatsLocsFormatted arr={formatCatsAndLocsData(location, COUNTRIES)} />,
+    () => <CatsLocsFormatted inputValues={location} selectData={COUNTRIES} align="end" />,
     [location]
   )
 

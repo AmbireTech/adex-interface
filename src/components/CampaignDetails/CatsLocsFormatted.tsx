@@ -1,58 +1,54 @@
 import { Accordion, Text } from '@mantine/core'
-import { useCallback, useMemo } from 'react'
+import { useMemo } from 'react'
+import { TargetingInputSingle } from 'adex-common/dist/types'
+import { SelectData } from 'types'
 
 type CatsLocsFormattedProps = {
   title?: string
-  arr: (string | null)[]
+  inputValues: TargetingInputSingle
+  selectData: SelectData[]
+  align?: 'start' | 'end'
 }
 
-const CatsLocsFormatted = ({ title, arr }: CatsLocsFormattedProps) => {
-  if (!arr) return null
-  const [itemKey, items] = useMemo(() => arr, [arr])
-  const values = useMemo(() => (items && items?.split(',')) || ['*'], [items])
-
-  const formatPrefix = useCallback((key: string | undefined) => {
-    let prefix = ''
-    let color = 'info'
-    switch (key) {
-      case 'all':
-        prefix = 'All '
-        break
-      case 'nin':
-        prefix = 'All except: '
-        color = 'warning'
-        break
-      default:
-        break
-    }
-
-    return (
-      <Text color={color} span>
-        {prefix}
-      </Text>
+const CatsLocsFormatted = ({ title, inputValues, selectData, align }: CatsLocsFormattedProps) => {
+  const values: string[] = useMemo(() => {
+    return (inputValues.apply !== 'all' ? inputValues[inputValues.apply] : []).map(
+      (x) => selectData.find((d) => d.value === x)?.label || ''
     )
-  }, [])
+  }, [inputValues, selectData])
+
+  const texOnly = useMemo(() => inputValues.apply === 'all', [inputValues])
 
   return (
-    <Accordion w="100%">
-      <Accordion.Item value={values[0]} key={values[0]} style={{ border: 0 }}>
-        <Accordion.Control px="xs" chevron={values.length < 2 ? <div /> : undefined}>
-          {title && (
-            <Text size="sm" color="dimmed">
-              {title}
-            </Text>
-          )}
-          <Text size="md" truncate>
-            {formatPrefix(itemKey!)}
-            {`${values.join(', ')}`}
-          </Text>
-        </Accordion.Control>
+    <>
+      {title && (
+        <Text size="sm" color="dimmed" align={align}>
+          {title}
+        </Text>
+      )}
+      {inputValues.apply === 'all' ? (
+        <Text size="md" truncate align={align}>
+          All
+        </Text>
+      ) : (
+        <Accordion w="100%">
+          <Accordion.Item value={values[0]} key={values[0]} style={{ border: 0 }}>
+            <Accordion.Control px="xs" chevron={texOnly ? <div /> : undefined} disabled={texOnly}>
+              {inputValues.apply === 'nin' && <Text color="warning">All except: </Text>}
+              <Text size="md" truncate align={align}>
+                {`${values.join(', ')}`}
+              </Text>
+            </Accordion.Control>
 
-        <Accordion.Panel px={0}>
-          <Text>{values.join(', ')}</Text>
-        </Accordion.Panel>
-      </Accordion.Item>
-    </Accordion>
+            <Accordion.Panel px={0}>
+              <Text size="sm" align={align}>
+                {values.join(', ')}
+              </Text>
+            </Accordion.Panel>
+          </Accordion.Item>
+        </Accordion>
+      )}
+    </>
   )
 }
 
