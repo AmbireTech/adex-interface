@@ -32,6 +32,7 @@ export type ValidationRegExBanner = {
 export type CreateCampaignOverview = {
   title: string
   value: any
+  isColumn?: boolean
 }
 
 export type ImageUrlInputProps = MantineStyleSystemProps & {
