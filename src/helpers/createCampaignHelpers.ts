@@ -359,8 +359,6 @@ export const hasUtmCampaign = (url: string) => {
   }
 }
 
-export const capitalize = (s: string) => s && s[0].toUpperCase() + s.slice(1)
-
 export const parseRange = (str: string): { min: number; max: number } => {
   const pattern = /^(\d+)_(\d+)-(\d+)_(\d+)$/
   const match = str.match(pattern)

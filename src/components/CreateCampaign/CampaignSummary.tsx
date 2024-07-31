@@ -1,4 +1,4 @@
-import { Button, Flex, Group, Text, UnstyledButton, createStyles } from '@mantine/core'
+import { Button, Stack, Group, Text, UnstyledButton, createStyles } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
 import { CREATE_CAMPAIGN_STEPS } from 'constants/createCampaign'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
@@ -152,7 +152,7 @@ const CampaignSummary = () => {
 
   return (
     <>
-      <Flex direction="column" pl="md" pr="md">
+      <Stack align="stretch">
         <CampaignDetailsRow
           lighterColor
           title="Budget"
@@ -167,8 +167,20 @@ const CampaignSummary = () => {
           value={formattedSelectedDevice}
         />
         <CampaignDetailsRow lighterColor title="Ad Format" value={adFormats} textSize="sm" />
-        <CampaignDetailsRow lighterColor title="Categories" value={formattedCats} textSize="sm" />
-        <CampaignDetailsRow lighterColor title="Countries" value={formattedLocs} textSize="sm" />
+        <CampaignDetailsRow
+          lighterColor
+          title="Categories"
+          value={formattedCats}
+          textSize="sm"
+          column
+        />
+        <CampaignDetailsRow
+          lighterColor
+          title="Countries"
+          value={formattedLocs}
+          textSize="sm"
+          column
+        />
         {/* <CampaignDetailsRow
           mt="md"
           lighterColor
@@ -195,7 +207,7 @@ const CampaignSummary = () => {
           noBorder
           mb="xs"
         />
-      </Flex>
+      </Stack>
       {/* Temporary disabled */}
       {/* <Flex justify="space-between" className={classes.bg} p="lg">
         <Text color="secondaryText" weight="bold">
@@ -203,13 +215,12 @@ const CampaignSummary = () => {
         </Text>
         <Text color="secondaryText">0</Text>
       </Flex> */}
-      <Flex direction="column" justify="space-between" align="center">
+      <Stack align="center" justify="space-between" spacing="sm" mt="xl">
         {!isTheLastStep ? (
           <Button
             w="90%"
             disabled={isNextBtnDisabled}
             size="lg"
-            mt="md"
             variant="filled"
             onClick={handleNextStepBtnClicked}
           >
@@ -219,7 +230,6 @@ const CampaignSummary = () => {
           <LaunchCampaignModal
             w="90%"
             size="lg"
-            mt="md"
             variant="filled"
             btnLabel="Launch Campaign"
             cancelBtnLabel="Go Back"
@@ -228,12 +238,11 @@ const CampaignSummary = () => {
             onConfirmClicked={throttledLaunchCampaign}
           />
         )}
-        <Button w="90%" size="lg" mt="md" variant="outline" onClick={handleSaveDraftClicked}>
+        <Button w="90%" size="lg" variant="outline" onClick={handleSaveDraftClicked}>
           Save Draft
         </Button>
         <UnstyledButton
           variant="underlined"
-          mt="sm"
           onClick={() => updateCampaign('step', step - 1)}
           disabled={isFirstStep}
           className={cx(classes.brandColor, { [classes.lightestBrandColor]: isFirstStep })}
@@ -247,7 +256,7 @@ const CampaignSummary = () => {
             </Text>
           </Group>
         </UnstyledButton>
-      </Flex>
+      </Stack>
       <SuccessModal
         text={
           <Text p="md">

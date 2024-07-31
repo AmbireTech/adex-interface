@@ -349,7 +349,7 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
         ) : (
           <Container fluid className={classes.wrapper}>
             {isAdminPanel && <AdminBadge title="Admin Details" />}
-            <Grid grow gutter="md">
+            <Grid gutter="md">
               <Grid.Col md={12} xl={6}>
                 <Stack>
                   <Text weight="bold" size="sm" color="dimmed">
