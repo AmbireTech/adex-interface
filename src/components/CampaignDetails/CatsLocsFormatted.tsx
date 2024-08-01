@@ -22,26 +22,26 @@ const CatsLocsFormatted = ({ title, inputValues, selectData, align }: CatsLocsFo
   return (
     <>
       {title && (
-        <Text size="sm" color="dimmed" align={align}>
+        <Text size="sm" c="dimmed" ta={align}>
           {title}
         </Text>
       )}
       {inputValues.apply === 'all' ? (
-        <Text size="md" truncate align={align}>
+        <Text size="md" truncate ta={align}>
           All
         </Text>
       ) : (
         <Accordion w="100%">
           <Accordion.Item value={values[0]} key={values[0]} style={{ border: 0 }}>
             <Accordion.Control px="xs" chevron={texOnly ? <div /> : undefined} disabled={texOnly}>
-              {inputValues.apply === 'nin' && <Text color="warning">All except: </Text>}
-              <Text size="md" truncate align={align}>
+              {inputValues.apply === 'nin' && <Text c="warning">All except: </Text>}
+              <Text size="md" truncate ta={align}>
                 {`${values.join(', ')}`}
               </Text>
             </Accordion.Control>
 
             <Accordion.Panel px={0}>
-              <Text size="sm" align={align}>
+              <Text size="sm" ta={align}>
                 {values.join(', ')}
               </Text>
             </Accordion.Panel>

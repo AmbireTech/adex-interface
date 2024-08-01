@@ -206,7 +206,9 @@ export const CustomTable = ({
           </Stack>
         ) : (
           <Table.Td key={column} className={classes.cell}>
-            {columnParsed}
+            <Text span c={color} truncate>
+              {columnParsed}
+            </Text>
           </Table.Td>
         )
       })
