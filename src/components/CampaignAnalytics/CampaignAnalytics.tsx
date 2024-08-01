@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState, useMemo } from 'react'
-import { Box, Container, Flex, Loader, Tabs } from '@mantine/core'
+import { Container, Flex, Loader, Tabs } from '@mantine/core'
 import { createStyles } from '@mantine/emotion'
 import { useParams } from 'react-router-dom'
 import { AnalyticsType, BaseAnalyticsData, AnalyticsPeriod } from 'types'
@@ -129,9 +129,8 @@ const CampaignAnalytics = () => {
 
   return (
     <Container fluid>
-      <Box p="md">
-        <GoBack title="Dashboard" fixed />
-      </Box>
+      <GoBack title="Dashboard" />
+
       <Tabs
         color="brand"
         value={activeTab}

@@ -16,7 +16,6 @@ import ArchivedIcon from 'resources/icons/Archived'
 import FormattedAmount from 'components/common/FormattedAmount/FormattedAmount'
 import PausedIcon from 'resources/icons/Paused'
 import EditIcon from 'resources/icons/Edit'
-import ActionButton from 'components/common/CustomTable/ActionButton/ActionButton'
 import AnalyticsIcon from 'resources/icons/Analytics'
 import useCustomNotifications from 'hooks/useCustomNotifications'
 import { AdminBadge } from 'components/common/AdminBadge'
@@ -233,14 +232,14 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
           </Group>
         </Paper>
         <Group gap="sm" justify="center">
-          <Text fw="bold" size="sm">
-            Campaign Analytics{' '}
-          </Text>
-          <ActionButton
-            title="View Analytics"
-            icon={<AnalyticsIcon size="32px" />}
-            action={() => navigate(`/dashboard/campaign-analytics/${campaign.id}`)}
-          />
+          <Button
+            variant="transparent"
+            color="mainText"
+            rightSection={<AnalyticsIcon size="26px" />}
+            onClick={() => navigate(`/dashboard/campaign-analytics/${campaign.id}`)}
+          >
+            Campaign Analytics
+          </Button>
         </Group>
       </Group>
 
