@@ -231,16 +231,15 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
             </Button>
           </Group>
         </Paper>
-        <Group gap="sm" justify="center">
-          <Button
-            variant="transparent"
-            color="mainText"
-            rightSection={<AnalyticsIcon size="26px" />}
-            onClick={() => navigate(`/dashboard/campaign-analytics/${campaign.id}`)}
-          >
-            Campaign Analytics
-          </Button>
-        </Group>
+        <Button
+          variant="transparent"
+          color="mainText"
+          rightSection={<AnalyticsIcon size="26px" />}
+          onClick={() => navigate(`/dashboard/campaign-analytics/${campaign.id}`)}
+          disabled={campaign?.status === CampaignStatus.draft}
+        >
+          Campaign Analytics
+        </Button>
       </Group>
 
       {isEditMode ? (
