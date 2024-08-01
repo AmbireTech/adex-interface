@@ -55,7 +55,7 @@ function SspStats() {
         </Tabs.List>
 
         <Tabs.Panel value="app" pl="xs">
-          {loading && <Loader size="sm" variant="dots" />}
+          {loading && <Loader size="sm" type="dots" />}
 
           <SimpleGrid
             cols={{ md: 1, xl: 2 }}
@@ -76,7 +76,7 @@ function SspStats() {
         </Tabs.Panel>
 
         <Tabs.Panel value="mobile" pl="xs">
-          {loading && <Loader size="sm" variant="dots" />}
+          {loading && <Loader size="sm" type="dots" />}
 
           <SimpleGrid
             cols={{ md: 1, xl: 2 }}
@@ -97,7 +97,7 @@ function SspStats() {
         </Tabs.Panel>
 
         <Tabs.Panel value="desktop" pl="xs">
-          {loading && <Loader size="sm" variant="dots" />}
+          {loading && <Loader size="sm" type="dots" />}
 
           <SimpleGrid
             cols={{ md: 1, xl: 2 }}
