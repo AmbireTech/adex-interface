@@ -1,20 +1,27 @@
-import { AppShell, Navbar, Header, MediaQuery, Burger, createStyles } from '@mantine/core'
+import { AppShell, Burger, MantineTheme, getPrimaryShade } from '@mantine/core'
+import { createStyles } from '@mantine/emotion'
+import { useColorScheme } from '@mantine/hooks'
 import SideNav from 'components/SideNav'
 import TopBar from 'components/TopBar'
 import { useState } from 'react'
 import { Outlet } from 'react-router-dom'
+import { SIDE_BAR_WIDTH } from 'themes/base'
 
-const useStyles = createStyles((theme) => ({
-  main: {
-    backgroundColor:
-      theme.colorScheme === 'dark'
-        ? theme.colors.darkBackground[theme.fn.primaryShade()]
-        : theme.colors.lightBackground[theme.fn.primaryShade()]
-  },
-  header: {
-    backgroundColor: 'inherit'
+const useStyles = createStyles((theme: MantineTheme) => {
+  const colorScheme = useColorScheme()
+  const primaryShade = getPrimaryShade(theme, colorScheme)
+  return {
+    main: {
+      backgroundColor: theme.colors.lightBackground[primaryShade]
+      // colorScheme === 'dark'
+      //   ? theme.colors.darkBackground[primaryShade]
+      //   : theme.colors.lightBackground[primaryShade]
+    },
+    header: {
+      backgroundColor: 'inherit'
+    }
   }
-}))
+})
 
 function UserPanel() {
   const { classes } = useStyles()
@@ -26,51 +33,53 @@ function UserPanel() {
     <AppShell
       padding="md"
       layout="alt"
-      navbarOffsetBreakpoint="sm"
-      asideOffsetBreakpoint="sm"
-      fixed
+      // navbarOffsetBreakpoint="sm"
+      // asideOffsetBreakpoint="sm"
+      // fixed
       className={classes.main}
-      navbar={
-        <Navbar hiddenBreakpoint="sm" height="100%" p="xs" hidden={!opened}>
-          <MediaQuery largerThan="sm" styles={{ display: 'none' }}>
-            <Burger
-              opened={opened}
-              onClick={() => setOpened((o) => !o)}
-              size="md"
-              color="grey"
-              mr="xl"
-            />
-          </MediaQuery>
-          <SideNav />
-        </Navbar>
-      }
-      header={
-        <Header
-          height={90}
-          pr="xl"
-          pl="xl"
-          className={classes.header}
-          style={{
-            display: 'flex',
-            flexDirection: 'row',
-            alignItems: 'center'
-          }}
-        >
-          <MediaQuery largerThan="sm" styles={{ display: 'none' }}>
-            <Burger
-              opened={opened}
-              onClick={() => setOpened((o) => !o)}
-              size="md"
-              color="grey"
-              mr="xl"
-            />
-          </MediaQuery>
-          <TopBar />
-        </Header>
-      }
+      header={{ height: 90 }}
+      navbar={{ width: SIDE_BAR_WIDTH, breakpoint: 'sm', collapsed: { mobile: true } }}
     >
-      <Outlet />
-      {/* Your application here */}
+      <AppShell.Header
+        h={90}
+        pr="xl"
+        pl="xl"
+        className={classes.header}
+        style={{
+          display: 'flex',
+          flexDirection: 'row',
+          alignItems: 'center'
+        }}
+      >
+        {/* <MediaQuery largerThan="sm" styles={{ display: 'none' }}> */}
+        <Burger
+          opened={opened}
+          onClick={() => setOpened((o) => !o)}
+          size="md"
+          color="grey"
+          mr="xl"
+          className="mantine-hidden-from-sm"
+        />
+        {/* </MediaQuery> */}
+        <TopBar />
+      </AppShell.Header>
+      <AppShell.Navbar p="xs">
+        {/* <MediaQuery largerThan="sm" styles={{ display: 'none' }}> */}
+        <Burger
+          opened={opened}
+          onClick={() => setOpened((o) => !o)}
+          size="md"
+          color="grey"
+          mr="xl"
+          className="mantine-hidden-from-sm"
+        />
+        {/* </MediaQuery> */}
+        <SideNav />
+      </AppShell.Navbar>
+      <AppShell.Main>
+        <Outlet />
+        {/* Your application here */}
+      </AppShell.Main>
     </AppShell>
   )
 }

@@ -1,4 +1,4 @@
-import { Group, Radio, Text } from '@mantine/core'
+import { Group, Radio } from '@mantine/core'
 import { ChangeEvent, useCallback } from 'react'
 
 type PaymentModelProps = {
@@ -25,7 +25,7 @@ const PaymentModel = ({ defaultValue, onChange, error }: PaymentModelProps) => {
     <Radio.Group
       defaultValue={defaultValue}
       onChange={(value) => handleSelectChange(value)}
-      error={error && <Text size="sm">{error}</Text>}
+      error={error || null}
     >
       <Group mt="xs">
         <Radio value="cpm" label="CPM" />

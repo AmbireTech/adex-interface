@@ -1,5 +1,14 @@
-import { Button, Stack, Group, Text, UnstyledButton, createStyles } from '@mantine/core'
-import { useDisclosure } from '@mantine/hooks'
+import {
+  Button,
+  Group,
+  MantineTheme,
+  Stack,
+  Text,
+  UnstyledButton,
+  getPrimaryShade,
+  lighten
+} from '@mantine/core'
+import { useDisclosure, useColorScheme } from '@mantine/hooks'
 import { CREATE_CAMPAIGN_STEPS } from 'constants/createCampaign'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import { useCallback, useEffect, useMemo, useState } from 'react'
@@ -11,23 +20,28 @@ import useCustomNotifications from 'hooks/useCustomNotifications'
 import useAccount from 'hooks/useAccount'
 import { useNavigate } from 'react-router-dom'
 import throttle from 'lodash.throttle'
+import { createStyles } from '@mantine/emotion'
 
-const useStyles = createStyles((theme) => ({
-  bg: {
-    background:
-      theme.colors.warning[theme.fn.primaryShade()] + theme.other.shades.hexColorSuffix.lightest
-  },
-  icon: {
-    width: 14,
-    height: 14
-  },
-  lightestBrandColor: {
-    color: theme.colors.brand[theme.fn.primaryShade()] + theme.other.shades.hexColorSuffix.lighter
-  },
-  brandColor: {
-    color: theme.colors.brand[theme.fn.primaryShade()]
+const useStyles = createStyles((theme: MantineTheme) => {
+  const colorScheme = useColorScheme()
+  const primaryShade = getPrimaryShade(theme, colorScheme)
+
+  return {
+    bg: {
+      background: lighten(theme.colors.warning[primaryShade], theme.other.shades.lighten.lightest)
+    },
+    icon: {
+      width: 14,
+      height: 14
+    },
+    lightestBrandColor: {
+      color: lighten(theme.colors.brand[primaryShade], theme.other.shades.lighten.lighter)
+    },
+    brandColor: {
+      color: theme.colors.brand[primaryShade]
+    }
   }
-}))
+})
 
 const CampaignSummary = () => {
   const { classes, cx } = useStyles()
@@ -198,12 +212,12 @@ const CampaignSummary = () => {
       </Stack>
       {/* Temporary disabled */}
       {/* <Flex justify="space-between" className={classes.bg} p="lg">
-        <Text color="secondaryText" weight="bold">
+        <Text c="secondaryText" fw="bold">
           Estimated Daily Impressions
         </Text>
-        <Text color="secondaryText">0</Text>
+        <Text c="secondaryText">0</Text>
       </Flex> */}
-      <Stack align="center" justify="space-between" spacing="sm" mt="xl">
+      <Stack align="center" justify="space-between" gap="sm" mt="xl">
         {!isTheLastStep ? (
           <Button
             w="90%"
@@ -235,11 +249,11 @@ const CampaignSummary = () => {
           disabled={isFirstStep}
           className={cx(classes.brandColor, { [classes.lightestBrandColor]: isFirstStep })}
         >
-          <Group position="center" align="center" spacing="xs" h={50}>
+          <Group justify="center" align="center" gap="xs" h={50}>
             <span>
               <LeftArrowIcon className={classes.icon} />
             </span>
-            <Text size="lg" weight="bold" underline>
+            <Text size="lg" fw="bold" td="underline">
               Go Back
             </Text>
           </Group>

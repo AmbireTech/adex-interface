@@ -42,7 +42,7 @@ const GetStarted = () => {
           <Grid.Col>
             <Title order={3}>Get started with AdEx</Title>
           </Grid.Col>
-          <Grid.Col md={1} order={1} xs={12}>
+          <Grid.Col span={{ xs: 12, md: 1 }} order={1}>
             <CustomCard
               width={294}
               height={330}
@@ -62,7 +62,7 @@ const GetStarted = () => {
               </Button>
             </CustomCard>
           </Grid.Col>
-          <Grid.Col md={4} order={2} xs={12}>
+          <Grid.Col span={{ xs: 12, md: 4 }} order={2}>
             <CustomCard
               width={294}
               height={330}
@@ -97,7 +97,7 @@ const GetStarted = () => {
               {/* )} */}
             </CustomCard>
           </Grid.Col>
-          <Grid.Col md={4} order={3} xs={12}>
+          <Grid.Col span={{ xs: 12, md: 4 }} order={3}>
             <CustomCard
               width={294}
               height={330}

@@ -196,7 +196,7 @@ const StepThree = () => {
     <>
       <Grid>
         <Grid.Col mb="md">
-          <Text color="secondaryText" size="sm" weight="bold" mb="xs">
+          <Text c="secondaryText" size="sm" fw="bold" mb="xs">
             1. Campaign Period
           </Text>
           <CampaignPeriod />
@@ -217,7 +217,7 @@ const StepThree = () => {
           />
         </Grid.Col>
         <Grid.Col mb="md">
-          <Text color="secondaryText" size="sm" weight="bold" mb="xs">
+          <Text c="secondaryText" size="sm" fw="bold" mb="xs">
             2. Payment Model
           </Text>
           <PaymentModel
@@ -227,7 +227,7 @@ const StepThree = () => {
           />
         </Grid.Col>
         <Grid.Col mb="md">
-          <Text color="secondaryText" size="sm" weight="bold" mb="xs">
+          <Text c="secondaryText" size="sm" fw="bold" mb="xs">
             3. Currency
           </Text>
           <SelectCurrency
@@ -238,7 +238,7 @@ const StepThree = () => {
           />
         </Grid.Col>
         <Grid.Col mb="md">
-          <Text color="secondaryText" size="sm" weight="bold" mb="xs">
+          <Text c="secondaryText" size="sm" fw="bold" mb="xs">
             4. Campaign Budget
           </Text>
           <CampaignBudget
@@ -270,15 +270,15 @@ const StepThree = () => {
           </Group>
         </Grid.Col>
         <Grid.Col mb="md">
-          <Group mb="xs" spacing="xs">
-            <Text color="secondaryText" size="sm" weight="bold">
+          <Group mb="xs" gap="xs">
+            <Text c="secondaryText" size="sm" fw="bold">
               5. CPM
             </Text>
             <Tooltip
               label={`Recommended CPM in USD: Min - ${recommendedPaymentBounds.min}; Max - ${recommendedPaymentBounds.max}`}
               ml="sm"
             >
-              <ActionIcon color="secondaryText" size="xs">
+              <ActionIcon variant="transparent" color="secondaryText" size="xs">
                 <InfoFilledIcon />
               </ActionIcon>
             </Tooltip>
@@ -295,7 +295,7 @@ const StepThree = () => {
           />
         </Grid.Col>
         <Grid.Col mb="md">
-          <Text color="secondaryText" size="sm" weight="bold" mb="xs">
+          <Text c="secondaryText" size="sm" fw="bold" mb="xs">
             6. Campaign Name
           </Text>
           <CampaignName

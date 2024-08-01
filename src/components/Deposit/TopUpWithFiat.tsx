@@ -69,7 +69,7 @@ const TopUpWithFiat = () => {
         </Alert>
       </Grid.Col> */}
       <Grid.Col>
-        <Text size="sm" color="secondaryText" fw="bold">
+        <Text size="sm" c="secondaryText" fw="bold">
           Deposit with credit card to your account directly using one of our partners
         </Text>
       </Grid.Col>

@@ -1,20 +1,27 @@
 import { useMemo } from 'react'
 import CustomTable from 'components/common/CustomTable'
-import { Flex, createStyles, Anchor } from '@mantine/core'
+import { Flex, Anchor, MantineTheme, getPrimaryShade } from '@mantine/core'
+import { createStyles } from '@mantine/emotion'
 import UrlIcon from 'resources/icons/Url'
 import { BaseAnalyticsData } from 'types'
 import { formatCurrency } from 'helpers'
 import { AdUnit } from 'adex-common'
 import { getMediaUrlWithProvider } from 'helpers/createCampaignHelpers'
 import MediaThumb from 'components/common/MediaThumb'
+import { useColorScheme } from '@mantine/hooks'
 
 const IPFS_GATEWAY = process.env.REACT_APP_IPFS_GATEWAY
 
-const useStyles = createStyles((theme) => ({
-  icon: {
-    color: theme.colors.brand[theme.fn.primaryShade()]
+const useStyles = createStyles((theme: MantineTheme) => {
+  const colorScheme = useColorScheme()
+  const primaryShade = getPrimaryShade(theme, colorScheme)
+
+  return {
+    icon: {
+      color: theme.colors.brand[primaryShade]
+    }
   }
-}))
+})
 
 const Creatives = ({
   creatives,

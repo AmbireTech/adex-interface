@@ -1,4 +1,5 @@
-import { Flex, Grid, Space, Table, createStyles, Text } from '@mantine/core'
+import { Flex, Grid, MantineTheme, Space, Table, Text, getPrimaryShade } from '@mantine/core'
+import { createStyles } from '@mantine/emotion'
 import { Placement } from 'adex-common'
 import {
   formatDate,
@@ -13,6 +14,7 @@ import { PropsWithChildren, ReactNode } from 'react'
 import AdExLogo from 'resources/logos/AdExLogo'
 import { IInvoiceDetails, InvoiceCompanyDetails, OperationEntry, StatementData } from 'types'
 import { networks } from 'lib/Icons'
+import { useColorScheme } from '@mantine/hooks'
 
 type InvoicesPDFProps = { invoiceDetails: IInvoiceDetails; placement: Placement }
 type SidesDetails = {
@@ -34,67 +36,71 @@ const formatTokenAmount = (amount: bigint, token: OperationEntry['token']): stri
   return `${formatCurrency(parseBigNumTokenAmountToDecimal(amount, token.decimals), 2)}`
 }
 
-const useStyles = createStyles((theme) => ({
-  wrapper: {
-    color: theme.colors.secondaryText[theme.fn.primaryShade()],
-    fontSize: theme.fontSizes.xs,
-    span: {
-      display: 'block',
+const useStyles = createStyles((theme: MantineTheme) => {
+  const colorScheme = useColorScheme()
+  const primaryShade = getPrimaryShade(theme, colorScheme)
+  return {
+    wrapper: {
+      color: theme.colors.secondaryText[primaryShade],
+      fontSize: theme.fontSizes.xs,
+      span: {
+        display: 'block',
+        wordBreak: 'break-word'
+      }
+    },
+    title: {
+      fontSize: theme.fontSizes.sm,
+      fontWeight: theme.other.fontWeights.bold
+    },
+    right: {
+      textAlign: 'end'
+    },
+    bold: {
+      fontWeight: theme.other.fontWeights.bold,
+      color: theme.colors.mainText[primaryShade]
+    },
+    italic: {
+      fontStyle: 'italic'
+    },
+    wrap: {
       wordBreak: 'break-word'
+    },
+    noWrap: {
+      whiteSpace: 'nowrap'
+    },
+    smallFontSize: {
+      fontSize: theme.fontSizes.xs
+    },
+    borderBottom: { borderBottom: '1px solid black', width: '100%', height: '70%' },
+    signature: { display: 'flex', justifyContent: 'center', fontSize: theme.fontSizes.xs },
+    rightAlignedText: {
+      textAlign: 'end'
+    },
+    head: {
+      background: theme.black,
+      padding: theme.spacing.xl,
+      color: 'white',
+      textAlign: 'end'
+    },
+    logo: {
+      width: 200
+    },
+    footer: {
+      borderTop: '1px solid',
+      borderColor: theme.colors.decorativeBorders[primaryShade]
+    },
+    tableHeader: {
+      backgroundColor: theme.colors.alternativeBackground[primaryShade]
+    },
+    tableBody: {
+      backgroundColor: theme.colors.lightBackground[primaryShade]
+    },
+    tableWrapper: {
+      borderRadius: theme.radius.sm,
+      overflow: 'hidden'
     }
-  },
-  title: {
-    fontSize: theme.fontSizes.sm,
-    fontWeight: theme.other.fontWeights.bold
-  },
-  right: {
-    textAlign: 'end'
-  },
-  bold: {
-    fontWeight: theme.other.fontWeights.bold,
-    color: theme.colors.mainText[theme.fn.primaryShade()]
-  },
-  italic: {
-    fontStyle: 'italic'
-  },
-  wrap: {
-    wordBreak: 'break-word'
-  },
-  noWrap: {
-    whiteSpace: 'nowrap'
-  },
-  smallFontSize: {
-    fontSize: theme.fontSizes.xs
-  },
-  borderBottom: { borderBottom: '1px solid black', width: '100%', height: '70%' },
-  signature: { display: 'flex', justifyContent: 'center', fontSize: theme.fontSizes.xs },
-  rightAlignedText: {
-    // textAlign: 'end'
-  },
-  head: {
-    background: theme.black,
-    padding: theme.spacing.xl,
-    color: 'white',
-    textAlign: 'end'
-  },
-  logo: {
-    width: 200
-  },
-  footer: {
-    borderTop: '1px solid',
-    borderColor: theme.colors.decorativeBorders[theme.fn.primaryShade()]
-  },
-  tableHeader: {
-    backgroundColor: theme.colors.alternativeBackground[theme.fn.primaryShade()]
-  },
-  tableBody: {
-    backgroundColor: theme.colors.lightBackground[theme.fn.primaryShade()]
-  },
-  tableWrapper: {
-    borderRadius: theme.radius.sm,
-    overflow: 'hidden'
   }
-}))
+})
 
 const BillingBlank = ({ children, header, seller, buyer, title }: DetailsProps) => {
   const { classes, cx } = useStyles()
@@ -106,7 +112,8 @@ const BillingBlank = ({ children, header, seller, buyer, title }: DetailsProps) 
           <div className={classes.logo}>
             <AdExLogo text="white" />
           </div>
-          <Text size={64} weight="bold">
+          {/* TODO: fix the size to be without px */}
+          <Text size="64px" fw="bold">
             {title}
           </Text>
         </Flex>
@@ -183,18 +190,18 @@ export const InvoicesPDF = ({ invoiceDetails, placement }: InvoicesPDFProps) => 
             className={cx(classes.tableHeader, classes.tableWrapper, classes.wrap)}
             p="xs"
           >
-            <Text color="secondaryText">Invoice No.:</Text>
-            <Text weight="bold">{invoiceDetails.invoiceId}</Text>
+            <Text c="secondaryText">Invoice No.:</Text>
+            <Text fw="bold">{invoiceDetails.invoiceId}</Text>
           </Flex>
           <Flex justify="space-between" pl="xs" pr="xs">
-            <Text color="secondaryText">Invoice Date:</Text>
-            <Text color="secondaryText">
+            <Text c="secondaryText">Invoice Date:</Text>
+            <Text c="secondaryText">
               {invoiceDetails.invoiceDate ? formatDate(invoiceDetails.invoiceDate) : 'N/A'}
             </Text>
           </Flex>
           <Flex justify="space-between" pl="xs" pr="xs">
-            <Text color="secondaryText">Payment Date:</Text>
-            <Text color="secondaryText">
+            <Text c="secondaryText">Payment Date:</Text>
+            <Text c="secondaryText">
               {invoiceDetails.paymentDate ? formatDate(invoiceDetails.paymentDate) : 'N/A'}
             </Text>
           </Flex>
@@ -203,42 +210,46 @@ export const InvoicesPDF = ({ invoiceDetails, placement }: InvoicesPDFProps) => 
     >
       <>
         <Table
-          fontSize="xs"
+          fs="xs"
           verticalSpacing="xs"
           w="100%"
           className={classes.tableWrapper}
           withColumnBorders
         >
-          <thead className={classes.tableHeader}>
-            <tr>
-              <th>Placement</th>
-              <th className={classes.rightAlignedText}>Impressions</th>
-              <th className={classes.rightAlignedText}>Clicks</th>
-              <th>CTR %</th>
-              <th>
+          <Table.Thead className={classes.tableHeader}>
+            <Table.Tr>
+              <Table.Th>Placement</Table.Th>
+              <Table.Th className={classes.rightAlignedText}>Impressions</Table.Th>
+              <Table.Th className={classes.rightAlignedText}>Clicks</Table.Th>
+              <Table.Th>CTR %</Table.Th>
+              <Table.Th>
                 <span>Average CPM</span>
                 <br />
                 <span>({invoiceDetails.currencyName})</span>
-              </th>
-              <th>
+              </Table.Th>
+              <Table.Th>
                 <span>Spent</span>
                 <br />
                 <span>({invoiceDetails.currencyName})</span>
-              </th>
-            </tr>
-          </thead>
-          <tbody className={classes.tableBody}>
-            <tr>
-              <td className={classes.wrap}>{placement}</td>
-              <td className={classes.rightAlignedText}>
+              </Table.Th>
+            </Table.Tr>
+          </Table.Thead>
+          <Table.Tbody className={classes.tableBody}>
+            <Table.Tr>
+              <Table.Td className={classes.wrap}>{placement}</Table.Td>
+              <Table.Td className={classes.rightAlignedText}>
                 {invoiceDetails.impressions.toLocaleString()}
-              </td>
-              <td className={classes.rightAlignedText}>{invoiceDetails.clicks.toLocaleString()}</td>
-              <td className={classes.rightAlignedText}>{invoiceDetails.ctr}</td>
-              <td className={classes.rightAlignedText}>{invoiceDetails.avgCpm}</td>
-              <td className={classes.rightAlignedText}>{invoiceDetails.amount.toFixed(4)}</td>
-            </tr>
-          </tbody>
+              </Table.Td>
+              <Table.Td className={classes.rightAlignedText}>
+                {invoiceDetails.clicks.toLocaleString()}
+              </Table.Td>
+              <Table.Td className={classes.rightAlignedText}>{invoiceDetails.ctr}</Table.Td>
+              <Table.Td className={classes.rightAlignedText}>{invoiceDetails.avgCpm}</Table.Td>
+              <Table.Td className={classes.rightAlignedText}>
+                {invoiceDetails.amount.toFixed(4)}
+              </Table.Td>
+            </Table.Tr>
+          </Table.Tbody>
         </Table>
         <Grid.Col span={12}>
           <Grid justify="end">
@@ -290,26 +301,26 @@ export const StatementsPDF = ({ statement, seller, buyer }: StatementsPDFProps) 
             className={cx(classes.tableHeader, classes.tableWrapper)}
             p="xs"
           >
-            <Text color="secondaryText">Statement Period:</Text>
-            <Text weight="bold">
+            <Text c="secondaryText">Statement Period:</Text>
+            <Text fw="bold">
               {getMonthRangeString(monthPeriodIndexToDate(statement.periodIndex))}
             </Text>
           </Flex>
           <Flex justify="space-between" pl="xs" pr="xs">
-            <Text color="secondaryText">Currency / Token:</Text>
-            <Text color="secondaryText">
+            <Text c="secondaryText">Currency / Token:</Text>
+            <Text c="secondaryText">
               {statement.token.name} (chain: {networks[statement.token.chainId]})
             </Text>
           </Flex>
           <Flex justify="space-between" pl="xs" pr="xs">
-            <Text color="secondaryText">Start balance:</Text>
-            <Text color="secondaryText">
+            <Text c="secondaryText">Start balance:</Text>
+            <Text c="secondaryText">
               {formatTokenAmount(statement.startBalance, statement.token)}
             </Text>
           </Flex>
           <Flex justify="space-between" pl="xs" pr="xs">
-            <Text color="secondaryText">End balance:</Text>
-            <Text color="secondaryText">
+            <Text c="secondaryText">End balance:</Text>
+            <Text c="secondaryText">
               {formatTokenAmount(statement.endBalance, statement.token)}
             </Text>
           </Flex>
@@ -317,41 +328,42 @@ export const StatementsPDF = ({ statement, seller, buyer }: StatementsPDFProps) 
       }
     >
       <>
+        {/* <Table fontSize="xs" verticalSpacing="xs" w="100%" className={classes.tableWrapper}> */}
         <Table
-          fontSize="xs"
+          fs="xs"
           verticalSpacing="xs"
           w="100%"
           className={classes.tableWrapper}
           withColumnBorders
         >
-          <thead className={classes.tableHeader}>
-            <tr>
-              <th>#</th>
-              <th>Date</th>
-              <th>Type</th>
-              <th>Description</th>
-              <th>amount ({statement.token.name})</th>
-            </tr>
-          </thead>
-          <tbody className={classes.tableBody}>
+          <Table.Thead className={classes.tableHeader}>
+            <Table.Tr>
+              <Table.Th>#</Table.Th>
+              <Table.Th>Date</Table.Th>
+              <Table.Th>Type</Table.Th>
+              <Table.Th>Description</Table.Th>
+              <Table.Th>amount ({statement.token.name})</Table.Th>
+            </Table.Tr>
+          </Table.Thead>
+          <Table.Tbody className={classes.tableBody}>
             {statement.operations.map((e, index) => (
               // eslint-disable-next-line
-              <tr key={index}>
-                <td>{index + 1}</td>
-                <td>{e.date.toLocaleDateString()}</td>
-                <td>
-                  <Text transform="capitalize">{e.name}</Text>
-                </td>
-                <td className={classes.wrap}>{e.id}</td>
-                <td className={cx(classes.rightAlignedText, classes.noWrap)}>
+              <Table.Tr key={index}>
+                <Table.Td>{index + 1}</Table.Td>
+                <Table.Td>{e.date.toLocaleDateString()}</Table.Td>
+                <Table.Td>
+                  <Text tt="capitalize">{e.name}</Text>
+                </Table.Td>
+                <Table.Td className={classes.wrap}>{e.id}</Table.Td>
+                <Table.Td className={cx(classes.rightAlignedText, classes.noWrap)}>
                   {`${e.type === 'campaignOpen' ? '-' : '+'}   ${formatTokenAmount(
                     e.amount,
                     statement.token
                   )}`}
-                </td>
-              </tr>
+                </Table.Td>
+              </Table.Tr>
             ))}
-          </tbody>
+          </Table.Tbody>
         </Table>
         <Grid.Col span={12}>
           <Space h="xl" />

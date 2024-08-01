@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState, useMemo } from 'react'
 import { Box, Container, Flex, Loader, Tabs } from '@mantine/core'
+import { createStyles } from '@mantine/emotion'
 import { useParams } from 'react-router-dom'
 import { AnalyticsType, BaseAnalyticsData, AnalyticsPeriod } from 'types'
 import GoBack from 'components/common/GoBack/GoBack'
@@ -16,7 +17,12 @@ import { TimeFrame } from './TimeFrame'
 import { generateCVSData } from './CvsDownloadConfigurations'
 import SeeOnMapBtn from './SeeOnMapBtn'
 
+const useStyles = createStyles(() => ({
+  tabsList: { border: 'none' }
+}))
+
 const CampaignAnalytics = () => {
+  const { classes } = useStyles()
   const { id } = useParams()
 
   const [activeTab, setActiveTab] = useState<AnalyticsType>('timeframe')
@@ -102,9 +108,10 @@ const CampaignAnalytics = () => {
     }
   }, [activeTab, campaignMappedAnalytics])
 
-  const handleTabChange = useCallback((value: AnalyticsType) => {
+  const handleTabChange = useCallback((value: string | null) => {
     // TODO: validate value if it is in AnalyticsType
-    setActiveTab(value)
+    if (!value) return
+    setActiveTab(value as AnalyticsType)
   }, [])
 
   // TODO: there is delay when updated analytics table is displayed after the tab is switched - add loading bars or something
@@ -128,10 +135,11 @@ const CampaignAnalytics = () => {
       <Tabs
         color="brand"
         value={activeTab}
-        onTabChange={handleTabChange}
-        styles={() => ({
-          tabsList: { border: 'none', padding: '20px 0' }
-        })}
+        onChange={handleTabChange}
+        py="sm"
+        classNames={{
+          list: classes.tabsList
+        }}
         keepMounted={false}
       >
         <Flex justify="space-between" align="baseline">

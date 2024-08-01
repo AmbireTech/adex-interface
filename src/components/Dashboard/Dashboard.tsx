@@ -369,13 +369,13 @@ const Dashboard = ({ isAdminPanel, accountId }: { isAdminPanel?: boolean; accoun
     <Container fluid>
       <Flex direction="column" justify="start">
         <Flex justify="space-between" align="center">
-          <Text size="sm" color="secondaryText" weight="bold" mb="md">
+          <Text size="sm" color="secondaryText" fw="bold" mb="md">
             {isAdminPanel ? '* admin' : 'All campaigns'}
           </Text>
 
           {!!filteredCampaignData.archivedCount && (
             <UnstyledButton onClick={toggleShowArchived}>
-              <Text size="sm" underline color="secondaryText">
+              <Text size="sm" td="underline" c="secondaryText">
                 {showArchived ? 'Hide Archived' : 'Show Archived'} (
                 {filteredCampaignData.archivedCount})
               </Text>

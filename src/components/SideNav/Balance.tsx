@@ -1,4 +1,5 @@
-import { Flex, createStyles, rem, Image, Text } from '@mantine/core'
+import { Flex, Image, Text, MantineTheme, getPrimaryShade } from '@mantine/core'
+import { createStyles } from '@mantine/emotion'
 import { useMemo, useState } from 'react'
 import DownArrowIcon from 'resources/icons/DownArrow'
 import { formatCurrency } from 'helpers'
@@ -6,18 +7,24 @@ import { parseBigNumTokenAmountToDecimal } from 'helpers/balances'
 import useAccount from 'hooks/useAccount'
 import { getTokenIcon, networks } from 'lib/Icons'
 import { DIGITS_AFTER_FLOATING_POINT } from 'constants/balances'
+import { useColorScheme } from '@mantine/hooks'
 
-const useStyles = createStyles((theme) => ({
-  rotateUpsideDown: {
-    transform: 'scale(-1)'
-  },
-  pointer: {
-    cursor: 'pointer'
-  },
-  secondaryColor: {
-    color: theme.colors.secondaryText[theme.fn.primaryShade()]
+const useStyles = createStyles((theme: MantineTheme) => {
+  const colorScheme = useColorScheme()
+  const primaryShade = getPrimaryShade(theme, colorScheme)
+
+  return {
+    rotateUpsideDown: {
+      transform: 'scale(-1)'
+    },
+    pointer: {
+      cursor: 'pointer'
+    },
+    secondaryColor: {
+      color: theme.colors.secondaryText[primaryShade]
+    }
   }
-}))
+})
 
 const FormattedBalance = ({ balance, iconUrl }: { balance: number; iconUrl: string }) => {
   const formattedBalance = useMemo(
@@ -38,10 +45,10 @@ const FormattedBalance = ({ balance, iconUrl }: { balance: number; iconUrl: stri
     <Flex direction="row" align="center" justify="flex-start">
       <Image src={iconUrl} alt="token_icon" width={18} height={18} />
       <Flex direction="row" align="baseline" justify="flex-start">
-        <Text size="lg" weight="bold" ml="xs">
+        <Text size="lg" fw="bold" ml="xs">
           {integerPart}
         </Text>
-        <Text size="sm" weight="bold">
+        <Text size="sm" fw="bold">
           {decimalPart}
         </Text>
       </Flex>
@@ -71,7 +78,7 @@ const Balance = () => {
   )
   return (
     <>
-      <Text size="sm" color="mainText" weight="bold">
+      <Text size="sm" c="mainText" fw="bold">
         Balance
       </Text>
       <Flex direction="row" align="center" justify="space-between">
@@ -80,7 +87,7 @@ const Balance = () => {
         {/* {!!deposits.length && ( */}
         {false && (
           <DownArrowIcon
-            size={rem(10)}
+            size="16px"
             className={cx(classes.pointer, { [classes.rotateUpsideDown]: opened })}
             onClick={() => setOpened((prevState) => !prevState)}
           />

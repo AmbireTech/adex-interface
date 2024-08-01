@@ -3,7 +3,6 @@ import {
   Group,
   Pagination,
   Table,
-  createStyles,
   Divider,
   Text,
   Stack,
@@ -11,9 +10,12 @@ import {
   ActionIcon,
   TableProps,
   MantineColor,
-  Tooltip
+  Tooltip,
+  MantineTheme,
+  getPrimaryShade
 } from '@mantine/core'
-import { useMediaQuery } from '@mantine/hooks'
+import { createStyles } from '@mantine/emotion'
+import { useMediaQuery, useColorScheme } from '@mantine/hooks'
 import usePagination from 'hooks/usePagination'
 import { useMemo, PropsWithChildren, ReactNode } from 'react'
 import Dots from 'resources/icons/TreeDotsMenu'
@@ -43,33 +45,40 @@ export type CustomTableProps = PropsWithChildren &
     actions?: TableRowAction[]
   }
 
-const useStyles = createStyles((theme) => ({
-  header: {
-    backgroundColor: theme.colors.alternativeBackground[theme.fn.primaryShade()]
-  },
-  background: {
-    backgroundColor: theme.colors.mainBackground[theme.fn.primaryShade()],
-    boxShadow: theme.shadows.xs
-  },
-  tableWrapper: {
-    width: '100%',
-    overflow: 'hidden',
-    overflowX: 'auto',
-    borderRadius: theme.radius.md
-  },
-  gridRow: { borderBottom: `1px solid ${theme.colors.decorativeBorders[theme.fn.primaryShade()]}` },
-  cell: {
-    overflow: 'hidden',
-    whiteSpace: 'nowrap',
-    textOverflow: 'ellipsis',
-    maxWidth: 200
-  },
-  action: {
-    '&:hover': {
-      color: theme.colors.brand[theme.fn.primaryShade()]
+const useStyles = createStyles((theme: MantineTheme) => {
+  const colorScheme = useColorScheme()
+  const primaryShade = getPrimaryShade(theme, colorScheme)
+
+  return {
+    header: {
+      backgroundColor: theme.colors.alternativeBackground[primaryShade]
+    },
+    background: {
+      backgroundColor: theme.colors.mainBackground[primaryShade],
+      boxShadow: theme.shadows.xs
+    },
+    tableWrapper: {
+      width: '100%',
+      overflow: 'hidden',
+      overflowX: 'auto',
+      borderRadius: theme.radius.md
+    },
+    gridRow: {
+      borderBottom: `1px solid ${theme.colors.decorativeBorders[primaryShade]}`
+    },
+    cell: {
+      overflow: 'hidden',
+      whiteSpace: 'nowrap',
+      textOverflow: 'ellipsis',
+      maxWidth: 200
+    },
+    action: {
+      '&:hover': {
+        color: theme.colors.brand[primaryShade]
+      }
     }
   }
-}))
+})
 
 const getLabel = (label: TableRowAction['label'], actionData: TableElement['actionData']) => {
   if (typeof label === 'function') {
@@ -114,7 +123,7 @@ export const CustomTable = ({
       const activeActions = [...(actions || [])].filter((a) => !a.hide?.(e.actionData))
 
       const actionsMenu = activeActions?.length && (
-        <Group position={isMobile ? 'center' : 'right'} w="100%" spacing="xl">
+        <Group justify={isMobile ? 'center' : 'right'} w="100%" gap="xl">
           {activeActions.slice(0, 3).map((a) => {
             const label = getLabel(a.label, e.actionData)
             return (
@@ -154,13 +163,14 @@ export const CustomTable = ({
                     <Menu.Item
                       color={a.color || 'dark'}
                       key={label}
-                      icon={
+                      leftSection={
                         <ActionIcon
                           size="23px"
                           variant="transparent"
                           color={a.color || 'dark'}
                           className={classes.action}
                           disabled={disabled}
+                          component="div"
                         >
                           {a.icon}
                         </ActionIcon>
@@ -185,39 +195,39 @@ export const CustomTable = ({
       const cols = columns.map((column, cidx) => {
         const columnParsed = column === 'status' ? e[column].element : e[column]
         return isMobile ? (
-          <Stack key={rowKey + column} align="stretch" justify="center" spacing="xs">
+          <Stack key={rowKey + column} align="stretch" justify="center" gap="xs">
             <Group grow>
-              <Text align="center">{headings[cidx]}</Text>
+              <Text ta="center">{headings[cidx]}</Text>
 
-              <Text align="center" truncate color={color}>
+              <Text span ta="center" truncate c={color}>
                 {columnParsed}
               </Text>
             </Group>
             <Divider />
           </Stack>
         ) : (
-          <td key={column} className={classes.cell}>
-            <Text color={color} truncate>
+          <Table.Td key={column} className={classes.cell}>
+            <Text size="sm" span c={color} truncate>
               {columnParsed}
             </Text>
-          </td>
+          </Table.Td>
         )
       })
 
       if (isMobile) {
         return (
-          <Stack key={rowKey} spacing="xs" align="stretch" justify="center">
+          <Stack key={rowKey} gap="xs" align="stretch" justify="center">
             <Divider bg="#EBEEFA" w="100%" p="10px" />
             {cols}
-            {!!actionsMenu}
+            {!!actionsMenu && actionsMenu}
           </Stack>
         )
       }
       return (
-        <tr key={rowKey}>
+        <Table.Tr key={rowKey}>
           {cols}
-          {!!actionsMenu && <td>{actionsMenu}</td>}
-        </tr>
+          {!!actionsMenu && <Table.Td>{actionsMenu}</Table.Td>}
+        </Table.Tr>
       )
     })
   }, [list, actions, isMobile, classes.action, classes.cell, columns, headings])
@@ -226,7 +236,7 @@ export const CustomTable = ({
   return (
     <Flex h="100%" w="100%" justify="space-between" direction="column" align="stretch">
       {isMobile ? (
-        <Stack spacing="xl">{rows}</Stack>
+        <Stack gap="xl">{rows}</Stack>
       ) : (
         <div className={classes.tableWrapper}>
           <Table
@@ -234,22 +244,22 @@ export const CustomTable = ({
             miw="max-content"
             w="100%"
             highlightOnHover
-            verticalSpacing={15}
+            verticalSpacing="sm"
             className={cx({ [classes.background]: background })}
           >
-            <thead className={classes.header}>
-              <tr>
+            <Table.Thead className={classes.header}>
+              <Table.Tr>
                 {headings.map((h) => (
-                  <th key={h}>{h}</th>
+                  <Table.Th key={h}>{h}</Table.Th>
                 ))}
                 {!!actions?.length && <th key="Action">Actions</th>}
-              </tr>
-            </thead>
-            <tbody>{rows}</tbody>
+              </Table.Tr>
+            </Table.Thead>
+            <Table.Tbody>{rows}</Table.Tbody>
           </Table>
         </div>
       )}
-      <Group w="100%" position="right" mt="xl">
+      <Group w="100%" justify="right" mt="xl">
         <Pagination
           total={maxPages}
           boundaries={1}

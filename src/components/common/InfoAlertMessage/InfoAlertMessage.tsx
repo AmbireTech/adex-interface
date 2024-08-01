@@ -1,50 +1,63 @@
-import { Grid, Text, createStyles, MantineStyleSystemProps } from '@mantine/core'
+import { Text, MantineTheme, lighten, getPrimaryShade, Flex, FlexProps } from '@mantine/core'
+import { createStyles } from '@mantine/emotion'
+import { useColorScheme } from '@mantine/hooks'
 import InfoCurlyBorder from 'resources/icons/InfoCurlyBorder'
 
-type InfoAlertMessageProps = MantineStyleSystemProps & {
+type InfoAlertMessageProps = FlexProps & {
   message: string
 }
 
-const useStyles = createStyles((theme) => ({
-  errorWrapper: {
-    alignItems: 'center',
-    border: '1px solid',
-    borderColor: theme.colors.decorativeBorders[theme.fn.primaryShade()],
-    boxShadow: theme.shadows.sm,
-    borderRadius: theme.radius.md,
-    marginBottom: theme.spacing.xs,
-    background:
-      theme.colors.warning[theme.fn.primaryShade()] + theme.other.shades.hexColorSuffix.lightest
-  },
-  errorIcon: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: 50,
-    borderTopLeftRadius: theme.radius.md,
-    borderBottomLeftRadius: theme.radius.md,
-    color: theme.colors.warning[theme.fn.primaryShade()]
-  },
-  text: {
-    background: theme.colors.mainBackground[theme.fn.primaryShade()],
-    borderTopRightRadius: theme.radius.md,
-    borderBottomRightRadius: theme.radius.md
+const useStyles = createStyles((theme: MantineTheme) => {
+  const colorScheme = useColorScheme()
+  const primaryShade = getPrimaryShade(theme, colorScheme)
+
+  return {
+    errorWrapper: {
+      alignItems: 'center',
+      border: '1px solid',
+      borderColor: theme.colors.decorativeBorders[primaryShade],
+      boxShadow: theme.shadows.sm,
+      borderRadius: theme.radius.md,
+      background: lighten(theme.colors.warning[primaryShade], theme.other.shades.lighten.lightest)
+    },
+    errorIcon: {
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      width: 50,
+      height: '100%',
+      borderTopLeftRadius: theme.radius.md,
+      borderBottomLeftRadius: theme.radius.md,
+      color: theme.colors.warning[primaryShade],
+      padding: theme.spacing.sm
+    },
+    text: {
+      flexGrow: 3,
+      background: theme.colors.mainBackground[primaryShade],
+      borderTopRightRadius: theme.radius.md,
+      borderBottomRightRadius: theme.radius.md,
+      padding: theme.spacing.md
+    }
   }
-}))
+})
 
 const InfoAlertMessage = ({ message, ...rest }: InfoAlertMessageProps) => {
   const { classes } = useStyles()
   return (
-    <Grid className={classes.errorWrapper} {...rest}>
-      <Grid.Col span="content" className={classes.errorIcon} p={0}>
+    <Flex
+      direction="row"
+      justify="space-between"
+      className={classes.errorWrapper}
+      wrap="nowrap"
+      {...rest}
+    >
+      <div className={classes.errorIcon}>
         <InfoCurlyBorder size="24px" />
-      </Grid.Col>
-      <Grid.Col span="auto" className={classes.text} p={0}>
-        <Text size="sm" m="md">
-          {message}
-        </Text>
-      </Grid.Col>
-    </Grid>
+      </div>
+      <div className={classes.text}>
+        <Text size="sm">{message}</Text>
+      </div>
+    </Flex>
   )
 }
 

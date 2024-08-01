@@ -68,17 +68,17 @@ function AccountInfo({ accountData }: { accountData: Account }) {
       <NumberInput
         mt="md"
         label="Available balance"
-        type="number"
+        // type="number"
         placeholder="Amount"
         hideControls
         disabled
         {...form.getInputProps('availableBalance')}
       />
-      <Text size="sm" weight={500} mt="xl">
+      <Text size="sm" fw={500} mt="xl">
         Billing details
       </Text>
       <Text size="xs">* Just for info, users can edit, admins can verify only</Text>
-      <Group mt="md" position="left" align="baseline">
+      <Group mt="md" justify="left" align="baseline">
         <TextInput
           label="First name"
           disabled
@@ -122,19 +122,19 @@ function AccountInfo({ accountData }: { accountData: Account }) {
         />
       </Group>
 
-      <Text size="sm" weight={500} mt="xl">
+      <Text size="sm" fw={500} mt="xl">
         Additional info
       </Text>
       <Text size="xs">* can be seen and edited only by admins</Text>
 
-      <Group mt="md" position="left" align="baseline">
+      <Group mt="md" justify="left" align="baseline">
         <TextInput label="Contact email" {...form.getInputProps('info.email')} />
         <TextInput label="Contact phone" {...form.getInputProps('info.phone')} />
         <TextInput label="Contact person" {...form.getInputProps('info.contactPerson')} />
         <Textarea label="Additional notes" w="100%" {...form.getInputProps('info.notes')} />
       </Group>
 
-      <Group position="left" mt="md">
+      <Group justify="left" mt="md">
         <Button type="submit" loading={loading} disabled={loading || !form.isDirty()}>
           Update account data
         </Button>

@@ -1,4 +1,4 @@
-import { useMantineTheme } from '@mantine/core'
+import { getPrimaryShade, lighten, useMantineTheme } from '@mantine/core'
 import { useCallback, useMemo, useState } from 'react'
 import { XYChartTheme, buildChartTheme } from '@visx/xychart'
 import { GlyphProps } from '@visx/xychart/lib/types'
@@ -6,6 +6,7 @@ import { ControlsProps, DataKey, FilteredAnalytics, ProvidedProps } from 'types'
 import { GlyphStar } from '@visx/glyph'
 import { curveLinear } from '@visx/curve'
 import { RenderTooltipGlyphProps } from '@visx/xychart/lib/components/Tooltip'
+import { useColorScheme } from '@mantine/hooks'
 import getAnimatedOrUnanimatedComponents from './getAnimatedOrUnanimatedComponents'
 
 const dateScaleConfig = { type: 'band', paddingInner: 0.3 } as const
@@ -61,13 +62,19 @@ const ChartControls = ({ children, data, metricsToShow }: ControlsProps) => {
   )
 
   const appTheme = useMantineTheme()
+  const colorScheme = useColorScheme()
+  const primaryShade = useMemo(
+    () => getPrimaryShade(appTheme, colorScheme),
+    [appTheme, colorScheme]
+  )
+
   const colors = useMemo(
     () =>
       [
-        metricsToShow.impressions && appTheme.colors.chartColorOne[appTheme.fn.primaryShade()],
-        metricsToShow.clicks && appTheme.colors.chartColorTwo[appTheme.fn.primaryShade()],
-        metricsToShow.avgCpm && appTheme.colors.chartColorThree[appTheme.fn.primaryShade()],
-        metricsToShow.paid && appTheme.colors.chartColorFour[appTheme.fn.primaryShade()]
+        metricsToShow.impressions && appTheme.colors.chartColorOne[primaryShade],
+        metricsToShow.clicks && appTheme.colors.chartColorTwo[primaryShade],
+        metricsToShow.avgCpm && appTheme.colors.chartColorThree[primaryShade],
+        metricsToShow.paid && appTheme.colors.chartColorFour[primaryShade]
       ].map((x) => x?.toString() || ''),
     [
       metricsToShow.impressions,
@@ -78,25 +85,21 @@ const ChartControls = ({ children, data, metricsToShow }: ControlsProps) => {
       appTheme.colors.chartColorTwo,
       appTheme.colors.chartColorThree,
       appTheme.colors.chartColorFour,
-      appTheme.fn
+      primaryShade
     ]
   )
 
   const gridColor = useMemo(
-    () =>
-      appTheme.fn.lighten(
-        appTheme.colors.mainText[appTheme.fn.primaryShade()],
-        appTheme.other.shades.lighten.lighter
-      ),
-    [appTheme.colors.mainText, appTheme.fn, appTheme.other.shades.lighten.lighter]
+    () => lighten(appTheme.colors.mainText[primaryShade], appTheme.other.shades.lighten.lighter),
+    [appTheme.colors.mainText, appTheme.other.shades.lighten.lighter, primaryShade]
   )
 
   const theme = buildChartTheme({
-    backgroundColor: appTheme.colors.mainBackground[appTheme.fn.primaryShade()],
+    backgroundColor: appTheme.colors.mainBackground[primaryShade],
     colors,
     gridColor,
     gridColorDark: gridColor,
-    svgLabelBig: { fill: appTheme.colors.mainBackground[appTheme.fn.primaryShade()] },
+    svgLabelBig: { fill: appTheme.colors.mainBackground[primaryShade] },
     tickLength: 8
   }) as XYChartTheme
   const [showGridRows, showGridColumns] = [true, false]

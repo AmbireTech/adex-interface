@@ -60,12 +60,11 @@ const useCreateCampaignData = () => {
         </Flex>
       )
     }
-    return <Text align="end">N/A</Text>
+    return <Text ta="end">N/A</Text>
   }, [selectedDevices])
 
   const formattedSelectedPlacement = useMemo(() => {
-    if (placement)
-      return <Text align="end">{placement === 'app' ? 'Applications' : 'Websites'}</Text>
+    if (placement) return <Text ta="end">{placement === 'app' ? 'Applications' : 'Websites'}</Text>
     return null
   }, [placement])
 
@@ -106,13 +105,13 @@ const useCreateCampaignData = () => {
   )
 
   const sizes = useMemo(
-    () => adUnits.map((adUnit) => `${adUnit.banner?.format.w}x${adUnit.banner?.format.h}`),
+    () => adUnits.map((adUnit: AdUnit) => `${adUnit.banner?.format.w}x${adUnit.banner?.format.h}`),
     [adUnits]
   )
   const uniqueSizesWithCount = useMemo(() => findDuplicates(sizes), [sizes])
   const adFormats = useMemo(
     () => (
-      <Stack spacing={0} align="end">
+      <Stack gap={0} align="end">
         {uniqueSizesWithCount.map((size) => (
           <Text key={`${size.count}${size.value}`}>{`${size.count}x ${size.value}`}</Text>
         ))}
@@ -125,7 +124,7 @@ const useCreateCampaignData = () => {
   const campaignNameFormatted = useMemo(() => title, [title])
   const adUnitsFormatted = useMemo(
     () => (
-      <Stack spacing="xs">
+      <Stack gap="xs">
         {adUnits.map((image: AdUnit) => {
           return <ImageUrlInput key={image.id} image={image} preview />
         })}

@@ -150,7 +150,7 @@ const Statements = () => {
           />
         )}
       </BillingDetailsModal>
-      <CustomTable headings={columnTitles} elements={elements} actions={actions} />
+      <CustomTable background headings={columnTitles} elements={elements} actions={actions} />
     </>
   )
 }

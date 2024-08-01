@@ -1,4 +1,4 @@
-import { FlexProps, MantineNumberSize } from '@mantine/core'
+import { FlexProps, MantineFontSize, MantineLineHeight } from '@mantine/core'
 
 export type CollapsibleFieldProps = {
   label: string
@@ -13,9 +13,8 @@ export type CampaignDetailsRowProps = FlexProps & {
   title: string
   value: any | undefined
   lighterColor?: boolean | undefined
-  textSize?: MantineNumberSize
+  textSize?: MantineFontSize
   noBorder?: boolean
   column?: boolean
-  lineHeight?: MantineNumberSize
-  nowrap?: boolean
+  lineHeight?: MantineLineHeight
 }

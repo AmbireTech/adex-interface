@@ -7,10 +7,12 @@ import {
   Group,
   Menu,
   rem,
-  createStyles,
   UnstyledButton,
-  CopyButton
+  CopyButton,
+  MantineTheme,
+  getPrimaryShade
 } from '@mantine/core'
+import { createStyles } from '@mantine/emotion'
 import { formatDate, maskAddress } from 'helpers/formatters'
 import useAccount from 'hooks/useAccount'
 import { useCallback, useMemo, useState } from 'react'
@@ -25,28 +27,34 @@ import StakingIcon from 'resources/icons/Staking'
 import { useAdExApi } from 'hooks/useAdexServices'
 import useCustomNotifications from 'hooks/useCustomNotifications'
 import CopyIcon from 'resources/icons/Copy'
+import { useColorScheme } from '@mantine/hooks'
 
-const useStyles = createStyles((theme) => ({
-  rotateUpsideDown: {
-    transform: 'scale(-1)'
-  },
-  menu: {
-    cursor: 'pointer'
-  },
-  icon: {
-    width: rem(14),
-    height: rem(14)
-  },
-  item: {
-    '&:hover': {
-      border: `1px solid ${theme.colors.decorativeBorders[theme.fn.primaryShade()]}`,
-      borderRadius: theme.radius.sm
+const useStyles = createStyles((theme: MantineTheme) => {
+  const colorScheme = useColorScheme()
+  const primaryShade = getPrimaryShade(theme, colorScheme)
+
+  return {
+    rotateUpsideDown: {
+      transform: 'scale(-1)'
+    },
+    menu: {
+      cursor: 'pointer'
+    },
+    icon: {
+      width: rem(14),
+      height: rem(14)
+    },
+    item: {
+      '&:hover': {
+        border: `1px solid ${theme.colors.decorativeBorders[primaryShade]}`,
+        borderRadius: theme.radius.sm
+      }
+    },
+    capitalizeText: {
+      textTransform: 'capitalize'
     }
-  },
-  capitalizeText: {
-    textTransform: 'capitalize'
   }
-}))
+})
 
 const formatTitle = (str: string) => {
   if (!str) return ''
@@ -115,13 +123,13 @@ function TopBar() {
   return (
     <Flex direction="row" gap="md" justify="space-between" align="center" style={{ flexGrow: 1 }}>
       <Flex direction="column" justify="end" align="baseline">
-        <Title order={5} weight="bold" className={classes.capitalizeText}>
+        <Title order={5} fw="bold" className={classes.capitalizeText}>
           {title}
         </Title>
         <Text fz="xs">{formatDate(new Date())}</Text>
       </Flex>
       <Flex direction="row" justify="end" gap="md" align="center">
-        <Group position="center">
+        <Group justify="center">
           {/* <Indicator>
             <ActionIcon>
               <BellIcon size={rem(24)} />
@@ -132,7 +140,7 @@ function TopBar() {
               <CopyIcon
                 className={classes.menu}
                 color={copied ? 'green' : undefined}
-                size={rem(24)}
+                size="24px"
                 onClick={copy}
               />
             )}
@@ -150,14 +158,15 @@ function TopBar() {
               <Group>
                 <Blockies seedString={adexAccount.address} />
                 <div>
-                  {/* <Text weight="bold" size="xs">
+                  {/* <Text fw="bold" size="xs">
                     John Doe
                   </Text> */}
-                  <Text color="secondaryText" size="xs">
+                  <Text c="secondaryText" size="xs">
                     {maskAddress(adexAccount.address)}
                   </Text>
                 </div>
                 <DownArrowIcon
+                  style={{ width: 10, height: 10 }}
                   size={rem(10)}
                   className={cx({ [classes.rotateUpsideDown]: opened })}
                 />

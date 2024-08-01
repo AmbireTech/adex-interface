@@ -1,13 +1,17 @@
 import {
-  Navbar,
   ScrollArea,
   Box,
   UnstyledButton,
   Text,
   useMantineTheme,
-  createStyles,
-  rem
+  rem,
+  AppShell,
+  MantineTheme,
+  getPrimaryShade,
+  MantineColorShade
 } from '@mantine/core'
+import { createStyles } from '@mantine/emotion'
+import { useColorScheme } from '@mantine/hooks'
 import { useMatch, useLocation, useResolvedPath, Link } from 'react-router-dom'
 import useAccount from 'hooks/useAccount'
 import DashboardIcon from 'resources/icons/Dashboard'
@@ -22,27 +26,31 @@ import NavLink from './NavLink'
 import Balance from './Balance'
 import CreateCampaignBtn from './CreateCampaignBtn'
 
-const useStyles = createStyles((theme) => ({
-  logo: {
-    display: 'block',
-    width: rem(103),
-    height: rem(40),
-    marginTop: theme.spacing.md,
-    marginBottom: theme.spacing.md
-  },
-  balance: {
-    borderBottom: `1px solid ${theme.colors.decorativeBorders[theme.fn.primaryShade()]}`,
-    paddingTop: theme.spacing.sm,
-    paddingBottom: theme.spacing.sm
-  },
-  newCampaign: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: theme.spacing.xl,
-    marginBottom: theme.spacing.xl
+const useStyles = createStyles(
+  (theme: MantineTheme, { primaryShade }: { primaryShade: MantineColorShade }) => {
+    return {
+      logo: {
+        display: 'block',
+        width: rem(103),
+        height: rem(40),
+        marginTop: theme.spacing.md,
+        marginBottom: theme.spacing.md
+      },
+      balance: {
+        borderBottom: `1px solid ${theme.colors.decorativeBorders[primaryShade]}`,
+        paddingTop: theme.spacing.sm,
+        paddingBottom: theme.spacing.sm
+      },
+      newCampaign: {
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginTop: theme.spacing.xl,
+        marginBottom: theme.spacing.xl
+      }
+    }
   }
-}))
+)
 
 function SideNav() {
   const {
@@ -53,8 +61,10 @@ function SideNav() {
   const location = useLocation()
   const match = useMatch(location.pathname)
   const year = useMemo(() => new Date().getFullYear(), [])
+  const colorScheme = useColorScheme()
   const theme = useMantineTheme()
-  const { classes } = useStyles()
+  const primaryShade = getPrimaryShade(theme, colorScheme)
+  const { classes } = useStyles({ primaryShade })
 
   const hasAvailableBalance = useMemo(
     () => availableBalance && availableBalance > 0,
@@ -63,24 +73,19 @@ function SideNav() {
 
   return (
     <>
-      <Navbar.Section>
+      <AppShell.Section>
         <UnstyledButton component={Link} to="" className={classes.logo}>
-          <AdExLogo
-            text={
-              theme.colorScheme === 'dark'
-                ? theme.white
-                : theme.colors.brandDarker[theme.fn.primaryShade()]
-            }
-          />
+          {/* <AdExLogo text={colorScheme === 'dark' ? theme.white : theme.colors.brandDarker[primaryShade]} /> */}
+          <AdExLogo text={theme.colors.brandDarker[primaryShade]} />
         </UnstyledButton>
-      </Navbar.Section>
-      <Navbar.Section className={classes.balance}>
+      </AppShell.Section>
+      <AppShell.Section className={classes.balance}>
         <Balance />
-      </Navbar.Section>
-      <Navbar.Section className={classes.newCampaign}>
+      </AppShell.Section>
+      <AppShell.Section className={classes.newCampaign}>
         <CreateCampaignBtn hasPopover={isManualDepositing && !hasAvailableBalance} />
-      </Navbar.Section>
-      <Navbar.Section mx="-xs" grow component={ScrollArea}>
+      </AppShell.Section>
+      <AppShell.Section mx="-xs" grow component={ScrollArea}>
         <Box>
           <NavLink
             to="/dashboard"
@@ -117,18 +122,18 @@ function SideNav() {
             />
           )}
         </Box>
-      </Navbar.Section>
-      <Navbar.Section mx="xs" mt="xl">
-        <Text color="secondaryText" size="sm">
+      </AppShell.Section>
+      <AppShell.Section mx="xs" mt="xl">
+        <Text c="secondaryText" size="sm">
           ©{year} AdEx.
         </Text>
-        <Text color="secondaryText" size="sm">
+        <Text c="secondaryText" size="sm">
           All Rights Reserved.
         </Text>
-        <Text color="secondaryText" size="sm">
+        <Text c="secondaryText" size="sm">
           V.{appVersion}-beta
         </Text>
-      </Navbar.Section>
+      </AppShell.Section>
     </>
   )
 }

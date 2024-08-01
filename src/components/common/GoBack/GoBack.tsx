@@ -1,25 +1,33 @@
-import { Flex, Text, createStyles } from '@mantine/core'
+import { MantineTheme, Text, getPrimaryShade, Flex } from '@mantine/core'
+import { createStyles } from '@mantine/emotion'
 import ActionButton from 'components/common/CustomTable/ActionButton/ActionButton'
 import LeftChevronIcon from 'resources/icons/LeftChevron'
 import { useNavigate } from 'react-router-dom'
 import { SIDE_BAR_WIDTH } from 'themes/base'
 import { PropsWithChildren } from 'react'
+import { useColorScheme } from '@mantine/hooks'
 
-const useStyles = createStyles((theme) => ({
-  sticky: {
-    position: 'fixed',
-    top: 90,
-    left: SIDE_BAR_WIDTH,
-    width: `calc(100% - ${SIDE_BAR_WIDTH}px)`,
-    zIndex: 10,
-    background: theme.colors.lightBackground[theme.fn.primaryShade()],
-    padding: `${theme.spacing.md} ${theme.spacing.xl}`,
-    [theme.fn.smallerThan('sm')]: {
-      left: 0,
-      width: '100%'
+const useStyles = createStyles((theme: MantineTheme) => {
+  const colorScheme = useColorScheme()
+  const primaryShade = getPrimaryShade(theme, colorScheme)
+
+  return {
+    sticky: {
+      position: 'fixed',
+      top: 90,
+      left: SIDE_BAR_WIDTH,
+      width: `calc(100% - ${SIDE_BAR_WIDTH}px)`,
+      zIndex: 10,
+      background: theme.colors.lightBackground[primaryShade],
+      marginLeft: theme.spacing.xl,
+      padding: `${theme.spacing.md} ${theme.spacing.xs}`
+      // TODO: fix the media query
+      // [theme.fn.smallerThan('sm')]: {
+      //   left: 0
+      // }
     }
   }
-}))
+})
 
 const GoBack = ({
   title,
@@ -34,7 +42,7 @@ const GoBack = ({
   return (
     <Flex align="center" className={cx({ [classes.sticky]: !!fixed })}>
       <ActionButton action={handleClick} icon={<LeftChevronIcon />} title={title}>
-        <Text weight="bold" size="sm">
+        <Text fw="bold" size="sm">
           {title}
         </Text>
       </ActionButton>

@@ -97,11 +97,11 @@ function AdminDeposit({ accountData }: { accountData: Account }) {
         {...form.getInputProps('accountId')}
         disabled
       />
-      <Group mt="sm" position="left" align="baseline">
+      <Group mt="sm" justify="left" align="baseline">
         <NumberInput
           mt="sm"
           label="Amount"
-          type="number"
+          // type="number"
           placeholder="Amount"
           hideControls
           min={0}
@@ -143,7 +143,7 @@ function AdminDeposit({ accountData }: { accountData: Account }) {
         />
       </Group>
 
-      <Group position="left" mt="md">
+      <Group justify="left" mt="md">
         <Button
           type="submit"
           loading={loading}

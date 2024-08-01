@@ -30,7 +30,7 @@ const SelectPlacements = () => {
 
   return (
     <>
-      <Text color="secondaryText" size="sm" weight="bold" mb="xs">
+      <Text c="secondaryText" size="sm" fw="bold" mb="xs">
         1. Select placements
       </Text>
       <Radio

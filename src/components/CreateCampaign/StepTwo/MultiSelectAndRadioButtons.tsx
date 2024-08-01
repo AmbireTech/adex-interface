@@ -1,7 +1,40 @@
 import { useCallback, useMemo, useState } from 'react'
-import { MultiSelect, Radio, Stack, Text } from '@mantine/core'
+import { MantineTheme, MultiSelect, Radio, Stack, Text, getPrimaryShade } from '@mantine/core'
 import { TargetingInputApplyProp } from 'adex-common/dist/types'
 import { MultiSelectAndRadioButtonsProps } from 'types'
+import { useColorScheme } from '@mantine/hooks'
+import { createStyles } from '@mantine/emotion'
+
+const useStyles = createStyles(
+  (theme: MantineTheme, { selectedRadio }: { selectedRadio: TargetingInputApplyProp }) => {
+    const colorScheme = useColorScheme()
+    const primaryShade = getPrimaryShade(theme, colorScheme)
+
+    return {
+      input: {
+        textTransform: 'capitalize',
+        borderColor:
+          selectedRadio === 'nin'
+            ? theme.colors.warning[primaryShade]
+            : theme.colors.brand[primaryShade],
+        backgroundColor: theme.colors.mainBackground[primaryShade],
+        boxShadow: theme.shadows.md
+      },
+      pill: {
+        textTransform: 'capitalize',
+        border: '1px solid',
+        borderColor:
+          selectedRadio === 'nin'
+            ? theme.colors.warning[primaryShade]
+            : theme.colors.brand[primaryShade],
+        color:
+          selectedRadio === 'nin'
+            ? theme.colors.warning[primaryShade]
+            : theme.colors.brand[primaryShade]
+      }
+    }
+  }
+)
 
 const MultiSelectAndRadioButtons = ({
   multiSelectData,
@@ -13,20 +46,30 @@ const MultiSelectAndRadioButtons = ({
   error
 }: MultiSelectAndRadioButtonsProps) => {
   const extendedData = useMemo(() => {
-    const regions = Object.keys(groups).map((region) => ({
-      label: region,
-      value: region,
-      group: 'Groups'
-    }))
-    return [...regions, ...multiSelectData]
-  }, [multiSelectData, groups])
+    const groupsArr = [
+      {
+        group: 'Groups',
+        items: Object.keys(groups).map((region) => ({
+          label: region,
+          value: region
+        }))
+      },
+      {
+        group: label,
+        items: [...multiSelectData]
+      }
+    ]
+
+    return [...groupsArr]
+  }, [multiSelectData, groups, label])
 
   const data = useMemo(() => [...extendedData], [extendedData])
   const [selectedRadio, setSelectedRadio] = useState<TargetingInputApplyProp>(defaultRadioValue)
   const [selectedValue, setSelectedValue] = useState<string[]>(defaultSelectValue)
+  const { classes } = useStyles({ selectedRadio })
 
-  const handleRadioChange = useCallback((value: TargetingInputApplyProp) => {
-    setSelectedRadio(value)
+  const handleRadioChange = useCallback((value: string) => {
+    setSelectedRadio(value as TargetingInputApplyProp)
     setSelectedValue([])
   }, [])
 
@@ -65,13 +108,13 @@ const MultiSelectAndRadioButtons = ({
   return (
     <>
       <Radio.Group value={selectedRadio} onChange={handleRadioChange} mb="md">
-        <Stack spacing="xs">
+        <Stack gap="xs">
           <Radio label="Select All" value="all" />
           <Radio label={`Select ${label}`} value="in" />
           <Radio label={`Select All ${label} Except`} value="nin" />
         </Stack>
       </Radio.Group>
-      <Text color="secondaryText" size="sm" weight="bold" mb="xs">
+      <Text c="secondaryText" size="sm" fw="bold" mb="xs">
         {labelText}
       </Text>
       <MultiSelect
@@ -84,32 +127,11 @@ const MultiSelectAndRadioButtons = ({
         data={data}
         onChange={handleSelectChange}
         placeholder={`Select ${label}`}
-        error={error && <Text size="sm">{error}</Text>}
-        styles={(theme) => ({
-          item: {
-            textTransform: 'capitalize'
-          },
-          input: {
-            textTransform: 'capitalize',
-            borderColor:
-              selectedRadio === 'nin'
-                ? theme.colors.warning[theme.fn.primaryShade()]
-                : theme.colors.brand[theme.fn.primaryShade()],
-            backgroundColor: theme.colors.mainBackground[theme.fn.primaryShade()],
-            boxShadow: theme.shadows.md
-          },
-          value: {
-            border: '1px solid',
-            borderColor:
-              selectedRadio === 'nin'
-                ? theme.colors.warning[theme.fn.primaryShade()]
-                : theme.colors.brand[theme.fn.primaryShade()],
-            color:
-              selectedRadio === 'nin'
-                ? theme.colors.warning[theme.fn.primaryShade()]
-                : theme.colors.brand[theme.fn.primaryShade()]
-          }
-        })}
+        error={error || null}
+        classNames={{
+          input: classes.input,
+          pill: classes.pill
+        }}
       />
     </>
   )

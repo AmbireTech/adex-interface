@@ -1,4 +1,4 @@
-import { MantineStyleSystemProps } from '@mantine/core'
+import { FlexProps } from '@mantine/core'
 import { AdUnit, TargetingInputApplyProp } from 'adex-common/dist/types'
 import { ChangeEventHandler } from 'react'
 
@@ -35,7 +35,7 @@ export type CreateCampaignOverview = {
   isColumn?: boolean
 }
 
-export type ImageUrlInputProps = MantineStyleSystemProps & {
+export type ImageUrlInputProps = FlexProps & {
   image: AdUnit
   toRemove?: boolean
   onDelete?: (file: AdUnit) => void
@@ -61,7 +61,7 @@ export type MultiSelectAndRadioButtonsProps = {
   error?: string
 }
 
-export type RangeTextProps = MantineStyleSystemProps & {
+export type RangeTextProps = {
   labelOne: string
   valueOne: string
   labelTwo: string

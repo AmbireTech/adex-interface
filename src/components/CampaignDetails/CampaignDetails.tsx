@@ -3,14 +3,18 @@ import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import {
   Container,
   Grid,
-  createStyles,
   Text,
   Box,
   Button,
   Paper,
   Stack,
-  Group
+  Group,
+  MantineTheme,
+  getPrimaryShade,
+  lighten
 } from '@mantine/core'
+import { useColorScheme } from '@mantine/hooks'
+import { createStyles } from '@mantine/emotion'
 import { modals } from '@mantine/modals'
 import BadgeStatusCampaign from 'components/Dashboard/BadgeStatusCampaign'
 import { CATEGORIES, COUNTRIES } from 'constants/createCampaign'
@@ -36,77 +40,91 @@ import DeleteIcon from 'resources/icons/Delete'
 import CatsLocsFormatted from './CatsLocsFormatted'
 import { AdminActions } from './AdminActions'
 
-const useStyles = createStyles((theme) => ({
-  wrapper: {
-    background: theme.colors.mainBackground[theme.fn.primaryShade()],
-    borderRadius: theme.radius.md,
-    padding: theme.spacing.lg,
-    margin: theme.spacing.md,
-    boxShadow: theme.shadows.sm
-  },
-  innerWrapper: {
-    background: theme.colors.lightBackground[theme.fn.primaryShade()],
-    border: '1px solid',
-    borderRadius: theme.radius.md,
-    borderColor: theme.colors.decorativeBorders[theme.fn.primaryShade()],
-    maxWidth: '100%',
-    padding: `${theme.spacing.xs} ${theme.spacing.md}`
-  },
-  scrollableContainer: {
-    maxHeight: 420,
-    overflowY: 'auto'
-  },
-  separator: {
-    borderBottom: `1px dashed ${theme.colors.decorativeBorders[theme.fn.primaryShade()]}`,
-    margin: `${theme.spacing.sm} 0`
-  },
-  actionIcons: {
-    color: theme.colors.secondaryText[3],
-    margin: '3px',
-    padding: '0 15px',
-    '&.active': {
-      color: theme.colors.success[3],
-      '&:hover': {
-        color: theme.colors.success[3],
-        background: theme.fn.lighten(theme.colors.success[3], theme.other.shades.lighten.lightest)
-      }
+const useStyles = createStyles((theme: MantineTheme) => {
+  const colorScheme = useColorScheme()
+  const primaryShade = getPrimaryShade(theme, colorScheme)
+
+  return {
+    wrapper: {
+      background: theme.colors.mainBackground[primaryShade],
+      borderRadius: theme.radius.md,
+      padding: theme.spacing.lg,
+      margin: theme.spacing.md,
+      boxShadow: theme.shadows.sm
     },
-    '&.paused': {
-      color: theme.colors.paused[3],
-      '&:hover': {
-        color: theme.colors.paused[3],
-        background: theme.fn.lighten(theme.colors.paused[3], theme.other.shades.lighten.lightest)
-      }
+    innerWrapper: {
+      background: theme.colors.lightBackground[primaryShade],
+      border: '1px solid',
+      borderRadius: theme.radius.md,
+      borderColor: theme.colors.decorativeBorders[primaryShade],
+      maxWidth: '100%',
+      padding: `${theme.spacing.xs} ${theme.spacing.md}`
     },
-    '&.stopped': {
-      '&:hover': {
-        color: theme.colors.stopped[3]
+    scrollableContainer: {
+      maxHeight: 420,
+      overflowY: 'auto'
+    },
+    separator: {
+      borderBottom: `1px dashed ${theme.colors.decorativeBorders[primaryShade]}`,
+      margin: `${theme.spacing.sm} 0`
+    },
+    actionIcons: {
+      color: theme.colors.secondaryText[primaryShade],
+      margin: '3px',
+      padding: '0 15px',
+      '&.active': {
+        color: theme.colors.success[primaryShade],
+        '&:hover': {
+          color: theme.colors.success[primaryShade],
+          background: lighten(theme.colors.success[3], theme.other.shades.lighten.lightest)
+        }
       },
-      '&.selected': {
-        color: theme.colors.stopped[3],
-        background: theme.fn.lighten(theme.colors.stopped[3], theme.other.shades.lighten.lightest)
-      }
-    },
-    '&.archived': {
-      '&:hover': {
-        color: theme.colors.mainText[3]
+      '&.paused': {
+        color: theme.colors.paused[primaryShade],
+        '&:hover': {
+          color: theme.colors.paused[primaryShade],
+          background: lighten(
+            theme.colors.paused[primaryShade],
+            theme.other.shades.lighten.lightest
+          )
+        }
       },
-      '&.selected': {
-        color: theme.colors.mainText[3],
-        background: theme.fn.lighten(theme.colors.mainText[3], theme.other.shades.lighten.lightest)
-      }
-    },
-    '&.edit': {
-      '&:hover': {
-        color: theme.colors.mainText[3]
+      '&.stopped': {
+        '&:hover': {
+          color: theme.colors.stopped[primaryShade]
+        },
+        '&.selected': {
+          color: theme.colors.stopped[primaryShade],
+          background: lighten(
+            theme.colors.stopped[primaryShade],
+            theme.other.shades.lighten.lightest
+          )
+        }
       },
-      '&.selected': {
-        color: theme.colors.mainText[3],
-        background: theme.fn.lighten(theme.colors.mainText[3], theme.other.shades.lighten.lightest)
+      '&.archived': {
+        '&:hover': {
+          color: theme.colors.mainText[primaryShade]
+        },
+        '&.selected': {
+          color: theme.colors.mainText[primaryShade],
+          background: lighten(
+            theme.colors.mainText[primaryShade],
+            theme.other.shades.lighten.lightest
+          )
+        }
+      },
+      '&.edit': {
+        '&:hover': {
+          color: theme.colors.mainText[primaryShade]
+        },
+        '&.selected': {
+          color: theme.colors.mainText[primaryShade],
+          background: lighten(theme.colors.mainText[3], theme.other.shades.lighten.lightest)
+        }
       }
     }
   }
-}))
+})
 
 const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
   const { classes, cx } = useStyles()
@@ -241,15 +259,15 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
   return (
     <>
       <Box p="md">
-        <Group position="center">
+        <Group justify="center">
           <GoBack title="Dashboard" />
           <Paper mx="auto" my="xs" shadow="md" radius="xl">
-            <Group spacing={2} p={2} position="center">
+            <Group gap={2} p={2} justify="center">
               <Button
                 className={cx(classes.actionIcons, {
                   active: canActivate
                 })}
-                rightIcon={<ActiveIcon size="15px" />}
+                rightSection={<ActiveIcon size="15px" />}
                 onClick={() =>
                   canActivate && changeCampaignStatus(CampaignStatus.active, campaign.id)
                 }
@@ -263,7 +281,7 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
                 className={cx(classes.actionIcons, {
                   paused: canPause
                 })}
-                rightIcon={<PausedIcon size="15px" />}
+                rightSection={<PausedIcon size="15px" />}
                 onClick={() => canPause && changeCampaignStatus(CampaignStatus.paused, campaign.id)}
                 variant="subtle"
                 disabled={!canPause}
@@ -275,7 +293,7 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
                 className={cx(classes.actionIcons, {
                   stopped: canStop
                 })}
-                rightIcon={<StopIcon size="15px" />}
+                rightSection={<StopIcon size="15px" />}
                 onClick={handleStopOrDelete}
                 disabled={!canStop}
                 variant="subtle"
@@ -288,7 +306,7 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
                   className={cx(classes.actionIcons, {
                     archived: true
                   })}
-                  rightIcon={<DeleteIcon size="15px" />}
+                  rightSection={<DeleteIcon size="15px" />}
                   onClick={handleStopOrDelete}
                   disabled={isAdminPanel}
                   variant="subtle"
@@ -300,7 +318,7 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
                   className={cx(classes.actionIcons, 'archived', {
                     selected: canArchive
                   })}
-                  rightIcon={<ArchivedIcon size="15px" />}
+                  rightSection={<ArchivedIcon size="15px" />}
                   onClick={handleArchive}
                   disabled={!canArchive}
                   variant="subtle"
@@ -314,7 +332,7 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
                 className={cx(classes.actionIcons, 'edit', {
                   selected: params.get('edit') && campaign.status !== CampaignStatus.draft
                 })}
-                rightIcon={<EditIcon size="15px" />}
+                rightSection={<EditIcon size="15px" />}
                 variant="subtle"
                 onClick={() =>
                   canEdit &&
@@ -330,8 +348,8 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
               </Button>
             </Group>
           </Paper>
-          <Group spacing="sm" position="center">
-            <Text weight="bold" size="sm">
+          <Group gap="sm" justify="center">
+            <Text fw="bold" size="sm">
               Campaign Analytics{' '}
             </Text>
             <ActionButton
@@ -349,9 +367,9 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
           <Container fluid className={classes.wrapper}>
             {isAdminPanel && <AdminBadge title="Admin Details" />}
             <Grid gutter="md">
-              <Grid.Col md={12} xl={6}>
+              <Grid.Col span={{ md: 12, xl: 6 }}>
                 <Stack>
-                  <Text weight="bold" size="sm" color="dimmed">
+                  <Text fw="bold" size="sm" c="dimmed">
                     Overview
                   </Text>
                   <Box className={classes.innerWrapper}>
@@ -365,7 +383,6 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
                       lineHeight="sm"
                       textSize="sm"
                       title="Id"
-                      nowrap
                       value={campaign?.id}
                     />
                     <CampaignDetailsRow
@@ -473,9 +490,9 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
                       title="Last modified by"
                       noBorder
                       value={
-                        <Stack spacing="xs" align="end">
+                        <Stack gap="xs" align="end">
                           <Text size="sm">{campaign.lastModifiedBy}</Text>
-                          <Text size="xs" color="dimmed">
+                          <Text size="xs" c="dimmed">
                             {new Date(Number(campaign.modified)).toLocaleString()}
                           </Text>
                         </Stack>
@@ -484,9 +501,9 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
                   </Box>
                 </Stack>
               </Grid.Col>
-              <Grid.Col md={12} xl={6}>
+              <Grid.Col span={{ md: 12, xl: 6 }}>
                 <Stack>
-                  <Text weight="bold" size="sm" color="dimmed">
+                  <Text fw="bold" size="sm" c="dimmed">
                     Targeting
                   </Text>
                   <Box className={classes.innerWrapper}>
@@ -503,11 +520,11 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
                   </Box>
                   {!!campaign.adUnits.length && (
                     <Stack>
-                      <Text weight="bold" size="sm" color="dimmed">
+                      <Text fw="bold" size="sm" color="dimmed">
                         Creatives
                       </Text>
                       <Box className={cx(classes.innerWrapper, classes.scrollableContainer)}>
-                        {campaign.adUnits.map((item: AdUnit, index) => {
+                        {campaign.adUnits.map((item: AdUnit, index: number) => {
                           const isLast = index === campaign.adUnits.length - 1
                           return (
                             <CampaignDetailsRow
@@ -533,9 +550,9 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
               </Grid.Col>
 
               {isAdminPanel && (
-                <Grid.Col md={12} xl={6} pt="xl">
+                <Grid.Col span={{ md: 12, xl: 6 }} pt="xl">
                   <Stack>
-                    <Text weight="bold" size="xl" pb="sm" color="attention">
+                    <Text fw="bold" size="xl" pb="sm" c="attention">
                       Admin actions
                     </Text>
                     <AdminActions item={campaign} />

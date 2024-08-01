@@ -1,4 +1,6 @@
-import { Container, Grid, Select, createStyles, Text } from '@mantine/core'
+import { Container, Grid, MantineTheme, Text, getPrimaryShade, lighten } from '@mantine/core'
+import { createStyles } from '@mantine/emotion'
+import { useColorScheme } from '@mantine/hooks'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import EthereumIcon from 'resources/networks/Ethereum'
 import PolygonIcon from 'resources/networks/Polygon'
@@ -9,51 +11,57 @@ import CustomCard from 'components/common/CustomCard'
 import { IS_MANUAL_DEPOSITING } from 'constants/balances'
 import { useNavigate } from 'react-router-dom'
 import TopUpAccountModal from 'components/common/TopUpAccountModal'
-import SelectItem from './SelectItem'
+import CustomCombobox from 'components/CustomCombobox'
 import SendCryptocurrency from './SendCryptocurrency'
 import TopUpWithFiat from './TopUpWithFiat'
 
-const useStyles = createStyles((theme) => ({
-  container: {
-    background: theme.colors.mainBackground[theme.fn.primaryShade()],
-    boxShadow: theme.shadows.sm,
-    borderRadius: theme.radius.sm,
-    marginTop: theme.spacing.xl
-  },
-  center: {
-    display: 'flex',
-    justifyContent: 'center'
-  },
-  confirmModalContent: {
-    background:
-      theme.colors.attention[theme.fn.primaryShade()] + theme.other.shades.hexColorSuffix.lightest,
-    padding: theme.spacing.xl
-  },
-  iconWrapper: {
-    width: 50,
-    height: 50,
-    background: `${theme.colors.attention[theme.fn.primaryShade()]}1A`,
-    borderRadius: '50%',
-    padding: theme.spacing.sm
-  },
-  attentionIcon: {
-    width: 25,
-    height: 25,
-    color: theme.colors.attention[theme.fn.primaryShade()]
-  },
-  root: {
-    padding: 0
+const useStyles = createStyles((theme: MantineTheme) => {
+  const colorScheme = useColorScheme()
+  const primaryShade = getPrimaryShade(theme, colorScheme)
+  return {
+    container: {
+      background: theme.colors.mainBackground[primaryShade],
+      boxShadow: theme.shadows.sm,
+      borderRadius: theme.radius.sm,
+      marginTop: theme.spacing.xl
+    },
+    center: {
+      display: 'flex',
+      justifyContent: 'center'
+    },
+    confirmModalContent: {
+      background: lighten(
+        theme.colors.attention[primaryShade],
+        theme.other.shades.lighten.lightest
+      ),
+      padding: theme.spacing.xl
+    },
+    iconWrapper: {
+      width: 50,
+      height: 50,
+      background: `${theme.colors.attention[primaryShade]}1A`,
+      borderRadius: '50%',
+      padding: theme.spacing.sm
+    },
+    attentionIcon: {
+      width: 25,
+      height: 25,
+      color: theme.colors.attention[primaryShade]
+    },
+    root: {
+      padding: 0
+    }
   }
-}))
+})
 
 const data = [
   {
-    image: <EthereumIcon size="30px" />,
+    image: <EthereumIcon size="24px" />,
     label: 'Ethereum',
     value: 'ethereum'
   },
   {
-    image: <PolygonIcon size="30px" />,
+    image: <PolygonIcon size="24px" />,
     label: 'Polygon',
     value: 'polygon'
   }
@@ -74,7 +82,6 @@ const Deposit = () => {
   const { classes } = useStyles()
   const [network, setNetwork] = useState(data[0].value)
   const [selectedTab, setSelectedTab] = useState<DepositMethods | null>(null)
-  const icon = useMemo(() => data.find(({ value }) => value === network)?.image, [network])
 
   const isManualDepositing = useMemo(() => IS_MANUAL_DEPOSITING === 'true', [])
   const [opened, setOpened] = useState(false)
@@ -93,22 +100,21 @@ const Deposit = () => {
     <Container size="xs" className={classes.container} pt="lg" pb="lg">
       <Grid grow align="center">
         <Grid.Col>
-          <Text size="sm" color="secondaryText" fw="bold">
+          <Text size="sm" c="secondaryText" fw="bold">
             Select Network
           </Text>
         </Grid.Col>
         <Grid.Col span={12}>
-          <Select
-            variant="filled"
-            data={data}
-            itemComponent={SelectItem}
-            value={network}
-            onChange={(value: string) => setNetwork(value)}
-            icon={icon}
+          <CustomCombobox
+            items={data}
+            defaultValue={network}
+            onChange={(event) => event.target.value && setNetwork(event.target.value)}
+            placeholder="Select Network"
+            error=""
           />
         </Grid.Col>
         <Grid.Col>
-          <Text size="sm" color="secondaryText" fw="bold">
+          <Text size="sm" c="secondaryText" fw="bold">
             Choose Method
           </Text>
         </Grid.Col>

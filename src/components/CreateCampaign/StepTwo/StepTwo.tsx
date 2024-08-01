@@ -59,7 +59,7 @@ const StepTwo = () => {
   return (
     <Grid>
       <Grid.Col>
-        <Text color="secondaryText" size="sm" weight="bold" mb="xs">
+        <Text c="secondaryText" size="sm" fw="bold" mb="xs">
           1. Categories
         </Text>
         <MultiSelectAndRadioButtons
@@ -77,7 +77,7 @@ const StepTwo = () => {
         />
       </Grid.Col>
       <Grid.Col>
-        <Text color="secondaryText" size="sm" weight="bold" mb="xs">
+        <Text c="secondaryText" size="sm" fw="bold" mb="xs">
           2. Countries
         </Text>
         <MultiSelectAndRadioButtons
