@@ -13,7 +13,6 @@ import {
 } from '@mantine/core'
 import { modals } from '@mantine/modals'
 import BadgeStatusCampaign from 'components/Dashboard/BadgeStatusCampaign'
-import { formatCatsAndLocsData } from 'helpers/createCampaignHelpers'
 import { CATEGORIES, COUNTRIES } from 'constants/createCampaign'
 import { AdUnit, CampaignStatus } from 'adex-common/dist/types'
 import MediaThumb from 'components/common/MediaThumb'
@@ -349,7 +348,7 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
         ) : (
           <Container fluid className={classes.wrapper}>
             {isAdminPanel && <AdminBadge title="Admin Details" />}
-            <Grid grow gutter="md">
+            <Grid gutter="md">
               <Grid.Col md={12} xl={6}>
                 <Stack>
                   <Text weight="bold" size="sm" color="dimmed">
@@ -493,17 +492,13 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
                   <Box className={classes.innerWrapper}>
                     <CatsLocsFormatted
                       title="Selected Categories"
-                      arr={formatCatsAndLocsData(
-                        campaign.targetingInput.inputs.categories,
-                        CATEGORIES
-                      )}
+                      inputValues={campaign.targetingInput.inputs.categories}
+                      selectData={CATEGORIES}
                     />
                     <CatsLocsFormatted
                       title="Selected Countries"
-                      arr={formatCatsAndLocsData(
-                        campaign.targetingInput.inputs.location,
-                        COUNTRIES
-                      )}
+                      inputValues={campaign.targetingInput.inputs.location}
+                      selectData={COUNTRIES}
                     />
                   </Box>
                   {!!campaign.adUnits.length && (

@@ -1,9 +1,8 @@
-import { AdUnit, TargetingInputApplyProp, TargetingInputSingle } from 'adex-common/dist/types'
+import { AdUnit, TargetingInputApplyProp } from 'adex-common/dist/types'
 import { DEFAULT_CATS_LOCS_VALUE } from 'constants/createCampaign'
 import { Campaign } from 'adex-common'
 import {
   Devices,
-  SelectData,
   ImageSizes,
   FileWithPath,
   HTMLBannerDimensions,
@@ -20,24 +19,6 @@ export const checkSelectedDevices = (devices: Devices[]) => {
     return devices[0]
   }
   if (devices.length === 2) return 'both'
-}
-
-export const formatCatsAndLocsData = (inputValues: TargetingInputSingle, lib: SelectData[]) => {
-  const selectedCats = Object.entries(inputValues).find(
-    ([, value]) => Array.isArray(value) && value.length > 0
-  )
-
-  if (inputValues.apply === 'all' && typeof selectedCats === 'undefined') return ['all', null]
-
-  if (!selectedCats) return [null, null]
-  const [key, values] = selectedCats
-
-  const labels = lib
-    .map((item) => (!!values.length && values.includes(item.value) ? item.label : null))
-    .filter((x) => !!x)
-    .join(', ')
-
-  return [key, labels]
 }
 
 export const updateCatsLocsObject = (selectedRadio: TargetingInputApplyProp, values: string[]) => {
@@ -358,8 +339,6 @@ export const hasUtmCampaign = (url: string) => {
     return false
   }
 }
-
-export const capitalize = (s: string) => s && s[0].toUpperCase() + s.slice(1)
 
 export const parseRange = (str: string): { min: number; max: number } => {
   const pattern = /^(\d+)_(\d+)-(\d+)_(\d+)$/

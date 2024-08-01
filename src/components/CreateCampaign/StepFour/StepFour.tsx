@@ -1,21 +1,10 @@
-import { Container, createStyles } from '@mantine/core'
+import { Paper } from '@mantine/core'
 import CampaignDetailsRow from 'components/common/CampainDetailsRow/CampaignDetailsRow'
 import useCreateCampaignData from 'hooks/useCreateCampaignData/useCreateCampaignData'
 import { useMemo } from 'react'
 import { CreateCampaignOverview } from 'types'
 
-const useStyles = createStyles((theme) => ({
-  wrapper: {
-    background: theme.colors.lightBackground[theme.fn.primaryShade()],
-    border: '1px solid',
-    borderRadius: theme.radius.md,
-    borderColor: theme.colors.decorativeBorders[theme.fn.primaryShade()],
-    maxWidth: '100%'
-  }
-}))
-
 const StepFour = () => {
-  const { classes } = useStyles()
   const {
     formattedSelectedDevice,
     priceBoundsFormatted,
@@ -39,7 +28,7 @@ const StepFour = () => {
       { title: 'Placements', value: formattedSelectedPlacement },
       { title: 'Device Type', value: formattedSelectedDevice },
       { title: 'Ad Format', value: adFormats },
-      { title: 'Creatives', value: adUnitsFormatted },
+      { title: 'Creatives', value: adUnitsFormatted, isColumn: true },
       { title: 'Selected Categories', value: formattedCats },
       { title: 'Selected Countries', value: formattedLocs },
       // {
@@ -74,7 +63,6 @@ const StepFour = () => {
     () =>
       campaignOverview.map((item: CreateCampaignOverview, i) => {
         const isLast = item === campaignOverview[campaignOverview.length - 1]
-        const isColumn = item.title === 'Creatives'
         const fullTitle = `${i + 1}. ${item.title}`
 
         return (
@@ -85,14 +73,18 @@ const StepFour = () => {
             value={item.value}
             textSize="sm"
             noBorder={isLast}
-            column={isColumn}
+            column={item.isColumn}
           />
         )
       }),
     [campaignOverview]
   )
 
-  return <Container className={classes.wrapper}>{rows}</Container>
+  return (
+    <Paper p="md" withBorder bg="lightBackground">
+      {rows}
+    </Paper>
+  )
 }
 
 export default StepFour
