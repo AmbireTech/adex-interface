@@ -383,7 +383,6 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
                       lineHeight="sm"
                       textSize="sm"
                       title="Id"
-                      nowrap
                       value={campaign?.id}
                     />
                     <CampaignDetailsRow

@@ -170,6 +170,7 @@ export const CustomTable = ({
                           color={a.color || 'dark'}
                           className={classes.action}
                           disabled={disabled}
+                          component="div"
                         >
                           {a.icon}
                         </ActionIcon>
@@ -198,7 +199,7 @@ export const CustomTable = ({
             <Group grow>
               <Text ta="center">{headings[cidx]}</Text>
 
-              <Text ta="center" truncate c={color}>
+              <Text span ta="center" truncate c={color}>
                 {columnParsed}
               </Text>
             </Group>
@@ -206,7 +207,7 @@ export const CustomTable = ({
           </Stack>
         ) : (
           <Table.Td key={column} className={classes.cell}>
-            <Text span c={color} truncate>
+            <Text size="sm" span c={color} truncate>
               {columnParsed}
             </Text>
           </Table.Td>

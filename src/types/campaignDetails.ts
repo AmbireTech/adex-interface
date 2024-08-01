@@ -17,5 +17,4 @@ export type CampaignDetailsRowProps = FlexProps & {
   noBorder?: boolean
   column?: boolean
   lineHeight?: MantineLineHeight
-  nowrap?: boolean
 }
