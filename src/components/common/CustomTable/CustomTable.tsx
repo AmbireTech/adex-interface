@@ -198,7 +198,7 @@ export const CustomTable = ({
             <Group grow>
               <Text ta="center">{headings[cidx]}</Text>
 
-              <Text ta="center" truncate color={color}>
+              <Text ta="center" truncate c={color}>
                 {columnParsed}
               </Text>
             </Group>
@@ -206,9 +206,7 @@ export const CustomTable = ({
           </Stack>
         ) : (
           <Table.Td key={column} className={classes.cell}>
-            <Text c={color} truncate>
-              {columnParsed}
-            </Text>
+            {columnParsed}
           </Table.Td>
         )
       })

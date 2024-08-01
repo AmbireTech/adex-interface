@@ -18,7 +18,7 @@ const CampaignName = ({ defaultValue, onChange, error, onFocus }: CampaignNamePr
       defaultValue={defaultValue}
       onChange={(event) => onChange(event)}
       onFocus={onFocus}
-      error={error && error}
+      error={error || null}
     />
   )
 }

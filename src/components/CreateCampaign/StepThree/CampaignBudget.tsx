@@ -74,7 +74,7 @@ const CampaignBudget = ({
         name="campaignBudget"
         onChange={(event) => handleOnChange(event)}
         onFocus={onFocus}
-        error={(err && err) || (error && error)}
+        error={err || error || null}
       />
       {budgetIsGreaterThanBalance && (
         <InfoAlertMessage

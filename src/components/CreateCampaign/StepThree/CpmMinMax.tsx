@@ -41,7 +41,7 @@ const CpmMinMax = ({
         defaultValue={defaultValueMin}
         onChange={(event) => onChangeMin(event)}
         onFocus={onFocusMin}
-        error={errorMin && errorMin}
+        error={errorMin || null}
       />
       <TextInput
         size="md"
@@ -60,7 +60,7 @@ const CpmMinMax = ({
         defaultValue={defaultValueMax}
         onChange={(event) => onChangeMax(event)}
         onFocus={onFocusMax}
-        error={errorMax && errorMax}
+        error={errorMax || null}
       />
     </Flex>
   )

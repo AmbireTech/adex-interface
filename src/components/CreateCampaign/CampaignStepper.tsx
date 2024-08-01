@@ -5,6 +5,7 @@ import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 function StyledStepper(props: StepperProps) {
   return (
     <Stepper
+      iconSize={20}
       styles={{
         stepBody: {
           display: 'none'

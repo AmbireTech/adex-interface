@@ -127,7 +127,7 @@ const MultiSelectAndRadioButtons = ({
         data={data}
         onChange={handleSelectChange}
         placeholder={`Select ${label}`}
-        error={error && error}
+        error={error || null}
         classNames={{
           input: classes.input,
           pill: classes.pill

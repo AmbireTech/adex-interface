@@ -172,7 +172,6 @@ const themeOverride: MantineThemeOverride = createTheme({
         radius: 'xl'
       },
       styles: (theme: MantineTheme, params: ButtonProps) => {
-        console.log('theme.primaryShade', theme.primaryShade)
         const outlineHoverBgColor = alpha(
           theme.colors[params.color || theme.primaryColor][theme.primaryShade as MantineColorShade],
           theme.other.shades.rgba.lightest
@@ -198,9 +197,9 @@ const themeOverride: MantineThemeOverride = createTheme({
                 : '',
             backgroundImage:
               // eslint-disable-next-line no-nested-ternary
-              params.variant === 'outline'
+              params.variant === 'outline' && !params.disabled
                 ? `radial-gradient(${outlineHoverBgColor}, ${outlineHoverBgColor})`
-                : params.variant === 'filled'
+                : params.variant === 'filled' && !params.disabled
                 ? `radial-gradient(${filledHoverBgColor}, ${filledHoverBgColor})`
                 : '',
             backgroundSize: customHover ? '0% 100%' : '',
@@ -213,7 +212,7 @@ const themeOverride: MantineThemeOverride = createTheme({
               color: params.color,
               backgroundSize: '100% 100%',
               backgroundColor:
-                params.variant === 'filled'
+                params.variant === 'filled' && !params.disabled
                   ? theme.colors[params.color || theme.primaryColor][
                       theme.primaryShade as MantineColorShade
                     ]

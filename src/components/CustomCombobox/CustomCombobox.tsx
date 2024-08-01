@@ -126,7 +126,7 @@ const CustomCombobox = ({
           rightSectionPointerEvents="none"
           maw={props.maw}
           size="md"
-          error={error && error}
+          error={error || null}
         >
           {selectedOption ? (
             <SelectOption {...selectedOption} />
