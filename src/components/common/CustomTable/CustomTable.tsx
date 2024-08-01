@@ -243,7 +243,7 @@ export const CustomTable = ({
             miw="max-content"
             w="100%"
             highlightOnHover
-            verticalSpacing={15}
+            verticalSpacing="sm"
             className={cx({ [classes.background]: background })}
           >
             <Table.Thead className={classes.header}>

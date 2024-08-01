@@ -293,7 +293,7 @@ const EditCampaign = ({ campaign }: { campaign: Campaign }) => {
                 label={`Recommended CPM: Min - ${recommendedPaymentBounds.min}; Max - ${recommendedPaymentBounds.max}`}
                 ml="sm"
               >
-                <ActionIcon color="secondaryText" size="xs">
+                <ActionIcon variant="transparent" color="secondaryText" size="xs">
                   <InfoFilledIcon />
                 </ActionIcon>
               </Tooltip>

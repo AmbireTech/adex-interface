@@ -121,13 +121,13 @@ export const CATEGORIES: SelectData[] = parseCats()
 export const COUNTRIES: SelectData[] = parseLocs()
 
 export const CAT_GROUPS = {
-  finance: ['IAB13', 'IAB13-7'],
-  gaming: ['IAB1', 'IAB9', 'IAB17'],
-  streaming: ['IAB1', 'IAB9', 'IAB17', 'IAB19']
+  Finance: ['IAB13', 'IAB13-7'],
+  Gaming: ['IAB1', 'IAB9', 'IAB17'],
+  Streaming: ['IAB1', 'IAB9', 'IAB17', 'IAB19']
 }
 
 export const REGION_GROUPS = {
-  africa: [
+  Africa: [
     'DZA',
     'AGO',
     'BEN',
@@ -183,7 +183,7 @@ export const REGION_GROUPS = {
     'ZMB',
     'ZWE'
   ],
-  asia: [
+  Asia: [
     'AFG',
     'ARM',
     'AZE',
@@ -234,7 +234,7 @@ export const REGION_GROUPS = {
     'VNM',
     'YEM'
   ],
-  europe: [
+  Europe: [
     'ALB',
     'AND',
     'AUT',
@@ -282,7 +282,7 @@ export const REGION_GROUPS = {
     'GBR',
     'VAT'
   ],
-  northAmerica: [
+  'North America': [
     'ATG',
     'BHS',
     'BRB',
@@ -307,7 +307,7 @@ export const REGION_GROUPS = {
     'TTO',
     'USA'
   ],
-  oceania: [
+  Oceania: [
     'AUS',
     'FJI',
     'KIR',
@@ -323,5 +323,18 @@ export const REGION_GROUPS = {
     'TUV',
     'VUT'
   ],
-  southAmerica: ['ARG', 'BOL', 'BRA', 'CHL', 'COL', 'ECU', 'GUY', 'PRY', 'PER', 'SUR', 'URY', 'VEN']
+  'South America': [
+    'ARG',
+    'BOL',
+    'BRA',
+    'CHL',
+    'COL',
+    'ECU',
+    'GUY',
+    'PRY',
+    'PER',
+    'SUR',
+    'URY',
+    'VEN'
+  ]
 }
