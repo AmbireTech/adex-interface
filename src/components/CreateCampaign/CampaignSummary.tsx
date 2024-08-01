@@ -181,20 +181,8 @@ const CampaignSummary = () => {
           value={formattedSelectedDevice}
         />
         <CampaignDetailsRow lighterColor title="Ad Format" value={adFormats} textSize="sm" />
-        <CampaignDetailsRow
-          lighterColor
-          title="Categories"
-          value={formattedCats}
-          textSize="sm"
-          column
-        />
-        <CampaignDetailsRow
-          lighterColor
-          title="Countries"
-          value={formattedLocs}
-          textSize="sm"
-          column
-        />
+        <CampaignDetailsRow lighterColor title="Categories" value={formattedCats} textSize="sm" />
+        <CampaignDetailsRow lighterColor title="Countries" value={formattedLocs} textSize="sm" />
         {/* <CampaignDetailsRow
           mt="md"
           lighterColor

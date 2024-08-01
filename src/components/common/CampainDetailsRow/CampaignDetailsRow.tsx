@@ -43,7 +43,7 @@ const CampaignDetailsRow = ({
       gap="xs"
       {...rest}
     >
-      <Text span fw="bold" size={textSize}>
+      <Text span fw="bold" size={textSize} c="secondaryText">
         {title}
       </Text>
       {typeof value === 'string' ? (
