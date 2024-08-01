@@ -247,9 +247,9 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
       {isEditMode ? (
         <EditCampaign campaign={campaign} />
       ) : (
-        <Paper p="md" shadow="xs">
+        <Paper p="lg" shadow="sm">
           {isAdminPanel && <AdminBadge title="Admin Details" />}
-          <Grid gutter="md">
+          <Grid gutter="lg">
             <Grid.Col span={{ md: 12, xl: 6 }}>
               <Stack>
                 <Text fw="bold" size="sm" c="dimmed">
@@ -385,51 +385,55 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
               </Stack>
             </Grid.Col>
             <Grid.Col span={{ md: 12, xl: 6 }}>
-              <Stack>
-                <Text fw="bold" size="sm" c="dimmed">
-                  Targeting
-                </Text>
-                <Paper bg="lightBackground" p="sm" shadow="xs">
-                  <Stack>
-                    <CatsLocsFormatted
-                      title="Selected Categories"
-                      inputValues={campaign.targetingInput.inputs.categories}
-                      selectData={CATEGORIES}
-                    />
-                    <Divider />
-                    <CatsLocsFormatted
-                      title="Selected Countries"
-                      inputValues={campaign.targetingInput.inputs.location}
-                      selectData={COUNTRIES}
-                    />
-                  </Stack>
-                </Paper>
+              <Stack gap="lg">
+                <Stack>
+                  <Text fw="bold" size="sm" c="dimmed">
+                    Targeting
+                  </Text>
+                  <Paper bg="lightBackground" p="sm" shadow="xs">
+                    <Stack>
+                      <CatsLocsFormatted
+                        title="Selected Categories"
+                        inputValues={campaign.targetingInput.inputs.categories}
+                        selectData={CATEGORIES}
+                      />
+                      <Divider />
+                      <CatsLocsFormatted
+                        title="Selected Countries"
+                        inputValues={campaign.targetingInput.inputs.location}
+                        selectData={COUNTRIES}
+                      />
+                    </Stack>
+                  </Paper>
+                </Stack>
                 {!!campaign.adUnits.length && (
                   <Stack>
-                    <Text fw="bold" size="sm" color="dimmed">
-                      Creatives
-                    </Text>
-                    <Paper bg="lightBackground" p="sm" shadow="xs">
-                      {campaign.adUnits.map((item: AdUnit, index: number) => {
-                        const isLast = index === campaign.adUnits.length - 1
-                        return (
-                          <CampaignDetailsRow
-                            key={item.id}
-                            lineHeight="sm"
-                            textSize="sm"
-                            title={`${item.banner?.format.w}x${item.banner?.format.h}`}
-                            value={
-                              <MediaThumb
-                                adUnit={item}
-                                previewOnClick
-                                title={`Target URL: ${item.banner?.targetUrl}`}
-                              />
-                            }
-                            noBorder={isLast}
-                          />
-                        )
-                      })}
-                    </Paper>
+                    <Stack>
+                      <Text fw="bold" size="sm" c="dimmed">
+                        Creatives
+                      </Text>
+                      <Paper bg="lightBackground" p="sm" shadow="xs">
+                        {campaign.adUnits.map((item: AdUnit, index: number) => {
+                          const isLast = index === campaign.adUnits.length - 1
+                          return (
+                            <CampaignDetailsRow
+                              key={item.id}
+                              lineHeight="sm"
+                              textSize="sm"
+                              title={`${item.banner?.format.w}x${item.banner?.format.h}`}
+                              value={
+                                <MediaThumb
+                                  adUnit={item}
+                                  previewOnClick
+                                  title={`Target URL: ${item.banner?.targetUrl}`}
+                                />
+                              }
+                              noBorder={isLast}
+                            />
+                          )
+                        })}
+                      </Paper>
+                    </Stack>
                   </Stack>
                 )}
               </Stack>
