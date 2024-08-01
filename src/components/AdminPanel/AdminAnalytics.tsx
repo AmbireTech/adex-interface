@@ -270,10 +270,10 @@ const AdminAnalytics = () => {
         </Flex>
 
         {loading ? (
-          <Loader size="xl" variant="dots" color="violet" />
+          <Loader size="xl" type="dots" color="violet" />
         ) : (
-          <Flex direction="column" mt="xl">
-            <Flex direction="row" align="center" justify="left" gap="xl" mb="md">
+          <Flex direction="column" mt="md">
+            <Flex direction="row" align="center" justify="left" gap="xs" mb="md">
               <Box>Totals: </Box>
               <Badge
                 leftSection={
@@ -281,13 +281,13 @@ const AdminAnalytics = () => {
                     <BillingIcon />
                   </ActionIcon>
                 }
-                size="xl"
+                size="lg"
               >
                 {Number(data.paid.toFixed(2)).toLocaleString()}
               </Badge>
 
               <Badge
-                size="xl"
+                size="lg"
                 leftSection={
                   <ActionIcon size="sm" color="brand">
                     <VisibilityIcon />
@@ -298,7 +298,7 @@ const AdminAnalytics = () => {
               </Badge>
 
               <Badge
-                size="xl"
+                size="lg"
                 leftSection={
                   <ActionIcon size="sm" color="brand">
                     <CheckMarkFilledIcon />

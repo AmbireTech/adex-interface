@@ -123,23 +123,24 @@ const AdminAnalytics = () => {
   return (
     <Container fluid px={0}>
       {initialDataLoading ? (
-        <Loader size="xl" variant="dots" color="violet" />
+        <Loader size="xl" type="dots" color="violet" />
       ) : (
         <Paper p="sm" withBorder>
           <Flex direction="column">
-            <Flex direction="row" align="center" justify="left" gap="xl" mb="md" wrap="wrap">
+            <Flex direction="row" align="center" justify="left" gap="xs" mb="md" wrap="wrap">
               <Box>Totals: </Box>
-              <Badge leftSection="Accounts" size="xl">
+              <Badge leftSection="Accounts" size="lg">
                 ({data.totalAccounts})
               </Badge>
-              <Badge leftSection="Deposits" size="xl">
+              <Badge leftSection="Deposits" size="lg">
                 ({data.totalDeposits} USDC)
               </Badge>
-              <Badge leftSection="Campaigns" size="xl">
+              <Badge leftSection="Campaigns" size="lg">
                 ({data.totalCampaignsLocked} USDC)
               </Badge>
               <Flex>
                 <TextInput
+                  size="sm"
                   placeholder="Search by id, name, info, billing data etc."
                   value={search}
                   onChange={(e) => setSearch(e.currentTarget.value)}
