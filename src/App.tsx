@@ -14,7 +14,7 @@ import { lightTheme } from 'themes'
 import { Notifications } from '@mantine/notifications'
 import ReactGA from 'react-ga4'
 import { Global, MantineEmotionProvider, emotionTransform } from '@mantine/emotion'
-// import { emotionCache } from './emotion'
+import { emotionCache } from './emotion'
 
 const ENV = process.env.REACT_APP_ENV
 
@@ -53,7 +53,7 @@ function App() {
   return (
     <AccountProvider>
       <AdminProvider>
-        <MantineEmotionProvider>
+        <MantineEmotionProvider cache={emotionCache}>
           <ColorSchemeScript forceColorScheme="light" />
           <MantineProvider
             theme={lightTheme}
