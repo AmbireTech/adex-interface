@@ -219,7 +219,7 @@ export const CustomTable = ({
           <Stack key={rowKey} gap="xs" align="stretch" justify="center">
             <Divider bg="#EBEEFA" w="100%" p="10px" />
             {cols}
-            {!!actionsMenu}
+            {!!actionsMenu && actionsMenu}
           </Stack>
         )
       }
