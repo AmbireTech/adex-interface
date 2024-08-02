@@ -4,7 +4,7 @@ import {
   // CampaignType,
   EventType
 } from 'adex-common'
-import { Container, Flex, Text, Loader, UnstyledButton } from '@mantine/core'
+import { Container, Flex, Text, Loader, UnstyledButton, Box } from '@mantine/core'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import CustomTable, { TableElement, TableRowAction } from 'components/common/CustomTable'
 import { periodNumberToDate } from 'helpers'
@@ -55,7 +55,7 @@ const getStatusOrder = (status: CampaignStatus) => {
 
 type DashboardTableElement = Omit<TableElement, 'actionData'> & {
   actionData: { campaign: Campaign; isDraft: boolean; canArchive: boolean }
-  title: string
+  title: string | JSX.Element
   placement: string
   status: {
     value: CampaignStatus
@@ -123,6 +123,8 @@ const Dashboard = ({ isAdminPanel, accountId }: { isAdminPanel?: boolean; accoun
               decimals
             )
 
+            const archived = cmpData.campaign.archived
+
             return {
               actionData: {
                 campaign,
@@ -134,9 +136,18 @@ const Dashboard = ({ isAdminPanel, accountId }: { isAdminPanel?: boolean; accoun
                   CampaignStatus.rejected
                 ].includes(campaign.status)
               },
-              rowColor: cmpData.campaign.archived ? 'red' : undefined,
+              rowColor: archived ? 'red' : undefined,
               id: cmpData.campaignId,
-              title: `${cmpData.campaign.archived ? 'Archived - ' : ''}${cmpData.campaign.title}`,
+              title: (
+                <Box mr="xl">
+                  {archived && (
+                    <Text span mr="lg">
+                      <BadgeStatusCampaign type={cmpData.campaign.status} isArchived={archived} />
+                    </Text>
+                  )}
+                  <Text span>{`${cmpData.campaign.title}`}</Text>
+                </Box>
+              ),
               // type: CampaignType[cmpData.campaign.type],
               placement:
                 cmpData.campaign.targetingInput.inputs.placements.in[0] === 'app'
