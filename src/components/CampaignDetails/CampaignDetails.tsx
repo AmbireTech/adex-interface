@@ -232,6 +232,7 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
           </Group>
         </Paper>
         <Button
+          fw="normal"
           variant="transparent"
           color="mainText"
           rightSection={<AnalyticsIcon size="26px" />}
