@@ -23,7 +23,6 @@ import { parseBigNumTokenAmountToDecimal, parseToBigNumPrecision } from 'helpers
 
 import {
   findArrayWithLengthInObjectAsValue,
-  updateCatsLocsObject,
   getRecommendedCPMRange
 } from 'helpers/createCampaignHelpers'
 import useAccount from 'hooks/useAccount'
@@ -193,20 +192,22 @@ const EditCampaign = ({ campaign }: { campaign: Campaign }) => {
 
   const handleCategories = useCallback(
     (selectedRadio: TargetingInputApplyProp, categoriesValue: string[]) => {
-      form.setFieldValue(
-        'targetingInput.inputs.categories',
-        updateCatsLocsObject(selectedRadio, categoriesValue)
-      )
+      form.setFieldValue('targetingInput.inputs.categories', {
+        apply: selectedRadio,
+        in: categoriesValue,
+        nin: categoriesValue
+      })
     },
     [form]
   )
 
   const handleCountries = useCallback(
     (selectedRadio: TargetingInputApplyProp, locationsValue: string[]) => {
-      form.setFieldValue(
-        'targetingInput.inputs.location',
-        updateCatsLocsObject(selectedRadio, locationsValue)
-      )
+      form.setFieldValue('targetingInput.inputs.location', {
+        apply: selectedRadio,
+        in: locationsValue,
+        nin: locationsValue
+      })
     },
     [form]
   )

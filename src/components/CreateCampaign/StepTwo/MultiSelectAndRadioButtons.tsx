@@ -68,10 +68,13 @@ const MultiSelectAndRadioButtons = ({
   const [selectedValue, setSelectedValue] = useState<string[]>(defaultSelectValue)
   const { classes } = useStyles({ selectedRadio })
 
-  const handleRadioChange = useCallback((value: string) => {
-    setSelectedRadio(value as TargetingInputApplyProp)
-    setSelectedValue([])
-  }, [])
+  const handleRadioChange = useCallback(
+    (value: string) => {
+      setSelectedRadio(value as TargetingInputApplyProp)
+      onCategoriesChange(value as TargetingInputApplyProp, selectedValue)
+    },
+    [onCategoriesChange, selectedValue]
+  )
 
   const handleSelectChange = useCallback(
     (value: string[]) => {
