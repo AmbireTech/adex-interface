@@ -105,6 +105,7 @@ const MultiSelectAndRadioButtons = ({
   const labelText = useMemo(() => {
     if (selectedRadio === 'in') return `Select ${label}`
     if (selectedRadio === 'nin') return `Select ${label} to exclude`
+    if (selectedRadio === 'all') return 'All selected'
     return ''
   }, [selectedRadio, label])
 
@@ -125,7 +126,8 @@ const MultiSelectAndRadioButtons = ({
         variant="filled"
         size="lg"
         radius="lg"
-        value={selectedValue}
+        // NOTE: just visually show the nothing but keeps the value in case of change - will not need to select again
+        value={selectedRadio === 'all' ? [] : selectedValue}
         disabled={selectedRadio === 'all'}
         data={data}
         onChange={handleSelectChange}

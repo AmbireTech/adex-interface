@@ -194,8 +194,8 @@ const EditCampaign = ({ campaign }: { campaign: Campaign }) => {
     (selectedRadio: TargetingInputApplyProp, categoriesValue: string[]) => {
       form.setFieldValue('targetingInput.inputs.categories', {
         apply: selectedRadio,
-        in: categoriesValue,
-        nin: categoriesValue
+        in: selectedRadio === 'in' ? categoriesValue : [],
+        nin: selectedRadio === 'nin' ? categoriesValue : []
       })
     },
     [form]
@@ -205,8 +205,8 @@ const EditCampaign = ({ campaign }: { campaign: Campaign }) => {
     (selectedRadio: TargetingInputApplyProp, locationsValue: string[]) => {
       form.setFieldValue('targetingInput.inputs.location', {
         apply: selectedRadio,
-        in: locationsValue,
-        nin: locationsValue
+        in: selectedRadio === 'in' ? locationsValue : [],
+        nin: selectedRadio === 'nin' ? locationsValue : []
       })
     },
     [form]
