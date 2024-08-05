@@ -259,14 +259,19 @@ const Dashboard = ({ isAdminPanel, accountId }: { isAdminPanel?: boolean; accoun
   const handleDelete = useCallback(
     (data: DashboardTableElement['actionData']) =>
       modals.openConfirmModal({
-        title: 'Delete draft',
+        centered: true,
+        withCloseButton: false,
+        padding: 0,
         children: (
           <CustomConfirmModalBody
             text={`Are you sure want to delete draft "${data.campaign.title}"`}
+            color="warning"
           />
         ),
         labels: { confirm: 'Delete', cancel: 'Cancel' },
-        confirmProps: { color: 'red' },
+        cancelProps: { color: 'secondaryText', variant: 'outline', size: 'md' },
+        confirmProps: { color: 'warning', variant: 'outline', size: 'md' },
+        groupProps: { justify: 'space-between', pb: 'md', px: 'md' },
         onConfirm: () => deleteDraftCampaign(data.campaign.id)
       }),
     [deleteDraftCampaign]
@@ -278,14 +283,22 @@ const Dashboard = ({ isAdminPanel, accountId }: { isAdminPanel?: boolean; accoun
       const confirm = cmp?.archived ? 'Unarchive' : 'Archive'
 
       return modals.openConfirmModal({
-        title: `${confirm} Campaign`,
+        centered: true,
+        withCloseButton: false,
+        padding: 0,
         children: (
           <CustomConfirmModalBody
             text={`Are you sure want to ${confirm} campaign "${cmp?.title}"`}
           />
         ),
         labels: { confirm, cancel: 'Cancel' },
-        confirmProps: { color: cmp?.archived ? 'blue' : 'red' },
+        cancelProps: { color: 'secondaryText', variant: 'outline', size: 'md' },
+        confirmProps: {
+          color: cmp?.archived ? 'brand' : 'attention',
+          variant: 'outline',
+          size: 'md'
+        },
+        groupProps: { justify: 'space-between', pb: 'md', px: 'md' },
         onConfirm: () => toggleArchived(cmp?.id || '')
       })
     },

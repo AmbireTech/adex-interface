@@ -1,64 +1,32 @@
-import {
-  ButtonProps,
-  Flex,
-  MantineColor,
-  MantineTheme,
-  Text,
-  getPrimaryShade,
-  lighten
-} from '@mantine/core'
-import { createStyles } from '@mantine/emotion'
-import { useColorScheme } from '@mantine/hooks'
+import { ButtonProps, Stack, MantineColor, Text, ThemeIcon, lighten } from '@mantine/core'
 import { PropsWithChildren } from 'react'
 import AttentionIcon from 'resources/icons/Attention'
+import { DEFAULT_PRIMARY_SHADE } from 'themes/base'
 
-const useStyles = createStyles((theme: MantineTheme, { color }: { color: MantineColor }) => {
-  const colorScheme = useColorScheme()
-  const primaryShade = getPrimaryShade(theme, colorScheme)
-
-  return {
-    confirmModalContent: {
-      background: lighten(
-        theme.colors[color][primaryShade],
-        theme.other.shades.hexColorSuffix.lightest
-      ),
-      padding: theme.spacing.xl
-    },
-    iconWrapper: {
-      width: 50,
-      height: 50,
-      background: `${theme.colors[color][primaryShade]}1A`,
-      borderRadius: '50%',
-      padding: theme.spacing.sm
-    },
-    attentionIcon: {
-      width: 25,
-      height: 25,
-      color: theme.colors.attention[primaryShade]
-    },
-    root: {
-      padding: 0
-    }
-  }
-})
-
-type ConfirmModalProps = ButtonProps &
+type CustomConfirmModalProps = ButtonProps &
   PropsWithChildren & {
     color?: MantineColor
     text: string | React.ReactNode
   }
 
-export const CustomConfirmModalBody = ({ color = 'attention', text }: ConfirmModalProps) => {
-  const { classes } = useStyles({ color })
-
+export const CustomConfirmModalBody = ({ color = 'attention', text }: CustomConfirmModalProps) => {
   return (
-    <Flex justify="center" className={classes.confirmModalContent}>
-      <div className={classes.iconWrapper}>
-        <AttentionIcon className={classes.attentionIcon} />
-      </div>
-      <Text w="100%" pt="xl">
-        {text}
-      </Text>
-    </Flex>
+    <Stack
+      align="center"
+      p="xl"
+      gap="lg"
+      style={(theme) => ({
+        backgroundColor: lighten(
+          theme.colors[color][DEFAULT_PRIMARY_SHADE],
+          theme.other.shades.lighten.lightest
+        )
+      })}
+    >
+      <ThemeIcon size="xl" variant="transparent" radius="xl" color={color}>
+        <AttentionIcon size="24px" />
+      </ThemeIcon>
+
+      <Text>{text}</Text>
+    </Stack>
   )
 }

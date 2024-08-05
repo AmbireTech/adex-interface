@@ -234,8 +234,12 @@ const themeOverride: MantineThemeOverride = createTheme({
       }
     }),
     Modal: Modal.extend({
+      defaultProps: {
+        padding: 0
+      },
       styles: (theme) => ({
         root: {
+          padding: 0,
           [theme.other.media.print]: {
             overflow: 'visible'
           }
