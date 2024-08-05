@@ -1,4 +1,4 @@
-import { Tabs, Paper } from '@mantine/core'
+import { Tabs, Paper, Container } from '@mantine/core'
 import { useNavigate, useParams, Outlet } from 'react-router-dom'
 import { AdminBadge } from 'components/common/AdminBadge'
 import Dashboard from 'components/Dashboard'
@@ -15,8 +15,7 @@ const AdminPanel = () => {
   console.log({ tabValue })
 
   return (
-    <>
-      {/* //TODO: move to top bar */}
+    <Container fluid>
       <StickyPanel>
         <AdminBadge title="Admin Panel" />
       </StickyPanel>
@@ -35,30 +34,30 @@ const AdminPanel = () => {
           </Tabs.Tab>
         </Tabs.List>
 
-        <Tabs.Panel value="campaigns" pt="xs">
-          <Paper p="sm" withBorder>
+        <Paper mt="md" p="sm" withBorder shadow="md">
+          <Tabs.Panel value="campaigns" pt="xs">
             <Dashboard isAdminPanel accountId={accountId} />
-          </Paper>
-        </Tabs.Panel>
+          </Tabs.Panel>
 
-        <Tabs.Panel value="validatorAnalytics" pt="xs">
-          <AdminAnalytics />
-        </Tabs.Panel>
+          <Tabs.Panel value="validatorAnalytics" pt="xs">
+            <AdminAnalytics />
+          </Tabs.Panel>
 
-        <Tabs.Panel value="sspStats" pt="xs">
-          <SspStats />
-        </Tabs.Panel>
+          <Tabs.Panel value="sspStats" pt="xs">
+            <SspStats />
+          </Tabs.Panel>
 
-        <Tabs.Panel value="accounts" pt="xs">
-          <Accounts />
-        </Tabs.Panel>
+          <Tabs.Panel value="accounts" pt="xs">
+            <Accounts />
+          </Tabs.Panel>
 
-        <Tabs.Panel value="user-account" pt="xs">
-          {/* <AccountDetails /> */}
-          <Outlet />
-        </Tabs.Panel>
+          <Tabs.Panel value="user-account" pt="xs">
+            {/* <AccountDetails /> */}
+            <Outlet />
+          </Tabs.Panel>
+        </Paper>
       </Tabs>
-    </>
+    </Container>
   )
 }
 
