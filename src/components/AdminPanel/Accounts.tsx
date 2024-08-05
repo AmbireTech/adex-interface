@@ -144,7 +144,7 @@ const AdminAnalytics = () => {
         />
       </Group>
       <CustomTable
-        background
+        noBorder
         headings={headings}
         elements={data.elements}
         pageSize={10}

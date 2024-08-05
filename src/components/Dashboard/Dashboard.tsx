@@ -4,7 +4,7 @@ import {
   // CampaignType,
   EventType
 } from 'adex-common'
-import { Container, Flex, Text, Loader, UnstyledButton, Box } from '@mantine/core'
+import { Container, Flex, Text, Loader, UnstyledButton } from '@mantine/core'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import CustomTable, { TableElement, TableRowAction } from 'components/common/CustomTable'
 import { periodNumberToDate } from 'helpers'
@@ -139,14 +139,12 @@ const Dashboard = ({ isAdminPanel, accountId }: { isAdminPanel?: boolean; accoun
               rowColor: archived ? 'red' : undefined,
               id: cmpData.campaignId,
               title: (
-                <Box mr="xl">
+                <Text truncate>
                   {archived && (
-                    <Text span mr="lg">
-                      <BadgeStatusCampaign type={cmpData.campaign.status} isArchived={archived} />
-                    </Text>
+                    <BadgeStatusCampaign type={cmpData.campaign.status} isArchived={archived} />
                   )}
-                  <Text span>{`${cmpData.campaign.title}`}</Text>
-                </Box>
+                  {`${archived ? ' ' : ''}${cmpData.campaign.title}`}
+                </Text>
               ),
               // type: CampaignType[cmpData.campaign.type],
               placement:
@@ -395,7 +393,7 @@ const Dashboard = ({ isAdminPanel, accountId }: { isAdminPanel?: boolean; accoun
         </Flex>
         {!initialDataLoading ? (
           <CustomTable
-            background
+            noBorder={isAdminPanel}
             headings={campaignHeaders}
             elements={elements}
             actions={actions}

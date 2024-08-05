@@ -31,7 +31,7 @@ const SSPs = ({
       })) || [],
     [data, currencyName]
   )
-  return <CustomTable background headings={headings} elements={elements} />
+  return <CustomTable headings={headings} elements={elements} />
 }
 
 export default SSPs

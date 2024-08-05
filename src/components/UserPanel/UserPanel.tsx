@@ -1,4 +1,4 @@
-import { AppShell, Burger, Flex } from '@mantine/core'
+import { AppShell, Burger, Container, Flex } from '@mantine/core'
 import SideNav from 'components/SideNav'
 import TopBar from 'components/TopBar'
 import { useState } from 'react'
@@ -45,7 +45,9 @@ function UserPanel() {
         <SideNav />
       </AppShell.Navbar>
       <AppShell.Main>
-        <Outlet />
+        <Container fluid>
+          <Outlet />
+        </Container>
       </AppShell.Main>
     </AppShell>
   )

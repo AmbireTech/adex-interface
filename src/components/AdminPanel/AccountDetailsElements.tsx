@@ -42,7 +42,6 @@ export const FundsActivity = ({ accountData }: { accountData: Account }) => {
   return (
     <Box>
       <CustomTable
-        background
         headings={['Type', 'Date', 'Amount', 'Token', 'Tx/Campaign id']}
         elements={elements}
         pageSize={10}

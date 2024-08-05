@@ -17,7 +17,8 @@ const BadgeStatusCampaign = ({ type, isArchived }: BadgeType) => {
       return {
         color: 'secondaryText',
         text: 'Archived',
-        icon: <ArchivedIcon size="13px" />
+        icon: <ArchivedIcon size="10px" />,
+        size: 'xs'
       }
     }
     switch (status) {

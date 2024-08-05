@@ -158,7 +158,7 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
   return (
     <Stack gap="xl">
       <StickyPanel>
-        <Paper mx="auto" shadow="xl" radius="xl">
+        <Paper mx="auto" shadow="lg" radius="xl">
           <Group align="center" justify="space-between">
             <GoBack title="Dashboard" />
             <Box>
@@ -255,7 +255,7 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
       {isEditMode ? (
         <EditCampaign campaign={campaign} />
       ) : (
-        <Paper p="lg" shadow="sm">
+        <Paper p="lg" shadow="xs">
           {isAdminPanel && <AdminBadge title="Admin Details" />}
           <Grid gutter="lg">
             <Grid.Col span={{ md: 12, xl: 6 }}>

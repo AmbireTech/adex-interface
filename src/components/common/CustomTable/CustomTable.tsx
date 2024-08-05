@@ -1,5 +1,4 @@
 import {
-  Flex,
   Group,
   Pagination,
   Table,
@@ -12,7 +11,9 @@ import {
   MantineColor,
   Tooltip,
   MantineTheme,
-  getPrimaryShade
+  getPrimaryShade,
+  Paper,
+  ScrollArea
 } from '@mantine/core'
 import { createStyles } from '@mantine/emotion'
 import { useMediaQuery, useColorScheme } from '@mantine/hooks'
@@ -38,11 +39,11 @@ export type TableRowAction = {
 
 export type CustomTableProps = PropsWithChildren &
   TableProps & {
-    background?: boolean
     headings: string[]
     elements: Array<TableElement>
     pageSize?: number
     actions?: TableRowAction[]
+    noBorder?: boolean
   }
 
 const useStyles = createStyles((theme: MantineTheme) => {
@@ -50,28 +51,6 @@ const useStyles = createStyles((theme: MantineTheme) => {
   const primaryShade = getPrimaryShade(theme, colorScheme)
 
   return {
-    header: {
-      backgroundColor: theme.colors.alternativeBackground[primaryShade]
-    },
-    background: {
-      backgroundColor: theme.colors.mainBackground[primaryShade],
-      boxShadow: theme.shadows.xs
-    },
-    tableWrapper: {
-      width: '100%',
-      overflow: 'hidden',
-      overflowX: 'auto',
-      borderRadius: theme.radius.md
-    },
-    gridRow: {
-      borderBottom: `1px solid ${theme.colors.decorativeBorders[primaryShade]}`
-    },
-    cell: {
-      overflow: 'hidden',
-      whiteSpace: 'nowrap',
-      textOverflow: 'ellipsis',
-      maxWidth: 200
-    },
     action: {
       '&:hover': {
         color: theme.colors.brand[primaryShade]
@@ -89,16 +68,16 @@ const getLabel = (label: TableRowAction['label'], actionData: TableElement['acti
 }
 
 export const CustomTable = ({
-  background,
   headings,
   elements,
   pageSize,
   actions,
+  noBorder,
   ...tableProps
 }: CustomTableProps) => {
   const isMobile = useMediaQuery('(max-width: 75rem)')
 
-  const { classes, cx } = useStyles()
+  const { classes } = useStyles()
   const columns: string[] = useMemo(
     () =>
       typeof elements[0] === 'object'
@@ -199,15 +178,15 @@ export const CustomTable = ({
             <Group grow>
               <Text ta="center">{headings[cidx]}</Text>
 
-              <Text span ta="center" truncate c={color}>
+              <Text ta="center" truncate c={color}>
                 {columnParsed}
               </Text>
             </Group>
             <Divider />
           </Stack>
         ) : (
-          <Table.Td key={column} className={classes.cell}>
-            <Text size="sm" span c={color} truncate>
+          <Table.Td key={column}>
+            <Text size="sm" c={color} truncate maw={200}>
               {columnParsed}
             </Text>
           </Table.Td>
@@ -230,45 +209,45 @@ export const CustomTable = ({
         </Table.Tr>
       )
     })
-  }, [list, actions, isMobile, classes.action, classes.cell, columns, headings])
+  }, [list, actions, isMobile, classes.action, columns, headings])
 
   if (!elements.length) return <Text>No data found</Text>
   return (
-    <Flex h="100%" w="100%" justify="space-between" direction="column" align="stretch">
-      {isMobile ? (
-        <Stack gap="xl">{rows}</Stack>
-      ) : (
-        <div className={classes.tableWrapper}>
-          <Table
-            {...tableProps}
-            miw="max-content"
-            w="100%"
-            highlightOnHover
-            verticalSpacing="sm"
-            className={cx({ [classes.background]: background })}
-          >
-            <Table.Thead className={classes.header}>
-              <Table.Tr>
-                {headings.map((h) => (
-                  <Table.Th key={h}>{h}</Table.Th>
-                ))}
-                {!!actions?.length && <th key="Action">Actions</th>}
-              </Table.Tr>
-            </Table.Thead>
-            <Table.Tbody>{rows}</Table.Tbody>
-          </Table>
-        </div>
-      )}
-      <Group w="100%" justify="right" mt="xl">
-        <Pagination
-          total={maxPages}
-          boundaries={1}
-          defaultValue={defaultPage}
-          onNextPage={onNextPage}
-          onPreviousPage={onPreviousPage}
-          onChange={(value) => onChange(value)}
-        />
-      </Group>
-    </Flex>
+    <Stack align="center" w="100%">
+      <Paper pb="md" w="100%" shadow={noBorder ? 'xl' : 'xs'}>
+        {isMobile ? (
+          <Stack gap="xl">{rows}</Stack>
+        ) : (
+          <ScrollArea scrollbars="x" type="auto" offsetScrollbars>
+            <Table {...tableProps} w="100%" highlightOnHover verticalSpacing="sm">
+              <Table.Thead bg="alternativeBackground">
+                <Table.Tr>
+                  {headings.map((h) => (
+                    <Table.Th key={h}>{h}</Table.Th>
+                  ))}
+                  {!!actions?.length && <th key="Action">Actions</th>}
+                </Table.Tr>
+              </Table.Thead>
+              <Table.Tbody>{rows}</Table.Tbody>
+            </Table>
+          </ScrollArea>
+        )}
+        <Group w="100%" justify="right" mt="xl" pr="md">
+          <Pagination
+            total={maxPages}
+            boundaries={1}
+            defaultValue={defaultPage}
+            onNextPage={onNextPage}
+            onPreviousPage={onPreviousPage}
+            onChange={(value) => onChange(value)}
+            styles={{
+              control: {
+                border: 0
+              }
+            }}
+          />
+        </Group>
+      </Paper>
+    </Stack>
   )
 }

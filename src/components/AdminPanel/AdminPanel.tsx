@@ -34,7 +34,7 @@ const AdminPanel = () => {
           </Tabs.Tab>
         </Tabs.List>
 
-        <Paper mt="md" p="sm" withBorder shadow="md">
+        <Paper mt="md" p="sm" shadow="xs">
           <Tabs.Panel value="campaigns" pt="xs">
             <Dashboard isAdminPanel accountId={accountId} />
           </Tabs.Panel>

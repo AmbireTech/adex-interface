@@ -304,7 +304,6 @@ const AdminAnalytics = () => {
           </Flex>
 
           <CustomTable
-            background
             headings={headings}
             elements={data.elements}
             pageSize={10}

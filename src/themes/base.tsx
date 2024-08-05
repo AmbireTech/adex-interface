@@ -12,7 +12,7 @@ import {
   AlertProps,
   Modal,
   Input,
-  Flex,
+  // Flex,
   lighten,
   alpha,
   MantineColorShade,
@@ -127,7 +127,7 @@ const themeOverride: MantineThemeOverride = createTheme({
     }
   },
   shadows: {
-    xs: '0'
+    xl: '0'
   },
   components: {
     Alert: Alert.extend({
@@ -270,14 +270,14 @@ const themeOverride: MantineThemeOverride = createTheme({
         }
       })
     }),
-    Flex: Flex.extend({
-      defaultProps: {
-        wrap: 'wrap'
-      }
-    }),
+    // Flex: Flex.extend({
+    //   defaultProps: {
+    //     wrap: 'wrap'
+    //   }
+    // }),
     Paper: Paper.extend({
       defaultProps: {
-        shadow: 'xs'
+        shadow: 'xl'
       }
     })
   },
