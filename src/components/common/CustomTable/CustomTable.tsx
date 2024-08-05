@@ -12,7 +12,8 @@ import {
   Tooltip,
   Paper,
   ScrollArea,
-  MantineShadow
+  MantineShadow,
+  ThemeIcon
 } from '@mantine/core'
 import { useMediaQuery } from '@mantine/hooks'
 import usePagination from 'hooks/usePagination'
@@ -84,10 +85,11 @@ export const CustomTable = ({
   const rows = useMemo(() => {
     return list.map((e, i) => {
       const activeActions = [...(actions || [])].filter((a) => !a.hide?.(e.actionData))
+      const maxActions = isMobile ? activeActions.length : 3
 
       const actionsMenu = activeActions?.length && (
         <Group justify={isMobile ? 'center' : 'right'} gap="sm" wrap="nowrap">
-          {activeActions.slice(0, 3).map((a) => {
+          {activeActions.slice(0, maxActions).map((a) => {
             const label = getLabel(a.label, e.actionData)
             return (
               <Tooltip key={label} label={label}>
@@ -103,8 +105,8 @@ export const CustomTable = ({
               </Tooltip>
             )
           })}
-          {activeActions.length > 3 && (
-            <Menu shadow="md" width={200}>
+          {!isMobile && activeActions.length > maxActions && (
+            <Menu shadow="md">
               <Menu.Target>
                 <ActionIcon size="23px" variant="transparent" color="mainText" component="div">
                   <Dots />
@@ -112,28 +114,23 @@ export const CustomTable = ({
               </Menu.Target>
 
               <Menu.Dropdown>
-                {activeActions.slice(3).map((a) => {
+                {activeActions.slice(maxActions).map((a) => {
                   const label = getLabel(a.label, e.actionData)
                   const disabled = a.disabled?.(e.actionData || e)
                   return (
                     <Menu.Item
+                      // maw={}
                       color={a.color || 'mainText'}
                       key={label}
                       leftSection={
-                        <ActionIcon
-                          size="23px"
-                          variant="transparent"
-                          color={a.color || 'mainText'}
-                          disabled={disabled}
-                          component="div"
-                        >
+                        <ThemeIcon size="20px" variant="transparent" color={a.color || 'mainText'}>
                           {a.icon}
-                        </ActionIcon>
+                        </ThemeIcon>
                       }
                       onClick={() => a.action(e.actionData || e)}
                       disabled={disabled}
                     >
-                      <Text size="md">{label}</Text>
+                      <Text size="sm">{label}</Text>
                     </Menu.Item>
                   )
                 })}
@@ -209,6 +206,7 @@ export const CustomTable = ({
         )}
         <Group w="100%" justify="right" mt="xl" pr="md">
           <Pagination
+            color="brand"
             total={maxPages}
             boundaries={1}
             defaultValue={defaultPage}

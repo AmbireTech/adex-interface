@@ -69,11 +69,7 @@ const variantColorResolver: VariantColorsResolver = (input) => {
   })
 
   // used for action icons mostly
-  if (
-    parsedColor.isThemeColor &&
-    parsedColor.color === 'mainText' &&
-    input.variant === 'transparent'
-  ) {
+  if (parsedColor.isThemeColor && parsedColor.color === 'mainText') {
     return {
       ...defaultResolvedColors,
       hoverColor: input.theme.colors.brand[DEFAULT_PRIMARY_SHADE]
