@@ -240,6 +240,7 @@ export const CustomTable = ({
             onNextPage={onNextPage}
             onPreviousPage={onPreviousPage}
             onChange={(value) => onChange(value)}
+            size="sm"
             styles={{
               control: {
                 border: 0
