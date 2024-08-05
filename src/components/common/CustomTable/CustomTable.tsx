@@ -13,7 +13,8 @@ import {
   MantineTheme,
   getPrimaryShade,
   Paper,
-  ScrollArea
+  ScrollArea,
+  MantineShadow
 } from '@mantine/core'
 import { createStyles } from '@mantine/emotion'
 import { useMediaQuery, useColorScheme } from '@mantine/hooks'
@@ -43,7 +44,7 @@ export type CustomTableProps = PropsWithChildren &
     elements: Array<TableElement>
     pageSize?: number
     actions?: TableRowAction[]
-    noBorder?: boolean
+    shadow?: MantineShadow
   }
 
 const useStyles = createStyles((theme: MantineTheme) => {
@@ -72,7 +73,7 @@ export const CustomTable = ({
   elements,
   pageSize,
   actions,
-  noBorder,
+  shadow = 'none',
   ...tableProps
 }: CustomTableProps) => {
   const isMobile = useMediaQuery('(max-width: 75rem)')
@@ -214,7 +215,7 @@ export const CustomTable = ({
   if (!elements.length) return <Text>No data found</Text>
   return (
     <Stack align="center" w="100%">
-      <Paper pb="md" w="100%" shadow={noBorder ? 'xl' : 'xs'}>
+      <Paper pb="md" w="100%" shadow={shadow}>
         {isMobile ? (
           <Stack gap="xl">{rows}</Stack>
         ) : (

@@ -143,13 +143,7 @@ const AdminAnalytics = () => {
           miw={420}
         />
       </Group>
-      <CustomTable
-        noBorder
-        headings={headings}
-        elements={data.elements}
-        pageSize={10}
-        actions={actions}
-      />
+      <CustomTable headings={headings} elements={data.elements} pageSize={10} actions={actions} />
     </Stack>
   )
 }

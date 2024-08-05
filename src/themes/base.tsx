@@ -12,11 +12,11 @@ import {
   AlertProps,
   Modal,
   Input,
-  // Flex,
   lighten,
   alpha,
   MantineColorShade,
   Paper
+  // ActionIcon
 } from '@mantine/core'
 import { Dropzone } from '@mantine/dropzone'
 import DownArrowIcon from 'resources/icons/DownArrow'
@@ -125,9 +125,6 @@ const themeOverride: MantineThemeOverride = createTheme({
       h5: { fontSize: '1.1669rem', fontWeight: '500', lineHeight: '1.6919rem' }
       // ...
     }
-  },
-  shadows: {
-    xl: '0'
   },
   components: {
     Alert: Alert.extend({
@@ -270,14 +267,9 @@ const themeOverride: MantineThemeOverride = createTheme({
         }
       })
     }),
-    // Flex: Flex.extend({
-    //   defaultProps: {
-    //     wrap: 'wrap'
-    //   }
-    // }),
     Paper: Paper.extend({
       defaultProps: {
-        shadow: 'xl'
+        shadow: 'none'
       }
     })
   },

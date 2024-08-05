@@ -393,7 +393,7 @@ const Dashboard = ({ isAdminPanel, accountId }: { isAdminPanel?: boolean; accoun
         </Flex>
         {!initialDataLoading ? (
           <CustomTable
-            noBorder={isAdminPanel}
+            shadow={!isAdminPanel ? 'xs' : undefined}
             headings={campaignHeaders}
             elements={elements}
             actions={actions}

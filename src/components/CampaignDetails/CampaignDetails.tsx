@@ -263,7 +263,7 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
                 <Text fw="bold" size="sm" c="dimmed">
                   Overview
                 </Text>
-                <Paper bg="lightBackground" p="md" shadow="xs" withBorder>
+                <Paper bg="lightBackground" p="md" withBorder>
                   <CampaignDetailsRow
                     lineHeight="sm"
                     textSize="sm"
@@ -398,7 +398,7 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
                   <Text fw="bold" size="sm" c="dimmed">
                     Targeting
                   </Text>
-                  <Paper bg="lightBackground" p="sm" shadow="xs" withBorder>
+                  <Paper bg="lightBackground" p="sm" withBorder>
                     <Stack>
                       <CatsLocsFormatted
                         title="Selected Categories"
@@ -420,7 +420,7 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
                       <Text fw="bold" size="sm" c="dimmed">
                         Creatives
                       </Text>
-                      <Paper bg="lightBackground" p="sm" shadow="xs" withBorder>
+                      <Paper bg="lightBackground" p="sm" withBorder>
                         {campaign.adUnits.map((item: AdUnit, index: number) => {
                           const isLast = index === campaign.adUnits.length - 1
                           return (

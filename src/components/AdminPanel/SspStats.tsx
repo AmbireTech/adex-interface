@@ -67,10 +67,10 @@ function SspStats() {
             // ]}
           >
             <Paper p="sm" withBorder>
-              <CustomTable pageSize={10} noBorder {...data.appBannerFormats} />
+              <CustomTable pageSize={10} {...data.appBannerFormats} />
             </Paper>
             <Paper p="sm" withBorder>
-              <CustomTable pageSize={10} noBorder {...data.appBidFloors} />
+              <CustomTable pageSize={10} {...data.appBidFloors} />
             </Paper>
           </SimpleGrid>
         </Tabs.Panel>
@@ -88,10 +88,10 @@ function SspStats() {
             // ]}
           >
             <Paper p="sm" withBorder>
-              <CustomTable pageSize={10} noBorder {...data.siteBannerFormatsMobile} />
+              <CustomTable pageSize={10} {...data.siteBannerFormatsMobile} />
             </Paper>
             <Paper p="sm" withBorder>
-              <CustomTable pageSize={10} noBorder {...data.siteMobileBidFloors} />
+              <CustomTable pageSize={10} {...data.siteMobileBidFloors} />
             </Paper>
           </SimpleGrid>
         </Tabs.Panel>
@@ -109,10 +109,10 @@ function SspStats() {
             // ]}
           >
             <Paper p="sm" withBorder>
-              <CustomTable pageSize={10} noBorder {...data.siteBannerFormatsDesktop} />
+              <CustomTable pageSize={10} {...data.siteBannerFormatsDesktop} />
             </Paper>
             <Paper p="sm" withBorder>
-              <CustomTable pageSize={10} noBorder {...data.siteDesktopBidFloors} />
+              <CustomTable pageSize={10} {...data.siteDesktopBidFloors} />
             </Paper>
           </SimpleGrid>
         </Tabs.Panel>
