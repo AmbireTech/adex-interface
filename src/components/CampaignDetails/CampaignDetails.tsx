@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo } from 'react'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
-import { Grid, Text, Button, Paper, Stack, Group, Divider } from '@mantine/core'
+import { Grid, Text, Button, Paper, Stack, Group, Divider, Box } from '@mantine/core'
 import { modals } from '@mantine/modals'
 import BadgeStatusCampaign from 'components/Dashboard/BadgeStatusCampaign'
 import { CATEGORIES, COUNTRIES } from 'constants/createCampaign'
@@ -22,6 +22,7 @@ import { AdminBadge } from 'components/common/AdminBadge'
 import EditCampaign from 'components/EditCampaign'
 import { CustomConfirmModalBody } from 'components/common/Modals/CustomConfirmModal/CustomConfirmModalBody'
 import DeleteIcon from 'resources/icons/Delete'
+import { StickyPanel } from 'components/TopBar/TopBarStickyPanel'
 import CatsLocsFormatted from './CatsLocsFormatted'
 import { AdminActions } from './AdminActions'
 
@@ -156,92 +157,100 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
   if (!campaign) return <div>Invalid Campaign Id</div>
   return (
     <Stack gap="xl">
-      <Group justify="center">
-        <GoBack title="Dashboard" />
-        <Paper mx="auto" shadow="md" radius="xl">
-          <Group gap="xs" p={4} justify="center">
-            <Button
-              rightSection={<ActiveIcon size="15px" />}
-              onClick={() =>
-                canActivate && changeCampaignStatus(CampaignStatus.active, campaign.id)
-              }
-              color="success"
-              disabled={!canActivate}
-              variant="light"
-            >
-              Activate
-            </Button>
+      <StickyPanel>
+        <Paper mx="auto" shadow="xl" radius="xl">
+          <Group align="center" justify="space-between">
+            <GoBack title="Dashboard" />
+            <Box>
+              <Group gap="xs" p={4} justify="center" w="100%">
+                <Button
+                  rightSection={<ActiveIcon size="15px" />}
+                  onClick={() =>
+                    canActivate && changeCampaignStatus(CampaignStatus.active, campaign.id)
+                  }
+                  color="success"
+                  disabled={!canActivate}
+                  variant="light"
+                >
+                  Activate
+                </Button>
 
-            <Button
-              rightSection={<PausedIcon size="15px" />}
-              onClick={() => canPause && changeCampaignStatus(CampaignStatus.paused, campaign.id)}
-              color="paused"
-              variant="subtle"
-              disabled={!canPause}
-            >
-              Pause
-            </Button>
+                <Button
+                  rightSection={<PausedIcon size="15px" />}
+                  onClick={() =>
+                    canPause && changeCampaignStatus(CampaignStatus.paused, campaign.id)
+                  }
+                  color="paused"
+                  variant="subtle"
+                  disabled={!canPause}
+                >
+                  Pause
+                </Button>
 
-            <Button
-              rightSection={<StopIcon size="15px" />}
-              onClick={handleStopOrDelete}
-              disabled={!canStop}
-              color="secondaryText"
-              variant="subtle"
-            >
-              Stop
-            </Button>
+                <Button
+                  rightSection={<StopIcon size="15px" />}
+                  onClick={handleStopOrDelete}
+                  disabled={!canStop}
+                  color="secondaryText"
+                  variant="subtle"
+                >
+                  Stop
+                </Button>
 
-            {campaign.status === CampaignStatus.draft ? (
-              <Button
-                rightSection={<DeleteIcon size="15px" />}
-                onClick={handleStopOrDelete}
-                disabled={isAdminPanel}
-                color="warning"
-                variant="subtle"
-              >
-                Delete draft
-              </Button>
-            ) : (
-              <Button
-                rightSection={<ArchivedIcon size="15px" />}
-                onClick={handleArchive}
-                disabled={!canArchive}
-                color="secondaryText"
-                variant="subtle"
-              >
-                {campaign.archived ? 'Unarchive' : 'Archive'}
-              </Button>
-            )}
+                {campaign.status === CampaignStatus.draft ? (
+                  <Button
+                    rightSection={<DeleteIcon size="15px" />}
+                    onClick={handleStopOrDelete}
+                    disabled={isAdminPanel}
+                    color="warning"
+                    variant="subtle"
+                  >
+                    Delete draft
+                  </Button>
+                ) : (
+                  <Button
+                    rightSection={<ArchivedIcon size="15px" />}
+                    onClick={handleArchive}
+                    disabled={!canArchive}
+                    color="secondaryText"
+                    variant="subtle"
+                  >
+                    {campaign.archived ? 'Unarchive' : 'Archive'}
+                  </Button>
+                )}
 
+                <Button
+                  disabled={!canEdit}
+                  rightSection={<EditIcon size="15px" />}
+                  variant="subtle"
+                  color="mainText"
+                  onClick={() =>
+                    canEdit &&
+                    setParams(
+                      params.get('edit') && campaign.status !== CampaignStatus.draft
+                        ? ''
+                        : 'edit=true',
+                      { replace: true }
+                    )
+                  }
+                >
+                  Edit
+                </Button>
+              </Group>
+            </Box>
             <Button
-              disabled={!canEdit}
-              rightSection={<EditIcon size="15px" />}
-              variant="subtle"
+              fw="normal"
+              variant="transparent"
               color="mainText"
-              onClick={() =>
-                canEdit &&
-                setParams(
-                  params.get('edit') && campaign.status !== CampaignStatus.draft ? '' : 'edit=true',
-                  { replace: true }
-                )
-              }
+              rightSection={<AnalyticsIcon size="26px" />}
+              onClick={() => navigate(`/dashboard/campaign-analytics/${campaign.id}`)}
+              disabled={campaign?.status === CampaignStatus.draft}
             >
-              Edit
+              Campaign Analytics
             </Button>
           </Group>
         </Paper>
-        <Button
-          fw="normal"
-          variant="transparent"
-          color="mainText"
-          rightSection={<AnalyticsIcon size="26px" />}
-          onClick={() => navigate(`/dashboard/campaign-analytics/${campaign.id}`)}
-          disabled={campaign?.status === CampaignStatus.draft}
-        >
-          Campaign Analytics
-        </Button>
-      </Group>
+      </StickyPanel>
 
       {isEditMode ? (
         <EditCampaign campaign={campaign} />
