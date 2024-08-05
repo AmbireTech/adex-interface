@@ -103,7 +103,7 @@ export const CustomTable = ({
       const activeActions = [...(actions || [])].filter((a) => !a.hide?.(e.actionData))
 
       const actionsMenu = activeActions?.length && (
-        <Group justify={isMobile ? 'center' : 'right'} w="100%" gap="xl">
+        <Group justify={isMobile ? 'center' : 'right'} gap="sm" wrap="nowrap">
           {activeActions.slice(0, 3).map((a) => {
             const label = getLabel(a.label, e.actionData)
             return (
