@@ -82,7 +82,7 @@ const CreateCampaign = () => {
     <>
       <Grid columns={24} mr="xl" ml="xl" mt="md">
         <Grid.Col span={{ sm: 24, lg: 18 }}>
-          <Paper p="md">
+          <Paper p="md" shadow="xs">
             <Stack gap="xl">
               <CustomStepper />
               <Wizard step={step} />
@@ -90,7 +90,7 @@ const CreateCampaign = () => {
           </Paper>
         </Grid.Col>
         <Grid.Col span={{ sm: 24, lg: 6 }}>
-          <Paper p="md">
+          <Paper p="md" shadow="sm">
             <CampaignSummary />
           </Paper>
         </Grid.Col>

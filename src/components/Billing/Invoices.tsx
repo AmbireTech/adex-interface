@@ -71,7 +71,12 @@ const Invoices = () => {
 
   return invoiceElements && invoiceElements.length ? (
     <>
-      <CustomTable headings={columnTitles} elements={invoiceElements} actions={actions} />
+      <CustomTable
+        headings={columnTitles}
+        elements={invoiceElements}
+        actions={actions}
+        shadow="xs"
+      />
       <InvoicesModal campaignId={selectedCampaignId} opened={opened} close={close} />
     </>
   ) : (
