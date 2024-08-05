@@ -4,7 +4,7 @@ import {
   createTheme,
   mergeMantineTheme
 } from '@mantine/core'
-import { baseTheme } from './base'
+import { baseTheme, DEFAULT_PRIMARY_SHADE } from './base'
 
 const theme: MantineThemeOverride = createTheme({
   // colorScheme: 'light',
@@ -296,7 +296,7 @@ const theme: MantineThemeOverride = createTheme({
     to: 'secondary',
     deg: 90
   },
-  primaryShade: 3
+  primaryShade: DEFAULT_PRIMARY_SHADE
 })
 
 export const lightTheme = mergeMantineTheme(baseTheme, theme)
