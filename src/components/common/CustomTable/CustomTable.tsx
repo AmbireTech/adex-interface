@@ -106,7 +106,7 @@ export const CustomTable = ({
             )
           })}
           {!isMobile && activeActions.length > maxActions && (
-            <Menu shadow="md">
+            <Menu shadow="lg" withArrow>
               <Menu.Target>
                 <ActionIcon size="23px" variant="transparent" color="mainText" component="div">
                   <Dots />
@@ -119,7 +119,6 @@ export const CustomTable = ({
                   const disabled = a.disabled?.(e.actionData || e)
                   return (
                     <Menu.Item
-                      // maw={}
                       color={a.color || 'mainText'}
                       key={label}
                       leftSection={
@@ -130,7 +129,7 @@ export const CustomTable = ({
                       onClick={() => a.action(e.actionData || e)}
                       disabled={disabled}
                     >
-                      <Text size="sm">{label}</Text>
+                      {label}
                     </Menu.Item>
                   )
                 })}
