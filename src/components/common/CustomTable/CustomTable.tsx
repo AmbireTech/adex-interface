@@ -10,14 +10,11 @@ import {
   TableProps,
   MantineColor,
   Tooltip,
-  MantineTheme,
-  getPrimaryShade,
   Paper,
   ScrollArea,
   MantineShadow
 } from '@mantine/core'
-import { createStyles } from '@mantine/emotion'
-import { useMediaQuery, useColorScheme } from '@mantine/hooks'
+import { useMediaQuery } from '@mantine/hooks'
 import usePagination from 'hooks/usePagination'
 import { useMemo, PropsWithChildren, ReactNode } from 'react'
 import Dots from 'resources/icons/TreeDotsMenu'
@@ -47,19 +44,6 @@ export type CustomTableProps = PropsWithChildren &
     shadow?: MantineShadow
   }
 
-const useStyles = createStyles((theme: MantineTheme) => {
-  const colorScheme = useColorScheme()
-  const primaryShade = getPrimaryShade(theme, colorScheme)
-
-  return {
-    action: {
-      '&:hover': {
-        color: theme.colors.brand[primaryShade]
-      }
-    }
-  }
-})
-
 const getLabel = (label: TableRowAction['label'], actionData: TableElement['actionData']) => {
   if (typeof label === 'function') {
     return label(actionData)
@@ -78,7 +62,6 @@ export const CustomTable = ({
 }: CustomTableProps) => {
   const isMobile = useMediaQuery('(max-width: 75rem)')
 
-  const { classes } = useStyles()
   const columns: string[] = useMemo(
     () =>
       typeof elements[0] === 'object'
@@ -111,8 +94,7 @@ export const CustomTable = ({
                 <ActionIcon
                   size="23px"
                   variant="transparent"
-                  color={a.color || 'dark'}
-                  className={classes.action}
+                  color={a.color || 'mainText'}
                   onClick={() => a.action(e.actionData || e)}
                   disabled={a.disabled?.(e.actionData || e)}
                 >
@@ -124,13 +106,7 @@ export const CustomTable = ({
           {activeActions.length > 3 && (
             <Menu shadow="md" width={200}>
               <Menu.Target>
-                <ActionIcon
-                  size="23px"
-                  variant="transparent"
-                  color="dark"
-                  className={classes.action}
-                  component="div"
-                >
+                <ActionIcon size="23px" variant="transparent" color="mainText" component="div">
                   <Dots />
                 </ActionIcon>
               </Menu.Target>
@@ -141,14 +117,13 @@ export const CustomTable = ({
                   const disabled = a.disabled?.(e.actionData || e)
                   return (
                     <Menu.Item
-                      color={a.color || 'dark'}
+                      color={a.color || 'mainText'}
                       key={label}
                       leftSection={
                         <ActionIcon
                           size="23px"
                           variant="transparent"
-                          color={a.color || 'dark'}
-                          className={classes.action}
+                          color={a.color || 'mainText'}
                           disabled={disabled}
                           component="div"
                         >
@@ -157,7 +132,6 @@ export const CustomTable = ({
                       }
                       onClick={() => a.action(e.actionData || e)}
                       disabled={disabled}
-                      className={classes.action}
                     >
                       <Text size="md">{label}</Text>
                     </Menu.Item>
@@ -210,7 +184,7 @@ export const CustomTable = ({
         </Table.Tr>
       )
     })
-  }, [list, actions, isMobile, classes.action, columns, headings])
+  }, [list, actions, isMobile, columns, headings])
 
   if (!elements.length) return <Text>No data found</Text>
   return (
