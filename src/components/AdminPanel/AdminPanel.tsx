@@ -2,6 +2,7 @@ import { Tabs, Paper } from '@mantine/core'
 import { useNavigate, useParams, Outlet } from 'react-router-dom'
 import { AdminBadge } from 'components/common/AdminBadge'
 import Dashboard from 'components/Dashboard'
+import { StickyPanel } from 'components/TopBar/TopBarStickyPanel'
 import AdminAnalytics from './AdminAnalytics'
 import Accounts from './Accounts'
 import { SspStats } from './SspStats'
@@ -16,7 +17,9 @@ const AdminPanel = () => {
   return (
     <>
       {/* //TODO: move to top bar */}
-      <AdminBadge title="Admin Panel" />
+      <StickyPanel>
+        <AdminBadge title="Admin Panel" />
+      </StickyPanel>
       <Tabs
         value={tabValue}
         onChange={(value) => navigate(`/dashboard/admin/${value}`)}
