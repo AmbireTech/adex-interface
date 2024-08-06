@@ -232,6 +232,9 @@ const Dashboard = ({ isAdminPanel, accountId }: { isAdminPanel?: boolean; accoun
           ...(isDuplicate && {
             id: '',
             title: `Copy - ${data.campaign.title}`,
+            activeFrom: BigInt(Date.now()),
+            activeTo:
+              BigInt(Date.now()) + BigInt(data.campaign.activeTo - data.campaign.activeFrom),
             status: CampaignStatus.created
           })
         })
