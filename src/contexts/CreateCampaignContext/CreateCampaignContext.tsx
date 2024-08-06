@@ -33,6 +33,7 @@ import dayjs from 'dayjs'
 import { formatDateTime } from 'helpers'
 import { isValidHttpUrl } from 'helpers/validators'
 import { useCampaignsData } from 'hooks/useCampaignsData'
+import { useForm } from '@mantine/form'
 
 const CreateCampaignContext = createContext<CreateCampaignType | null>(null)
 
@@ -62,8 +63,16 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
     }),
     [adexAccount?.address, balanceToken?.address, balanceToken?.decimals, balanceToken?.chainId]
   )
+  const form = useForm({
+    mode: 'uncontrolled',
+    initialValues: defaultValue
+    // TODO: add validate: use Step for validations
+  })
+  // TODO: remove completely campaign useState
+  const [c, setCampaign] = useState<CampaignUI>(defaultValue)
+  console.log('campaignStateOld', c)
+  const campaign = useMemo(() => form.getValues(), [form])
 
-  const [campaign, setCampaign] = useState<CampaignUI>(defaultValue)
   const [selectedBannerSizes, setSelectedBannerSizes] = useState<
     SupplyStatsDetails[] | SupplyStatsDetails[][]
   >([])
@@ -91,10 +100,11 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
     if (savedCampaign) {
       const parsedCampaign = superjson.parse<CampaignUI>(savedCampaign)
       if (!deepEqual(parsedCampaign, defaultValue)) {
-        setCampaign(parsedCampaign)
+        // setCampaign(parsedCampaign)
+        form.setValues(parsedCampaign)
       }
     }
-  }, [defaultValue])
+  }, [])
 
   useEffect(() => {
     updateSupplyStats()
@@ -102,10 +112,11 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
 
   useEffect(() => {
     window.onbeforeunload = () => {
-      setCampaign((prev) => {
-        localStorage.setItem('createCampaign', superjson.stringify(prev))
-        return prev
-      })
+      localStorage.setItem('createCampaign', superjson.stringify(form.getValues()))
+      // setCampaign((prev) => {
+      //   localStorage.setItem('createCampaign', superjson.stringify(prev))
+      //   return prev
+      // })
       return undefined
     }
 
@@ -266,15 +277,16 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
       return updated
     })
   }, [setCampaign])
-
+  // TODO: remove updatePartOfCampaign it can be used only updateCampaign func
   const updatePartOfCampaign = useCallback(
     (value: Partial<CampaignUI>) => {
-      setCampaign((prevState) => ({
-        ...prevState,
-        ...value
-      }))
+      form.setValues(value)
+      // setCampaign((prevState) => ({
+      //   ...prevState,
+      //   ...value
+      // }))
     },
-    [setCampaign]
+    [form]
   )
 
   const updateCampaign = useCallback(
@@ -282,14 +294,16 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
       key: CampaignItemKey,
       value: CampaignUI[CampaignItemKey]
     ) => {
-      setCampaign((prevState) => {
-        const updated = { ...prevState }
-        updated[key] = value
-        updated.draftModified = true
-        return updated
-      })
+      form.setValues({ [key]: value, draftModified: true })
+
+      // setCampaign((prevState) => {
+      //   const updated = { ...prevState }
+      //   updated[key] = value
+      //   updated.draftModified = true
+      //   return updated
+      // })
     },
-    [setCampaign]
+    [form]
   )
 
   const updateCampaignWithPrevStateNested = useCallback(
