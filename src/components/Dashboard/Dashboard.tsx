@@ -19,7 +19,7 @@ import AnalyticsIcon from 'resources/icons/Analytics'
 import DuplicateIcon from 'resources/icons/Duplicate'
 import DeleteIcon from 'resources/icons/Delete'
 import EditIcon from 'resources/icons/Edit'
-import { CustomConfirmModalBody } from 'components/common/Modals/CustomConfirmModal/CustomConfirmModalBody'
+import { defaultConfirmModalProps } from 'components/common/Modals/CustomConfirmModal'
 import BadgeStatusCampaign from './BadgeStatusCampaign'
 
 const campaignHeaders = [
@@ -55,7 +55,7 @@ const getStatusOrder = (status: CampaignStatus) => {
 
 type DashboardTableElement = Omit<TableElement, 'actionData'> & {
   actionData: { campaign: Campaign; isDraft: boolean; canArchive: boolean }
-  title: string
+  title: string | JSX.Element
   placement: string
   status: {
     value: CampaignStatus
@@ -123,6 +123,8 @@ const Dashboard = ({ isAdminPanel, accountId }: { isAdminPanel?: boolean; accoun
               decimals
             )
 
+            const archived = cmpData.campaign.archived
+
             return {
               actionData: {
                 campaign,
@@ -134,9 +136,16 @@ const Dashboard = ({ isAdminPanel, accountId }: { isAdminPanel?: boolean; accoun
                   CampaignStatus.rejected
                 ].includes(campaign.status)
               },
-              rowColor: cmpData.campaign.archived ? 'red' : undefined,
+              rowColor: archived ? 'red' : undefined,
               id: cmpData.campaignId,
-              title: `${cmpData.campaign.archived ? 'Archived - ' : ''}${cmpData.campaign.title}`,
+              title: (
+                <Text truncate>
+                  {archived && (
+                    <BadgeStatusCampaign type={cmpData.campaign.status} isArchived={archived} />
+                  )}
+                  {`${archived ? ' ' : ''}${cmpData.campaign.title}`}
+                </Text>
+              ),
               // type: CampaignType[cmpData.campaign.type],
               placement:
                 cmpData.campaign.targetingInput.inputs.placements.in[0] === 'app'
@@ -249,17 +258,14 @@ const Dashboard = ({ isAdminPanel, accountId }: { isAdminPanel?: boolean; accoun
 
   const handleDelete = useCallback(
     (data: DashboardTableElement['actionData']) =>
-      modals.openConfirmModal({
-        title: 'Delete draft',
-        children: (
-          <CustomConfirmModalBody
-            text={`Are you sure want to delete draft "${data.campaign.title}"`}
-          />
-        ),
-        labels: { confirm: 'Delete', cancel: 'Cancel' },
-        confirmProps: { color: 'red' },
-        onConfirm: () => deleteDraftCampaign(data.campaign.id)
-      }),
+      modals.openConfirmModal(
+        defaultConfirmModalProps({
+          text: `Are you sure want to delete draft "${data.campaign.title}"`,
+          color: 'warning',
+          labels: { confirm: 'Delete', cancel: 'Cancel' },
+          onConfirm: () => deleteDraftCampaign(data.campaign.id)
+        })
+      ),
     [deleteDraftCampaign]
   )
 
@@ -268,17 +274,14 @@ const Dashboard = ({ isAdminPanel, accountId }: { isAdminPanel?: boolean; accoun
       const cmp = data.campaign
       const confirm = cmp?.archived ? 'Unarchive' : 'Archive'
 
-      return modals.openConfirmModal({
-        title: `${confirm} Campaign`,
-        children: (
-          <CustomConfirmModalBody
-            text={`Are you sure want to ${confirm} campaign "${cmp?.title}"`}
-          />
-        ),
-        labels: { confirm, cancel: 'Cancel' },
-        confirmProps: { color: cmp?.archived ? 'blue' : 'red' },
-        onConfirm: () => toggleArchived(cmp?.id || '')
-      })
+      modals.openConfirmModal(
+        defaultConfirmModalProps({
+          text: `Are you sure want to ${confirm} campaign "${cmp?.title}"`,
+          color: cmp?.archived ? 'brand' : 'attention',
+          labels: { confirm, cancel: 'Cancel' },
+          onConfirm: () => toggleArchived(cmp?.id || '')
+        })
+      )
     },
     [toggleArchived]
   )
@@ -384,7 +387,7 @@ const Dashboard = ({ isAdminPanel, accountId }: { isAdminPanel?: boolean; accoun
         </Flex>
         {!initialDataLoading ? (
           <CustomTable
-            background
+            shadow={!isAdminPanel ? 'xs' : undefined}
             headings={campaignHeaders}
             elements={elements}
             actions={actions}

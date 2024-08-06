@@ -1,6 +1,6 @@
 import { Grid, Stack, Paper } from '@mantine/core'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect } from 'react'
 import { modals } from '@mantine/modals'
 import useCustomNotifications from 'hooks/useCustomNotifications'
 import type {
@@ -8,7 +8,7 @@ import type {
   unstable_BlockerFunction as BlockerFunction
 } from 'react-router-dom'
 import { unstable_useBlocker as useBlocker } from 'react-router-dom'
-import { CustomConfirmModal } from 'components/common/Modals'
+import { defaultConfirmModalProps } from 'components/common/Modals/CustomConfirmModal'
 import CustomStepper from './CampaignStepper'
 import CampaignSummary from './CampaignSummary'
 import StepOne from './StepOne/StepOne'
@@ -38,18 +38,16 @@ const CreateCampaign = () => {
     saveToDraftCampaign
   } = useCreateCampaignContext()
   const { showNotification } = useCustomNotifications()
-  const [openedModal, setOpenedModal] = useState(false)
 
-  const blocker: Blocker = useBlocker(
-    useCallback<BlockerFunction>(
-      ({ currentLocation, nextLocation }) => currentLocation.pathname !== nextLocation.pathname,
-      []
-    )
+  const shouldBlock = useCallback<BlockerFunction>(
+    ({ currentLocation, nextLocation }) =>
+      campaign.draftModified && currentLocation.pathname !== nextLocation.pathname,
+    [campaign]
   )
 
-  const blockerProceed = useCallback(() => blocker.proceed?.(), [blocker])
+  const blocker: Blocker = useBlocker(shouldBlock)
 
-  const handleConfirmBtnClicked = useCallback(async () => {
+  const saveDraft = useCallback(async () => {
     try {
       const res = await saveToDraftCampaign(campaign)
 
@@ -62,49 +60,43 @@ const CreateCampaign = () => {
       console.error(err)
       showNotification('error', 'Creating campaign failed', 'Data error')
     }
-    modals.closeAll()
-    blockerProceed()
-  }, [showNotification, saveToDraftCampaign, blockerProceed, campaign])
-
-  const handleCancelBtnClicked = useCallback(() => {
-    if (blocker.state === 'blocked') blockerProceed()
-  }, [blocker.state, blockerProceed])
+  }, [showNotification, saveToDraftCampaign, campaign])
 
   useEffect(() => {
-    if (blocker.state === 'blocked' && campaign.draftModified) {
-      setOpenedModal(true)
-    } else if (blocker.state === 'blocked') {
-      blockerProceed()
+    if (blocker.state === 'blocked') {
+      return modals.openConfirmModal(
+        defaultConfirmModalProps({
+          text: 'You have unsaved changes. Do you want to save them as a draft?',
+          color: 'attention',
+          labels: { confirm: 'Save as draft', cancel: 'Continue edit' },
+          onConfirm: () => {
+            saveDraft()
+            blocker.proceed()
+          },
+          onAbort: () => {
+            blocker.reset()
+          }
+        })
+      )
     }
-  }, [blocker, campaign, blockerProceed])
+  }, [blocker, saveDraft])
 
   return (
-    <>
-      <Grid columns={24} mr="xl" ml="xl" mt="md">
-        <Grid.Col span={{ sm: 24, lg: 18 }}>
-          <Paper p="md">
-            <Stack gap="xl">
-              <CustomStepper />
-              <Wizard step={step} />
-            </Stack>
-          </Paper>
-        </Grid.Col>
-        <Grid.Col span={{ sm: 24, lg: 6 }}>
-          <Paper p="md">
-            <CampaignSummary />
-          </Paper>
-        </Grid.Col>
-      </Grid>
-      <CustomConfirmModal
-        cancelBtnLabel="No"
-        confirmBtnLabel="Yes"
-        onCancelClicked={handleCancelBtnClicked}
-        onConfirmClicked={handleConfirmBtnClicked}
-        color="attention"
-        text="You may have unsaved changes. Do you want to save them as a draft?"
-        opened={openedModal}
-      />
-    </>
+    <Grid columns={24} mr="xl" ml="xl" mt="md">
+      <Grid.Col span={{ sm: 24, lg: 18 }}>
+        <Paper p="md" shadow="xs">
+          <Stack gap="xl">
+            <CustomStepper />
+            <Wizard step={step} />
+          </Stack>
+        </Paper>
+      </Grid.Col>
+      <Grid.Col span={{ sm: 24, lg: 6 }}>
+        <Paper p="md" shadow="sm">
+          <CampaignSummary />
+        </Paper>
+      </Grid.Col>
+    </Grid>
   )
 }
 

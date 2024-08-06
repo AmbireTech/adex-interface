@@ -121,7 +121,14 @@ function TopBar() {
   ])
 
   return (
-    <Flex direction="row" gap="md" justify="space-between" align="center" style={{ flexGrow: 1 }}>
+    <Flex
+      direction="row"
+      gap="md"
+      justify="space-between"
+      align="center"
+      style={{ flexGrow: 1 }}
+      wrap="nowrap"
+    >
       <Flex direction="column" justify="end" align="baseline">
         <Title order={5} fw="bold" className={classes.capitalizeText}>
           {title}

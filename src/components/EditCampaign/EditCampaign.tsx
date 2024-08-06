@@ -23,7 +23,6 @@ import { parseBigNumTokenAmountToDecimal, parseToBigNumPrecision } from 'helpers
 
 import {
   findArrayWithLengthInObjectAsValue,
-  updateCatsLocsObject,
   getRecommendedCPMRange
 } from 'helpers/createCampaignHelpers'
 import useAccount from 'hooks/useAccount'
@@ -38,7 +37,7 @@ import type {
 import { unstable_useBlocker as useBlocker } from 'react-router-dom'
 import InfoFilledIcon from 'resources/icons/InfoFilled'
 import throttle from 'lodash.throttle'
-import { CustomConfirmModalBody } from 'components/common/Modals/CustomConfirmModal/CustomConfirmModalBody'
+import { defaultConfirmModalProps } from 'components/common/Modals/CustomConfirmModal'
 
 type TargetingInputEdit = {
   version: string
@@ -164,20 +163,19 @@ const EditCampaign = ({ campaign }: { campaign: Campaign }) => {
 
   useEffect(() => {
     if (blocker.state === 'blocked') {
-      return modals.openConfirmModal({
-        title: 'Unsaved changes!',
-        children: (
-          <CustomConfirmModalBody text="You did not save your changes. Are you sure you want to leave this page?" />
-        ),
-        labels: { confirm: 'Leave the page', cancel: 'Cancel' },
-        confirmProps: { color: 'warning' },
-        onConfirm: () => {
-          blocker.proceed()
-        },
-        onAbort: () => {
-          blocker.reset()
-        }
-      })
+      return modals.openConfirmModal(
+        defaultConfirmModalProps({
+          text: 'You did not save your changes. Are you sure you want to leave this page?',
+          color: 'warning',
+          labels: { confirm: 'Leave the page', cancel: 'Cancel' },
+          onConfirm: () => {
+            blocker.proceed()
+          },
+          onAbort: () => {
+            blocker.reset()
+          }
+        })
+      )
     }
   }, [blocker])
 
@@ -193,20 +191,22 @@ const EditCampaign = ({ campaign }: { campaign: Campaign }) => {
 
   const handleCategories = useCallback(
     (selectedRadio: TargetingInputApplyProp, categoriesValue: string[]) => {
-      form.setFieldValue(
-        'targetingInput.inputs.categories',
-        updateCatsLocsObject(selectedRadio, categoriesValue)
-      )
+      form.setFieldValue('targetingInput.inputs.categories', {
+        apply: selectedRadio,
+        in: selectedRadio === 'in' ? categoriesValue : [],
+        nin: selectedRadio === 'nin' ? categoriesValue : []
+      })
     },
     [form]
   )
 
   const handleCountries = useCallback(
     (selectedRadio: TargetingInputApplyProp, locationsValue: string[]) => {
-      form.setFieldValue(
-        'targetingInput.inputs.location',
-        updateCatsLocsObject(selectedRadio, locationsValue)
-      )
+      form.setFieldValue('targetingInput.inputs.location', {
+        apply: selectedRadio,
+        in: selectedRadio === 'in' ? locationsValue : [],
+        nin: selectedRadio === 'nin' ? locationsValue : []
+      })
     },
     [form]
   )

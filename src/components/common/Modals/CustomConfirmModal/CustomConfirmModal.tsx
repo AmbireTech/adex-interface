@@ -109,7 +109,7 @@ const CustomConfirmModal = ({
         }}
         centered
       >
-        <Flex justify="center" className={classes.confirmModalContent}>
+        <Flex align="center" direction="column" className={classes.confirmModalContent}>
           <div className={classes.iconWrapper}>
             {/* TODO: icon should be passed as a prop */}
             <AttentionIcon className={classes.attentionIcon} />

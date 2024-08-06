@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useCallback, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Container, Loader, Flex, Box, Badge, TextInput, Paper } from '@mantine/core'
+import { Loader, Box, Badge, TextInput, Stack, Group } from '@mantine/core'
 
 import CustomTable from 'components/common/CustomTable'
 import useAdmin from 'hooks/useAdmin'
@@ -34,7 +34,7 @@ const AdminAnalytics = () => {
     }
 
     const accArr = Array.from(accounts.values())
-    // TODO: fix this when multy token
+    // TODO: fix this when multi token
     const decimals = accArr[0].balanceToken?.decimals
     const totalDeposits = parseBigNumTokenAmountToDecimal(
       accArr.reduce((sum, a) => sum + BigInt(a.fundsDeposited.total), 0n),
@@ -120,45 +120,31 @@ const AdminAnalytics = () => {
     ]
   }, [handlePreview])
 
-  return (
-    <Container fluid px={0}>
-      {initialDataLoading ? (
-        <Loader size="xl" type="dots" color="violet" />
-      ) : (
-        <Paper p="sm" withBorder>
-          <Flex direction="column">
-            <Flex direction="row" align="center" justify="left" gap="xs" mb="md" wrap="wrap">
-              <Box>Totals: </Box>
-              <Badge leftSection="Accounts" size="lg">
-                ({data.totalAccounts})
-              </Badge>
-              <Badge leftSection="Deposits" size="lg">
-                ({data.totalDeposits} USDC)
-              </Badge>
-              <Badge leftSection="Campaigns" size="lg">
-                ({data.totalCampaignsLocked} USDC)
-              </Badge>
-              <Flex>
-                <TextInput
-                  size="sm"
-                  placeholder="Search by id, name, info, billing data etc."
-                  value={search}
-                  onChange={(e) => setSearch(e.currentTarget.value)}
-                  miw={420}
-                />
-              </Flex>
-            </Flex>
-            <CustomTable
-              background
-              headings={headings}
-              elements={data.elements}
-              pageSize={10}
-              actions={actions}
-            />
-          </Flex>
-        </Paper>
-      )}
-    </Container>
+  return initialDataLoading ? (
+    <Loader size="xl" type="dots" color="violet" />
+  ) : (
+    <Stack>
+      <Group align="center" justify="left" gap="xs" mb="md" wrap="wrap">
+        <Box>Totals: </Box>
+        <Badge leftSection="Accounts" size="lg">
+          ({data.totalAccounts})
+        </Badge>
+        <Badge leftSection="Deposits" size="lg">
+          ({data.totalDeposits} USDC)
+        </Badge>
+        <Badge leftSection="Campaigns" size="lg">
+          ({data.totalCampaignsLocked} USDC)
+        </Badge>
+        <TextInput
+          size="sm"
+          placeholder="Search by id, name, info, billing data etc."
+          value={search}
+          onChange={(e) => setSearch(e.currentTarget.value)}
+          miw={420}
+        />
+      </Group>
+      <CustomTable headings={headings} elements={data.elements} pageSize={10} actions={actions} />
+    </Stack>
   )
 }
 

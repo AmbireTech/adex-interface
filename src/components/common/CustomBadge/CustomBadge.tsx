@@ -3,6 +3,7 @@ import {
   BadgeProps,
   Flex,
   MantineColor,
+  MantineSize,
   MantineTheme,
   Text,
   getPrimaryShade,
@@ -29,12 +30,13 @@ type CustomBadgeProps = BadgeProps & {
   color: MantineColor
   text: string
   icon?: ReactNode
+  size?: MantineSize
 }
 
-const CustomBadge = ({ color, text, icon, ...rest }: CustomBadgeProps) => {
+const CustomBadge = ({ color, text, icon, size = 'lg', ...rest }: CustomBadgeProps) => {
   const { classes } = useStyles({ color })
   return (
-    <Badge size="lg" variant="outline" color={color} className={classes.wrapper} {...rest}>
+    <Badge size={size} variant="outline" color={color} className={classes.wrapper} {...rest}>
       <Flex align="center" wrap="nowrap">
         <Text size="xs" mr={icon ? 'xs' : undefined}>
           {text}

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo } from 'react'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
-import { Grid, Text, Button, Paper, Stack, Group, Divider } from '@mantine/core'
+import { Grid, Text, Button, Paper, Stack, Group, Divider, Box } from '@mantine/core'
 import { modals } from '@mantine/modals'
 import BadgeStatusCampaign from 'components/Dashboard/BadgeStatusCampaign'
 import { CATEGORIES, COUNTRIES } from 'constants/createCampaign'
@@ -20,8 +20,9 @@ import AnalyticsIcon from 'resources/icons/Analytics'
 import useCustomNotifications from 'hooks/useCustomNotifications'
 import { AdminBadge } from 'components/common/AdminBadge'
 import EditCampaign from 'components/EditCampaign'
-import { CustomConfirmModalBody } from 'components/common/Modals/CustomConfirmModal/CustomConfirmModalBody'
+import { defaultConfirmModalProps } from 'components/common/Modals/CustomConfirmModal'
 import DeleteIcon from 'resources/icons/Delete'
+import { StickyPanel } from 'components/TopBar/TopBarStickyPanel'
 import CatsLocsFormatted from './CatsLocsFormatted'
 import { AdminActions } from './AdminActions'
 
@@ -54,20 +55,17 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
 
     const confirm = campaign?.archived ? 'Unarchive' : 'Archive'
 
-    return modals.openConfirmModal({
-      title: `${confirm} Campaign`,
-      children: (
-        <CustomConfirmModalBody
-          text={`Are you sure want to ${confirm} campaign "${campaign?.title}"`}
-        />
-      ),
-      labels: { confirm, cancel: 'Cancel' },
-      confirmProps: { color: campaign?.archived ? 'blue' : 'red' },
-      onConfirm: () => {
-        toggleArchived(campaign?.id || '')
-        showNotification('info', `Campaign ${campaign?.archived ? 'Unarchived' : 'Archived'}`)
-      }
-    })
+    modals.openConfirmModal(
+      defaultConfirmModalProps({
+        text: `Are you sure want to ${confirm} campaign "${campaign?.title}"`,
+        color: campaign?.archived ? 'brand' : 'warning',
+        labels: { confirm, cancel: 'Cancel' },
+        onConfirm: () => {
+          toggleArchived(campaign?.id || '')
+          showNotification('info', `Campaign ${campaign?.archived ? 'Unarchived' : 'Archived'}`)
+        }
+      })
+    )
   }, [campaign?.archived, campaign?.id, campaign?.title, showNotification, toggleArchived])
 
   const handleStopOrDelete = useCallback(() => {
@@ -77,7 +75,7 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
 
     const isDraft = campaign?.status === CampaignStatus.draft
 
-    const confirm = isDraft ? 'Delete Draft' : 'Stop'
+    const confirmLabel = isDraft ? 'Delete Draft' : 'Stop'
     const onConfirm = isDraft
       ? () => {
           deleteDraftCampaign(campaign.id)
@@ -89,19 +87,15 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
           showNotification('info', 'Campaign stopped!')
         }
 
-    return modals.openConfirmModal({
-      title: `${confirm} Campaign`,
-      children: (
-        <CustomConfirmModalBody
-          text={`Are you sure want to ${confirm} campaign "${campaign?.title}. This action is irreversible!"`}
-        />
-      ),
-      labels: { confirm: 'Yes', cancel: 'Cancel' },
-      confirmProps: { color: campaign?.archived ? 'blue' : 'red' },
-      onConfirm
-    })
+    modals.openConfirmModal(
+      defaultConfirmModalProps({
+        text: `Are you sure want to ${confirmLabel} campaign "${campaign?.title}. This action is irreversible!"`,
+        color: isDraft ? 'warning' : 'brand',
+        labels: { confirm: 'Yes', cancel: 'Cancel' },
+        onConfirm
+      })
+    )
   }, [
-    campaign?.archived,
     campaign?.id,
     campaign?.status,
     campaign?.title,
@@ -156,96 +150,105 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
   if (!campaign) return <div>Invalid Campaign Id</div>
   return (
     <Stack gap="xl">
-      <Group justify="center">
-        <GoBack title="Dashboard" />
-        <Paper mx="auto" shadow="md" radius="xl">
-          <Group gap="xs" p={4} justify="center">
-            <Button
-              rightSection={<ActiveIcon size="15px" />}
-              onClick={() =>
-                canActivate && changeCampaignStatus(CampaignStatus.active, campaign.id)
-              }
-              color="success"
-              disabled={!canActivate}
-              variant="light"
-            >
-              Activate
-            </Button>
+      <StickyPanel>
+        <Paper mx="auto" shadow="lg" radius="xl">
+          <Group align="center" justify="space-between">
+            <GoBack title="Dashboard" />
+            <Box>
+              <Group gap="xs" p={4} justify="center" w="100%">
+                <Button
+                  rightSection={<ActiveIcon size="15px" />}
+                  onClick={() =>
+                    canActivate && changeCampaignStatus(CampaignStatus.active, campaign.id)
+                  }
+                  color="success"
+                  disabled={!canActivate}
+                  variant="light"
+                >
+                  Activate
+                </Button>
 
-            <Button
-              rightSection={<PausedIcon size="15px" />}
-              onClick={() => canPause && changeCampaignStatus(CampaignStatus.paused, campaign.id)}
-              color="paused"
-              variant="subtle"
-              disabled={!canPause}
-            >
-              Pause
-            </Button>
+                <Button
+                  rightSection={<PausedIcon size="15px" />}
+                  onClick={() =>
+                    canPause && changeCampaignStatus(CampaignStatus.paused, campaign.id)
+                  }
+                  color="paused"
+                  variant="subtle"
+                  disabled={!canPause}
+                >
+                  Pause
+                </Button>
 
-            <Button
-              rightSection={<StopIcon size="15px" />}
-              onClick={handleStopOrDelete}
-              disabled={!canStop}
-              color="secondaryText"
-              variant="subtle"
-            >
-              Stop
-            </Button>
+                <Button
+                  rightSection={<StopIcon size="15px" />}
+                  onClick={handleStopOrDelete}
+                  disabled={!canStop}
+                  color="secondaryText"
+                  variant="subtle"
+                >
+                  Stop
+                </Button>
 
-            {campaign.status === CampaignStatus.draft ? (
-              <Button
-                rightSection={<DeleteIcon size="15px" />}
-                onClick={handleStopOrDelete}
-                disabled={isAdminPanel}
-                color="warning"
-                variant="subtle"
-              >
-                Delete draft
-              </Button>
-            ) : (
-              <Button
-                rightSection={<ArchivedIcon size="15px" />}
-                onClick={handleArchive}
-                disabled={!canArchive}
-                color="secondaryText"
-                variant="subtle"
-              >
-                {campaign.archived ? 'Unarchive' : 'Archive'}
-              </Button>
-            )}
+                {campaign.status === CampaignStatus.draft ? (
+                  <Button
+                    rightSection={<DeleteIcon size="15px" />}
+                    onClick={handleStopOrDelete}
+                    disabled={isAdminPanel}
+                    color="warning"
+                    variant="subtle"
+                  >
+                    Delete draft
+                  </Button>
+                ) : (
+                  <Button
+                    rightSection={<ArchivedIcon size="15px" />}
+                    onClick={handleArchive}
+                    disabled={!canArchive}
+                    color="secondaryText"
+                    variant="subtle"
+                  >
+                    {campaign.archived ? 'Unarchive' : 'Archive'}
+                  </Button>
+                )}
 
+                <Button
+                  disabled={!canEdit}
+                  rightSection={<EditIcon size="15px" />}
+                  variant="subtle"
+                  color="mainText"
+                  onClick={() =>
+                    canEdit &&
+                    setParams(
+                      params.get('edit') && campaign.status !== CampaignStatus.draft
+                        ? ''
+                        : 'edit=true',
+                      { replace: true }
+                    )
+                  }
+                >
+                  Edit
+                </Button>
+              </Group>
+            </Box>
             <Button
-              disabled={!canEdit}
-              rightSection={<EditIcon size="15px" />}
-              variant="subtle"
+              fw="normal"
+              variant="transparent"
               color="mainText"
-              onClick={() =>
-                canEdit &&
-                setParams(
-                  params.get('edit') && campaign.status !== CampaignStatus.draft ? '' : 'edit=true',
-                  { replace: true }
-                )
-              }
+              rightSection={<AnalyticsIcon size="26px" />}
+              onClick={() => navigate(`/dashboard/campaign-analytics/${campaign.id}`)}
+              disabled={campaign?.status === CampaignStatus.draft}
             >
-              Edit
+              Campaign Analytics
             </Button>
           </Group>
         </Paper>
-        <Button
-          variant="transparent"
-          color="mainText"
-          rightSection={<AnalyticsIcon size="26px" />}
-          onClick={() => navigate(`/dashboard/campaign-analytics/${campaign.id}`)}
-          disabled={campaign?.status === CampaignStatus.draft}
-        >
-          Campaign Analytics
-        </Button>
-      </Group>
+      </StickyPanel>
 
       {isEditMode ? (
         <EditCampaign campaign={campaign} />
       ) : (
-        <Paper p="lg" shadow="sm">
+        <Paper p="lg" shadow="xs">
           {isAdminPanel && <AdminBadge title="Admin Details" />}
           <Grid gutter="lg">
             <Grid.Col span={{ md: 12, xl: 6 }}>
@@ -253,7 +256,7 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
                 <Text fw="bold" size="sm" c="dimmed">
                   Overview
                 </Text>
-                <Paper bg="lightBackground" p="md">
+                <Paper bg="lightBackground" p="md" withBorder>
                   <CampaignDetailsRow
                     lineHeight="sm"
                     textSize="sm"
@@ -388,7 +391,7 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
                   <Text fw="bold" size="sm" c="dimmed">
                     Targeting
                   </Text>
-                  <Paper bg="lightBackground" p="sm" shadow="xs">
+                  <Paper bg="lightBackground" p="sm" withBorder>
                     <Stack>
                       <CatsLocsFormatted
                         title="Selected Categories"
@@ -410,7 +413,7 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
                       <Text fw="bold" size="sm" c="dimmed">
                         Creatives
                       </Text>
-                      <Paper bg="lightBackground" p="sm" shadow="xs">
+                      <Paper bg="lightBackground" p="sm" withBorder>
                         {campaign.adUnits.map((item: AdUnit, index: number) => {
                           const isLast = index === campaign.adUnits.length - 1
                           return (

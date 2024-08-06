@@ -1,7 +1,8 @@
 import { isInRange, hasLength, matches, useForm } from '@mantine/form'
 import { useCallback, useMemo, useState, FormEvent } from 'react'
 import { Button, Group, TextInput, Box, NumberInput } from '@mantine/core'
-import { CustomConfirmModal } from 'components/common/Modals'
+import { defaultConfirmModalProps } from 'components/common/Modals/CustomConfirmModal'
+import { modals } from '@mantine/modals'
 import useAdmin from 'hooks/useAdmin'
 import throttle from 'lodash.throttle'
 import { Account } from 'types'
@@ -23,7 +24,6 @@ function AdminDeposit({ accountData }: { accountData: Account }) {
   const { showNotification } = useCustomNotifications()
   const { makeDeposit, updateAccounts } = useAdmin()
   const [loading, setLoading] = useState(false)
-  const [opened, setOpened] = useState(false)
 
   const form = useForm<Deposit>({
     initialValues: {
@@ -63,7 +63,6 @@ function AdminDeposit({ accountData }: { accountData: Account }) {
           form.reset()
           updateAccounts()
           showNotification('info', `Deposit to ${form.values.accountId} success!`)
-          setOpened(false)
         },
         (err) => {
           showNotification('error', err, `Error depositing to ${form.values.accountId}`)
@@ -83,9 +82,17 @@ function AdminDeposit({ accountData }: { accountData: Account }) {
   const onSubmit = useCallback(
     (e: FormEvent) => {
       e.preventDefault()
-      !form.validate().hasErrors && setOpened(true)
+      !form.validate().hasErrors &&
+        modals.openConfirmModal(
+          defaultConfirmModalProps({
+            text: `Are you sure you want to deposit ${form.values.amount}  ${form.values.token.name} to ${form.values.accountId}?`,
+            color: 'attention',
+            labels: { confirm: 'Yes Sir', cancel: 'No' },
+            onConfirm: () => form.onSubmit(throttledSbm)
+          })
+        )
     },
-    [form]
+    [form, throttledSbm]
   )
 
   return (
@@ -153,19 +160,6 @@ function AdminDeposit({ accountData }: { accountData: Account }) {
           Make deposit
         </Button>
       </Group>
-      <CustomConfirmModal
-        cancelBtnLabel="No"
-        confirmBtnLabel="Yes Sir"
-        onCancelClicked={() => setOpened(false)}
-        onConfirmClicked={() => {
-          console.log('yes sir')
-          console.log({ form })
-          form.onSubmit(throttledSbm)()
-        }}
-        color="attention"
-        text={`Are you sure you want to deposit ${form.values.amount}  ${form.values.token.name} to ${form.values.accountId}?`}
-        opened={opened}
-      />
     </Box>
   )
 }

@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useState, useMemo } from 'react'
-import { Container, Flex, Loader, Tabs } from '@mantine/core'
-import { createStyles } from '@mantine/emotion'
+import { Container, Flex, Loader, Tabs, Paper, Group } from '@mantine/core'
 import { useParams } from 'react-router-dom'
 import { AnalyticsType, BaseAnalyticsData, AnalyticsPeriod } from 'types'
 import GoBack from 'components/common/GoBack/GoBack'
@@ -9,6 +8,7 @@ import useCampaignAnalytics from 'hooks/useCampaignAnalytics'
 import { useCampaignsData } from 'hooks/useCampaignsData'
 import { Campaign } from 'adex-common'
 import useAccount from 'hooks/useAccount'
+import { StickyPanel } from 'components/TopBar/TopBarStickyPanel'
 import Placements from './Placements'
 import Creatives from './Creatives'
 import SSPs from './SSPs'
@@ -17,12 +17,7 @@ import { TimeFrame } from './TimeFrame'
 import { generateCVSData } from './CvsDownloadConfigurations'
 import SeeOnMapBtn from './SeeOnMapBtn'
 
-const useStyles = createStyles(() => ({
-  tabsList: { border: 'none' }
-}))
-
 const CampaignAnalytics = () => {
-  const { classes } = useStyles()
   const { id } = useParams()
 
   const [activeTab, setActiveTab] = useState<AnalyticsType>('timeframe')
@@ -129,18 +124,27 @@ const CampaignAnalytics = () => {
 
   return (
     <Container fluid>
-      <GoBack title="Dashboard" />
+      <StickyPanel>
+        <Paper mx="auto" shadow="xl" radius="xl">
+          <Group justify="space-between">
+            <GoBack title="Dashboard" />
+            <Group align="center" justify="space-between">
+              {isMapBtnShown && (
+                <SeeOnMapBtn onBtnClicked={() => setIsMapVisible((prev) => !prev)} />
+              )}
+              {csvData && activeTab !== 'timeframe' && (
+                <DownloadCSV
+                  data={csvData.tabData}
+                  mapHeadersToDataProperties={csvData.mapHeadersToDataProperties}
+                  filename={csvData.filename}
+                />
+              )}
+            </Group>
+          </Group>
+        </Paper>
+      </StickyPanel>
 
-      <Tabs
-        color="brand"
-        value={activeTab}
-        onChange={handleTabChange}
-        py="sm"
-        classNames={{
-          list: classes.tabsList
-        }}
-        keepMounted={false}
-      >
+      <Tabs color="brand" value={activeTab} onChange={handleTabChange} py="sm" keepMounted={false}>
         <Flex justify="space-between" align="baseline">
           <Tabs.List>
             <Tabs.Tab value="timeframe">TIME FRAME</Tabs.Tab>
@@ -149,16 +153,6 @@ const CampaignAnalytics = () => {
             <Tabs.Tab value="adUnit">CREATIVES</Tabs.Tab>
             {isAdmin && <Tabs.Tab value="ssp">SSPs</Tabs.Tab>}
           </Tabs.List>
-          <Flex align="center" justify="space-between">
-            {isMapBtnShown && <SeeOnMapBtn onBtnClicked={() => setIsMapVisible((prev) => !prev)} />}
-            {csvData && activeTab !== 'timeframe' && (
-              <DownloadCSV
-                data={csvData.tabData}
-                mapHeadersToDataProperties={csvData.mapHeadersToDataProperties}
-                filename={csvData.filename}
-              />
-            )}
-          </Flex>
         </Flex>
         {loading && (
           <Flex justify="center" align="center" mt={69}>

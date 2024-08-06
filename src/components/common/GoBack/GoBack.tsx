@@ -10,6 +10,7 @@ const GoBack = ({ title, path }: { title: string; path?: string } & PropsWithChi
 
   return (
     <Button
+      fw="normal"
       variant="transparent"
       color="mainText"
       onClick={handleClick}

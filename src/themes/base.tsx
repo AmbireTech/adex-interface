@@ -12,10 +12,12 @@ import {
   AlertProps,
   Modal,
   Input,
-  Flex,
   lighten,
   alpha,
-  MantineColorShade
+  Paper,
+  defaultVariantColorsResolver,
+  VariantColorsResolver,
+  parseThemeColor
 } from '@mantine/core'
 import { Dropzone } from '@mantine/dropzone'
 import DownArrowIcon from 'resources/icons/DownArrow'
@@ -57,6 +59,25 @@ declare module '@mantine/core' {
 
 export const SIDE_BAR_WIDTH = 227
 const MOBILE_MAX_WIDTH_IN_PX = 475
+export const DEFAULT_PRIMARY_SHADE = 3
+
+const variantColorResolver: VariantColorsResolver = (input) => {
+  const defaultResolvedColors = defaultVariantColorsResolver(input)
+  const parsedColor = parseThemeColor({
+    color: input.color || input.theme.primaryColor,
+    theme: input.theme
+  })
+
+  // used for action icons mostly
+  if (parsedColor.isThemeColor && parsedColor.color === 'mainText') {
+    return {
+      ...defaultResolvedColors,
+      hoverColor: input.theme.colors.brand[DEFAULT_PRIMARY_SHADE]
+    }
+  }
+
+  return defaultResolvedColors
+}
 
 // NOTE: Put here components overrides for sizes, form, animations etc. In light/(dark) theme - only colors
 // const themeOverride: MantineThemeOverride = createTheme({
@@ -133,26 +154,22 @@ const themeOverride: MantineThemeOverride = createTheme({
           root: {
             background: custom
               ? lighten(
-                  theme.colors[color || theme.primaryColor][
-                    theme.primaryShade as MantineColorShade
-                  ],
+                  theme.colors[color || theme.primaryColor][DEFAULT_PRIMARY_SHADE],
                   theme.other.shades.lighten.lightest
                 )
               : '',
             borderColor: custom
-              ? theme.colors[color || theme.primaryColor][theme.primaryShade as MantineColorShade]
+              ? theme.colors[color || theme.primaryColor][DEFAULT_PRIMARY_SHADE]
               : '',
             svg: {
-              color: custom
-                ? theme.colors[color || theme.primaryColor][theme.primaryShade as MantineColorShade]
-                : '',
+              color: custom ? theme.colors[color || theme.primaryColor][DEFAULT_PRIMARY_SHADE] : '',
               marginTop: custom ? theme.spacing.md : '',
               width: rem(30),
               height: rem(30)
             }
           },
           message: {
-            color: custom ? theme.colors.mainText[theme.primaryShade as MantineColorShade] : ''
+            color: custom ? theme.colors.mainText[DEFAULT_PRIMARY_SHADE] : ''
           }
         }
       }
@@ -173,14 +190,12 @@ const themeOverride: MantineThemeOverride = createTheme({
       },
       styles: (theme: MantineTheme, params: ButtonProps) => {
         const outlineHoverBgColor = alpha(
-          theme.colors[params.color || theme.primaryColor][theme.primaryShade as MantineColorShade],
+          theme.colors[params.color || theme.primaryColor][DEFAULT_PRIMARY_SHADE],
           theme.other.shades.rgba.lightest
         )
 
         const filledHoverBgColor =
-          theme.colors[params.color || theme.primaryColor][
-            (theme.primaryShade as MantineColorShade) + 1
-          ]
+          theme.colors[params.color || theme.primaryColor][DEFAULT_PRIMARY_SHADE + 1]
 
         const customHover = params.variant === 'outline' || params.variant === 'filled'
 
@@ -189,9 +204,7 @@ const themeOverride: MantineThemeOverride = createTheme({
             background:
               params.variant === 'outline'
                 ? alpha(
-                    theme.colors[params.color || theme.primaryColor][
-                      theme.primaryShade as MantineColorShade
-                    ],
+                    theme.colors[params.color || theme.primaryColor][DEFAULT_PRIMARY_SHADE],
                     theme.other.shades.rgba.lightest
                   )
                 : '',
@@ -213,9 +226,7 @@ const themeOverride: MantineThemeOverride = createTheme({
               backgroundSize: '100% 100%',
               backgroundColor:
                 params.variant === 'filled' && !params.disabled
-                  ? theme.colors[params.color || theme.primaryColor][
-                      theme.primaryShade as MantineColorShade
-                    ]
+                  ? theme.colors[params.color || theme.primaryColor][DEFAULT_PRIMARY_SHADE]
                   : ''
             }
           }
@@ -223,8 +234,12 @@ const themeOverride: MantineThemeOverride = createTheme({
       }
     }),
     Modal: Modal.extend({
+      defaultProps: {
+        padding: 0
+      },
       styles: (theme) => ({
         root: {
+          padding: 0,
           [theme.other.media.print]: {
             overflow: 'visible'
           }
@@ -248,31 +263,32 @@ const themeOverride: MantineThemeOverride = createTheme({
     Input: Input.extend({
       styles: (theme) => ({
         input: {
-          backgroundColor: theme.colors.lightBackground[theme.primaryShade as MantineColorShade],
+          backgroundColor: theme.colors.lightBackground[DEFAULT_PRIMARY_SHADE],
           // TODO: check how to override it properly
-          // borderColor: theme.colors.nonDecorativeBorders[theme.primaryShade as MantineColorShade],
+          // borderColor: theme.colors.nonDecorativeBorders[DEFAULT_PRIMARY_SHADE],
           borderRadius: theme.radius.md
         },
         icon: {
           borderRight: '1px solid',
-          borderColor: theme.colors.nonDecorativeBorders[theme.primaryShade as MantineColorShade]
+          borderColor: theme.colors.nonDecorativeBorders[DEFAULT_PRIMARY_SHADE]
         }
       })
     }),
     Dropzone: Dropzone.extend({
       styles: (theme: MantineTheme) => ({
         root: {
-          backgroundColor: theme.colors.lightBackground[theme.primaryShade as MantineColorShade]
+          backgroundColor: theme.colors.lightBackground[DEFAULT_PRIMARY_SHADE]
         }
       })
     }),
-    Flex: Flex.extend({
+    Paper: Paper.extend({
       defaultProps: {
-        wrap: 'wrap'
+        shadow: 'none'
       }
     })
   },
-  primaryShade: { light: 3, dark: 4 }
+  primaryShade: { light: 3, dark: 4 },
+  variantColorResolver
 })
 
 export const baseTheme = mergeMantineTheme(DEFAULT_THEME, themeOverride)
