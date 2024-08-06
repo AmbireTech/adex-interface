@@ -315,7 +315,14 @@ const Dashboard = ({ isAdminPanel, accountId }: { isAdminPanel?: boolean; accoun
         action: handleAnalytics,
         label: 'Show Analytics',
         icon: <AnalyticsIcon />,
-        disabled: (ada: DashboardTableElement['actionData']) => ada.isDraft
+        disabled: (ada: DashboardTableElement['actionData']) =>
+          ada.isDraft ||
+          [
+            CampaignStatus.rejected,
+            CampaignStatus.ready,
+            CampaignStatus.inReview,
+            CampaignStatus.created
+          ].includes(ada.campaign.status)
       }
     ]
 
