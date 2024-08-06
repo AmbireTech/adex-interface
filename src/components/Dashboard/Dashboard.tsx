@@ -19,7 +19,7 @@ import AnalyticsIcon from 'resources/icons/Analytics'
 import DuplicateIcon from 'resources/icons/Duplicate'
 import DeleteIcon from 'resources/icons/Delete'
 import EditIcon from 'resources/icons/Edit'
-import { defaultConfirmModalProps } from 'components/common/Modals/CustomConfirmModal/CustomConfirmModalBody'
+import { defaultConfirmModalProps } from 'components/common/Modals/CustomConfirmModal'
 import BadgeStatusCampaign from './BadgeStatusCampaign'
 
 const campaignHeaders = [

@@ -37,7 +37,7 @@ import type {
 import { unstable_useBlocker as useBlocker } from 'react-router-dom'
 import InfoFilledIcon from 'resources/icons/InfoFilled'
 import throttle from 'lodash.throttle'
-import { defaultConfirmModalProps } from 'components/common/Modals/CustomConfirmModal/CustomConfirmModalBody'
+import { defaultConfirmModalProps } from 'components/common/Modals/CustomConfirmModal'
 
 type TargetingInputEdit = {
   version: string
