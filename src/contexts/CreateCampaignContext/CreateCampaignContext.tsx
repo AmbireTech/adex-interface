@@ -63,8 +63,8 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
     }),
     [adexAccount?.address, balanceToken?.address, balanceToken?.decimals, balanceToken?.chainId]
   )
-  const form = useForm({
-    mode: 'uncontrolled',
+  const form = useForm<CampaignUI>({
+    // mode: 'uncontrolled',
     initialValues: defaultValue
     // TODO: add validate: use Step for validations
   })
@@ -462,7 +462,8 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
       defaultValue,
       addUTMToTargetURLS,
       selectedBidFloors,
-      validateAdUnitTargetURL
+      validateAdUnitTargetURL,
+      form
     }),
     [
       campaign,
@@ -481,7 +482,8 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
       defaultValue,
       addUTMToTargetURLS,
       selectedBidFloors,
-      validateAdUnitTargetURL
+      validateAdUnitTargetURL,
+      form
     ]
   )
 

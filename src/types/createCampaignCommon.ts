@@ -1,5 +1,6 @@
 import { AdUnit, Campaign } from 'adex-common/dist/types/Dsp/Campaign'
 import { Alpha3Code } from 'adex-common'
+import { UseFormReturnType } from '@mantine/form'
 import { Devices, ErrorTargetUrl } from './createCampaign'
 
 export type SelectData = { value: string | Alpha3Code; label: string; group?: string }
@@ -73,4 +74,5 @@ export type CreateCampaignType = {
   addUTMToTargetURLS: () => void
   selectedBidFloors: SupplyStatsDetails[] | SupplyStatsDetails[][]
   validateAdUnitTargetURL: () => void
+  form: UseFormReturnType<CampaignUI, (values: CampaignUI) => CampaignUI>
 }
