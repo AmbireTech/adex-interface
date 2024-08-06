@@ -168,7 +168,6 @@ const EditCampaign = ({ campaign }: { campaign: Campaign }) => {
           text: 'You did not save your changes. Are you sure you want to leave this page?',
           color: 'warning',
           labels: { confirm: 'Leave the page', cancel: 'Cancel' },
-          confirmProps: { color: 'warning' },
           onConfirm: () => {
             blocker.proceed()
           },
