@@ -58,9 +58,8 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
     modals.openConfirmModal(
       defaultConfirmModalProps({
         text: `Are you sure want to ${confirm} campaign "${campaign?.title}"`,
-        color: 'warning',
+        color: campaign?.archived ? 'brand' : 'warning',
         labels: { confirm, cancel: 'Cancel' },
-        confirmProps: { color: campaign?.archived ? 'blue' : 'red' },
         onConfirm: () => {
           toggleArchived(campaign?.id || '')
           showNotification('info', `Campaign ${campaign?.archived ? 'Unarchived' : 'Archived'}`)
@@ -93,7 +92,6 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
         text: `Are you sure want to ${confirmLabel} campaign "${campaign?.title}. This action is irreversible!"`,
         color: isDraft ? 'warning' : 'brand',
         labels: { confirm: 'Yes', cancel: 'Cancel' },
-        confirmProps: { color: isDraft ? 'warning' : 'brand' },
         onConfirm
       })
     )

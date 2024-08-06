@@ -43,7 +43,7 @@ export const defaultConfirmModalProps = ({
     ),
     labels: labels || { confirm: 'confirm', cancel: 'cancel' },
     cancelProps: { color: 'secondaryText', variant: 'outline', size: 'md', ...cancelProps },
-    confirmProps: { color: 'warning', variant: 'outline', size: 'md', ...confirmProps },
+    confirmProps: { color, variant: 'outline', size: 'md', ...confirmProps },
     groupProps: { justify: 'space-between', pb: 'md', px: 'md' },
     ...rest
   }
