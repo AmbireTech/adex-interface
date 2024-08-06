@@ -41,8 +41,8 @@ const CreateCampaign = () => {
 
   const shouldBlock = useCallback<BlockerFunction>(
     ({ currentLocation, nextLocation }) =>
-      campaign.draftModified && currentLocation.pathname !== nextLocation.pathname,
-    [campaign]
+      currentLocation.pathname !== nextLocation.pathname && campaign.draftModified,
+    [campaign.draftModified]
   )
 
   const blocker: Blocker = useBlocker(shouldBlock)
@@ -64,17 +64,17 @@ const CreateCampaign = () => {
 
   useEffect(() => {
     if (blocker.state === 'blocked') {
-      return modals.openConfirmModal(
+      modals.openConfirmModal(
         defaultConfirmModalProps({
           text: 'You have unsaved changes. Do you want to save them as a draft?',
           color: 'attention',
-          labels: { confirm: 'Save as draft', cancel: 'Continue edit' },
+          labels: { confirm: 'Leave the page', cancel: 'Save draft' },
           onConfirm: () => {
-            saveDraft()
             blocker.proceed()
           },
-          onAbort: () => {
-            blocker.reset()
+          onCancel: () => {
+            saveDraft()
+            blocker.proceed()
           }
         })
       )
