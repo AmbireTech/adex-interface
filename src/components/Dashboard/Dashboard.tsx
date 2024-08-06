@@ -19,7 +19,7 @@ import AnalyticsIcon from 'resources/icons/Analytics'
 import DuplicateIcon from 'resources/icons/Duplicate'
 import DeleteIcon from 'resources/icons/Delete'
 import EditIcon from 'resources/icons/Edit'
-import { CustomConfirmModalBody } from 'components/common/Modals/CustomConfirmModal/CustomConfirmModalBody'
+import { defaultConfirmModalProps } from 'components/common/Modals/CustomConfirmModal/CustomConfirmModalBody'
 import BadgeStatusCampaign from './BadgeStatusCampaign'
 
 const campaignHeaders = [
@@ -258,22 +258,14 @@ const Dashboard = ({ isAdminPanel, accountId }: { isAdminPanel?: boolean; accoun
 
   const handleDelete = useCallback(
     (data: DashboardTableElement['actionData']) =>
-      modals.openConfirmModal({
-        centered: true,
-        withCloseButton: false,
-        padding: 0,
-        children: (
-          <CustomConfirmModalBody
-            text={`Are you sure want to delete draft "${data.campaign.title}"`}
-            color="warning"
-          />
-        ),
-        labels: { confirm: 'Delete', cancel: 'Cancel' },
-        cancelProps: { color: 'secondaryText', variant: 'outline', size: 'md' },
-        confirmProps: { color: 'warning', variant: 'outline', size: 'md' },
-        groupProps: { justify: 'space-between', pb: 'md', px: 'md' },
-        onConfirm: () => deleteDraftCampaign(data.campaign.id)
-      }),
+      modals.openConfirmModal(
+        defaultConfirmModalProps({
+          text: `Are you sure want to delete draft "${data.campaign.title}"`,
+          color: 'warning',
+          labels: { confirm: 'Delete', cancel: 'Cancel' },
+          onConfirm: () => deleteDraftCampaign(data.campaign.id)
+        })
+      ),
     [deleteDraftCampaign]
   )
 
@@ -282,25 +274,14 @@ const Dashboard = ({ isAdminPanel, accountId }: { isAdminPanel?: boolean; accoun
       const cmp = data.campaign
       const confirm = cmp?.archived ? 'Unarchive' : 'Archive'
 
-      return modals.openConfirmModal({
-        centered: true,
-        withCloseButton: false,
-        padding: 0,
-        children: (
-          <CustomConfirmModalBody
-            text={`Are you sure want to ${confirm} campaign "${cmp?.title}"`}
-          />
-        ),
-        labels: { confirm, cancel: 'Cancel' },
-        cancelProps: { color: 'secondaryText', variant: 'outline', size: 'md' },
-        confirmProps: {
+      modals.openConfirmModal(
+        defaultConfirmModalProps({
+          text: `Are you sure want to ${confirm} campaign "${cmp?.title}"`,
           color: cmp?.archived ? 'brand' : 'attention',
-          variant: 'outline',
-          size: 'md'
-        },
-        groupProps: { justify: 'space-between', pb: 'md', px: 'md' },
-        onConfirm: () => toggleArchived(cmp?.id || '')
-      })
+          labels: { confirm, cancel: 'Cancel' },
+          onConfirm: () => toggleArchived(cmp?.id || '')
+        })
+      )
     },
     [toggleArchived]
   )

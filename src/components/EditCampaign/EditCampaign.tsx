@@ -37,7 +37,7 @@ import type {
 import { unstable_useBlocker as useBlocker } from 'react-router-dom'
 import InfoFilledIcon from 'resources/icons/InfoFilled'
 import throttle from 'lodash.throttle'
-import { CustomConfirmModalBody } from 'components/common/Modals/CustomConfirmModal/CustomConfirmModalBody'
+import { defaultConfirmModalProps } from 'components/common/Modals/CustomConfirmModal/CustomConfirmModalBody'
 
 type TargetingInputEdit = {
   version: string
@@ -163,20 +163,20 @@ const EditCampaign = ({ campaign }: { campaign: Campaign }) => {
 
   useEffect(() => {
     if (blocker.state === 'blocked') {
-      return modals.openConfirmModal({
-        title: 'Unsaved changes!',
-        children: (
-          <CustomConfirmModalBody text="You did not save your changes. Are you sure you want to leave this page?" />
-        ),
-        labels: { confirm: 'Leave the page', cancel: 'Cancel' },
-        confirmProps: { color: 'warning' },
-        onConfirm: () => {
-          blocker.proceed()
-        },
-        onAbort: () => {
-          blocker.reset()
-        }
-      })
+      return modals.openConfirmModal(
+        defaultConfirmModalProps({
+          text: 'You did not save your changes. Are you sure you want to leave this page?',
+          color: 'warning',
+          labels: { confirm: 'Leave the page', cancel: 'Cancel' },
+          confirmProps: { color: 'warning' },
+          onConfirm: () => {
+            blocker.proceed()
+          },
+          onAbort: () => {
+            blocker.reset()
+          }
+        })
+      )
     }
   }, [blocker])
 

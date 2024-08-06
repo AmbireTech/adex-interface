@@ -20,7 +20,7 @@ import AnalyticsIcon from 'resources/icons/Analytics'
 import useCustomNotifications from 'hooks/useCustomNotifications'
 import { AdminBadge } from 'components/common/AdminBadge'
 import EditCampaign from 'components/EditCampaign'
-import { CustomConfirmModalBody } from 'components/common/Modals/CustomConfirmModal/CustomConfirmModalBody'
+import { defaultConfirmModalProps } from 'components/common/Modals/CustomConfirmModal/CustomConfirmModalBody'
 import DeleteIcon from 'resources/icons/Delete'
 import { StickyPanel } from 'components/TopBar/TopBarStickyPanel'
 import CatsLocsFormatted from './CatsLocsFormatted'
@@ -55,20 +55,18 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
 
     const confirm = campaign?.archived ? 'Unarchive' : 'Archive'
 
-    return modals.openConfirmModal({
-      title: `${confirm} Campaign`,
-      children: (
-        <CustomConfirmModalBody
-          text={`Are you sure want to ${confirm} campaign "${campaign?.title}"`}
-        />
-      ),
-      labels: { confirm, cancel: 'Cancel' },
-      confirmProps: { color: campaign?.archived ? 'blue' : 'red' },
-      onConfirm: () => {
-        toggleArchived(campaign?.id || '')
-        showNotification('info', `Campaign ${campaign?.archived ? 'Unarchived' : 'Archived'}`)
-      }
-    })
+    modals.openConfirmModal(
+      defaultConfirmModalProps({
+        text: `Are you sure want to ${confirm} campaign "${campaign?.title}"`,
+        color: 'warning',
+        labels: { confirm, cancel: 'Cancel' },
+        confirmProps: { color: campaign?.archived ? 'blue' : 'red' },
+        onConfirm: () => {
+          toggleArchived(campaign?.id || '')
+          showNotification('info', `Campaign ${campaign?.archived ? 'Unarchived' : 'Archived'}`)
+        }
+      })
+    )
   }, [campaign?.archived, campaign?.id, campaign?.title, showNotification, toggleArchived])
 
   const handleStopOrDelete = useCallback(() => {
@@ -78,7 +76,7 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
 
     const isDraft = campaign?.status === CampaignStatus.draft
 
-    const confirm = isDraft ? 'Delete Draft' : 'Stop'
+    const confirmLabel = isDraft ? 'Delete Draft' : 'Stop'
     const onConfirm = isDraft
       ? () => {
           deleteDraftCampaign(campaign.id)
@@ -90,19 +88,16 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
           showNotification('info', 'Campaign stopped!')
         }
 
-    return modals.openConfirmModal({
-      title: `${confirm} Campaign`,
-      children: (
-        <CustomConfirmModalBody
-          text={`Are you sure want to ${confirm} campaign "${campaign?.title}. This action is irreversible!"`}
-        />
-      ),
-      labels: { confirm: 'Yes', cancel: 'Cancel' },
-      confirmProps: { color: campaign?.archived ? 'blue' : 'red' },
-      onConfirm
-    })
+    modals.openConfirmModal(
+      defaultConfirmModalProps({
+        text: `Are you sure want to ${confirmLabel} campaign "${campaign?.title}. This action is irreversible!"`,
+        color: isDraft ? 'warning' : 'brand',
+        labels: { confirm: 'Yes', cancel: 'Cancel' },
+        confirmProps: { color: isDraft ? 'warning' : 'brand' },
+        onConfirm
+      })
+    )
   }, [
-    campaign?.archived,
     campaign?.id,
     campaign?.status,
     campaign?.title,
