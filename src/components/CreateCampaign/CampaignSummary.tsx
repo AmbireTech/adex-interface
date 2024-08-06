@@ -15,12 +15,14 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import LeftArrowIcon from 'resources/icons/LeftArrow'
 import useCreateCampaignData from 'hooks/useCreateCampaignData/useCreateCampaignData'
 import CampaignDetailsRow from 'components/common/CampainDetailsRow'
-import { LaunchCampaignModal, SuccessModal } from 'components/common/Modals'
+import { SuccessModal } from 'components/common/Modals'
 import useCustomNotifications from 'hooks/useCustomNotifications'
 import useAccount from 'hooks/useAccount'
 import { useNavigate } from 'react-router-dom'
 import throttle from 'lodash.throttle'
 import { createStyles } from '@mantine/emotion'
+import { modals } from '@mantine/modals'
+import { defaultConfirmModalProps } from 'components/common/Modals/CustomConfirmModal'
 
 const useStyles = createStyles((theme: MantineTheme) => {
   const colorScheme = useColorScheme()
@@ -102,6 +104,19 @@ const CampaignSummary = () => {
     () => throttle(launchCampaign, 1069, { leading: true }),
     [launchCampaign]
   )
+
+  const confirmLaunch = useCallback(() => {
+    return modals.openConfirmModal(
+      defaultConfirmModalProps({
+        text: "Once you click on 'Launch campaign' any creative updates disabled. Are you certain you wish to proceed with the launch?",
+        color: 'attention',
+        labels: { confirm: 'Launch Campaign', cancel: 'Continue edit' },
+        onConfirm: () => {
+          throttledLaunchCampaign()
+        }
+      })
+    )
+  }, [throttledLaunchCampaign])
 
   const handleNextStepBtnClicked = useCallback(() => {
     if (step === 0) {
@@ -229,16 +244,9 @@ const CampaignSummary = () => {
             Next Step
           </Button>
         ) : (
-          <LaunchCampaignModal
-            w="90%"
-            size="lg"
-            variant="filled"
-            btnLabel="Launch Campaign"
-            cancelBtnLabel="Go Back"
-            confirmBtnLabel="Launch Campaign"
-            onCancelClicked={() => console.log('Canceled')}
-            onConfirmClicked={throttledLaunchCampaign}
-          />
+          <Button w="90%" size="lg" variant="filled" onClick={confirmLaunch}>
+            Launch Campaign
+          </Button>
         )}
         <Button w="90%" size="lg" variant="outline" onClick={handleSaveDraftClicked}>
           Save Draft
