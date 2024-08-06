@@ -166,7 +166,7 @@ const EditCampaign = ({ campaign }: { campaign: Campaign }) => {
       return modals.openConfirmModal(
         defaultConfirmModalProps({
           text: 'You did not save your changes. Are you sure you want to leave this page?',
-          color: 'warning',
+          color: 'attention',
           labels: { confirm: 'Leave the page', cancel: 'Continue edit' },
           onConfirm: () => {
             blocker.proceed()

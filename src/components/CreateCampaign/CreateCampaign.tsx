@@ -68,12 +68,12 @@ const CreateCampaign = () => {
         defaultConfirmModalProps({
           text: 'You have unsaved changes. Do you want to save them as a draft?',
           color: 'attention',
-          labels: { confirm: 'Save draft', cancel: 'Continue without saving' },
+          labels: { confirm: 'Leave the page', cancel: 'Save draft' },
           onConfirm: () => {
-            saveDraft()
             blocker.proceed()
           },
           onCancel: () => {
+            saveDraft()
             blocker.proceed()
           }
         })
