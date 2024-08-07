@@ -1,33 +1,49 @@
-import { Button, Stack, Group, Text, UnstyledButton, createStyles } from '@mantine/core'
-import { useDisclosure } from '@mantine/hooks'
+import {
+  Button,
+  Group,
+  MantineTheme,
+  Stack,
+  Text,
+  UnstyledButton,
+  getPrimaryShade,
+  lighten
+} from '@mantine/core'
+import { useDisclosure, useColorScheme } from '@mantine/hooks'
 import { CREATE_CAMPAIGN_STEPS } from 'constants/createCampaign'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import LeftArrowIcon from 'resources/icons/LeftArrow'
 import useCreateCampaignData from 'hooks/useCreateCampaignData/useCreateCampaignData'
 import CampaignDetailsRow from 'components/common/CampainDetailsRow'
-import { LaunchCampaignModal, SuccessModal } from 'components/common/Modals'
+import { SuccessModal } from 'components/common/Modals'
 import useCustomNotifications from 'hooks/useCustomNotifications'
 import useAccount from 'hooks/useAccount'
 import { useNavigate } from 'react-router-dom'
 import throttle from 'lodash.throttle'
+import { createStyles } from '@mantine/emotion'
+import { modals } from '@mantine/modals'
+import { defaultConfirmModalProps } from 'components/common/Modals/CustomConfirmModal'
 
-const useStyles = createStyles((theme) => ({
-  bg: {
-    background:
-      theme.colors.warning[theme.fn.primaryShade()] + theme.other.shades.hexColorSuffix.lightest
-  },
-  icon: {
-    width: 14,
-    height: 14
-  },
-  lightestBrandColor: {
-    color: theme.colors.brand[theme.fn.primaryShade()] + theme.other.shades.hexColorSuffix.lighter
-  },
-  brandColor: {
-    color: theme.colors.brand[theme.fn.primaryShade()]
+const useStyles = createStyles((theme: MantineTheme) => {
+  const colorScheme = useColorScheme()
+  const primaryShade = getPrimaryShade(theme, colorScheme)
+
+  return {
+    bg: {
+      background: lighten(theme.colors.warning[primaryShade], theme.other.shades.lighten.lightest)
+    },
+    icon: {
+      width: 14,
+      height: 14
+    },
+    lightestBrandColor: {
+      color: lighten(theme.colors.brand[primaryShade], theme.other.shades.lighten.lighter)
+    },
+    brandColor: {
+      color: theme.colors.brand[primaryShade]
+    }
   }
-}))
+})
 
 const CampaignSummary = () => {
   const { classes, cx } = useStyles()
@@ -88,6 +104,19 @@ const CampaignSummary = () => {
     () => throttle(launchCampaign, 1069, { leading: true }),
     [launchCampaign]
   )
+
+  const confirmLaunch = useCallback(() => {
+    return modals.openConfirmModal(
+      defaultConfirmModalProps({
+        text: "Once you click on 'Launch campaign' any creative updates disabled. Are you certain you wish to proceed with the launch?",
+        color: 'attention',
+        labels: { confirm: 'Launch Campaign', cancel: 'Continue edit' },
+        onConfirm: () => {
+          throttledLaunchCampaign()
+        }
+      })
+    )
+  }, [throttledLaunchCampaign])
 
   const handleNextStepBtnClicked = useCallback(() => {
     if (step === 0) {
@@ -198,12 +227,12 @@ const CampaignSummary = () => {
       </Stack>
       {/* Temporary disabled */}
       {/* <Flex justify="space-between" className={classes.bg} p="lg">
-        <Text color="secondaryText" weight="bold">
+        <Text c="secondaryText" fw="bold">
           Estimated Daily Impressions
         </Text>
-        <Text color="secondaryText">0</Text>
+        <Text c="secondaryText">0</Text>
       </Flex> */}
-      <Stack align="center" justify="space-between" spacing="sm" mt="xl">
+      <Stack align="center" justify="space-between" gap="sm" mt="xl">
         {!isTheLastStep ? (
           <Button
             w="90%"
@@ -215,16 +244,9 @@ const CampaignSummary = () => {
             Next Step
           </Button>
         ) : (
-          <LaunchCampaignModal
-            w="90%"
-            size="lg"
-            variant="filled"
-            btnLabel="Launch Campaign"
-            cancelBtnLabel="Go Back"
-            confirmBtnLabel="Launch Campaign"
-            onCancelClicked={() => console.log('Canceled')}
-            onConfirmClicked={throttledLaunchCampaign}
-          />
+          <Button w="90%" size="lg" variant="filled" onClick={confirmLaunch}>
+            Launch Campaign
+          </Button>
         )}
         <Button w="90%" size="lg" variant="outline" onClick={handleSaveDraftClicked}>
           Save Draft
@@ -235,11 +257,11 @@ const CampaignSummary = () => {
           disabled={isFirstStep}
           className={cx(classes.brandColor, { [classes.lightestBrandColor]: isFirstStep })}
         >
-          <Group position="center" align="center" spacing="xs" h={50}>
+          <Group justify="center" align="center" gap="xs" h={50}>
             <span>
               <LeftArrowIcon className={classes.icon} />
             </span>
-            <Text size="lg" weight="bold" underline>
+            <Text size="lg" fw="bold" td="underline">
               Go Back
             </Text>
           </Group>

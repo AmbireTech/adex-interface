@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState, useMemo } from 'react'
-import { Box, Container, Flex, Loader, Tabs } from '@mantine/core'
+import { Container, Flex, Loader, Tabs, Paper, Group, Text } from '@mantine/core'
 import { useParams } from 'react-router-dom'
 import { AnalyticsType, BaseAnalyticsData, AnalyticsPeriod } from 'types'
 import GoBack from 'components/common/GoBack/GoBack'
@@ -8,6 +8,8 @@ import useCampaignAnalytics from 'hooks/useCampaignAnalytics'
 import { useCampaignsData } from 'hooks/useCampaignsData'
 import { Campaign } from 'adex-common'
 import useAccount from 'hooks/useAccount'
+import { StickyPanel } from 'components/TopBar/TopBarStickyPanel'
+import { AdminBadge } from 'components/common/AdminBadge'
 import Placements from './Placements'
 import Creatives from './Creatives'
 import SSPs from './SSPs'
@@ -16,7 +18,7 @@ import { TimeFrame } from './TimeFrame'
 import { generateCVSData } from './CvsDownloadConfigurations'
 import SeeOnMapBtn from './SeeOnMapBtn'
 
-const CampaignAnalytics = () => {
+const CampaignAnalytics = ({ isAdminPanel = false }: { isAdminPanel?: boolean }) => {
   const { id } = useParams()
 
   const [activeTab, setActiveTab] = useState<AnalyticsType>('timeframe')
@@ -36,8 +38,7 @@ const CampaignAnalytics = () => {
   const {
     adexAccount: {
       fundsOnCampaigns: { perCampaign }
-    },
-    isAdmin
+    }
   } = useAccount()
 
   const currencyName = useMemo(
@@ -85,13 +86,13 @@ const CampaignAnalytics = () => {
     setAnalyticsKey(undefined)
 
     const checkAnalytics = async () => {
-      const key = await getAnalyticsKeyAndUpdate(activeTab, campaign)
+      const key = await getAnalyticsKeyAndUpdate(activeTab, campaign, !!isAdminPanel)
       setAnalyticsKey(key)
       console.log('key', key)
     }
 
     checkAnalytics()
-  }, [activeTab, campaign, getAnalyticsKeyAndUpdate])
+  }, [activeTab, campaign, getAnalyticsKeyAndUpdate, isAdminPanel])
 
   useEffect(() => {
     if (campaignMappedAnalytics) {
@@ -102,9 +103,10 @@ const CampaignAnalytics = () => {
     }
   }, [activeTab, campaignMappedAnalytics])
 
-  const handleTabChange = useCallback((value: AnalyticsType) => {
+  const handleTabChange = useCallback((value: string | null) => {
     // TODO: validate value if it is in AnalyticsType
-    setActiveTab(value)
+    if (!value) return
+    setActiveTab(value as AnalyticsType)
   }, [])
 
   // TODO: there is delay when updated analytics table is displayed after the tab is switched - add loading bars or something
@@ -122,36 +124,40 @@ const CampaignAnalytics = () => {
 
   return (
     <Container fluid>
-      <Box p="md">
-        <GoBack title="Dashboard" fixed />
-      </Box>
-      <Tabs
-        color="brand"
-        value={activeTab}
-        onTabChange={handleTabChange}
-        styles={() => ({
-          tabsList: { border: 'none', padding: '20px 0' }
-        })}
-        keepMounted={false}
-      >
+      <StickyPanel>
+        <Paper mx="auto" shadow="xl" radius="xl">
+          <Group justify="space-between">
+            <GoBack title="Go Back" />
+            <Text size="sm" truncate>
+              Campaign: {campaign?.title}
+              {isAdminPanel && ` (${campaign?.owner})`}
+            </Text>
+            <Group align="center" justify="space-between">
+              {isMapBtnShown && (
+                <SeeOnMapBtn onBtnClicked={() => setIsMapVisible((prev) => !prev)} />
+              )}
+              {csvData && activeTab !== 'timeframe' && (
+                <DownloadCSV
+                  data={csvData.tabData}
+                  mapHeadersToDataProperties={csvData.mapHeadersToDataProperties}
+                  filename={csvData.filename}
+                />
+              )}
+            </Group>
+          </Group>
+        </Paper>
+        {isAdminPanel && <AdminBadge title="Admin Campaign Analytics" />}
+      </StickyPanel>
+
+      <Tabs color="brand" value={activeTab} onChange={handleTabChange} py="sm" keepMounted={false}>
         <Flex justify="space-between" align="baseline">
           <Tabs.List>
             <Tabs.Tab value="timeframe">TIME FRAME</Tabs.Tab>
             <Tabs.Tab value="hostname">PLACEMENTS</Tabs.Tab>
             <Tabs.Tab value="country">REGIONS</Tabs.Tab>
             <Tabs.Tab value="adUnit">CREATIVES</Tabs.Tab>
-            {isAdmin && <Tabs.Tab value="ssp">SSPs</Tabs.Tab>}
+            {isAdminPanel && <Tabs.Tab value="ssp">SSPs</Tabs.Tab>}
           </Tabs.List>
-          <Flex align="center" justify="space-between">
-            {isMapBtnShown && <SeeOnMapBtn onBtnClicked={() => setIsMapVisible((prev) => !prev)} />}
-            {csvData && activeTab !== 'timeframe' && (
-              <DownloadCSV
-                data={csvData.tabData}
-                mapHeadersToDataProperties={csvData.mapHeadersToDataProperties}
-                filename={csvData.filename}
-              />
-            )}
-          </Flex>
         </Flex>
         {loading && (
           <Flex justify="center" align="center" mt={69}>
@@ -193,7 +199,7 @@ const CampaignAnalytics = () => {
           currencyName={currencyName}
         />
       )}
-      {isAdmin && !loading && activeTab === 'ssp' && (
+      {isAdminPanel && !loading && activeTab === 'ssp' && (
         <SSPs data={campaignMappedAnalytics} currencyName={currencyName} />
       )}
     </Container>

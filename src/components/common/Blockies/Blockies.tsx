@@ -1,4 +1,4 @@
-import { createStyles } from '@mantine/core'
+import { createStyles } from '@mantine/emotion'
 import * as blockies from 'blockies-ts'
 
 const useStyles = createStyles((theme, { size, icon }: { size: string; icon: string }) => ({

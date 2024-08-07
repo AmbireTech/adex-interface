@@ -1,8 +1,13 @@
-import { UnstyledButton, Group, Text, createStyles } from '@mantine/core'
+import { UnstyledButton, Group, Text, lighten, MantineTheme, getPrimaryShade } from '@mantine/core'
+import { createStyles } from '@mantine/emotion'
 import { Link, LinkProps } from 'react-router-dom'
 import CustomPopover from 'components/common/CustomPopover'
+import { useColorScheme } from '@mantine/hooks'
 
-const useStyles = createStyles((theme) => {
+const useStyles = createStyles((theme: MantineTheme) => {
+  const colorScheme = useColorScheme()
+  const primaryShade = getPrimaryShade(theme, colorScheme)
+
   return {
     button: {
       display: 'block',
@@ -11,17 +16,17 @@ const useStyles = createStyles((theme) => {
       padding: theme.spacing.xs,
       borderRadius: 'none',
       position: 'relative',
-      color: theme.fn.lighten(
-        theme.colors.mainText[theme.fn.primaryShade()],
-        theme.other.shades.lighten.lighter
-      ),
+      color: lighten(theme.colors.mainText[primaryShade], theme.other.shades.lighten.lighter),
       '&:hover': {
-        background: theme.colors.lightBackground[theme.fn.primaryShade()]
+        background: theme.colors.lightBackground[primaryShade]
       }
     },
     active: {
-      // backgroundColor: theme.fn.primaryColor() + theme.other.shades.hexColorSuffix.lightest,
-      color: theme.fn.primaryColor(),
+      backgroundColor: lighten(
+        theme.colors.brand[primaryShade],
+        theme.other.shades.lighten.lightest
+      ),
+      color: theme.colors.brand[primaryShade],
       fontWeight: theme.other.fontWeights.regular,
       opacity: 1,
       '&:before': {
@@ -31,7 +36,7 @@ const useStyles = createStyles((theme) => {
         top: 0,
         bottom: 0,
         width: 5,
-        backgroundColor: theme.fn.primaryColor()
+        backgroundColor: theme.colors.brand[primaryShade]
       }
     },
     icon: {
@@ -67,7 +72,7 @@ function NavLink({
   const { classes, cx } = useStyles()
   return hasPopover ? (
     <CustomPopover popoverContent={popoverContent}>
-      <UnstyledButton className={classes.button} px="xl">
+      <UnstyledButton className={classes.button} px="md">
         <Group>
           <span className={classes.icon}>{icon}</span>
           <Text size="md">{label}</Text>
@@ -81,7 +86,7 @@ function NavLink({
       title={label}
       onClick={action}
       className={cx(classes.button, { [classes.active]: active })}
-      px="xl"
+      px="md"
       {...rest}
     >
       <Group>

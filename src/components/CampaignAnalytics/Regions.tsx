@@ -48,7 +48,7 @@ const Regions = ({
   return (
     <Grid grow>
       <Grid.Col>
-        <CustomTable background headings={headings} elements={elements} />
+        <CustomTable headings={headings} elements={elements} />
       </Grid.Col>
       <Modal
         opened={isMapVisible}

@@ -111,7 +111,7 @@ export const validateTitle = (value: string) => {
   if (value === '') {
     return {
       isValid: false,
-      errMsg: 'Enter Title'
+      errMsg: 'Enter campaign name'
     }
   }
   if (value.length < 2) {

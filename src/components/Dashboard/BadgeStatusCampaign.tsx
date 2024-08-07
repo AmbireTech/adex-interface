@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from 'react'
+import { useMemo } from 'react'
 import { BadgeType, IBadgeConfig } from 'types'
 import { CampaignStatus } from 'adex-common'
 import CustomBadge from 'components/common/CustomBadge'
@@ -8,10 +8,19 @@ import UnderReviewIcon from 'resources/icons/UnderReview'
 import StopIcon from 'resources/icons/Stop'
 import ActiveIcon from 'resources/icons/Active'
 import PausedIcon from 'resources/icons/Paused'
-// import ArchivedIcon from 'resources/icons/Archived'
+import ArchivedIcon from 'resources/icons/Archived'
 
-const BadgeStatusCampaign = ({ type }: BadgeType) => {
-  const getStatusLabel = useCallback((status: number): IBadgeConfig => {
+const BadgeStatusCampaign = ({ type, isArchived }: BadgeType) => {
+  const labelCfg = useMemo<IBadgeConfig>(() => {
+    const status = type
+    if (isArchived) {
+      return {
+        color: 'secondaryText',
+        text: 'Archived',
+        icon: <ArchivedIcon size="10px" />,
+        size: 'xs'
+      }
+    }
     switch (status) {
       case CampaignStatus.created:
         return {
@@ -68,14 +77,6 @@ const BadgeStatusCampaign = ({ type }: BadgeType) => {
           text: 'Paused',
           icon: <PausedIcon size="13px" />
         }
-      // TODO: uncomment when CampaignStatus.archived is added
-      // case CampaignStatus.archived:
-      //   return {
-      //     color: 'secondaryText',
-      //     text: 'Archived',
-      //     icon: <ArchivedIcon size="13px" />
-      //   }
-      // TODO: uncomment when CampaignStatus.rejected is added
       case CampaignStatus.rejected:
         return {
           color: 'warning',
@@ -96,11 +97,9 @@ const BadgeStatusCampaign = ({ type }: BadgeType) => {
           icon: undefined
         }
     }
-  }, [])
+  }, [isArchived, type])
 
-  const status = useMemo(() => getStatusLabel(type), [getStatusLabel, type])
-
-  return <CustomBadge color={status.color} text={status.text} icon={status.icon} />
+  return <CustomBadge color={labelCfg.color} text={labelCfg.text} icon={labelCfg.icon} />
 }
 
 export default BadgeStatusCampaign

@@ -1,17 +1,25 @@
-import { Flex, Text, createStyles } from '@mantine/core'
+import { Flex, MantineTheme, Text, getPrimaryShade, lighten } from '@mantine/core'
+import { createStyles } from '@mantine/emotion'
+import { useColorScheme } from '@mantine/hooks'
 import { CampaignDetailsRowProps } from 'types'
 
-const useStyles = createStyles((theme, { lighterColor }: { lighterColor: boolean }) => ({
-  border: {
-    borderBottom: `1px dashed ${theme.colors.decorativeBorders[theme.fn.primaryShade()]}`
-  },
-  textColor: {
-    color: !lighterColor
-      ? theme.colors.secondaryText[theme.fn.primaryShade()]
-      : theme.colors.secondaryText[theme.fn.primaryShade()] +
-        theme.other.shades.hexColorSuffix.lighter
+const useStyles = createStyles(
+  (theme: MantineTheme, { lighterColor }: { lighterColor: boolean }) => {
+    const colorScheme = useColorScheme()
+    const primaryShade = getPrimaryShade(theme, colorScheme)
+
+    return {
+      border: {
+        borderBottom: `1px dashed ${theme.colors.decorativeBorders[primaryShade]}`
+      },
+      textColor: {
+        color: !lighterColor
+          ? theme.colors.secondaryText[primaryShade]
+          : lighten(theme.colors.secondaryText[primaryShade], theme.other.shades.lighten.lighter)
+      }
+    }
   }
-}))
+)
 
 const CampaignDetailsRow = ({
   title,
@@ -35,11 +43,11 @@ const CampaignDetailsRow = ({
       gap="xs"
       {...rest}
     >
-      <Text span weight="bold" size={textSize} color="secondaryText">
+      <Text fw="bold" size={textSize} c="secondaryText">
         {title}
       </Text>
       {typeof value === 'string' ? (
-        <Text align="end" span={!column} w={column ? '100%' : 'auto'}>
+        <Text ta="end" truncate w={column ? '100%' : 'auto'}>
           {value}
         </Text>
       ) : (

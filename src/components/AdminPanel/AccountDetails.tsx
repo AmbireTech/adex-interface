@@ -19,20 +19,21 @@ function AccountDetails() {
   return (
     <Box>
       <SimpleGrid
-        cols={2}
-        breakpoints={[
-          { maxWidth: 'xl', cols: 2, spacing: 'xl' },
-          { maxWidth: 'md', cols: 1, spacing: 'xl' }
-        ]}
+        cols={{ md: 1, xl: 2 }}
+        spacing="xl"
+        // breakpoints={[
+        //   { maxWidth: 'xl', cols: 2, spacing: 'xl' },
+        //   { maxWidth: 'md', cols: 1, spacing: 'xl' }
+        // ]}
       >
         <Paper p="sm" withBorder>
-          <Title order={5} color="brand">
+          <Title order={5} c="brand">
             Account info form
           </Title>
           <AccountInfo accountData={accountData} />
         </Paper>
         <Paper p="sm" withBorder>
-          <Title order={5} color="brand">
+          <Title order={5} c="brand">
             Deposit form
           </Title>
           <AdminDeposit accountData={accountData} />
@@ -40,7 +41,7 @@ function AccountDetails() {
       </SimpleGrid>
       <SimpleGrid spacing="xl" mt="xl">
         <Paper p="sm" withBorder>
-          <Title order={5} color="brand">
+          <Title order={5} c="brand">
             Activity
           </Title>
           <FundsActivity accountData={accountData} />
@@ -48,7 +49,7 @@ function AccountDetails() {
       </SimpleGrid>
       <SimpleGrid spacing="xl" mt="xl">
         <Paper p="sm" withBorder>
-          <Title order={5} color="brand">
+          <Title order={5} c="brand">
             Campaigns
           </Title>
           <Dashboard isAdminPanel accountId={accountId} />

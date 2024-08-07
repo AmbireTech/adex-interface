@@ -23,7 +23,6 @@ import { parseBigNumTokenAmountToDecimal, parseToBigNumPrecision } from 'helpers
 
 import {
   findArrayWithLengthInObjectAsValue,
-  updateCatsLocsObject,
   getRecommendedCPMRange
 } from 'helpers/createCampaignHelpers'
 import useAccount from 'hooks/useAccount'
@@ -38,7 +37,7 @@ import type {
 import { unstable_useBlocker as useBlocker } from 'react-router-dom'
 import InfoFilledIcon from 'resources/icons/InfoFilled'
 import throttle from 'lodash.throttle'
-import { CustomConfirmModalBody } from 'components/common/Modals/CustomConfirmModal/CustomConfirmModalBody'
+import { defaultConfirmModalProps } from 'components/common/Modals/CustomConfirmModal'
 
 type TargetingInputEdit = {
   version: string
@@ -164,20 +163,19 @@ const EditCampaign = ({ campaign }: { campaign: Campaign }) => {
 
   useEffect(() => {
     if (blocker.state === 'blocked') {
-      return modals.openConfirmModal({
-        title: 'Unsaved changes!',
-        children: (
-          <CustomConfirmModalBody text="You did not save your changes. Are you sure you want to leave this page?" />
-        ),
-        labels: { confirm: 'Leave the page', cancel: 'Cancel' },
-        confirmProps: { color: 'warning' },
-        onConfirm: () => {
-          blocker.proceed()
-        },
-        onAbort: () => {
-          blocker.reset()
-        }
-      })
+      return modals.openConfirmModal(
+        defaultConfirmModalProps({
+          text: 'You did not save your changes. Are you sure you want to leave this page?',
+          color: 'attention',
+          labels: { confirm: 'Leave the page', cancel: 'Continue edit' },
+          onConfirm: () => {
+            blocker.proceed()
+          },
+          onCancel: () => {
+            blocker.reset()
+          }
+        })
+      )
     }
   }, [blocker])
 
@@ -193,20 +191,22 @@ const EditCampaign = ({ campaign }: { campaign: Campaign }) => {
 
   const handleCategories = useCallback(
     (selectedRadio: TargetingInputApplyProp, categoriesValue: string[]) => {
-      form.setFieldValue(
-        'targetingInput.inputs.categories',
-        updateCatsLocsObject(selectedRadio, categoriesValue)
-      )
+      form.setFieldValue('targetingInput.inputs.categories', {
+        apply: selectedRadio,
+        in: selectedRadio === 'in' ? categoriesValue : [],
+        nin: selectedRadio === 'nin' ? categoriesValue : []
+      })
     },
     [form]
   )
 
   const handleCountries = useCallback(
     (selectedRadio: TargetingInputApplyProp, locationsValue: string[]) => {
-      form.setFieldValue(
-        'targetingInput.inputs.location',
-        updateCatsLocsObject(selectedRadio, locationsValue)
-      )
+      form.setFieldValue('targetingInput.inputs.location', {
+        apply: selectedRadio,
+        in: selectedRadio === 'in' ? locationsValue : [],
+        nin: selectedRadio === 'nin' ? locationsValue : []
+      })
     },
     [form]
   )
@@ -283,17 +283,17 @@ const EditCampaign = ({ campaign }: { campaign: Campaign }) => {
   return (
     <Paper p="md">
       <form onSubmit={form.onSubmit(throttledSbm)}>
-        <Stack spacing="xl">
-          <Stack spacing="xs">
-            <Group spacing="xs">
-              <Text color="secondaryText" size="sm" weight="bold">
+        <Stack gap="xl">
+          <Stack gap="xs">
+            <Group gap="xs">
+              <Text color="secondaryText" size="sm" fw="bold">
                 CPM
               </Text>
               <Tooltip
                 label={`Recommended CPM: Min - ${recommendedPaymentBounds.min}; Max - ${recommendedPaymentBounds.max}`}
                 ml="sm"
               >
-                <ActionIcon color="secondaryText" size="xs">
+                <ActionIcon variant="transparent" color="secondaryText" size="xs">
                   <InfoFilledIcon />
                 </ActionIcon>
               </Tooltip>
@@ -310,7 +310,7 @@ const EditCampaign = ({ campaign }: { campaign: Campaign }) => {
                 }
                 rightSectionWidth="auto"
                 name="cpmPricingBoundsMin"
-                precision={2}
+                decimalScale={2}
                 {...form.getInputProps('pricingBounds.IMPRESSION.min')}
               />
               <NumberInput
@@ -325,14 +325,14 @@ const EditCampaign = ({ campaign }: { campaign: Campaign }) => {
                 }
                 rightSectionWidth="md"
                 name="cpmPricingBoundsMax"
-                precision={2}
+                decimalScale={2}
                 {...form.getInputProps('pricingBounds.IMPRESSION.max')}
               />
             </Group>
           </Stack>
 
-          <Stack spacing="xs">
-            <Text color="secondaryText" size="sm" weight="bold">
+          <Stack gap="xs">
+            <Text c="secondaryText" size="sm" fw="bold">
               Advanced
             </Text>
             <Group>
@@ -345,8 +345,8 @@ const EditCampaign = ({ campaign }: { campaign: Campaign }) => {
             </Group>
           </Stack>
 
-          <Stack spacing="xs">
-            <Text color="secondaryText" size="sm" weight="bold">
+          <Stack gap="xs">
+            <Text c="secondaryText" size="sm" fw="bold">
               Categories
             </Text>
             <MultiSelectAndRadioButtons
@@ -365,8 +365,8 @@ const EditCampaign = ({ campaign }: { campaign: Campaign }) => {
             />
           </Stack>
 
-          <Stack spacing="xs">
-            <Text color="secondaryText" size="sm" weight="bold">
+          <Stack gap="xs">
+            <Text c="secondaryText" size="sm" fw="bold">
               Countries
             </Text>
             <MultiSelectAndRadioButtons

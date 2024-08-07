@@ -1,4 +1,5 @@
-import { Alert, Flex, Text, createStyles } from '@mantine/core'
+import { Alert, Flex, MantineTheme, Text, getPrimaryShade } from '@mantine/core'
+import { createStyles } from '@mantine/emotion'
 import { checkBannerSizes } from 'helpers/createCampaignHelpers'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import { useMemo } from 'react'
@@ -6,14 +7,20 @@ import { AdUnit } from 'adex-common/dist/types'
 import { SupplyStatsDetails } from 'types'
 import InfoIcon from 'resources/icons/Info'
 import CustomAnchor from 'components/common/customAnchor'
+import { useColorScheme } from '@mantine/hooks'
 
 const SIZES_COUNT_TO_SHOW = 6
 
-const useStyles = createStyles((theme) => ({
-  brandTextColor: {
-    color: theme.colors.brand[theme.fn.primaryShade()]
+const useStyles = createStyles((theme: MantineTheme) => {
+  const colorScheme = useColorScheme()
+  const primaryShade = getPrimaryShade(theme, colorScheme)
+
+  return {
+    brandTextColor: {
+      color: theme.colors.brand[primaryShade]
+    }
   }
-}))
+})
 
 const getPopularBannerSizes = (bannerSizes: SupplyStatsDetails[] | SupplyStatsDetails[][]) => {
   let result: SupplyStatsDetails[][] | SupplyStatsDetails[] = []
@@ -57,8 +64,8 @@ const BannerSizesList = ({ adUnits }: { adUnits: AdUnit[] }) => {
         </Text>
         <CustomAnchor
           external
-          underline
-          weight="bold"
+          underline="always"
+          fw="bold"
           href="https://help.adex.network/hc/en-us/articles/14499102255772-What-are-the-supported-ad-formats"
           className={classes.brandTextColor}
         >

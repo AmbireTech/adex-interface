@@ -2,30 +2,38 @@ import {
   Flex,
   Text,
   Button,
-  createStyles,
   MantineColor,
-  MantineStyleSystemProps
+  ButtonProps,
+  MantineTheme,
+  getPrimaryShade,
+  lighten
 } from '@mantine/core'
+import { createStyles } from '@mantine/emotion'
+import { useColorScheme } from '@mantine/hooks'
 
-type CampaignActionBtnProps = MantineStyleSystemProps & {
+type CampaignActionBtnProps = ButtonProps & {
   text: string
   icon: React.ReactNode
   color: MantineColor
   onBtnClicked: () => void
 }
 
-const useStyles = createStyles((theme, { color }: { color: MantineColor }) => ({
-  btn: {
-    background:
-      theme.colors[color][theme.fn.primaryShade()] + theme.other.shades.hexColorSuffix.lightest,
-    fontWeight: 'normal',
-    textTransform: 'capitalize',
-    '&:hover': {
-      background: theme.colors[color][theme.fn.primaryShade()],
-      color: 'white'
+const useStyles = createStyles((theme: MantineTheme, { color }: { color: MantineColor }) => {
+  const colorScheme = useColorScheme()
+  const primaryShade = getPrimaryShade(theme, colorScheme)
+
+  return {
+    btn: {
+      background: lighten(theme.colors[color][primaryShade], theme.other.shades.lighten.lightest),
+      fontWeight: 'normal',
+      textTransform: 'capitalize',
+      '&:hover': {
+        background: theme.colors[color][primaryShade],
+        color: 'white'
+      }
     }
   }
-}))
+})
 
 const CampaignActionBtn = ({
   text,

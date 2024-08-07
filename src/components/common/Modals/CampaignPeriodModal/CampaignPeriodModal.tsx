@@ -2,15 +2,17 @@ import {
   Group,
   Modal,
   Text,
-  rem,
   Grid,
-  createStyles,
   Flex,
   Button,
   UnstyledButton,
-  Stack
+  Stack,
+  MantineTheme,
+  getPrimaryShade
 } from '@mantine/core'
+import { createStyles } from '@mantine/emotion'
 import { DatePicker } from '@mantine/dates'
+import { useColorScheme } from '@mantine/hooks'
 import { formatDateShort } from 'helpers/formatters'
 import { useCallback, useMemo, useState } from 'react'
 import CalendarIcon from 'resources/icons/Calendar'
@@ -24,26 +26,31 @@ import CampaignTimePicker from './CampaignTimePicker'
 
 type DateOrTime = 'date' | 'time'
 
-const useStyles = createStyles((theme) => ({
-  wrapper: {
-    cursor: 'pointer',
-    border: '1px solid',
-    borderColor: theme.colors.decorativeBorders[theme.fn.primaryShade()]
-  },
-  selected: {
-    borderColor: theme.colors.brand[theme.fn.primaryShade()],
-    color: theme.colors.brand[theme.fn.primaryShade()],
-    backgroundColor: theme.colors.lightBackground[theme.fn.primaryShade()]
-  },
-  footer: {
-    backgroundColor: theme.colors.lightBackground[theme.fn.primaryShade()],
-    padding: theme.spacing.lg
-  },
-  month: {
-    background: theme.colors.lightBackground[theme.fn.primaryShade()],
-    borderRadius: theme.radius.md
+const useStyles = createStyles((theme: MantineTheme) => {
+  const colorScheme = useColorScheme()
+  const primaryShade = getPrimaryShade(theme, colorScheme)
+
+  return {
+    wrapper: {
+      cursor: 'pointer',
+      border: '1px solid',
+      borderColor: theme.colors.decorativeBorders[primaryShade]
+    },
+    selected: {
+      borderColor: theme.colors.brand[primaryShade],
+      color: theme.colors.brand[primaryShade],
+      backgroundColor: theme.colors.lightBackground[primaryShade]
+    },
+    footer: {
+      backgroundColor: theme.colors.lightBackground[primaryShade],
+      padding: theme.spacing.lg
+    },
+    month: {
+      background: theme.colors.lightBackground[primaryShade],
+      borderRadius: theme.radius.md
+    }
   }
-}))
+})
 
 const CampaignPeriodModal = ({ opened, close }: { opened: boolean; close: () => void }) => {
   const allLocales = useMemo(() => initAllLocales(), [])
@@ -120,49 +127,51 @@ const CampaignPeriodModal = ({ opened, close }: { opened: boolean; close: () => 
   }, [updateCampaign, mergedEndDateTime, mergedStartDateTime, close])
 
   return (
-    <Modal centered size={736} padding={0} opened={opened} withCloseButton={false} onClose={close}>
+    <Modal centered size={736} opened={opened} withCloseButton={false} onClose={close}>
       <Grid grow m={0}>
         <Grid.Col p={0}>
           <Grid>
             <Grid.Col
+              p={0}
               span={6}
               className={cx(classes.wrapper, { [classes.selected]: isDateTabSelected })}
               onClick={() => handleSelectDateOrTimeTabClicked('date')}
             >
-              <Group position="apart" align="center" pl="xs" pt="xs">
+              <Flex justify="space-between" align="center" p="xs">
                 <Group>
                   <CalendarIcon />
                   <div>
-                    <Text weight="bold" size="xl">
+                    <Text fw="bold" size="xl">
                       Set Period
                     </Text>
-                    <Text color="secondaryText" size="xs">
+                    <Text c="secondaryText" size="xs">
                       Current date: {currentDate}
                     </Text>
                   </div>
                 </Group>
-                <DownArrowIcon size={rem(10)} style={{ transform: 'rotate(-90deg)' }} />
-              </Group>
+                <DownArrowIcon size="10px" style={{ transform: 'rotate(-90deg)' }} />
+              </Flex>
             </Grid.Col>
             <Grid.Col
+              p={0}
               span={6}
               className={cx(classes.wrapper, { [classes.selected]: !isDateTabSelected })}
               onClick={() => handleSelectDateOrTimeTabClicked('time')}
             >
-              <Group position="apart" align="center" pr="xs" pt="xs">
+              <Flex justify="space-between" align="center" p="xs">
                 <Group>
                   <TimeIcon />
                   <div>
-                    <Text weight="bold" size="xl">
+                    <Text fw="bold" size="xl">
                       Set Time
                     </Text>
-                    <Text color="secondaryText" size="xs">
+                    <Text c="secondaryText" size="xs">
                       Current time: <Clock />
                     </Text>
                   </div>
                 </Group>
-                <DownArrowIcon size={rem(10)} style={{ transform: 'rotate(-90deg)' }} />
-              </Group>
+                <DownArrowIcon size="10px" style={{ transform: 'rotate(-90deg)' }} />
+              </Flex>
             </Grid.Col>
           </Grid>
         </Grid.Col>
@@ -184,7 +193,7 @@ const CampaignPeriodModal = ({ opened, close }: { opened: boolean; close: () => 
             <Grid grow>
               <Grid.Col span={6}>
                 <Stack align="center">
-                  <Text color="secondaryText" size="md" p="xs">
+                  <Text c="secondaryText" size="md" p="xs">
                     Start time
                   </Text>
                   <CampaignTimePicker
@@ -195,7 +204,7 @@ const CampaignPeriodModal = ({ opened, close }: { opened: boolean; close: () => 
               </Grid.Col>
               <Grid.Col span={6}>
                 <Stack align="center">
-                  <Text color="secondaryText" size="md" p="xs">
+                  <Text c="secondaryText" size="md" p="xs">
                     End time
                   </Text>
                   <CampaignTimePicker
@@ -216,7 +225,7 @@ const CampaignPeriodModal = ({ opened, close }: { opened: boolean; close: () => 
             className={classes.footer}
           >
             <Flex direction="column">
-              <Text color="secondaryText" size="xs">
+              <Text c="secondaryText" size="xs">
                 Start Date
               </Text>
               <Text size="md">
@@ -224,7 +233,7 @@ const CampaignPeriodModal = ({ opened, close }: { opened: boolean; close: () => 
               </Text>
             </Flex>
             <Flex direction="column">
-              <Text color="secondaryText" size="xs">
+              <Text c="secondaryText" size="xs">
                 End Date
               </Text>
               <Text size="md">

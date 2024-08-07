@@ -1,5 +1,4 @@
 export * from './account'
-export * from './actionButton'
 export * from './badgeStatusCampaign'
 export * from './customCard'
 export * from './customAnchor'

@@ -1,27 +1,46 @@
-import { Badge, BadgeProps, Flex, MantineColor, Text, createStyles } from '@mantine/core'
+import {
+  Badge,
+  BadgeProps,
+  Flex,
+  MantineColor,
+  MantineSize,
+  MantineTheme,
+  Text,
+  getPrimaryShade,
+  lighten
+} from '@mantine/core'
+import { createStyles } from '@mantine/emotion'
+import { useColorScheme } from '@mantine/hooks'
 import { ReactNode } from 'react'
 
-const useStyles = createStyles((theme, { color }: { color: string }) => ({
-  wrapper: {
-    background:
-      theme.colors[color][theme.fn.primaryShade()] + theme.other.shades.hexColorSuffix.lightest,
-    fontWeight: 'normal',
-    textTransform: 'capitalize'
+const useStyles = createStyles((theme: MantineTheme, { color }: { color: string }) => {
+  const colorScheme = useColorScheme()
+  const primaryShade = getPrimaryShade(theme, colorScheme)
+
+  return {
+    wrapper: {
+      background: lighten(theme.colors[color][primaryShade], theme.other.shades.lighten.lightest),
+      fontWeight: 'normal',
+      textTransform: 'capitalize'
+    }
   }
-}))
+})
 
 type CustomBadgeProps = BadgeProps & {
   color: MantineColor
   text: string
   icon?: ReactNode
+  size?: MantineSize
 }
 
-const CustomBadge = ({ color, text, icon, ...rest }: CustomBadgeProps) => {
+const CustomBadge = ({ color, text, icon, size = 'lg', ...rest }: CustomBadgeProps) => {
   const { classes } = useStyles({ color })
   return (
-    <Badge size="lg" variant="outline" color={color} className={classes.wrapper} {...rest}>
+    <Badge size={size} variant="outline" color={color} className={classes.wrapper} {...rest}>
       <Flex align="center" wrap="nowrap">
-        <Text mr={icon ? 'xs' : undefined}>{text}</Text>
+        <Text size="xs" mr={icon ? 'xs' : undefined}>
+          {text}
+        </Text>
         {icon}
       </Flex>
     </Badge>

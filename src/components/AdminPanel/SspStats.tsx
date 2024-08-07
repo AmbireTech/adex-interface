@@ -55,14 +55,16 @@ function SspStats() {
         </Tabs.List>
 
         <Tabs.Panel value="app" pl="xs">
-          {loading && <Loader size="sm" variant="dots" />}
+          {loading && <Loader size="sm" type="dots" />}
 
           <SimpleGrid
-            cols={2}
-            breakpoints={[
-              { maxWidth: 'xl', cols: 2, spacing: 'xl' },
-              { maxWidth: 'md', cols: 1, spacing: 'xl' }
-            ]}
+            cols={{ md: 1, xl: 2 }}
+            spacing="xl"
+            // cols={2}
+            // breakpoints={[
+            //   { maxWidth: 'xl', cols: 2, spacing: 'xl' },
+            //   { maxWidth: 'md', cols: 1, spacing: 'xl' }
+            // ]}
           >
             <Paper p="sm" withBorder>
               <CustomTable pageSize={10} {...data.appBannerFormats} />
@@ -74,14 +76,16 @@ function SspStats() {
         </Tabs.Panel>
 
         <Tabs.Panel value="mobile" pl="xs">
-          {loading && <Loader size="sm" variant="dots" />}
+          {loading && <Loader size="sm" type="dots" />}
 
           <SimpleGrid
-            cols={2}
-            breakpoints={[
-              { maxWidth: 'xl', cols: 2, spacing: 'xl' },
-              { maxWidth: 'md', cols: 1, spacing: 'xl' }
-            ]}
+            cols={{ md: 1, xl: 2 }}
+            spacing="xl"
+            // cols={2}
+            // breakpoints={[
+            //   { maxWidth: 'xl', cols: 2, spacing: 'xl' },
+            //   { maxWidth: 'md', cols: 1, spacing: 'xl' }
+            // ]}
           >
             <Paper p="sm" withBorder>
               <CustomTable pageSize={10} {...data.siteBannerFormatsMobile} />
@@ -93,14 +97,16 @@ function SspStats() {
         </Tabs.Panel>
 
         <Tabs.Panel value="desktop" pl="xs">
-          {loading && <Loader size="sm" variant="dots" />}
+          {loading && <Loader size="sm" type="dots" />}
 
           <SimpleGrid
-            cols={2}
-            breakpoints={[
-              { maxWidth: 'xl', cols: 2, spacing: 'xl' },
-              { maxWidth: 'md', cols: 1, spacing: 'xl' }
-            ]}
+            cols={{ md: 1, xl: 2 }}
+            spacing="xl"
+            // cols={2}
+            // breakpoints={[
+            //   { maxWidth: 'xl', cols: 2, spacing: 'xl' },
+            //   { maxWidth: 'md', cols: 1, spacing: 'xl' }
+            // ]}
           >
             <Paper p="sm" withBorder>
               <CustomTable pageSize={10} {...data.siteBannerFormatsDesktop} />

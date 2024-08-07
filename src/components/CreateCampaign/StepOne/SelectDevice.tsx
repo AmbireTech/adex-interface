@@ -22,7 +22,7 @@ const SelectDevice = () => {
 
   return (
     <>
-      <Text color="secondaryText" size="sm" weight="bold" mb="xs">
+      <Text c="secondaryText" size="sm" fw="bold" mb="xs">
         2. Select device
       </Text>
       <Flex gap={20} justify="space-between">

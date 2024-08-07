@@ -1,26 +1,33 @@
-import { createStyles } from '@mantine/core'
+import { MantineTheme, getPrimaryShade } from '@mantine/core'
 import { Accessors, XYChartProps, BaseAnalyticsData, MetricsToShow } from 'types'
+import { createStyles } from '@mantine/emotion'
+import { useColorScheme } from '@mantine/hooks'
 import ChartControls from './Chart'
 
-const useStyles = createStyles((theme) => ({
-  row: {
-    display: 'flex',
-    justifyContent: 'start',
-    alignItems: 'center',
-    fontWeight: 'normal',
-    color: theme.colors.mainText[theme.fn.primaryShade()]
-  },
-  dot: {
-    height: 6,
-    width: 6,
-    borderRadius: '50%',
-    display: 'inline-block',
-    marginRight: theme.spacing.xs
-  },
-  hidden: {
-    display: 'none'
+const useStyles = createStyles((theme: MantineTheme) => {
+  const colorScheme = useColorScheme()
+  const primaryShade = getPrimaryShade(theme, colorScheme)
+
+  return {
+    row: {
+      display: 'flex',
+      justifyContent: 'start',
+      alignItems: 'center',
+      fontWeight: 'normal',
+      color: theme.colors.mainText[primaryShade]
+    },
+    dot: {
+      height: 6,
+      width: 6,
+      borderRadius: '50%',
+      display: 'inline-block',
+      marginRight: theme.spacing.xs
+    },
+    hidden: {
+      display: 'none'
+    }
   }
-}))
+})
 
 const metricLabel: { [x in keyof MetricsToShow]?: string } = {
   clicks: 'Clicks',
