@@ -79,6 +79,17 @@ const useStyles = createStyles(
         '#text': {
           color: border ? theme.colors.brand[primaryShade] : undefined
         }
+      },
+
+      // NOTE: quick fix for disabled card - needs re-write of the component
+      disabled: {
+        cursor: 'no-drop',
+        border: 0,
+        background: theme.colors.gray[3],
+        '&:hover': {
+          boxShadow: 'none',
+          border: 0
+        }
       }
     }
   }
@@ -98,7 +109,8 @@ const CustomCard = ({
   to,
   active,
   variant,
-  hasCheckMark
+  hasCheckMark,
+  disabled
 }: ICustomCardProps) => {
   const { classes, cx } = useStyles({
     color,
@@ -110,10 +122,10 @@ const CustomCard = ({
 
   return (
     <Box
-      className={cx(classes.wrapper, { [classes.active]: active })}
+      className={cx(classes.wrapper, { [classes.active]: active, [classes.disabled]: disabled })}
       component={component}
       to={to}
-      onClick={action}
+      onClick={!disabled ? action : () => {}}
     >
       {hasCheckMark && (
         <Group justify="right" pr="xs" pt="xs">

@@ -166,9 +166,18 @@ const BillingDetails = () => {
                 </Text>
               </Box>
             ) : (
-              <Button miw={260} size="lg" type="submit" color="secondary" variant="outline">
-                Confirm details
-              </Button>
+              <Box>
+                <Button miw={260} size="lg" type="submit" color="secondary" variant="outline">
+                  Confirm details
+                </Button>
+                <Text mt="md">
+                  Fill in your billing details and contact us at &nbsp;
+                  <CustomAnchor external href="mailto:contactus@adex.network">
+                    contactus@adex.network
+                  </CustomAnchor>
+                  &nbsp; to verify the data.
+                </Text>
+              </Box>
             )}
           </Group>
         </Stack>
