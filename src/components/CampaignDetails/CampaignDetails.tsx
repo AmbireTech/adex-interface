@@ -243,13 +243,13 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
             </Button>
           </Group>
         </Paper>
+        {isAdminPanel && <AdminBadge title="Admin campaign details" />}
       </StickyPanel>
 
       {isEditMode ? (
         <EditCampaign campaign={campaign} />
       ) : (
         <Paper p="lg" shadow="xs">
-          {isAdminPanel && <AdminBadge title="Admin Details" />}
           <Grid gutter="lg">
             <Grid.Col span={{ md: 12, xl: 6 }}>
               <Stack>

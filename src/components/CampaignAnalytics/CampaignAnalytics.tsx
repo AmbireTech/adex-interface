@@ -9,6 +9,7 @@ import { useCampaignsData } from 'hooks/useCampaignsData'
 import { Campaign } from 'adex-common'
 import useAccount from 'hooks/useAccount'
 import { StickyPanel } from 'components/TopBar/TopBarStickyPanel'
+import { AdminBadge } from 'components/common/AdminBadge'
 import Placements from './Placements'
 import Creatives from './Creatives'
 import SSPs from './SSPs'
@@ -17,7 +18,7 @@ import { TimeFrame } from './TimeFrame'
 import { generateCVSData } from './CvsDownloadConfigurations'
 import SeeOnMapBtn from './SeeOnMapBtn'
 
-const CampaignAnalytics = () => {
+const CampaignAnalytics = ({ isAdminPanel = false }: { isAdminPanel?: boolean }) => {
   const { id } = useParams()
 
   const [activeTab, setActiveTab] = useState<AnalyticsType>('timeframe')
@@ -37,8 +38,7 @@ const CampaignAnalytics = () => {
   const {
     adexAccount: {
       fundsOnCampaigns: { perCampaign }
-    },
-    isAdmin
+    }
   } = useAccount()
 
   const currencyName = useMemo(
@@ -86,13 +86,13 @@ const CampaignAnalytics = () => {
     setAnalyticsKey(undefined)
 
     const checkAnalytics = async () => {
-      const key = await getAnalyticsKeyAndUpdate(activeTab, campaign)
+      const key = await getAnalyticsKeyAndUpdate(activeTab, campaign, !!isAdminPanel)
       setAnalyticsKey(key)
       console.log('key', key)
     }
 
     checkAnalytics()
-  }, [activeTab, campaign, getAnalyticsKeyAndUpdate])
+  }, [activeTab, campaign, getAnalyticsKeyAndUpdate, isAdminPanel])
 
   useEffect(() => {
     if (campaignMappedAnalytics) {
@@ -142,6 +142,7 @@ const CampaignAnalytics = () => {
             </Group>
           </Group>
         </Paper>
+        {isAdminPanel && <AdminBadge title="Admin Campaign Analytics" />}
       </StickyPanel>
 
       <Tabs color="brand" value={activeTab} onChange={handleTabChange} py="sm" keepMounted={false}>
@@ -151,7 +152,7 @@ const CampaignAnalytics = () => {
             <Tabs.Tab value="hostname">PLACEMENTS</Tabs.Tab>
             <Tabs.Tab value="country">REGIONS</Tabs.Tab>
             <Tabs.Tab value="adUnit">CREATIVES</Tabs.Tab>
-            {isAdmin && <Tabs.Tab value="ssp">SSPs</Tabs.Tab>}
+            {isAdminPanel && <Tabs.Tab value="ssp">SSPs</Tabs.Tab>}
           </Tabs.List>
         </Flex>
         {loading && (
@@ -194,7 +195,7 @@ const CampaignAnalytics = () => {
           currencyName={currencyName}
         />
       )}
-      {isAdmin && !loading && activeTab === 'ssp' && (
+      {isAdminPanel && !loading && activeTab === 'ssp' && (
         <SSPs data={campaignMappedAnalytics} currencyName={currencyName} />
       )}
     </Container>
