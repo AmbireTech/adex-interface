@@ -2,18 +2,17 @@ import { useCallback, useMemo } from 'react'
 import { Checkbox, Grid } from '@mantine/core'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import { AdUnit } from 'adex-common/dist/types'
-import { UploadedBannersProps } from 'types'
 import ImageUrlInput from './ImageUrlInput'
 
-const UploadedBanners = ({
-  updateAutoUTMChecked,
-  autoUTMChecked,
-  onDeleteCreativeBtnClicked,
-  handleOnInputChange
-}: UploadedBannersProps) => {
+type UploadedBannersProps = {
+  onDeleteCreativeBtnClicked: (file: AdUnit) => void
+}
+
+const UploadedBanners = ({ onDeleteCreativeBtnClicked }: UploadedBannersProps) => {
   const {
-    campaign: { adUnits, errorsTargetURLValidations },
-    selectedBannerSizes
+    campaign: { adUnits },
+    selectedBannerSizes,
+    form
   } = useCreateCampaignContext()
 
   const allowedSizes = useMemo(
@@ -37,21 +36,21 @@ const UploadedBanners = ({
     <Grid>
       <Grid.Col>
         <Checkbox
-          checked={autoUTMChecked}
           label="Auto UTM tracking"
-          onChange={(event) => updateAutoUTMChecked(event.currentTarget.checked)}
+          key={form.key('autoUTMChecked')}
+          {...form.getInputProps('autoUTMChecked', { type: 'checkbox' })}
         />
       </Grid.Col>
       {adUnits.length > 0 &&
-        adUnits.map((image: AdUnit) => {
+        adUnits.map((image: AdUnit, index: number) => {
           return (
             <Grid.Col key={image.id}>
               <ImageUrlInput
                 image={image}
-                error={errorsTargetURLValidations[image.id] || undefined}
                 toRemove={!isMatchedTheSizes(image)}
                 onDelete={onDeleteCreativeBtnClicked}
-                onChange={(e: any) => handleOnInputChange(e.target.value, image.id)}
+                index={index}
+                form={form}
               />
             </Grid.Col>
           )

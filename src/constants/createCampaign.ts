@@ -113,8 +113,7 @@ export const CREATE_CAMPAIGN_DEFAULT_VALUE: CampaignUI = {
   archived: false,
   createdBy: '',
   lastModifiedBy: '',
-  draftModified: false,
-  errorsTargetURLValidations: {}
+  draftModified: false
 }
 
 export const CATEGORIES: SelectData[] = parseCats()

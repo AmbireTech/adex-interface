@@ -1,15 +1,11 @@
 import { AdUnit, Campaign } from 'adex-common/dist/types/Dsp/Campaign'
 import { Alpha3Code } from 'adex-common'
 import { UseFormReturnType } from '@mantine/form'
-import { Devices, ErrorTargetUrl } from './createCampaign'
+import { Devices } from './createCampaign'
 
 export type SelectData = { value: string | Alpha3Code; label: string; group?: string }
 
 export type PaymentModelType = 'cpm' | 'cpc'
-
-export type ErrorsTargetURLValidations = {
-  [key: string]: ErrorTargetUrl
-}
 
 export type CampaignUI = Campaign & {
   step: number
@@ -27,7 +23,6 @@ export type CampaignUI = Campaign & {
   autoUTMChecked: boolean
   asapStartingDate: boolean
   draftModified: boolean
-  errorsTargetURLValidations: ErrorsTargetURLValidations
 }
 
 export type ImageSizes = {
@@ -66,13 +61,11 @@ export type CreateCampaignType = {
   resetCampaign: () => void
   addAdUnit: (adUnitToAdd: AdUnit) => void
   removeAdUnit: (adUnitIdToRemove: string) => void
-  addTargetURLToAdUnit: (inputText: string, adUnitId: string) => void
   selectedBannerSizes: SupplyStatsDetails[] | SupplyStatsDetails[][]
   saveToDraftCampaign: (camp?: CampaignUI) => Promise<any>
   updateCampaignFromDraft: (draftCampaign: Campaign) => void
   defaultValue: CampaignUI
   addUTMToTargetURLS: () => void
   selectedBidFloors: SupplyStatsDetails[] | SupplyStatsDetails[][]
-  validateAdUnitTargetURL: () => void
   form: UseFormReturnType<CampaignUI, (values: CampaignUI) => CampaignUI>
 }

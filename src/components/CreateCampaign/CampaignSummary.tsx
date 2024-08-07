@@ -51,13 +51,13 @@ const CampaignSummary = () => {
   const [opened, { open, close }] = useDisclosure(false)
   const { updateBalance } = useAccount()
   const {
-    campaign: { step, adUnits, autoUTMChecked, errorsTargetURLValidations },
+    campaign: { step, adUnits, autoUTMChecked },
     updateCampaign,
     publishCampaign,
     resetCampaign,
     saveToDraftCampaign,
     addUTMToTargetURLS,
-    validateAdUnitTargetURL
+    form
   } = useCreateCampaignContext()
   const {
     formattedSelectedDevice,
@@ -120,15 +120,8 @@ const CampaignSummary = () => {
 
   const handleNextStepBtnClicked = useCallback(() => {
     if (step === 0) {
-      validateAdUnitTargetURL()
-      if (Object.values(errorsTargetURLValidations).some((e) => !e.success)) {
-        showNotification(
-          'error',
-          'Please enter a target URL starting with https://',
-          'Invalid Target URL'
-        )
-        return
-      }
+      // TODO: maybe the form should be validated not only for the first step
+      if (form.validate().hasErrors) return
 
       if (autoUTMChecked) {
         addUTMToTargetURLS()
@@ -148,15 +141,7 @@ const CampaignSummary = () => {
 
       updateCampaign('step', step + 1)
     }
-  }, [
-    step,
-    updateCampaign,
-    showNotification,
-    addUTMToTargetURLS,
-    autoUTMChecked,
-    errorsTargetURLValidations,
-    validateAdUnitTargetURL
-  ])
+  }, [step, updateCampaign, addUTMToTargetURLS, autoUTMChecked, form])
 
   const handleSaveDraftClicked = useCallback(async () => {
     try {

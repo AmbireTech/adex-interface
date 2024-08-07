@@ -1,12 +1,31 @@
-import { ActionIcon, Flex, Input, MantineTheme, Text, getPrimaryShade } from '@mantine/core'
+import {
+  ActionIcon,
+  Flex,
+  FlexProps,
+  Input,
+  MantineTheme,
+  Text,
+  getPrimaryShade
+} from '@mantine/core'
 import { createStyles } from '@mantine/emotion'
+import { UseFormReturnType } from '@mantine/form'
 import { useColorScheme } from '@mantine/hooks'
+import { AdUnit } from 'adex-common'
 import CustomBadge from 'components/common/CustomBadge'
 import InfoAlertMessage from 'components/common/InfoAlertMessage'
 import MediaThumb from 'components/common/MediaThumb'
-import { useCallback, useMemo } from 'react'
+import { useMemo } from 'react'
 import DeleteIcon from 'resources/icons/Delete'
-import { ImageUrlInputProps } from 'types'
+import { CampaignUI } from 'types'
+
+type ImageUrlInputProps = FlexProps & {
+  image: AdUnit
+  toRemove?: boolean
+  onDelete?: (file: AdUnit) => void
+  preview?: boolean
+  index?: number
+  form?: UseFormReturnType<CampaignUI, (values: CampaignUI) => CampaignUI>
+}
 
 const useStyles = createStyles((theme: MantineTheme, { hasError }: { hasError: boolean }) => {
   const colorScheme = useColorScheme()
@@ -63,21 +82,19 @@ const ImageUrlInput = ({
   onDelete,
   onChange,
   preview,
-  error,
+  index,
+  form,
   ...rest
 }: ImageUrlInputProps) => {
   const hasError: boolean = useMemo(
-    () => (!error?.success && error?.isDirty) || (!error?.success && error?.isDirty) || !!toRemove,
-    [error, toRemove]
+    () =>
+      (form?.errors[`adUnits.${index}.banner.targetUrl`] &&
+        form?.errors[`adUnits.${index}.banner.targetUrl`] !== '') ||
+      !!toRemove,
+    [form?.errors, index, toRemove]
   )
-  const { classes, cx } = useStyles({ hasError })
 
-  const handleChange = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      onChange?.(event)
-    },
-    [onChange]
-  )
+  const { classes, cx } = useStyles({ hasError })
 
   return (
     <>
@@ -102,10 +119,8 @@ const ImageUrlInput = ({
         />
         <Input
           className={classes.inputField}
-          onChange={handleChange}
           error={hasError}
           disabled={toRemove || preview}
-          defaultValue={image.banner?.targetUrl}
           type="url"
           variant="unstyled"
           placeholder="Please enter a target URL starting with https://"
@@ -114,6 +129,8 @@ const ImageUrlInput = ({
             section: classes.rightSection,
             input: classes.input
           }}
+          key={form?.key(`adUnits.${index}.banner.targetUrl`)}
+          {...form?.getInputProps(`adUnits.${index}.banner.targetUrl`)}
         />
         {(!preview || onDelete) && (
           <ActionIcon
@@ -127,7 +144,9 @@ const ImageUrlInput = ({
           </ActionIcon>
         )}
       </Flex>
-      {error?.errMsg && <Text c="warning">{error?.errMsg}</Text>}
+      {form?.errors[`adUnits.${index}.banner.targetUrl`] && (
+        <Text c="warning">{form?.errors[`adUnits.${index}.banner.targetUrl`]}</Text>
+      )}
     </>
   )
 }
