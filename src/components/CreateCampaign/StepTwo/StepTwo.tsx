@@ -1,12 +1,5 @@
 import { Grid, Text } from '@mantine/core'
-import {
-  CAMPAIGN_CATEGORIES_INPUT,
-  CAMPAIGN_LOCATION_INPUT,
-  CATEGORIES,
-  CAT_GROUPS,
-  COUNTRIES,
-  REGION_GROUPS
-} from 'constants/createCampaign'
+import { CATEGORIES, CAT_GROUPS, COUNTRIES, REGION_GROUPS } from 'constants/createCampaign'
 import { useCallback, useMemo } from 'react'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import { TargetingInputApplyProp } from 'adex-common/dist/types'
@@ -16,34 +9,34 @@ import {
 } from 'helpers/createCampaignHelpers'
 import MultiSelectAndRadioButtons from './MultiSelectAndRadioButtons'
 
+type SelectedTypes = 'categories' | 'location'
+
+const TARGETING_INPUT_LABEL = 'targetingInput'
+
 const StepTwo = () => {
   const {
     campaign: {
+      targetingInput,
       targetingInput: {
         inputs: { location, categories }
       }
     },
-    updateCampaignWithPrevStateNested
+    updateCampaign
   } = useCreateCampaignContext()
 
-  const handleCategories = useCallback(
-    (selectedRadio: TargetingInputApplyProp, categoriesValue: string[]) => {
-      updateCampaignWithPrevStateNested(
-        CAMPAIGN_CATEGORIES_INPUT,
-        updateCatsLocsObject(selectedRadio, categoriesValue)
-      )
-    },
-    [updateCampaignWithPrevStateNested]
-  )
+  const handleSelect = useCallback(
+    (selectedRadio: TargetingInputApplyProp, values: string[], type: SelectedTypes) => {
+      const updated = {
+        ...targetingInput,
+        inputs: {
+          ...targetingInput.inputs,
+          [type]: updateCatsLocsObject(selectedRadio, values)
+        }
+      }
 
-  const handleCountries = useCallback(
-    (selectedRadio: TargetingInputApplyProp, locationsValue: string[]) => {
-      updateCampaignWithPrevStateNested(
-        CAMPAIGN_LOCATION_INPUT,
-        updateCatsLocsObject(selectedRadio, locationsValue)
-      )
+      updateCampaign(TARGETING_INPUT_LABEL, updated)
     },
-    [updateCampaignWithPrevStateNested]
+    [updateCampaign, targetingInput]
   )
 
   const catSelectedRadioAndValuesArray = useMemo(
@@ -63,7 +56,9 @@ const StepTwo = () => {
           1. Categories
         </Text>
         <MultiSelectAndRadioButtons
-          onCategoriesChange={handleCategories}
+          onCategoriesChange={(selectedRadio, values) =>
+            handleSelect(selectedRadio, values, 'categories')
+          }
           multiSelectData={CATEGORIES}
           defaultRadioValue={
             catSelectedRadioAndValuesArray &&
@@ -81,7 +76,9 @@ const StepTwo = () => {
           2. Countries
         </Text>
         <MultiSelectAndRadioButtons
-          onCategoriesChange={handleCountries}
+          onCategoriesChange={(selectedRadio, values) =>
+            handleSelect(selectedRadio, values, 'location')
+          }
           defaultRadioValue={
             locSelectedRadioAndValuesArray &&
             (locSelectedRadioAndValuesArray[0] as TargetingInputApplyProp)

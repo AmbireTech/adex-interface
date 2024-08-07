@@ -121,6 +121,7 @@ const CampaignSummary = () => {
   const handleNextStepBtnClicked = useCallback(() => {
     if (step === 0) {
       // TODO: maybe the form should be validated not only for the first step
+      // or just check for errors without validating the form
       if (form.validate().hasErrors) return
 
       if (autoUTMChecked) {
