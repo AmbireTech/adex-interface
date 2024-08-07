@@ -71,7 +71,12 @@ const AdminAnalytics = () => {
           .toLowerCase()
           .includes(search.toLowerCase().trim())
       )
-      .sort((a, b) => Number(b.availableBalance) - Number(a.availableBalance))
+      .sort(
+        (a, b) =>
+          b.fundsOnCampaigns.perCampaign.length - a.fundsOnCampaigns.perCampaign.length ||
+          Number(b.fundsDeposited.total) - Number(a.fundsDeposited.total) ||
+          Number(b.availableBalance) - Number(a.availableBalance)
+      )
       .map((a) => {
         return {
           id: a.id,
