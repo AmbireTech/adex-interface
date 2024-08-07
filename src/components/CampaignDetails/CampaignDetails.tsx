@@ -236,7 +236,11 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
               variant="transparent"
               color="mainText"
               rightSection={<AnalyticsIcon size="26px" />}
-              onClick={() => navigate(`/dashboard/campaign-analytics/${campaign.id}`)}
+              onClick={() =>
+                navigate(
+                  `/dashboard/campaign-analytics/${isAdminPanel ? 'admin/' : ''}${campaign.id}`
+                )
+              }
               disabled={campaign?.status === CampaignStatus.draft}
             >
               Campaign Analytics
