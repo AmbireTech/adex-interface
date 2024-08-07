@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState, useMemo } from 'react'
-import { Container, Flex, Loader, Tabs, Paper, Group } from '@mantine/core'
+import { Container, Flex, Loader, Tabs, Paper, Group, Text } from '@mantine/core'
 import { useParams } from 'react-router-dom'
 import { AnalyticsType, BaseAnalyticsData, AnalyticsPeriod } from 'types'
 import GoBack from 'components/common/GoBack/GoBack'
@@ -127,7 +127,11 @@ const CampaignAnalytics = ({ isAdminPanel = false }: { isAdminPanel?: boolean })
       <StickyPanel>
         <Paper mx="auto" shadow="xl" radius="xl">
           <Group justify="space-between">
-            <GoBack title="Dashboard" />
+            <GoBack title="Go Back" />
+            <Text size="sm" truncate>
+              Campaign: {campaign?.title}
+              {isAdminPanel && ` (${campaign?.owner})`}
+            </Text>
             <Group align="center" justify="space-between">
               {isMapBtnShown && (
                 <SeeOnMapBtn onBtnClicked={() => setIsMapVisible((prev) => !prev)} />
