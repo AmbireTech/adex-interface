@@ -88,7 +88,7 @@ function AdminDeposit({ accountData }: { accountData: Account }) {
             text: `Are you sure you want to deposit ${form.values.amount}  ${form.values.token.name} to ${form.values.accountId}?`,
             color: 'attention',
             labels: { confirm: 'Yes Sir', cancel: 'No' },
-            onConfirm: () => form.onSubmit(throttledSbm)
+            onConfirm: () => form.onSubmit(throttledSbm)()
           })
         )
     },
