@@ -1,6 +1,6 @@
 {
   "name": "adex-interface",
-  "version": "0.69.27",
+  "version": "0.69.28",
   "private": true,
   "dependencies": {
     "@ambire/login-sdk-core": "^0.0.21",
