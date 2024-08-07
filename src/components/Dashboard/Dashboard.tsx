@@ -215,9 +215,9 @@ const Dashboard = ({ isAdminPanel, accountId }: { isAdminPanel?: boolean; accoun
 
   const handleAnalytics = useCallback(
     (data: DashboardTableElement['actionData']) => {
-      navigate(`/dashboard/campaign-analytics/${data.campaign.id}`)
+      navigate(`/dashboard/campaign-analytics/${isAdminPanel ? 'admin/' : ''}${data.campaign.id}`)
     },
-    [navigate]
+    [isAdminPanel, navigate]
   )
 
   const handleEditDraft = useCallback(

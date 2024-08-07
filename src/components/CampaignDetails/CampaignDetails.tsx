@@ -236,20 +236,24 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
               variant="transparent"
               color="mainText"
               rightSection={<AnalyticsIcon size="26px" />}
-              onClick={() => navigate(`/dashboard/campaign-analytics/${campaign.id}`)}
+              onClick={() =>
+                navigate(
+                  `/dashboard/campaign-analytics/${isAdminPanel ? 'admin/' : ''}${campaign.id}`
+                )
+              }
               disabled={campaign?.status === CampaignStatus.draft}
             >
               Campaign Analytics
             </Button>
           </Group>
         </Paper>
+        {isAdminPanel && <AdminBadge title="Admin campaign details" />}
       </StickyPanel>
 
       {isEditMode ? (
         <EditCampaign campaign={campaign} />
       ) : (
         <Paper p="lg" shadow="xs">
-          {isAdminPanel && <AdminBadge title="Admin Details" />}
           <Grid gutter="lg">
             <Grid.Col span={{ md: 12, xl: 6 }}>
               <Stack>

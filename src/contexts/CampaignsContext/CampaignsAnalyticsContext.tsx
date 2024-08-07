@@ -274,7 +274,7 @@ const CampaignsAnalyticsProvider: FC<PropsWithChildren> = ({ children }) => {
 
       // TODO: alg to set the timeframe depending on campaign start/end and current date
       const baseQuery: AnalyticsDataQuery = {
-        ...(!forAdmin && { campaignId: campaign?.id }),
+        ...(!!campaign && { campaignId: campaign?.id }),
         ...period,
         metric: 'paid',
         eventType: 'CLICK',

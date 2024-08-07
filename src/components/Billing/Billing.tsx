@@ -5,6 +5,7 @@ import { useState } from 'react'
 import BillingDetailsIcon from 'resources/icons/BillingDetails'
 import InvoiceIcon from 'resources/icons/Invoice'
 import StatementsIcon from 'resources/icons/Statements'
+import useAccount from 'hooks/useAccount'
 import BillingDetails from './BillingDetails'
 import Invoices from './Invoices'
 import Statements from './AccountStatements'
@@ -29,10 +30,23 @@ const TabSwitch = ({ selectedTab }: { selectedTab: TabType }) => {
 }
 
 const BillingCard = (props: Omit<ICustomCardProps, 'width' | 'height' | 'color' | 'variant'>) => (
-  <CustomCard {...props} width="100%" height={100} color="secondary" variant="shadow" />
+  <CustomCard
+    {...props}
+    component="button"
+    width="100%"
+    height={100}
+    color="secondary"
+    variant="shadow"
+  />
 )
 
 function Billing() {
+  const {
+    adexAccount: {
+      billingDetails: { verified }
+    }
+  } = useAccount()
+
   const [selectedTab, setSelectedTab] = useState<TabType>(TabType.BillingTab)
   const handleTabClicked = (value: TabType) => setSelectedTab(value)
 
@@ -47,17 +61,20 @@ function Billing() {
               active={selectedTab === TabType.BillingTab}
               action={() => handleTabClicked(TabType.BillingTab)}
             />
+
             <BillingCard
               text="Invoices"
               iconLeft={<InvoiceIcon size="24px" />}
               active={selectedTab === TabType.InvoicesTab}
               action={() => handleTabClicked(TabType.InvoicesTab)}
+              disabled={!verified}
             />
             <BillingCard
               text="Account Statements"
               iconLeft={<StatementsIcon size="24px" />}
               active={selectedTab === TabType.StatementsTab}
               action={() => handleTabClicked(TabType.StatementsTab)}
+              disabled={!verified}
             />
           </Stack>
         </Grid.Col>
