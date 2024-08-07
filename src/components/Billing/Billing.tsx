@@ -1,5 +1,4 @@
-import { Grid } from '@mantine/core'
-// import { useViewportSize } from '@mantine/hooks'
+import { Container, Grid, Stack } from '@mantine/core'
 import { ICustomCardProps } from 'types'
 import CustomCard from 'components/common/CustomCard'
 import { useState } from 'react'
@@ -38,41 +37,35 @@ function Billing() {
   const handleTabClicked = (value: TabType) => setSelectedTab(value)
 
   return (
-    <Grid grow columns={10}>
-      <Grid.Col span={{ sm: 10, md: 3, lg: 2 }}>
-        <Grid>
-          <Grid.Col>
+    <Container size="xl">
+      <Grid columns={12} gutter="xl">
+        <Grid.Col span={{ sm: 12, md: 4, lg: 4 }}>
+          <Stack gap="md">
             <BillingCard
               text="Billing details"
               iconLeft={<BillingDetailsIcon size="24px" />}
               active={selectedTab === TabType.BillingTab}
               action={() => handleTabClicked(TabType.BillingTab)}
             />
-          </Grid.Col>
-          <Grid.Col>
             <BillingCard
               text="Invoices"
               iconLeft={<InvoiceIcon size="24px" />}
               active={selectedTab === TabType.InvoicesTab}
               action={() => handleTabClicked(TabType.InvoicesTab)}
             />
-          </Grid.Col>
-          <Grid.Col>
             <BillingCard
               text="Account Statements"
               iconLeft={<StatementsIcon size="24px" />}
               active={selectedTab === TabType.StatementsTab}
               action={() => handleTabClicked(TabType.StatementsTab)}
             />
-          </Grid.Col>
-        </Grid>
-      </Grid.Col>
-      <Grid.Col span={{ sm: 10, md: 7, lg: 4 }}>
-        <TabSwitch selectedTab={selectedTab} />
-      </Grid.Col>
-      {/* Note: this column is an empty, we use it instead of margin */}
-      <Grid.Col span={{ sm: 0, md: 0, lg: 4 }} />
-    </Grid>
+          </Stack>
+        </Grid.Col>
+        <Grid.Col span={{ sm: 12, md: 8, lg: 8 }}>
+          <TabSwitch selectedTab={selectedTab} />
+        </Grid.Col>
+      </Grid>
+    </Container>
   )
 }
 
