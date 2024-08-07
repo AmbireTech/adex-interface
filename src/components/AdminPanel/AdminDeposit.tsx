@@ -53,15 +53,12 @@ function AdminDeposit({ accountData }: { accountData: Account }) {
 
   const handleSubmit = useCallback(
     async (values: Deposit) => {
-      console.log({ values })
       setLoading(true)
       await makeDeposit(
         values,
         () => {
-          form.resetTouched()
-          form.resetDirty()
-          form.reset()
           updateAccounts()
+          form.reset()
           showNotification('info', `Deposit to ${form.values.accountId} success!`)
         },
         (err) => {
