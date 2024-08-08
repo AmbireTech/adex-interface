@@ -12,8 +12,6 @@ export const CAMPAIGN_INCLUDE_INCENTIVIZED_INPUT =
   'targetingInput.inputs.advanced.includeIncentivized'
 export const CAMPAIGN_DISABLE_FREQUENCY_CAPPING_INPUT =
   'targetingInput.inputs.advanced.disableFrequencyCapping'
-export const CAMPAIGN_LIMIT_DAILY_AVERAGE_SPENDING_INPUT =
-  'targetingInput.inputs.advanced.limitDailyAverageSpending'
 
 const THIRTY_DAYS_IN_MILLISECONDS = 2592000000
 

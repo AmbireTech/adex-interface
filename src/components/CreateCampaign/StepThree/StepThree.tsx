@@ -10,14 +10,12 @@ import {
   TextInput,
   Tooltip
 } from '@mantine/core'
-import { useCallback, useMemo } from 'react'
+import { useMemo } from 'react'
 import InfoFilledIcon from 'resources/icons/InfoFilled'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
-import {
-  // CAMPAIGN_DISABLE_FREQUENCY_CAPPING_INPUT,
-  // CAMPAIGN_INCLUDE_INCENTIVIZED_INPUT,
-  CAMPAIGN_LIMIT_DAILY_AVERAGE_SPENDING_INPUT
-} from 'constants/createCampaign'
+import // CAMPAIGN_DISABLE_FREQUENCY_CAPPING_INPUT,
+// CAMPAIGN_INCLUDE_INCENTIVIZED_INPUT
+'constants/createCampaign'
 import InfoAlertMessage from 'components/common/InfoAlertMessage'
 import { parseRange } from 'helpers/createCampaignHelpers'
 import InfoIcon from 'resources/icons/Info'
@@ -26,37 +24,13 @@ import CampaignPeriod from './CampaignPeriod'
 import SelectCurrency from './SelectCurrency'
 
 const StepThree = () => {
-  const {
-    campaign: {
-      asapStartingDate,
-      targetingInput: {
-        inputs: {
-          advanced: {
-            // disableFrequencyCapping,
-            //  includeIncentivized,
-            limitDailyAverageSpending
-          }
-        }
-      }
-    },
-    updateCampaign,
-    updateCampaignWithPrevStateNested,
-    selectedBidFloors,
-    form
-  } = useCreateCampaignContext()
+  const { selectedBidFloors, form } = useCreateCampaignContext()
 
   const recommendedPaymentBounds = useMemo(() => {
     const rangeUnparsed = selectedBidFloors.flat().sort((a, b) => b.count - a.count)[0]?.value
 
     return rangeUnparsed ? parseRange(rangeUnparsed) : { min: 'N/A', max: 'N/A' }
   }, [selectedBidFloors])
-
-  const handleTargetInputAdvanced = useCallback(
-    (key: string, value: boolean) => {
-      updateCampaignWithPrevStateNested(key, value)
-    },
-    [updateCampaignWithPrevStateNested]
-  )
 
   const budgetIsGreaterThanBalance = useMemo(
     () =>
@@ -84,9 +58,11 @@ const StepThree = () => {
       </Grid.Col>
       <Grid.Col>
         <Checkbox
-          checked={asapStartingDate}
           label="As soon as possible"
-          onChange={(event) => updateCampaign('asapStartingDate', event.currentTarget.checked)}
+          key={form.key('asapStartingDate')}
+          {...form.getInputProps('asapStartingDate', {
+            type: 'checkbox'
+          })}
         />
       </Grid.Col>
       <Grid.Col mb="md">
@@ -144,14 +120,11 @@ const StepThree = () => {
         </Flex>
         <Group my="sm">
           <Checkbox
-            checked={limitDailyAverageSpending}
             label="Limit average daily spending"
-            onChange={(event) =>
-              handleTargetInputAdvanced(
-                CAMPAIGN_LIMIT_DAILY_AVERAGE_SPENDING_INPUT,
-                event.currentTarget.checked
-              )
-            }
+            key={form.key('targetingInput.inputs.advanced.limitDailyAverageSpending')}
+            {...form.getInputProps('targetingInput.inputs.advanced.limitDailyAverageSpending', {
+              type: 'checkbox'
+            })}
           />
           <DefaultCustomAnchor
             href="https://help.adex.network/hc/en-us/articles/15014607423260-How-to-limit-your-average-daily-spend"
@@ -252,18 +225,6 @@ const StepThree = () => {
               onChange={(event) =>
                 handleTargetInputAdvanced(
                   CAMPAIGN_DISABLE_FREQUENCY_CAPPING_INPUT,
-                  event.currentTarget.checked
-                )
-              }
-            />
-          </Group>
-          <Group my="sm">
-            <Checkbox
-              checked={limitDailyAverageSpending}
-              label="Limit average daily spending"
-              onChange={(event) =>
-                handleTargetInputAdvanced(
-                  CAMPAIGN_LIMIT_DAILY_AVERAGE_SPENDING_INPUT,
                   event.currentTarget.checked
                 )
               }
