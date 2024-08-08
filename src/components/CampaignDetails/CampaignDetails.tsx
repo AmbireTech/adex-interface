@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo } from 'react'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
-import { Grid, Text, Button, Paper, Stack, Group, Divider, Box } from '@mantine/core'
+import { Grid, Text, Button, Paper, Stack, Group, Divider, Box, Anchor } from '@mantine/core'
 import { modals } from '@mantine/modals'
 import BadgeStatusCampaign from 'components/Dashboard/BadgeStatusCampaign'
 import { CATEGORIES, COUNTRIES } from 'constants/createCampaign'
@@ -261,6 +261,23 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
                   Overview
                 </Text>
                 <Paper bg="lightBackground" p="md" withBorder>
+                  {isAdminPanel && (
+                    <CampaignDetailsRow
+                      lineHeight="sm"
+                      textSize="sm"
+                      title="Owner"
+                      value={
+                        <Anchor
+                          underline="never"
+                          size="inherit"
+                          href={`/dashboard/admin/user-account/${campaign.owner}`}
+                          c="secondaryText"
+                        >
+                          {campaign.owner}
+                        </Anchor>
+                      }
+                    />
+                  )}
                   <CampaignDetailsRow
                     lineHeight="sm"
                     textSize="sm"

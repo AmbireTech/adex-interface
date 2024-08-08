@@ -131,7 +131,12 @@ function AccountInfo({ accountData }: { accountData: Account }) {
         <TextInput label="Contact email" {...form.getInputProps('info.email')} />
         <TextInput label="Contact phone" {...form.getInputProps('info.phone')} />
         <TextInput label="Contact person" {...form.getInputProps('info.contactPerson')} />
-        <Textarea label="Additional notes" w="100%" {...form.getInputProps('info.notes')} />
+        <Textarea
+          label="Additional notes"
+          w="100%"
+          rows={7}
+          {...form.getInputProps('info.notes')}
+        />
       </Group>
 
       <Group justify="left" mt="md">
