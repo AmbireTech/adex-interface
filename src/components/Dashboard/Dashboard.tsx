@@ -92,7 +92,7 @@ const Dashboard = ({ isAdminPanel, accountId }: { isAdminPanel?: boolean; accoun
             ? x.campaign.owner.toLowerCase() === accountId.toLowerCase()
             : true
 
-        const isArchived = x.campaign.archived
+        const isArchived = matchFilter && x.campaign.archived
         if (isArchived) archivedCount++
 
         return matchFilter && ((!showArchived && !isArchived) || (showArchived && isArchived))
