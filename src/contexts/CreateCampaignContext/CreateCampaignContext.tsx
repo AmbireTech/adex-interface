@@ -27,8 +27,8 @@ import { formatDateTime } from 'helpers'
 import { useCampaignsData } from 'hooks/useCampaignsData'
 import { useForm } from '@mantine/form'
 
-export const MIN_CAMPAIGN_BUDGET_VALUE_ADMIN = 20
-export const MIN_CAMPAIGN_BUDGET_VALUE = 300
+const MIN_CAMPAIGN_BUDGET_VALUE_ADMIN = 20
+const MIN_CAMPAIGN_BUDGET_VALUE = 300
 const MIN_CPM_VALUE = 0.1
 
 const isValidHttpUrl = (inputURL: string) => {
@@ -96,7 +96,7 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
       // paymentModel: (value, values) =>
       //   value === '' && values.step === 2 ? 'Select payment method' : null,
       currency: (value, values) => (value === '' && values.step === 2 ? 'Select currency' : null),
-      campaignBudget: (value, values) => {
+      budget: (value, values) => {
         if (values.step === 2) {
           if (!value || Number(value) === 0 || Number.isNaN(Number(value))) {
             return 'Enter campaign budget or a valid number'
@@ -276,27 +276,6 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
     [form]
   )
 
-  const updateCampaignWithPrevStateNested = useCallback(
-    (nestedKey: string, value: any) => {
-      setCampaign((prevState) => {
-        const updated = { ...prevState }
-        const keys = nestedKey.split('.')
-        let currentLevel: any = updated
-
-        for (let i = 0; i < keys.length - 1; i++) {
-          if (!(keys[i] in currentLevel)) {
-            currentLevel[keys[i]] = {}
-          }
-          currentLevel = currentLevel[keys[i]]
-        }
-
-        currentLevel[keys[keys.length - 1]] = value
-        return updated
-      })
-    },
-    [setCampaign]
-  )
-
   const resetCampaign = useCallback(() => {
     // setCampaign({ ...defaultValue })
     // TODO: reset form
@@ -384,18 +363,16 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
             draftCampaign.outpaceAssetDecimals
           ).toString()
         },
-        campaignBudget: BigInt(
-          parseFromBigNumPrecision(
-            BigInt(Math.floor(Number(draftCampaign.campaignBudget))),
-            draftCampaign.outpaceAssetDecimals
-          )
-        ),
+        budget: parseFromBigNumPrecision(
+          BigInt(Math.floor(Number(draftCampaign.campaignBudget))),
+          draftCampaign.outpaceAssetDecimals
+        ).toString(),
         draftModified: false
       }
 
-      setCampaign(mappedDraftCampaign)
+      form.setValues(mappedDraftCampaign)
     },
-    [balanceToken.name]
+    [balanceToken.name, form]
   )
 
   const contextValue = useMemo(
@@ -404,7 +381,6 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
       setCampaign,
       updatePartOfCampaign,
       updateCampaign,
-      updateCampaignWithPrevStateNested,
       publishCampaign,
       resetCampaign,
       addAdUnit,
@@ -422,7 +398,6 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
       setCampaign,
       updatePartOfCampaign,
       updateCampaign,
-      updateCampaignWithPrevStateNested,
       publishCampaign,
       resetCampaign,
       addAdUnit,

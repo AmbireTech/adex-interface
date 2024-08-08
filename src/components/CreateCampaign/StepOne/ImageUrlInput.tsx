@@ -118,6 +118,7 @@ const ImageUrlInput = ({
           text={`${image.banner?.format.w}x${image.banner?.format.h}`}
         />
         <Input
+          defaultValue={image.banner?.targetUrl}
           className={classes.inputField}
           error={hasError}
           disabled={toRemove || preview}

@@ -34,8 +34,7 @@ const StepThree = () => {
 
   const budgetIsGreaterThanBalance = useMemo(
     () =>
-      form.errors &&
-      form.errors.campaignBudget === 'Available balance is lower than the campaign budget',
+      form.errors && form.errors.budget === 'Available balance is lower than the campaign budget',
     [form.errors]
   )
 
@@ -106,9 +105,9 @@ const StepThree = () => {
             // TODO: Should get/calculate estimated fee
             // description={`Estimated fee: 0.15 ${balanceToken.name}`}
             inputWrapperOrder={['label', 'input', 'description', 'error']}
-            name="campaignBudget"
-            key={form.key('campaignBudget')}
-            {...form.getInputProps('campaignBudget')}
+            name="budget"
+            key={form.key('budget')}
+            {...form.getInputProps('budget')}
           />
           {budgetIsGreaterThanBalance && (
             <InfoAlertMessage

@@ -23,6 +23,7 @@ export type CampaignUI = Campaign & {
   autoUTMChecked: boolean
   asapStartingDate: boolean
   draftModified: boolean
+  budget: string
 }
 
 export type ImageSizes = {
@@ -55,7 +56,6 @@ export type CreateCampaignType = {
     key: CampaignItemKey,
     value: CampaignUI[CampaignItemKey]
   ) => void
-  updateCampaignWithPrevStateNested: (nestedKey: string, value: any) => void
   updatePartOfCampaign: (camp: Partial<CampaignUI>) => void
   publishCampaign: () => Promise<any>
   resetCampaign: () => void

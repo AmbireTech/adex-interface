@@ -61,6 +61,7 @@ export const CREATE_CAMPAIGN_DEFAULT_VALUE: CampaignUI = {
   currency: '',
   autoUTMChecked: false,
   asapStartingDate: false,
+  budget: '',
   outpaceAssetAddr: '',
   outpaceAssetDecimals: 0,
   outpaceAddr: '',

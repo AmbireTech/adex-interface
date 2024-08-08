@@ -203,7 +203,7 @@ export const mapCampaignUItoCampaign = (campaignUI: CampaignUI): ReducedCampaign
     outpaceAssetAddr: campaignUI.outpaceAssetAddr,
     outpaceAssetDecimals: campaignUI.outpaceAssetDecimals,
     outpaceAddr: campaignUI.outpaceAddr,
-    campaignBudget: campaignUI.campaignBudget,
+    campaignBudget: BigInt(Number(campaignUI.budget)),
     outpaceChainId: campaignUI.outpaceChainId,
     nonce: campaignUI.nonce,
     title: campaignUI.title,
