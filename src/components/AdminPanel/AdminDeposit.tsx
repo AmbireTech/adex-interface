@@ -22,7 +22,7 @@ type Deposit = {
 
 function AdminDeposit({ accountData }: { accountData: Account }) {
   const { showNotification } = useCustomNotifications()
-  const { makeDeposit, updateAccounts } = useAdmin()
+  const { makeDeposit, getAllAccounts } = useAdmin()
   const [loading, setLoading] = useState(false)
 
   const form = useForm<Deposit>({
@@ -57,7 +57,7 @@ function AdminDeposit({ accountData }: { accountData: Account }) {
       await makeDeposit(
         values,
         () => {
-          updateAccounts()
+          getAllAccounts()
           form.reset()
           showNotification('info', `Deposit to ${form.values.accountId} success!`)
         },
@@ -68,7 +68,7 @@ function AdminDeposit({ accountData }: { accountData: Account }) {
 
       setLoading(false)
     },
-    [form, makeDeposit, showNotification, updateAccounts]
+    [form, makeDeposit, showNotification, getAllAccounts]
   )
 
   const throttledSbm = useMemo(

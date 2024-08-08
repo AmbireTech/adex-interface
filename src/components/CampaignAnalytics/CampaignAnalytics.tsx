@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState, useMemo } from 'react'
-import { Container, Flex, Loader, Tabs, Paper, Group, Text } from '@mantine/core'
+import { Container, Flex, Loader, Tabs, Paper, Group, Text, Anchor, Center } from '@mantine/core'
 import { useParams } from 'react-router-dom'
 import { AnalyticsType, BaseAnalyticsData, AnalyticsPeriod } from 'types'
 import GoBack from 'components/common/GoBack/GoBack'
@@ -111,14 +111,22 @@ const CampaignAnalytics = ({ isAdminPanel = false }: { isAdminPanel?: boolean })
 
   // TODO: there is delay when updated analytics table is displayed after the tab is switched - add loading bars or something
 
-  if (!id) {
-    return <div>Invalid campaign ID</div>
-  }
-
   const loading = useMemo(
     () => !analyticsKey || !campaignMappedAnalytics,
     [analyticsKey, campaignMappedAnalytics]
   )
+
+  if (loading && !campaign) {
+    return (
+      <Center>
+        <Loader />
+      </Center>
+    )
+  }
+
+  if (!id) {
+    return <div>Invalid campaign ID</div>
+  }
 
   // TODO: better tabs optimization, this si temp fix that prevents 80-90% of the prev re-renders, there is sill 1 extra re-rended that can be fixed
 
@@ -130,7 +138,17 @@ const CampaignAnalytics = ({ isAdminPanel = false }: { isAdminPanel?: boolean })
             <GoBack title="Go Back" />
             <Text size="sm" truncate>
               Campaign: {campaign?.title}
-              {isAdminPanel && ` (${campaign?.owner})`}
+              {isAdminPanel && (
+                <Anchor
+                  underline="never"
+                  size="xs"
+                  href={`/dashboard/admin/user-account/${campaign?.owner}`}
+                  c="secondaryText"
+                >
+                  {' '}
+                  ({campaign?.owner})
+                </Anchor>
+              )}
             </Text>
             <Group align="center" justify="space-between">
               {isMapBtnShown && (

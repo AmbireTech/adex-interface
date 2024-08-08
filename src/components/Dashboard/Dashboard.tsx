@@ -4,7 +4,7 @@ import {
   // CampaignType,
   EventType
 } from 'adex-common'
-import { Container, Flex, Text, Loader, UnstyledButton } from '@mantine/core'
+import { Container, Flex, Text, Loader, UnstyledButton, Anchor, Box } from '@mantine/core'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import CustomTable, { TableElement, TableRowAction } from 'components/common/CustomTable'
 import { periodNumberToDate } from 'helpers'
@@ -139,11 +139,23 @@ const Dashboard = ({ isAdminPanel, accountId }: { isAdminPanel?: boolean; accoun
               rowColor: archived ? 'red' : undefined,
               id: cmpData.campaignId,
               title: (
-                <Text truncate>
+                <Text size="sm" truncate>
                   {archived && (
                     <BadgeStatusCampaign type={cmpData.campaign.status} isArchived={archived} />
                   )}
                   {`${archived ? ' ' : ''}${cmpData.campaign.title}`}
+                  {isAdminPanel && (
+                    <Box>
+                      <Anchor
+                        underline="never"
+                        size="xs"
+                        href={`/dashboard/admin/user-account/${campaign.owner}`}
+                        c="secondaryText"
+                      >
+                        {campaign.owner}
+                      </Anchor>
+                    </Box>
+                  )}
                 </Text>
               ),
               // type: CampaignType[cmpData.campaign.type],
@@ -203,7 +215,7 @@ const Dashboard = ({ isAdminPanel, accountId }: { isAdminPanel?: boolean; accoun
             }
           })
         : [],
-    [filteredCampaignData]
+    [filteredCampaignData.campaignData, isAdminPanel]
   )
 
   const handlePreview = useCallback(
