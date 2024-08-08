@@ -24,13 +24,24 @@ import { parseBigNumTokenAmountToDecimal, parseFromBigNumPrecision } from 'helpe
 import { AdUnit, Campaign, Placement } from 'adex-common'
 import dayjs from 'dayjs'
 import { formatDateTime } from 'helpers'
-import { isValidHttpUrl } from 'helpers/validators'
 import { useCampaignsData } from 'hooks/useCampaignsData'
 import { useForm } from '@mantine/form'
 
 export const MIN_CAMPAIGN_BUDGET_VALUE_ADMIN = 20
 export const MIN_CAMPAIGN_BUDGET_VALUE = 300
 const MIN_CPM_VALUE = 0.1
+
+const isValidHttpUrl = (inputURL: string) => {
+  let url
+
+  try {
+    url = new URL(inputURL)
+  } catch (_) {
+    return false
+  }
+
+  return url.protocol === 'http:' || url.protocol === 'https:'
+}
 
 const validateBudget = (value: bigint, availableBalance: bigint, decimals: number) => {
   const formattedToken = Number(parseBigNumTokenAmountToDecimal(availableBalance, decimals))

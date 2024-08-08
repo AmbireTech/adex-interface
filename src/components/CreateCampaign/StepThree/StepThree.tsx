@@ -18,15 +18,6 @@ import {
   // CAMPAIGN_INCLUDE_INCENTIVIZED_INPUT,
   CAMPAIGN_LIMIT_DAILY_AVERAGE_SPENDING_INPUT
 } from 'constants/createCampaign'
-// import {
-//   validateCPMMax,
-//   validateCPMMin,
-//   validateCampaignBudget,
-//   validateCurrency,
-//   validatePaymentModel,
-//   validateTitle
-// } from 'helpers/validators'
-// import { parseBigNumTokenAmountToDecimal } from 'helpers'
 import InfoAlertMessage from 'components/common/InfoAlertMessage'
 import { parseRange } from 'helpers/createCampaignHelpers'
 import InfoIcon from 'resources/icons/Info'
@@ -66,52 +57,6 @@ const StepThree = () => {
     },
     [updateCampaignWithPrevStateNested]
   )
-
-  // TODO: Move the validateFields in other file
-  // const validateFields = useCallback(() => {
-  //   const newErrors = { ...DEFAULT_ERROR_VALUES }
-
-  //   const paymentModelValidation = validatePaymentModel(paymentModel)
-  //   if (!paymentModelValidation.isValid) newErrors.paymentModel = paymentModelValidation.errMsg
-
-  //   const currencyValidation = validateCurrency(currency)
-  //   if (!currencyValidation.isValid) newErrors.currency = currencyValidation.errMsg
-  //   const campaignBudgetValidation = validateCampaignBudget(
-  //     campaignBudget,
-  //     availableBalance,
-  //     balanceToken.decimals,
-  //     isAdmin
-  //   )
-
-  //   console.log({ campaignBudgetValidation })
-  //   if (!campaignBudgetValidation.isValid)
-  //     newErrors.campaignBudget = campaignBudgetValidation.errMsg
-
-  //   const cpmPricingBoundsMinValidation = validateCPMMin(min, max)
-  //   if (!cpmPricingBoundsMinValidation.isValid)
-  //     newErrors.cpmPricingBoundsMin = cpmPricingBoundsMinValidation.errMsg
-
-  //   const cpmPricingBoundsMaxValidation = validateCPMMax(min, max)
-  //   if (!cpmPricingBoundsMaxValidation.isValid)
-  //     newErrors.cpmPricingBoundsMax = cpmPricingBoundsMaxValidation.errMsg
-
-  //   const titleValidation = validateTitle(title)
-  //   if (!titleValidation.isValid) newErrors.title = titleValidation.errMsg
-
-  //   setErrors(newErrors)
-
-  //   return Object.values(newErrors).every((error) => !error)
-  // }, [
-  //   paymentModel,
-  //   currency,
-  //   campaignBudget,
-  //   availableBalance,
-  //   balanceToken.decimals,
-  //   isAdmin,
-  //   min,
-  //   max,
-  //   title
-  // ])
 
   const budgetIsGreaterThanBalance = useMemo(
     () =>
