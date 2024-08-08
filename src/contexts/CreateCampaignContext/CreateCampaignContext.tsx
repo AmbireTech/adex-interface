@@ -151,13 +151,9 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
       }
     }
   })
-  // TODO: remove completely campaign useState
-  const [c, setCampaign] = useState<CampaignUI>(defaultValue)
+
   const campaign = useMemo(() => form.getValues(), [form])
-  console.log('-'.repeat(40))
-  console.log('cOld', c)
-  console.log('cNew', campaign)
-  console.log('-'.repeat(40))
+
   const [selectedBannerSizes, setSelectedBannerSizes] = useState<
     SupplyStatsDetails[] | SupplyStatsDetails[][]
   >([])
@@ -185,7 +181,6 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
     if (savedCampaign) {
       const parsedCampaign = superjson.parse<CampaignUI>(savedCampaign)
       if (!deepEqual(parsedCampaign, defaultValue)) {
-        // setCampaign(parsedCampaign)
         form.setValues(parsedCampaign)
       }
     }
@@ -198,10 +193,6 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
   useEffect(() => {
     window.onbeforeunload = () => {
       localStorage.setItem('createCampaign', superjson.stringify(form.getValues()))
-      // setCampaign((prev) => {
-      //   localStorage.setItem('createCampaign', superjson.stringify(prev))
-      //   return prev
-      // })
       return undefined
     }
 
@@ -277,7 +268,6 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
   )
 
   const resetCampaign = useCallback(() => {
-    // setCampaign({ ...defaultValue })
     // TODO: reset form
     form.resetTouched()
     form.resetDirty()
@@ -378,7 +368,6 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
   const contextValue = useMemo(
     () => ({
       campaign,
-      setCampaign,
       updatePartOfCampaign,
       updateCampaign,
       publishCampaign,
@@ -395,7 +384,6 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
     }),
     [
       campaign,
-      setCampaign,
       updatePartOfCampaign,
       updateCampaign,
       publishCampaign,

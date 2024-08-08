@@ -51,7 +51,6 @@ export type SupplyStats = {
 
 export type CreateCampaignType = {
   campaign: CampaignUI
-  setCampaign: (val: CampaignUI | ((prevState: CampaignUI) => CampaignUI)) => void
   updateCampaign: <CampaignItemKey extends keyof CampaignUI>(
     key: CampaignItemKey,
     value: CampaignUI[CampaignItemKey]
