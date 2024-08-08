@@ -157,7 +157,7 @@ export const CustomTable = ({
           </Stack>
         ) : (
           <Table.Td key={column}>
-            <Text size="sm" c={color} truncate maw={200}>
+            <Text size="sm" c={color} truncate maw={290}>
               {columnParsed}
             </Text>
           </Table.Td>

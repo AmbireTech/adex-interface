@@ -17,7 +17,7 @@ type Deposit = {
 
 interface IAdminContext {
   accounts: Map<string, Account>
-  updateAccounts: () => void
+  getAllAccounts: () => void
   initialDataLoading: boolean
   makeDeposit: (
     values: Deposit,
@@ -38,7 +38,7 @@ const AdminProvider: FC<PropsWithChildren> = ({ children }) => {
   const [initialDataLoading, setLoading] = useState(true)
   const [accounts, setAccounts] = useState<Map<string, Account>>(new Map<string, Account>())
 
-  const updateAccounts = useCallback(async () => {
+  const getAllAccounts = useCallback(async () => {
     try {
       const res = await adexServicesRequest<Array<Account>>('backend', {
         route: '/dsp/admin/accounts/all',
@@ -140,12 +140,12 @@ const AdminProvider: FC<PropsWithChildren> = ({ children }) => {
   const contextValue = useMemo(
     () => ({
       accounts,
-      updateAccounts,
+      getAllAccounts,
       initialDataLoading,
       makeDeposit,
       updateAccountInfo
     }),
-    [accounts, initialDataLoading, makeDeposit, updateAccounts, updateAccountInfo]
+    [accounts, initialDataLoading, makeDeposit, getAllAccounts, updateAccountInfo]
   )
 
   return <AdminContext.Provider value={contextValue}>{children}</AdminContext.Provider>

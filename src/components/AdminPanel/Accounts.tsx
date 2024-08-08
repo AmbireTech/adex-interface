@@ -20,7 +20,7 @@ const headingsDefault = [
 
 const AdminAnalytics = () => {
   const navigate = useNavigate()
-  const { accounts, initialDataLoading, updateAccounts } = useAdmin()
+  const { accounts, initialDataLoading, getAllAccounts } = useAdmin()
   const headings = useMemo(() => [...headingsDefault], [])
   const [search, setSearch] = useState('')
 
@@ -105,8 +105,8 @@ const AdminAnalytics = () => {
   }, [accounts, search])
 
   useEffect(() => {
-    updateAccounts()
-  }, [updateAccounts])
+    getAllAccounts()
+  }, [getAllAccounts])
 
   const handlePreview = useCallback(
     (item: { id: string }) => {

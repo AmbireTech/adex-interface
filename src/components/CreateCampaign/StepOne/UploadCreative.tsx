@@ -1,4 +1,4 @@
-import { Grid, Text } from '@mantine/core'
+import { Stack, Text, Code } from '@mantine/core'
 import { useCallback, useRef } from 'react'
 import { AdUnit } from 'adex-common/dist/types'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
@@ -46,26 +46,27 @@ const UploadCreative = () => {
   )
 
   return (
-    <Grid>
-      <Grid.Col>
-        <Text c="secondaryText" size="sm" fw="bold" mb="xs">
-          3. Upload creatives
-        </Text>
-        <BannerSizesList adUnits={adUnits} />
-        <FilesDropzone onDrop={onDrop} />
-      </Grid.Col>
+    <Stack>
+      <Text c="secondaryText" size="sm" fw="bold" mb="xs">
+        3. Upload creatives
+      </Text>
+      <BannerSizesList adUnits={adUnits} />
+      <FilesDropzone onDrop={onDrop} />
+      <Text size="xs">
+        * uploading html banners requirements: <Code>.zip</Code> fille with index.html inside;
+        <Code>index.html</Code> file need to include meta tag in format{' '}
+        <Code>{'<meta name="ad.size" content="width=320,height=50">'}</Code>
+      </Text>
 
       {adUnits.length ? (
-        <Grid.Col>
-          <UploadedBanners
-            autoUTMChecked={autoUTMChecked}
-            updateAutoUTMChecked={updateAutoUTMChecked}
-            onDeleteCreativeBtnClicked={handleDeleteCreativeBtnClicked}
-            handleOnInputChange={handleOnInputChange}
-          />
-        </Grid.Col>
+        <UploadedBanners
+          autoUTMChecked={autoUTMChecked}
+          updateAutoUTMChecked={updateAutoUTMChecked}
+          onDeleteCreativeBtnClicked={handleDeleteCreativeBtnClicked}
+          handleOnInputChange={handleOnInputChange}
+        />
       ) : null}
-    </Grid>
+    </Stack>
   )
 }
 

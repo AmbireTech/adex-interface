@@ -1,5 +1,5 @@
-import { useMemo } from 'react'
-import { SimpleGrid, Box, Title, Paper } from '@mantine/core'
+import { useEffect, useMemo } from 'react'
+import { SimpleGrid, Box, Title, Paper, Loader, Center } from '@mantine/core'
 import useAdmin from 'hooks/useAdmin'
 import { useParams } from 'react-router-dom'
 import Dashboard from 'components/Dashboard'
@@ -9,10 +9,23 @@ import { AdminDeposit } from './AdminDeposit'
 
 function AccountDetails() {
   const { accountId = '' } = useParams()
-  const { accounts, initialDataLoading } = useAdmin()
+  const { accounts, initialDataLoading, getAllAccounts } = useAdmin()
+  console.log({ accounts })
   const accountData = useMemo(() => accounts.get(accountId), [accounts, accountId])
 
-  if (!accountData || initialDataLoading) {
+  useEffect(() => {
+    initialDataLoading && getAllAccounts()
+  }, [getAllAccounts, initialDataLoading])
+
+  if (initialDataLoading) {
+    return (
+      <Center>
+        <Loader />
+      </Center>
+    )
+  }
+
+  if (!accountData) {
     return <div>{`Invalid account id ${accountId}`}</div>
   }
 
