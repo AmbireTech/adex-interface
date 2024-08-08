@@ -119,10 +119,11 @@ const CampaignSummary = () => {
   }, [throttledLaunchCampaign])
 
   const handleNextStepBtnClicked = useCallback(() => {
+    if (form.validate().hasErrors) return
     if (step === 0) {
       // TODO: maybe the form should be validated not only for the first step
       // or just check for errors without validating the form
-      if (form.validate().hasErrors) return
+      if (Object.keys(form.errors).length) return
 
       if (autoUTMChecked) {
         addUTMToTargetURLS()
@@ -131,13 +132,10 @@ const CampaignSummary = () => {
 
     if (step < CREATE_CAMPAIGN_STEPS - 1) {
       if (step === 2) {
-        const element = document.getElementById('createCampaignSubmitBtn1')
-        element?.click()
-
+        if (Object.keys(form.errors).length) return
         if (autoUTMChecked) {
           addUTMToTargetURLS()
         }
-        return
       }
 
       updateCampaign('step', step + 1)

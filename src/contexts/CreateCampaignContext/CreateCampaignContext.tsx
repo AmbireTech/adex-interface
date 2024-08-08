@@ -20,13 +20,22 @@ import {
   prepareCampaignObject,
   selectBannerSizes
 } from 'helpers/createCampaignHelpers'
-import { parseFromBigNumPrecision } from 'helpers/balances'
+import { parseBigNumTokenAmountToDecimal, parseFromBigNumPrecision } from 'helpers/balances'
 import { AdUnit, Campaign, Placement } from 'adex-common'
 import dayjs from 'dayjs'
 import { formatDateTime } from 'helpers'
 import { isValidHttpUrl } from 'helpers/validators'
 import { useCampaignsData } from 'hooks/useCampaignsData'
 import { useForm } from '@mantine/form'
+
+export const MIN_CAMPAIGN_BUDGET_VALUE_ADMIN = 20
+export const MIN_CAMPAIGN_BUDGET_VALUE = 300
+const MIN_CPM_VALUE = 0.1
+
+const validateBudget = (value: bigint, availableBalance: bigint, decimals: number) => {
+  const formattedToken = Number(parseBigNumTokenAmountToDecimal(availableBalance, decimals))
+  return formattedToken < Number(value)
+}
 
 const CreateCampaignContext = createContext<CreateCampaignType | null>(null)
 
@@ -36,7 +45,12 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
   // TODO: the address will be fixed and will always has a default value
   const {
     adexAccount,
-    adexAccount: { balanceToken }
+    adexAccount: {
+      availableBalance,
+      balanceToken,
+      balanceToken: { decimals }
+    },
+    isAdmin
   } = useAccount()
 
   const defaultValue = useMemo(
@@ -55,23 +69,84 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
     }),
     [adexAccount?.address, balanceToken?.address, balanceToken?.decimals, balanceToken?.chainId]
   )
+
   const form = useForm({
-    // mode: 'uncontrolled',
     initialValues: defaultValue,
+    validateInputOnChange: ['cpmPricingBounds.min', 'cpmPricingBounds.max'],
     validateInputOnBlur: true,
     validate: {
+      // TODO: apply all the validations
       adUnits: {
         banner: {
-          targetUrl: (value) => (!isValidHttpUrl(value) ? 'Please enter a valid URL' : null)
+          targetUrl: (value, values) =>
+            !isValidHttpUrl(value) && values.step === 0 ? 'Please enter a valid URL' : null
         }
+      },
+      // paymentModel: (value, values) =>
+      //   value === '' && values.step === 2 ? 'Select payment method' : null,
+      currency: (value, values) => (value === '' && values.step === 2 ? 'Select currency' : null),
+      campaignBudget: (value, values) => {
+        if (values.step === 2) {
+          if (!value || Number(value) === 0 || Number.isNaN(Number(value))) {
+            return 'Enter campaign budget or a valid number'
+          }
+
+          const minAmount = isAdmin ? MIN_CAMPAIGN_BUDGET_VALUE_ADMIN : MIN_CAMPAIGN_BUDGET_VALUE
+
+          if (Number(value) < minAmount) {
+            return `Campaign budget can not be lower than ${minAmount}`
+          }
+          if (validateBudget(BigInt(Number(value)), availableBalance, decimals)) {
+            return 'Available balance is lower than the campaign budget'
+          }
+        }
+
+        return null
+      },
+      cpmPricingBounds: {
+        min: (value, values) => {
+          if (values.step === 2) {
+            if (Number(value) === 0 || Number.isNaN(Number(value)))
+              return 'Enter CPM min value or a valid number'
+            if (Number(value) < MIN_CPM_VALUE)
+              return `CPM min can not be lower than ${MIN_CPM_VALUE}`
+            if (Number(value) >= Number(values.cpmPricingBounds.max))
+              return 'CPM min can not be greater than CPM max'
+          }
+
+          return null
+        },
+        max: (value, values) => {
+          if (values.step === 2) {
+            if (Number(value) === 0 || Number.isNaN(Number(value)))
+              return 'Enter CPM max value or a valid number'
+            if (Number(value) <= 0) return 'CPM max should be greater than 0'
+            if (Number(value) <= Number(values.cpmPricingBounds.min))
+              return 'CPM max can not be lower than CPM min'
+          }
+
+          return null
+        }
+      },
+      title: (value, values) => {
+        if (values.step === 2) {
+          if (value === '') return 'Enter campaign name'
+          if (value.length < 2) {
+            return 'Campaign name must have at least 2 letters'
+          }
+        }
+
+        return null
       }
     }
   })
   // TODO: remove completely campaign useState
   const [c, setCampaign] = useState<CampaignUI>(defaultValue)
-  console.log('c', c)
   const campaign = useMemo(() => form.getValues(), [form])
-
+  console.log('-'.repeat(40))
+  console.log('cOld', c)
+  console.log('cNew', campaign)
+  console.log('-'.repeat(40))
   const [selectedBannerSizes, setSelectedBannerSizes] = useState<
     SupplyStatsDetails[] | SupplyStatsDetails[][]
   >([])
@@ -212,9 +287,14 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
   )
 
   const resetCampaign = useCallback(() => {
-    setCampaign({ ...defaultValue })
+    // setCampaign({ ...defaultValue })
+    // TODO: reset form
+    form.resetTouched()
+    form.resetDirty()
+    form.reset()
+    form.setValues({ ...defaultValue })
     localStorage.setItem('createCampaign', superjson.stringify({ ...defaultValue }))
-  }, [setCampaign, defaultValue])
+  }, [form, defaultValue])
 
   const publishCampaign = useCallback(() => {
     const preparedCampaign = prepareCampaignObject(campaign, balanceToken.decimals)
