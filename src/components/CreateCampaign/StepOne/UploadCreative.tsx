@@ -1,5 +1,5 @@
 import { Stack, Text, Code } from '@mantine/core'
-import { useCallback, useRef } from 'react'
+import { useCallback } from 'react'
 import { AdUnit } from 'adex-common/dist/types'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import useDropzone from 'hooks/useDropzone'
@@ -20,7 +20,6 @@ const UploadCreative = () => {
     (isChecked: boolean) => updateCampaign('autoUTMChecked', isChecked),
     [updateCampaign]
   )
-  const debounceTimer = useRef<NodeJS.Timeout>()
 
   const { onDrop } = useDropzone()
 
@@ -33,14 +32,7 @@ const UploadCreative = () => {
 
   const handleOnInputChange = useCallback(
     (inputText: string, adUnitId: string) => {
-      // const isValid = isValidHttpUrl(inputText)
-      // if (!isValid) return
-
-      if (debounceTimer.current) clearTimeout(debounceTimer.current)
-
-      debounceTimer.current = setTimeout(() => {
-        addTargetURLToAdUnit(inputText, adUnitId)
-      }, 300)
+      addTargetURLToAdUnit(inputText, adUnitId)
     },
     [addTargetURLToAdUnit]
   )

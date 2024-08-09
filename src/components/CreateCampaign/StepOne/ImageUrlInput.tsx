@@ -62,6 +62,7 @@ const ImageUrlInput = ({
   toRemove,
   onDelete,
   onChange,
+  onBlur,
   preview,
   error,
   ...rest
@@ -114,6 +115,7 @@ const ImageUrlInput = ({
             section: classes.rightSection,
             input: classes.input
           }}
+          onBlur={onBlur}
         />
         {(!preview || onDelete) && (
           <ActionIcon

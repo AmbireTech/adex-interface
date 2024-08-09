@@ -22,15 +22,13 @@ import {
   addUrlUtmTracking,
   deepEqual,
   hasUtmCampaign,
-  isPastDateTime,
   prepareCampaignObject,
   removeProperty,
   selectBannerSizes
 } from 'helpers/createCampaignHelpers'
 import { parseFromBigNumPrecision } from 'helpers/balances'
 import { AdUnit, Campaign, Placement } from 'adex-common'
-import dayjs from 'dayjs'
-import { formatDateTime } from 'helpers'
+import { formatDateTime, WEEK } from 'helpers'
 import { isValidHttpUrl } from 'helpers/validators'
 import { useCampaignsData } from 'hooks/useCampaignsData'
 
@@ -55,9 +53,8 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
       outpaceAddr: adexAccount?.address || '0x',
       outpaceAssetDecimals: balanceToken.decimals,
       outpaceChainId: balanceToken.chainId,
-      startsAt: isPastDateTime(CREATE_CAMPAIGN_DEFAULT_VALUE.startsAt)
-        ? dayjs().add(1, 'minute').toDate()
-        : CREATE_CAMPAIGN_DEFAULT_VALUE.startsAt,
+      startsAt: new Date(),
+      endsAt: new Date(Date.now() + WEEK),
       errorsTargetURLValidations: {}
     }),
     [adexAccount?.address, balanceToken?.address, balanceToken?.decimals, balanceToken?.chainId]
@@ -118,6 +115,7 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
     (adUnitToAdd: AdUnit) => {
       setCampaign((prev) => {
         const { errorsTargetURLValidations } = { ...prev }
+        const nextValidations = { ...errorsTargetURLValidations }
         errorsTargetURLValidations[adUnitToAdd.id] = {
           errMsg: '',
           success: false,
@@ -126,7 +124,7 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
         const updated = {
           ...prev,
           adUnits: [...prev.adUnits, adUnitToAdd],
-          errorsTargetURLValidations
+          errorsTargetURLValidations: nextValidations
         }
         return updated
       })
@@ -137,12 +135,13 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
   const removeAdUnit = useCallback(
     (adUnitIdToRemove: string) => {
       setCampaign((prev) => {
-        let { errorsTargetURLValidations } = { ...prev }
-        errorsTargetURLValidations = removeProperty(adUnitIdToRemove, errorsTargetURLValidations)
+        const { errorsTargetURLValidations } = { ...prev }
+        const nextValidations = { ...errorsTargetURLValidations }
+
         const updated = {
           ...prev,
           adUnits: [...prev.adUnits.filter((item) => item.id !== adUnitIdToRemove)],
-          errorsTargetURLValidations
+          errorsTargetURLValidations: removeProperty(adUnitIdToRemove, nextValidations)
         }
         return updated
       })
@@ -193,7 +192,7 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
     (inputText: string, adUnitId: string) => {
       setCampaign((prev) => {
         const { adUnits, errorsTargetURLValidations } = { ...prev }
-        const copy = { ...errorsTargetURLValidations }
+        const nextValidations = { ...errorsTargetURLValidations }
         const mappedAdUnits = adUnits.map((element) => {
           const elCopy = { ...element }
 
@@ -201,15 +200,15 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
             elCopy.banner!.targetUrl = inputText
 
             if (elCopy.banner?.targetUrl === '') {
-              copy[elCopy.id] = { errMsg: '', success: false, isDirty: true }
+              nextValidations[elCopy.id] = { errMsg: '', success: false, isDirty: true }
             } else if (elCopy.banner?.targetUrl && !isValidHttpUrl(elCopy.banner?.targetUrl)) {
-              copy[elCopy.id] = {
+              nextValidations[elCopy.id] = {
                 errMsg: 'Please enter a valid URL',
                 success: false,
                 isDirty: true
               }
             } else {
-              copy[elCopy.id] = { errMsg: '', success: true, isDirty: true }
+              nextValidations[elCopy.id] = { errMsg: '', success: true, isDirty: true }
             }
           }
 
@@ -219,7 +218,7 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
         const updated = {
           ...prev,
           adUnits: mappedAdUnits,
-          errorsTargetURLValidations: copy
+          errorsTargetURLValidations: nextValidations
         }
         return updated
       })
@@ -314,8 +313,19 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
   )
 
   const resetCampaign = useCallback(() => {
-    setCampaign({ ...defaultValue })
-    localStorage.setItem('createCampaign', superjson.stringify({ ...defaultValue }))
+    console.log('resetCampaign', defaultValue)
+    const toSetReset = {
+      ...defaultValue,
+      // NOTE: tem fix for reset. Looks like default value is mutated with draft campaigns. It needs total re-write of the create campaign logic.
+      // Will not waste more time atm to fix this
+      errorsTargetURLValidations: {},
+      startsAt: new Date(),
+      endsAt: new Date(Date.now() + WEEK),
+      draftModified: false
+    }
+    setCampaign(toSetReset)
+    // Do we need this???
+    localStorage.setItem('createCampaign', superjson.stringify(toSetReset))
   }, [setCampaign, defaultValue])
 
   const publishCampaign = useCallback(() => {
@@ -334,38 +344,36 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
   }, [campaign, adexServicesRequest, balanceToken.decimals])
 
   const saveToDraftCampaign = useCallback(
-    (camp?: CampaignUI) => {
+    async (camp?: CampaignUI) => {
       const currCampaign = camp || campaign
       const preparedCampaign = prepareCampaignObject(currCampaign, balanceToken.decimals)
 
-      if (defaultValue.startsAt === currCampaign.startsAt) {
-        preparedCampaign.activeFrom = null
-      }
-      if (defaultValue.endsAt === currCampaign.endsAt) {
-        preparedCampaign.activeTo = null
-      }
-      if (preparedCampaign.title === '') {
-        preparedCampaign.title = `Draft Campaign ${formatDateTime(new Date())}`
-      }
+      preparedCampaign.title =
+        preparedCampaign.title || `Draft Campaign ${formatDateTime(new Date())}`
 
       const body = serialize(preparedCampaign).json
 
-      return adexServicesRequest('backend', {
-        route: '/dsp/campaigns/draft',
-        method: 'POST',
-        body,
-        headers: {
-          'Content-Type': 'application/json'
+      try {
+        const res = await adexServicesRequest('backend', {
+          route: '/dsp/campaigns/draft',
+          method: 'POST',
+          body,
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        })
+
+        // TODO: resp Type
+        // @ts-ignore
+        if (!res || !res?.success) {
+          throw new Error('Error on saving draft campaign')
         }
-      })
+        return res
+      } catch (err) {
+        throw new Error('Error on saving draft campaign')
+      }
     },
-    [
-      campaign,
-      adexServicesRequest,
-      balanceToken.decimals,
-      defaultValue.startsAt,
-      defaultValue.endsAt
-    ]
+    [campaign, adexServicesRequest, balanceToken.decimals]
   )
 
   const updateCampaignFromDraft = useCallback(
@@ -433,7 +441,6 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
   const contextValue = useMemo(
     () => ({
       campaign,
-      setCampaign,
       updatePartOfCampaign,
       updateCampaign,
       updateCampaignWithPrevStateNested,
@@ -452,7 +459,6 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
     }),
     [
       campaign,
-      setCampaign,
       updatePartOfCampaign,
       updateCampaign,
       updateCampaignWithPrevStateNested,

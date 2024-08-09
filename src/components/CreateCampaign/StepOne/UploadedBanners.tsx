@@ -13,7 +13,8 @@ const UploadedBanners = ({
 }: UploadedBannersProps) => {
   const {
     campaign: { adUnits, errorsTargetURLValidations },
-    selectedBannerSizes
+    selectedBannerSizes,
+    validateAdUnitTargetURL
   } = useCreateCampaignContext()
 
   const allowedSizes = useMemo(
@@ -52,6 +53,7 @@ const UploadedBanners = ({
                 toRemove={!isMatchedTheSizes(image)}
                 onDelete={onDeleteCreativeBtnClicked}
                 onChange={(e: any) => handleOnInputChange(e.target.value, image.id)}
+                onBlur={() => validateAdUnitTargetURL()}
               />
             </Grid.Col>
           )
