@@ -11,7 +11,7 @@ import {
 import { useDisclosure, useColorScheme } from '@mantine/hooks'
 import { CREATE_CAMPAIGN_STEPS } from 'constants/createCampaign'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useMemo } from 'react'
 import LeftArrowIcon from 'resources/icons/LeftArrow'
 import useCreateCampaignData from 'hooks/useCreateCampaignData/useCreateCampaignData'
 import CampaignDetailsRow from 'components/common/CampainDetailsRow'
@@ -69,37 +69,35 @@ const CampaignSummary = () => {
   } = useCreateCampaignData()
   const { showNotification } = useCustomNotifications()
 
-  const [isNextBtnDisabled, setIsNextBtnDisabled] = useState(false)
-  const noSelectedCatsOrLogs = useMemo(() => {
-    return !(
-      (targetingInput.inputs.categories.apply === 'all' ||
-        (targetingInput.inputs.categories.apply === 'in' &&
-          targetingInput.inputs.categories.in.length) ||
-        (targetingInput.inputs.categories.apply === 'in' &&
-          targetingInput.inputs.categories.in.length)) &&
-      (targetingInput.inputs.location.apply === 'all' ||
-        (targetingInput.inputs.location.apply === 'in' &&
-          targetingInput.inputs.location.in.length) ||
-        (targetingInput.inputs.location.apply === 'in' && targetingInput.inputs.location.in.length))
-    )
+  const nextStepDisabled = useMemo(() => {
+    if (step === 0) {
+      return !adUnits.length || Object.values(errorsTargetURLValidations).some((e) => !e.success)
+    }
+    if (step === 1) {
+      return !(
+        (targetingInput.inputs.categories.apply === 'all' ||
+          (targetingInput.inputs.categories.apply === 'in' &&
+            targetingInput.inputs.categories.in.length) ||
+          (targetingInput.inputs.categories.apply === 'in' &&
+            targetingInput.inputs.categories.in.length)) &&
+        (targetingInput.inputs.location.apply === 'all' ||
+          (targetingInput.inputs.location.apply === 'in' &&
+            targetingInput.inputs.location.in.length) ||
+          (targetingInput.inputs.location.apply === 'in' &&
+            targetingInput.inputs.location.in.length))
+      )
+    }
+
+    return false
   }, [
+    adUnits.length,
+    errorsTargetURLValidations,
+    step,
     targetingInput.inputs.categories.apply,
     targetingInput.inputs.categories.in.length,
     targetingInput.inputs.location.apply,
     targetingInput.inputs.location.in.length
   ])
-
-  useEffect(() => {
-    let hasErrors = false
-    if (step === 0) {
-      hasErrors =
-        !adUnits.length || Object.values(errorsTargetURLValidations).some((e) => !e.success)
-    } else if (step === 1) {
-      hasErrors = noSelectedCatsOrLogs
-    }
-
-    setIsNextBtnDisabled(hasErrors)
-  }, [step, noSelectedCatsOrLogs, adUnits, errorsTargetURLValidations])
 
   const isTheLastStep = useMemo(() => step === CREATE_CAMPAIGN_STEPS - 1, [step])
   const isFirstStep = useMemo(() => step === 0, [step])
@@ -256,7 +254,7 @@ const CampaignSummary = () => {
         {!isTheLastStep ? (
           <Button
             w="90%"
-            disabled={isNextBtnDisabled}
+            disabled={nextStepDisabled}
             size="lg"
             variant="filled"
             onClick={handleNextStepBtnClicked}
