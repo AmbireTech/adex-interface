@@ -1,6 +1,4 @@
 import { Grid, Text } from '@mantine/core'
-import { useCallback } from 'react'
-import { AdUnit } from 'adex-common/dist/types'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import useDropzone from 'hooks/useDropzone'
 import UploadedBanners from './UploadedBanners'
@@ -9,18 +7,10 @@ import FilesDropzone from './FilesDropzone'
 
 const UploadCreative = () => {
   const {
-    campaign: { adUnits },
-    removeAdUnit
+    campaign: { adUnits }
   } = useCreateCampaignContext()
 
   const { onDrop } = useDropzone()
-
-  const handleDeleteCreativeBtnClicked = useCallback(
-    (file: AdUnit) => {
-      removeAdUnit(file.id)
-    },
-    [removeAdUnit]
-  )
 
   return (
     <Grid>
@@ -34,7 +24,7 @@ const UploadCreative = () => {
 
       {adUnits.length ? (
         <Grid.Col>
-          <UploadedBanners onDeleteCreativeBtnClicked={handleDeleteCreativeBtnClicked} />
+          <UploadedBanners />
         </Grid.Col>
       ) : null}
     </Grid>

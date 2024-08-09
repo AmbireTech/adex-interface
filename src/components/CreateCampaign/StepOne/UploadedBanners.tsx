@@ -4,15 +4,12 @@ import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import { AdUnit } from 'adex-common/dist/types'
 import ImageUrlInput from './ImageUrlInput'
 
-type UploadedBannersProps = {
-  onDeleteCreativeBtnClicked: (file: AdUnit) => void
-}
-
-const UploadedBanners = ({ onDeleteCreativeBtnClicked }: UploadedBannersProps) => {
+const UploadedBanners = () => {
   const {
     campaign: { adUnits },
     selectedBannerSizes,
-    form
+    form,
+    removeAdUnit
   } = useCreateCampaignContext()
 
   const allowedSizes = useMemo(
@@ -48,7 +45,7 @@ const UploadedBanners = ({ onDeleteCreativeBtnClicked }: UploadedBannersProps) =
               <ImageUrlInput
                 image={image}
                 toRemove={!isMatchedTheSizes(image)}
-                onDelete={onDeleteCreativeBtnClicked}
+                onDelete={removeAdUnit}
                 index={index}
                 form={form}
               />

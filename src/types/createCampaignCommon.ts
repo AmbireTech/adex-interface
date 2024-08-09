@@ -59,7 +59,7 @@ export type CreateCampaignType = {
   publishCampaign: () => Promise<any>
   resetCampaign: () => void
   addAdUnit: (adUnitToAdd: AdUnit) => void
-  removeAdUnit: (adUnitIdToRemove: string) => void
+  removeAdUnit: (index: number) => void
   selectedBannerSizes: SupplyStatsDetails[] | SupplyStatsDetails[][]
   saveToDraftCampaign: (camp?: CampaignUI) => Promise<any>
   updateCampaignFromDraft: (draftCampaign: Campaign) => void

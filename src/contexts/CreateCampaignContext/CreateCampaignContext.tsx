@@ -25,7 +25,7 @@ import { AdUnit, Campaign, Placement } from 'adex-common'
 import dayjs from 'dayjs'
 import { formatDateTime } from 'helpers'
 import { useCampaignsData } from 'hooks/useCampaignsData'
-import { useForm } from '@mantine/form'
+import { hasLength, isNotEmpty, useForm } from '@mantine/form'
 
 const MIN_CAMPAIGN_BUDGET_VALUE_ADMIN = 20
 const MIN_CAMPAIGN_BUDGET_VALUE = 300
@@ -90,12 +90,10 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
       adUnits: {
         banner: {
           targetUrl: (value, values) =>
-            !isValidHttpUrl(value) && values.step === 0 ? 'Please enter a valid URL' : null
+            values.step === 0 && !isValidHttpUrl(value) ? 'Please enter a valid URL' : null
         }
       },
-      // paymentModel: (value, values) =>
-      //   value === '' && values.step === 2 ? 'Select payment method' : null,
-      currency: (value, values) => (value === '' && values.step === 2 ? 'Select currency' : null),
+      currency: (value, values) => values.step === 2 && isNotEmpty('Select currency')(value),
       budget: (value, values) => {
         if (values.step === 2) {
           if (!value || Number(value) === 0 || Number.isNaN(Number(value))) {
@@ -119,6 +117,7 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
           if (values.step === 2) {
             if (Number(value) === 0 || Number.isNaN(Number(value)))
               return 'Enter CPM min value or a valid number'
+            if (Number(value) <= 0) return 'CPM min should be greater than 0'
             if (Number(value) < MIN_CPM_VALUE)
               return `CPM min can not be lower than ${MIN_CPM_VALUE}`
             if (Number(value) >= Number(values.cpmPricingBounds.max))
@@ -139,16 +138,9 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
           return null
         }
       },
-      title: (value, values) => {
-        if (values.step === 2) {
-          if (value === '') return 'Enter campaign name'
-          if (value.length < 2) {
-            return 'Campaign name must have at least 2 letters'
-          }
-        }
-
-        return null
-      }
+      title: (value, values) =>
+        values.step === 2 &&
+        hasLength({ min: 2, max: 100 }, 'Campaign name must have at least 2 letters')(value)
     }
   })
 
@@ -209,11 +201,10 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
   )
 
   const removeAdUnit = useCallback(
-    (adUnitIdToRemove: string) => {
-      const { adUnits } = { ...campaign }
-      form.setValues({ adUnits: adUnits.filter((item: AdUnit) => item.id !== adUnitIdToRemove) })
+    (index: number) => {
+      form.removeListItem('adUnits', index)
     },
-    [form, campaign]
+    [form]
   )
 
   const addUTMToTargetURLS = useCallback(() => {

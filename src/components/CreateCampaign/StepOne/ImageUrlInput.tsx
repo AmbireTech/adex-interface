@@ -21,7 +21,7 @@ import { CampaignUI } from 'types'
 type ImageUrlInputProps = FlexProps & {
   image: AdUnit
   toRemove?: boolean
-  onDelete?: (file: AdUnit) => void
+  onDelete?: (index: number) => void
   preview?: boolean
   index?: number
   form?: UseFormReturnType<CampaignUI, (values: CampaignUI) => CampaignUI>
@@ -118,7 +118,7 @@ const ImageUrlInput = ({
           text={`${image.banner?.format.w}x${image.banner?.format.h}`}
         />
         <Input
-          defaultValue={image.banner?.targetUrl}
+          defaultValue={!form ? image.banner?.targetUrl : undefined}
           className={classes.inputField}
           error={hasError}
           disabled={toRemove || preview}
@@ -130,8 +130,12 @@ const ImageUrlInput = ({
             section: classes.rightSection,
             input: classes.input
           }}
-          key={form?.key(`adUnits.${index}.banner.targetUrl`)}
-          {...form?.getInputProps(`adUnits.${index}.banner.targetUrl`)}
+          {...(form
+            ? {
+                key: form.key(`adUnits.${index}.banner.targetUrl`),
+                ...form.getInputProps(`adUnits.${index}.banner.targetUrl`)
+              }
+            : {})}
         />
         {(!preview || onDelete) && (
           <ActionIcon
@@ -139,7 +143,7 @@ const ImageUrlInput = ({
             title="Remove"
             color="secondaryText"
             variant="transparent"
-            onClick={() => onDelete && onDelete(image)}
+            onClick={() => onDelete && typeof index !== 'undefined' && onDelete(index)}
           >
             <DeleteIcon size="24px" />
           </ActionIcon>
