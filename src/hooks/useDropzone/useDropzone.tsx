@@ -16,7 +16,7 @@ const IPFS_GATEWAY = process.env.REACT_APP_IPFS_GATEWAY
 
 const useDropzone = () => {
   const [uploadedFiles, setUploadedFiles] = useState<FileWithPath[] | null>(null)
-  const { addAdUnit } = useCreateCampaignContext()
+  const { addAdUnit, validateAdUnitTargetURL } = useCreateCampaignContext()
   const { uploadMedia, uploadZipMedia } = useMediaUpload()
 
   const onDrop = useCallback(
@@ -91,6 +91,7 @@ const useDropzone = () => {
                 adUnit.banner.format = { w: result.width, h: result.height }
               }
               addAdUnit(adUnit)
+              validateAdUnitTargetURL()
             } catch (err) {
               console.error('ERROR: ', err)
             }
@@ -99,7 +100,7 @@ const useDropzone = () => {
         })
       setUploadedFiles(null)
     },
-    [setUploadedFiles, addAdUnit, uploadMedia, uploadZipMedia]
+    [uploadZipMedia, uploadMedia, addAdUnit, validateAdUnitTargetURL]
   )
 
   useEffect(() => {

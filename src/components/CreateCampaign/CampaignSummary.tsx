@@ -11,7 +11,7 @@ import {
 import { useDisclosure, useColorScheme } from '@mantine/hooks'
 import { CREATE_CAMPAIGN_STEPS } from 'constants/createCampaign'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useMemo } from 'react'
 import LeftArrowIcon from 'resources/icons/LeftArrow'
 import useCreateCampaignData from 'hooks/useCreateCampaignData/useCreateCampaignData'
 import CampaignDetailsRow from 'components/common/CampainDetailsRow'
@@ -51,13 +51,13 @@ const CampaignSummary = () => {
   const [opened, { open, close }] = useDisclosure(false)
   const { updateBalance } = useAccount()
   const {
-    campaign: { step, adUnits, autoUTMChecked, errorsTargetURLValidations },
+    campaign: { step, adUnits, autoUTMChecked, errorsTargetURLValidations, targetingInput },
     updateCampaign,
+    updatePartOfCampaign,
     publishCampaign,
     resetCampaign,
     saveToDraftCampaign,
-    addUTMToTargetURLS,
-    validateAdUnitTargetURL
+    addUTMToTargetURLS
   } = useCreateCampaignContext()
   const {
     formattedSelectedDevice,
@@ -70,15 +70,35 @@ const CampaignSummary = () => {
   } = useCreateCampaignData()
   const { showNotification } = useCustomNotifications()
 
-  const [isNextBtnDisabled, setIsNextBtnDisabled] = useState(false)
-  const noSelectedCatsOrLogs = useMemo(
-    () => !formattedCats || !formattedLocs,
-    [formattedCats, formattedLocs]
-  )
+  const nextStepDisabled = useMemo(() => {
+    if (step === 0) {
+      return !adUnits.length || Object.values(errorsTargetURLValidations).some((e) => !e.success)
+    }
+    if (step === 1) {
+      return !(
+        (targetingInput.inputs.categories.apply === 'all' ||
+          (targetingInput.inputs.categories.apply === 'in' &&
+            targetingInput.inputs.categories.in.length) ||
+          (targetingInput.inputs.categories.apply === 'in' &&
+            targetingInput.inputs.categories.in.length)) &&
+        (targetingInput.inputs.location.apply === 'all' ||
+          (targetingInput.inputs.location.apply === 'in' &&
+            targetingInput.inputs.location.in.length) ||
+          (targetingInput.inputs.location.apply === 'in' &&
+            targetingInput.inputs.location.in.length))
+      )
+    }
 
-  useEffect(() => {
-    setIsNextBtnDisabled((step === 0 && !adUnits.length) || (step === 1 && noSelectedCatsOrLogs))
-  }, [step, noSelectedCatsOrLogs, adUnits])
+    return false
+  }, [
+    adUnits.length,
+    errorsTargetURLValidations,
+    step,
+    targetingInput.inputs.categories.apply,
+    targetingInput.inputs.categories.in.length,
+    targetingInput.inputs.location.apply,
+    targetingInput.inputs.location.in.length
+  ])
 
   const isTheLastStep = useMemo(() => step === CREATE_CAMPAIGN_STEPS - 1, [step])
   const isFirstStep = useMemo(() => step === 0, [step])
@@ -120,7 +140,6 @@ const CampaignSummary = () => {
 
   const handleNextStepBtnClicked = useCallback(() => {
     if (step === 0) {
-      validateAdUnitTargetURL()
       if (Object.values(errorsTargetURLValidations).some((e) => !e.success)) {
         showNotification(
           'error',
@@ -137,6 +156,7 @@ const CampaignSummary = () => {
 
     if (step < CREATE_CAMPAIGN_STEPS - 1) {
       if (step === 2) {
+        // NOTE: wtf?
         const element = document.getElementById('createCampaignSubmitBtn1')
         element?.click()
 
@@ -154,8 +174,7 @@ const CampaignSummary = () => {
     showNotification,
     addUTMToTargetURLS,
     autoUTMChecked,
-    errorsTargetURLValidations,
-    validateAdUnitTargetURL
+    errorsTargetURLValidations
   ])
 
   const handleSaveDraftClicked = useCallback(async () => {
@@ -163,8 +182,8 @@ const CampaignSummary = () => {
       const res = await saveToDraftCampaign()
 
       if (res && res.success) {
-        resetCampaign()
-        navigate('/dashboard/')
+        updatePartOfCampaign({ draftModified: false })
+        showNotification('info', 'Draft saved')
       } else {
         showNotification('warning', 'invalid campaign data response', 'Data error')
       }
@@ -172,7 +191,7 @@ const CampaignSummary = () => {
       console.error(err)
       showNotification('error', 'Creating campaign failed', 'Data error')
     }
-  }, [resetCampaign, saveToDraftCampaign, showNotification, navigate])
+  }, [saveToDraftCampaign, showNotification, updatePartOfCampaign])
 
   const handleOnModalClose = useCallback(() => {
     navigate('/dashboard/')
@@ -236,7 +255,7 @@ const CampaignSummary = () => {
         {!isTheLastStep ? (
           <Button
             w="90%"
-            disabled={isNextBtnDisabled}
+            disabled={nextStepDisabled}
             size="lg"
             variant="filled"
             onClick={handleNextStepBtnClicked}

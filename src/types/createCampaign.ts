@@ -40,6 +40,7 @@ export type ImageUrlInputProps = FlexProps & {
   toRemove?: boolean
   onDelete?: (file: AdUnit) => void
   onChange?: ChangeEventHandler<HTMLInputElement> | undefined
+  onBlur?: ChangeEventHandler<HTMLInputElement> | undefined
   preview?: boolean
   error?: ErrorTargetUrl | undefined
 }
