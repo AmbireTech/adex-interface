@@ -11,8 +11,6 @@ import MultiSelectAndRadioButtons from './MultiSelectAndRadioButtons'
 
 type SelectedTypes = 'categories' | 'location'
 
-const TARGETING_INPUT_LABEL = 'targetingInput'
-
 const StepTwo = () => {
   const {
     campaign: {
@@ -34,7 +32,7 @@ const StepTwo = () => {
         }
       }
 
-      updateCampaign(TARGETING_INPUT_LABEL, updated)
+      updateCampaign({ targetingInput: updated })
     },
     [updateCampaign, targetingInput]
   )

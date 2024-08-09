@@ -61,47 +61,18 @@ const CampaignPeriodModal = ({ opened, close }: { opened: boolean; close: () => 
 
   const { classes, cx } = useStyles()
   const [[startDate, endDate], setStartEndDates] = useState<[Date | null, Date | null]>([
-    startsAt ? new Date(startsAt) : null,
-    endsAt ? new Date(endsAt) : null
+    new Date(startsAt),
+    new Date(endsAt)
   ])
 
-  const [[startTime, endTime], setStartEndTimes] = useState<[string | null, string | null]>([
-    (startsAt && dayjs(startsAt).format('HH:mm')) || null,
-    (endsAt && dayjs(endsAt).format('HH:mm')) || null
+  const [[startTime, endTime], setStartEndTimes] = useState<[string, string]>([
+    dayjs(startsAt).format('HH:mm'),
+    dayjs(endsAt).format('HH:mm')
   ])
-  const locale = useMemo(() => navigator && navigator.language.split('-')[0], [])
   const [selectDateOrTimeTab, setSelectDateOrTimeTab] = useState<DateOrTime>('date')
-  const isDateTabSelected = useMemo(() => selectDateOrTimeTab === 'date', [selectDateOrTimeTab])
+  const locale = useMemo(() => navigator && navigator.language.split('-')[0], [])
+
   const dateNow = useMemo(() => new Date(), [])
-  const currentDate = useMemo(() => formatDateShort(dateNow), [dateNow])
-  const mergedStartDateTime = useMemo(
-    () =>
-      startDate && startTime
-        ? dayjs(startDate)
-            .hour(parseInt(startTime.split(':')[0], 10))
-            .minute(parseInt(startTime.split(':')[1], 10))
-        : null,
-    [startDate, startTime]
-  )
-
-  const mergedEndDateTime = useMemo(
-    () =>
-      endDate && endTime
-        ? dayjs(endDate)
-            .hour(parseInt(endTime.split(':')[0], 10))
-            .minute(parseInt(endTime.split(':')[1], 10))
-        : null,
-    [endDate, endTime]
-  )
-
-  const startDateFormatted = useMemo(
-    () => (startDate ? formatDateShort(startDate) : currentDate),
-    [startDate, currentDate]
-  )
-  const endDateFormatted = useMemo(
-    () => (endDate ? formatDateShort(endDate) : currentDate),
-    [endDate, currentDate]
-  )
 
   const setStartTime = useCallback(
     (value: string) => {
@@ -113,145 +84,134 @@ const CampaignPeriodModal = ({ opened, close }: { opened: boolean; close: () => 
     (value: string) => setStartEndTimes([startTime, value]),
     [startTime]
   )
-  const handleSelectDateOrTimeTabClicked = useCallback(
-    (tabValue: DateOrTime) => setSelectDateOrTimeTab(tabValue),
-    []
-  )
 
   const handleApplyBtnClicked = useCallback(() => {
-    if (mergedEndDateTime && mergedStartDateTime) {
-      updateCampaign('startsAt', mergedStartDateTime.toDate())
-      updateCampaign('endsAt', mergedEndDateTime.toDate())
-      close()
-    }
-  }, [updateCampaign, mergedEndDateTime, mergedStartDateTime, close])
+    updateCampaign({
+      startsAt: dayjs(startDate)
+        .hour(parseInt(startTime.split(':')[0], 10))
+        .minute(parseInt(startTime.split(':')[1], 10))
+        .toDate(),
+      endsAt: dayjs(endDate)
+        .hour(parseInt(endTime.split(':')[0], 10))
+        .minute(parseInt(endTime.split(':')[1], 10))
+        .toDate()
+    })
+    close()
+  }, [updateCampaign, startDate, startTime, endDate, endTime, close])
 
   return (
     <Modal centered size={736} opened={opened} withCloseButton={false} onClose={close}>
-      <Grid grow m={0}>
-        <Grid.Col p={0}>
-          <Grid>
-            <Grid.Col
-              p={0}
-              span={6}
-              className={cx(classes.wrapper, { [classes.selected]: isDateTabSelected })}
-              onClick={() => handleSelectDateOrTimeTabClicked('date')}
-            >
-              <Flex justify="space-between" align="center" p="xs">
-                <Group>
-                  <CalendarIcon />
-                  <div>
-                    <Text fw="bold" size="xl">
-                      Set Period
-                    </Text>
-                    <Text c="secondaryText" size="xs">
-                      Current date: {currentDate}
-                    </Text>
-                  </div>
-                </Group>
-                <DownArrowIcon size="10px" style={{ transform: 'rotate(-90deg)' }} />
-              </Flex>
+      <Stack>
+        <Grid>
+          <Grid.Col
+            span={6}
+            className={cx(classes.wrapper, { [classes.selected]: selectDateOrTimeTab === 'date' })}
+            onClick={() => setSelectDateOrTimeTab('date')}
+          >
+            <Flex justify="space-between" align="center">
+              <Group>
+                <CalendarIcon />
+                <div>
+                  <Text fw="bold" size="xl">
+                    Set Period
+                  </Text>
+                  <Text c="secondaryText" size="xs">
+                    Current date: {formatDateShort(dateNow)}
+                  </Text>
+                </div>
+              </Group>
+              <DownArrowIcon size="10px" style={{ transform: 'rotate(-90deg)' }} />
+            </Flex>
+          </Grid.Col>
+          <Grid.Col
+            span={6}
+            className={cx(classes.wrapper, { [classes.selected]: selectDateOrTimeTab === 'time' })}
+            onClick={() => setSelectDateOrTimeTab('time')}
+          >
+            <Flex justify="space-between" align="center">
+              <Group>
+                <TimeIcon />
+                <div>
+                  <Text fw="bold" size="xl">
+                    Set Time
+                  </Text>
+                  <Text c="secondaryText" size="xs">
+                    Current time: <Clock />
+                  </Text>
+                </div>
+              </Group>
+              <DownArrowIcon size="10px" style={{ transform: 'rotate(-90deg)' }} />
+            </Flex>
+          </Grid.Col>
+        </Grid>
+        {selectDateOrTimeTab === 'date' ? (
+          <Flex justify="center">
+            <DatePicker
+              size="lg"
+              type="range"
+              locale={allLocales[locale]}
+              numberOfColumns={2}
+              value={[startDate, endDate]}
+              onChange={setStartEndDates}
+              minDate={dateNow}
+              classNames={{ month: classes.month }}
+            />
+          </Flex>
+        ) : (
+          <Grid grow p="lg">
+            <Grid.Col span={6}>
+              <Stack align="center">
+                <Text c="secondaryText" size="md" p="xs">
+                  Start time
+                </Text>
+                <CampaignTimePicker
+                  defaultValue={dayjs(startsAt).format('HH:mm')}
+                  onChange={(e) => setStartTime(e.target.value)}
+                />
+              </Stack>
             </Grid.Col>
-            <Grid.Col
-              p={0}
-              span={6}
-              className={cx(classes.wrapper, { [classes.selected]: !isDateTabSelected })}
-              onClick={() => handleSelectDateOrTimeTabClicked('time')}
-            >
-              <Flex justify="space-between" align="center" p="xs">
-                <Group>
-                  <TimeIcon />
-                  <div>
-                    <Text fw="bold" size="xl">
-                      Set Time
-                    </Text>
-                    <Text c="secondaryText" size="xs">
-                      Current time: <Clock />
-                    </Text>
-                  </div>
-                </Group>
-                <DownArrowIcon size="10px" style={{ transform: 'rotate(-90deg)' }} />
-              </Flex>
+            <Grid.Col span={6}>
+              <Stack align="center">
+                <Text c="secondaryText" size="md" p="xs">
+                  End time
+                </Text>
+                <CampaignTimePicker
+                  defaultValue={dayjs(endsAt).format('HH:mm')}
+                  onChange={(e) => setEndTime(e.target.value)}
+                />
+              </Stack>
             </Grid.Col>
           </Grid>
-        </Grid.Col>
-        <Grid.Col pt="lg" pb="lg">
-          {selectDateOrTimeTab === 'date' ? (
-            <Flex justify="center">
-              <DatePicker
-                size="lg"
-                type="range"
-                locale={allLocales[locale]}
-                numberOfColumns={2}
-                value={[startDate, endDate]}
-                onChange={setStartEndDates}
-                minDate={dateNow}
-                classNames={{ month: classes.month }}
-              />
-            </Flex>
-          ) : (
-            <Grid grow>
-              <Grid.Col span={6}>
-                <Stack align="center">
-                  <Text c="secondaryText" size="md" p="xs">
-                    Start time
-                  </Text>
-                  <CampaignTimePicker
-                    defaultValue={dayjs(startsAt).format('HH:mm')}
-                    onChange={(e) => setStartTime(e.target.value)}
-                  />
-                </Stack>
-              </Grid.Col>
-              <Grid.Col span={6}>
-                <Stack align="center">
-                  <Text c="secondaryText" size="md" p="xs">
-                    End time
-                  </Text>
-                  <CampaignTimePicker
-                    defaultValue={dayjs(endsAt).format('HH:mm')}
-                    onChange={(e) => setEndTime(e.target.value)}
-                  />
-                </Stack>
-              </Grid.Col>
-            </Grid>
-          )}
-        </Grid.Col>
-        <Grid.Col p={0}>
-          <Flex
-            wrap="wrap"
-            direction="row"
-            justify="space-around"
-            align="center"
-            className={classes.footer}
-          >
-            <Flex direction="column">
-              <Text c="secondaryText" size="xs">
-                Start Date
-              </Text>
-              <Text size="md">
-                {startDateFormatted} {startTime}
-              </Text>
-            </Flex>
-            <Flex direction="column">
-              <Text c="secondaryText" size="xs">
-                End Date
-              </Text>
-              <Text size="md">
-                {endDateFormatted} {endTime}
-              </Text>
-            </Flex>
-            <Button
-              disabled={!(mergedEndDateTime && mergedStartDateTime)}
-              variant="filled"
-              size="lg"
-              onClick={handleApplyBtnClicked}
-            >
-              Apply
-            </Button>
-            <UnstyledButton onClick={() => close()}>Cancel</UnstyledButton>
+        )}
+        <Flex
+          wrap="wrap"
+          direction="row"
+          justify="space-around"
+          align="center"
+          className={classes.footer}
+        >
+          <Flex direction="column">
+            <Text c="secondaryText" size="xs">
+              Start Date
+            </Text>
+            <Text size="md">
+              {formatDateShort(startDate || dateNow)} {startTime}
+            </Text>
           </Flex>
-        </Grid.Col>
-      </Grid>
+          <Flex direction="column">
+            <Text c="secondaryText" size="xs">
+              End Date
+            </Text>
+            <Text size="md">
+              {formatDateShort(endDate || dateNow)} {endTime}
+            </Text>
+          </Flex>
+          <Button variant="filled" size="lg" onClick={handleApplyBtnClicked}>
+            Apply
+          </Button>
+          <UnstyledButton onClick={() => close()}>Cancel</UnstyledButton>
+        </Flex>
+      </Stack>
     </Modal>
   )
 }

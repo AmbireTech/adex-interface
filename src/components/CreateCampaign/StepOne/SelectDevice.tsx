@@ -17,7 +17,7 @@ const SelectDevice = () => {
       ? devices.filter((selectedDevice) => selectedDevice !== device)
       : [...devices, device]
 
-    updateCampaign('devices', updatedDevices)
+    updateCampaign({ devices: updatedDevices })
   }
 
   return (

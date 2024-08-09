@@ -18,7 +18,7 @@ const SelectPlacements = () => {
   } = useCreateCampaignContext()
 
   useEffect(() => {
-    if (placement === 'app') updateCampaign('devices', [])
+    if (placement === 'app') updateCampaign({ devices: [] })
   }, [placement, updateCampaign])
 
   return (

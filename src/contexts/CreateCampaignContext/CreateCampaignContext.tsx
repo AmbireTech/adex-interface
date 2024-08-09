@@ -83,7 +83,7 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
 
   const form = useForm({
     initialValues: defaultValue,
-    // validateInputOnChange: ['cpmPricingBounds.min', 'cpmPricingBounds.max'],
+    // validateInputOnChange: ['budget'],
     validateInputOnBlur: true,
     validate: {
       adUnits: {
@@ -158,6 +158,17 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
     SupplyStatsDetails[] | SupplyStatsDetails[][]
   >([])
 
+  const updateCampaign = useCallback(
+    (value: Partial<CampaignUI>) => {
+      form.setValues((prev) => ({
+        ...prev,
+        draftModified: !prev.draftModified ? true : prev.draftModified,
+        ...value
+      }))
+    },
+    [form]
+  )
+
   useEffect(() => {
     const placement = campaign.targetingInput.inputs.placements.in[0]
     const devices = campaign.devices
@@ -178,7 +189,7 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
     if (savedCampaign) {
       const parsedCampaign = superjson.parse<CampaignUI>(savedCampaign)
       if (!deepEqual(parsedCampaign, defaultValue)) {
-        form.setValues(parsedCampaign)
+        updateCampaign(parsedCampaign)
       }
     }
   }, []) // eslint-disable-line
@@ -243,33 +254,16 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
       })
     }
 
-    form.setValues({ adUnits })
-  }, [form, campaign])
-
-  const updateCampaign = useCallback(
-    <CampaignItemKey extends keyof CampaignUI>(
-      key: CampaignItemKey,
-      value: CampaignUI[CampaignItemKey]
-    ) => {
-      form.setValues((prev) => {
-        const shouldUpdateDraft = !prev.draftModified
-        return {
-          ...prev,
-          draftModified: shouldUpdateDraft ? true : prev.draftModified,
-          [key]: value
-        }
-      })
-    },
-    [form]
-  )
+    updateCampaign({ adUnits })
+  }, [updateCampaign, campaign])
 
   const resetCampaign = useCallback(() => {
     form.resetTouched()
     form.resetDirty()
     form.reset()
-    form.setValues({ ...defaultValue })
+    updateCampaign({ ...defaultValue })
     localStorage.setItem('createCampaign', superjson.stringify({ ...defaultValue }))
-  }, [form, defaultValue])
+  }, [form, defaultValue, updateCampaign])
 
   const publishCampaign = useCallback(() => {
     const preparedCampaign = prepareCampaignObject(campaign, balanceToken.decimals)
@@ -355,9 +349,9 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
         draftModified: false
       }
 
-      form.setValues(mappedDraftCampaign)
+      updateCampaign(mappedDraftCampaign)
     },
-    [balanceToken.name, form]
+    [balanceToken.name, updateCampaign]
   )
 
   const contextValue = useMemo(

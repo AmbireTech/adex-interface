@@ -138,7 +138,7 @@ const CampaignSummary = () => {
         }
       }
 
-      updateCampaign('step', step + 1)
+      updateCampaign({ step: step + 1 })
     }
   }, [step, updateCampaign, addUTMToTargetURLS, autoUTMChecked, form])
 
@@ -237,7 +237,7 @@ const CampaignSummary = () => {
         </Button>
         <UnstyledButton
           variant="underlined"
-          onClick={() => updateCampaign('step', step - 1)}
+          onClick={() => updateCampaign({ step: step - 1 })}
           disabled={isFirstStep}
           className={cx(classes.brandColor, { [classes.lightestBrandColor]: isFirstStep })}
         >
