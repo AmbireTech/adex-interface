@@ -51,7 +51,7 @@ const CampaignSummary = () => {
   const [opened, { open, close }] = useDisclosure(false)
   const { updateBalance } = useAccount()
   const {
-    campaign: { step, adUnits, autoUTMChecked, errorsTargetURLValidations },
+    campaign: { step, adUnits, autoUTMChecked, errorsTargetURLValidations, targetingInput },
     updateCampaign,
     publishCampaign,
     resetCampaign,
@@ -70,17 +70,31 @@ const CampaignSummary = () => {
   const { showNotification } = useCustomNotifications()
 
   const [isNextBtnDisabled, setIsNextBtnDisabled] = useState(false)
-  const noSelectedCatsOrLogs = useMemo(
-    () => !formattedCats || !formattedLocs,
-    [formattedCats, formattedLocs]
-  )
+  const noSelectedCatsOrLogs = useMemo(() => {
+    return !(
+      (targetingInput.inputs.categories.apply === 'all' ||
+        (targetingInput.inputs.categories.apply === 'in' &&
+          targetingInput.inputs.categories.in.length) ||
+        (targetingInput.inputs.categories.apply === 'in' &&
+          targetingInput.inputs.categories.in.length)) &&
+      (targetingInput.inputs.location.apply === 'all' ||
+        (targetingInput.inputs.location.apply === 'in' &&
+          targetingInput.inputs.location.in.length) ||
+        (targetingInput.inputs.location.apply === 'in' && targetingInput.inputs.location.in.length))
+    )
+  }, [
+    targetingInput.inputs.categories.apply,
+    targetingInput.inputs.categories.in.length,
+    targetingInput.inputs.location.apply,
+    targetingInput.inputs.location.in.length
+  ])
 
   useEffect(() => {
     let hasErrors = false
     if (step === 0) {
       hasErrors =
         !adUnits.length || Object.values(errorsTargetURLValidations).some((e) => !e.success)
-    } else if (step === 2) {
+    } else if (step === 1) {
       hasErrors = noSelectedCatsOrLogs
     }
 
