@@ -320,7 +320,8 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
       // Will not waste more time atm to fix this
       errorsTargetURLValidations: {},
       startsAt: new Date(),
-      endsAt: new Date(Date.now() + WEEK)
+      endsAt: new Date(Date.now() + WEEK),
+      draftModified: false
     }
     setCampaign(toSetReset)
     // Do we need this???
@@ -442,7 +443,6 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
   const contextValue = useMemo(
     () => ({
       campaign,
-      setCampaign,
       updatePartOfCampaign,
       updateCampaign,
       updateCampaignWithPrevStateNested,
@@ -461,7 +461,6 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
     }),
     [
       campaign,
-      setCampaign,
       updatePartOfCampaign,
       updateCampaign,
       updateCampaignWithPrevStateNested,
