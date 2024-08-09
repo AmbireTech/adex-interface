@@ -344,38 +344,36 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
   }, [campaign, adexServicesRequest, balanceToken.decimals])
 
   const saveToDraftCampaign = useCallback(
-    (camp?: CampaignUI) => {
+    async (camp?: CampaignUI) => {
       const currCampaign = camp || campaign
       const preparedCampaign = prepareCampaignObject(currCampaign, balanceToken.decimals)
 
-      if (defaultValue.startsAt === currCampaign.startsAt) {
-        preparedCampaign.activeFrom = null
-      }
-      if (defaultValue.endsAt === currCampaign.endsAt) {
-        preparedCampaign.activeTo = null
-      }
-      if (preparedCampaign.title === '') {
-        preparedCampaign.title = `Draft Campaign ${formatDateTime(new Date())}`
-      }
+      preparedCampaign.title =
+        preparedCampaign.title || `Draft Campaign ${formatDateTime(new Date())}`
 
       const body = serialize(preparedCampaign).json
 
-      return adexServicesRequest('backend', {
-        route: '/dsp/campaigns/draft',
-        method: 'POST',
-        body,
-        headers: {
-          'Content-Type': 'application/json'
+      try {
+        const res = await adexServicesRequest('backend', {
+          route: '/dsp/campaigns/draft',
+          method: 'POST',
+          body,
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        })
+
+        // TODO: resp Type
+        // @ts-ignore
+        if (!res || !res?.success) {
+          throw new Error('Error on saving draft campaign')
         }
-      })
+        return res
+      } catch (err) {
+        throw new Error('Error on saving draft campaign')
+      }
     },
-    [
-      campaign,
-      adexServicesRequest,
-      balanceToken.decimals,
-      defaultValue.startsAt,
-      defaultValue.endsAt
-    ]
+    [campaign, adexServicesRequest, balanceToken.decimals]
   )
 
   const updateCampaignFromDraft = useCallback(

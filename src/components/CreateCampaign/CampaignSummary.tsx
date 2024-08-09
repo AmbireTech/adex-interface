@@ -53,6 +53,7 @@ const CampaignSummary = () => {
   const {
     campaign: { step, adUnits, autoUTMChecked, errorsTargetURLValidations, targetingInput },
     updateCampaign,
+    updatePartOfCampaign,
     publishCampaign,
     resetCampaign,
     saveToDraftCampaign,
@@ -181,8 +182,8 @@ const CampaignSummary = () => {
       const res = await saveToDraftCampaign()
 
       if (res && res.success) {
-        resetCampaign()
-        navigate('/dashboard/')
+        updatePartOfCampaign({ draftModified: false })
+        showNotification('info', 'Draft saved')
       } else {
         showNotification('warning', 'invalid campaign data response', 'Data error')
       }
@@ -190,7 +191,7 @@ const CampaignSummary = () => {
       console.error(err)
       showNotification('error', 'Creating campaign failed', 'Data error')
     }
-  }, [resetCampaign, saveToDraftCampaign, showNotification, navigate])
+  }, [saveToDraftCampaign, showNotification, updatePartOfCampaign])
 
   const handleOnModalClose = useCallback(() => {
     navigate('/dashboard/')
