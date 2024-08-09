@@ -83,10 +83,9 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
 
   const form = useForm({
     initialValues: defaultValue,
-    validateInputOnChange: ['cpmPricingBounds.min', 'cpmPricingBounds.max'],
+    // validateInputOnChange: ['cpmPricingBounds.min', 'cpmPricingBounds.max'],
     validateInputOnBlur: true,
     validate: {
-      // TODO: apply all the validations
       adUnits: {
         banner: {
           targetUrl: (value, values) =>
@@ -120,7 +119,10 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
             if (Number(value) <= 0) return 'CPM min should be greater than 0'
             if (Number(value) < MIN_CPM_VALUE)
               return `CPM min can not be lower than ${MIN_CPM_VALUE}`
-            if (Number(value) >= Number(values.cpmPricingBounds.max))
+            if (
+              values.cpmPricingBounds.max !== '' &&
+              Number(value) >= Number(values.cpmPricingBounds.max)
+            )
               return 'CPM min can not be greater than CPM max'
           }
 
@@ -131,7 +133,10 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
             if (Number(value) === 0 || Number.isNaN(Number(value)))
               return 'Enter CPM max value or a valid number'
             if (Number(value) <= 0) return 'CPM max should be greater than 0'
-            if (Number(value) <= Number(values.cpmPricingBounds.min))
+            if (
+              values.cpmPricingBounds.min !== '' &&
+              Number(value) <= Number(values.cpmPricingBounds.min)
+            )
               return 'CPM max can not be lower than CPM min'
           }
 
@@ -240,26 +245,25 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
 
     form.setValues({ adUnits })
   }, [form, campaign])
-  // TODO: remove updatePartOfCampaign it can be used only updateCampaign func
-  const updatePartOfCampaign = useCallback(
-    (value: Partial<CampaignUI>) => {
-      form.setValues(value)
-    },
-    [form]
-  )
 
   const updateCampaign = useCallback(
     <CampaignItemKey extends keyof CampaignUI>(
       key: CampaignItemKey,
       value: CampaignUI[CampaignItemKey]
     ) => {
-      form.setValues({ [key]: value, draftModified: true })
+      form.setValues((prev) => {
+        const shouldUpdateDraft = !prev.draftModified
+        return {
+          ...prev,
+          draftModified: shouldUpdateDraft ? true : prev.draftModified,
+          [key]: value
+        }
+      })
     },
     [form]
   )
 
   const resetCampaign = useCallback(() => {
-    // TODO: reset form
     form.resetTouched()
     form.resetDirty()
     form.reset()
@@ -359,7 +363,6 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
   const contextValue = useMemo(
     () => ({
       campaign,
-      updatePartOfCampaign,
       updateCampaign,
       publishCampaign,
       resetCampaign,
@@ -375,7 +378,6 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
     }),
     [
       campaign,
-      updatePartOfCampaign,
       updateCampaign,
       publishCampaign,
       resetCampaign,

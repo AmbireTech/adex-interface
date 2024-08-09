@@ -55,7 +55,6 @@ export type CreateCampaignType = {
     key: CampaignItemKey,
     value: CampaignUI[CampaignItemKey]
   ) => void
-  updatePartOfCampaign: (camp: Partial<CampaignUI>) => void
   publishCampaign: () => Promise<any>
   resetCampaign: () => void
   addAdUnit: (adUnitToAdd: AdUnit) => void
