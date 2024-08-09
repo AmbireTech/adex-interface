@@ -56,8 +56,7 @@ const CampaignSummary = () => {
     publishCampaign,
     resetCampaign,
     saveToDraftCampaign,
-    addUTMToTargetURLS,
-    validateAdUnitTargetURL
+    addUTMToTargetURLS
   } = useCreateCampaignContext()
   const {
     formattedSelectedDevice,
@@ -77,8 +76,16 @@ const CampaignSummary = () => {
   )
 
   useEffect(() => {
-    setIsNextBtnDisabled((step === 0 && !adUnits.length) || (step === 1 && noSelectedCatsOrLogs))
-  }, [step, noSelectedCatsOrLogs, adUnits])
+    let hasErrors = false
+    if (step === 0) {
+      hasErrors =
+        !adUnits.length || Object.values(errorsTargetURLValidations).some((e) => !e.success)
+    } else if (step === 2) {
+      hasErrors = noSelectedCatsOrLogs
+    }
+
+    setIsNextBtnDisabled(hasErrors)
+  }, [step, noSelectedCatsOrLogs, adUnits, errorsTargetURLValidations])
 
   const isTheLastStep = useMemo(() => step === CREATE_CAMPAIGN_STEPS - 1, [step])
   const isFirstStep = useMemo(() => step === 0, [step])
@@ -120,7 +127,6 @@ const CampaignSummary = () => {
 
   const handleNextStepBtnClicked = useCallback(() => {
     if (step === 0) {
-      validateAdUnitTargetURL()
       if (Object.values(errorsTargetURLValidations).some((e) => !e.success)) {
         showNotification(
           'error',
@@ -137,6 +143,7 @@ const CampaignSummary = () => {
 
     if (step < CREATE_CAMPAIGN_STEPS - 1) {
       if (step === 2) {
+        // NOTE: wtf?
         const element = document.getElementById('createCampaignSubmitBtn1')
         element?.click()
 
@@ -154,8 +161,7 @@ const CampaignSummary = () => {
     showNotification,
     addUTMToTargetURLS,
     autoUTMChecked,
-    errorsTargetURLValidations,
-    validateAdUnitTargetURL
+    errorsTargetURLValidations
   ])
 
   const handleSaveDraftClicked = useCallback(async () => {
