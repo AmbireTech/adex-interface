@@ -79,13 +79,13 @@ const CampaignSummary = () => {
         (targetingInput.inputs.categories.apply === 'all' ||
           (targetingInput.inputs.categories.apply === 'in' &&
             targetingInput.inputs.categories.in.length) ||
-          (targetingInput.inputs.categories.apply === 'in' &&
-            targetingInput.inputs.categories.in.length)) &&
+          (targetingInput.inputs.categories.apply === 'nin' &&
+            targetingInput.inputs.categories.nin.length)) &&
         (targetingInput.inputs.location.apply === 'all' ||
           (targetingInput.inputs.location.apply === 'in' &&
             targetingInput.inputs.location.in.length) ||
-          (targetingInput.inputs.location.apply === 'in' &&
-            targetingInput.inputs.location.in.length))
+          (targetingInput.inputs.location.apply === 'nin' &&
+            targetingInput.inputs.location.nin.length))
       )
     }
 
@@ -96,8 +96,10 @@ const CampaignSummary = () => {
     step,
     targetingInput.inputs.categories.apply,
     targetingInput.inputs.categories.in.length,
+    targetingInput.inputs.categories.nin.length,
     targetingInput.inputs.location.apply,
-    targetingInput.inputs.location.in.length
+    targetingInput.inputs.location.in.length,
+    targetingInput.inputs.location.nin.length
   ])
 
   const isTheLastStep = useMemo(() => step === CREATE_CAMPAIGN_STEPS - 1, [step])
