@@ -70,7 +70,6 @@ const CustomCombobox = ({
   items,
   defaultValue,
   onChange,
-  // onFocus,
   error,
   placeholder,
   ...props

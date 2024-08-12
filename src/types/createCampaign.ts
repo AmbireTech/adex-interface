@@ -1,5 +1,3 @@
-import { TargetingInputApplyProp } from 'adex-common/dist/types'
-
 export type Devices = 'mobile' | 'desktop'
 
 export type Sizes = {
@@ -25,16 +23,6 @@ export type CreateCampaignOverview = {
   title: string
   value: any
   isColumn?: boolean
-}
-
-export type MultiSelectAndRadioButtonsProps = {
-  multiSelectData: { value: string; label: string }[]
-  label: string
-  defaultSelectValue?: string[]
-  defaultRadioValue?: TargetingInputApplyProp
-  onCategoriesChange: (selectedRadio: TargetingInputApplyProp, categories: string[]) => void
-  groups: { [key: string]: string[] }
-  error?: string
 }
 
 export type RangeTextProps = {

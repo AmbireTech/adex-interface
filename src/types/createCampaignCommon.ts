@@ -63,4 +63,6 @@ export type CreateCampaignType = {
   addUTMToTargetURLS: () => void
   selectedBidFloors: SupplyStatsDetails[] | SupplyStatsDetails[][]
   form: UseFormReturnType<CampaignUI, (values: CampaignUI) => CampaignUI>
+  // TODO: fix the types
+  updateCampaignField: (field: string, value: any) => void
 }

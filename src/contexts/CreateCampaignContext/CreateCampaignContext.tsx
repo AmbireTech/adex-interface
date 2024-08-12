@@ -92,6 +92,41 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
             values.step === 0 && !isValidHttpUrl(value) ? 'Please enter a valid URL' : null
         }
       },
+      targetingInput: {
+        inputs: {
+          categories: ({ apply, in: isin, nin }, { step }) => {
+            if (step === 1) {
+              if (apply === 'in' && !isin.length) {
+                return 'Categories list cannot be empty'
+              }
+              if (apply === 'nin' && !nin.length) {
+                return 'Categories list cannot be empty'
+              }
+            }
+
+            return null
+          },
+          location: ({ apply, in: isin, nin }, { step }) => {
+            if (step === 1) {
+              if (apply === 'in' && !isin.length) {
+                return 'Countries list cannot be empty'
+              }
+              if (apply === 'nin' && !nin.length) {
+                return 'Countries list cannot be empty'
+              }
+            }
+
+            return null
+          }
+          // advanced: {
+          //   includeIncentivized: (value) => (typeof value !== 'boolean' ? 'Invalid value' : null),
+          //   disableFrequencyCapping: (value) =>
+          //     typeof value !== 'boolean' ? 'Invalid value' : null,
+          //   limitDailyAverageSpending: (value) =>
+          //     typeof value !== 'boolean' ? 'Invalid value' : null
+          // }
+        }
+      },
       currency: (value, values) => values.step === 2 && isNotEmpty('Select currency')(value),
       budget: (value, values) => {
         if (values.step === 2) {
@@ -166,6 +201,11 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
         ...value
       }))
     },
+    [form]
+  )
+
+  const updateCampaignField = useCallback(
+    (field: string, value: any) => form.setFieldValue(field, value),
     [form]
   )
 
@@ -368,7 +408,8 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
       defaultValue,
       addUTMToTargetURLS,
       selectedBidFloors,
-      form
+      form,
+      updateCampaignField
     }),
     [
       campaign,
@@ -383,7 +424,8 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
       defaultValue,
       addUTMToTargetURLS,
       selectedBidFloors,
-      form
+      form,
+      updateCampaignField
     ]
   )
 

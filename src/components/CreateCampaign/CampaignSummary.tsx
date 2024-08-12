@@ -129,6 +129,9 @@ const CampaignSummary = () => {
         addUTMToTargetURLS()
       }
     }
+    if (step === 1) {
+      if (Object.keys(form.errors).length) return
+    }
 
     if (step < CREATE_CAMPAIGN_STEPS - 1) {
       if (step === 2) {
