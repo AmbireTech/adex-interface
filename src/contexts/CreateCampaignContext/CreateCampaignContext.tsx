@@ -127,6 +127,24 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
           // }
         }
       },
+      startsAt: (value, { step }) => {
+        if (step === 2) {
+          if (value.getTime() <= Date.now()) {
+            return 'The start date cannot be set in the past'
+          }
+        }
+
+        return null
+      },
+      endsAt: (value, { step }) => {
+        if (step === 2) {
+          if (value.getTime() <= Date.now()) {
+            return 'The end date cannot be set in the past'
+          }
+        }
+
+        return null
+      },
       currency: (value, values) => values.step === 2 && isNotEmpty('Select currency')(value),
       budget: (value, values) => {
         if (values.step === 2) {
@@ -137,7 +155,7 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
           const minAmount = isAdmin ? MIN_CAMPAIGN_BUDGET_VALUE_ADMIN : MIN_CAMPAIGN_BUDGET_VALUE
 
           if (Number(value) < minAmount) {
-            return `Campaign budget can not be lower than ${minAmount}`
+            return `Campaign budget cannot be lower than ${minAmount}`
           }
           if (validateBudget(BigInt(Number(value)), availableBalance, decimals)) {
             return 'Available balance is lower than the campaign budget'
@@ -153,12 +171,12 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
               return 'Enter CPM min value or a valid number'
             if (Number(value) <= 0) return 'CPM min should be greater than 0'
             if (Number(value) < MIN_CPM_VALUE)
-              return `CPM min can not be lower than ${MIN_CPM_VALUE}`
+              return `CPM min cannot be lower than ${MIN_CPM_VALUE}`
             if (
               values.cpmPricingBounds.max !== '' &&
               Number(value) >= Number(values.cpmPricingBounds.max)
             )
-              return 'CPM min can not be greater than CPM max'
+              return 'CPM min cannot be greater than CPM max'
           }
 
           return null
@@ -172,7 +190,7 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
               values.cpmPricingBounds.min !== '' &&
               Number(value) <= Number(values.cpmPricingBounds.min)
             )
-              return 'CPM max can not be lower than CPM min'
+              return 'CPM max cannot be lower than CPM min'
           }
 
           return null
@@ -180,7 +198,7 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
       },
       title: (value, values) =>
         values.step === 2 &&
-        hasLength({ min: 2, max: 100 }, 'Campaign name must have at least 2 letters')(value)
+        hasLength({ min: 2, max: 100 }, 'Campaign name must contain at least 2 characters')(value)
     }
   })
 

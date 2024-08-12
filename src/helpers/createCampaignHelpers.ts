@@ -21,16 +21,6 @@ export const checkSelectedDevices = (devices: Devices[]) => {
   if (devices.length === 2) return 'both'
 }
 
-// export const updateCatsLocsObject = (selectedRadio: TargetingInputApplyProp, values: string[]) => {
-//   // const updated = { ...DEFAULT_CATS_LOCS_VALUE }
-//   const updated = structuredClone(DEFAULT_CATS_LOCS_VALUE)
-//   if (selectedRadio !== 'all') {
-//     updated[selectedRadio] = values
-//     updated.apply = selectedRadio
-//   }
-//   return updated
-// }
-
 export const findArrayWithLengthInObjectAsValue = (obj: object) =>
   Object.entries(obj).find(([, value]) => Array.isArray(value) && value.length > 0)
 
