@@ -191,7 +191,7 @@ const CampaignSummary = () => {
       const res = await saveToDraftCampaign()
 
       if (res && res.success) {
-        updatePartOfCampaign({ draftModified: false })
+        updatePartOfCampaign({ dirty: false })
         showNotification('info', 'Draft saved')
       } else {
         showNotification('warning', 'invalid campaign data response', 'Data error')
