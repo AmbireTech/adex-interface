@@ -41,8 +41,8 @@ const CreateCampaign = () => {
 
   const shouldBlock = useCallback<BlockerFunction>(
     ({ currentLocation, nextLocation }) =>
-      currentLocation.pathname !== nextLocation.pathname && campaign.draftModified,
-    [campaign.draftModified]
+      currentLocation.pathname !== nextLocation.pathname && campaign.dirty,
+    [campaign.dirty]
   )
 
   const blocker: Blocker = useBlocker(shouldBlock)

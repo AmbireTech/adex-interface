@@ -23,6 +23,7 @@ import throttle from 'lodash.throttle'
 import { createStyles } from '@mantine/emotion'
 import { modals } from '@mantine/modals'
 import { defaultConfirmModalProps } from 'components/common/Modals/CustomConfirmModal'
+import { UtmInfo } from './CreateCampaignCommon'
 
 const useStyles = createStyles((theme: MantineTheme) => {
   const colorScheme = useColorScheme()
@@ -51,7 +52,21 @@ const CampaignSummary = () => {
   const [opened, { open, close }] = useDisclosure(false)
   const { updateBalance } = useAccount()
   const {
-    campaign: { step, adUnits, autoUTMChecked, errorsTargetURLValidations, targetingInput },
+    campaign: {
+      step,
+      adUnits,
+      autoUTMChecked,
+      errorsTargetURLValidations,
+      targetingInput: {
+        inputs: {
+          placements: {
+            in: [placement]
+          },
+          categories,
+          location
+        }
+      }
+    },
     updateCampaign,
     updatePartOfCampaign,
     publishCampaign,
@@ -76,30 +91,26 @@ const CampaignSummary = () => {
     }
     if (step === 1) {
       return !(
-        (targetingInput.inputs.categories.apply === 'all' ||
-          (targetingInput.inputs.categories.apply === 'in' &&
-            targetingInput.inputs.categories.in.length) ||
-          (targetingInput.inputs.categories.apply === 'nin' &&
-            targetingInput.inputs.categories.nin.length)) &&
-        (targetingInput.inputs.location.apply === 'all' ||
-          (targetingInput.inputs.location.apply === 'in' &&
-            targetingInput.inputs.location.in.length) ||
-          (targetingInput.inputs.location.apply === 'nin' &&
-            targetingInput.inputs.location.nin.length))
+        (categories.apply === 'all' ||
+          (categories.apply === 'in' && categories.in.length) ||
+          (categories.apply === 'nin' && categories.nin.length)) &&
+        (location.apply === 'all' ||
+          (location.apply === 'in' && location.in.length) ||
+          (location.apply === 'nin' && location.nin.length))
       )
     }
 
     return false
   }, [
     adUnits.length,
+    categories.apply,
+    categories.in.length,
+    categories.nin.length,
     errorsTargetURLValidations,
-    step,
-    targetingInput.inputs.categories.apply,
-    targetingInput.inputs.categories.in.length,
-    targetingInput.inputs.categories.nin.length,
-    targetingInput.inputs.location.apply,
-    targetingInput.inputs.location.in.length,
-    targetingInput.inputs.location.nin.length
+    location.apply,
+    location.in.length,
+    location.nin.length,
+    step
   ])
 
   const isTheLastStep = useMemo(() => step === CREATE_CAMPAIGN_STEPS - 1, [step])
@@ -150,10 +161,10 @@ const CampaignSummary = () => {
         )
         return
       }
+    }
 
-      if (autoUTMChecked) {
-        addUTMToTargetURLS()
-      }
+    if (step === 2 && autoUTMChecked) {
+      addUTMToTargetURLS()
     }
 
     if (step < CREATE_CAMPAIGN_STEPS - 1) {
@@ -161,10 +172,6 @@ const CampaignSummary = () => {
         // NOTE: wtf?
         const element = document.getElementById('createCampaignSubmitBtn1')
         element?.click()
-
-        if (autoUTMChecked) {
-          addUTMToTargetURLS()
-        }
         return
       }
 
@@ -184,7 +191,7 @@ const CampaignSummary = () => {
       const res = await saveToDraftCampaign()
 
       if (res && res.success) {
-        updatePartOfCampaign({ draftModified: false })
+        updatePartOfCampaign({ dirty: false })
         showNotification('info', 'Draft saved')
       } else {
         showNotification('warning', 'invalid campaign data response', 'Data error')
@@ -212,10 +219,18 @@ const CampaignSummary = () => {
         <CampaignDetailsRow lighterColor title="CPM" value={priceBoundsFormatted} textSize="sm" />
         <CampaignDetailsRow
           lighterColor
-          title="Device"
+          title="Placement"
+          value={placement === 'site' ? 'Website' : 'App'}
           textSize="sm"
-          value={formattedSelectedDevice}
         />
+        {placement === 'site' && (
+          <CampaignDetailsRow
+            lighterColor
+            title="Device"
+            textSize="sm"
+            value={formattedSelectedDevice}
+          />
+        )}
         <CampaignDetailsRow lighterColor title="Ad Format" value={adFormats} textSize="sm" />
         <CampaignDetailsRow lighterColor title="Categories" value={formattedCats} textSize="sm" />
         <CampaignDetailsRow lighterColor title="Countries" value={formattedLocs} textSize="sm" />
@@ -241,6 +256,23 @@ const CampaignSummary = () => {
           lineHeight="xs"
           title="Limit average daily spending"
           value={advancedTargeInput.limitDailyAverageSpending ? 'Yes' : 'No'}
+          textSize="sm"
+          noBorder
+          mb="xs"
+        />
+
+        <CampaignDetailsRow
+          lighterColor
+          lineHeight="xs"
+          title="Auto UTM tracking"
+          value={
+            <Group gap="sm">
+              <Text size="inherit" c={autoUTMChecked ? 'success' : 'warning'}>
+                {autoUTMChecked ? 'Enabled' : 'Disabled'}
+              </Text>
+              <UtmInfo title="" placement={placement} />
+            </Group>
+          }
           textSize="sm"
           noBorder
           mb="xs"

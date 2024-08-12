@@ -4,6 +4,7 @@ import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import { AdUnit } from 'adex-common/dist/types'
 import { UploadedBannersProps } from 'types'
 import ImageUrlInput from './ImageUrlInput'
+import { UtmInfo } from '../CreateCampaignCommon'
 
 const UploadedBanners = ({
   updateAutoUTMChecked,
@@ -12,8 +13,19 @@ const UploadedBanners = ({
   handleOnInputChange
 }: UploadedBannersProps) => {
   const {
-    campaign: { adUnits, errorsTargetURLValidations },
+    campaign: {
+      adUnits,
+      errorsTargetURLValidations,
+      targetingInput: {
+        inputs: {
+          placements: {
+            in: [placement]
+          }
+        }
+      }
+    },
     selectedBannerSizes,
+
     validateAdUnitTargetURL
   } = useCreateCampaignContext()
 
@@ -39,7 +51,8 @@ const UploadedBanners = ({
       <Grid.Col>
         <Checkbox
           checked={autoUTMChecked}
-          label="Auto UTM tracking"
+          // label="Auto UTM tracking"
+          label={<UtmInfo title="     Auto UTM tracking *" placement={placement} />}
           onChange={(event) => updateAutoUTMChecked(event.currentTarget.checked)}
         />
       </Grid.Col>

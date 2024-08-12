@@ -284,13 +284,14 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
       setCampaign((prevState) => {
         const updated = { ...prevState }
         updated[key] = value
-        updated.draftModified = true
+        updated.dirty = true
         return updated
       })
     },
     [setCampaign]
   )
 
+  // NOTE: what exactly is the purpose fo this fn ??? Why can not work with updateCampaign or updatePartOfCampaign
   const updateCampaignWithPrevStateNested = useCallback(
     (nestedKey: string, value: any) => {
       setCampaign((prevState) => {
@@ -306,6 +307,7 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
         }
 
         currentLevel[keys[keys.length - 1]] = value
+        updated.dirty = true
         return updated
       })
     },
@@ -321,7 +323,7 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
       errorsTargetURLValidations: {},
       startsAt: new Date(),
       endsAt: new Date(Date.now() + WEEK),
-      draftModified: false
+      dirty: false
     }
     setCampaign(toSetReset)
     // Do we need this???
@@ -381,7 +383,7 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
       const errorsTargetURLValidations = draftCampaign.adUnits.reduce((acc, adUnit) => {
         const targetUrl = adUnit.banner?.targetUrl || ''
         const validationResult = {
-          isDirty: true,
+          isDirty: false,
           errMsg: '',
           success: false
         }
@@ -429,7 +431,7 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
             draftCampaign.outpaceAssetDecimals
           )
         ),
-        draftModified: false,
+        dirty: false,
         errorsTargetURLValidations
       }
 
