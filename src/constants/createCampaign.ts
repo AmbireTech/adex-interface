@@ -113,7 +113,7 @@ export const CREATE_CAMPAIGN_DEFAULT_VALUE: CampaignUI = {
   archived: false,
   createdBy: '',
   lastModifiedBy: '',
-  draftModified: false,
+  dirty: false,
   errorsTargetURLValidations: {}
 }
 
