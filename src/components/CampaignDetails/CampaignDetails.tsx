@@ -23,6 +23,7 @@ import EditCampaign from 'components/EditCampaign'
 import { defaultConfirmModalProps } from 'components/common/Modals/CustomConfirmModal'
 import DeleteIcon from 'resources/icons/Delete'
 import { StickyPanel } from 'components/TopBar/TopBarStickyPanel'
+import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import CatsLocsFormatted from './CatsLocsFormatted'
 import { AdminActions } from './AdminActions'
 
@@ -34,6 +35,7 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
     toggleArchived,
     deleteDraftCampaign
   } = useCampaignsData()
+  const { updateCampaignFromDraft } = useCreateCampaignContext()
   const { showNotification } = useCustomNotifications()
   const navigate = useNavigate()
   const [params, setParams] = useSearchParams()
@@ -47,6 +49,7 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
   const campaign = useMemo(() => campaignData?.campaign, [campaignData])
 
   const isEditMode = useMemo(() => params.get('edit'), [params])
+  const isDraft = useMemo(() => campaign?.status === CampaignStatus.draft, [campaign?.status])
 
   const handleArchive = useCallback(() => {
     if (!campaign?.id) {
@@ -72,8 +75,6 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
     if (!campaign?.id || !campaign?.status) {
       return
     }
-
-    const isDraft = campaign?.status === CampaignStatus.draft
 
     const confirmLabel = isDraft ? 'Delete Draft' : 'Stop'
     const onConfirm = isDraft
@@ -101,9 +102,18 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
     campaign?.title,
     changeCampaignStatus,
     deleteDraftCampaign,
+    isDraft,
     navigate,
     showNotification
   ])
+
+  const handleEditDraft = useCallback(() => {
+    campaign &&
+      updateCampaignFromDraft({
+        ...campaign
+      })
+    navigate('/dashboard/create-campaign', {})
+  }, [campaign, updateCampaignFromDraft, navigate])
 
   useEffect(() => {
     if (id) {
@@ -146,6 +156,10 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
       campaign?.status && [CampaignStatus.active, CampaignStatus.paused].includes(campaign?.status)
     )
   }, [campaign?.status])
+
+  const canEditDraft = useMemo(() => {
+    return !isAdminPanel && isDraft
+  }, [isAdminPanel, isDraft])
 
   if (!campaign) return <div>Invalid Campaign Id</div>
   return (
@@ -213,21 +227,18 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
                 )}
 
                 <Button
-                  disabled={!canEdit}
+                  disabled={isDraft ? !canEditDraft : !canEdit}
                   rightSection={<EditIcon size="15px" />}
                   variant="subtle"
                   color="mainText"
                   onClick={() =>
-                    canEdit &&
-                    setParams(
-                      params.get('edit') && campaign.status !== CampaignStatus.draft
-                        ? ''
-                        : 'edit=true',
-                      { replace: true }
-                    )
+                    isDraft
+                      ? canEditDraft && handleEditDraft()
+                      : canEdit &&
+                        setParams(params.get('edit') ? '' : 'edit=true', { replace: true })
                   }
                 >
-                  Edit
+                  {isDraft ? 'Edit draft' : 'Edit'}
                 </Button>
               </Group>
             </Box>
