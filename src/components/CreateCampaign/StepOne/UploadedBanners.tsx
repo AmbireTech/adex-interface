@@ -73,7 +73,7 @@ const UploadedBanners = ({
                   format:{' '}
                   <Code>
                     {`utm_source=AdEx&utm_term=${
-                      placement === 'site' ? 'WEB' : 'APP'
+                      placement === 'site' ? 'Website' : 'App'
                     }&utm_campaign={CAMPAIGN_TITLE}&utm_content={BANNER_SIZE}`}
                   </Code>
                   {'. '}

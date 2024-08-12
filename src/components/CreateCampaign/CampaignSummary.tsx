@@ -150,10 +150,10 @@ const CampaignSummary = () => {
         )
         return
       }
+    }
 
-      if (autoUTMChecked) {
-        addUTMToTargetURLS()
-      }
+    if (step === 2 && autoUTMChecked) {
+      addUTMToTargetURLS()
     }
 
     if (step < CREATE_CAMPAIGN_STEPS - 1) {
@@ -161,10 +161,6 @@ const CampaignSummary = () => {
         // NOTE: wtf?
         const element = document.getElementById('createCampaignSubmitBtn1')
         element?.click()
-
-        if (autoUTMChecked) {
-          addUTMToTargetURLS()
-        }
         return
       }
 
