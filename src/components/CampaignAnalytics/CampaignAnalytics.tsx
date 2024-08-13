@@ -124,7 +124,7 @@ const CampaignAnalytics = ({ isAdminPanel = false }: { isAdminPanel?: boolean })
     )
   }
 
-  if (!id) {
+  if (!id || (!loading && !campaign)) {
     return <div>Invalid campaign ID</div>
   }
 
@@ -192,13 +192,14 @@ const CampaignAnalytics = ({ isAdminPanel = false }: { isAdminPanel?: boolean })
           currencyName={currencyName}
         />
       )}
-      {!loading && activeTab === 'hostname' && (
+      {!loading && campaign && activeTab === 'hostname' && (
         <Placements
           placements={campaignMappedAnalytics}
           currencyName={currencyName}
           // NOTE: currently we have only have one placement per campaign
           // TODO; this can be get from analytics but that means 2x request to validator
           placement={campaign?.targetingInput.inputs.placements.in[0] || 'site'}
+          campaign={campaign}
         />
       )}
       {!loading && activeTab === 'country' && (

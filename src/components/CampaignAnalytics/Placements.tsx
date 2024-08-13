@@ -1,18 +1,25 @@
-import { Placement } from 'adex-common'
-import CustomTable from 'components/common/CustomTable'
+import { Campaign, Placement } from 'adex-common'
+import CustomTable, { TableElement, TableRowAction } from 'components/common/CustomTable'
 import { getHumneSrcName } from 'helpers'
-import { useMemo } from 'react'
+import { useCallback, useMemo } from 'react'
 import { BaseAnalyticsData } from 'types'
+import { useAdExApi } from 'hooks/useAdexServices'
+import useCustomNotifications from 'hooks/useCustomNotifications'
+import InvisibilityIcon from 'resources/icons/Invisibility'
 
 const Placements = ({
   placements,
   currencyName,
-  placement
+  placement,
+  campaign
 }: {
   placements: BaseAnalyticsData[] | undefined
   currencyName: string
   placement: Placement
+  campaign: Campaign
 }) => {
+  const { adexServicesRequest } = useAdExApi()
+  const { showNotification } = useCustomNotifications()
   if (!placements?.length) {
     return <div>No placement found</div>
   }
@@ -29,20 +36,100 @@ const Placements = ({
     [placement]
   )
 
-  const elements = useMemo(
+  type PlacementsTableElement = Omit<TableElement, 'actionData'> & {
+    actionData: { placementName: string; isBlocked: boolean; segment: string }
+    id: string
+    placementName: string
+    impressions: string
+    clicks: string
+    ctr: string
+    avgCpm: string
+    paid: string
+  }
+
+  const elements: PlacementsTableElement[] = useMemo(
     () =>
-      placements?.map((item) => ({
-        id: item.segment,
-        segment: getHumneSrcName(item.segment, placement),
-        impressions: item.impressions.toLocaleString(),
-        clicks: item.clicks.toLocaleString(),
-        ctr: `${item.ctr} %`,
-        avgCpm: `${item.avgCpm} ${currencyName}`,
-        paid: `${item.paid.toFixed(4)} ${currencyName}`
-      })) || [],
-    [placements, placement, currencyName]
+      placements?.map((item) => {
+        const isBlocked = campaign.targetingInput.inputs.publishers.nin.includes(item.segment)
+        const placementName = getHumneSrcName(item.segment, placement)
+        return {
+          rowColor: isBlocked ? 'red' : 'inherit',
+          actionData: { placementName, isBlocked, segment: item.segment },
+          id: item.segment,
+          placementName,
+          impressions: item.impressions.toLocaleString(),
+          clicks: item.clicks.toLocaleString(),
+          ctr: `${item.ctr} %`,
+          avgCpm: `${item.avgCpm} ${currencyName}`,
+          paid: `${item.paid.toFixed(4)} ${currencyName}`
+        }
+      }) || [],
+    [placements, campaign.targetingInput.inputs.publishers.nin, placement, currencyName]
   )
-  return <CustomTable headings={headings} elements={elements} />
+
+  const toggleBlocked = useCallback(
+    async ({ placementName, isBlocked, segment }: PlacementsTableElement['actionData']) => {
+      console.log({ placementName })
+
+      const blockedPublishers: Campaign['targetingInput']['inputs']['publishers'] = {
+        ...campaign.targetingInput.inputs.placements,
+        apply: 'nin',
+        nin: isBlocked
+          ? [...campaign.targetingInput.inputs.placements.nin].filter((x) => x === segment)
+          : [...campaign.targetingInput.inputs.placements.nin, segment]
+      }
+
+      const body: Pick<Campaign, 'pricingBounds' | 'targetingInput'> = {
+        pricingBounds: { ...campaign.pricingBounds },
+        targetingInput: {
+          ...campaign.targetingInput,
+          inputs: {
+            ...campaign.targetingInput.inputs,
+            publishers: blockedPublishers
+          }
+        }
+      }
+      try {
+        await adexServicesRequest('backend', {
+          route: `/dsp/campaigns/edit/${campaign.id}`,
+          method: 'PUT',
+          body,
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        })
+        showNotification(
+          'info',
+          placementName,
+          `Successfully ${isBlocked ? 'unblocked' : 'blocked'}`
+        )
+        // updateCampaignDataById(campaign.id)
+      } catch {
+        return showNotification('error', "Couldn't update the Campaign data!")
+      }
+    },
+    [
+      adexServicesRequest,
+      campaign.id,
+      campaign.pricingBounds,
+      campaign.targetingInput,
+      showNotification
+    ]
+  )
+
+  const actions = useMemo(() => {
+    const placementActions: TableRowAction[] = [
+      {
+        action: toggleBlocked,
+        label: 'Block this source',
+        icon: <InvisibilityIcon size="inherit" />
+      }
+    ]
+
+    return placementActions
+  }, [toggleBlocked])
+
+  return <CustomTable headings={headings} elements={elements} actions={actions} />
 }
 
 export default Placements
