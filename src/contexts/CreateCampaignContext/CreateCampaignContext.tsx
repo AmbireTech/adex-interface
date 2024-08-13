@@ -107,8 +107,8 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
     validate: {
       adUnits: {
         banner: {
-          targetUrl: (value, values) =>
-            values.step === 0 && !isValidHttpUrl(value) ? 'Please enter a valid URL' : null
+          targetUrl: (value, { step }) =>
+            step === 0 && !isValidHttpUrl(value) ? 'Please enter a valid URL' : null
         }
       },
       targetingInput: {
@@ -136,14 +136,11 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
             }
 
             return null
+          },
+          advanced: {
+            limitDailyAverageSpending: (value, { step }) =>
+              step === 2 && typeof value !== 'boolean' ? 'Invalid value' : null
           }
-          // advanced: {
-          //   includeIncentivized: (value) => (typeof value !== 'boolean' ? 'Invalid value' : null),
-          //   disableFrequencyCapping: (value) =>
-          //     typeof value !== 'boolean' ? 'Invalid value' : null,
-          //   limitDailyAverageSpending: (value) =>
-          //     typeof value !== 'boolean' ? 'Invalid value' : null
-          // }
         }
       },
       startsAt: (value, { step }) => {
@@ -164,9 +161,11 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
 
         return null
       },
-      currency: (value, values) => values.step === 2 && isNotEmpty('Select currency')(value),
-      budget: (value, values) => {
-        if (values.step === 2) {
+      asapStartingDate: (value, { step }) =>
+        step === 2 && typeof value !== 'boolean' ? 'Invalid value' : null,
+      currency: (value, { step }) => step === 2 && isNotEmpty('Select currency')(value),
+      budget: (value, { step }) => {
+        if (step === 2) {
           if (!value || Number(value) === 0 || Number.isNaN(Number(value))) {
             return 'Enter campaign budget or a valid number'
           }
@@ -184,39 +183,33 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
         return null
       },
       cpmPricingBounds: {
-        min: (value, values) => {
-          if (values.step === 2) {
+        min: (value, { step, cpmPricingBounds: { max } }) => {
+          if (step === 2) {
             if (Number(value) === 0 || Number.isNaN(Number(value)))
               return 'Enter CPM min value or a valid number'
             if (Number(value) <= 0) return 'CPM min should be greater than 0'
             if (Number(value) < MIN_CPM_VALUE)
               return `CPM min cannot be lower than ${MIN_CPM_VALUE}`
-            if (
-              values.cpmPricingBounds.max !== '' &&
-              Number(value) >= Number(values.cpmPricingBounds.max)
-            )
+            if (max !== '' && Number(value) >= Number(max))
               return 'CPM min cannot be greater than CPM max'
           }
 
           return null
         },
-        max: (value, values) => {
-          if (values.step === 2) {
+        max: (value, { step, cpmPricingBounds: { min } }) => {
+          if (step === 2) {
             if (Number(value) === 0 || Number.isNaN(Number(value)))
               return 'Enter CPM max value or a valid number'
             if (Number(value) <= 0) return 'CPM max should be greater than 0'
-            if (
-              values.cpmPricingBounds.min !== '' &&
-              Number(value) <= Number(values.cpmPricingBounds.min)
-            )
+            if (min !== '' && Number(value) <= Number(min))
               return 'CPM max cannot be lower than CPM min'
           }
 
           return null
         }
       },
-      title: (value, values) =>
-        values.step === 2 &&
+      title: (value, { step }) =>
+        step === 2 &&
         hasLength({ min: 2, max: 100 }, 'Campaign name must contain at least 2 characters')(value)
     },
     transformValues: (values) => {
