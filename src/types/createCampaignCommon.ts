@@ -57,7 +57,7 @@ export type CreateCampaignType = {
   addAdUnit: (adUnitToAdd: AdUnit) => void
   removeAdUnit: (index: number) => void
   selectedBannerSizes: SupplyStatsDetails[] | SupplyStatsDetails[][]
-  saveToDraftCampaign: (camp?: CampaignUI) => Promise<any>
+  saveToDraftCampaign: () => Promise<any>
   updateCampaignFromDraft: (draftCampaign: Campaign) => void
   defaultValue: CampaignUI
   addUTMToTargetURLS: () => void

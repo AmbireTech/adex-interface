@@ -1,17 +1,14 @@
 import { AdUnit } from 'adex-common/dist/types'
-// import { DEFAULT_CATS_LOCS_VALUE } from 'constants/createCampaign'
 import { Campaign } from 'adex-common'
 import {
   Devices,
   ImageSizes,
   FileWithPath,
   HTMLBannerDimensions,
-  CampaignUI,
   SupplyStats,
   SupplyStatsDetails
 } from 'types'
 import dayjs from 'dayjs'
-import { parseToBigNumPrecision } from 'helpers'
 
 export const checkSelectedDevices = (devices: Devices[]) => {
   if (!devices.length) return null
@@ -168,79 +165,6 @@ export const initAllLocales = () => {
     return acc
   }, {})
   return allLocales
-}
-
-export type Modify<T, R> = Omit<T, keyof R> & R
-
-type ReducedCampaign = Omit<
-  Modify<Campaign, { id?: string }>,
-  | 'created'
-  | 'owner'
-  | 'validators'
-  | 'targetingRules'
-  | 'status'
-  | 'reviewStatus'
-  | 'modified'
-  | 'archived'
-  | 'createdBy'
-  | 'lastModifiedBy'
->
-
-export const mapCampaignUItoCampaign = (campaignUI: CampaignUI): ReducedCampaign => {
-  const campaign: ReducedCampaign = {
-    ...(campaignUI.id ? { id: campaignUI.id } : {}),
-    type: campaignUI.type,
-    outpaceAssetAddr: campaignUI.outpaceAssetAddr,
-    outpaceAssetDecimals: campaignUI.outpaceAssetDecimals,
-    outpaceAddr: campaignUI.outpaceAddr,
-    campaignBudget: BigInt(Number(campaignUI.budget)),
-    outpaceChainId: campaignUI.outpaceChainId,
-    nonce: campaignUI.nonce,
-    title: campaignUI.title,
-    adUnits: campaignUI.adUnits,
-    pricingBounds: campaignUI.pricingBounds,
-    activeFrom: campaignUI.activeFrom,
-    activeTo: campaignUI.activeTo,
-    targetingInput: campaignUI.targetingInput
-  }
-
-  return campaign
-}
-
-export const removeProperty = (propKey: any, { [propKey]: propValue, ...rest }) => rest
-
-export const prepareCampaignObject = (campaign: CampaignUI, decimals: number) => {
-  // TODO: fix the type
-  let mappedCampaign: any = mapCampaignUItoCampaign(campaign)
-
-  // NOTE: only for draft but it will come from BE
-  // mappedCampaign.id = `${campaign.title}-${Date.now().toString(16)}`
-  mappedCampaign.campaignBudget = parseToBigNumPrecision(
-    Math.floor(Number(mappedCampaign.campaignBudget)),
-    decimals
-  )
-  mappedCampaign.pricingBounds.IMPRESSION!.min = parseToBigNumPrecision(
-    Number(campaign.cpmPricingBounds.min) / 1000,
-    decimals
-  )
-  mappedCampaign.pricingBounds.IMPRESSION!.max = parseToBigNumPrecision(
-    Number(campaign.cpmPricingBounds.max) / 1000,
-    decimals
-  )
-  mappedCampaign.activeFrom = campaign.asapStartingDate
-    ? BigInt(Date.now())
-    : BigInt(campaign.startsAt.getTime())
-  mappedCampaign.activeTo = BigInt(campaign.endsAt.getTime())
-
-  if (mappedCampaign.id === '') {
-    mappedCampaign = removeProperty('id', mappedCampaign)
-  }
-  // eslint-disable-next-line no-underscore-dangle
-  if (mappedCampaign._id) {
-    mappedCampaign = removeProperty('_id', mappedCampaign)
-  }
-
-  return mappedCampaign
 }
 
 export const isPastDateTime = (dateTime: Date | string) => {

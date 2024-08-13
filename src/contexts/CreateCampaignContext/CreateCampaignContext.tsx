@@ -17,7 +17,6 @@ import {
   deepEqual,
   hasUtmCampaign,
   isPastDateTime,
-  prepareCampaignObject,
   selectBannerSizes
 } from 'helpers/createCampaignHelpers'
 import {
@@ -34,7 +33,7 @@ import { hasLength, isNotEmpty, useForm } from '@mantine/form'
 type Modify<T, R> = Omit<T, keyof R> & R
 
 type ReducedCampaign = Omit<
-  Modify<Campaign, { id?: string }>,
+  Modify<Campaign, { id?: string; activeFrom: bigint | null; activeTo: bigint | null }>,
   | 'created'
   | 'owner'
   | 'validators'
@@ -389,40 +388,30 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
     })
   }, [form, adexServicesRequest])
 
-  const saveToDraftCampaign = useCallback(
-    (camp?: CampaignUI) => {
-      const currCampaign = camp || campaign
-      const preparedCampaign = prepareCampaignObject(currCampaign, balanceToken.decimals)
+  const saveToDraftCampaign = useCallback(() => {
+    const preparedCampaign = form.getTransformedValues()
 
-      if (defaultValue.startsAt === currCampaign.startsAt) {
-        preparedCampaign.activeFrom = null
-      }
-      if (defaultValue.endsAt === currCampaign.endsAt) {
-        preparedCampaign.activeTo = null
-      }
-      if (preparedCampaign.title === '') {
-        preparedCampaign.title = `Draft Campaign ${formatDateTime(new Date())}`
-      }
+    if (defaultValue.startsAt === campaign.startsAt) {
+      preparedCampaign.activeFrom = null
+    }
+    if (defaultValue.endsAt === campaign.endsAt) {
+      preparedCampaign.activeTo = null
+    }
+    if (preparedCampaign.title === '') {
+      preparedCampaign.title = `Draft Campaign ${formatDateTime(new Date())}`
+    }
 
-      const body = serialize(preparedCampaign).json
+    const body = serialize(preparedCampaign).json
 
-      return adexServicesRequest('backend', {
-        route: '/dsp/campaigns/draft',
-        method: 'POST',
-        body,
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      })
-    },
-    [
-      campaign,
-      adexServicesRequest,
-      balanceToken.decimals,
-      defaultValue.startsAt,
-      defaultValue.endsAt
-    ]
-  )
+    return adexServicesRequest('backend', {
+      route: '/dsp/campaigns/draft',
+      method: 'POST',
+      body,
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+  }, [adexServicesRequest, form, campaign, defaultValue])
 
   const updateCampaignFromDraft = useCallback(
     (draftCampaign: Campaign) => {

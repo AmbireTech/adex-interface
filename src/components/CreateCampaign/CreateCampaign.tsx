@@ -58,7 +58,7 @@ const CreateCampaign = () => {
 
   const saveDraft = useCallback(async () => {
     try {
-      const res = await saveToDraftCampaign(campaign)
+      const res = await saveToDraftCampaign()
 
       if (res && res.success) {
         showNotification('info', 'Draft saved')
@@ -69,7 +69,7 @@ const CreateCampaign = () => {
       console.error(err)
       showNotification('error', 'Creating campaign failed', 'Data error')
     }
-  }, [showNotification, saveToDraftCampaign, campaign])
+  }, [showNotification, saveToDraftCampaign])
 
   useEffect(() => {
     if (blocker.state === 'blocked') {
