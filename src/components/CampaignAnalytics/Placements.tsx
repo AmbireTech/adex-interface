@@ -1,4 +1,4 @@
-import { Campaign, Placement } from 'adex-common'
+import { Campaign, CampaignStatus, Placement } from 'adex-common'
 import CustomTable, { TableElement, TableRowAction } from 'components/common/CustomTable'
 import { getHumneSrcName } from 'helpers'
 import { useCallback, useMemo } from 'react'
@@ -6,6 +6,7 @@ import { BaseAnalyticsData } from 'types'
 import { useAdExApi } from 'hooks/useAdexServices'
 import useCustomNotifications from 'hooks/useCustomNotifications'
 import InvisibilityIcon from 'resources/icons/Invisibility'
+import VisibilityIcon from 'resources/icons/Visibility'
 
 const Placements = ({
   placements,
@@ -37,7 +38,11 @@ const Placements = ({
   )
 
   type PlacementsTableElement = Omit<TableElement, 'actionData'> & {
-    actionData: { placementName: string; isBlocked: boolean; segment: string }
+    actionData: {
+      placementName: string
+      isBlocked: boolean
+      segment: string
+    }
     id: string
     placementName: string
     impressions: string
@@ -52,9 +57,13 @@ const Placements = ({
       placements?.map((item) => {
         const isBlocked = campaign.targetingInput.inputs.publishers.nin.includes(item.segment)
         const placementName = getHumneSrcName(item.segment, placement)
-        return {
+        const data: PlacementsTableElement = {
           rowColor: isBlocked ? 'red' : 'inherit',
-          actionData: { placementName, isBlocked, segment: item.segment },
+          actionData: {
+            placementName,
+            isBlocked,
+            segment: item.segment
+          },
           id: item.segment,
           placementName,
           impressions: item.impressions.toLocaleString(),
@@ -63,6 +72,8 @@ const Placements = ({
           avgCpm: `${item.avgCpm} ${currencyName}`,
           paid: `${item.paid.toFixed(4)} ${currencyName}`
         }
+
+        return data
       }) || [],
     [placements, campaign.targetingInput.inputs.publishers.nin, placement, currencyName]
   )
@@ -119,16 +130,22 @@ const Placements = ({
 
   const actions = useMemo(() => {
     const placementActions: TableRowAction[] = [
-      {
-        action: (props: PlacementsTableElement['actionData']) => toggleBlocked(props),
-        label: ({ isBlocked, placementName }: PlacementsTableElement['actionData']) =>
-          `${isBlocked ? 'Unblock' : 'Block'} "${placementName}"`,
-        icon: <InvisibilityIcon size="inherit" />
-      }
-    ]
+      CampaignStatus.active,
+      CampaignStatus.paused
+    ].includes(campaign.status)
+      ? [
+          {
+            action: (props: PlacementsTableElement['actionData']) => toggleBlocked(props),
+            label: ({ isBlocked, placementName }: PlacementsTableElement['actionData']) =>
+              `${isBlocked ? 'Unblock' : 'Block'} "${placementName}"`,
+            icon: ({ isBlocked }: PlacementsTableElement['actionData']) =>
+              isBlocked ? <VisibilityIcon size="inherit" /> : <InvisibilityIcon size="inherit" />
+          }
+        ]
+      : []
 
     return placementActions
-  }, [toggleBlocked])
+  }, [campaign.status, toggleBlocked])
 
   return <CustomTable headings={headings} elements={elements} actions={actions} />
 }
