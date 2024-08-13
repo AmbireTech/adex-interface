@@ -24,7 +24,12 @@ import CampaignPeriod from './CampaignPeriod'
 import SelectCurrency from './SelectCurrency'
 
 const StepThree = () => {
-  const { selectedBidFloors, form } = useCreateCampaignContext()
+  const {
+    campaign: { currency },
+    selectedBidFloors,
+    form,
+    updateCampaignField
+  } = useCreateCampaignContext()
 
   const recommendedPaymentBounds = useMemo(() => {
     const rangeUnparsed = selectedBidFloors.flat().sort((a, b) => b.count - a.count)[0]?.value
@@ -86,8 +91,8 @@ const StepThree = () => {
           3. Currency
         </Text>
         <SelectCurrency
-          defaultValue={form.values.currency}
-          onChange={(value) => form.setFieldValue('currency', value)}
+          defaultValue={currency}
+          onChange={(value) => updateCampaignField('currency', value)}
           error={(form.errors.currency && form.errors.currency) || ''}
         />
       </Grid.Col>
