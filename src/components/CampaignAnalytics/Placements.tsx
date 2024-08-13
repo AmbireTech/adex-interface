@@ -7,6 +7,7 @@ import { useAdExApi } from 'hooks/useAdexServices'
 import useCustomNotifications from 'hooks/useCustomNotifications'
 import InvisibilityIcon from 'resources/icons/Invisibility'
 import VisibilityIcon from 'resources/icons/Visibility'
+import { useCampaignsData } from 'hooks/useCampaignsData'
 
 const Placements = ({
   placements,
@@ -21,6 +22,8 @@ const Placements = ({
 }) => {
   const { adexServicesRequest } = useAdExApi()
   const { showNotification } = useCustomNotifications()
+  const { updateCampaignDataById } = useCampaignsData()
+
   if (!placements?.length) {
     return <div>No placement found</div>
   }
@@ -80,14 +83,12 @@ const Placements = ({
 
   const toggleBlocked = useCallback(
     async ({ placementName, isBlocked, segment }: PlacementsTableElement['actionData']) => {
-      console.log({ placementName })
-
       const blockedPublishers: Campaign['targetingInput']['inputs']['publishers'] = {
-        ...campaign.targetingInput.inputs.placements,
+        ...campaign.targetingInput.inputs.publishers,
         apply: 'nin',
         nin: isBlocked
-          ? [...campaign.targetingInput.inputs.placements.nin].filter((x) => x === segment)
-          : [...campaign.targetingInput.inputs.placements.nin, segment]
+          ? [...campaign.targetingInput.inputs.publishers.nin].filter((x) => x !== segment)
+          : [...campaign.targetingInput.inputs.publishers.nin, segment]
       }
 
       const body: Pick<Campaign, 'pricingBounds' | 'targetingInput'> = {
@@ -114,18 +115,12 @@ const Placements = ({
           placementName,
           `Successfully ${isBlocked ? 'unblocked' : 'blocked'}`
         )
-        // updateCampaignDataById(campaign.id)
+        updateCampaignDataById(campaign.id)
       } catch {
         return showNotification('error', "Couldn't update the Campaign data!")
       }
     },
-    [
-      adexServicesRequest,
-      campaign.id,
-      campaign.pricingBounds,
-      campaign.targetingInput,
-      showNotification
-    ]
+    [adexServicesRequest, campaign, showNotification, updateCampaignDataById]
   )
 
   const actions = useMemo(() => {
