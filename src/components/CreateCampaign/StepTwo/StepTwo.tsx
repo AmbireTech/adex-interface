@@ -21,7 +21,7 @@ const StepTwo = () => {
       }
     },
     updateCampaignField,
-    form
+    errors
   } = useCreateCampaignContext()
 
   const handleSelect = useCallback(
@@ -52,7 +52,7 @@ const StepTwo = () => {
           }
           groups={CAT_GROUPS}
           label="Categories"
-          error={form.errors[CATEGORIES_PATH]?.toString()}
+          error={errors[CATEGORIES_PATH]?.toString()}
         />
       </Grid.Col>
       <Grid.Col>
@@ -68,7 +68,7 @@ const StepTwo = () => {
           multiSelectData={COUNTRIES}
           groups={REGION_GROUPS}
           label="Countries"
-          error={form.errors[LOCATION_PATH]?.toString()}
+          error={errors[LOCATION_PATH]?.toString()}
         />
       </Grid.Col>
     </Grid>

@@ -27,8 +27,10 @@ const StepThree = () => {
   const {
     campaign: { currency },
     selectedBidFloors,
-    form,
-    updateCampaignField
+    getInputProps,
+    updateCampaignField,
+    key,
+    errors
   } = useCreateCampaignContext()
 
   const recommendedPaymentBounds = useMemo(() => {
@@ -38,9 +40,8 @@ const StepThree = () => {
   }, [selectedBidFloors])
 
   const budgetIsGreaterThanBalance = useMemo(
-    () =>
-      form.errors && form.errors.budget === 'Available balance is lower than the campaign budget',
-    [form.errors]
+    () => errors && errors.budget === 'Available balance is lower than the campaign budget',
+    [errors]
   )
 
   return (
@@ -63,8 +64,8 @@ const StepThree = () => {
       <Grid.Col>
         <Checkbox
           label="As soon as possible"
-          key={form.key('asapStartingDate')}
-          {...form.getInputProps('asapStartingDate', {
+          key={key('asapStartingDate')}
+          {...getInputProps('asapStartingDate', {
             type: 'checkbox'
           })}
         />
@@ -76,8 +77,8 @@ const StepThree = () => {
               2. Payment Model
             </Text>
           }
-          key={form.key('paymentModel')}
-          {...form.getInputProps('paymentModel')}
+          key={key('paymentModel')}
+          {...getInputProps('paymentModel')}
         >
           <Group mt="xs">
             <Radio value="cpm" label="CPM" />
@@ -93,7 +94,7 @@ const StepThree = () => {
         <SelectCurrency
           defaultValue={currency}
           onChange={(value) => updateCampaignField('currency', value)}
-          error={(form.errors.currency && form.errors.currency) || ''}
+          error={(errors.currency && errors.currency) || ''}
         />
       </Grid.Col>
       <Grid.Col mb="md">
@@ -111,8 +112,8 @@ const StepThree = () => {
             // description={`Estimated fee: 0.15 ${balanceToken.name}`}
             inputWrapperOrder={['label', 'input', 'description', 'error']}
             name="budget"
-            key={form.key('budget')}
-            {...form.getInputProps('budget')}
+            key={key('budget')}
+            {...getInputProps('budget')}
           />
           {budgetIsGreaterThanBalance && (
             <InfoAlertMessage
@@ -125,8 +126,8 @@ const StepThree = () => {
         <Group my="sm">
           <Checkbox
             label="Limit average daily spending"
-            key={form.key('targetingInput.inputs.advanced.limitDailyAverageSpending')}
-            {...form.getInputProps('targetingInput.inputs.advanced.limitDailyAverageSpending', {
+            key={key('targetingInput.inputs.advanced.limitDailyAverageSpending')}
+            {...getInputProps('targetingInput.inputs.advanced.limitDailyAverageSpending', {
               type: 'checkbox'
             })}
           />
@@ -169,8 +170,8 @@ const StepThree = () => {
             }
             rightSectionWidth="auto"
             name="cpmPricingBounds.min"
-            key={form.key('cpmPricingBounds.min')}
-            {...form.getInputProps('cpmPricingBounds.min')}
+            key={key('cpmPricingBounds.min')}
+            {...getInputProps('cpmPricingBounds.min')}
           />
           <TextInput
             size="md"
@@ -186,8 +187,8 @@ const StepThree = () => {
             }
             rightSectionWidth="md"
             name="cpmPricingBounds.max"
-            key={form.key('cpmPricingBounds.max')}
-            {...form.getInputProps('cpmPricingBounds.max')}
+            key={key('cpmPricingBounds.max')}
+            {...getInputProps('cpmPricingBounds.max')}
           />
         </Flex>
       </Grid.Col>
@@ -202,8 +203,8 @@ const StepThree = () => {
           maw={{ sm: '100%', lg: '50%' }}
           placeholder="Campaign Name"
           name="title"
-          key={form.key('title')}
-          {...form.getInputProps('title')}
+          key={key('title')}
+          {...getInputProps('title')}
         />
       </Grid.Col>
       {/* <Grid.Col mb="md">

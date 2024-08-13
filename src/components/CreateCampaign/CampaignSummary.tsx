@@ -49,7 +49,8 @@ const CampaignSummary = () => {
     resetCampaign,
     saveToDraftCampaign,
     addUTMToTargetURLS,
-    form
+    form,
+    errors
   } = useCreateCampaignContext()
   const {
     formattedSelectedDevice,
@@ -75,7 +76,7 @@ const CampaignSummary = () => {
   const isTheLastStep = useMemo(() => step === CREATE_CAMPAIGN_STEPS - 1, [step])
   const isFirstStep = useMemo(() => step === 0, [step])
 
-  const hasFormValidationErrors = useMemo(() => Object.keys(form.errors).length > 0, [form.errors])
+  const hasFormValidationErrors = useMemo(() => Object.keys(errors).length > 0, [errors])
 
   const handleNextStepBtnClicked = useCallback(() => {
     if (form.validate().hasErrors) return

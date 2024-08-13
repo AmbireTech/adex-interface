@@ -14,7 +14,7 @@ const SelectPlacements = () => {
       }
     },
     updateCampaign,
-    form
+    getInputProps
   } = useCreateCampaignContext()
 
   useEffect(() => {
@@ -30,7 +30,7 @@ const SelectPlacements = () => {
       }
       name="placement"
       defaultValue={placement}
-      {...form.getInputProps('targetingInput.inputs.placements.in.0')}
+      {...getInputProps('targetingInput.inputs.placements.in.0')}
     >
       <Radio label="Websites" value="site" mb="xs" />
       <Radio label="Applications" value="app" />

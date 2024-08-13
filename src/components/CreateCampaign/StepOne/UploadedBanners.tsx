@@ -9,7 +9,9 @@ const UploadedBanners = () => {
     campaign: { adUnits },
     selectedBannerSizes,
     form,
-    removeAdUnit
+    removeAdUnit,
+    getInputProps,
+    key
   } = useCreateCampaignContext()
 
   const allowedSizes = useMemo(
@@ -34,8 +36,8 @@ const UploadedBanners = () => {
       <Grid.Col>
         <Checkbox
           label="Auto UTM tracking"
-          key={form.key('autoUTMChecked')}
-          {...form.getInputProps('autoUTMChecked', { type: 'checkbox' })}
+          key={key('autoUTMChecked')}
+          {...getInputProps('autoUTMChecked', { type: 'checkbox' })}
         />
       </Grid.Col>
       {adUnits.length > 0 &&

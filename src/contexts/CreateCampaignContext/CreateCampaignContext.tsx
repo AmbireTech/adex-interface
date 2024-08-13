@@ -253,6 +253,7 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
   })
 
   const campaign = useMemo(() => form.getValues(), [form])
+  const { getInputProps, key, errors } = form
 
   const [selectedBannerSizes, setSelectedBannerSizes] = useState<
     SupplyStatsDetails[] | SupplyStatsDetails[][]
@@ -467,7 +468,10 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
       addUTMToTargetURLS,
       selectedBidFloors,
       form,
-      updateCampaignField
+      updateCampaignField,
+      getInputProps,
+      key,
+      errors
     }),
     [
       campaign,
@@ -483,7 +487,10 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
       addUTMToTargetURLS,
       selectedBidFloors,
       form,
-      updateCampaignField
+      updateCampaignField,
+      getInputProps,
+      key,
+      errors
     ]
   )
 
