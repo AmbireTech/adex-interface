@@ -120,8 +120,9 @@ const Placements = ({
   const actions = useMemo(() => {
     const placementActions: TableRowAction[] = [
       {
-        action: toggleBlocked,
-        label: 'Block this source',
+        action: (props: PlacementsTableElement['actionData']) => toggleBlocked(props),
+        label: ({ isBlocked, placementName }: PlacementsTableElement['actionData']) =>
+          `${isBlocked ? 'Unblock' : 'Block'} "${placementName}"`,
         icon: <InvisibilityIcon size="inherit" />
       }
     ]
