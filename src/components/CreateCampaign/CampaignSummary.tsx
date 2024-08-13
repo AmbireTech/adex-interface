@@ -49,8 +49,7 @@ const CampaignSummary = () => {
     resetCampaign,
     saveToDraftCampaign,
     addUTMToTargetURLS,
-    form,
-    errors
+    form
   } = useCreateCampaignContext()
   const {
     formattedSelectedDevice,
@@ -76,24 +75,10 @@ const CampaignSummary = () => {
   const isTheLastStep = useMemo(() => step === CREATE_CAMPAIGN_STEPS - 1, [step])
   const isFirstStep = useMemo(() => step === 0, [step])
 
-  const hasFormValidationErrors = useMemo(() => Object.keys(errors).length > 0, [errors])
-
   const handleNextStepBtnClicked = useCallback(() => {
     if (form.validate().hasErrors) return
-    if (step === 0) {
-      if (hasFormValidationErrors) return
-
-      if (autoUTMChecked) {
-        addUTMToTargetURLS()
-      }
-    }
-    if (step === 1) {
-      if (hasFormValidationErrors) return
-    }
-
     if (step < CREATE_CAMPAIGN_STEPS - 1) {
-      if (step === 2) {
-        if (hasFormValidationErrors) return
+      if (step === 0 || step === 2) {
         if (autoUTMChecked) {
           addUTMToTargetURLS()
         }
@@ -101,7 +86,7 @@ const CampaignSummary = () => {
 
       updateCampaign({ step: step + 1 })
     }
-  }, [step, updateCampaign, addUTMToTargetURLS, autoUTMChecked, form, hasFormValidationErrors])
+  }, [step, updateCampaign, addUTMToTargetURLS, autoUTMChecked, form])
 
   const handleSaveDraftClicked = useCallback(async () => {
     try {
