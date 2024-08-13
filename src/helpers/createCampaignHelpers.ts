@@ -298,7 +298,7 @@ export function deepEqual<T>(obj1: T, obj2: T): boolean {
 
 const UTM_PARAMS = {
   utm_source: 'AdEx',
-  utm_medium: 'CPM',
+  // utm_medium: '', // NOTE: utm_medium will be appended at BE
   utm_term: '',
   utm_campaign: '',
   utm_content: ''
