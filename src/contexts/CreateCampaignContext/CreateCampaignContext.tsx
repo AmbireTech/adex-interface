@@ -20,12 +20,32 @@ import {
   prepareCampaignObject,
   selectBannerSizes
 } from 'helpers/createCampaignHelpers'
-import { parseBigNumTokenAmountToDecimal, parseFromBigNumPrecision } from 'helpers/balances'
+import {
+  parseBigNumTokenAmountToDecimal,
+  parseFromBigNumPrecision,
+  parseToBigNumPrecision
+} from 'helpers/balances'
 import { AdUnit, Campaign, Placement } from 'adex-common'
 import dayjs from 'dayjs'
 import { formatDateTime } from 'helpers'
 import { useCampaignsData } from 'hooks/useCampaignsData'
 import { hasLength, isNotEmpty, useForm } from '@mantine/form'
+
+type Modify<T, R> = Omit<T, keyof R> & R
+
+type ReducedCampaign = Omit<
+  Modify<Campaign, { id?: string }>,
+  | 'created'
+  | 'owner'
+  | 'validators'
+  | 'targetingRules'
+  | 'status'
+  | 'reviewStatus'
+  | 'modified'
+  | 'archived'
+  | 'createdBy'
+  | 'lastModifiedBy'
+>
 
 const MIN_CAMPAIGN_BUDGET_VALUE_ADMIN = 20
 const MIN_CAMPAIGN_BUDGET_VALUE = 300
@@ -199,6 +219,37 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
       title: (value, values) =>
         values.step === 2 &&
         hasLength({ min: 2, max: 100 }, 'Campaign name must contain at least 2 characters')(value)
+    },
+    transformValues: (values) => {
+      const transformedValuesToCampaign: ReducedCampaign = {
+        ...(values.id ? { id: values.id } : {}),
+        type: values.type,
+        outpaceAssetAddr: values.outpaceAssetAddr,
+        outpaceAssetDecimals: values.outpaceAssetDecimals,
+        outpaceAddr: values.outpaceAddr,
+        campaignBudget: parseToBigNumPrecision(
+          Math.floor(Number(BigInt(Number(values.budget)))),
+          decimals
+        ),
+        outpaceChainId: values.outpaceChainId,
+        nonce: values.nonce,
+        title: values.title,
+        adUnits: values.adUnits,
+        pricingBounds: {
+          ...values.pricingBounds,
+          IMPRESSION: {
+            min: parseToBigNumPrecision(Number(values.cpmPricingBounds.min) / 1000, decimals),
+            max: parseToBigNumPrecision(Number(values.cpmPricingBounds.max) / 1000, decimals)
+          }
+        },
+        activeFrom: values.asapStartingDate
+          ? BigInt(Date.now())
+          : BigInt(values.startsAt.getTime()),
+        activeTo: BigInt(values.endsAt.getTime()),
+        targetingInput: values.targetingInput
+      }
+
+      return transformedValuesToCampaign
     }
   })
 
@@ -324,7 +375,7 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
   }, [form, defaultValue, updateCampaign])
 
   const publishCampaign = useCallback(() => {
-    const preparedCampaign = prepareCampaignObject(campaign, balanceToken.decimals)
+    const preparedCampaign = form.getTransformedValues()
 
     const body = serialize(preparedCampaign).json
 
@@ -336,7 +387,7 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
         'Content-Type': 'application/json'
       }
     })
-  }, [campaign, adexServicesRequest, balanceToken.decimals])
+  }, [form, adexServicesRequest])
 
   const saveToDraftCampaign = useCallback(
     (camp?: CampaignUI) => {

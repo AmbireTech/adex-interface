@@ -8,21 +8,16 @@ import {
   getPrimaryShade,
   lighten
 } from '@mantine/core'
-import { useDisclosure, useColorScheme } from '@mantine/hooks'
+import { useColorScheme } from '@mantine/hooks'
 import { CREATE_CAMPAIGN_STEPS } from 'constants/createCampaign'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import LeftArrowIcon from 'resources/icons/LeftArrow'
 import useCreateCampaignData from 'hooks/useCreateCampaignData/useCreateCampaignData'
 import CampaignDetailsRow from 'components/common/CampainDetailsRow'
-import { SuccessModal } from 'components/common/Modals'
 import useCustomNotifications from 'hooks/useCustomNotifications'
-import useAccount from 'hooks/useAccount'
 import { useNavigate } from 'react-router-dom'
-import throttle from 'lodash.throttle'
 import { createStyles } from '@mantine/emotion'
-import { modals } from '@mantine/modals'
-import { defaultConfirmModalProps } from 'components/common/Modals/CustomConfirmModal'
 
 const useStyles = createStyles((theme: MantineTheme) => {
   const colorScheme = useColorScheme()
@@ -48,12 +43,9 @@ const useStyles = createStyles((theme: MantineTheme) => {
 const CampaignSummary = () => {
   const { classes, cx } = useStyles()
   const navigate = useNavigate()
-  const [opened, { open, close }] = useDisclosure(false)
-  const { updateBalance } = useAccount()
   const {
     campaign: { step, adUnits, autoUTMChecked },
     updateCampaign,
-    publishCampaign,
     resetCampaign,
     saveToDraftCampaign,
     addUTMToTargetURLS,
@@ -83,59 +75,24 @@ const CampaignSummary = () => {
   const isTheLastStep = useMemo(() => step === CREATE_CAMPAIGN_STEPS - 1, [step])
   const isFirstStep = useMemo(() => step === 0, [step])
 
-  const launchCampaign = useCallback(async () => {
-    try {
-      const res = await publishCampaign()
-
-      if (res && res.success) {
-        await updateBalance()
-        open()
-        resetCampaign()
-      } else {
-        showNotification('warning', 'invalid campaign data response', 'Data error')
-      }
-    } catch (err) {
-      console.error(err)
-      showNotification('error', 'Creating campaign failed', 'Data error')
-    }
-  }, [publishCampaign, resetCampaign, open, showNotification, updateBalance])
-
-  const throttledLaunchCampaign = useMemo(
-    () => throttle(launchCampaign, 1069, { leading: true }),
-    [launchCampaign]
-  )
-
-  const confirmLaunch = useCallback(() => {
-    return modals.openConfirmModal(
-      defaultConfirmModalProps({
-        text: "Once you click on 'Launch campaign' any creative updates disabled. Are you certain you wish to proceed with the launch?",
-        color: 'attention',
-        labels: { confirm: 'Launch Campaign', cancel: 'Continue edit' },
-        onConfirm: () => {
-          throttledLaunchCampaign()
-        }
-      })
-    )
-  }, [throttledLaunchCampaign])
+  const hasFormValidationErrors = useMemo(() => Object.keys(form.errors).length > 0, [form.errors])
 
   const handleNextStepBtnClicked = useCallback(() => {
     if (form.validate().hasErrors) return
     if (step === 0) {
-      // TODO: maybe the form should be validated not only for the first step
-      // or just check for errors without validating the form
-      if (Object.keys(form.errors).length) return
+      if (hasFormValidationErrors) return
 
       if (autoUTMChecked) {
         addUTMToTargetURLS()
       }
     }
     if (step === 1) {
-      if (Object.keys(form.errors).length) return
+      if (hasFormValidationErrors) return
     }
 
     if (step < CREATE_CAMPAIGN_STEPS - 1) {
       if (step === 2) {
-        if (Object.keys(form.errors).length) return
+        if (hasFormValidationErrors) return
         if (autoUTMChecked) {
           addUTMToTargetURLS()
         }
@@ -143,7 +100,7 @@ const CampaignSummary = () => {
 
       updateCampaign({ step: step + 1 })
     }
-  }, [step, updateCampaign, addUTMToTargetURLS, autoUTMChecked, form])
+  }, [step, updateCampaign, addUTMToTargetURLS, autoUTMChecked, form, hasFormValidationErrors])
 
   const handleSaveDraftClicked = useCallback(async () => {
     try {
@@ -160,11 +117,6 @@ const CampaignSummary = () => {
       showNotification('error', 'Creating campaign failed', 'Data error')
     }
   }, [resetCampaign, saveToDraftCampaign, showNotification, navigate])
-
-  const handleOnModalClose = useCallback(() => {
-    navigate('/dashboard/')
-    close()
-  }, [navigate, close])
 
   return (
     <>
@@ -220,7 +172,7 @@ const CampaignSummary = () => {
         <Text c="secondaryText">0</Text>
       </Flex> */}
       <Stack align="center" justify="space-between" gap="sm" mt="xl">
-        {!isTheLastStep ? (
+        {!isTheLastStep && (
           <Button
             w="90%"
             disabled={isNextBtnDisabled}
@@ -230,8 +182,9 @@ const CampaignSummary = () => {
           >
             Next Step
           </Button>
-        ) : (
-          <Button w="90%" size="lg" variant="filled" onClick={confirmLaunch}>
+        )}
+        {isTheLastStep && (
+          <Button type="submit" w="90%" size="lg" variant="filled">
             Launch Campaign
           </Button>
         )}
@@ -254,17 +207,6 @@ const CampaignSummary = () => {
           </Group>
         </UnstyledButton>
       </Stack>
-      <SuccessModal
-        text={
-          <Text p="md">
-            Your campaign has been successfully launched and is now under review.{' '}
-            <strong>It may take up to 24 hours for your campaign to be activated</strong>. Thank you
-            for your patience!
-          </Text>
-        }
-        opened={opened}
-        close={handleOnModalClose}
-      />
     </>
   )
 }
