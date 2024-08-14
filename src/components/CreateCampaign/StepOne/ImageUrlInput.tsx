@@ -79,6 +79,7 @@ const ImageUrlInput = ({
   toRemove,
   onDelete,
   onChange,
+  onBlur,
   preview,
   index,
   form,

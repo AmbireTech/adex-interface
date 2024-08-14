@@ -16,7 +16,6 @@ import {
   addUrlUtmTracking,
   deepEqual,
   hasUtmCampaign,
-  isPastDateTime,
   selectBannerSizes
 } from 'helpers/createCampaignHelpers'
 import {
@@ -25,8 +24,7 @@ import {
   parseToBigNumPrecision
 } from 'helpers/balances'
 import { AdUnit, Campaign, Placement } from 'adex-common'
-import dayjs from 'dayjs'
-import { formatDateTime } from 'helpers'
+import { formatDateTime, WEEK } from 'helpers'
 import { useCampaignsData } from 'hooks/useCampaignsData'
 import { hasLength, isNotEmpty, useForm } from '@mantine/form'
 
@@ -93,9 +91,8 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
       outpaceAddr: adexAccount?.address || '0x',
       outpaceAssetDecimals: balanceToken.decimals,
       outpaceChainId: balanceToken.chainId,
-      startsAt: isPastDateTime(CREATE_CAMPAIGN_DEFAULT_VALUE.startsAt)
-        ? dayjs().add(1, 'minute').toDate()
-        : CREATE_CAMPAIGN_DEFAULT_VALUE.startsAt
+      startsAt: new Date(),
+      endsAt: new Date(Date.now() + WEEK)
     }),
     [adexAccount?.address, balanceToken?.address, balanceToken?.decimals, balanceToken?.chainId]
   )
@@ -259,7 +256,7 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
     (value: Partial<CampaignUI>) => {
       form.setValues((prev) => ({
         ...prev,
-        draftModified: !prev.draftModified ? true : prev.draftModified,
+        dirty: true,
         ...value
       }))
     },
@@ -363,8 +360,15 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
     form.resetTouched()
     form.resetDirty()
     form.reset()
-    updateCampaign({ ...defaultValue })
-    localStorage.setItem('createCampaign', superjson.stringify({ ...defaultValue }))
+    const toSetReset = {
+      ...defaultValue,
+      startsAt: new Date(),
+      endsAt: new Date(Date.now() + WEEK),
+      dirty: false
+    }
+    updateCampaign(toSetReset)
+    // Do we need this???
+    localStorage.setItem('createCampaign', superjson.stringify(toSetReset))
   }, [form, defaultValue, updateCampaign])
 
   const publishCampaign = useCallback(() => {
@@ -382,30 +386,34 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
     })
   }, [form, adexServicesRequest])
 
-  const saveToDraftCampaign = useCallback(() => {
+  const saveToDraftCampaign = useCallback(async () => {
     const preparedCampaign = form.getTransformedValues()
 
-    if (defaultValue.startsAt === campaign.startsAt) {
-      preparedCampaign.activeFrom = null
-    }
-    if (defaultValue.endsAt === campaign.endsAt) {
-      preparedCampaign.activeTo = null
-    }
-    if (preparedCampaign.title === '') {
-      preparedCampaign.title = `Draft Campaign ${formatDateTime(new Date())}`
-    }
+    preparedCampaign.title =
+      preparedCampaign.title || `Draft Campaign ${formatDateTime(new Date())}`
 
     const body = serialize(preparedCampaign).json
 
-    return adexServicesRequest('backend', {
-      route: '/dsp/campaigns/draft',
-      method: 'POST',
-      body,
-      headers: {
-        'Content-Type': 'application/json'
+    try {
+      const res = await adexServicesRequest('backend', {
+        route: '/dsp/campaigns/draft',
+        method: 'POST',
+        body,
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+
+      // TODO: resp Type
+      // @ts-ignore
+      if (!res || !res?.success) {
+        throw new Error('Error on saving draft campaign')
       }
-    })
-  }, [adexServicesRequest, form, campaign, defaultValue])
+      return res
+    } catch (err) {
+      throw new Error('Error on saving draft campaign')
+    }
+  }, [adexServicesRequest, form])
 
   const updateCampaignFromDraft = useCallback(
     (draftCampaign: Campaign) => {
@@ -438,7 +446,7 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
           BigInt(Math.floor(Number(draftCampaign.campaignBudget))),
           draftCampaign.outpaceAssetDecimals
         ).toString(),
-        draftModified: false
+        dirty: false
       }
 
       updateCampaign(mappedDraftCampaign)

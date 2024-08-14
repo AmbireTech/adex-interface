@@ -98,9 +98,28 @@ export const getHTMLBannerDimensions = async (
           return
         }
 
+        // NOTE: we need meta tag in this format - add it to help center and info in the upload menu
+        // <meta name="ad.size" content="width=320,height=50">
+
+        // @ts-ignore
+        const sizeContent = iframeDocument.head.querySelector('meta[name="ad.size"]')?.content || ''
+        const match = sizeContent.match(/width=([0-9]+),height=([0-9]+)/)
+
+        if (
+          !match ||
+          !match[1] ||
+          !match[2] ||
+          Number.isInteger(match[1]) ||
+          Number.isInteger(match[2])
+        ) {
+          throw new Error(
+            'Invalid html banner - missing ad size meta tag in format <meta name="ad.size" content="width=320,height=50">'
+          )
+        }
+
         const dimensions = {
-          width: iframeDocument.body.scrollWidth,
-          height: iframeDocument.body.scrollHeight
+          width: Number(match[1]),
+          height: Number(match[2])
         }
 
         document.body.removeChild(tempIframe)
@@ -108,6 +127,7 @@ export const getHTMLBannerDimensions = async (
         resolve(dimensions)
       }
       tempIframe.onerror = (error) => {
+        console.log(error)
         document.body.removeChild(tempIframe)
         URL.revokeObjectURL(blobUrl)
         reject(error)
@@ -192,7 +212,7 @@ export function deepEqual<T>(obj1: T, obj2: T): boolean {
 
 const UTM_PARAMS = {
   utm_source: 'AdEx',
-  utm_medium: 'CPM',
+  // utm_medium: '', // NOTE: utm_medium will be appended at BE
   utm_term: '',
   utm_campaign: '',
   utm_content: ''

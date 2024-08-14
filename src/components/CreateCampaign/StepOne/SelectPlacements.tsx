@@ -1,6 +1,6 @@
 import { Radio, Text } from '@mantine/core'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
-import { useEffect } from 'react'
+// import { useEffect } from 'react'
 
 const SelectPlacements = () => {
   const {
@@ -13,13 +13,15 @@ const SelectPlacements = () => {
         }
       }
     },
-    updateCampaign,
-    getInputProps
+    // updateCampaign,
+    getInputProps,
+    key
   } = useCreateCampaignContext()
 
-  useEffect(() => {
-    if (placement === 'app') updateCampaign({ devices: [] })
-  }, [placement, updateCampaign])
+  // TODO: check if needed
+  // useEffect(() => {
+  //   if (placement === 'app') updateCampaign({ devices: [] })
+  // }, [placement, updateCampaign])
 
   return (
     <Radio.Group
@@ -30,6 +32,7 @@ const SelectPlacements = () => {
       }
       name="placement"
       defaultValue={placement}
+      key={key('targetingInput.inputs.placements.in.0')}
       {...getInputProps('targetingInput.inputs.placements.in.0')}
     >
       <Radio label="Websites" value="site" mb="xs" />

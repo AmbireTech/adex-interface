@@ -1,11 +1,11 @@
-import { Grid } from '@mantine/core'
-// import { useViewportSize } from '@mantine/hooks'
+import { Container, Grid, Stack } from '@mantine/core'
 import { ICustomCardProps } from 'types'
 import CustomCard from 'components/common/CustomCard'
 import { useState } from 'react'
 import BillingDetailsIcon from 'resources/icons/BillingDetails'
 import InvoiceIcon from 'resources/icons/Invoice'
 import StatementsIcon from 'resources/icons/Statements'
+import useAccount from 'hooks/useAccount'
 import BillingDetails from './BillingDetails'
 import Invoices from './Invoices'
 import Statements from './AccountStatements'
@@ -30,49 +30,59 @@ const TabSwitch = ({ selectedTab }: { selectedTab: TabType }) => {
 }
 
 const BillingCard = (props: Omit<ICustomCardProps, 'width' | 'height' | 'color' | 'variant'>) => (
-  <CustomCard {...props} width="100%" height={100} color="secondary" variant="shadow" />
+  <CustomCard
+    {...props}
+    component="button"
+    width="100%"
+    height={100}
+    color="secondary"
+    variant="shadow"
+  />
 )
 
 function Billing() {
+  const {
+    adexAccount: {
+      billingDetails: { verified }
+    }
+  } = useAccount()
+
   const [selectedTab, setSelectedTab] = useState<TabType>(TabType.BillingTab)
   const handleTabClicked = (value: TabType) => setSelectedTab(value)
 
   return (
-    <Grid grow columns={10}>
-      <Grid.Col span={{ sm: 10, md: 3, lg: 2 }}>
-        <Grid>
-          <Grid.Col>
+    <Container size="xl">
+      <Grid columns={12} gutter="xl">
+        <Grid.Col span={{ sm: 12, md: 4, lg: 4 }}>
+          <Stack gap="md">
             <BillingCard
               text="Billing details"
               iconLeft={<BillingDetailsIcon size="24px" />}
               active={selectedTab === TabType.BillingTab}
               action={() => handleTabClicked(TabType.BillingTab)}
             />
-          </Grid.Col>
-          <Grid.Col>
+
             <BillingCard
               text="Invoices"
               iconLeft={<InvoiceIcon size="24px" />}
               active={selectedTab === TabType.InvoicesTab}
               action={() => handleTabClicked(TabType.InvoicesTab)}
+              disabled={!verified}
             />
-          </Grid.Col>
-          <Grid.Col>
             <BillingCard
               text="Account Statements"
               iconLeft={<StatementsIcon size="24px" />}
               active={selectedTab === TabType.StatementsTab}
               action={() => handleTabClicked(TabType.StatementsTab)}
+              disabled={!verified}
             />
-          </Grid.Col>
-        </Grid>
-      </Grid.Col>
-      <Grid.Col span={{ sm: 10, md: 7, lg: 4 }}>
-        <TabSwitch selectedTab={selectedTab} />
-      </Grid.Col>
-      {/* Note: this column is an empty, we use it instead of margin */}
-      <Grid.Col span={{ sm: 0, md: 0, lg: 4 }} />
-    </Grid>
+          </Stack>
+        </Grid.Col>
+        <Grid.Col span={{ sm: 12, md: 8, lg: 8 }}>
+          <TabSwitch selectedTab={selectedTab} />
+        </Grid.Col>
+      </Grid>
+    </Container>
   )
 }
 

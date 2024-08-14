@@ -8,3 +8,7 @@ export const CountryData: Map<string, { name: string }> = (() => {
 
   return data
 })()
+
+export const CountryNames: Array<string> = (() => {
+  return AllCountries.map(({ name }) => name)
+})()

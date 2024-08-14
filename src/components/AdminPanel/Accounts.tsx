@@ -20,7 +20,7 @@ const headingsDefault = [
 
 const AdminAnalytics = () => {
   const navigate = useNavigate()
-  const { accounts, initialDataLoading, updateAccounts } = useAdmin()
+  const { accounts, initialDataLoading, getAllAccounts } = useAdmin()
   const headings = useMemo(() => [...headingsDefault], [])
   const [search, setSearch] = useState('')
 
@@ -71,7 +71,12 @@ const AdminAnalytics = () => {
           .toLowerCase()
           .includes(search.toLowerCase().trim())
       )
-      .sort((a, b) => Number(b.availableBalance) - Number(a.availableBalance))
+      .sort(
+        (a, b) =>
+          b.fundsOnCampaigns.perCampaign.length - a.fundsOnCampaigns.perCampaign.length ||
+          Number(b.fundsDeposited.total) - Number(a.fundsDeposited.total) ||
+          Number(b.availableBalance) - Number(a.availableBalance)
+      )
       .map((a) => {
         return {
           id: a.id,
@@ -100,8 +105,8 @@ const AdminAnalytics = () => {
   }, [accounts, search])
 
   useEffect(() => {
-    updateAccounts()
-  }, [updateAccounts])
+    getAllAccounts()
+  }, [getAllAccounts])
 
   const handlePreview = useCallback(
     (item: { id: string }) => {

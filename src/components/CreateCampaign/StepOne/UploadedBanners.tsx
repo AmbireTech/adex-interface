@@ -3,10 +3,20 @@ import { Checkbox, Grid } from '@mantine/core'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import { AdUnit } from 'adex-common/dist/types'
 import ImageUrlInput from './ImageUrlInput'
+import { UtmInfo } from '../CreateCampaignCommon'
 
 const UploadedBanners = () => {
   const {
-    campaign: { adUnits },
+    campaign: {
+      adUnits,
+      targetingInput: {
+        inputs: {
+          placements: {
+            in: [placement]
+          }
+        }
+      }
+    },
     selectedBannerSizes,
     form,
     removeAdUnit,
@@ -35,7 +45,7 @@ const UploadedBanners = () => {
     <Grid>
       <Grid.Col>
         <Checkbox
-          label="Auto UTM tracking"
+          label={<UtmInfo title="     Auto UTM tracking *" placement={placement} />}
           key={key('autoUTMChecked')}
           {...getInputProps('autoUTMChecked', { type: 'checkbox' })}
         />

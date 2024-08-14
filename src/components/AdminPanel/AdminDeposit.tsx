@@ -22,7 +22,7 @@ type Deposit = {
 
 function AdminDeposit({ accountData }: { accountData: Account }) {
   const { showNotification } = useCustomNotifications()
-  const { makeDeposit, updateAccounts } = useAdmin()
+  const { makeDeposit, getAllAccounts } = useAdmin()
   const [loading, setLoading] = useState(false)
 
   const form = useForm<Deposit>({
@@ -53,15 +53,12 @@ function AdminDeposit({ accountData }: { accountData: Account }) {
 
   const handleSubmit = useCallback(
     async (values: Deposit) => {
-      console.log({ values })
       setLoading(true)
       await makeDeposit(
         values,
         () => {
-          form.resetTouched()
-          form.resetDirty()
+          getAllAccounts()
           form.reset()
-          updateAccounts()
           showNotification('info', `Deposit to ${form.values.accountId} success!`)
         },
         (err) => {
@@ -71,7 +68,7 @@ function AdminDeposit({ accountData }: { accountData: Account }) {
 
       setLoading(false)
     },
-    [form, makeDeposit, showNotification, updateAccounts]
+    [form, makeDeposit, showNotification, getAllAccounts]
   )
 
   const throttledSbm = useMemo(
@@ -88,7 +85,7 @@ function AdminDeposit({ accountData }: { accountData: Account }) {
             text: `Are you sure you want to deposit ${form.values.amount}  ${form.values.token.name} to ${form.values.accountId}?`,
             color: 'attention',
             labels: { confirm: 'Yes Sir', cancel: 'No' },
-            onConfirm: () => form.onSubmit(throttledSbm)
+            onConfirm: () => form.onSubmit(throttledSbm)()
           })
         )
     },

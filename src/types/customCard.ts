@@ -17,6 +17,7 @@ export interface ICustomCardProps {
   active?: boolean
   hasCheckMark?: boolean
   variant?: CustomCardType
+  disabled?: boolean
 }
 
 export interface ICustomCardStyleProps {

@@ -100,7 +100,14 @@ const CampaignPeriodModal = ({ opened, close }: { opened: boolean; close: () => 
   }, [updateCampaign, startDate, startTime, endDate, endTime, close])
 
   return (
-    <Modal centered size={736} opened={opened} withCloseButton={false} onClose={close}>
+    <Modal
+      centered
+      size={736}
+      opened={opened}
+      withCloseButton={false}
+      onClose={close}
+      styles={{ body: { padding: 0 } }}
+    >
       <Stack>
         <Grid>
           <Grid.Col

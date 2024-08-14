@@ -11,13 +11,13 @@ import {
 import { useColorScheme } from '@mantine/hooks'
 import { CREATE_CAMPAIGN_STEPS } from 'constants/createCampaign'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useMemo } from 'react'
 import LeftArrowIcon from 'resources/icons/LeftArrow'
 import useCreateCampaignData from 'hooks/useCreateCampaignData/useCreateCampaignData'
 import CampaignDetailsRow from 'components/common/CampainDetailsRow'
 import useCustomNotifications from 'hooks/useCustomNotifications'
-import { useNavigate } from 'react-router-dom'
 import { createStyles } from '@mantine/emotion'
+import { UtmInfo } from './CreateCampaignCommon'
 
 const useStyles = createStyles((theme: MantineTheme) => {
   const colorScheme = useColorScheme()
@@ -42,11 +42,22 @@ const useStyles = createStyles((theme: MantineTheme) => {
 
 const CampaignSummary = () => {
   const { classes, cx } = useStyles()
-  const navigate = useNavigate()
+  // const navigate = useNavigate()
   const {
-    campaign: { step, adUnits, autoUTMChecked },
+    campaign: {
+      step,
+      adUnits,
+      autoUTMChecked,
+      targetingInput: {
+        inputs: {
+          placements: {
+            in: [placement]
+          }
+        }
+      }
+    },
     updateCampaign,
-    resetCampaign,
+    // resetCampaign,
     saveToDraftCampaign,
     addUTMToTargetURLS,
     form
@@ -61,24 +72,13 @@ const CampaignSummary = () => {
     advancedTargeInput
   } = useCreateCampaignData()
   const { showNotification } = useCustomNotifications()
-
-  const [isNextBtnDisabled, setIsNextBtnDisabled] = useState(false)
-  const noSelectedCatsOrLogs = useMemo(
-    () => !formattedCats || !formattedLocs,
-    [formattedCats, formattedLocs]
-  )
-
-  useEffect(() => {
-    setIsNextBtnDisabled((step === 0 && !adUnits.length) || (step === 1 && noSelectedCatsOrLogs))
-  }, [step, noSelectedCatsOrLogs, adUnits])
-
   const isTheLastStep = useMemo(() => step === CREATE_CAMPAIGN_STEPS - 1, [step])
   const isFirstStep = useMemo(() => step === 0, [step])
 
   const handleNextStepBtnClicked = useCallback(() => {
     if (form.validate().hasErrors) return
     if (step < CREATE_CAMPAIGN_STEPS - 1) {
-      if (step === 0 || step === 2) {
+      if (step === 2) {
         if (autoUTMChecked) {
           addUTMToTargetURLS()
         }
@@ -93,8 +93,8 @@ const CampaignSummary = () => {
       const res = await saveToDraftCampaign()
 
       if (res && res.success) {
-        resetCampaign()
-        navigate('/dashboard/')
+        updateCampaign({ dirty: false })
+        showNotification('info', 'Draft saved')
       } else {
         showNotification('warning', 'invalid campaign data response', 'Data error')
       }
@@ -102,7 +102,7 @@ const CampaignSummary = () => {
       console.error(err)
       showNotification('error', 'Creating campaign failed', 'Data error')
     }
-  }, [resetCampaign, saveToDraftCampaign, showNotification, navigate])
+  }, [saveToDraftCampaign, showNotification, updateCampaign])
 
   return (
     <>
@@ -116,10 +116,18 @@ const CampaignSummary = () => {
         <CampaignDetailsRow lighterColor title="CPM" value={priceBoundsFormatted} textSize="sm" />
         <CampaignDetailsRow
           lighterColor
-          title="Device"
+          title="Placement"
+          value={placement === 'site' ? 'Website' : 'App'}
           textSize="sm"
-          value={formattedSelectedDevice}
         />
+        {placement === 'site' && (
+          <CampaignDetailsRow
+            lighterColor
+            title="Device"
+            textSize="sm"
+            value={formattedSelectedDevice}
+          />
+        )}
         <CampaignDetailsRow lighterColor title="Ad Format" value={adFormats} textSize="sm" />
         <CampaignDetailsRow lighterColor title="Categories" value={formattedCats} textSize="sm" />
         <CampaignDetailsRow lighterColor title="Countries" value={formattedLocs} textSize="sm" />
@@ -149,6 +157,23 @@ const CampaignSummary = () => {
           noBorder
           mb="xs"
         />
+
+        <CampaignDetailsRow
+          lighterColor
+          lineHeight="xs"
+          title="Auto UTM tracking"
+          value={
+            <Group gap="sm">
+              <Text size="inherit" c={autoUTMChecked ? 'success' : 'warning'}>
+                {autoUTMChecked ? 'Enabled' : 'Disabled'}
+              </Text>
+              <UtmInfo title="" placement={placement} />
+            </Group>
+          }
+          textSize="sm"
+          noBorder
+          mb="xs"
+        />
       </Stack>
       {/* Temporary disabled */}
       {/* <Flex justify="space-between" className={classes.bg} p="lg">
@@ -161,7 +186,7 @@ const CampaignSummary = () => {
         {!isTheLastStep && (
           <Button
             w="90%"
-            disabled={isNextBtnDisabled}
+            disabled={step === 0 && !adUnits.length}
             size="lg"
             variant="filled"
             onClick={handleNextStepBtnClicked}

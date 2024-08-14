@@ -54,7 +54,7 @@ const GetStarted = () => {
               <Button
                 w="70%"
                 size="lg"
-                variant="filled"
+                variant="outline"
                 color="secondary"
                 onClick={() => navigate('/dashboard/billing')}
               >
@@ -88,7 +88,7 @@ const GetStarted = () => {
               <Button
                 w="70%"
                 size="lg"
-                variant="filled"
+                variant="outline"
                 color="secondary"
                 onClick={() => navigate('/dashboard/deposit')}
               >
@@ -109,7 +109,7 @@ const GetStarted = () => {
               <Button
                 w="70%"
                 size="lg"
-                variant="filled"
+                variant="outline"
                 color="secondary"
                 p="0"
                 onClick={handleCreateCampaignBtnClicked}

@@ -4,7 +4,7 @@ import {
   // CampaignType,
   EventType
 } from 'adex-common'
-import { Container, Flex, Text, Loader, UnstyledButton } from '@mantine/core'
+import { Container, Flex, Text, Loader, UnstyledButton, Anchor, Box } from '@mantine/core'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import CustomTable, { TableElement, TableRowAction } from 'components/common/CustomTable'
 import { periodNumberToDate } from 'helpers'
@@ -92,7 +92,7 @@ const Dashboard = ({ isAdminPanel, accountId }: { isAdminPanel?: boolean; accoun
             ? x.campaign.owner.toLowerCase() === accountId.toLowerCase()
             : true
 
-        const isArchived = x.campaign.archived
+        const isArchived = matchFilter && x.campaign.archived
         if (isArchived) archivedCount++
 
         return matchFilter && ((!showArchived && !isArchived) || (showArchived && isArchived))
@@ -139,11 +139,23 @@ const Dashboard = ({ isAdminPanel, accountId }: { isAdminPanel?: boolean; accoun
               rowColor: archived ? 'red' : undefined,
               id: cmpData.campaignId,
               title: (
-                <Text truncate>
+                <Text size="sm" truncate>
                   {archived && (
                     <BadgeStatusCampaign type={cmpData.campaign.status} isArchived={archived} />
                   )}
                   {`${archived ? ' ' : ''}${cmpData.campaign.title}`}
+                  {isAdminPanel && (
+                    <Box>
+                      <Anchor
+                        underline="never"
+                        size="xs"
+                        href={`/dashboard/admin/user-account/${campaign.owner}`}
+                        c="secondaryText"
+                      >
+                        {campaign.owner}
+                      </Anchor>
+                    </Box>
+                  )}
                 </Text>
               ),
               // type: CampaignType[cmpData.campaign.type],
@@ -203,7 +215,7 @@ const Dashboard = ({ isAdminPanel, accountId }: { isAdminPanel?: boolean; accoun
             }
           })
         : [],
-    [filteredCampaignData]
+    [filteredCampaignData.campaignData, isAdminPanel]
   )
 
   const handlePreview = useCallback(
@@ -215,9 +227,9 @@ const Dashboard = ({ isAdminPanel, accountId }: { isAdminPanel?: boolean; accoun
 
   const handleAnalytics = useCallback(
     (data: DashboardTableElement['actionData']) => {
-      navigate(`/dashboard/campaign-analytics/${data.campaign.id}`)
+      navigate(`/dashboard/campaign-analytics/${isAdminPanel ? 'admin/' : ''}${data.campaign.id}`)
     },
-    [navigate]
+    [isAdminPanel, navigate]
   )
 
   const handleEditDraft = useCallback(
@@ -232,6 +244,9 @@ const Dashboard = ({ isAdminPanel, accountId }: { isAdminPanel?: boolean; accoun
           ...(isDuplicate && {
             id: '',
             title: `Copy - ${data.campaign.title}`,
+            activeFrom: BigInt(Date.now()),
+            activeTo:
+              BigInt(Date.now()) + BigInt(data.campaign.activeTo - data.campaign.activeFrom),
             status: CampaignStatus.created
           })
         })
@@ -312,7 +327,14 @@ const Dashboard = ({ isAdminPanel, accountId }: { isAdminPanel?: boolean; accoun
         action: handleAnalytics,
         label: 'Show Analytics',
         icon: <AnalyticsIcon />,
-        disabled: (ada: DashboardTableElement['actionData']) => ada.isDraft
+        disabled: (ada: DashboardTableElement['actionData']) =>
+          ada.isDraft ||
+          [
+            CampaignStatus.rejected,
+            CampaignStatus.ready,
+            CampaignStatus.inReview,
+            CampaignStatus.created
+          ].includes(ada.campaign.status)
       }
     ]
 

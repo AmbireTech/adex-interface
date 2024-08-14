@@ -202,13 +202,6 @@ const themeOverride: MantineThemeOverride = createTheme({
 
         return {
           root: {
-            background:
-              params.variant === 'outline'
-                ? alpha(
-                    theme.colors[params.color || theme.primaryColor][DEFAULT_PRIMARY_SHADE],
-                    theme.other.shades.rgba.lightest
-                  )
-                : '',
             backgroundImage:
               // eslint-disable-next-line no-nested-ternary
               params.variant === 'outline' && !params.disabled
@@ -235,9 +228,6 @@ const themeOverride: MantineThemeOverride = createTheme({
       }
     }),
     Modal: Modal.extend({
-      defaultProps: {
-        padding: 0
-      },
       styles: (theme) => ({
         root: {
           padding: 0,

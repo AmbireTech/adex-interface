@@ -99,7 +99,7 @@ const useDropzone = () => {
         })
       setUploadedFiles(null)
     },
-    [setUploadedFiles, addAdUnit, uploadMedia, uploadZipMedia]
+    [uploadZipMedia, uploadMedia, addAdUnit]
   )
 
   useEffect(() => {

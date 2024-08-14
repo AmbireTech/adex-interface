@@ -118,7 +118,7 @@ function SideNav() {
               to="/dashboard/admin/campaigns"
               // icon={<BillingIcon />}
               label="Admin Panel"
-              active={useResolvedPath('admin').pathname === match?.pathname}
+              active={useResolvedPath('admin/campaigns').pathname === match?.pathname}
             />
           )}
         </Box>

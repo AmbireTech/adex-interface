@@ -34,7 +34,7 @@ export const defaultConfirmModalProps = ({
           )
         })}
       >
-        <ThemeIcon size="xl" variant="transparent" radius="xl" color={color}>
+        <ThemeIcon size="xl" variant="light" radius="xl" color={color}>
           <AttentionIcon size="24px" />
         </ThemeIcon>
 
@@ -42,8 +42,8 @@ export const defaultConfirmModalProps = ({
       </Stack>
     ),
     labels: labels || { confirm: 'confirm', cancel: 'cancel' },
-    cancelProps: { color: 'secondaryText', variant: 'outline', size: 'md', ...cancelProps },
-    confirmProps: { color, variant: 'outline', size: 'md', ...confirmProps },
+    cancelProps: { color: 'brand', variant: 'outline', size: 'md', ...cancelProps },
+    confirmProps: { color: 'brand', variant: 'filled', size: 'md', ...confirmProps },
     groupProps: { justify: 'space-between', pb: 'md', px: 'md' },
     ...rest
   }
