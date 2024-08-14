@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState, useMemo } from 'react'
 import { Container, Flex, Loader, Tabs, Paper, Group, Text, Anchor, Center } from '@mantine/core'
-import { useParams } from 'react-router-dom'
-import { AnalyticsType, BaseAnalyticsData, AnalyticsPeriod } from 'types'
+import { useParams, useNavigate } from 'react-router-dom'
+import { BaseAnalyticsData, AnalyticsPeriod, AnalyticsType } from 'types'
 import GoBack from 'components/common/GoBack/GoBack'
 import DownloadCSV from 'components/common/DownloadCSV'
 import useCampaignAnalytics from 'hooks/useCampaignAnalytics'
@@ -19,9 +19,9 @@ import { generateCVSData } from './CvsDownloadConfigurations'
 import SeeOnMapBtn from './SeeOnMapBtn'
 
 const CampaignAnalytics = ({ isAdminPanel = false }: { isAdminPanel?: boolean }) => {
-  const { id } = useParams()
+  const { id, activeTab = 'timeframe' } = useParams<{ id: string; activeTab: AnalyticsType }>()
 
-  const [activeTab, setActiveTab] = useState<AnalyticsType>('timeframe')
+  const navigate = useNavigate()
   const [isMapBtnShown, setIsMapBtnShown] = useState<boolean>(false)
   const [isMapVisible, setIsMapVisible] = useState<boolean>(false)
   const [csvData, setCsvData] = useState<any | undefined>()
@@ -103,11 +103,16 @@ const CampaignAnalytics = ({ isAdminPanel = false }: { isAdminPanel?: boolean })
     }
   }, [activeTab, campaignMappedAnalytics])
 
-  const handleTabChange = useCallback((value: string | null) => {
-    // TODO: validate value if it is in AnalyticsType
-    if (!value) return
-    setActiveTab(value as AnalyticsType)
-  }, [])
+  const handleTabChange = useCallback(
+    (value: string | null) => {
+      campaign?.id &&
+        navigate(
+          `/dashboard/campaign-analytics${isAdminPanel ? '/admin' : ''}/${campaign?.id}/${value}`,
+          { replace: true }
+        )
+    },
+    [campaign?.id, isAdminPanel, navigate]
+  )
 
   // TODO: there is delay when updated analytics table is displayed after the tab is switched - add loading bars or something
 

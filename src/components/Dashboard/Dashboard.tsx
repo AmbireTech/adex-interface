@@ -260,7 +260,7 @@ const Dashboard = ({ isAdminPanel, accountId }: { isAdminPanel?: boolean; accoun
 
   const handleEdit = useCallback(
     (data: DashboardTableElement['actionData']) =>
-      navigate(`/dashboard/campaign-details/${data.campaign.id}?edit=true`, {}),
+      navigate(`/dashboard/campaign-details/${data.campaign.id}/budget?edit=true`, {}),
     [navigate]
   )
 

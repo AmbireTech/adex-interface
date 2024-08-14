@@ -3,8 +3,8 @@ import CustomTable, { TableElement, TableRowAction } from 'components/common/Cus
 import { getHumneSrcName } from 'helpers'
 import { useMemo } from 'react'
 import { BaseAnalyticsData } from 'types'
-import InvisibilityIcon from 'resources/icons/Invisibility'
-import VisibilityIcon from 'resources/icons/Visibility'
+import IncludeIcon from 'resources/icons/Include'
+import ExcludeIcon from 'resources/icons/Exclude'
 import { useCampaignsData } from 'hooks/useCampaignsData'
 
 const Placements = ({
@@ -89,7 +89,7 @@ const Placements = ({
             label: ({ isBlocked, placementName }: PlacementsTableElement['actionData']) =>
               `${isBlocked ? 'Unblock' : 'Block'} "${placementName}"`,
             icon: ({ isBlocked }: PlacementsTableElement['actionData']) =>
-              isBlocked ? <VisibilityIcon size="inherit" /> : <InvisibilityIcon size="inherit" />
+              isBlocked ? <IncludeIcon /> : <ExcludeIcon />
           }
         ]
       : []
