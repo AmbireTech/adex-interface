@@ -117,6 +117,7 @@ const ImageUrlInput = ({
           text={`${image.banner?.format.w}x${image.banner?.format.h}`}
         />
         <Input
+          onKeyDown={(event) => event.key === 'Enter' && event.preventDefault()}
           defaultValue={!form ? image.banner?.targetUrl : undefined}
           className={classes.inputField}
           error={hasError}
