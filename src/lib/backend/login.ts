@@ -56,20 +56,18 @@ export const isTokenExpired = (token: string) => {
 
 export const getMessageToSign = async (user: any) => {
   const url = `${BACKEND_BASE_URL}/dsp/login-msg`
-  const method = 'POST'
   const body = {
     wallet: user.address,
     chainId: user.chainId
   }
-  const headers = {
-    'Content-Type': 'application/json'
-  }
 
-  const req: RequestOptions<any> = {
+  const req: RequestOptions = {
     url,
-    method,
-    headers,
-    body
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(body)
   }
 
   return fetchService(req).then(processResponse)
@@ -82,31 +80,29 @@ type VerifyLoginProps = {
 
 export const verifyLogin = async (body: VerifyLoginProps) => {
   const url = `${BACKEND_BASE_URL}/dsp/login-verify`
-  const method = 'POST'
-  const headers = {
-    'Content-Type': 'application/json'
-  }
 
-  const req: RequestOptions<any> = {
+  const req: RequestOptions = {
     url,
-    method,
-    headers,
-    body
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(body)
   }
 
   return fetchService(req).then(processResponse)
 }
 
 export const refreshAccessToken = async (refreshToken: string) => {
-  const req: RequestOptions<any> = {
+  const req: RequestOptions = {
     url: `${BACKEND_BASE_URL}/dsp/refresh-token`,
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
     },
-    body: {
+    body: JSON.stringify({
       refreshToken
-    }
+    })
   }
 
   return fetchService(req).then(processResponse)
