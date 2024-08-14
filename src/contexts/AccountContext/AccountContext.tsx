@@ -252,7 +252,7 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
         body:
           reqOptions.body instanceof FormData
             ? reqOptions.body
-            : JSON.stringify(SuperJSON.serialize(reqOptions.body).json),
+            : reqOptions.body && JSON.stringify(SuperJSON.serialize(reqOptions.body).json),
         queryParams: reqOptions.queryParams,
         headers: reqOptions.headers
       }
