@@ -15,7 +15,7 @@ const useStyles = createStyles((theme: MantineTheme, { hasErrors }: { hasErrors:
       backgroundColor: theme.colors.lightBackground[primaryShade],
       border: '1px solid',
       borderColor: hasErrors
-        ? theme.colors.warning[primaryShade]
+        ? theme.colors.error[primaryShade]
         : theme.colors.decorativeBorders[primaryShade],
       borderRadius: theme.radius.md,
       padding: theme.spacing.sm
@@ -47,13 +47,13 @@ const CampaignPeriod = () => {
         align="center"
         className={classes.wrapper}
       >
-        <Flex direction="column" c={errorStartsAt ? 'warning' : undefined}>
+        <Flex direction="column" c={errorStartsAt ? 'error' : undefined}>
           <Text c="secondaryText" size="xs">
             Start Date
           </Text>
           <Text size="md">{startDateTime}</Text>
         </Flex>
-        <Flex direction="column" c={errorEndsAt ? 'warning' : undefined}>
+        <Flex direction="column" c={errorEndsAt ? 'error' : undefined}>
           <Text c="secondaryText" size="xs">
             End Date
           </Text>
@@ -65,12 +65,12 @@ const CampaignPeriod = () => {
         <CampaignPeriodModal opened={opened} close={close} />
       </Flex>
       {errorStartsAt && (
-        <Text size="sm" c="warning">
+        <Text size="sm" c="error">
           {errorStartsAt}
         </Text>
       )}
       {errorEndsAt && (
-        <Text size="sm" c="warning">
+        <Text size="sm" c="error">
           {errorEndsAt}
         </Text>
       )}

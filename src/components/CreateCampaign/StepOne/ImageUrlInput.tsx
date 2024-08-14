@@ -42,7 +42,7 @@ const useStyles = createStyles((theme: MantineTheme, { hasError }: { hasError: b
       borderRight: '1px solid',
       padding: theme.spacing.xs,
       borderColor: hasError
-        ? theme.colors.warning[primaryShade]
+        ? theme.colors.error[primaryShade]
         : theme.colors.decorativeBorders[primaryShade]
     },
     wrapper: {
@@ -51,20 +51,18 @@ const useStyles = createStyles((theme: MantineTheme, { hasError }: { hasError: b
       borderColor: theme.colors.decorativeBorders[primaryShade],
       borderRadius: theme.radius.md,
       '&:focus-within': {
-        borderColor: hasError
-          ? theme.colors.warning[primaryShade]
-          : theme.colors.brand[primaryShade],
+        borderColor: hasError ? theme.colors.error[primaryShade] : theme.colors.brand[primaryShade],
         '#mediaWrapper': {
           borderColor: hasError
-            ? theme.colors.warning[primaryShade]
+            ? theme.colors.error[primaryShade]
             : theme.colors.brand[primaryShade]
         }
       }
     },
     inputError: {
-      borderColor: theme.colors.warning[primaryShade],
+      borderColor: theme.colors.error[primaryShade],
       '#mediaWrapper': {
-        borderColor: theme.colors.warning[primaryShade]
+        borderColor: theme.colors.error[primaryShade]
       }
     },
     infoError: {
@@ -114,7 +112,7 @@ const ImageUrlInput = ({
           <MediaThumb adUnit={image} />
         </div>
         <CustomBadge
-          color={hasError ? 'warning' : 'brand'}
+          color={hasError ? 'error' : 'brand'}
           text={`${image.banner?.format.w}x${image.banner?.format.h}`}
         />
         <Input
@@ -150,7 +148,7 @@ const ImageUrlInput = ({
         )}
       </Flex>
       {form?.errors[`adUnits.${index}.banner.targetUrl`] && (
-        <Text c="warning">{form?.errors[`adUnits.${index}.banner.targetUrl`]}</Text>
+        <Text c="error">{form?.errors[`adUnits.${index}.banner.targetUrl`]}</Text>
       )}
     </>
   )

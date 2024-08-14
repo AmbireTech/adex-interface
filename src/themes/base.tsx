@@ -47,6 +47,7 @@ type ExtendedCustomColors =
   | 'nonDecorativeBorders'
   | 'stopped'
   | 'paused'
+  | 'error'
   | DefaultMantineColor
 
 type Tuple<T, N extends number> = [T, ...T[]] & { length: N }
