@@ -108,7 +108,7 @@ const CampaignPeriodModal = ({ opened, close }: { opened: boolean; close: () => 
             className={cx(classes.wrapper, { [classes.selected]: selectDateOrTimeTab === 'date' })}
             onClick={() => setSelectDateOrTimeTab('date')}
           >
-            <Flex justify="space-between" align="center">
+            <Flex justify="space-between" align="center" p="xs">
               <Group>
                 <CalendarIcon />
                 <div>
@@ -128,7 +128,7 @@ const CampaignPeriodModal = ({ opened, close }: { opened: boolean; close: () => 
             className={cx(classes.wrapper, { [classes.selected]: selectDateOrTimeTab === 'time' })}
             onClick={() => setSelectDateOrTimeTab('time')}
           >
-            <Flex justify="space-between" align="center">
+            <Flex justify="space-between" align="center" p="xs">
               <Group>
                 <TimeIcon />
                 <div>
