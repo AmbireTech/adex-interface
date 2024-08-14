@@ -8,7 +8,7 @@ import {
   useState
 } from 'react'
 import { CREATE_CAMPAIGN_DEFAULT_VALUE, dateNowPlusThirtyDays } from 'constants/createCampaign'
-import superjson, { serialize } from 'superjson'
+import superjson from 'superjson'
 import {
   CampaignUI,
   CreateCampaignType,
@@ -333,12 +333,10 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
   const publishCampaign = useCallback(() => {
     const preparedCampaign = prepareCampaignObject(campaign, balanceToken.decimals)
 
-    const body = serialize(preparedCampaign).json
-
     return adexServicesRequest('backend', {
       route: '/dsp/campaigns',
       method: 'POST',
-      body,
+      body: preparedCampaign,
       headers: {
         'Content-Type': 'application/json'
       }
@@ -353,13 +351,11 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
       preparedCampaign.title =
         preparedCampaign.title || `Draft Campaign ${formatDateTime(new Date())}`
 
-      const body = serialize(preparedCampaign).json
-
       try {
         const res = await adexServicesRequest('backend', {
           route: '/dsp/campaigns/draft',
           method: 'POST',
-          body,
+          body: preparedCampaign,
           headers: {
             'Content-Type': 'application/json'
           }
