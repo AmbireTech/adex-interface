@@ -42,7 +42,6 @@ const useStyles = createStyles((theme: MantineTheme) => {
 
 const CampaignSummary = () => {
   const { classes, cx } = useStyles()
-  // const navigate = useNavigate()
   const {
     campaign: {
       step,
@@ -57,7 +56,6 @@ const CampaignSummary = () => {
       }
     },
     updateCampaign,
-    // resetCampaign,
     saveToDraftCampaign,
     addUTMToTargetURLS,
     form

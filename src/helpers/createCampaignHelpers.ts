@@ -8,7 +8,6 @@ import {
   SupplyStats,
   SupplyStatsDetails
 } from 'types'
-import dayjs from 'dayjs'
 
 export const checkSelectedDevices = (devices: Devices[]) => {
   if (!devices.length) return null
@@ -185,12 +184,6 @@ export const initAllLocales = () => {
     return acc
   }, {})
   return allLocales
-}
-
-export const isPastDateTime = (dateTime: Date | string) => {
-  const givenDateTime = dayjs(dateTime)
-  const currentDateTime = dayjs()
-  return givenDateTime.isBefore(currentDateTime)
 }
 
 export function deepEqual<T>(obj1: T, obj2: T): boolean {
