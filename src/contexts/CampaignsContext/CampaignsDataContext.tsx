@@ -16,6 +16,11 @@ import { CREATE_CAMPAIGN_DEFAULT_VALUE } from 'constants/createCampaign'
 import { parseBigNumTokenAmountToDecimal } from 'helpers/balances'
 import { defaultSupplyStats } from './defaultData'
 
+type NotificationMsg = {
+  title?: string
+  msg?: string
+}
+
 const defaultCampaignData: CampaignData = {
   campaignId: '',
   campaign: { ...CREATE_CAMPAIGN_DEFAULT_VALUE },
@@ -120,8 +125,10 @@ interface ICampaignsDataContext {
   editCampaign: (
     campaignId: string,
     pricingBounds?: Partial<Campaign['pricingBounds']>,
-    inputs?: Partial<Campaign['targetingInput']['inputs']>
-  ) => Promise<void>
+    inputs?: Partial<Campaign['targetingInput']['inputs']>,
+    successMsg?: NotificationMsg,
+    errMsg?: NotificationMsg
+  ) => Promise<{ success: boolean }>
   toggleArchived: (id: string) => void
   toggleBlockedSource: (campaignId: string, srcId: string, srcName: string) => Promise<void>
 }
@@ -390,7 +397,9 @@ const CampaignsDataProvider: FC<PropsWithChildren & { type: 'user' | 'admin' }> 
     async (
       campaignId: string,
       pricingBounds?: Partial<Campaign['pricingBounds']>,
-      inputs?: Partial<Campaign['targetingInput']['inputs']>
+      inputs?: Partial<Campaign['targetingInput']['inputs']>,
+      successMsg?: NotificationMsg,
+      errMsg?: NotificationMsg
     ) => {
       const campaign = campaignsData.get(campaignId)?.campaign
 
@@ -419,7 +428,7 @@ const CampaignsDataProvider: FC<PropsWithChildren & { type: 'user' | 'admin' }> 
       }
 
       try {
-        await adexServicesRequest('backend', {
+        const res = await adexServicesRequest<{ success?: boolean }>('backend', {
           route: `/dsp/campaigns/edit/${campaign.id}`,
           method: 'PUT',
           body,
@@ -428,10 +437,24 @@ const CampaignsDataProvider: FC<PropsWithChildren & { type: 'user' | 'admin' }> 
           }
         })
 
-        showNotification('info', 'Successfully updated Campaign data!')
+        if (!res?.success) {
+          throw new Error('Error on updating campaign data')
+        }
+
+        showNotification(
+          'info',
+          successMsg?.msg || 'Successfully updated Campaign data!',
+          successMsg?.title
+        )
         updateCampaignDataById(campaign.id)
+        return { success: true }
       } catch {
-        return showNotification('error', "Couldn't update the Campaign data!")
+        showNotification(
+          'error',
+          errMsg?.msg || "Couldn't update the Campaign data!",
+          errMsg?.title
+        )
+        return { success: false }
       }
     },
     [campaignsData, adexServicesRequest, showNotification, updateCampaignDataById]
@@ -458,7 +481,10 @@ const CampaignsDataProvider: FC<PropsWithChildren & { type: 'user' | 'admin' }> 
         publishers: { ...blockedPublishers }
       }
 
-      return editCampaign(campaignId, undefined, inputs)
+      await editCampaign(campaignId, undefined, inputs, {
+        title: isBlocked ? 'Unblocked' : 'Blocked',
+        msg: srcName
+      })
     },
     [campaignsData, editCampaign]
   )

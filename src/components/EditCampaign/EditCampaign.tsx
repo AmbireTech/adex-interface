@@ -26,8 +26,6 @@ import {
   getRecommendedCPMRange
 } from 'helpers/createCampaignHelpers'
 import useAccount from 'hooks/useAccount'
-import { useAdExApi } from 'hooks/useAdexServices'
-import useCustomNotifications from 'hooks/useCustomNotifications'
 import { useCallback, useEffect, useMemo } from 'react'
 import { useCampaignsData } from 'hooks/useCampaignsData'
 import type {
@@ -57,12 +55,10 @@ type FormProps = {
 }
 
 const EditCampaign = ({ campaign }: { campaign: Campaign }) => {
-  const { adexServicesRequest } = useAdExApi()
-  const { showNotification } = useCustomNotifications()
   const {
     adexAccount: { balanceToken }
   } = useAccount()
-  const { updateCampaignDataById, supplyStats } = useCampaignsData()
+  const { supplyStats, editCampaign } = useCampaignsData()
 
   const recommendedPaymentBounds = useMemo(
     () => getRecommendedCPMRange(supplyStats, campaign),
@@ -211,73 +207,38 @@ const EditCampaign = ({ campaign }: { campaign: Campaign }) => {
     [form]
   )
 
-  const editCampaign = useCallback(
+  const handleEditCampaign = useCallback(
     async (values: FormProps) => {
       const impression = {
-        min: Number(
-          parseToBigNumPrecision(
-            Number(values.pricingBounds.IMPRESSION?.min) / 1000,
-            balanceToken.decimals
-          )
+        min: parseToBigNumPrecision(
+          Number(values.pricingBounds.IMPRESSION?.min) / 1000,
+          balanceToken.decimals
         ),
-        max: Number(
-          parseToBigNumPrecision(
-            Number(values.pricingBounds.IMPRESSION?.max) / 1000,
-            balanceToken.decimals
-          )
+        max: parseToBigNumPrecision(
+          Number(values.pricingBounds.IMPRESSION?.max) / 1000,
+          balanceToken.decimals
         )
       }
 
-      const body: FormProps = {
-        pricingBounds: {
-          CLICK: { min: 0, max: 0 },
-          IMPRESSION: impression
-        },
-        targetingInput: {
-          version: '1',
-          inputs: {
-            categories: values.targetingInput.inputs.categories,
-            location: values.targetingInput.inputs.location,
-            advanced: {
-              disableFrequencyCapping:
-                values.targetingInput.inputs.advanced.disableFrequencyCapping,
-              includeIncentivized: values.targetingInput.inputs.advanced.includeIncentivized,
-              limitDailyAverageSpending:
-                values.targetingInput.inputs.advanced.limitDailyAverageSpending
-            }
-          }
-        }
+      const pricingBounds: Partial<Campaign['pricingBounds']> = {
+        IMPRESSION: impression
+      }
+      const inputs: Partial<Campaign['targetingInput']['inputs']> = {
+        categories: values.targetingInput.inputs.categories,
+        location: values.targetingInput.inputs.location
       }
 
-      try {
-        await adexServicesRequest('backend', {
-          route: `/dsp/campaigns/edit/${campaign.id}`,
-          method: 'PUT',
-          body,
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        })
+      const { success } = await editCampaign(campaign.id, pricingBounds, inputs)
+      if (success) {
         form.resetDirty()
-        showNotification('info', 'Successfully updated Campaign data!')
-        updateCampaignDataById(campaign.id)
-      } catch {
-        return showNotification('error', "Couldn't update the Campaign data!")
       }
     },
-    [
-      balanceToken.decimals,
-      adexServicesRequest,
-      campaign.id,
-      form,
-      showNotification,
-      updateCampaignDataById
-    ]
+    [balanceToken.decimals, editCampaign, campaign.id, form]
   )
 
   const throttledSbm = useMemo(() => {
-    return throttle(editCampaign, 3000, { leading: true })
-  }, [editCampaign])
+    return throttle(handleEditCampaign, 3000, { leading: true })
+  }, [handleEditCampaign])
 
   if (!campaign) return <div>Invalid Campaign ID</div>
   return (
