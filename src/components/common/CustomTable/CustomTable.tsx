@@ -31,7 +31,7 @@ export type TableRowAction = {
   action: (e: TableElement['actionData']) => any
   label: ((e: TableElement['actionData']) => string) | string
   color?: MantineColor
-  icon: ReactNode
+  icon: ((e: TableElement['actionData']) => ReactNode) | ReactNode
   disabled?: (e?: TableElement['actionData']) => boolean
   hide?: (e?: TableElement['actionData']) => boolean
 }
@@ -51,6 +51,14 @@ const getLabel = (label: TableRowAction['label'], actionData: TableElement['acti
   }
 
   return label
+}
+
+const getIcon = (icon: TableRowAction['icon'], actionData: TableElement['actionData']) => {
+  if (typeof icon === 'function') {
+    return icon(actionData)
+  }
+
+  return icon
 }
 
 export const CustomTable = ({
@@ -100,7 +108,7 @@ export const CustomTable = ({
                   onClick={() => a.action(e.actionData || e)}
                   disabled={a.disabled?.(e.actionData || e)}
                 >
-                  {a.icon}
+                  {getIcon(a.icon, e.actionData)}
                 </ActionIcon>
               </Tooltip>
             )
@@ -123,7 +131,7 @@ export const CustomTable = ({
                       key={label}
                       leftSection={
                         <ThemeIcon size="20px" variant="transparent" color={a.color || 'mainText'}>
-                          {a.icon}
+                          {getIcon(a.icon, e.actionData)}
                         </ThemeIcon>
                       }
                       onClick={() => a.action(e.actionData || e)}
