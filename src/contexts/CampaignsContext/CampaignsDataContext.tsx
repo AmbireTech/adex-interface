@@ -117,6 +117,11 @@ interface ICampaignsDataContext {
   initialDataLoading: boolean
   changeCampaignStatus: (status: CampaignStatus, campaignId: Campaign['id']) => void
   deleteDraftCampaign: (id: string) => void
+  editCampaign: (
+    campaignId: string,
+    pricingBounds?: Partial<Campaign['pricingBounds']>,
+    inputs?: Partial<Campaign['targetingInput']['inputs']>
+  ) => Promise<void>
   toggleArchived: (id: string) => void
   toggleBlockedSource: (campaignId: string, srcId: string, srcName: string) => Promise<void>
 }
@@ -381,6 +386,57 @@ const CampaignsDataProvider: FC<PropsWithChildren & { type: 'user' | 'admin' }> 
     [adexServicesRequest, updateCampaignDataById]
   )
 
+  const editCampaign = useCallback(
+    async (
+      campaignId: string,
+      pricingBounds?: Partial<Campaign['pricingBounds']>,
+      inputs?: Partial<Campaign['targetingInput']['inputs']>
+    ) => {
+      const campaign = campaignsData.get(campaignId)?.campaign
+
+      if (!campaign) {
+        throw new Error('invalid campaign')
+      }
+
+      const body: Pick<Campaign, 'pricingBounds' | 'targetingInput'> = {
+        pricingBounds: { ...campaign.pricingBounds, ...pricingBounds },
+        targetingInput: {
+          ...campaign.targetingInput,
+          inputs: {
+            ...campaign.targetingInput.inputs,
+            ...(inputs?.location && { location: inputs.location }),
+            ...(inputs?.categories && {
+              categories: inputs.categories
+            }),
+            ...(inputs?.publishers && {
+              publishers: inputs.publishers
+            }),
+            // NOTE: uncomment if we decide that changing placements will be editable on the UI
+            // ...(targetingInput?.inputs?.placements && { placements: targetingInput.inputs.placements}),
+            ...(inputs?.advanced && { advanced: inputs.advanced })
+          }
+        }
+      }
+
+      try {
+        await adexServicesRequest('backend', {
+          route: `/dsp/campaigns/edit/${campaign.id}`,
+          method: 'PUT',
+          body,
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        })
+
+        showNotification('info', 'Successfully updated Campaign data!')
+        updateCampaignDataById(campaign.id)
+      } catch {
+        return showNotification('error', "Couldn't update the Campaign data!")
+      }
+    },
+    [campaignsData, adexServicesRequest, showNotification, updateCampaignDataById]
+  )
+
   const toggleBlockedSource: ICampaignsDataContext['toggleBlockedSource'] = useCallback(
     async (campaignId, srcName, srcId): Promise<void> => {
       const campaign = campaignsData.get(campaignId)?.campaign
@@ -398,32 +454,13 @@ const CampaignsDataProvider: FC<PropsWithChildren & { type: 'user' | 'admin' }> 
           : [...campaign.targetingInput.inputs.publishers.nin, srcId]
       }
 
-      const body: Pick<Campaign, 'pricingBounds' | 'targetingInput'> = {
-        pricingBounds: { ...campaign.pricingBounds },
-        targetingInput: {
-          ...campaign.targetingInput,
-          inputs: {
-            ...campaign.targetingInput.inputs,
-            publishers: blockedPublishers
-          }
-        }
+      const inputs: Partial<Campaign['targetingInput']['inputs']> = {
+        publishers: { ...blockedPublishers }
       }
-      try {
-        await adexServicesRequest('backend', {
-          route: `/dsp/campaigns/edit/${campaign.id}`,
-          method: 'PUT',
-          body,
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        })
-        updateCampaignDataById(campaign.id)
-        showNotification('info', srcName, `Successfully ${isBlocked ? 'unblocked' : 'blocked'}`)
-      } catch {
-        showNotification('error', "Couldn't update the Campaign data!")
-      }
+
+      return editCampaign(campaignId, undefined, inputs)
     },
-    [adexServicesRequest, campaignsData, showNotification, updateCampaignDataById]
+    [campaignsData, editCampaign]
   )
 
   const contextValue = useMemo(
@@ -437,7 +474,8 @@ const CampaignsDataProvider: FC<PropsWithChildren & { type: 'user' | 'admin' }> 
       deleteDraftCampaign,
       toggleArchived,
       updateSupplyStats,
-      toggleBlockedSource
+      toggleBlockedSource,
+      editCampaign
     }),
     [
       campaignsData,
@@ -449,7 +487,8 @@ const CampaignsDataProvider: FC<PropsWithChildren & { type: 'user' | 'admin' }> 
       deleteDraftCampaign,
       toggleArchived,
       updateSupplyStats,
-      toggleBlockedSource
+      toggleBlockedSource,
+      editCampaign
     ]
   )
 
