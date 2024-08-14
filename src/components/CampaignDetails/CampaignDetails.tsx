@@ -229,8 +229,8 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
                 <Button
                   disabled={isDraft ? !canEditDraft : !canEdit}
                   rightSection={<EditIcon size="15px" />}
-                  variant="subtle"
-                  color="mainText"
+                  variant={isEditMode ? 'filled' : 'subtle'}
+                  color={isEditMode ? 'brand' : 'mainText'}
                   onClick={() =>
                     isDraft
                       ? canEditDraft && handleEditDraft()
@@ -262,7 +262,7 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
       </StickyPanel>
 
       {isEditMode ? (
-        <EditCampaign campaign={campaign} />
+        <EditCampaign campaign={campaign} isAdmin={isAdminPanel} />
       ) : (
         <Paper p="lg" shadow="xs">
           <Grid gutter="lg">

@@ -249,7 +249,10 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
       const req: RequestOptions = {
         url: `${baseUrl}/${urlCheck}`,
         method: reqOptions.method,
-        body: reqOptions.body ? JSON.stringify(SuperJSON.serialize(reqOptions.body).json) : null,
+        body:
+          reqOptions.body instanceof FormData
+            ? reqOptions.body
+            : reqOptions.body && JSON.stringify(SuperJSON.serialize(reqOptions.body).json),
         queryParams: reqOptions.queryParams,
         headers: reqOptions.headers
       }
