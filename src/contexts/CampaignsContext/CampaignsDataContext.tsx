@@ -118,6 +118,7 @@ interface ICampaignsDataContext {
   changeCampaignStatus: (status: CampaignStatus, campaignId: Campaign['id']) => void
   deleteDraftCampaign: (id: string) => void
   toggleArchived: (id: string) => void
+  toggleBlockedSource: (campaignId: string, srcId: string, srcName: string) => Promise<void>
 }
 
 const CampaignsDataContext = createContext<ICampaignsDataContext | null>(null)
@@ -380,6 +381,51 @@ const CampaignsDataProvider: FC<PropsWithChildren & { type: 'user' | 'admin' }> 
     [adexServicesRequest, updateCampaignDataById]
   )
 
+  const toggleBlockedSource: ICampaignsDataContext['toggleBlockedSource'] = useCallback(
+    async (campaignId, srcName, srcId): Promise<void> => {
+      const campaign = campaignsData.get(campaignId)?.campaign
+      if (!campaign) {
+        throw new Error('invalid campaign ')
+      }
+
+      const isBlocked = campaign.targetingInput.inputs.publishers.nin.includes(srcId)
+
+      const blockedPublishers: Campaign['targetingInput']['inputs']['publishers'] = {
+        ...campaign.targetingInput.inputs.publishers,
+        apply: 'nin',
+        nin: isBlocked
+          ? [...campaign.targetingInput.inputs.publishers.nin].filter((x) => x !== srcId)
+          : [...campaign.targetingInput.inputs.publishers.nin, srcId]
+      }
+
+      const body: Pick<Campaign, 'pricingBounds' | 'targetingInput'> = {
+        pricingBounds: { ...campaign.pricingBounds },
+        targetingInput: {
+          ...campaign.targetingInput,
+          inputs: {
+            ...campaign.targetingInput.inputs,
+            publishers: blockedPublishers
+          }
+        }
+      }
+      try {
+        await adexServicesRequest('backend', {
+          route: `/dsp/campaigns/edit/${campaign.id}`,
+          method: 'PUT',
+          body,
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        })
+        updateCampaignDataById(campaign.id)
+        showNotification('info', srcName, `Successfully ${isBlocked ? 'unblocked' : 'blocked'}`)
+      } catch {
+        showNotification('error', "Couldn't update the Campaign data!")
+      }
+    },
+    [adexServicesRequest, campaignsData, showNotification, updateCampaignDataById]
+  )
+
   const contextValue = useMemo(
     () => ({
       campaignsData,
@@ -390,7 +436,8 @@ const CampaignsDataProvider: FC<PropsWithChildren & { type: 'user' | 'admin' }> 
       changeCampaignStatus,
       deleteDraftCampaign,
       toggleArchived,
-      updateSupplyStats
+      updateSupplyStats,
+      toggleBlockedSource
     }),
     [
       campaignsData,
@@ -401,7 +448,8 @@ const CampaignsDataProvider: FC<PropsWithChildren & { type: 'user' | 'admin' }> 
       changeCampaignStatus,
       deleteDraftCampaign,
       toggleArchived,
-      updateSupplyStats
+      updateSupplyStats,
+      toggleBlockedSource
     ]
   )
 
