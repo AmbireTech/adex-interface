@@ -262,7 +262,7 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
       </StickyPanel>
 
       {isEditMode ? (
-        <EditCampaign campaign={campaign} />
+        <EditCampaign campaign={campaign} isAdmin={isAdminPanel} />
       ) : (
         <Paper p="lg" shadow="xs">
           <Grid gutter="lg">
