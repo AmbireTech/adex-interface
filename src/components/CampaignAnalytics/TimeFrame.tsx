@@ -2,9 +2,10 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Grid, Title, Flex, Text, lighten, MantineTheme, getPrimaryShade } from '@mantine/core'
 import { createStyles } from '@mantine/emotion'
 import TimeFrameChart from 'components/common/Chart/TimeFrameChart'
-import { BaseAnalyticsData, AnalyticsPeriod, FilteredAnalytics, MetricsToShow } from 'types'
+import { BaseAnalyticsData, FilteredAnalytics, MetricsToShow } from 'types'
 import { formatCurrency } from 'helpers'
 import { useViewportSize, useColorScheme } from '@mantine/hooks'
+import { useCampaignsAnalyticsData } from 'hooks/useCampaignAnalytics/useCampaignAnalyticsData'
 import ChartControlBtn from './ChartControlBtn'
 
 const useStyles = createStyles((theme: MantineTheme) => {
@@ -46,16 +47,14 @@ function sumArrayProperties(analytics: BaseAnalyticsData[]) {
   }
 }
 
-export const TimeFrame = ({
-  timeFrames,
-  period,
-  currencyName
-}: {
-  timeFrames: BaseAnalyticsData[] | undefined
-  period: AnalyticsPeriod | undefined
-  currencyName: string
-}) => {
+export const TimeFrame = ({ campaignId }: { campaignId: string }) => {
   const { classes } = useStyles()
+
+  const { campaignMappedAnalytics, analyticsKey, currencyName } = useCampaignsAnalyticsData({
+    campaignId,
+    analyticsType: 'timeframe'
+  })
+
   const { width: windowWidth } = useViewportSize()
   const [filteredData, setFilteredData] = useState<FilteredAnalytics[]>([])
 
@@ -71,8 +70,8 @@ export const TimeFrame = ({
   })
 
   useEffect(() => {
-    if (timeFrames) {
-      const result = timeFrames.map((obj) => {
+    if (campaignMappedAnalytics) {
+      const result = campaignMappedAnalytics.map((obj) => {
         const filteredObj: FilteredAnalytics = {
           segment: new Date(Number(obj.segment)).toLocaleString()
         }
@@ -90,22 +89,22 @@ export const TimeFrame = ({
       })
       setFilteredData(result)
     }
-  }, [timeFrames, metricsToShow])
+  }, [metricsToShow, campaignMappedAnalytics])
 
   const totalSum = useMemo(
     () =>
-      timeFrames
-        ? sumArrayProperties(timeFrames)
+      campaignMappedAnalytics
+        ? sumArrayProperties(campaignMappedAnalytics)
         : // TODO: default
           { clicks: 0, impressions: 0, avgCpm: 0, ctr: 0, paid: 0 },
-    [timeFrames]
+    [campaignMappedAnalytics]
   )
 
   const handleMetricClick = useCallback((value: boolean, propNameToRemove: keyof MetricsToShow) => {
     setMetricsToShow((prev) => ({ ...prev, [propNameToRemove]: value }))
   }, [])
 
-  if (!timeFrames?.length) {
+  if (!campaignMappedAnalytics?.length) {
     return <div>No time frame data found 🙈</div>
   }
 
@@ -161,10 +160,14 @@ export const TimeFrame = ({
           timeFrameData={filteredData}
           metricsToShow={metricsToShow}
         />
-        {period && (
+        {analyticsKey?.period && (
           <Flex align="center" justify="space-between" ml="xl" mr="xl">
-            <Text className={classes.lighterGray}>Starts: {period.start?.toString()}</Text>
-            <Text className={classes.lighterGray}>Ends: {period.end?.toString()}</Text>
+            <Text className={classes.lighterGray}>
+              Starts: {analyticsKey?.period.start?.toString()}
+            </Text>
+            <Text className={classes.lighterGray}>
+              Ends: {analyticsKey?.period.end?.toString()}
+            </Text>
           </Flex>
         )}
       </Grid.Col>

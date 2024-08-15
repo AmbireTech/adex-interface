@@ -1,61 +1,42 @@
-import { useCallback, useEffect, useState } from 'react'
-import { Container, Flex, Loader, Tabs, Paper, Group, Text, Anchor, Center } from '@mantine/core'
+import { useCallback } from 'react'
+import { Container, Flex, Tabs, Paper, Group } from '@mantine/core'
 import { useParams, useNavigate } from 'react-router-dom'
 import { AnalyticsType } from 'types'
-import GoBack from 'components/common/GoBack/GoBack'
-import DownloadCSV from 'components/common/DownloadCSV'
+// import GoBack from 'components/common/GoBack/GoBack'
+// import DownloadCSV from 'components/common/DownloadCSV'
 import { StickyPanel } from 'components/TopBar/TopBarStickyPanel'
 import { AdminBadge } from 'components/common/AdminBadge'
-import { useCampaignsAnalyticsData } from 'hooks/useCampaignAnalytics/useCampaignAnalyticsData'
 import Placements from './Placements'
 import Creatives from './Creatives'
-import SSPs from './SSPs'
+// import SSPs from './SSPs'
 import Regions from './Regions'
 import { TimeFrame } from './TimeFrame'
-import { generateCVSData } from './CvsDownloadConfigurations'
+// import { generateCVSData } from './CvsDownloadConfigurations'
 
 const CampaignAnalytics = ({ isAdminPanel = false }: { isAdminPanel?: boolean }) => {
   const { id, activeTab = 'timeframe' } = useParams<{ id: string; activeTab: AnalyticsType }>()
 
   const navigate = useNavigate()
-  const [csvData, setCsvData] = useState<any | undefined>()
+  // const [csvData, setCsvData] = useState<any | undefined>()
 
-  const { campaignMappedAnalytics, campaign, loading, currencyName, analyticsKey } =
-    useCampaignsAnalyticsData({
-      campaignId: id || '',
-      forAdmin: isAdminPanel,
-      analyticsType: activeTab
-    })
-
-  useEffect(() => {
-    if (campaignMappedAnalytics) {
-      // TODO: fix csf Data types an add the type to useState
-      setCsvData(generateCVSData(activeTab, campaignMappedAnalytics))
-    }
-  }, [activeTab, campaignMappedAnalytics])
+  // useEffect(() => {
+  //   if (campaignMappedAnalytics) {
+  //     // TODO: fix csf Data types an add the type to useState
+  //     // setCsvData(generateCVSData(activeTab, campaignMappedAnalytics))
+  //   }
+  // }, [activeTab, campaignMappedAnalytics])
 
   const handleTabChange = useCallback(
     (value: string | null) => {
-      campaign?.id &&
-        navigate(
-          `/dashboard/campaign-analytics${isAdminPanel ? '/admin' : ''}/${campaign?.id}/${value}`,
-          { replace: true }
-        )
+      id &&
+        navigate(`/dashboard/campaign-analytics${isAdminPanel ? '/admin' : ''}/${id}/${value}`, {
+          replace: true
+        })
     },
-    [campaign?.id, isAdminPanel, navigate]
+    [id, isAdminPanel, navigate]
   )
 
-  // TODO: there is delay when updated analytics table is displayed after the tab is switched - add loading bars or something
-
-  if (loading && !campaign) {
-    return (
-      <Center>
-        <Loader />
-      </Center>
-    )
-  }
-
-  if (!id || (!loading && !campaign)) {
+  if (!id) {
     return <div>Invalid campaign ID</div>
   }
 
@@ -66,7 +47,7 @@ const CampaignAnalytics = ({ isAdminPanel = false }: { isAdminPanel?: boolean })
       <StickyPanel>
         <Paper mx="auto" shadow="xl" radius="xl">
           <Group justify="space-between">
-            <GoBack title="Go Back" />
+            {/* <GoBack title="Go Back" />
             <Text size="sm" truncate>
               Campaign: {campaign?.title}
               {isAdminPanel && (
@@ -89,7 +70,7 @@ const CampaignAnalytics = ({ isAdminPanel = false }: { isAdminPanel?: boolean })
                   filename={csvData.filename}
                 />
               )}
-            </Group>
+            </Group> */}
           </Group>
         </Paper>
         {isAdminPanel && <AdminBadge title="Admin Campaign Analytics" />}
@@ -97,7 +78,7 @@ const CampaignAnalytics = ({ isAdminPanel = false }: { isAdminPanel?: boolean })
 
       <Tabs color="brand" value={activeTab} onChange={handleTabChange} py="sm" keepMounted={false}>
         <Flex justify="space-between" align="baseline">
-          <Tabs.List>
+          <Tabs.List mb="md">
             <Tabs.Tab value="timeframe">TIME FRAME</Tabs.Tab>
             <Tabs.Tab value="hostname">PLACEMENTS</Tabs.Tab>
             <Tabs.Tab value="country">REGIONS</Tabs.Tab>
@@ -105,28 +86,22 @@ const CampaignAnalytics = ({ isAdminPanel = false }: { isAdminPanel?: boolean })
             {isAdminPanel && <Tabs.Tab value="ssp">SSPs</Tabs.Tab>}
           </Tabs.List>
         </Flex>
-        {loading && (
-          <Flex justify="center" align="center" mt={69}>
-            <Loader size="xl" />
-          </Flex>
-        )}
-      </Tabs>
-
-      {!loading && activeTab === 'timeframe' && (
-        <TimeFrame
-          timeFrames={campaignMappedAnalytics}
-          period={analyticsKey?.period}
-          currencyName={currencyName}
-        />
-      )}
-      {!loading && campaign && activeTab === 'hostname' && (
-        <Placements campaignId={id} forAdmin={isAdminPanel} />
-      )}
-      {!loading && activeTab === 'country' && <Regions campaignId={id} />}
-      {!loading && activeTab === 'adUnit' && <Creatives campaignId={id} />}
-      {isAdminPanel && !loading && activeTab === 'ssp' && (
+        <Tabs.Panel value="timeframe">
+          <TimeFrame campaignId={id} />
+        </Tabs.Panel>
+        <Tabs.Panel value="hostname">
+          <Placements campaignId={id} forAdmin={isAdminPanel} />
+        </Tabs.Panel>
+        <Tabs.Panel value="country">
+          <Regions campaignId={id} />
+        </Tabs.Panel>
+        <Tabs.Panel value="adUnit">
+          <Creatives campaignId={id} />
+        </Tabs.Panel>
+        {/* {isAdminPanel && !loading && activeTab === 'ssp' && (
         <SSPs data={campaignMappedAnalytics} currencyName={currencyName} />
-      )}
+      )} */}
+      </Tabs>
     </Container>
   )
 }
