@@ -13,17 +13,14 @@ import SSPs from './SSPs'
 import Regions from './Regions'
 import { TimeFrame } from './TimeFrame'
 import { generateCVSData } from './CvsDownloadConfigurations'
-import SeeOnMapBtn from './SeeOnMapBtn'
 
 const CampaignAnalytics = ({ isAdminPanel = false }: { isAdminPanel?: boolean }) => {
   const { id, activeTab = 'timeframe' } = useParams<{ id: string; activeTab: AnalyticsType }>()
 
   const navigate = useNavigate()
-  const [isMapBtnShown, setIsMapBtnShown] = useState<boolean>(false)
-  const [isMapVisible, setIsMapVisible] = useState<boolean>(false)
   const [csvData, setCsvData] = useState<any | undefined>()
 
-  const { campaignMappedAnalytics, totalPaid, campaign, loading, currencyName, analyticsKey } =
+  const { campaignMappedAnalytics, campaign, loading, currencyName, analyticsKey } =
     useCampaignsAnalyticsData({
       campaignId: id || '',
       forAdmin: isAdminPanel,
@@ -32,8 +29,6 @@ const CampaignAnalytics = ({ isAdminPanel = false }: { isAdminPanel?: boolean })
 
   useEffect(() => {
     if (campaignMappedAnalytics) {
-      setIsMapBtnShown(activeTab === 'country')
-
       // TODO: fix csf Data types an add the type to useState
       setCsvData(generateCVSData(activeTab, campaignMappedAnalytics))
     }
@@ -87,9 +82,6 @@ const CampaignAnalytics = ({ isAdminPanel = false }: { isAdminPanel?: boolean })
               )}
             </Text>
             <Group align="center" justify="space-between">
-              {isMapBtnShown && (
-                <SeeOnMapBtn onBtnClicked={() => setIsMapVisible((prev) => !prev)} />
-              )}
               {csvData && activeTab !== 'timeframe' && (
                 <DownloadCSV
                   data={csvData.tabData}
@@ -120,7 +112,6 @@ const CampaignAnalytics = ({ isAdminPanel = false }: { isAdminPanel?: boolean })
         )}
       </Tabs>
 
-      {}
       {!loading && activeTab === 'timeframe' && (
         <TimeFrame
           timeFrames={campaignMappedAnalytics}
@@ -131,15 +122,7 @@ const CampaignAnalytics = ({ isAdminPanel = false }: { isAdminPanel?: boolean })
       {!loading && campaign && activeTab === 'hostname' && (
         <Placements campaignId={id} forAdmin={isAdminPanel} />
       )}
-      {!loading && activeTab === 'country' && (
-        <Regions
-          regions={campaignMappedAnalytics}
-          isMapVisible={isMapVisible}
-          currencyName={currencyName}
-          totalPaid={totalPaid}
-          onClose={() => setIsMapVisible(false)}
-        />
-      )}
+      {!loading && activeTab === 'country' && <Regions campaignId={id} />}
       {!loading && activeTab === 'adUnit' && (
         <Creatives
           creatives={campaignMappedAnalytics}

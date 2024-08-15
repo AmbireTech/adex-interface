@@ -1,35 +1,29 @@
-import { BaseAnalyticsData } from 'types'
-import { useMemo } from 'react'
-import { Grid, Modal } from '@mantine/core'
+import { useMemo, useState } from 'react'
+import { Grid, Modal, Button } from '@mantine/core'
 import { useViewportSize } from '@mantine/hooks'
 import { CountryData } from 'helpers/countries'
 import CustomTable from 'components/common/CustomTable'
+import { useCampaignsAnalyticsData } from 'hooks/useCampaignAnalytics/useCampaignAnalyticsData'
+import MapIcon from 'resources/icons/Map'
 import GeoCustom from '../common/CustomTableWithDropdown/WorldMap'
 
 const headings = ['Country', 'Share', 'Impressions', 'Clicks', 'CTR', 'Average CPM', 'Spent']
 
-const Regions = ({
-  regions,
-  isMapVisible,
-  currencyName,
-  totalPaid,
-  onClose
-}: {
-  regions: BaseAnalyticsData[] | undefined
-  isMapVisible: boolean
-  currencyName: string
-  totalPaid: number
-  onClose: () => void
-}) => {
-  const { width: windowWidth, height: windowHeight } = useViewportSize()
+const Regions = ({ campaignId }: { campaignId: string }) => {
+  const [isMapVisible, setIsMapVisible] = useState<boolean>(false)
+  const { campaignMappedAnalytics, totalPaid, currencyName } = useCampaignsAnalyticsData({
+    campaignId,
+    analyticsType: 'country'
+  })
+  const { width, height } = useViewportSize()
 
   // TODO: add elements types, fix custom table data
   const elements = useMemo(() => {
-    const paid = regions?.reduce((sum, i) => sum + i.paid, 0) || 1
+    const paid = campaignMappedAnalytics?.reduce((sum, i) => sum + i.paid, 0) || 1
     // TODO: investigate analytics timeframe edge case
     console.log(totalPaid)
     return (
-      regions?.map((item) => ({
+      campaignMappedAnalytics?.map((item) => ({
         segment: CountryData.get(item.segment)?.name,
         share: `${((item.paid / paid) * 100).toFixed(2)} %`,
         impressions: item.impressions,
@@ -39,29 +33,28 @@ const Regions = ({
         paid: `${item.paid.toFixed(4)} ${currencyName}`
       })) || []
     )
-  }, [regions, totalPaid, currencyName])
+  }, [campaignMappedAnalytics, totalPaid, currencyName])
 
-  if (!regions?.length) {
+  if (!campaignMappedAnalytics?.length) {
     return <div>No regions found</div>
   }
 
   return (
     <Grid grow>
       <Grid.Col>
+        <Button onClick={() => setIsMapVisible((prev) => !prev)} rightSection={<MapIcon />}>
+          See on Map{' '}
+        </Button>
         <CustomTable headings={headings} elements={elements} />
       </Grid.Col>
       <Modal
         opened={isMapVisible}
-        onClose={onClose}
+        onClose={() => setIsMapVisible(false)}
         title="Word Map"
-        size={windowWidth >= 768 ? windowWidth - 290 : windowWidth - 60}
-        padding="lg"
+        centered
+        size="100%"
       >
-        <GeoCustom
-          width={windowWidth >= 768 ? windowWidth - 290 : windowWidth - 60}
-          height={windowHeight}
-          regions={regions}
-        />
+        <GeoCustom width={width} height={height} regions={campaignMappedAnalytics} />
       </Modal>
     </Grid>
   )
