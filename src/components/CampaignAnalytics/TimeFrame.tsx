@@ -57,12 +57,13 @@ function sumArrayProperties(analytics: BaseAnalyticsData[]) {
   }
 }
 
-export const TimeFrame = ({ campaignId }: { campaignId: string }) => {
+export const TimeFrame = ({ forAdmin, campaignId }: { forAdmin: boolean; campaignId: string }) => {
   const { classes } = useStyles()
 
   const { campaignMappedAnalytics, analyticsKey, currencyName, loading } =
     useCampaignsAnalyticsData({
       campaignId,
+      forAdmin,
       analyticsType: 'timeframe'
     })
 
