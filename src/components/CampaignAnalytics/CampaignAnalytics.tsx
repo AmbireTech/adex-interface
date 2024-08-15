@@ -1,30 +1,27 @@
-import { useCallback } from 'react'
-import { Container, Flex, Tabs, Paper, Group } from '@mantine/core'
+import { useCallback, useMemo } from 'react'
+import { Container, Flex, Tabs, Paper, Group, Text, Anchor } from '@mantine/core'
 import { useParams, useNavigate } from 'react-router-dom'
 import { AnalyticsType } from 'types'
-// import GoBack from 'components/common/GoBack/GoBack'
+import GoBack from 'components/common/GoBack/GoBack'
 // import DownloadCSV from 'components/common/DownloadCSV'
 import { StickyPanel } from 'components/TopBar/TopBarStickyPanel'
 import { AdminBadge } from 'components/common/AdminBadge'
+import { useCampaignsData } from 'hooks/useCampaignsData'
 import Placements from './Placements'
 import Creatives from './Creatives'
 import SSPs from './SSPs'
 import Regions from './Regions'
 import { TimeFrame } from './TimeFrame'
-// import { generateCVSData } from './CvsDownloadConfigurations'
 
 const CampaignAnalytics = ({ isAdminPanel = false }: { isAdminPanel?: boolean }) => {
   const { id, activeTab = 'timeframe' } = useParams<{ id: string; activeTab: AnalyticsType }>()
+  const { campaignsData } = useCampaignsData()
+  const campaign = useMemo(
+    () => (id ? campaignsData.get(id)?.campaign : undefined),
+    [campaignsData, id]
+  )
 
   const navigate = useNavigate()
-  // const [csvData, setCsvData] = useState<any | undefined>()
-
-  // useEffect(() => {
-  //   if (campaignMappedAnalytics) {
-  //     // TODO: fix csf Data types an add the type to useState
-  //     // setCsvData(generateCVSData(activeTab, campaignMappedAnalytics))
-  //   }
-  // }, [activeTab, campaignMappedAnalytics])
 
   const handleTabChange = useCallback(
     (value: string | null) => {
@@ -40,14 +37,12 @@ const CampaignAnalytics = ({ isAdminPanel = false }: { isAdminPanel?: boolean })
     return <div>Invalid campaign ID</div>
   }
 
-  // TODO: better tabs optimization, this si temp fix that prevents 80-90% of the prev re-renders, there is sill 1 extra re-rended that can be fixed
-
   return (
     <Container fluid>
       <StickyPanel>
         <Paper mx="auto" shadow="xl" radius="xl">
-          <Group justify="space-between">
-            {/* <GoBack title="Go Back" />
+          <Group justify="space-between" pr="md">
+            <GoBack title="Go Back" />
             <Text size="sm" truncate>
               Campaign: {campaign?.title}
               {isAdminPanel && (
@@ -62,15 +57,6 @@ const CampaignAnalytics = ({ isAdminPanel = false }: { isAdminPanel?: boolean })
                 </Anchor>
               )}
             </Text>
-            <Group align="center" justify="space-between">
-              {csvData && activeTab !== 'timeframe' && (
-                <DownloadCSV
-                  data={csvData.tabData}
-                  mapHeadersToDataProperties={csvData.mapHeadersToDataProperties}
-                  filename={csvData.filename}
-                />
-              )}
-            </Group> */}
           </Group>
         </Paper>
         {isAdminPanel && <AdminBadge title="Admin Campaign Analytics" />}
