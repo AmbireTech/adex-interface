@@ -1,15 +1,12 @@
-import { useCallback, useEffect, useState, useMemo } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { Container, Flex, Loader, Tabs, Paper, Group, Text, Anchor, Center } from '@mantine/core'
 import { useParams, useNavigate } from 'react-router-dom'
-import { BaseAnalyticsData, AnalyticsPeriod, AnalyticsType } from 'types'
+import { AnalyticsType } from 'types'
 import GoBack from 'components/common/GoBack/GoBack'
 import DownloadCSV from 'components/common/DownloadCSV'
-import useCampaignAnalytics from 'hooks/useCampaignAnalytics'
-import { useCampaignsData } from 'hooks/useCampaignsData'
-import { Campaign } from 'adex-common'
-import useAccount from 'hooks/useAccount'
 import { StickyPanel } from 'components/TopBar/TopBarStickyPanel'
 import { AdminBadge } from 'components/common/AdminBadge'
+import { useCampaignsAnalyticsData } from 'hooks/useCampaignAnalytics/useCampaignAnalyticsData'
 import Placements from './Placements'
 import Creatives from './Creatives'
 import SSPs from './SSPs'
@@ -25,74 +22,13 @@ const CampaignAnalytics = ({ isAdminPanel = false }: { isAdminPanel?: boolean })
   const [isMapBtnShown, setIsMapBtnShown] = useState<boolean>(false)
   const [isMapVisible, setIsMapVisible] = useState<boolean>(false)
   const [csvData, setCsvData] = useState<any | undefined>()
-  const [analyticsKey, setAnalyticsKey] = useState<
-    | {
-        key: string
-        period: AnalyticsPeriod
-      }
-    | undefined
-  >()
 
-  const { analyticsData, getAnalyticsKeyAndUpdate, mappedAnalytics } = useCampaignAnalytics()
-  const { campaignsData, updateCampaignDataById } = useCampaignsData()
-  const {
-    adexAccount: {
-      fundsOnCampaigns: { perCampaign }
-    }
-  } = useAccount()
-
-  const currencyName = useMemo(
-    () =>
-      id && !!perCampaign.length
-        ? perCampaign.find((item) => item.id === id)?.token.name || ''
-        : '',
-    [id, perCampaign]
-  )
-
-  const campaign: Campaign | undefined = useMemo(
-    () => (id ? campaignsData.get(id)?.campaign : undefined),
-    [id, campaignsData]
-  )
-
-  const totalPaid: number = useMemo(
-    () => (id ? campaignsData.get(id)?.paid || 0 : 0),
-    [id, campaignsData]
-  )
-
-  const campaignAnalytics = useMemo(
-    () => analyticsData.get(analyticsKey?.key || ''),
-    [analyticsData, analyticsKey]
-  )
-
-  const campaignMappedAnalytics: BaseAnalyticsData[] | undefined = useMemo(
-    () => mappedAnalytics.get(analyticsKey?.key || ''),
-    [analyticsKey, mappedAnalytics]
-  )
-
-  useEffect(() => {
-    console.log({ campaignAnalytics })
-    console.log({ campaignMappedAnalytics })
-  }, [campaignAnalytics, campaignMappedAnalytics])
-
-  useEffect(() => {
-    if (id) {
-      console.log({ id })
-      updateCampaignDataById(id)
-    }
-  }, [id, updateCampaignDataById])
-
-  useEffect(() => {
-    if (!campaign) return
-    setAnalyticsKey(undefined)
-
-    const checkAnalytics = async () => {
-      const key = await getAnalyticsKeyAndUpdate(activeTab, campaign, !!isAdminPanel)
-      setAnalyticsKey(key)
-      console.log('key', key)
-    }
-
-    checkAnalytics()
-  }, [activeTab, campaign, getAnalyticsKeyAndUpdate, isAdminPanel])
+  const { campaignMappedAnalytics, totalPaid, campaign, loading, currencyName, analyticsKey } =
+    useCampaignsAnalyticsData({
+      campaignId: id || '',
+      forAdmin: isAdminPanel,
+      analyticsType: activeTab
+    })
 
   useEffect(() => {
     if (campaignMappedAnalytics) {
@@ -115,11 +51,6 @@ const CampaignAnalytics = ({ isAdminPanel = false }: { isAdminPanel?: boolean })
   )
 
   // TODO: there is delay when updated analytics table is displayed after the tab is switched - add loading bars or something
-
-  const loading = useMemo(
-    () => !analyticsKey || !campaignMappedAnalytics,
-    [analyticsKey, campaignMappedAnalytics]
-  )
 
   if (loading && !campaign) {
     return (
