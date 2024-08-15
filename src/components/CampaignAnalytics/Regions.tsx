@@ -20,11 +20,12 @@ const csvHeaders = {
   Spent: 'paid'
 }
 
-const Regions = ({ campaignId }: { campaignId: string }) => {
+const Regions = ({ forAdmin, campaignId }: { forAdmin: boolean; campaignId: string }) => {
   const [isMapVisible, setIsMapVisible] = useState<boolean>(false)
   const { campaignMappedAnalytics, currencyName, analyticsKey, loading } =
     useCampaignsAnalyticsData({
       campaignId,
+      forAdmin,
       analyticsType: 'country'
     })
   const { width, height } = useViewportSize()

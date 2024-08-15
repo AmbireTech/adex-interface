@@ -73,19 +73,19 @@ const CampaignAnalytics = ({ isAdminPanel = false }: { isAdminPanel?: boolean })
           </Tabs.List>
         </Flex>
         <Tabs.Panel value="timeframe">
-          <TimeFrame campaignId={id} />
+          <TimeFrame campaignId={id} forAdmin={isAdminPanel} />
         </Tabs.Panel>
         <Tabs.Panel value="hostname">
           <Placements campaignId={id} forAdmin={isAdminPanel} />
         </Tabs.Panel>
         <Tabs.Panel value="country">
-          <Regions campaignId={id} />
+          <Regions campaignId={id} forAdmin={isAdminPanel} />
         </Tabs.Panel>
         <Tabs.Panel value="adUnit">
-          <Creatives campaignId={id} />
+          <Creatives campaignId={id} forAdmin={isAdminPanel} />
         </Tabs.Panel>
         <Tabs.Panel value="ssp">
-          <SSPs campaignId={id} />
+          <SSPs campaignId={id} forAdmin={isAdminPanel} />
         </Tabs.Panel>
       </Tabs>
     </Container>

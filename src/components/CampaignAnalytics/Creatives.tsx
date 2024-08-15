@@ -20,10 +20,11 @@ const csvHeaders = {
   Spent: 'paid'
 }
 
-const Creatives = ({ campaignId }: { campaignId: string }) => {
+const Creatives = ({ forAdmin, campaignId }: { forAdmin: boolean; campaignId: string }) => {
   const { campaignMappedAnalytics, currencyName, campaign, analyticsKey, loading } =
     useCampaignsAnalyticsData({
       campaignId,
+      forAdmin,
       analyticsType: 'adUnit'
     })
 

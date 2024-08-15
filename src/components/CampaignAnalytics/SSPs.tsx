@@ -4,9 +4,10 @@ import { useCampaignsAnalyticsData } from 'hooks/useCampaignAnalytics/useCampaig
 
 const headings = ['SSP', 'Impressions', 'Clicks', 'CTR', 'Average CPM', 'Spent']
 
-const SSPs = ({ campaignId }: { campaignId: string }) => {
+const SSPs = ({ forAdmin, campaignId }: { forAdmin: boolean; campaignId: string }) => {
   const { campaignMappedAnalytics, currencyName } = useCampaignsAnalyticsData({
     campaignId,
+    forAdmin,
     analyticsType: 'ssp'
   })
 
