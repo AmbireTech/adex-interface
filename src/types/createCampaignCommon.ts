@@ -1,4 +1,4 @@
-import { AdUnit, Campaign } from 'adex-common/dist/types/Dsp/Campaign'
+import { Campaign } from 'adex-common/dist/types/Dsp/Campaign'
 import { Alpha3Code } from 'adex-common'
 // import { UseFormReturnType } from '@mantine/form'
 import { FormErrors, GetInputProps, Key, UseFormReturnType } from '@mantine/form/lib/types'
@@ -55,7 +55,6 @@ export type CreateCampaignType = {
   updateCampaign: (camp: Partial<CampaignUI>) => void
   publishCampaign: () => Promise<any>
   resetCampaign: () => void
-  addAdUnit: (adUnitToAdd: AdUnit) => void
   removeAdUnit: (index: number) => void
   selectedBannerSizes: SupplyStatsDetails[] | SupplyStatsDetails[][]
   saveToDraftCampaign: () => Promise<any>

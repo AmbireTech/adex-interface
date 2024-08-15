@@ -184,7 +184,7 @@ const CampaignSummary = () => {
         {!isTheLastStep && (
           <Button
             w="90%"
-            disabled={step === 0 && !adUnits.length}
+            disabled={isFirstStep && !adUnits.length}
             size="lg"
             variant="filled"
             onClick={handleNextStepBtnClicked}

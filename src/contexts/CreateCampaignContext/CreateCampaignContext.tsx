@@ -23,7 +23,7 @@ import {
   parseFromBigNumPrecision,
   parseToBigNumPrecision
 } from 'helpers/balances'
-import { AdUnit, Campaign, Placement } from 'adex-common'
+import { Campaign, Placement } from 'adex-common'
 import { formatDateTime, WEEK } from 'helpers'
 import { useCampaignsData } from 'hooks/useCampaignsData'
 import { hasLength, isNotEmpty, useForm } from '@mantine/form'
@@ -308,13 +308,6 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
     }
   }, []) // eslint-disable-line
 
-  const addAdUnit = useCallback(
-    (adUnitToAdd: AdUnit) => {
-      form.insertListItem('adUnits', adUnitToAdd)
-    },
-    [form]
-  )
-
   const removeAdUnit = useCallback(
     (index: number) => {
       form.removeListItem('adUnits', index)
@@ -456,7 +449,6 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
       updateCampaign,
       publishCampaign,
       resetCampaign,
-      addAdUnit,
       removeAdUnit,
       selectedBannerSizes,
       saveToDraftCampaign,
@@ -475,7 +467,6 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
       updateCampaign,
       publishCampaign,
       resetCampaign,
-      addAdUnit,
       removeAdUnit,
       selectedBannerSizes,
       saveToDraftCampaign,
