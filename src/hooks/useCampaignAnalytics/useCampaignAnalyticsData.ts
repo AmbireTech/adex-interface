@@ -16,7 +16,6 @@ export function useCampaignsAnalyticsData({
 }) {
   const { getAnalyticsKeyAndUpdate, mappedAnalytics } = useCampaignAnalytics()
   const { campaignsData, updateCampaignDataById } = useCampaignsData()
-
   const [analyticsKey, setAnalyticsKey] = useState<
     | {
         key: string

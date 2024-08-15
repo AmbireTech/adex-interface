@@ -1,22 +1,31 @@
 import { useMemo } from 'react'
 import CustomTable from 'components/common/CustomTable'
-import { Flex, Anchor } from '@mantine/core'
+import { Flex, Anchor, Stack, Group } from '@mantine/core'
 import UrlIcon from 'resources/icons/Url'
 import { formatCurrency } from 'helpers'
 import { getMediaUrlWithProvider } from 'helpers/createCampaignHelpers'
 import MediaThumb from 'components/common/MediaThumb'
+import DownloadCSV from 'components/common/DownloadCSV'
 
 import { useCampaignsAnalyticsData } from 'hooks/useCampaignAnalytics/useCampaignAnalyticsData'
 
 const IPFS_GATEWAY = process.env.REACT_APP_IPFS_GATEWAY
 
 const headings = ['Media', 'Size', 'Impressions', 'Clicks', 'CTR %', 'Spent', 'Target']
+const csvHeaders = {
+  Creative: 'segment',
+  Impressions: 'impressions',
+  Clicks: 'clicks',
+  'CTR%': 'crt',
+  Spent: 'paid'
+}
 
 const Creatives = ({ campaignId }: { campaignId: string }) => {
-  const { campaignMappedAnalytics, currencyName, campaign, loading } = useCampaignsAnalyticsData({
-    campaignId,
-    analyticsType: 'adUnit'
-  })
+  const { campaignMappedAnalytics, currencyName, campaign, analyticsKey, loading } =
+    useCampaignsAnalyticsData({
+      campaignId,
+      analyticsType: 'adUnit'
+    })
 
   const elements = useMemo(() => {
     if (loading || !campaignMappedAnalytics || !campaign) {
@@ -47,11 +56,19 @@ const Creatives = ({ campaignId }: { campaignId: string }) => {
     })
   }, [campaign, campaignMappedAnalytics, currencyName, loading])
 
-  if (!elements?.length) {
-    return <div>No creatives found</div>
-  }
-
-  return <CustomTable headings={headings} elements={elements} />
+  return (
+    <Stack gap="xs">
+      <Group align="center" justify="end">
+        <DownloadCSV
+          data={campaignMappedAnalytics}
+          mapHeadersToDataProperties={csvHeaders}
+          filename={`${analyticsKey?.key}.csv`}
+          disabled={loading}
+        />
+      </Group>
+      <CustomTable headings={headings} elements={elements} loading={loading} />
+    </Stack>
+  )
 }
 
 export default Creatives

@@ -6,6 +6,8 @@ import IncludeIcon from 'resources/icons/Include'
 import ExcludeIcon from 'resources/icons/Exclude'
 import { useCampaignsData } from 'hooks/useCampaignsData'
 import { useCampaignsAnalyticsData } from 'hooks/useCampaignAnalytics/useCampaignAnalyticsData'
+import { Stack, Group } from '@mantine/core'
+import DownloadCSV from 'components/common/DownloadCSV'
 
 type PlacementsTableElement = Omit<TableElement, 'actionData'> & {
   actionData: {
@@ -23,11 +25,12 @@ type PlacementsTableElement = Omit<TableElement, 'actionData'> & {
 }
 
 const Placements = ({ forAdmin, campaignId }: { forAdmin: boolean; campaignId: string }) => {
-  const { campaignMappedAnalytics, campaign, currencyName } = useCampaignsAnalyticsData({
-    campaignId,
-    forAdmin,
-    analyticsType: 'hostname'
-  })
+  const { campaignMappedAnalytics, campaign, currencyName, loading, analyticsKey } =
+    useCampaignsAnalyticsData({
+      campaignId,
+      forAdmin,
+      analyticsType: 'hostname'
+    })
   const { toggleBlockedSource } = useCampaignsData()
 
   const placement = useMemo(
@@ -44,6 +47,18 @@ const Placements = ({ forAdmin, campaignId }: { forAdmin: boolean; campaignId: s
       'Average CPM',
       'Spent'
     ],
+    [placement]
+  )
+
+  const csvHeaders = useMemo(
+    () => ({
+      [placement === 'app' ? 'App' : 'Website']: 'segment',
+      Impressions: 'impressions',
+      Clicks: 'clicks',
+      'CRT%': 'crt',
+      Spent: 'paid',
+      'Average CPM': 'avgCpm'
+    }),
     [placement]
   )
 
@@ -102,11 +117,19 @@ const Placements = ({ forAdmin, campaignId }: { forAdmin: boolean; campaignId: s
     return placementActions
   }, [campaign, toggleBlockedSource])
 
-  if (!campaign || !campaignMappedAnalytics?.length) {
-    return <div>No placement found</div>
-  }
-
-  return <CustomTable headings={headings} elements={elements} actions={actions} />
+  return (
+    <Stack gap="xs">
+      <Group align="center" justify="end">
+        <DownloadCSV
+          data={campaignMappedAnalytics}
+          mapHeadersToDataProperties={csvHeaders}
+          filename={`${analyticsKey?.key}.csv`}
+          disabled={loading}
+        />
+      </Group>
+      <CustomTable headings={headings} elements={elements} actions={actions} loading={loading} />
+    </Stack>
+  )
 }
 
 export default Placements

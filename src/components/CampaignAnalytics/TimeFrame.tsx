@@ -1,5 +1,15 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { Grid, Title, Flex, Text, lighten, MantineTheme, getPrimaryShade } from '@mantine/core'
+import {
+  Grid,
+  Title,
+  Flex,
+  Text,
+  lighten,
+  MantineTheme,
+  getPrimaryShade,
+  Box,
+  LoadingOverlay
+} from '@mantine/core'
 import { createStyles } from '@mantine/emotion'
 import TimeFrameChart from 'components/common/Chart/TimeFrameChart'
 import { BaseAnalyticsData, FilteredAnalytics, MetricsToShow } from 'types'
@@ -50,10 +60,11 @@ function sumArrayProperties(analytics: BaseAnalyticsData[]) {
 export const TimeFrame = ({ campaignId }: { campaignId: string }) => {
   const { classes } = useStyles()
 
-  const { campaignMappedAnalytics, analyticsKey, currencyName } = useCampaignsAnalyticsData({
-    campaignId,
-    analyticsType: 'timeframe'
-  })
+  const { campaignMappedAnalytics, analyticsKey, currencyName, loading } =
+    useCampaignsAnalyticsData({
+      campaignId,
+      analyticsType: 'timeframe'
+    })
 
   const { width: windowWidth } = useViewportSize()
   const [filteredData, setFilteredData] = useState<FilteredAnalytics[]>([])
@@ -104,73 +115,72 @@ export const TimeFrame = ({ campaignId }: { campaignId: string }) => {
     setMetricsToShow((prev) => ({ ...prev, [propNameToRemove]: value }))
   }, [])
 
-  if (!campaignMappedAnalytics?.length) {
-    return <div>No time frame data found 🙈</div>
-  }
-
   return (
-    <Grid p="xs">
-      <Grid.Col className={classes.wrapper}>
-        <Grid>
-          <Grid.Col span="content">
-            <ChartControlBtn
-              value={formatCurrency(totalSum.impressions, 0)}
-              text="Total impressions"
-              bgColor="chartColorOne"
-              onClick={(v: boolean) => handleMetricClick(v, 'impressions')}
-              whiteFontColor
-            />
-          </Grid.Col>
-          <Grid.Col span="content">
-            <ChartControlBtn
-              value={`${formatCurrency(totalSum.clicks, 0)} (${formatCurrency(
-                totalSum.ctr,
-                2
-              )} % CTR)`}
-              text="Total clicks & CTR"
-              bgColor="chartColorTwo"
-              onClick={(v: boolean) => handleMetricClick(v, 'clicks')}
-              whiteFontColor
-            />
-          </Grid.Col>
-          <Grid.Col span="content">
-            <ChartControlBtn
-              value={`~ ${formatCurrency(totalSum.avgCpm, 3)} ${currencyName} / CPM`}
-              text="Average CPM"
-              bgColor="chartColorThree"
-              onClick={(v: boolean) => handleMetricClick(v, 'avgCpm')}
-              whiteFontColor
-            />
-          </Grid.Col>
-          <Grid.Col span="content">
-            <ChartControlBtn
-              value={`~ ${formatCurrency(totalSum.paid, 2)} ${currencyName}`}
-              text="Total spent"
-              bgColor="chartColorFour"
-              onClick={(v: boolean) => handleMetricClick(v, 'paid')}
-            />
-          </Grid.Col>
-        </Grid>
-      </Grid.Col>
-      <Grid.Col className={classes.wrapper}>
-        <Title order={5}>Chart</Title>
-        <TimeFrameChart
-          width={windowWidth >= 768 ? windowWidth - 315 : windowWidth - 100}
-          height={420}
-          timeFrameData={filteredData}
-          metricsToShow={metricsToShow}
-        />
-        {analyticsKey?.period && (
-          <Flex align="center" justify="space-between" ml="xl" mr="xl">
-            <Text className={classes.lighterGray}>
-              Starts: {analyticsKey?.period.start?.toString()}
-            </Text>
-            <Text className={classes.lighterGray}>
-              Ends: {analyticsKey?.period.end?.toString()}
-            </Text>
-          </Flex>
-        )}
-      </Grid.Col>
-    </Grid>
+    <Box pos="relative">
+      <LoadingOverlay visible={loading} />
+      <Grid p="xs">
+        <Grid.Col className={classes.wrapper}>
+          <Grid>
+            <Grid.Col span="content">
+              <ChartControlBtn
+                value={formatCurrency(totalSum.impressions, 0)}
+                text="Total impressions"
+                bgColor="chartColorOne"
+                onClick={(v: boolean) => handleMetricClick(v, 'impressions')}
+                whiteFontColor
+              />
+            </Grid.Col>
+            <Grid.Col span="content">
+              <ChartControlBtn
+                value={`${formatCurrency(totalSum.clicks, 0)} (${formatCurrency(
+                  totalSum.ctr,
+                  2
+                )} % CTR)`}
+                text="Total clicks & CTR"
+                bgColor="chartColorTwo"
+                onClick={(v: boolean) => handleMetricClick(v, 'clicks')}
+                whiteFontColor
+              />
+            </Grid.Col>
+            <Grid.Col span="content">
+              <ChartControlBtn
+                value={`~ ${formatCurrency(totalSum.avgCpm, 3)} ${currencyName} / CPM`}
+                text="Average CPM"
+                bgColor="chartColorThree"
+                onClick={(v: boolean) => handleMetricClick(v, 'avgCpm')}
+                whiteFontColor
+              />
+            </Grid.Col>
+            <Grid.Col span="content">
+              <ChartControlBtn
+                value={`~ ${formatCurrency(totalSum.paid, 2)} ${currencyName}`}
+                text="Total spent"
+                bgColor="chartColorFour"
+                onClick={(v: boolean) => handleMetricClick(v, 'paid')}
+              />
+            </Grid.Col>
+          </Grid>
+        </Grid.Col>
+        <Grid.Col className={classes.wrapper}>
+          <Title order={5}>Chart</Title>
+          <TimeFrameChart
+            width={windowWidth >= 768 ? windowWidth - 315 : windowWidth - 100}
+            height={420}
+            timeFrameData={filteredData}
+            metricsToShow={metricsToShow}
+          />
+          {analyticsKey?.period && (
+            <Flex align="center" justify="space-between" ml="xl" mr="xl">
+              <Text className={classes.lighterGray}>
+                Starts: {analyticsKey?.period.start?.toString()}
+              </Text>
+              <Text className={classes.lighterGray}>
+                Ends: {analyticsKey?.period.end?.toString()}
+              </Text>
+            </Flex>
+          )}
+        </Grid.Col>
+      </Grid>
+    </Box>
   )
 }

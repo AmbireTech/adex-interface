@@ -1,20 +1,32 @@
 import { useMemo, useState } from 'react'
-import { Grid, Modal, Button } from '@mantine/core'
+import { Group, Modal, Button, Stack } from '@mantine/core'
 import { useViewportSize } from '@mantine/hooks'
 import { CountryData } from 'helpers/countries'
 import CustomTable from 'components/common/CustomTable'
 import { useCampaignsAnalyticsData } from 'hooks/useCampaignAnalytics/useCampaignAnalyticsData'
 import MapIcon from 'resources/icons/Map'
+import DownloadCSV from 'components/common/DownloadCSV'
 import GeoCustom from '../common/CustomTableWithDropdown/WorldMap'
 
 const headings = ['Country', 'Share', 'Impressions', 'Clicks', 'CTR', 'Average CPM', 'Spent']
 
+const csvHeaders = {
+  Country: 'segment',
+  Share: 'share',
+  Impressions: 'impressions',
+  Clicks: 'clicks',
+  'CTR%': 'ctr',
+  'Average CPM': 'avgCpm',
+  Spent: 'paid'
+}
+
 const Regions = ({ campaignId }: { campaignId: string }) => {
   const [isMapVisible, setIsMapVisible] = useState<boolean>(false)
-  const { campaignMappedAnalytics, currencyName } = useCampaignsAnalyticsData({
-    campaignId,
-    analyticsType: 'country'
-  })
+  const { campaignMappedAnalytics, currencyName, analyticsKey, loading } =
+    useCampaignsAnalyticsData({
+      campaignId,
+      analyticsType: 'country'
+    })
   const { width, height } = useViewportSize()
 
   const elements = useMemo(() => {
@@ -36,24 +48,27 @@ const Regions = ({ campaignId }: { campaignId: string }) => {
     )
   }, [campaignMappedAnalytics, currencyName])
 
-  if (!campaignMappedAnalytics?.length) {
-    return <div>No regions found</div>
-  }
-
   return (
-    <Grid grow>
-      <Grid.Col>
+    <Stack gap="xs">
+      <Group align="center" justify="end">
         <Button
           variant="transparent"
           color="mainText"
-          size="xs"
+          size="sm"
           onClick={() => setIsMapVisible((prev) => !prev)}
           rightSection={<MapIcon size="1rem" />}
+          disabled={loading}
         >
           See on Map{' '}
         </Button>
-        <CustomTable headings={headings} elements={elements} />
-      </Grid.Col>
+        <DownloadCSV
+          data={campaignMappedAnalytics}
+          mapHeadersToDataProperties={csvHeaders}
+          filename={`${analyticsKey?.key}.csv`}
+          disabled={loading}
+        />
+        <CustomTable headings={headings} elements={elements} loading={loading} />
+      </Group>
       <Modal
         opened={isMapVisible}
         onClose={() => setIsMapVisible(false)}
@@ -63,7 +78,7 @@ const Regions = ({ campaignId }: { campaignId: string }) => {
       >
         <GeoCustom width={width} height={height} regions={campaignMappedAnalytics} />
       </Modal>
-    </Grid>
+    </Stack>
   )
 }
 
