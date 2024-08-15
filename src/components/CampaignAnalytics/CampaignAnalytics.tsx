@@ -123,13 +123,7 @@ const CampaignAnalytics = ({ isAdminPanel = false }: { isAdminPanel?: boolean })
         <Placements campaignId={id} forAdmin={isAdminPanel} />
       )}
       {!loading && activeTab === 'country' && <Regions campaignId={id} />}
-      {!loading && activeTab === 'adUnit' && (
-        <Creatives
-          creatives={campaignMappedAnalytics}
-          units={campaign?.adUnits}
-          currencyName={currencyName}
-        />
-      )}
+      {!loading && activeTab === 'adUnit' && <Creatives campaignId={id} />}
       {isAdminPanel && !loading && activeTab === 'ssp' && (
         <SSPs data={campaignMappedAnalytics} currencyName={currencyName} />
       )}

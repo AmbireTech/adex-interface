@@ -11,17 +11,18 @@ const headings = ['Country', 'Share', 'Impressions', 'Clicks', 'CTR', 'Average C
 
 const Regions = ({ campaignId }: { campaignId: string }) => {
   const [isMapVisible, setIsMapVisible] = useState<boolean>(false)
-  const { campaignMappedAnalytics, totalPaid, currencyName } = useCampaignsAnalyticsData({
+  const { campaignMappedAnalytics, currencyName } = useCampaignsAnalyticsData({
     campaignId,
     analyticsType: 'country'
   })
   const { width, height } = useViewportSize()
 
-  // TODO: add elements types, fix custom table data
   const elements = useMemo(() => {
+    if (!campaignMappedAnalytics) {
+      return []
+    }
     const paid = campaignMappedAnalytics?.reduce((sum, i) => sum + i.paid, 0) || 1
-    // TODO: investigate analytics timeframe edge case
-    console.log(totalPaid)
+
     return (
       campaignMappedAnalytics?.map((item) => ({
         segment: CountryData.get(item.segment)?.name,
@@ -33,7 +34,7 @@ const Regions = ({ campaignId }: { campaignId: string }) => {
         paid: `${item.paid.toFixed(4)} ${currencyName}`
       })) || []
     )
-  }, [campaignMappedAnalytics, totalPaid, currencyName])
+  }, [campaignMappedAnalytics, currencyName])
 
   if (!campaignMappedAnalytics?.length) {
     return <div>No regions found</div>
@@ -42,7 +43,13 @@ const Regions = ({ campaignId }: { campaignId: string }) => {
   return (
     <Grid grow>
       <Grid.Col>
-        <Button onClick={() => setIsMapVisible((prev) => !prev)} rightSection={<MapIcon />}>
+        <Button
+          variant="transparent"
+          color="mainText"
+          size="xs"
+          onClick={() => setIsMapVisible((prev) => !prev)}
+          rightSection={<MapIcon size="1rem" />}
+        >
           See on Map{' '}
         </Button>
         <CustomTable headings={headings} elements={elements} />
