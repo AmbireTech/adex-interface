@@ -13,7 +13,8 @@ import {
   Paper,
   ScrollArea,
   MantineShadow,
-  ThemeIcon
+  ThemeIcon,
+  LoadingOverlay
 } from '@mantine/core'
 import { useMediaQuery } from '@mantine/hooks'
 import usePagination from 'hooks/usePagination'
@@ -43,6 +44,7 @@ export type CustomTableProps = PropsWithChildren &
     pageSize?: number
     actions?: TableRowAction[]
     shadow?: MantineShadow
+    loading?: boolean
   }
 
 const getLabel = (label: TableRowAction['label'], actionData: TableElement['actionData']) => {
@@ -67,6 +69,7 @@ export const CustomTable = ({
   pageSize,
   actions,
   shadow = 'none',
+  loading,
   ...tableProps
 }: CustomTableProps) => {
   const isMobile = useMediaQuery('(max-width: 75rem)')
@@ -190,15 +193,18 @@ export const CustomTable = ({
     })
   }, [list, actions, isMobile, columns, headings])
 
-  if (!elements.length) return <Text>No data found</Text>
+  // if (!elements.length) return <Text>No data found</Text>
   return (
-    <Stack align="center" w="100%">
+    <Stack align="center" w="100%" pos="relative">
+      <LoadingOverlay visible={loading} />
       <Paper pb="md" w="100%" shadow={shadow}>
         {isMobile ? (
-          <Stack gap="xl">{rows}</Stack>
+          <Stack gap="xl" mih={420}>
+            {rows}
+          </Stack>
         ) : (
           <ScrollArea scrollbars="x" type="auto" offsetScrollbars>
-            <Table {...tableProps} w="100%" highlightOnHover verticalSpacing="sm">
+            <Table {...tableProps} mih={420} w="100%" highlightOnHover verticalSpacing="sm">
               <Table.Thead bg="alternativeBackground">
                 <Table.Tr>
                   {headings.map((h) => (

@@ -37,6 +37,7 @@ import { unstable_useBlocker as useBlocker, useParams, useNavigate } from 'react
 import InfoFilledIcon from 'resources/icons/InfoFilled'
 import throttle from 'lodash.throttle'
 import { defaultConfirmModalProps } from 'components/common/Modals/CustomConfirmModal'
+import Placements from 'components/CampaignAnalytics/Placements'
 
 type TargetingInputEdit = {
   version: string
@@ -260,6 +261,7 @@ const EditCampaign = ({ campaign, isAdmin }: { campaign: Campaign; isAdmin?: boo
         <Tabs.List mb="xl">
           <Tabs.Tab value="budget">Budget</Tabs.Tab>
           <Tabs.Tab value="targeting">Targeting</Tabs.Tab>
+          <Tabs.Tab value="placements">Placements</Tabs.Tab>
         </Tabs.List>
 
         <form onSubmit={form.onSubmit(throttledSbm)}>
@@ -385,6 +387,10 @@ const EditCampaign = ({ campaign, isAdmin }: { campaign: Campaign; isAdmin?: boo
             </Stack>
           </Tabs.Panel>
         </form>
+
+        <Tabs.Panel value="placements">
+          <Placements campaignId={campaign.id} forAdmin={!!isAdmin} />
+        </Tabs.Panel>
       </Tabs>
     </Paper>
   )
