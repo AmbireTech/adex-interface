@@ -8,7 +8,7 @@ import { StickyPanel } from 'components/TopBar/TopBarStickyPanel'
 import { AdminBadge } from 'components/common/AdminBadge'
 import Placements from './Placements'
 import Creatives from './Creatives'
-// import SSPs from './SSPs'
+import SSPs from './SSPs'
 import Regions from './Regions'
 import { TimeFrame } from './TimeFrame'
 // import { generateCVSData } from './CvsDownloadConfigurations'
@@ -98,9 +98,9 @@ const CampaignAnalytics = ({ isAdminPanel = false }: { isAdminPanel?: boolean })
         <Tabs.Panel value="adUnit">
           <Creatives campaignId={id} />
         </Tabs.Panel>
-        {/* {isAdminPanel && !loading && activeTab === 'ssp' && (
-        <SSPs data={campaignMappedAnalytics} currencyName={currencyName} />
-      )} */}
+        <Tabs.Panel value="ssp">
+          <SSPs campaignId={id} />
+        </Tabs.Panel>
       </Tabs>
     </Container>
   )
