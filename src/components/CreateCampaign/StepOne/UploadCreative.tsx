@@ -1,4 +1,4 @@
-import { Grid, Text, Code, Stack, Loader, Flex } from '@mantine/core'
+import { Text, Code, Stack, Loader, Flex } from '@mantine/core'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import useDropzone from 'hooks/useDropzone'
 import UploadedBanners from './UploadedBanners'
@@ -24,17 +24,11 @@ const UploadCreative = () => {
         <Code>index.html</Code> file need to include meta tag in format{' '}
         <Code>{'<meta name="ad.size" content="width=320,height=50">'}</Code>
       </Text>
-      {adUnits.length ? (
-        <Grid.Col>
-          <UploadedBanners />
-        </Grid.Col>
-      ) : null}
+      {adUnits.length ? <UploadedBanners /> : null}
       {isLoading && (
-        <Grid.Col>
-          <Flex justify="center" align="center" h="10vh">
-            <Loader size="md" />
-          </Flex>
-        </Grid.Col>
+        <Flex justify="center" align="center" h="10vh">
+          <Loader size="md" />
+        </Flex>
       )}
     </Stack>
   )
