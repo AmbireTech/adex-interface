@@ -117,6 +117,31 @@ const Placements = ({ forAdmin, campaignId }: { forAdmin: boolean; campaignId: s
     return placementActions
   }, [campaign, toggleBlockedSource])
 
+  const selectedActions = useMemo(() => {
+    if (!campaign?.id) return []
+    const placementActions: TableRowAction[] = [
+      CampaignStatus.active,
+      CampaignStatus.paused
+    ].includes(campaign.status)
+      ? [
+          {
+            action: (props: PlacementsTableElement['actionData']) =>
+              toggleBlockedSource(campaign?.id, props.placementName, props.segment),
+            label: (selectedElements) => `Block selected ${selectedElements?.size}`,
+            icon: () => <ExcludeIcon size="10px" />
+          },
+          {
+            action: (props: PlacementsTableElement['actionData']) =>
+              toggleBlockedSource(campaign?.id, props.placementName, props.segment),
+            label: (selectedElements) => `Unblock selected ${selectedElements?.size}`,
+            icon: () => <ExcludeIcon size="10px" />
+          }
+        ]
+      : []
+
+    return placementActions
+  }, [campaign, toggleBlockedSource])
+
   return (
     <Stack gap="xs">
       <Group align="center" justify="end">
@@ -127,7 +152,13 @@ const Placements = ({ forAdmin, campaignId }: { forAdmin: boolean; campaignId: s
           disabled={loading}
         />
       </Group>
-      <CustomTable headings={headings} elements={elements} actions={actions} loading={loading} />
+      <CustomTable
+        headings={headings}
+        elements={elements}
+        actions={actions}
+        loading={loading}
+        selectedActions={selectedActions}
+      />
     </Stack>
   )
 }

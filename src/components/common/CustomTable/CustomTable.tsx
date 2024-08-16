@@ -14,11 +14,14 @@ import {
   ScrollArea,
   MantineShadow,
   ThemeIcon,
-  LoadingOverlay
+  LoadingOverlay,
+  Checkbox,
+  CheckIcon,
+  Button
 } from '@mantine/core'
-import { useMediaQuery } from '@mantine/hooks'
+import { useSet, useMediaQuery } from '@mantine/hooks'
 import usePagination from 'hooks/usePagination'
-import { useMemo, PropsWithChildren, ReactNode } from 'react'
+import { useMemo, PropsWithChildren, ReactNode, useCallback } from 'react'
 import Dots from 'resources/icons/TreeDotsMenu'
 
 export type TableElement = {
@@ -45,9 +48,10 @@ export type CustomTableProps = PropsWithChildren &
     actions?: TableRowAction[]
     shadow?: MantineShadow
     loading?: boolean
+    selectedActions?: TableRowAction[]
   }
 
-const getLabel = (label: TableRowAction['label'], actionData: TableElement['actionData']) => {
+const getLabel = (label: TableRowAction['label'], actionData?: TableElement['actionData']) => {
   if (typeof label === 'function') {
     return label(actionData)
   }
@@ -55,7 +59,7 @@ const getLabel = (label: TableRowAction['label'], actionData: TableElement['acti
   return label
 }
 
-const getIcon = (icon: TableRowAction['icon'], actionData: TableElement['actionData']) => {
+const getIcon = (icon: TableRowAction['icon'], actionData?: TableElement['actionData']) => {
   if (typeof icon === 'function') {
     return icon(actionData)
   }
@@ -70,9 +74,11 @@ export const CustomTable = ({
   actions,
   shadow = 'none',
   loading,
+  selectedActions,
   ...tableProps
 }: CustomTableProps) => {
   const isMobile = useMediaQuery('(max-width: 75rem)')
+  const selectedElemets = useSet<string>()
 
   const columns: string[] = useMemo(
     () =>
@@ -92,6 +98,43 @@ export const CustomTable = ({
   const list = useMemo(() => {
     return elements.slice(startIndex, endIndex)
   }, [elements, startIndex, endIndex])
+
+  const handleCheckbox = useCallback(
+    (checked: boolean, id: string) => {
+      selectedElemets[checked ? 'add' : 'delete'](id || '')
+    },
+    [selectedElemets]
+  )
+
+  const currentPageSelected = useMemo(
+    () => list.every((x) => selectedElemets.has(x.id || '')),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [list, selectedElemets, selectedElemets.size]
+  )
+
+  const handleCheckboxMaster = useCallback(() => {
+    list.forEach((x) => selectedElemets[currentPageSelected ? 'delete' : 'add'](x.id || ''))
+  }, [currentPageSelected, list, selectedElemets])
+
+  const masterActionMenu = useMemo(() => {
+    return selectedActions?.map((a) => {
+      const label = getLabel(a.label, selectedElemets)
+
+      return (
+        <Tooltip key={label} label={label}>
+          <Button
+            size="xs"
+            variant="transparent"
+            color={a.color || 'mainText'}
+            onClick={() => a.action(selectedElemets.values())}
+            leftSection={getIcon(a.icon, selectedElemets)}
+          >
+            {label}
+          </Button>
+        </Tooltip>
+      )
+    })
+  }, [selectedActions, selectedElemets, selectedElemets.size])
 
   const rows = useMemo(() => {
     return list.map((e, i) => {
@@ -153,8 +196,17 @@ export const CustomTable = ({
       const color = e.rowColor
       const rowKey = e.id?.toString() || i
 
-      const cols = columns.map((column, cidx) => {
-        const columnParsed = column === 'status' ? e[column].element : e[column]
+      const cols = [...(selectedActions ? ['select'] : []), ...columns].map((column, cidx) => {
+        const columnParsed =
+          e[column]?.element ||
+          e[column] ||
+          (column === 'select' && (
+            <Checkbox
+              checked={selectedElemets.has(e.id || '')}
+              onChange={(el) => handleCheckbox(el.currentTarget.checked, e.id || '')}
+            />
+          ))
+
         return isMobile ? (
           <Stack key={rowKey + column} align="stretch" justify="center" gap="xs">
             <Group grow>
@@ -191,15 +243,22 @@ export const CustomTable = ({
         </Table.Tr>
       )
     })
-  }, [list, actions, isMobile, columns, headings])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [list, actions, isMobile, columns, selectedElemets, selectedElemets.size, headings])
 
-  // if (!elements.length) return <Text>No data found</Text>
   return (
-    <Stack align="center" w="100%" pos="relative">
+    <Stack align="stretch" w="100%" pos="relative">
+      <Group justify="start">{masterActionMenu}</Group>
+
       <LoadingOverlay visible={loading} />
       <Paper pb="md" w="100%" shadow={shadow}>
         {isMobile ? (
           <Stack gap="xl" mih={420}>
+            {selectedActions && (
+              <ActionIcon size="md" m="sm" variant="light" onClick={handleCheckboxMaster}>
+                <CheckIcon />
+              </ActionIcon>
+            )}
             {rows}
           </Stack>
         ) : (
@@ -207,6 +266,14 @@ export const CustomTable = ({
             <Table {...tableProps} mih={420} w="100%" highlightOnHover verticalSpacing="sm">
               <Table.Thead bg="alternativeBackground">
                 <Table.Tr>
+                  {selectedActions && (
+                    <Table.Th>
+                      <ActionIcon size="md" variant="light" onClick={handleCheckboxMaster}>
+                        <CheckIcon />
+                      </ActionIcon>
+                    </Table.Th>
+                  )}
+
                   {headings.map((h) => (
                     <Table.Th key={h}>{h}</Table.Th>
                   ))}
@@ -225,7 +292,7 @@ export const CustomTable = ({
             defaultValue={defaultPage}
             onNextPage={onNextPage}
             onPreviousPage={onPreviousPage}
-            onChange={(value) => onChange(value)}
+            onChange={onChange}
             size="sm"
             styles={{
               control: {
