@@ -126,7 +126,7 @@ export const CustomTable = ({
             size="xs"
             variant="transparent"
             color={a.color || 'mainText'}
-            onClick={() => a.action(selectedElemets.values())}
+            onClick={() => a.action(Array.from(selectedElemets.values()))}
             leftSection={getIcon(a.icon, selectedElemets)}
           >
             {label}

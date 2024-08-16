@@ -131,6 +131,11 @@ interface ICampaignsDataContext {
   ) => Promise<{ success: boolean }>
   toggleArchived: (id: string) => void
   toggleBlockedSource: (campaignId: string, srcId: string, srcName: string) => Promise<void>
+  addOrRemoveSources: (
+    action: 'block' | 'unblock',
+    campaignId: Campaign['id'],
+    sources: { srcId: string; srcName: string }[]
+  ) => Promise<void>
 }
 
 const CampaignsDataContext = createContext<ICampaignsDataContext | null>(null)
@@ -489,6 +494,36 @@ const CampaignsDataProvider: FC<PropsWithChildren & { type: 'user' | 'admin' }> 
     [campaignsData, editCampaign]
   )
 
+  const addOrRemoveSources: ICampaignsDataContext['addOrRemoveSources'] = useCallback(
+    async (action, campaignId, sources): Promise<void> => {
+      const campaign = campaignsData.get(campaignId)?.campaign
+      if (!campaign) {
+        throw new Error('invalid campaign ')
+      }
+
+      console.log({ sources })
+      const cleanNin = [...campaign.targetingInput.inputs.publishers.nin].filter((x) =>
+        sources.some((s) => s.srcId === x)
+      )
+
+      const blockedPublishers: Campaign['targetingInput']['inputs']['publishers'] = {
+        ...campaign.targetingInput.inputs.publishers,
+        apply: 'nin',
+        nin: action === 'unblock' ? cleanNin : [...cleanNin, ...sources.map((x) => x.srcId)]
+      }
+
+      const inputs: Partial<Campaign['targetingInput']['inputs']> = {
+        publishers: { ...blockedPublishers }
+      }
+
+      await editCampaign(campaignId, undefined, inputs, {
+        title: action === 'unblock' ? 'Unblocked' : 'Blocked',
+        msg: 'kor'
+      })
+    },
+    [campaignsData, editCampaign]
+  )
+
   const contextValue = useMemo(
     () => ({
       campaignsData,
@@ -501,7 +536,8 @@ const CampaignsDataProvider: FC<PropsWithChildren & { type: 'user' | 'admin' }> 
       toggleArchived,
       updateSupplyStats,
       toggleBlockedSource,
-      editCampaign
+      editCampaign,
+      addOrRemoveSources
     }),
     [
       campaignsData,
@@ -514,7 +550,8 @@ const CampaignsDataProvider: FC<PropsWithChildren & { type: 'user' | 'admin' }> 
       toggleArchived,
       updateSupplyStats,
       toggleBlockedSource,
-      editCampaign
+      editCampaign,
+      addOrRemoveSources
     ]
   )
 

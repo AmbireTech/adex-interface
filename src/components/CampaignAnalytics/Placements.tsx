@@ -31,7 +31,7 @@ const Placements = ({ forAdmin, campaignId }: { forAdmin: boolean; campaignId: s
       forAdmin,
       analyticsType: 'hostname'
     })
-  const { toggleBlockedSource } = useCampaignsData()
+  const { toggleBlockedSource, addOrRemoveSources } = useCampaignsData()
 
   const placement = useMemo(
     () => campaign?.targetingInput.inputs.placements.in[0] || 'site',
@@ -125,14 +125,28 @@ const Placements = ({ forAdmin, campaignId }: { forAdmin: boolean; campaignId: s
     ].includes(campaign.status)
       ? [
           {
-            action: (props: PlacementsTableElement['actionData']) =>
-              toggleBlockedSource(campaign?.id, props.placementName, props.segment),
+            action: (props) =>
+              addOrRemoveSources(
+                'block',
+                campaign?.id,
+                props.map((x: any) => ({
+                  srcId: x,
+                  srcName: x
+                }))
+              ),
             label: (selectedElements) => `Block selected ${selectedElements?.size}`,
             icon: () => <ExcludeIcon size="10px" />
           },
           {
-            action: (props: PlacementsTableElement['actionData']) =>
-              toggleBlockedSource(campaign?.id, props.placementName, props.segment),
+            action: (props) =>
+              addOrRemoveSources(
+                'unblock',
+                campaign?.id,
+                props.map((x: any) => ({
+                  srcId: x,
+                  srcName: x
+                }))
+              ),
             label: (selectedElements) => `Unblock selected ${selectedElements?.size}`,
             icon: () => <ExcludeIcon size="10px" />
           }
@@ -140,7 +154,7 @@ const Placements = ({ forAdmin, campaignId }: { forAdmin: boolean; campaignId: s
       : []
 
     return placementActions
-  }, [campaign, toggleBlockedSource])
+  }, [campaign, addOrRemoveSources])
 
   return (
     <Stack gap="xs">
