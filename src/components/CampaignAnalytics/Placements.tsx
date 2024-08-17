@@ -2,12 +2,12 @@ import { CampaignStatus } from 'adex-common'
 import CustomTable, { TableElement, TableRowAction } from 'components/common/CustomTable'
 import { getHumneSrcName } from 'helpers'
 import { useMemo } from 'react'
-import IncludeIcon from 'resources/icons/Include'
-import ExcludeIcon from 'resources/icons/Exclude'
 import { useCampaignsData } from 'hooks/useCampaignsData'
 import { useCampaignsAnalyticsData } from 'hooks/useCampaignAnalytics/useCampaignAnalyticsData'
 import { Stack, Group } from '@mantine/core'
 import DownloadCSV from 'components/common/DownloadCSV'
+import VisibilityIcon from 'resources/icons/Visibility'
+import InvisibilityIcon from 'resources/icons/Invisibility'
 
 type PlacementsTableElement = Omit<TableElement, 'actionData'> & {
   actionData: {
@@ -109,7 +109,7 @@ const Placements = ({ forAdmin, campaignId }: { forAdmin: boolean; campaignId: s
             label: ({ isBlocked, placementName }: PlacementsTableElement['actionData']) =>
               `${isBlocked ? 'Unblock' : 'Block'} "${placementName}"`,
             icon: ({ isBlocked }: PlacementsTableElement['actionData']) =>
-              isBlocked ? <IncludeIcon /> : <ExcludeIcon />
+              isBlocked ? <VisibilityIcon /> : <InvisibilityIcon />
           }
         ]
       : []
@@ -135,7 +135,8 @@ const Placements = ({ forAdmin, campaignId }: { forAdmin: boolean; campaignId: s
                 }))
               ),
             label: (selectedElements) => `Block selected ${selectedElements?.size}`,
-            icon: () => <ExcludeIcon size="10px" />
+            icon: () => <VisibilityIcon size="10px" />,
+            color: 'warning'
           },
           {
             action: (props) =>
@@ -148,7 +149,8 @@ const Placements = ({ forAdmin, campaignId }: { forAdmin: boolean; campaignId: s
                 }))
               ),
             label: (selectedElements) => `Unblock selected ${selectedElements?.size}`,
-            icon: () => <ExcludeIcon size="10px" />
+            icon: () => <InvisibilityIcon size="10px" />,
+            color: 'brand'
           }
         ]
       : []

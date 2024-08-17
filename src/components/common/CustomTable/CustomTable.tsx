@@ -112,9 +112,14 @@ export const CustomTable = ({
     [list, selectedElemets, selectedElemets.size]
   )
 
-  const handleCheckboxMaster = useCallback(() => {
-    list.forEach((x) => selectedElemets[currentPageSelected ? 'delete' : 'add'](x.id || ''))
-  }, [currentPageSelected, list, selectedElemets])
+  const handleCheckboxMaster = useCallback(
+    (all?: boolean) => {
+      ;(all ? elements : list).forEach((x) =>
+        selectedElemets[currentPageSelected ? 'delete' : 'add'](x.id || '')
+      )
+    },
+    [currentPageSelected, elements, list, selectedElemets]
+  )
 
   const masterActionMenu = useMemo(() => {
     return selectedActions?.map((a) => {
@@ -123,8 +128,8 @@ export const CustomTable = ({
       return (
         <Tooltip key={label} label={label}>
           <Button
-            size="xs"
-            variant="transparent"
+            size="sm"
+            variant="filled"
             color={a.color || 'mainText'}
             onClick={() => a.action(Array.from(selectedElemets.values()))}
             leftSection={getIcon(a.icon, selectedElemets)}
@@ -134,7 +139,24 @@ export const CustomTable = ({
         </Tooltip>
       )
     })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedActions, selectedElemets, selectedElemets.size])
+
+  const masterSelectAction = useMemo(
+    () =>
+      selectedActions && (
+        <ActionIcon
+          size="md"
+          m="sm"
+          variant="transparent"
+          color="mainText"
+          onClick={() => handleCheckboxMaster()}
+        >
+          <CheckIcon />
+        </ActionIcon>
+      ),
+    [handleCheckboxMaster, selectedActions]
+  )
 
   const rows = useMemo(() => {
     return list.map((e, i) => {
@@ -248,17 +270,11 @@ export const CustomTable = ({
 
   return (
     <Stack align="stretch" w="100%" pos="relative">
-      <Group justify="start">{masterActionMenu}</Group>
-
       <LoadingOverlay visible={loading} />
       <Paper pb="md" w="100%" shadow={shadow}>
         {isMobile ? (
           <Stack gap="xl" mih={420}>
-            {selectedActions && (
-              <ActionIcon size="md" m="sm" variant="light" onClick={handleCheckboxMaster}>
-                <CheckIcon />
-              </ActionIcon>
-            )}
+            {masterSelectAction}
             {rows}
           </Stack>
         ) : (
@@ -266,13 +282,7 @@ export const CustomTable = ({
             <Table {...tableProps} mih={420} w="100%" highlightOnHover verticalSpacing="sm">
               <Table.Thead bg="alternativeBackground">
                 <Table.Tr>
-                  {selectedActions && (
-                    <Table.Th>
-                      <ActionIcon size="md" variant="light" onClick={handleCheckboxMaster}>
-                        <CheckIcon />
-                      </ActionIcon>
-                    </Table.Th>
-                  )}
+                  {masterSelectAction}
 
                   {headings.map((h) => (
                     <Table.Th key={h}>{h}</Table.Th>
@@ -284,7 +294,8 @@ export const CustomTable = ({
             </Table>
           </ScrollArea>
         )}
-        <Group w="100%" justify="right" mt="xl" pr="md">
+        <Group w="100%" justify={selectedElemets.size ? 'space-between' : 'right'} mt="xl" pr="md">
+          {!!selectedElemets.size && <Group>{masterActionMenu}</Group>}
           <Pagination
             color="brand"
             total={maxPages}

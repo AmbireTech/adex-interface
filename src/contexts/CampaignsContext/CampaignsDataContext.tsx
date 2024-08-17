@@ -502,8 +502,8 @@ const CampaignsDataProvider: FC<PropsWithChildren & { type: 'user' | 'admin' }> 
       }
 
       console.log({ sources })
-      const cleanNin = [...campaign.targetingInput.inputs.publishers.nin].filter((x) =>
-        sources.some((s) => s.srcId === x)
+      const cleanNin = [...campaign.targetingInput.inputs.publishers.nin].filter(
+        (x) => !sources.some((s) => s.srcId === x)
       )
 
       const blockedPublishers: Campaign['targetingInput']['inputs']['publishers'] = {
