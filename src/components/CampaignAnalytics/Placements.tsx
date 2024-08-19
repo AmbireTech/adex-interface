@@ -4,7 +4,7 @@ import { getHumneSrcName } from 'helpers'
 import { ReactNode, useCallback, useMemo } from 'react'
 import { useCampaignsData } from 'hooks/useCampaignsData'
 import { useCampaignsAnalyticsData } from 'hooks/useCampaignAnalytics/useCampaignAnalyticsData'
-import { Group, ThemeIcon } from '@mantine/core'
+import { Group, ThemeIcon, Text } from '@mantine/core'
 import DownloadCSV from 'components/common/DownloadCSV'
 import BlockIcon from 'resources/icons/Block'
 
@@ -76,15 +76,15 @@ const Placements = ({ forAdmin, campaignId }: { forAdmin: boolean; campaignId: s
                 srcId: item.segment
               },
               id: item.segment,
-              placementName: (
+              placementName: isBlocked ? (
                 <Group align="center">
-                  {isBlocked && (
-                    <ThemeIcon size="xs" variant="transparent" c="inherit">
-                      <BlockIcon size="inherit" />
-                    </ThemeIcon>
-                  )}{' '}
-                  {srcName}
+                  <ThemeIcon size="xs" variant="transparent" c="inherit">
+                    <BlockIcon size="inherit" />
+                  </ThemeIcon>{' '}
+                  <Text c="inherit">{srcName}</Text>
                 </Group>
+              ) : (
+                srcName
               ),
               impressions: item.impressions.toLocaleString(),
               clicks: item.clicks.toLocaleString(),

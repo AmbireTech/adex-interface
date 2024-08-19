@@ -91,7 +91,8 @@ export const CustomTable = ({
         : [],
     [elements]
   )
-  const maxItemsPerPage = pageSize || 10
+
+  const maxItemsPerPage = pageSize || (isMobile ? elements.length : 10)
   const { maxPages, defaultPage, startIndex, endIndex, onNextPage, onPreviousPage, onChange } =
     usePagination({
       elementsLength: elements.length,
@@ -108,18 +109,17 @@ export const CustomTable = ({
     [selectedElements]
   )
 
-  const currentPageElementsAllSelected = useMemo(
+  const currentPageElementsAllSelected: boolean = useMemo(
     () => !!selectedElements.size && list.every((x) => selectedElements.has(x.id || '')),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [list, selectedElements, selectedElements.size]
   )
 
   const handleCheckboxMaster = useCallback(
-    (all?: boolean) => {
-      ;(all ? elements : list).forEach((x) =>
+    (all?: boolean) =>
+      [...(all ? elements : list)].forEach((x) =>
         selectedElements[currentPageElementsAllSelected ? 'delete' : 'add'](x.id || '')
-      )
-    },
+      ),
     [currentPageElementsAllSelected, elements, list, selectedElements]
   )
 
@@ -135,7 +135,7 @@ export const CustomTable = ({
                 size="sm"
                 variant="light"
                 color={a.color || 'mainText'}
-                onClick={() => {
+                onChange={() => {
                   a.action(
                     Array.from(selectedElements.values()).map(
                       (id) => elements.find((x) => x.id === id)?.actionData
@@ -158,9 +158,18 @@ export const CustomTable = ({
   const masterSelectAction = useMemo(
     () =>
       selectedActions && (
-        <Checkbox checked={currentPageElementsAllSelected} onClick={() => handleCheckboxMaster()} />
+        <Checkbox
+          size="sm"
+          checked={currentPageElementsAllSelected}
+          onChange={() => handleCheckboxMaster()}
+        />
       ),
     [currentPageElementsAllSelected, handleCheckboxMaster, selectedActions]
+  )
+
+  const colHeadings: string[] = useMemo(
+    () => [...(selectedActions ? ['select'] : []), ...headings, ...(actions ? ['actions'] : [])],
+    [actions, headings, selectedActions]
   )
 
   const rows = useMemo(() => {
@@ -169,7 +178,7 @@ export const CustomTable = ({
       const maxActions = isMobile ? activeActions.length : 3
 
       const actionsMenu = activeActions?.length && (
-        <Group justify={isMobile ? 'center' : 'right'} gap="sm" wrap="nowrap">
+        <Group justify={isMobile ? 'auto' : 'right'} gap="sm" wrap="nowrap">
           {activeActions.slice(0, maxActions).map((a) => {
             const label = getLabel(a.label, e.actionData)
             return (
@@ -223,53 +232,63 @@ export const CustomTable = ({
       const color = e.rowColor
       const rowKey = e.id?.toString() || i
 
-      const cols = [...(selectedActions ? ['select'] : []), ...columns].map((column, cidx) => {
-        const columnParsed =
+      const colsToMap = [
+        ...(selectedActions ? ['select'] : []),
+        ...columns,
+        ...(activeActions.length ? ['actions'] : [])
+      ]
+
+      const cols = colsToMap.map((column, cidx) => {
+        const colElement =
           e[column]?.element ||
           e[column] ||
           (column === 'select' && (
             <Checkbox
+              size="sm"
               aria-label="Select row"
               checked={selectedElements.has(e.id || '')}
               onChange={(el) => handleCheckbox(el.currentTarget.checked, e.id || '')}
             />
-          ))
+          )) ||
+          (column === 'actions' && actionsMenu)
+
+        const el =
+          typeof colElement !== 'object' ? (
+            <Text ta="left" truncate maw={200}>
+              {colElement}
+            </Text>
+          ) : (
+            colElement
+          )
 
         return isMobile ? (
-          <Stack key={rowKey + column} align="stretch" justify="center" gap="xs">
-            <Group grow>
-              <Text ta="center">{headings[cidx]}</Text>
-
-              <Text ta="center" truncate c={color}>
-                {columnParsed}
+          <Stack gap="xs">
+            <Group key={rowKey + column} grow align="center" px="sm">
+              <Text ta="left" tt="capitalize" fw="bold">
+                {colsToMap[cidx]}:
               </Text>
+              {el}
             </Group>
-            <Divider />
+            <Divider hidden={cidx === colsToMap.length - 1} />
           </Stack>
         ) : (
-          <Table.Td key={column} maw={20}>
-            <Text size="sm" c={color} truncate maw={290}>
-              {columnParsed}
-            </Text>
+          <Table.Td key={column} c={color}>
+            {el}
           </Table.Td>
         )
       })
 
       if (isMobile) {
         return (
-          <Stack key={rowKey} gap="xs" align="stretch" justify="center">
-            <Divider bg="#EBEEFA" w="100%" p="10px" />
-            {cols}
-            {!!actionsMenu && actionsMenu}
-          </Stack>
+          <Paper py="sm" shadow="xs">
+            <Stack key={rowKey} gap="xs" align="stretch" justify="center">
+              {/* <Divider color="lightBackground" size={14} /> */}
+              {cols}
+            </Stack>
+          </Paper>
         )
       }
-      return (
-        <Table.Tr key={rowKey}>
-          {cols}
-          {!!actionsMenu && <Table.Td>{actionsMenu}</Table.Td>}
-        </Table.Tr>
-      )
+      return <Table.Tr key={rowKey}>{cols}</Table.Tr>
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [list, actions, isMobile, columns, selectedElements, selectedElements.size, headings])
@@ -281,57 +300,51 @@ export const CustomTable = ({
         {selectedElements.size && masterActionMenu}
         {tableActions}
       </Group>
-      <Paper pb="md" w="100%" shadow={shadow}>
-        {isMobile ? (
-          <Stack gap="xl">
-            {selectedActions && (
-              <Group align="center" justify="center" pt="xs">
-                Select current page: {masterSelectAction}
-              </Group>
-            )}
-            {rows}
-          </Stack>
-        ) : (
+
+      {isMobile ? (
+        <Stack gap="xl">
+          {selectedActions && (
+            <Group align="center" justify="left" pt="xs">
+              Select all: {masterSelectAction}
+            </Group>
+          )}
+          {rows}
+        </Stack>
+      ) : (
+        <Paper pb="md" w="100%" shadow={shadow}>
           <ScrollArea scrollbars="x" type="auto" offsetScrollbars>
-            <Table
-              {...tableProps}
-              mih={420}
-              w="100%"
-              highlightOnHover
-              verticalSpacing="sm"
-              layout="auto"
-            >
+            <Table {...tableProps} mih={420} w="100%" highlightOnHover verticalSpacing="sm">
               <Table.Thead bg="alternativeBackground">
                 <Table.Tr>
-                  {selectedActions && <Table.Th w="sm">{masterSelectAction}</Table.Th>}
-                  {headings.map((h) => (
-                    <Table.Th key={h}>{h}</Table.Th>
+                  {colHeadings.map((h) => (
+                    <Table.Th tt="capitalize" key={h} w={h === 'select' ? 20 : 'auto'}>
+                      {h === 'select' ? masterSelectAction : h}
+                    </Table.Th>
                   ))}
-                  {!!actions?.length && <th key="Action">Actions</th>}
                 </Table.Tr>
               </Table.Thead>
               <Table.Tbody>{rows}</Table.Tbody>
             </Table>
           </ScrollArea>
-        )}
-        <Group w="100%" justify="right" mt="xl" pr="md">
-          <Pagination
-            color="brand"
-            total={maxPages}
-            boundaries={1}
-            defaultValue={defaultPage}
-            onNextPage={onNextPage}
-            onPreviousPage={onPreviousPage}
-            onChange={onChange}
-            size="sm"
-            styles={{
-              control: {
-                border: 0
-              }
-            }}
-          />
-        </Group>
-      </Paper>
+          <Group w="100%" justify="right" mt="xl" pr="md">
+            <Pagination
+              color="brand"
+              total={maxPages}
+              boundaries={1}
+              defaultValue={defaultPage}
+              onNextPage={onNextPage}
+              onPreviousPage={onPreviousPage}
+              onChange={onChange}
+              size="sm"
+              styles={{
+                control: {
+                  border: 0
+                }
+              }}
+            />
+          </Group>
+        </Paper>
+      )}
     </Stack>
   )
 }
