@@ -1,22 +1,21 @@
 import { CampaignStatus } from 'adex-common'
 import CustomTable, { TableElement, TableRowAction } from 'components/common/CustomTable'
 import { getHumneSrcName } from 'helpers'
-import { useMemo } from 'react'
-import IncludeIcon from 'resources/icons/Include'
-import ExcludeIcon from 'resources/icons/Exclude'
+import { ReactNode, useCallback, useMemo } from 'react'
 import { useCampaignsData } from 'hooks/useCampaignsData'
 import { useCampaignsAnalyticsData } from 'hooks/useCampaignAnalytics/useCampaignAnalyticsData'
-import { Stack, Group } from '@mantine/core'
+import { Group, ThemeIcon, Text } from '@mantine/core'
 import DownloadCSV from 'components/common/DownloadCSV'
+import BlockIcon from 'resources/icons/Block'
 
 type PlacementsTableElement = Omit<TableElement, 'actionData'> & {
   actionData: {
-    placementName: string
+    srcId: string
     isBlocked: boolean
-    segment: string
+    srcName: string
   }
   id: string
-  placementName: string
+  placementName: string | ReactNode
   impressions: string
   clicks: string
   ctr: string
@@ -31,7 +30,7 @@ const Placements = ({ forAdmin, campaignId }: { forAdmin: boolean; campaignId: s
       forAdmin,
       analyticsType: 'hostname'
     })
-  const { toggleBlockedSource } = useCampaignsData()
+  const { filterSources } = useCampaignsData()
 
   const placement = useMemo(
     () => campaign?.targetingInput.inputs.placements.in[0] || 'site',
@@ -68,16 +67,25 @@ const Placements = ({ forAdmin, campaignId }: { forAdmin: boolean; campaignId: s
         ? []
         : campaignMappedAnalytics.map((item) => {
             const isBlocked = !!campaign.targetingInput.inputs.publishers.nin.includes(item.segment)
-            const placementName = getHumneSrcName(item.segment, placement)
+            const srcName = getHumneSrcName(item.segment, placement)
             const data: PlacementsTableElement = {
-              rowColor: isBlocked ? 'red' : 'inherit',
+              rowColor: isBlocked ? 'warning' : 'inherit',
               actionData: {
-                placementName,
+                srcName,
                 isBlocked,
-                segment: item.segment
+                srcId: item.segment
               },
               id: item.segment,
-              placementName,
+              placementName: isBlocked ? (
+                <Group align="center">
+                  <ThemeIcon size="xs" variant="transparent" c="inherit">
+                    <BlockIcon size="100%" />
+                  </ThemeIcon>{' '}
+                  <Text c="inherit">{srcName}</Text>
+                </Group>
+              ) : (
+                srcName
+              ),
               impressions: item.impressions.toLocaleString(),
               clicks: item.clicks.toLocaleString(),
               ctr: `${item.ctr} %`,
@@ -96,7 +104,21 @@ const Placements = ({ forAdmin, campaignId }: { forAdmin: boolean; campaignId: s
     ]
   )
 
-  const actions = useMemo(() => {
+  const filterSrc = useCallback(
+    ({
+      action,
+      sources
+    }: {
+      action: 'include' | 'exclude'
+      sources: { srcName: string; srcId: string }[]
+    }) => {
+      if (!campaign?.id) return
+      filterSources(action, campaign?.id, sources)
+    },
+    [campaign?.id, filterSources]
+  )
+
+  const selectedActions = useMemo(() => {
     if (!campaign?.id) return []
     const placementActions: TableRowAction[] = [
       CampaignStatus.active,
@@ -104,31 +126,56 @@ const Placements = ({ forAdmin, campaignId }: { forAdmin: boolean; campaignId: s
     ].includes(campaign.status)
       ? [
           {
-            action: (props: PlacementsTableElement['actionData']) =>
-              toggleBlockedSource(campaign?.id, props.placementName, props.segment),
-            label: ({ isBlocked, placementName }: PlacementsTableElement['actionData']) =>
-              `${isBlocked ? 'Unblock' : 'Block'} "${placementName}"`,
-            icon: ({ isBlocked }: PlacementsTableElement['actionData']) =>
-              isBlocked ? <IncludeIcon /> : <ExcludeIcon />
+            action: (props: PlacementsTableElement['actionData'][]) =>
+              filterSrc({
+                action: 'exclude',
+                sources: props.map(({ srcId, srcName }) => ({
+                  srcId,
+                  srcName
+                }))
+              }),
+            label: (selectedElements) => `Block selected (${selectedElements?.size})`,
+            icon: (
+              <ThemeIcon variant="transparent" size="xs">
+                <BlockIcon size="14px" />
+              </ThemeIcon>
+            ),
+            color: 'warning'
+          },
+          {
+            action: (props: PlacementsTableElement['actionData'][]) =>
+              filterSrc({
+                action: 'include',
+                sources: props.map(({ srcId, srcName }) => ({
+                  srcId,
+                  srcName
+                }))
+              }),
+            label: (selectedElements) => `Unblock selected (${selectedElements?.size})`,
+            // icon: () => <VisibilityIcon size="10px" />,
+            color: 'success'
           }
         ]
       : []
 
     return placementActions
-  }, [campaign, toggleBlockedSource])
+  }, [campaign?.id, campaign?.status, filterSrc])
 
   return (
-    <Stack gap="xs">
-      <Group align="center" justify="end">
+    <CustomTable
+      headings={headings}
+      elements={elements}
+      loading={loading}
+      selectedActions={selectedActions}
+      tableActions={
         <DownloadCSV
           data={campaignMappedAnalytics}
           mapHeadersToDataProperties={csvHeaders}
           filename={`${analyticsKey?.key}.csv`}
           disabled={loading}
         />
-      </Group>
-      <CustomTable headings={headings} elements={elements} actions={actions} loading={loading} />
-    </Stack>
+      }
+    />
   )
 }
 

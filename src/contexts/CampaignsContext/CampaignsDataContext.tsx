@@ -130,7 +130,11 @@ interface ICampaignsDataContext {
     errMsg?: NotificationMsg
   ) => Promise<{ success: boolean }>
   toggleArchived: (id: string) => void
-  toggleBlockedSource: (campaignId: string, srcId: string, srcName: string) => Promise<void>
+  filterSources: (
+    action: 'include' | 'exclude',
+    campaignId: Campaign['id'],
+    sources: { srcId: string; srcName: string }[]
+  ) => Promise<void>
 }
 
 const CampaignsDataContext = createContext<ICampaignsDataContext | null>(null)
@@ -460,21 +464,22 @@ const CampaignsDataProvider: FC<PropsWithChildren & { type: 'user' | 'admin' }> 
     [campaignsData, adexServicesRequest, showNotification, updateCampaignDataById]
   )
 
-  const toggleBlockedSource: ICampaignsDataContext['toggleBlockedSource'] = useCallback(
-    async (campaignId, srcName, srcId): Promise<void> => {
+  const filterSources: ICampaignsDataContext['filterSources'] = useCallback(
+    async (action, campaignId, sources): Promise<void> => {
       const campaign = campaignsData.get(campaignId)?.campaign
       if (!campaign) {
         throw new Error('invalid campaign ')
       }
 
-      const isBlocked = campaign.targetingInput.inputs.publishers.nin.includes(srcId)
+      console.log({ sources })
+      const cleanNin = [...campaign.targetingInput.inputs.publishers.nin].filter(
+        (x) => !sources.some((s) => s.srcId === x)
+      )
 
       const blockedPublishers: Campaign['targetingInput']['inputs']['publishers'] = {
         ...campaign.targetingInput.inputs.publishers,
         apply: 'nin',
-        nin: isBlocked
-          ? [...campaign.targetingInput.inputs.publishers.nin].filter((x) => x !== srcId)
-          : [...campaign.targetingInput.inputs.publishers.nin, srcId]
+        nin: action === 'include' ? cleanNin : [...cleanNin, ...sources.map((x) => x.srcId)]
       }
 
       const inputs: Partial<Campaign['targetingInput']['inputs']> = {
@@ -482,8 +487,8 @@ const CampaignsDataProvider: FC<PropsWithChildren & { type: 'user' | 'admin' }> 
       }
 
       await editCampaign(campaignId, undefined, inputs, {
-        title: isBlocked ? 'Unblocked' : 'Blocked',
-        msg: srcName
+        title: action === 'exclude' ? 'Blocked' : 'Unblocked',
+        msg: sources.length === 1 ? sources[0].srcName : `${sources.length} placements`
       })
     },
     [campaignsData, editCampaign]
@@ -500,8 +505,8 @@ const CampaignsDataProvider: FC<PropsWithChildren & { type: 'user' | 'admin' }> 
       deleteDraftCampaign,
       toggleArchived,
       updateSupplyStats,
-      toggleBlockedSource,
-      editCampaign
+      editCampaign,
+      filterSources
     }),
     [
       campaignsData,
@@ -513,8 +518,8 @@ const CampaignsDataProvider: FC<PropsWithChildren & { type: 'user' | 'admin' }> 
       deleteDraftCampaign,
       toggleArchived,
       updateSupplyStats,
-      toggleBlockedSource,
-      editCampaign
+      editCampaign,
+      filterSources
     ]
   )
 
