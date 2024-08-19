@@ -69,7 +69,7 @@ const Placements = ({ forAdmin, campaignId }: { forAdmin: boolean; campaignId: s
             const isBlocked = !!campaign.targetingInput.inputs.publishers.nin.includes(item.segment)
             const srcName = getHumneSrcName(item.segment, placement)
             const data: PlacementsTableElement = {
-              rowColor: isBlocked ? 'red' : 'inherit',
+              rowColor: isBlocked ? 'warning' : 'inherit',
               actionData: {
                 srcName,
                 isBlocked,
@@ -134,7 +134,7 @@ const Placements = ({ forAdmin, campaignId }: { forAdmin: boolean; campaignId: s
                   srcName
                 }))
               }),
-            label: (selectedElements) => `Block selected ${selectedElements?.size}`,
+            label: (selectedElements) => `Block selected (${selectedElements?.size})`,
             icon: (
               <ThemeIcon variant="transparent" size="xs">
                 <BlockIcon size="inherit" />
@@ -151,7 +151,7 @@ const Placements = ({ forAdmin, campaignId }: { forAdmin: boolean; campaignId: s
                   srcName
                 }))
               }),
-            label: (selectedElements) => `Unblock selected ${selectedElements?.size}`,
+            label: (selectedElements) => `Unblock selected (${selectedElements?.size})`,
             // icon: () => <VisibilityIcon size="10px" />,
             color: 'success'
           }

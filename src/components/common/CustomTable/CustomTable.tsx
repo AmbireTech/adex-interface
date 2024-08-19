@@ -175,7 +175,7 @@ export const CustomTable = ({
             return (
               <Tooltip key={label} label={label}>
                 <ActionIcon
-                  size="23px"
+                  size="sm"
                   variant="transparent"
                   color={a.color || 'mainText'}
                   onClick={() => a.action(e.actionData || e)}
@@ -203,7 +203,7 @@ export const CustomTable = ({
                       color={a.color || 'mainText'}
                       key={label}
                       leftSection={
-                        <ThemeIcon size="20px" variant="transparent" color={a.color || 'mainText'}>
+                        <ThemeIcon size="sm" variant="transparent" color={a.color || 'mainText'}>
                           {getIcon(a.icon, e.actionData)}
                         </ThemeIcon>
                       }
@@ -229,6 +229,7 @@ export const CustomTable = ({
           e[column] ||
           (column === 'select' && (
             <Checkbox
+              aria-label="Select row"
               checked={selectedElements.has(e.id || '')}
               onChange={(el) => handleCheckbox(el.currentTarget.checked, e.id || '')}
             />
@@ -246,7 +247,7 @@ export const CustomTable = ({
             <Divider />
           </Stack>
         ) : (
-          <Table.Td key={column}>
+          <Table.Td key={column} maw={20}>
             <Text size="sm" c={color} truncate maw={290}>
               {columnParsed}
             </Text>
@@ -292,10 +293,17 @@ export const CustomTable = ({
           </Stack>
         ) : (
           <ScrollArea scrollbars="x" type="auto" offsetScrollbars>
-            <Table {...tableProps} mih={420} w="100%" highlightOnHover verticalSpacing="sm">
+            <Table
+              {...tableProps}
+              mih={420}
+              w="100%"
+              highlightOnHover
+              verticalSpacing="sm"
+              layout="auto"
+            >
               <Table.Thead bg="alternativeBackground">
                 <Table.Tr>
-                  {selectedActions && <Table.Th maw={20}>{masterSelectAction}</Table.Th>}
+                  {selectedActions && <Table.Th w="sm">{masterSelectAction}</Table.Th>}
                   {headings.map((h) => (
                     <Table.Th key={h}>{h}</Table.Th>
                   ))}
