@@ -136,7 +136,11 @@ export const CustomTable = ({
                 variant="light"
                 color={a.color || 'mainText'}
                 onClick={() => {
-                  a.action(Array.from(selectedElemets.values()))
+                  a.action(
+                    Array.from(selectedElemets.values()).map(
+                      (id) => elements.find((x) => x.id === id)?.actionData
+                    )
+                  )
                   selectedElemets.clear()
                 }}
                 leftSection={getIcon(a.icon, selectedElemets)}
