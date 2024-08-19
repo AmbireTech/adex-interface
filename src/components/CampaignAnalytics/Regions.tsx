@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { Group, Modal, Button, Stack } from '@mantine/core'
+import { Group, Modal, Button, Box } from '@mantine/core'
 import { useViewportSize } from '@mantine/hooks'
 import { CountryData } from 'helpers/countries'
 import CustomTable from 'components/common/CustomTable'
@@ -50,7 +50,7 @@ const Regions = ({ forAdmin, campaignId }: { forAdmin: boolean; campaignId: stri
   }, [campaignMappedAnalytics, currencyName])
 
   return (
-    <Stack gap="xs">
+    <Box>
       <CustomTable
         headings={headings}
         elements={elements}
@@ -86,7 +86,7 @@ const Regions = ({ forAdmin, campaignId }: { forAdmin: boolean; campaignId: stri
       >
         <GeoCustom width={width} height={height} regions={campaignMappedAnalytics} />
       </Modal>
-    </Stack>
+    </Box>
   )
 }
 

@@ -8,7 +8,7 @@ import {
 } from 'react'
 import { useCampaignsData } from 'hooks/useCampaignsData'
 import { useCampaignsAnalyticsData } from 'hooks/useCampaignAnalytics/useCampaignAnalyticsData'
-import { Stack, Group, ThemeIcon } from '@mantine/core'
+import { Group, ThemeIcon } from '@mantine/core'
 import DownloadCSV from 'components/common/DownloadCSV'
 // import VisibilityIcon from 'resources/icons/Include'
 import BlockIcon from 'resources/icons/Block'
@@ -172,23 +172,20 @@ const Placements = ({ forAdmin, campaignId }: { forAdmin: boolean; campaignId: s
   }, [campaign, filterSources])
 
   return (
-    <Stack gap="xs">
-      <Group align="center" justify="end" />
-      <CustomTable
-        headings={headings}
-        elements={elements}
-        loading={loading}
-        selectedActions={selectedActions}
-        tableActions={
-          <DownloadCSV
-            data={campaignMappedAnalytics}
-            mapHeadersToDataProperties={csvHeaders}
-            filename={`${analyticsKey?.key}.csv`}
-            disabled={loading}
-          />
-        }
-      />
-    </Stack>
+    <CustomTable
+      headings={headings}
+      elements={elements}
+      loading={loading}
+      selectedActions={selectedActions}
+      tableActions={
+        <DownloadCSV
+          data={campaignMappedAnalytics}
+          mapHeadersToDataProperties={csvHeaders}
+          filename={`${analyticsKey?.key}.csv`}
+          disabled={loading}
+        />
+      }
+    />
   )
 }
 
