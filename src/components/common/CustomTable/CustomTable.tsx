@@ -109,7 +109,7 @@ export const CustomTable = ({
   )
 
   const currentPageElementsAllSelected = useMemo(
-    () => selectedElements.size && list.every((x) => selectedElements.has(x.id || '')),
+    () => !!selectedElements.size && list.every((x) => selectedElements.has(x.id || '')),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [list, selectedElements, selectedElements.size]
   )
