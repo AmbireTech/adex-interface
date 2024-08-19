@@ -130,9 +130,8 @@ interface ICampaignsDataContext {
     errMsg?: NotificationMsg
   ) => Promise<{ success: boolean }>
   toggleArchived: (id: string) => void
-  toggleBlockedSource: (campaignId: string, srcId: string, srcName: string) => Promise<void>
-  addOrRemoveSources: (
-    action: 'block' | 'unblock',
+  filterSources: (
+    action: 'include' | 'exclude',
     campaignId: Campaign['id'],
     sources: { srcId: string; srcName: string }[]
   ) => Promise<void>
@@ -465,36 +464,7 @@ const CampaignsDataProvider: FC<PropsWithChildren & { type: 'user' | 'admin' }> 
     [campaignsData, adexServicesRequest, showNotification, updateCampaignDataById]
   )
 
-  const toggleBlockedSource: ICampaignsDataContext['toggleBlockedSource'] = useCallback(
-    async (campaignId, srcName, srcId): Promise<void> => {
-      const campaign = campaignsData.get(campaignId)?.campaign
-      if (!campaign) {
-        throw new Error('invalid campaign ')
-      }
-
-      const isBlocked = campaign.targetingInput.inputs.publishers.nin.includes(srcId)
-
-      const blockedPublishers: Campaign['targetingInput']['inputs']['publishers'] = {
-        ...campaign.targetingInput.inputs.publishers,
-        apply: 'nin',
-        nin: isBlocked
-          ? [...campaign.targetingInput.inputs.publishers.nin].filter((x) => x !== srcId)
-          : [...campaign.targetingInput.inputs.publishers.nin, srcId]
-      }
-
-      const inputs: Partial<Campaign['targetingInput']['inputs']> = {
-        publishers: { ...blockedPublishers }
-      }
-
-      await editCampaign(campaignId, undefined, inputs, {
-        title: isBlocked ? 'Unblocked' : 'Blocked',
-        msg: srcName
-      })
-    },
-    [campaignsData, editCampaign]
-  )
-
-  const addOrRemoveSources: ICampaignsDataContext['addOrRemoveSources'] = useCallback(
+  const filterSources: ICampaignsDataContext['filterSources'] = useCallback(
     async (action, campaignId, sources): Promise<void> => {
       const campaign = campaignsData.get(campaignId)?.campaign
       if (!campaign) {
@@ -509,7 +479,7 @@ const CampaignsDataProvider: FC<PropsWithChildren & { type: 'user' | 'admin' }> 
       const blockedPublishers: Campaign['targetingInput']['inputs']['publishers'] = {
         ...campaign.targetingInput.inputs.publishers,
         apply: 'nin',
-        nin: action === 'unblock' ? cleanNin : [...cleanNin, ...sources.map((x) => x.srcId)]
+        nin: action === 'include' ? cleanNin : [...cleanNin, ...sources.map((x) => x.srcId)]
       }
 
       const inputs: Partial<Campaign['targetingInput']['inputs']> = {
@@ -517,7 +487,7 @@ const CampaignsDataProvider: FC<PropsWithChildren & { type: 'user' | 'admin' }> 
       }
 
       await editCampaign(campaignId, undefined, inputs, {
-        title: action === 'unblock' ? 'Unblocked' : 'Blocked',
+        title: action === 'exclude' ? 'Unblocked' : 'Blocked',
         msg: 'kor'
       })
     },
@@ -535,9 +505,8 @@ const CampaignsDataProvider: FC<PropsWithChildren & { type: 'user' | 'admin' }> 
       deleteDraftCampaign,
       toggleArchived,
       updateSupplyStats,
-      toggleBlockedSource,
       editCampaign,
-      addOrRemoveSources
+      filterSources
     }),
     [
       campaignsData,
@@ -549,9 +518,8 @@ const CampaignsDataProvider: FC<PropsWithChildren & { type: 'user' | 'admin' }> 
       deleteDraftCampaign,
       toggleArchived,
       updateSupplyStats,
-      toggleBlockedSource,
       editCampaign,
-      addOrRemoveSources
+      filterSources
     ]
   )
 

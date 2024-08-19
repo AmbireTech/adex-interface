@@ -31,7 +31,7 @@ const Placements = ({ forAdmin, campaignId }: { forAdmin: boolean; campaignId: s
       forAdmin,
       analyticsType: 'hostname'
     })
-  const { toggleBlockedSource, addOrRemoveSources } = useCampaignsData()
+  const { filterSources } = useCampaignsData()
 
   const placement = useMemo(
     () => campaign?.targetingInput.inputs.placements.in[0] || 'site',
@@ -104,8 +104,15 @@ const Placements = ({ forAdmin, campaignId }: { forAdmin: boolean; campaignId: s
     ].includes(campaign.status)
       ? [
           {
-            action: (props: PlacementsTableElement['actionData']) =>
-              toggleBlockedSource(campaign?.id, props.placementName, props.segment),
+            action: ({
+              isBlocked,
+
+              segment,
+              placementName
+            }: PlacementsTableElement['actionData']) =>
+              filterSources(isBlocked ? 'include' : 'exclude', campaign?.id, [
+                { srcId: segment, srcName: placementName }
+              ]),
             label: ({ isBlocked, placementName }: PlacementsTableElement['actionData']) =>
               `${isBlocked ? 'Unblock' : 'Block'} "${placementName}"`,
             icon: ({ isBlocked }: PlacementsTableElement['actionData']) =>
@@ -115,7 +122,7 @@ const Placements = ({ forAdmin, campaignId }: { forAdmin: boolean; campaignId: s
       : []
 
     return placementActions
-  }, [campaign, toggleBlockedSource])
+  }, [filterSources, campaign?.id, campaign?.status])
 
   const selectedActions = useMemo(() => {
     if (!campaign?.id) return []
@@ -126,8 +133,8 @@ const Placements = ({ forAdmin, campaignId }: { forAdmin: boolean; campaignId: s
       ? [
           {
             action: (props) =>
-              addOrRemoveSources(
-                'block',
+              filterSources(
+                'exclude',
                 campaign?.id,
                 props.map((x: any) => ({
                   srcId: x,
@@ -140,8 +147,8 @@ const Placements = ({ forAdmin, campaignId }: { forAdmin: boolean; campaignId: s
           },
           {
             action: (props) =>
-              addOrRemoveSources(
-                'unblock',
+              filterSources(
+                'include',
                 campaign?.id,
                 props.map((x: any) => ({
                   srcId: x,
@@ -156,7 +163,7 @@ const Placements = ({ forAdmin, campaignId }: { forAdmin: boolean; campaignId: s
       : []
 
     return placementActions
-  }, [campaign, addOrRemoveSources])
+  }, [campaign, filterSources])
 
   return (
     <Stack gap="xs">
