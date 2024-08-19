@@ -8,10 +8,10 @@ import {
 } from 'react'
 import { useCampaignsData } from 'hooks/useCampaignsData'
 import { useCampaignsAnalyticsData } from 'hooks/useCampaignAnalytics/useCampaignAnalyticsData'
-import { Stack, Group } from '@mantine/core'
+import { Stack, Group, ThemeIcon } from '@mantine/core'
 import DownloadCSV from 'components/common/DownloadCSV'
 // import VisibilityIcon from 'resources/icons/Include'
-import InvisibilityIcon from 'resources/icons/Invisibility'
+import BlockIcon from 'resources/icons/Block'
 // import throttle from 'lodash.throttle'
 
 type PlacementsTableElement = Omit<TableElement, 'actionData'> & {
@@ -84,7 +84,12 @@ const Placements = ({ forAdmin, campaignId }: { forAdmin: boolean; campaignId: s
               id: item.segment,
               placementName: (
                 <Group align="center">
-                  {isBlocked && <InvisibilityIcon size="14px" />} {placementName}
+                  {isBlocked && (
+                    <ThemeIcon size="xs" variant="transparent" c="inherit">
+                      <BlockIcon size="inherit" />
+                    </ThemeIcon>
+                  )}{' '}
+                  {placementName}
                 </Group>
               ),
               impressions: item.impressions.toLocaleString(),
@@ -139,7 +144,11 @@ const Placements = ({ forAdmin, campaignId }: { forAdmin: boolean; campaignId: s
                 }))
               ),
             label: (selectedElements) => `Block selected ${selectedElements?.size}`,
-            icon: () => <InvisibilityIcon size="10px" />,
+            icon: (
+              <ThemeIcon variant="transparent" size="xs">
+                <BlockIcon size="inherit" />
+              </ThemeIcon>
+            ),
             color: 'warning'
           },
           {
