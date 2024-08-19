@@ -487,8 +487,8 @@ const CampaignsDataProvider: FC<PropsWithChildren & { type: 'user' | 'admin' }> 
       }
 
       await editCampaign(campaignId, undefined, inputs, {
-        title: action === 'exclude' ? 'Unblocked' : 'Blocked',
-        msg: 'kor'
+        title: action === 'exclude' ? 'Blocked' : 'Unblocked',
+        msg: sources.length === 1 ? sources[0].srcName : `${sources.length} placements`
       })
     },
     [campaignsData, editCampaign]

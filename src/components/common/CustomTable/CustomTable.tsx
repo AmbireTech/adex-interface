@@ -16,7 +16,7 @@ import {
   ThemeIcon,
   LoadingOverlay,
   Checkbox,
-  CheckIcon,
+  // CheckIcon,
   Button
 } from '@mantine/core'
 import { useSet, useMediaQuery } from '@mantine/hooks'
@@ -35,7 +35,7 @@ export type TableRowAction = {
   action: (e: TableElement['actionData']) => any
   label: ((e: TableElement['actionData']) => string) | string
   color?: MantineColor
-  icon: ((e: TableElement['actionData']) => ReactNode) | ReactNode
+  icon?: ((e: TableElement['actionData']) => ReactNode) | ReactNode
   disabled?: (e?: TableElement['actionData']) => boolean
   hide?: (e?: TableElement['actionData']) => boolean
 }
@@ -49,6 +49,7 @@ export type CustomTableProps = PropsWithChildren &
     shadow?: MantineShadow
     loading?: boolean
     selectedActions?: TableRowAction[]
+    tableActions?: ReactNode
   }
 
 const getLabel = (label: TableRowAction['label'], actionData?: TableElement['actionData']) => {
@@ -75,6 +76,7 @@ export const CustomTable = ({
   shadow = 'none',
   loading,
   selectedActions,
+  tableActions,
   ...tableProps
 }: CustomTableProps) => {
   const isMobile = useMediaQuery('(max-width: 75rem)')
@@ -106,7 +108,7 @@ export const CustomTable = ({
     [selectedElemets]
   )
 
-  const currentPageSelected = useMemo(
+  const currentPageElementsAllSelected = useMemo(
     () => list.every((x) => selectedElemets.has(x.id || '')),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [list, selectedElemets, selectedElemets.size]
@@ -115,50 +117,46 @@ export const CustomTable = ({
   const handleCheckboxMaster = useCallback(
     (all?: boolean) => {
       ;(all ? elements : list).forEach((x) =>
-        selectedElemets[currentPageSelected ? 'delete' : 'add'](x.id || '')
+        selectedElemets[currentPageElementsAllSelected ? 'delete' : 'add'](x.id || '')
       )
     },
-    [currentPageSelected, elements, list, selectedElemets]
+    [currentPageElementsAllSelected, elements, list, selectedElemets]
   )
 
   const masterActionMenu = useMemo(() => {
-    return selectedActions?.map((a) => {
-      const label = getLabel(a.label, selectedElemets)
+    return (
+      <Group>
+        {selectedActions?.map((a) => {
+          const label = getLabel(a.label, selectedElemets)
 
-      return (
-        <Tooltip key={label} label={label}>
-          <Button
-            size="sm"
-            variant="light"
-            color={a.color || 'mainText'}
-            onClick={() => {
-              a.action(Array.from(selectedElemets.values()))
-              // selectedElemets.clear()
-            }}
-            leftSection={getIcon(a.icon, selectedElemets)}
-          >
-            {label}
-          </Button>
-        </Tooltip>
-      )
-    })
+          return (
+            <Tooltip key={label} label={label}>
+              <Button
+                size="sm"
+                variant="light"
+                color={a.color || 'mainText'}
+                onClick={() => {
+                  a.action(Array.from(selectedElemets.values()))
+                  selectedElemets.clear()
+                }}
+                leftSection={getIcon(a.icon, selectedElemets)}
+              >
+                {label}
+              </Button>
+            </Tooltip>
+          )
+        })}
+      </Group>
+    )
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedActions, selectedElemets, selectedElemets.size])
 
   const masterSelectAction = useMemo(
     () =>
       selectedActions && (
-        <ActionIcon
-          size="md"
-          m="sm"
-          variant="transparent"
-          color="mainText"
-          onClick={() => handleCheckboxMaster()}
-        >
-          <CheckIcon />
-        </ActionIcon>
+        <Checkbox checked={currentPageElementsAllSelected} onClick={() => handleCheckboxMaster()} />
       ),
-    [handleCheckboxMaster, selectedActions]
+    [currentPageElementsAllSelected, handleCheckboxMaster, selectedActions]
   )
 
   const rows = useMemo(() => {
@@ -274,10 +272,18 @@ export const CustomTable = ({
   return (
     <Stack align="stretch" w="100%" pos="relative">
       <LoadingOverlay visible={loading} />
+      <Group align="center" justify={selectedElemets.size ? 'space-between' : 'right'}>
+        {selectedElemets.size && masterActionMenu}
+        {tableActions}
+      </Group>
       <Paper pb="md" w="100%" shadow={shadow}>
         {isMobile ? (
-          <Stack gap="xl" mih={420}>
-            {masterSelectAction}
+          <Stack gap="xl">
+            {selectedActions && (
+              <Group align="center" justify="center" pt="xs">
+                Select current page: {masterSelectAction}
+              </Group>
+            )}
             {rows}
           </Stack>
         ) : (
@@ -285,8 +291,7 @@ export const CustomTable = ({
             <Table {...tableProps} mih={420} w="100%" highlightOnHover verticalSpacing="sm">
               <Table.Thead bg="alternativeBackground">
                 <Table.Tr>
-                  {masterSelectAction}
-
+                  {selectedActions && <Table.Th maw={20}>{masterSelectAction}</Table.Th>}
                   {headings.map((h) => (
                     <Table.Th key={h}>{h}</Table.Th>
                   ))}
@@ -297,8 +302,7 @@ export const CustomTable = ({
             </Table>
           </ScrollArea>
         )}
-        <Group w="100%" justify={selectedElemets.size ? 'space-between' : 'right'} mt="xl" pr="md">
-          {!!selectedElemets.size && <Group>{masterActionMenu}</Group>}
+        <Group w="100%" justify="right" mt="xl" pr="md">
           <Pagination
             color="brand"
             total={maxPages}
