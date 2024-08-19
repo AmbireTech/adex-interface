@@ -80,7 +80,7 @@ export const CustomTable = ({
   ...tableProps
 }: CustomTableProps) => {
   const isMobile = useMediaQuery('(max-width: 75rem)')
-  const selectedElemets = useSet<string>()
+  const selectedElements = useSet<string>()
 
   const columns: string[] = useMemo(
     () =>
@@ -103,31 +103,31 @@ export const CustomTable = ({
 
   const handleCheckbox = useCallback(
     (checked: boolean, id: string) => {
-      selectedElemets[checked ? 'add' : 'delete'](id || '')
+      selectedElements[checked ? 'add' : 'delete'](id || '')
     },
-    [selectedElemets]
+    [selectedElements]
   )
 
   const currentPageElementsAllSelected = useMemo(
-    () => list.every((x) => selectedElemets.has(x.id || '')),
+    () => selectedElements.size && list.every((x) => selectedElements.has(x.id || '')),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [list, selectedElemets, selectedElemets.size]
+    [list, selectedElements, selectedElements.size]
   )
 
   const handleCheckboxMaster = useCallback(
     (all?: boolean) => {
       ;(all ? elements : list).forEach((x) =>
-        selectedElemets[currentPageElementsAllSelected ? 'delete' : 'add'](x.id || '')
+        selectedElements[currentPageElementsAllSelected ? 'delete' : 'add'](x.id || '')
       )
     },
-    [currentPageElementsAllSelected, elements, list, selectedElemets]
+    [currentPageElementsAllSelected, elements, list, selectedElements]
   )
 
   const masterActionMenu = useMemo(() => {
     return (
       <Group>
         {selectedActions?.map((a) => {
-          const label = getLabel(a.label, selectedElemets)
+          const label = getLabel(a.label, selectedElements)
 
           return (
             <Tooltip key={label} label={label}>
@@ -137,13 +137,13 @@ export const CustomTable = ({
                 color={a.color || 'mainText'}
                 onClick={() => {
                   a.action(
-                    Array.from(selectedElemets.values()).map(
+                    Array.from(selectedElements.values()).map(
                       (id) => elements.find((x) => x.id === id)?.actionData
                     )
                   )
-                  selectedElemets.clear()
+                  selectedElements.clear()
                 }}
-                leftSection={getIcon(a.icon, selectedElemets)}
+                leftSection={getIcon(a.icon, selectedElements)}
               >
                 {label}
               </Button>
@@ -153,7 +153,7 @@ export const CustomTable = ({
       </Group>
     )
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedActions, selectedElemets, selectedElemets.size])
+  }, [selectedActions, selectedElements, selectedElements.size])
 
   const masterSelectAction = useMemo(
     () =>
@@ -229,7 +229,7 @@ export const CustomTable = ({
           e[column] ||
           (column === 'select' && (
             <Checkbox
-              checked={selectedElemets.has(e.id || '')}
+              checked={selectedElements.has(e.id || '')}
               onChange={(el) => handleCheckbox(el.currentTarget.checked, e.id || '')}
             />
           ))
@@ -271,13 +271,13 @@ export const CustomTable = ({
       )
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [list, actions, isMobile, columns, selectedElemets, selectedElemets.size, headings])
+  }, [list, actions, isMobile, columns, selectedElements, selectedElements.size, headings])
 
   return (
     <Stack align="stretch" w="100%" pos="relative">
       <LoadingOverlay visible={loading} />
-      <Group align="center" justify={selectedElemets.size ? 'space-between' : 'right'}>
-        {selectedElemets.size && masterActionMenu}
+      <Group align="center" justify={selectedElements.size ? 'space-between' : 'right'}>
+        {selectedElements.size && masterActionMenu}
         {tableActions}
       </Group>
       <Paper pb="md" w="100%" shadow={shadow}>
