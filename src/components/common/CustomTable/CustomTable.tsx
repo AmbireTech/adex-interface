@@ -129,9 +129,12 @@ export const CustomTable = ({
         <Tooltip key={label} label={label}>
           <Button
             size="sm"
-            variant="filled"
+            variant="light"
             color={a.color || 'mainText'}
-            onClick={() => a.action(Array.from(selectedElemets.values()))}
+            onClick={() => {
+              a.action(Array.from(selectedElemets.values()))
+              // selectedElemets.clear()
+            }}
             leftSection={getIcon(a.icon, selectedElemets)}
           >
             {label}

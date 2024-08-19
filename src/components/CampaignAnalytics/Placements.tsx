@@ -1,13 +1,14 @@
 import { CampaignStatus } from 'adex-common'
 import CustomTable, { TableElement, TableRowAction } from 'components/common/CustomTable'
 import { getHumneSrcName } from 'helpers'
-import { useMemo } from 'react'
+import { useCallback, useMemo } from 'react'
 import { useCampaignsData } from 'hooks/useCampaignsData'
 import { useCampaignsAnalyticsData } from 'hooks/useCampaignAnalytics/useCampaignAnalyticsData'
 import { Stack, Group } from '@mantine/core'
 import DownloadCSV from 'components/common/DownloadCSV'
 import VisibilityIcon from 'resources/icons/Visibility'
 import InvisibilityIcon from 'resources/icons/Invisibility'
+import throttle from 'lodash.throttle'
 
 type PlacementsTableElement = Omit<TableElement, 'actionData'> & {
   actionData: {
@@ -96,6 +97,18 @@ const Placements = ({ forAdmin, campaignId }: { forAdmin: boolean; campaignId: s
     ]
   )
 
+  const filterSrc = useCallback(
+    ({ isBlocked, segment, placementName }: PlacementsTableElement['actionData']) => {
+      if (!campaign?.id) return
+      filterSources(isBlocked ? 'include' : 'exclude', campaign?.id, [
+        { srcId: segment, srcName: placementName }
+      ])
+    },
+    [campaign?.id, filterSources]
+  )
+
+  const throttledFilter = useMemo(() => throttle(filterSrc, 420, { leading: true }), [filterSrc])
+
   const actions = useMemo(() => {
     if (!campaign?.id) return []
     const placementActions: TableRowAction[] = [
@@ -104,15 +117,7 @@ const Placements = ({ forAdmin, campaignId }: { forAdmin: boolean; campaignId: s
     ].includes(campaign.status)
       ? [
           {
-            action: ({
-              isBlocked,
-
-              segment,
-              placementName
-            }: PlacementsTableElement['actionData']) =>
-              filterSources(isBlocked ? 'include' : 'exclude', campaign?.id, [
-                { srcId: segment, srcName: placementName }
-              ]),
+            action: throttledFilter,
             label: ({ isBlocked, placementName }: PlacementsTableElement['actionData']) =>
               `${isBlocked ? 'Unblock' : 'Block'} "${placementName}"`,
             icon: ({ isBlocked }: PlacementsTableElement['actionData']) =>
@@ -122,7 +127,7 @@ const Placements = ({ forAdmin, campaignId }: { forAdmin: boolean; campaignId: s
       : []
 
     return placementActions
-  }, [filterSources, campaign?.id, campaign?.status])
+  }, [campaign?.id, campaign?.status, throttledFilter])
 
   const selectedActions = useMemo(() => {
     if (!campaign?.id) return []
