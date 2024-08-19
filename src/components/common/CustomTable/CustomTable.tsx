@@ -135,7 +135,7 @@ export const CustomTable = ({
                 size="sm"
                 variant="light"
                 color={a.color || 'mainText'}
-                onChange={() => {
+                onClick={() => {
                   a.action(
                     Array.from(selectedElements.values()).map(
                       (id) => elements.find((x) => x.id === id)?.actionData

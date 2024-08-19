@@ -76,7 +76,7 @@ const DownloadCSV = ({
       variant="transparent"
       rightSection={
         <ThemeIcon size="sm" variant="transparent" c="inherit">
-          <DownloadIcon size="inherit" />
+          <DownloadIcon size="100%" />
         </ThemeIcon>
       }
     >

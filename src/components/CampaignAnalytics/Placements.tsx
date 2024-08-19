@@ -79,7 +79,7 @@ const Placements = ({ forAdmin, campaignId }: { forAdmin: boolean; campaignId: s
               placementName: isBlocked ? (
                 <Group align="center">
                   <ThemeIcon size="xs" variant="transparent" c="inherit">
-                    <BlockIcon size="inherit" />
+                    <BlockIcon size="100%" />
                   </ThemeIcon>{' '}
                   <Text c="inherit">{srcName}</Text>
                 </Group>
@@ -137,7 +137,7 @@ const Placements = ({ forAdmin, campaignId }: { forAdmin: boolean; campaignId: s
             label: (selectedElements) => `Block selected (${selectedElements?.size})`,
             icon: (
               <ThemeIcon variant="transparent" size="xs">
-                <BlockIcon size="inherit" />
+                <BlockIcon size="14px" />
               </ThemeIcon>
             ),
             color: 'warning'
