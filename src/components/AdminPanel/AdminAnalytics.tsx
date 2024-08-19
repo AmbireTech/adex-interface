@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo, useCallback } from 'react'
-import { Select, Loader, Flex, Box, Text, Badge, ActionIcon } from '@mantine/core'
+import { Select, Loader, Flex, Box, Text, Badge, ActionIcon, Stack, Group } from '@mantine/core'
 import { BaseAnalyticsData, AnalyticsPeriod, Timeframe, AnalyticsType, SSPs } from 'types'
 import useCampaignAnalytics from 'hooks/useCampaignAnalytics'
 import CustomTable from 'components/common/CustomTable'
@@ -259,8 +259,8 @@ const AdminAnalytics = () => {
       {loading ? (
         <Loader size="xl" type="dots" color="violet" />
       ) : (
-        <Flex direction="column" mt="md">
-          <Flex direction="row" align="center" justify="left" gap="xs" mb="md">
+        <Stack>
+          <Group align="center" justify="left" gap="xs">
             <Box>Totals: </Box>
             <Badge
               leftSection={
@@ -301,7 +301,7 @@ const AdminAnalytics = () => {
               filename={`${analyticsKey?.key || 'admin-data-export'}.csv`}
               disabled={loading}
             />
-          </Flex>
+          </Group>
 
           <CustomTable
             headings={headings}
@@ -309,7 +309,7 @@ const AdminAnalytics = () => {
             pageSize={10}
             actions={analType === 'campaignId' ? actions : undefined}
           />
-        </Flex>
+        </Stack>
       )}
     </>
   )

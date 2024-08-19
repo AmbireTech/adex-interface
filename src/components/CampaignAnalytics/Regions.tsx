@@ -51,25 +51,32 @@ const Regions = ({ forAdmin, campaignId }: { forAdmin: boolean; campaignId: stri
 
   return (
     <Stack gap="xs">
-      <Group align="center" justify="end">
-        <Button
-          variant="transparent"
-          color="mainText"
-          size="sm"
-          onClick={() => setIsMapVisible((prev) => !prev)}
-          rightSection={<MapIcon size="1rem" />}
-          disabled={loading}
-        >
-          See on Map{' '}
-        </Button>
-        <DownloadCSV
-          data={campaignMappedAnalytics}
-          mapHeadersToDataProperties={csvHeaders}
-          filename={`${analyticsKey?.key}.csv`}
-          disabled={loading}
-        />
-        <CustomTable headings={headings} elements={elements} loading={loading} />
-      </Group>
+      <CustomTable
+        headings={headings}
+        elements={elements}
+        loading={loading}
+        tableActions={
+          <Group align="center" justify="end" gap="xs">
+            <Button
+              variant="transparent"
+              color="mainText"
+              size="sm"
+              onClick={() => setIsMapVisible((prev) => !prev)}
+              rightSection={<MapIcon size="1rem" />}
+              disabled={loading}
+            >
+              See on Map
+            </Button>
+            <DownloadCSV
+              data={campaignMappedAnalytics}
+              mapHeadersToDataProperties={csvHeaders}
+              filename={`${analyticsKey?.key}.csv`}
+              disabled={loading}
+            />
+          </Group>
+        }
+      />
+
       <Modal
         opened={isMapVisible}
         onClose={() => setIsMapVisible(false)}
