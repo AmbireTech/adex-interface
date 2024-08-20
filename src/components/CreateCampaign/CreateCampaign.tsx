@@ -38,13 +38,8 @@ const CreateCampaign = () => {
   const [isSuccessModalOpened, SetIsSuccessModalOpened] = useState(false)
   const { updateBalance } = useAccount()
   const navigate = useNavigate()
-  const {
-    campaign: { step },
-    saveToDraftCampaign,
-    publishCampaign,
-    resetCampaign,
-    form
-  } = useCreateCampaignContext()
+  const { saveToDraftCampaign, publishCampaign, resetCampaign, form, step } =
+    useCreateCampaignContext()
   const { showNotification } = useCustomNotifications()
 
   const shouldBlock = useCallback<BlockerFunction>(
@@ -120,7 +115,7 @@ const CreateCampaign = () => {
         <Grid.Col span={{ sm: 24, lg: 18 }}>
           <Paper p="md" shadow="xs">
             <Stack gap="xl">
-              <CustomStepper />
+              <CustomStepper stepsCount={4} />
               <Wizard step={step} />
             </Stack>
           </Paper>
