@@ -39,7 +39,6 @@ const CreateCampaign = () => {
   const { updateBalance } = useAccount()
   const navigate = useNavigate()
   const {
-    campaign,
     campaign: { step },
     saveToDraftCampaign,
     publishCampaign,
@@ -50,26 +49,11 @@ const CreateCampaign = () => {
 
   const shouldBlock = useCallback<BlockerFunction>(
     ({ currentLocation, nextLocation }) =>
-      currentLocation.pathname !== nextLocation.pathname && campaign.dirty,
-    [campaign.dirty]
+      currentLocation.pathname !== nextLocation.pathname && form.isDirty(),
+    [form]
   )
 
   const blocker: Blocker = useBlocker(shouldBlock)
-
-  const saveDraft = useCallback(async () => {
-    try {
-      const res = await saveToDraftCampaign()
-
-      if (res && res.success) {
-        showNotification('info', 'Draft saved')
-      } else {
-        showNotification('warning', 'invalid campaign data response', 'Data error')
-      }
-    } catch (err) {
-      console.error(err)
-      showNotification('error', 'Creating campaign failed', 'Data error')
-    }
-  }, [showNotification, saveToDraftCampaign])
 
   useEffect(() => {
     if (blocker.state === 'blocked') {
@@ -82,13 +66,13 @@ const CreateCampaign = () => {
             blocker.proceed()
           },
           onCancel: () => {
-            saveDraft()
+            saveToDraftCampaign()
             blocker.proceed()
           }
         })
       )
     }
-  }, [blocker, saveDraft])
+  }, [blocker, saveToDraftCampaign])
 
   const launchCampaign = useCallback(async () => {
     try {
