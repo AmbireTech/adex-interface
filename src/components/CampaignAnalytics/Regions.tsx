@@ -1,35 +1,43 @@
-import { BaseAnalyticsData } from 'types'
-import { useMemo } from 'react'
-import { Grid, Modal } from '@mantine/core'
+import { useMemo, useState } from 'react'
+import { Group, Modal, Button, Box } from '@mantine/core'
 import { useViewportSize } from '@mantine/hooks'
 import { CountryData } from 'helpers/countries'
 import CustomTable from 'components/common/CustomTable'
+import { useCampaignsAnalyticsData } from 'hooks/useCampaignAnalytics/useCampaignAnalyticsData'
+import MapIcon from 'resources/icons/Map'
+import DownloadCSV from 'components/common/DownloadCSV'
 import GeoCustom from '../common/CustomTableWithDropdown/WorldMap'
 
 const headings = ['Country', 'Share', 'Impressions', 'Clicks', 'CTR', 'Average CPM', 'Spent']
 
-const Regions = ({
-  regions,
-  isMapVisible,
-  currencyName,
-  totalPaid,
-  onClose
-}: {
-  regions: BaseAnalyticsData[] | undefined
-  isMapVisible: boolean
-  currencyName: string
-  totalPaid: number
-  onClose: () => void
-}) => {
-  const { width: windowWidth, height: windowHeight } = useViewportSize()
+const csvHeaders = {
+  Country: 'segment',
+  Share: 'share',
+  Impressions: 'impressions',
+  Clicks: 'clicks',
+  'CTR%': 'ctr',
+  'Average CPM': 'avgCpm',
+  Spent: 'paid'
+}
 
-  // TODO: add elements types, fix custom table data
+const Regions = ({ forAdmin, campaignId }: { forAdmin: boolean; campaignId: string }) => {
+  const [isMapVisible, setIsMapVisible] = useState<boolean>(false)
+  const { campaignMappedAnalytics, currencyName, analyticsKey, loading } =
+    useCampaignsAnalyticsData({
+      campaignId,
+      forAdmin,
+      analyticsType: 'country'
+    })
+  const { width, height } = useViewportSize()
+
   const elements = useMemo(() => {
-    const paid = regions?.reduce((sum, i) => sum + i.paid, 0) || 1
-    // TODO: investigate analytics timeframe edge case
-    console.log(totalPaid)
+    if (!campaignMappedAnalytics) {
+      return []
+    }
+    const paid = campaignMappedAnalytics?.reduce((sum, i) => sum + i.paid, 0) || 1
+
     return (
-      regions?.map((item) => ({
+      campaignMappedAnalytics?.map((item) => ({
         segment: CountryData.get(item.segment)?.name,
         share: `${((item.paid / paid) * 100).toFixed(2)} %`,
         impressions: item.impressions,
@@ -39,31 +47,46 @@ const Regions = ({
         paid: `${item.paid.toFixed(4)} ${currencyName}`
       })) || []
     )
-  }, [regions, totalPaid, currencyName])
-
-  if (!regions?.length) {
-    return <div>No regions found</div>
-  }
+  }, [campaignMappedAnalytics, currencyName])
 
   return (
-    <Grid grow>
-      <Grid.Col>
-        <CustomTable headings={headings} elements={elements} />
-      </Grid.Col>
+    <Box>
+      <CustomTable
+        headings={headings}
+        elements={elements}
+        loading={loading}
+        tableActions={
+          <Group align="center" justify="end" gap="xs">
+            <Button
+              variant="transparent"
+              color="mainText"
+              size="sm"
+              onClick={() => setIsMapVisible((prev) => !prev)}
+              rightSection={<MapIcon size="1rem" />}
+              disabled={loading}
+            >
+              See on Map
+            </Button>
+            <DownloadCSV
+              data={campaignMappedAnalytics}
+              mapHeadersToDataProperties={csvHeaders}
+              filename={`${analyticsKey?.key}.csv`}
+              disabled={loading}
+            />
+          </Group>
+        }
+      />
+
       <Modal
         opened={isMapVisible}
-        onClose={onClose}
+        onClose={() => setIsMapVisible(false)}
         title="Word Map"
-        size={windowWidth >= 768 ? windowWidth - 290 : windowWidth - 60}
-        padding="lg"
+        centered
+        size="100%"
       >
-        <GeoCustom
-          width={windowWidth >= 768 ? windowWidth - 290 : windowWidth - 60}
-          height={windowHeight}
-          regions={regions}
-        />
+        <GeoCustom width={width} height={height} regions={campaignMappedAnalytics} />
       </Modal>
-    </Grid>
+    </Box>
   )
 }
 

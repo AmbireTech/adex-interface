@@ -8,7 +8,7 @@ export const UtmInfo = ({ title = '', placement }: { title: string; placement?: 
       <Group>
         <Text size="inherit">{title}</Text>
         <ActionIcon size="sm" variant="transparent">
-          <InfoIcon size="inherit" />
+          <InfoIcon size="100%" />
         </ActionIcon>
       </Group>
     </HoverCard.Target>

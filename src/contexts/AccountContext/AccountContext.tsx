@@ -20,6 +20,7 @@ import { AmbireLoginSDK } from '@ambire/login-sdk-core'
 import { DAPP_ICON_PATH, DAPP_NAME, DEFAULT_CHAIN_ID } from 'constants/login'
 import useCustomNotifications from 'hooks/useCustomNotifications'
 import { fetchService, getReqErr, RequestOptions } from 'services'
+import SuperJSON from 'superjson'
 
 const ambireLoginSDK = new AmbireLoginSDK({
   dappName: DAPP_NAME,
@@ -31,7 +32,7 @@ export const VALIDATOR_BASE_URL = process.env.REACT_APP_VALIDATOR_BASE_URL
 const UNAUTHORIZED_ERR_STR = 'Unauthorized!'
 
 console.log({ BACKEND_BASE_URL })
-const processResponse = (res: any) => {
+const processResponse = <R extends any>(res: Response): Promise<R> => {
   // console.log('res', res)
   if (res.status >= 200 && res.status < 400) {
     return res.json()
@@ -49,8 +50,9 @@ const processResponse = (res: any) => {
 
 type AdExService = 'backend' | 'validator'
 
-type ApiRequestOptions<T> = Omit<RequestOptions<T>, 'url'> & {
+type ApiRequestOptions = Omit<RequestOptions, 'url' | 'body'> & {
   route: string
+  body?: BodyInit | object | string | null
   noAuth?: boolean
   onErrMsg?: string
 }
@@ -64,10 +66,10 @@ interface IAccountContext {
   disconnectWallet: () => void
   updateAccessToken: () => Promise<any>
   resetAdexAccount: () => void
-  adexServicesRequest: <T extends any>(
+  adexServicesRequest: <R extends any>(
     service: AdExService,
-    reqOptions: ApiRequestOptions<T>
-  ) => Promise<T>
+    reqOptions: ApiRequestOptions
+  ) => Promise<R>
   updateBalance: () => Promise<void>
   updateBillingDetails: (billingDetails: BillingDetails) => Promise<void>
   isLoading: boolean
@@ -235,7 +237,7 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
 
   const adexServicesRequest = useCallback(
     // Note
-    async <T extends any>(service: AdExService, reqOptions: ApiRequestOptions<T>): Promise<T> => {
+    async <R extends any>(service: AdExService, reqOptions: ApiRequestOptions): Promise<R> => {
       // temp hax for using the same token fot validator auth
       const authHeaderProp = service === 'backend' ? 'X-DSP-AUTH' : 'authorization'
 
@@ -244,10 +246,13 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
       const baseUrl = (service === 'backend' ? BACKEND_BASE_URL : VALIDATOR_BASE_URL) || ''
       const urlCheck = reqOptions.route.replace(baseUrl, '').replace(/^\//, '')
 
-      const req: RequestOptions<T> = {
+      const req: RequestOptions = {
         url: `${baseUrl}/${urlCheck}`,
         method: reqOptions.method,
-        body: reqOptions.body,
+        body:
+          reqOptions.body instanceof FormData
+            ? reqOptions.body
+            : reqOptions.body && JSON.stringify(SuperJSON.serialize(reqOptions.body).json),
         queryParams: reqOptions.queryParams,
         headers: reqOptions.headers
       }
@@ -277,16 +282,17 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
 
       console.log('req', req)
 
-      return fetchService(req)
-        .then(processResponse)
-        .catch((err) => {
-          console.log(err)
-          // TODO: better check
-          if (err && err.message && err.message.includes(UNAUTHORIZED_ERR_STR)) {
-            resetAdexAccount()
-          }
-          showNotification('error', err.message, reqOptions.onErrMsg || 'Data error')
-        })
+      try {
+        const res = await fetchService(req)
+        return await processResponse<R>(res)
+      } catch (err: any) {
+        console.log(err)
+        if (err && err.message && err.message.includes(UNAUTHORIZED_ERR_STR)) {
+          resetAdexAccount()
+        }
+        showNotification('error', err.message, reqOptions.onErrMsg || 'Data error')
+        return Promise.reject<R>()
+      }
     },
     [adexAccount.accessToken, resetAdexAccount, showNotification, updateAccessToken]
   )
@@ -458,7 +464,7 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
   const updateBillingDetails = useCallback(
     async (billingDetails: BillingDetails) => {
       try {
-        const updated = await adexServicesRequest<unknown>('backend', {
+        const updated = await adexServicesRequest<{ success?: boolean }>('backend', {
           route: '/dsp/accounts/billing-details',
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },

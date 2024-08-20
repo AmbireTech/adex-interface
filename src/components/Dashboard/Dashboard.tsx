@@ -7,10 +7,9 @@ import {
 import { Container, Flex, Text, Loader, UnstyledButton, Anchor, Box } from '@mantine/core'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import CustomTable, { TableElement, TableRowAction } from 'components/common/CustomTable'
-import { periodNumberToDate } from 'helpers'
 import { useNavigate } from 'react-router-dom'
 import { useCampaignsData } from 'hooks/useCampaignsData'
-import { parseBigNumTokenAmountToDecimal } from 'helpers/balances'
+import { parseBigNumTokenAmountToDecimal, maskAddress, periodNumberToDate } from 'helpers'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import useCustomNotifications from 'hooks/useCustomNotifications'
 import { modals } from '@mantine/modals'
@@ -139,7 +138,7 @@ const Dashboard = ({ isAdminPanel, accountId }: { isAdminPanel?: boolean; accoun
               rowColor: archived ? 'red' : undefined,
               id: cmpData.campaignId,
               title: (
-                <Text size="sm" truncate>
+                <Text truncate maw={256}>
                   {archived && (
                     <BadgeStatusCampaign type={cmpData.campaign.status} isArchived={archived} />
                   )}
@@ -152,7 +151,7 @@ const Dashboard = ({ isAdminPanel, accountId }: { isAdminPanel?: boolean; accoun
                         href={`/dashboard/admin/user-account/${campaign.owner}`}
                         c="secondaryText"
                       >
-                        {campaign.owner}
+                        {maskAddress(campaign.owner)}
                       </Anchor>
                     </Box>
                   )}
@@ -260,7 +259,7 @@ const Dashboard = ({ isAdminPanel, accountId }: { isAdminPanel?: boolean; accoun
 
   const handleEdit = useCallback(
     (data: DashboardTableElement['actionData']) =>
-      navigate(`/dashboard/campaign-details/${data.campaign.id}?edit=true`, {}),
+      navigate(`/dashboard/campaign-details/${data.campaign.id}/budget?edit=true`, {}),
     [navigate]
   )
 

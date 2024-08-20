@@ -7,7 +7,8 @@ import {
   ActionIcon,
   Checkbox,
   NumberInput,
-  Paper
+  Paper,
+  Tabs
 } from '@mantine/core'
 import { useForm } from '@mantine/form'
 import { modals } from '@mantine/modals'
@@ -26,18 +27,17 @@ import {
   getRecommendedCPMRange
 } from 'helpers/createCampaignHelpers'
 import useAccount from 'hooks/useAccount'
-import { useAdExApi } from 'hooks/useAdexServices'
-import useCustomNotifications from 'hooks/useCustomNotifications'
 import { useCallback, useEffect, useMemo } from 'react'
 import { useCampaignsData } from 'hooks/useCampaignsData'
 import type {
   unstable_Blocker as Blocker,
   unstable_BlockerFunction as BlockerFunction
 } from 'react-router-dom'
-import { unstable_useBlocker as useBlocker } from 'react-router-dom'
+import { unstable_useBlocker as useBlocker, useParams, useNavigate } from 'react-router-dom'
 import InfoFilledIcon from 'resources/icons/InfoFilled'
 import throttle from 'lodash.throttle'
 import { defaultConfirmModalProps } from 'components/common/Modals/CustomConfirmModal'
+import Placements from 'components/CampaignAnalytics/Placements'
 
 type TargetingInputEdit = {
   version: string
@@ -56,13 +56,13 @@ type FormProps = {
   targetingInput: TargetingInputEdit
 }
 
-const EditCampaign = ({ campaign }: { campaign: Campaign }) => {
-  const { adexServicesRequest } = useAdExApi()
-  const { showNotification } = useCustomNotifications()
+const EditCampaign = ({ campaign, isAdmin }: { campaign: Campaign; isAdmin?: boolean }) => {
   const {
     adexAccount: { balanceToken }
   } = useAccount()
-  const { updateCampaignDataById, supplyStats } = useCampaignsData()
+  const { tabValue = 'budget' } = useParams()
+  const navigate = useNavigate()
+  const { supplyStats, editCampaign } = useCampaignsData()
 
   const recommendedPaymentBounds = useMemo(
     () => getRecommendedCPMRange(supplyStats, campaign),
@@ -211,185 +211,187 @@ const EditCampaign = ({ campaign }: { campaign: Campaign }) => {
     [form]
   )
 
-  const editCampaign = useCallback(
+  const handleEditCampaign = useCallback(
     async (values: FormProps) => {
       const impression = {
-        min: Number(
-          parseToBigNumPrecision(
-            Number(values.pricingBounds.IMPRESSION?.min) / 1000,
-            balanceToken.decimals
-          )
+        min: parseToBigNumPrecision(
+          Number(values.pricingBounds.IMPRESSION?.min) / 1000,
+          balanceToken.decimals
         ),
-        max: Number(
-          parseToBigNumPrecision(
-            Number(values.pricingBounds.IMPRESSION?.max) / 1000,
-            balanceToken.decimals
-          )
+        max: parseToBigNumPrecision(
+          Number(values.pricingBounds.IMPRESSION?.max) / 1000,
+          balanceToken.decimals
         )
       }
 
-      const body: FormProps = {
-        pricingBounds: {
-          CLICK: { min: 0, max: 0 },
-          IMPRESSION: impression
-        },
-        targetingInput: {
-          version: '1',
-          inputs: {
-            categories: values.targetingInput.inputs.categories,
-            location: values.targetingInput.inputs.location,
-            advanced: {
-              disableFrequencyCapping:
-                values.targetingInput.inputs.advanced.disableFrequencyCapping,
-              includeIncentivized: values.targetingInput.inputs.advanced.includeIncentivized,
-              limitDailyAverageSpending:
-                values.targetingInput.inputs.advanced.limitDailyAverageSpending
-            }
-          }
-        }
+      const pricingBounds: Partial<Campaign['pricingBounds']> = {
+        IMPRESSION: impression
+      }
+      const inputs: Partial<Campaign['targetingInput']['inputs']> = {
+        categories: values.targetingInput.inputs.categories,
+        location: values.targetingInput.inputs.location
       }
 
-      try {
-        await adexServicesRequest('backend', {
-          route: `/dsp/campaigns/edit/${campaign.id}`,
-          method: 'PUT',
-          body,
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        })
+      const { success } = await editCampaign(campaign.id, pricingBounds, inputs)
+      if (success) {
         form.resetDirty()
-        showNotification('info', 'Successfully updated Campaign data!')
-        updateCampaignDataById(campaign.id)
-      } catch {
-        return showNotification('error', "Couldn't update the Campaign data!")
       }
     },
-    [
-      balanceToken.decimals,
-      adexServicesRequest,
-      campaign.id,
-      form,
-      showNotification,
-      updateCampaignDataById
-    ]
+    [balanceToken.decimals, editCampaign, campaign.id, form]
   )
 
   const throttledSbm = useMemo(() => {
-    return throttle(editCampaign, 3000, { leading: true })
-  }, [editCampaign])
+    return throttle(handleEditCampaign, 3000, { leading: true })
+  }, [handleEditCampaign])
 
   if (!campaign) return <div>Invalid Campaign ID</div>
   return (
-    <Paper p="md">
-      <form onSubmit={form.onSubmit(throttledSbm)}>
-        <Stack gap="xl">
-          <Stack gap="xs">
-            <Group gap="xs">
-              <Text color="secondaryText" size="sm" fw="bold">
-                CPM
-              </Text>
-              <Tooltip
-                label={`Recommended CPM: Min - ${recommendedPaymentBounds.min}; Max - ${recommendedPaymentBounds.max}`}
-                ml="sm"
-              >
-                <ActionIcon variant="transparent" color="secondaryText" size="xs">
-                  <InfoFilledIcon />
-                </ActionIcon>
-              </Tooltip>
-            </Group>
-            <Group align="baseline">
-              <NumberInput
-                w="196px"
-                size="md"
-                placeholder="CPM min"
-                rightSection={
-                  <Text color="brand" mr="sm" size="sm">
-                    Min
+    <Paper p="md" shadow="xs">
+      <Tabs
+        value={tabValue}
+        onChange={(value) =>
+          navigate(
+            `/dashboard/campaign-details${isAdmin ? '/admin' : ''}/${
+              campaign.id
+            }/${value}?edit=true`,
+            { replace: true }
+          )
+        }
+      >
+        <Tabs.List mb="xl">
+          <Tabs.Tab value="budget">Budget</Tabs.Tab>
+          <Tabs.Tab value="targeting">Targeting</Tabs.Tab>
+          <Tabs.Tab value="placements">Placements</Tabs.Tab>
+        </Tabs.List>
+
+        <form onSubmit={form.onSubmit(throttledSbm)}>
+          <Tabs.Panel value="budget">
+            <Stack gap="xl">
+              <Stack gap="xs">
+                <Group gap="xs">
+                  <Text color="secondaryText" size="sm" fw="bold">
+                    CPM
                   </Text>
-                }
-                rightSectionWidth="auto"
-                name="cpmPricingBoundsMin"
-                decimalScale={2}
-                {...form.getInputProps('pricingBounds.IMPRESSION.min')}
-              />
-              <NumberInput
-                w="196px"
-                size="md"
-                placeholder="CPM max"
-                inputWrapperOrder={['input', 'description', 'error']}
-                rightSection={
-                  <Text color="brand" mr="sm" size="sm">
-                    Max
-                  </Text>
-                }
-                rightSectionWidth="md"
-                name="cpmPricingBoundsMax"
-                decimalScale={2}
-                {...form.getInputProps('pricingBounds.IMPRESSION.max')}
-              />
-            </Group>
-          </Stack>
+                  <Tooltip
+                    label={`Recommended CPM: Min - ${recommendedPaymentBounds.min}; Max - ${recommendedPaymentBounds.max}`}
+                    ml="sm"
+                  >
+                    <ActionIcon variant="transparent" color="secondaryText" size="xs">
+                      <InfoFilledIcon />
+                    </ActionIcon>
+                  </Tooltip>
+                </Group>
+                <Group align="baseline">
+                  <NumberInput
+                    w="196px"
+                    size="md"
+                    placeholder="CPM min"
+                    rightSection={
+                      <Text color="brand" mr="sm" size="sm">
+                        Min
+                      </Text>
+                    }
+                    rightSectionWidth="auto"
+                    name="cpmPricingBoundsMin"
+                    decimalScale={2}
+                    {...form.getInputProps('pricingBounds.IMPRESSION.min')}
+                  />
+                  <NumberInput
+                    w="196px"
+                    size="md"
+                    placeholder="CPM max"
+                    inputWrapperOrder={['input', 'description', 'error']}
+                    rightSection={
+                      <Text color="brand" mr="sm" size="sm">
+                        Max
+                      </Text>
+                    }
+                    rightSectionWidth="md"
+                    name="cpmPricingBoundsMax"
+                    decimalScale={2}
+                    {...form.getInputProps('pricingBounds.IMPRESSION.max')}
+                  />
+                </Group>
+              </Stack>
 
-          <Stack gap="xs">
-            <Text c="secondaryText" size="sm" fw="bold">
-              Advanced
-            </Text>
-            <Group>
-              <Checkbox
-                label="Limit average daily spending"
-                {...form.getInputProps('targetingInput.inputs.advanced.limitDailyAverageSpending', {
-                  type: 'checkbox'
-                })}
-              />
-            </Group>
-          </Stack>
+              <Stack gap="xs">
+                <Text c="secondaryText" size="sm" fw="bold">
+                  Advanced
+                </Text>
+                <Group>
+                  <Checkbox
+                    label="Limit average daily spending"
+                    {...form.getInputProps(
+                      'targetingInput.inputs.advanced.limitDailyAverageSpending',
+                      {
+                        type: 'checkbox'
+                      }
+                    )}
+                  />
+                </Group>
+              </Stack>
 
-          <Stack gap="xs">
-            <Text c="secondaryText" size="sm" fw="bold">
-              Categories
-            </Text>
-            <MultiSelectAndRadioButtons
-              onCategoriesChange={handleCategories}
-              multiSelectData={CATEGORIES}
-              defaultRadioValue={
-                catSelectedRadioAndValuesArray &&
-                (catSelectedRadioAndValuesArray[0] as TargetingInputApplyProp)
-              }
-              defaultSelectValue={
-                catSelectedRadioAndValuesArray && (catSelectedRadioAndValuesArray[1] as string[])
-              }
-              groups={CAT_GROUPS}
-              label="Categories"
-              error={form.errors['targetingInput.inputs.categories']?.toString()}
-            />
-          </Stack>
+              <Button disabled={!form.isDirty()} size="lg" type="submit" maw={200}>
+                Save Changes
+              </Button>
+            </Stack>
+          </Tabs.Panel>
 
-          <Stack gap="xs">
-            <Text c="secondaryText" size="sm" fw="bold">
-              Countries
-            </Text>
-            <MultiSelectAndRadioButtons
-              onCategoriesChange={handleCountries}
-              defaultRadioValue={
-                locSelectedRadioAndValuesArray &&
-                (locSelectedRadioAndValuesArray[0] as TargetingInputApplyProp)
-              }
-              defaultSelectValue={
-                locSelectedRadioAndValuesArray && (locSelectedRadioAndValuesArray[1] as string[])
-              }
-              multiSelectData={COUNTRIES}
-              groups={REGION_GROUPS}
-              label="Countries"
-              error={form.errors['targetingInput.inputs.location']?.toString()}
-            />
-          </Stack>
+          <Tabs.Panel value="targeting">
+            <Stack gap="xl">
+              <Stack gap="xs">
+                <Text c="secondaryText" size="sm" fw="bold">
+                  Categories
+                </Text>
+                <MultiSelectAndRadioButtons
+                  onCategoriesChange={handleCategories}
+                  multiSelectData={CATEGORIES}
+                  defaultRadioValue={
+                    catSelectedRadioAndValuesArray &&
+                    (catSelectedRadioAndValuesArray[0] as TargetingInputApplyProp)
+                  }
+                  defaultSelectValue={
+                    catSelectedRadioAndValuesArray &&
+                    (catSelectedRadioAndValuesArray[1] as string[])
+                  }
+                  groups={CAT_GROUPS}
+                  label="Categories"
+                  error={form.errors['targetingInput.inputs.categories']?.toString()}
+                />
+              </Stack>
 
-          <Button disabled={!form.isDirty()} size="lg" type="submit" maw={200}>
-            Save Changes
-          </Button>
-        </Stack>
-      </form>
+              <Stack gap="xs">
+                <Text c="secondaryText" size="sm" fw="bold">
+                  Countries
+                </Text>
+                <MultiSelectAndRadioButtons
+                  onCategoriesChange={handleCountries}
+                  defaultRadioValue={
+                    locSelectedRadioAndValuesArray &&
+                    (locSelectedRadioAndValuesArray[0] as TargetingInputApplyProp)
+                  }
+                  defaultSelectValue={
+                    locSelectedRadioAndValuesArray &&
+                    (locSelectedRadioAndValuesArray[1] as string[])
+                  }
+                  multiSelectData={COUNTRIES}
+                  groups={REGION_GROUPS}
+                  label="Countries"
+                  error={form.errors['targetingInput.inputs.location']?.toString()}
+                />
+              </Stack>
+
+              <Button disabled={!form.isDirty()} size="lg" type="submit" maw={200}>
+                Save Changes
+              </Button>
+            </Stack>
+          </Tabs.Panel>
+        </form>
+
+        <Tabs.Panel value="placements">
+          <Placements campaignId={campaign.id} forAdmin={!!isAdmin} />
+        </Tabs.Panel>
+      </Tabs>
     </Paper>
   )
 }

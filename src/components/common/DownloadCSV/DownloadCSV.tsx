@@ -1,4 +1,4 @@
-import { Flex, Text, Button } from '@mantine/core'
+import { Button, ThemeIcon } from '@mantine/core'
 import { AdUnit } from 'adex-common'
 import DownloadIcon from 'resources/icons/Download'
 import { BaseAnalyticsData, Country, Hostname } from 'types'
@@ -71,15 +71,16 @@ const DownloadCSV = ({
     <Button
       onClick={handleDownload}
       disabled={disabled}
-      color="secondaryText"
+      size="sm"
+      color="mainText"
       variant="transparent"
+      rightSection={
+        <ThemeIcon size="sm" variant="transparent" c="inherit">
+          <DownloadIcon size="100%" />
+        </ThemeIcon>
+      }
     >
-      <Flex align="center">
-        <Text size="sm" mr="sm">
-          .CSV
-        </Text>
-        <DownloadIcon size="24px" />
-      </Flex>
+      .CSV
     </Button>
   )
 }

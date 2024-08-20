@@ -1,54 +1,46 @@
 import { useMemo } from 'react'
 import CustomTable from 'components/common/CustomTable'
-import { Flex, Anchor, MantineTheme, getPrimaryShade } from '@mantine/core'
-import { createStyles } from '@mantine/emotion'
+import { Flex, Anchor } from '@mantine/core'
 import UrlIcon from 'resources/icons/Url'
-import { BaseAnalyticsData } from 'types'
 import { formatCurrency } from 'helpers'
-import { AdUnit } from 'adex-common'
 import { getMediaUrlWithProvider } from 'helpers/createCampaignHelpers'
 import MediaThumb from 'components/common/MediaThumb'
-import { useColorScheme } from '@mantine/hooks'
+import DownloadCSV from 'components/common/DownloadCSV'
+
+import { useCampaignsAnalyticsData } from 'hooks/useCampaignAnalytics/useCampaignAnalyticsData'
 
 const IPFS_GATEWAY = process.env.REACT_APP_IPFS_GATEWAY
 
-const useStyles = createStyles((theme: MantineTheme) => {
-  const colorScheme = useColorScheme()
-  const primaryShade = getPrimaryShade(theme, colorScheme)
+const headings = ['Media', 'Size', 'Impressions', 'Clicks', 'CTR %', 'Spent', 'Target']
+const csvHeaders = {
+  Creative: 'segment',
+  Impressions: 'impressions',
+  Clicks: 'clicks',
+  'CTR%': 'crt',
+  Spent: 'paid'
+}
 
-  return {
-    icon: {
-      color: theme.colors.brand[primaryShade]
-    }
-  }
-})
-
-const Creatives = ({
-  creatives,
-  units,
-  currencyName
-}: {
-  creatives: BaseAnalyticsData[] | undefined
-  units: AdUnit[] | undefined
-  currencyName: string
-}) => {
-  const { classes } = useStyles()
-
-  const headings = useMemo(
-    () => ['Media', 'Size', 'Impressions', 'Clicks', 'CTR %', 'Spent', 'Target'],
-    []
-  )
+const Creatives = ({ forAdmin, campaignId }: { forAdmin: boolean; campaignId: string }) => {
+  const { campaignMappedAnalytics, currencyName, campaign, analyticsKey, loading } =
+    useCampaignsAnalyticsData({
+      campaignId,
+      forAdmin,
+      analyticsType: 'adUnit'
+    })
 
   const elements = useMemo(() => {
-    return creatives?.map((item) => {
-      const unitForId = units?.find((x) => x.id === item.segment)
+    if (loading || !campaignMappedAnalytics || !campaign) {
+      return []
+    }
+    return campaignMappedAnalytics?.map((item) => {
+      const unitForId = campaign?.adUnits?.find((x) => x.id === item.segment)
       const media = getMediaUrlWithProvider(unitForId?.banner?.mediaUrl, IPFS_GATEWAY) || ''
 
       return {
         media: (
           <Flex align="center">
-            <Anchor href={media} target="_blank" mr="sm">
-              <UrlIcon size="25px" className={classes.icon} />
+            <Anchor href={media} target="_blank" mr="sm" c="brand">
+              <UrlIcon size="25px" color="inherit" />
             </Anchor>
             {unitForId && <MediaThumb adUnit={unitForId} previewOnClick />}
           </Flex>
@@ -63,13 +55,23 @@ const Creatives = ({
         link: unitForId?.banner?.targetUrl
       }
     })
-  }, [classes.icon, creatives, currencyName, units])
+  }, [campaign, campaignMappedAnalytics, currencyName, loading])
 
-  if (!elements?.length) {
-    return <div>No creatives found</div>
-  }
-
-  return <CustomTable headings={headings} elements={elements} />
+  return (
+    <CustomTable
+      headings={headings}
+      elements={elements}
+      loading={loading}
+      tableActions={
+        <DownloadCSV
+          data={campaignMappedAnalytics}
+          mapHeadersToDataProperties={csvHeaders}
+          filename={`${analyticsKey?.key}.csv`}
+          disabled={loading}
+        />
+      }
+    />
+  )
 }
 
 export default Creatives

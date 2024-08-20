@@ -1,12 +1,12 @@
-export interface RequestOptions<T> {
+export interface RequestOptions {
   url: string
   method?: 'GET' | 'POST' | 'OPTIONS' | 'PUT' | 'DELETE'
   headers?: Record<string, string>
   queryParams?: Record<string, string>
-  body?: T | FormData
+  body?: BodyInit | null
 }
 
-export async function fetchService<T>(options: RequestOptions<T>) {
+export async function fetchService(options: RequestOptions): Promise<Response> {
   const { url, method = 'GET', headers = {}, queryParams, body } = options
 
   const queryString = queryParams ? new URLSearchParams(queryParams).toString() : ''
@@ -18,7 +18,7 @@ export async function fetchService<T>(options: RequestOptions<T>) {
     headers: {
       ...headers
     },
-    body: body instanceof FormData ? body : JSON.stringify(body)
+    body
   })
 }
 

@@ -16,6 +16,11 @@ import { CREATE_CAMPAIGN_DEFAULT_VALUE } from 'constants/createCampaign'
 import { parseBigNumTokenAmountToDecimal } from 'helpers/balances'
 import { defaultSupplyStats } from './defaultData'
 
+type NotificationMsg = {
+  title?: string
+  msg?: string
+}
+
 const defaultCampaignData: CampaignData = {
   campaignId: '',
   campaign: { ...CREATE_CAMPAIGN_DEFAULT_VALUE },
@@ -117,7 +122,19 @@ interface ICampaignsDataContext {
   initialDataLoading: boolean
   changeCampaignStatus: (status: CampaignStatus, campaignId: Campaign['id']) => void
   deleteDraftCampaign: (id: string) => void
+  editCampaign: (
+    campaignId: string,
+    pricingBounds?: Partial<Campaign['pricingBounds']>,
+    inputs?: Partial<Campaign['targetingInput']['inputs']>,
+    successMsg?: NotificationMsg,
+    errMsg?: NotificationMsg
+  ) => Promise<{ success: boolean }>
   toggleArchived: (id: string) => void
+  filterSources: (
+    action: 'include' | 'exclude',
+    campaignId: Campaign['id'],
+    sources: { srcId: string; srcName: string }[]
+  ) => Promise<void>
 }
 
 const CampaignsDataContext = createContext<ICampaignsDataContext | null>(null)
@@ -380,6 +397,103 @@ const CampaignsDataProvider: FC<PropsWithChildren & { type: 'user' | 'admin' }> 
     [adexServicesRequest, updateCampaignDataById]
   )
 
+  const editCampaign = useCallback(
+    async (
+      campaignId: string,
+      pricingBounds?: Partial<Campaign['pricingBounds']>,
+      inputs?: Partial<Campaign['targetingInput']['inputs']>,
+      successMsg?: NotificationMsg,
+      errMsg?: NotificationMsg
+    ) => {
+      const campaign = campaignsData.get(campaignId)?.campaign
+
+      if (!campaign) {
+        throw new Error('invalid campaign')
+      }
+
+      const body: Pick<Campaign, 'pricingBounds' | 'targetingInput'> = {
+        pricingBounds: { ...campaign.pricingBounds, ...pricingBounds },
+        targetingInput: {
+          ...campaign.targetingInput,
+          inputs: {
+            ...campaign.targetingInput.inputs,
+            ...(inputs?.location && { location: inputs.location }),
+            ...(inputs?.categories && {
+              categories: inputs.categories
+            }),
+            ...(inputs?.publishers && {
+              publishers: inputs.publishers
+            }),
+            // NOTE: uncomment if we decide that changing placements will be editable on the UI
+            // ...(targetingInput?.inputs?.placements && { placements: targetingInput.inputs.placements}),
+            ...(inputs?.advanced && { advanced: inputs.advanced })
+          }
+        }
+      }
+
+      try {
+        const res = await adexServicesRequest<{ success?: boolean }>('backend', {
+          route: `/dsp/campaigns/edit/${campaign.id}`,
+          method: 'PUT',
+          body,
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        })
+
+        if (!res?.success) {
+          throw new Error('Error on updating campaign data')
+        }
+
+        showNotification(
+          'info',
+          successMsg?.msg || 'Successfully updated Campaign data!',
+          successMsg?.title
+        )
+        updateCampaignDataById(campaign.id)
+        return { success: true }
+      } catch {
+        showNotification(
+          'error',
+          errMsg?.msg || "Couldn't update the Campaign data!",
+          errMsg?.title
+        )
+        return { success: false }
+      }
+    },
+    [campaignsData, adexServicesRequest, showNotification, updateCampaignDataById]
+  )
+
+  const filterSources: ICampaignsDataContext['filterSources'] = useCallback(
+    async (action, campaignId, sources): Promise<void> => {
+      const campaign = campaignsData.get(campaignId)?.campaign
+      if (!campaign) {
+        throw new Error('invalid campaign ')
+      }
+
+      console.log({ sources })
+      const cleanNin = [...campaign.targetingInput.inputs.publishers.nin].filter(
+        (x) => !sources.some((s) => s.srcId === x)
+      )
+
+      const blockedPublishers: Campaign['targetingInput']['inputs']['publishers'] = {
+        ...campaign.targetingInput.inputs.publishers,
+        apply: 'nin',
+        nin: action === 'include' ? cleanNin : [...cleanNin, ...sources.map((x) => x.srcId)]
+      }
+
+      const inputs: Partial<Campaign['targetingInput']['inputs']> = {
+        publishers: { ...blockedPublishers }
+      }
+
+      await editCampaign(campaignId, undefined, inputs, {
+        title: action === 'exclude' ? 'Blocked' : 'Unblocked',
+        msg: sources.length === 1 ? sources[0].srcName : `${sources.length} placements`
+      })
+    },
+    [campaignsData, editCampaign]
+  )
+
   const contextValue = useMemo(
     () => ({
       campaignsData,
@@ -390,7 +504,9 @@ const CampaignsDataProvider: FC<PropsWithChildren & { type: 'user' | 'admin' }> 
       changeCampaignStatus,
       deleteDraftCampaign,
       toggleArchived,
-      updateSupplyStats
+      updateSupplyStats,
+      editCampaign,
+      filterSources
     }),
     [
       campaignsData,
@@ -401,7 +517,9 @@ const CampaignsDataProvider: FC<PropsWithChildren & { type: 'user' | 'admin' }> 
       changeCampaignStatus,
       deleteDraftCampaign,
       toggleArchived,
-      updateSupplyStats
+      updateSupplyStats,
+      editCampaign,
+      filterSources
     ]
   )
 
