@@ -23,7 +23,6 @@ export type CampaignUI = Campaign & {
   updated?: string
   autoUTMChecked: boolean
   asapStartingDate: boolean
-  dirty: boolean
   budget: string
 }
 
@@ -51,12 +50,16 @@ export type SupplyStats = {
 }
 
 export type CreateCampaignType = {
+  step: number
+  nextStep: () => void
+  prevStep: () => void
+  // stepsCount: number
   campaign: CampaignUI
   updateCampaign: (camp: Partial<CampaignUI>) => void
   publishCampaign: () => Promise<any>
   resetCampaign: () => void
   removeAdUnit: (index: number) => void
-  selectedBannerSizes: SupplyStatsDetails[] | SupplyStatsDetails[][]
+  allowedBannerSizes: string[]
   saveToDraftCampaign: () => Promise<any>
   updateCampaignFromDraft: (draftCampaign: Campaign) => void
   defaultValue: CampaignUI
