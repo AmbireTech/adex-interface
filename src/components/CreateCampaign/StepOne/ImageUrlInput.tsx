@@ -54,18 +54,12 @@ const ImageUrlInput = ({
               ...form.getInputProps(`adUnits.${index}.banner.targetUrl`)
             }
           : {})}
-        wrapperProps={{ style: { display: 'flex', flexDirection: 'column', width: '100%' } }}
-        leftSectionWidth="170px"
-        leftSectionProps={{
-          style: {
-            width: 'auto',
-            padding: '14px'
-          }
-        }}
+        // TODO: fix it
+        leftSectionWidth="180px"
         leftSectionPointerEvents="visible"
         leftSection={
-          <Group c="inherit" gap="xs" m="0">
-            <MediaThumb width={30} height={30} adUnit={image} />
+          <Group c="inherit" gap="sm" justify="left" h="100%">
+            <MediaThumb width={36} height={36} adUnit={image} />
 
             <Divider size="xs" orientation="vertical" color={hasError ? 'error' : 'brand'} />
             <CustomBadge
