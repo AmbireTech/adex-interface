@@ -27,6 +27,7 @@ import { Campaign, Placement } from 'adex-common'
 import { formatDateTime, WEEK } from 'helpers'
 import { useCampaignsData } from 'hooks/useCampaignsData'
 import { hasLength, isNotEmpty, useForm } from '@mantine/form'
+import useCustomNotifications from 'hooks/useCustomNotifications'
 
 type Modify<T, R> = Omit<T, keyof R> & R
 
@@ -70,6 +71,8 @@ const CreateCampaignContext = createContext<CreateCampaignType | null>(null)
 const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
   const { adexServicesRequest } = useAdExApi()
   const { supplyStats, updateSupplyStats } = useCampaignsData()
+  const { showNotification } = useCustomNotifications()
+  const [step, setStep] = useState(0)
   // TODO: the address will be fixed and will always has a default value
   const {
     adexAccount,
@@ -97,32 +100,57 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
     [adexAccount?.address, balanceToken?.address, balanceToken?.decimals, balanceToken?.chainId]
   )
 
+  const [allowedBannerSizes, setAllowedBannerSizes] = useState<string[]>([])
+
+  const [selectedBidFloors, setSelectedBidFloors] = useState<
+    SupplyStatsDetails[] | SupplyStatsDetails[][]
+  >([])
+
   const form = useForm({
     initialValues: defaultValue,
     // validateInputOnChange: ['budget'],
     validateInputOnBlur: true,
+    validateInputOnChange: ['adUnits'],
     validate: {
       adUnits: {
         banner: {
-          targetUrl: (value, { step }) =>
-            step === 0 && !isValidHttpUrl(value) ? 'Please enter a valid URL' : null
+          format: (value) => {
+            if (step === 0 && !allowedBannerSizes.some((x) => x === `${value?.w}x${value?.h}`)) {
+              return 'IMedia size not allowed'
+            }
+          },
+          targetUrl: (value, { adUnits }) => {
+            console.log({ value })
+            console.log({ adUnits })
+            if (step === 0 && !isValidHttpUrl(value)) {
+              return 'Please enter a valid URL'
+            }
+          }
         }
       },
       targetingInput: {
         inputs: {
-          categories: ({ apply, in: isin, nin }, { step }) => {
-            if (step === 1) {
-              if (apply === 'in' && !isin.length) {
-                return 'Categories list cannot be empty'
-              }
-              if (apply === 'nin' && !nin.length) {
-                return 'Categories list cannot be empty'
-              }
+          placements: ({ in: isin }, values) => {
+            if (step === 0 && !isin.length) {
+              return 'Placement not selected'
             }
 
-            return null
+            // NOTE: ugly temp hack to validate adUnits length other than internal nits validation
+            if (step === 0 && !values.adUnits.length) {
+              return 'Ad units not selected'
+            }
           },
-          location: ({ apply, in: isin, nin }, { step }) => {
+          categories: ({ apply, in: isin, nin }) => {
+            if (step === 1) {
+              if (apply === 'in' && !isin.length) {
+                return 'Categories list cannot be empty'
+              }
+              if (apply === 'nin' && !nin.length) {
+                return 'Categories list cannot be empty'
+              }
+            }
+          },
+          location: ({ apply, in: isin, nin }) => {
             if (step === 1) {
               if (apply === 'in' && !isin.length) {
                 return 'Countries list cannot be empty'
@@ -131,37 +159,31 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
                 return 'Countries list cannot be empty'
               }
             }
-
-            return null
           },
           advanced: {
-            limitDailyAverageSpending: (value, { step }) =>
-              step === 2 && typeof value !== 'boolean' ? 'Invalid value' : null
+            limitDailyAverageSpending: (value) =>
+              step === 2 && typeof value !== 'boolean' ? 'Invalid value' : undefined
           }
         }
       },
-      startsAt: (value, { step }) => {
+      startsAt: (value) => {
         if (step === 2) {
           if (value.getTime() <= Date.now()) {
             return 'The start date cannot be set in the past'
           }
         }
-
-        return null
       },
-      endsAt: (value, { step }) => {
+      endsAt: (value) => {
         if (step === 2) {
           if (value.getTime() <= Date.now()) {
             return 'The end date cannot be set in the past'
           }
         }
-
-        return null
       },
-      asapStartingDate: (value, { step }) =>
-        step === 2 && typeof value !== 'boolean' ? 'Invalid value' : null,
-      currency: (value, { step }) => step === 2 && isNotEmpty('Select currency')(value),
-      budget: (value, { step }) => {
+      asapStartingDate: (value) =>
+        step === 2 && typeof value !== 'boolean' ? 'Invalid value' : undefined,
+      currency: (value) => step === 2 && isNotEmpty('Select currency')(value),
+      budget: (value) => {
         if (step === 2) {
           if (!value || Number(value) === 0 || Number.isNaN(Number(value))) {
             return 'Enter campaign budget or a valid number'
@@ -176,11 +198,9 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
             return 'Available balance is lower than the campaign budget'
           }
         }
-
-        return null
       },
       cpmPricingBounds: {
-        min: (value, { step, cpmPricingBounds: { max } }) => {
+        min: (value, { cpmPricingBounds: { max } }) => {
           if (step === 2) {
             if (Number(value) === 0 || Number.isNaN(Number(value)))
               return 'Enter CPM min value or a valid number'
@@ -193,7 +213,7 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
 
           return null
         },
-        max: (value, { step, cpmPricingBounds: { min } }) => {
+        max: (value, { cpmPricingBounds: { min } }) => {
           if (step === 2) {
             if (Number(value) === 0 || Number.isNaN(Number(value)))
               return 'Enter CPM max value or a valid number'
@@ -205,7 +225,7 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
           return null
         }
       },
-      title: (value, { step }) =>
+      title: (value) =>
         step === 2 &&
         hasLength({ min: 2, max: 100 }, 'Campaign name must contain at least 2 characters')(value)
     },
@@ -245,18 +265,10 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
   const campaign = useMemo(() => form.getValues(), [form])
   const { getInputProps, key, errors } = form
 
-  const [selectedBannerSizes, setSelectedBannerSizes] = useState<
-    SupplyStatsDetails[] | SupplyStatsDetails[][]
-  >([])
-  const [selectedBidFloors, setSelectedBidFloors] = useState<
-    SupplyStatsDetails[] | SupplyStatsDetails[][]
-  >([])
-
   const updateCampaign = useCallback(
     (value: Partial<CampaignUI>) => {
       form.setValues((prev) => ({
         ...prev,
-        dirty: true,
         ...value
       }))
     },
@@ -275,10 +287,12 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
     const selectedPlatforms: Placement | Devices[] = placement === 'app' ? placement : devices
     if (Array.isArray(selectedPlatforms)) {
       const result = selectedPlatforms.map((platform) => mappedSupplyStats[platform][0])
-      setSelectedBannerSizes(result)
+      setAllowedBannerSizes(result.flat().map((x) => x.value))
       setSelectedBidFloors(selectedPlatforms.map((platform) => mappedSupplyStats[platform][1]))
     } else {
-      setSelectedBannerSizes(selectedPlatforms ? mappedSupplyStats[selectedPlatforms][0] : [])
+      setAllowedBannerSizes(
+        (selectedPlatforms ? mappedSupplyStats[selectedPlatforms][0] : []).map((x) => x.value)
+      )
       setSelectedBidFloors(selectedPlatforms ? mappedSupplyStats[selectedPlatforms][1] : [])
     }
   }, [campaign.devices, campaign.targetingInput.inputs.placements.in, supplyStats])
@@ -296,6 +310,11 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
   useEffect(() => {
     updateSupplyStats()
   }, []) // eslint-disable-line
+
+  useEffect(() => {
+    form.validate()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [step])
 
   useEffect(() => {
     window.onbeforeunload = () => {
@@ -396,13 +415,16 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
       // TODO: resp Type
       // @ts-ignore
       if (!res || !res?.success) {
+        showNotification('info', 'Draft saved')
         throw new Error('Error on saving draft campaign')
       }
+      form.resetDirty()
       return res
     } catch (err) {
+      showNotification('error', 'Creating campaign failed', 'Data error')
       throw new Error('Error on saving draft campaign')
     }
-  }, [adexServicesRequest, form])
+  }, [adexServicesRequest, form, showNotification])
 
   const updateCampaignFromDraft = useCallback(
     (draftCampaign: Campaign) => {
@@ -434,13 +456,33 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
         budget: parseFromBigNumPrecision(
           BigInt(Math.floor(Number(draftCampaign.campaignBudget))),
           draftCampaign.outpaceAssetDecimals
-        ).toString(),
-        dirty: false
+        ).toString()
       }
 
       updateCampaign(mappedDraftCampaign)
+      form.resetDirty()
     },
-    [balanceToken.name, updateCampaign]
+    [balanceToken.name, form, updateCampaign]
+  )
+
+  const nextStep = useCallback(
+    () =>
+      setStep((current) => {
+        if (form.validate().hasErrors) {
+          return current
+        }
+
+        if (current === 2 && form.getValues().autoUTMChecked) {
+          addUTMToTargetURLS()
+        }
+        return current < 4 ? current + 1 : current
+      }),
+    [addUTMToTargetURLS, form]
+  )
+
+  const prevStep = useCallback(
+    () => setStep((current) => (current > 0 ? current - 1 : current)),
+    []
   )
 
   const contextValue = useMemo(
@@ -450,7 +492,7 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
       publishCampaign,
       resetCampaign,
       removeAdUnit,
-      selectedBannerSizes,
+      allowedBannerSizes,
       saveToDraftCampaign,
       updateCampaignFromDraft,
       defaultValue,
@@ -460,7 +502,10 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
       updateCampaignField,
       getInputProps,
       key,
-      errors
+      errors,
+      step,
+      nextStep,
+      prevStep
     }),
     [
       campaign,
@@ -468,7 +513,7 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
       publishCampaign,
       resetCampaign,
       removeAdUnit,
-      selectedBannerSizes,
+      allowedBannerSizes,
       saveToDraftCampaign,
       updateCampaignFromDraft,
       defaultValue,
@@ -478,7 +523,10 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
       updateCampaignField,
       getInputProps,
       key,
-      errors
+      errors,
+      step,
+      nextStep,
+      prevStep
     ]
   )
 
