@@ -1,4 +1,3 @@
-import { AdUnit } from 'adex-common/dist/types'
 import { Campaign } from 'adex-common'
 import {
   Devices,
@@ -19,23 +18,6 @@ export const checkSelectedDevices = (devices: Devices[]) => {
 
 export const findArrayWithLengthInObjectAsValue = (obj: object) =>
   Object.entries(obj).find(([, value]) => Array.isArray(value) && value.length > 0)
-
-export const checkBannerSizes = (
-  bannerSizes: {
-    value: string
-    count: number
-    checked?: boolean
-  }[],
-  adUnits: AdUnit[]
-) =>
-  bannerSizes.map((item) => {
-    const copy = { ...item }
-    adUnits.forEach((adUnit) => {
-      copy.checked = !!(item.value === `${adUnit.banner?.format.w}x${adUnit.banner?.format.h}`)
-    })
-
-    return copy
-  })
 
 export const selectBannerSizes = (
   supplyStats: SupplyStats

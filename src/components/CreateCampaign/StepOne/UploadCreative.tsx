@@ -17,7 +17,7 @@ const UploadCreative = () => {
       <Text c="secondaryText" size="sm" fw="bold" mb="xs">
         3. Upload creatives
       </Text>
-      <BannerSizesList adUnits={adUnits} />
+      <BannerSizesList />
       <FilesDropzone onDrop={onDrop} />
       <Text size="xs">
         * uploading html banners requirements: <Code>.zip</Code> fille with index.html inside;

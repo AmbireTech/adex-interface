@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from 'react'
+import { useCallback } from 'react'
 import { Checkbox, Grid } from '@mantine/core'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import { AdUnit } from 'adex-common/dist/types'
@@ -17,35 +17,26 @@ const UploadedBanners = () => {
         }
       }
     },
-    selectedBannerSizes,
+    allowedBannerSizes,
     form,
     removeAdUnit,
     getInputProps,
     key
   } = useCreateCampaignContext()
 
-  const allowedSizes = useMemo(
-    () => selectedBannerSizes.flat().map((item) => item.value),
-    [selectedBannerSizes]
-  )
-
   const isMatchedTheSizes = useCallback(
     (img: AdUnit) => {
-      if (!allowedSizes || allowedSizes.length === 0) {
-        return true
-      }
-
       const size = `${img.banner?.format.w}x${img.banner?.format.h}`
-      return allowedSizes.includes(size)
+      return allowedBannerSizes.includes(size)
     },
-    [allowedSizes]
+    [allowedBannerSizes]
   )
 
   return (
     <Grid>
       <Grid.Col>
         <Checkbox
-          label={<UtmInfo title="     Auto UTM tracking *" placement={placement} />}
+          label={<UtmInfo title="Auto UTM tracking *" placement={placement} />}
           key={key('autoUTMChecked')}
           {...getInputProps('autoUTMChecked', { type: 'checkbox' })}
         />
