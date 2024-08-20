@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import CustomTable from 'components/common/CustomTable'
-import { Flex, Anchor, Stack, Group } from '@mantine/core'
+import { Flex, Anchor } from '@mantine/core'
 import UrlIcon from 'resources/icons/Url'
 import { formatCurrency } from 'helpers'
 import { getMediaUrlWithProvider } from 'helpers/createCampaignHelpers'
@@ -58,17 +58,19 @@ const Creatives = ({ forAdmin, campaignId }: { forAdmin: boolean; campaignId: st
   }, [campaign, campaignMappedAnalytics, currencyName, loading])
 
   return (
-    <Stack gap="xs">
-      <Group align="center" justify="end">
+    <CustomTable
+      headings={headings}
+      elements={elements}
+      loading={loading}
+      tableActions={
         <DownloadCSV
           data={campaignMappedAnalytics}
           mapHeadersToDataProperties={csvHeaders}
           filename={`${analyticsKey?.key}.csv`}
           disabled={loading}
         />
-      </Group>
-      <CustomTable headings={headings} elements={elements} loading={loading} />
-    </Stack>
+      }
+    />
   )
 }
 
