@@ -109,8 +109,7 @@ export const CREATE_CAMPAIGN_DEFAULT_VALUE: CampaignUI = {
   modified: BigInt(Date.now()),
   archived: false,
   createdBy: '',
-  lastModifiedBy: '',
-  dirty: false
+  lastModifiedBy: ''
 }
 
 export const CATEGORIES: SelectData[] = parseCats()
