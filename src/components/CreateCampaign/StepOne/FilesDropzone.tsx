@@ -34,36 +34,36 @@ const FilesDropzone = ({ onDrop }: FilesDropzoneProps) => {
       }}
     >
       <Group align="center" justify="center" p="sm" style={{ pointerEvents: 'none' }}>
-        <Dropzone.Accept>
-          {/* <IconUpload
+        {/* <Dropzone.Accept>
+          <IconUpload
               style={{
                 width: rem(52),
                 height: rem(52),
                 color: 'var(--mantine-color-blue-6)'
               }}
               stroke={1.5}
-            /> */}
+            />
         </Dropzone.Accept>
         <Dropzone.Reject>
-          {/* <IconX
+          <IconX
               style={{
                 width: rem(52),
                 height: rem(52),
                 color: 'var(--mantine-color-red-6)'
               }}
               stroke={1.5}
-            /> */}
+            />
         </Dropzone.Reject>
         <Dropzone.Idle>
-          {/* <ImageIcon
+          <ImageIcon
               style={{
                 width: rem(52),
                 height: rem(52),
                 color: 'var(--mantine-color-dimmed)'
               }}
               stroke={1.5}
-            /> */}
-        </Dropzone.Idle>
+            />
+        </Dropzone.Idle> */}
         <div>
           <Group justify="center" mb="sm">
             <ImageIcon size="20px" />

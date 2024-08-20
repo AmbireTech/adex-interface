@@ -110,13 +110,21 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
     initialValues: defaultValue,
     // validateInputOnChange: ['budget'],
     validateInputOnBlur: true,
-    validateInputOnChange: ['adUnits'],
+    validateInputOnChange: ['adUnits.banner'],
+    initialErrors: {
+      adUnits: 'Should add at least one ad unit'
+    },
+    initialDirty: {
+      adUnits: true
+    },
     validate: {
       adUnits: {
         banner: {
           format: (value) => {
+            // console.log({ valueFormat: value })
+
             if (step === 0 && !allowedBannerSizes.some((x) => x === `${value?.w}x${value?.h}`)) {
-              return 'IMedia size not allowed'
+              return 'The banner size does not meet the requirements.'
             }
           },
           targetUrl: (value, { adUnits }) => {
@@ -311,10 +319,10 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
     updateSupplyStats()
   }, []) // eslint-disable-line
 
-  useEffect(() => {
-    form.validate()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [step])
+  // useEffect(() => {
+  //   form.validate()
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [step])
 
   useEffect(() => {
     window.onbeforeunload = () => {

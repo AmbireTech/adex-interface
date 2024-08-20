@@ -1,5 +1,4 @@
-import { useCallback } from 'react'
-import { Checkbox, Grid } from '@mantine/core'
+import { Checkbox, Stack } from '@mantine/core'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import { AdUnit } from 'adex-common/dist/types'
 import ImageUrlInput from './ImageUrlInput'
@@ -17,45 +16,25 @@ const UploadedBanners = () => {
         }
       }
     },
-    allowedBannerSizes,
     form,
     removeAdUnit,
     getInputProps,
     key
   } = useCreateCampaignContext()
 
-  const isMatchedTheSizes = useCallback(
-    (img: AdUnit) => {
-      const size = `${img.banner?.format.w}x${img.banner?.format.h}`
-      return allowedBannerSizes.includes(size)
-    },
-    [allowedBannerSizes]
-  )
-
   return (
-    <Grid>
-      <Grid.Col>
-        <Checkbox
-          label={<UtmInfo title="Auto UTM tracking *" placement={placement} />}
-          key={key('autoUTMChecked')}
-          {...getInputProps('autoUTMChecked', { type: 'checkbox' })}
-        />
-      </Grid.Col>
+    <Stack align="stretch" justify="center">
+      <Checkbox
+        label={<UtmInfo title="Auto UTM tracking *" placement={placement} />}
+        key={key('autoUTMChecked')}
+        {...getInputProps('autoUTMChecked', { type: 'checkbox' })}
+      />
+
       {adUnits.length > 0 &&
         adUnits.map((image: AdUnit, index: number) => {
-          return (
-            <Grid.Col key={image.id}>
-              <ImageUrlInput
-                image={image}
-                toRemove={!isMatchedTheSizes(image)}
-                onDelete={removeAdUnit}
-                index={index}
-                form={form}
-              />
-            </Grid.Col>
-          )
+          return <ImageUrlInput image={image} onDelete={removeAdUnit} index={index} form={form} />
         })}
-    </Grid>
+    </Stack>
   )
 }
 
