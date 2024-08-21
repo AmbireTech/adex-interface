@@ -252,6 +252,7 @@ const themeOverride: MantineThemeOverride = createTheme({
       })
     }),
     Input: Input.extend({
+      // TODO: why styles not defaultProps
       styles: (theme) => ({
         input: {
           backgroundColor: theme.colors.lightBackground[DEFAULT_PRIMARY_SHADE],
@@ -273,6 +274,11 @@ const themeOverride: MantineThemeOverride = createTheme({
       })
     }),
     Paper: Paper.extend({
+      styles: {
+        root: {
+          overflow: 'hidden'
+        }
+      },
       defaultProps: {
         shadow: 'none'
       }

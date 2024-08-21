@@ -114,7 +114,7 @@ const useDropzone = () => {
         )
 
         const updatedAdUnits = adUnits.concat(adUnitsToAdd)
-        adUnitsToAdd.length && updateCampaign({ adUnits: updatedAdUnits })
+        adUnitsToAdd.length && updateCampaign({ adUnits: updatedAdUnits }, true)
       } catch (err: any) {
         console.error('ERROR in getBanners: ', err)
         showNotification('error', `Failed to upload creative: ${err.message || err}`)

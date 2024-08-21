@@ -116,11 +116,7 @@ const StepThree = () => {
             {...getInputProps('budget')}
           />
           {budgetIsGreaterThanBalance && (
-            <InfoAlertMessage
-              mt={{ sm: 'sm', lg: '0' }}
-              w={{ sm: '100%', lg: '40%' }}
-              message="You have insufficient funds in your account for launching a campaign. Top up your account from here. Your campaign has been automatically saved in drafts."
-            />
+            <InfoAlertMessage message="You have insufficient funds in your account for launching a campaign. Top up your account from here. Your campaign has been automatically saved in drafts." />
           )}
         </Flex>
         <Group my="sm">

@@ -10,41 +10,40 @@ import { CampaignUI } from 'types'
 
 type ImageUrlInputProps = FlexProps & {
   image: AdUnit
-  toRemove?: boolean
   onDelete?: (index: number) => void
   preview?: boolean
   index?: number
   form?: UseFormReturnType<CampaignUI, (values: CampaignUI) => CampaignUI>
 }
 
-const ImageUrlInput = ({
-  image,
-  toRemove,
-  onDelete,
-  // onChange,
-  // onBlur,
-  preview,
-  index,
-  form
-}: ImageUrlInputProps) => {
+const ImageUrlInput = ({ image, onDelete, preview, index, form }: ImageUrlInputProps) => {
+  const hasFormatError: boolean = useMemo(
+    () => !!form?.errors[`adUnits.${index}.banner.format`],
+    [form?.errors, index]
+  )
+
   const hasError: boolean = useMemo(
-    () =>
-      !!form?.errors[`adUnits.${index}.banner.targetUrl`] ||
-      !!form?.errors[`adUnits.${index}.banner.format`] ||
-      !!toRemove,
-    [form?.errors, index, toRemove]
+    () => hasFormatError || !!form?.errors[`adUnits.${index}.banner.format`],
+    [form?.errors, hasFormatError, index]
+  )
+
+  const disable: boolean = useMemo(
+    () => !!preview || !!form?.errors[`adUnits.${index}.banner.format`],
+    [form?.errors, index, preview]
   )
 
   return (
     <>
-      {!!form?.errors[`adUnits.${index}.banner.format`] && (
-        <InfoAlertMessage message="The banner size does not meet the requirements." />
+      {hasFormatError && (
+        <InfoAlertMessage
+          message={form?.errors[`adUnits.${index}.banner.format`]?.toString() || ''}
+        />
       )}
 
       <TextInput
         onKeyDown={(event) => event.key === 'Enter' && event.preventDefault()}
         defaultValue={!form ? image.banner?.targetUrl : undefined}
-        disabled={toRemove || preview}
+        disabled={disable}
         type="url"
         placeholder="Please enter a target URL starting with https://"
         size="lg"
@@ -60,10 +59,13 @@ const ImageUrlInput = ({
         leftSection={
           <Group c="inherit" gap="sm" justify="left" h="100%">
             <MediaThumb width={36} height={36} adUnit={image} />
-
-            <Divider size="xs" orientation="vertical" color={hasError ? 'error' : 'brand'} />
+            <Divider
+              size="xs"
+              orientation="vertical"
+              styles={{ root: { borderColor: 'inherit' } }}
+            />
             <CustomBadge
-              color={hasError ? 'error' : 'brand'}
+              color={hasError ? 'warning' : 'brand'}
               text={`${image.banner?.format.w}x${image.banner?.format.h}`}
             />
           </Group>

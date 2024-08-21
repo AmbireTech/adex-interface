@@ -110,10 +110,6 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
     initialValues: defaultValue,
     // validateInputOnChange: ['budget'],
     validateInputOnBlur: true,
-    validateInputOnChange: ['adUnits.banner'],
-    initialErrors: {
-      adUnits: 'Should add at least one ad unit'
-    },
     initialDirty: {
       adUnits: true
     },
@@ -121,10 +117,11 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
       adUnits: {
         banner: {
           format: (value) => {
-            // console.log({ valueFormat: value })
-
-            if (step === 0 && !allowedBannerSizes.some((x) => x === `${value?.w}x${value?.h}`)) {
-              return 'The banner size does not meet the requirements.'
+            if (step === 0) {
+              const format = `${value?.w}x${value?.h}`
+              return !allowedBannerSizes.some((x) => x === format)
+                ? `The banner size (${format}) does not meet the requirements.`
+                : undefined
             }
           },
           targetUrl: (value, { adUnits }) => {
@@ -274,11 +271,14 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
   const { getInputProps, key, errors } = form
 
   const updateCampaign = useCallback(
-    (value: Partial<CampaignUI>) => {
+    (value: Partial<CampaignUI>, validate?: boolean) => {
       form.setValues((prev) => ({
         ...prev,
         ...value
       }))
+      // NOTE: as this fn is used to update values out from inputs,
+      // validateInputOnBlur and validateInputOnChange are not working when setValues is used
+      validate && form.validate()
     },
     [form]
   )
