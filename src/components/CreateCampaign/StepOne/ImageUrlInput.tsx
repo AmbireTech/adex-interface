@@ -1,12 +1,12 @@
-import { ActionIcon, Divider, FlexProps, TextInput, Group } from '@mantine/core'
+import { ActionIcon, Divider, FlexProps, TextInput, Group, ThemeIcon, Box } from '@mantine/core'
 import { UseFormReturnType } from '@mantine/form'
 import { AdUnit } from 'adex-common'
 import CustomBadge from 'components/common/CustomBadge'
-import InfoAlertMessage from 'components/common/InfoAlertMessage'
 import MediaThumb from 'components/common/MediaThumb'
 import { useMemo } from 'react'
 import DeleteIcon from 'resources/icons/Delete'
 import { CampaignUI } from 'types'
+import InfoCurlyBorder from 'resources/icons/InfoCurlyBorder'
 
 type ImageUrlInputProps = FlexProps & {
   image: AdUnit
@@ -23,7 +23,7 @@ const ImageUrlInput = ({ image, onDelete, preview, index, form }: ImageUrlInputP
   )
 
   const hasError: boolean = useMemo(
-    () => hasFormatError || !!form?.errors[`adUnits.${index}.banner.format`],
+    () => hasFormatError || !!form?.errors[`adUnits.${index}.banner.targetUrl`],
     [form?.errors, hasFormatError, index]
   )
 
@@ -33,59 +33,75 @@ const ImageUrlInput = ({ image, onDelete, preview, index, form }: ImageUrlInputP
   )
 
   return (
-    <>
-      {hasFormatError && (
-        <InfoAlertMessage
-          message={form?.errors[`adUnits.${index}.banner.format`]?.toString() || ''}
-        />
-      )}
+    <TextInput
+      onKeyDown={(event) => event.key === 'Enter' && event.preventDefault()}
+      defaultValue={!form ? image.banner?.targetUrl : undefined}
+      disabled={disable}
+      placeholder="Please enter a target URL starting with https://"
+      size="lg"
+      {...(hasFormatError
+        ? {
+            key: form?.key(`adUnits.${index}.banner.format`),
+            ...form?.getInputProps(`adUnits.${index}.banner.format`),
+            value: index !== undefined && form?.getValues().adUnits[index].title
+          }
+        : {
+            key: form?.key(`adUnits.${index}.banner.targetUrl`),
+            ...form?.getInputProps(`adUnits.${index}.banner.targetUrl`)
+          })}
+      // TODO: fix it
+      leftSectionWidth="170px"
+      leftSectionPointerEvents="visible"
+      leftSectionProps={{
+        style: {
+          justifyContent: 'start',
+          padding: 0,
+          overflow: 'hidden'
+        }
+      }}
+      leftSection={
+        <Group gap="0" justify="left" align="center" h="100%">
+          {hasFormatError ? (
+            <ThemeIcon color="warning" variant="light" h="100%" w={54} px="xs" radius={0}>
+              <InfoCurlyBorder />
+            </ThemeIcon>
+          ) : (
+            <Box px="xs">
+              <MediaThumb width={34} height={34} adUnit={image} />
+            </Box>
+          )}
 
-      <TextInput
-        onKeyDown={(event) => event.key === 'Enter' && event.preventDefault()}
-        defaultValue={!form ? image.banner?.targetUrl : undefined}
-        disabled={disable}
-        type="url"
-        placeholder="Please enter a target URL starting with https://"
-        size="lg"
-        {...(form
-          ? {
-              key: form.key(`adUnits.${index}.banner.targetUrl`),
-              ...form.getInputProps(`adUnits.${index}.banner.targetUrl`)
-            }
-          : {})}
-        // TODO: fix it
-        leftSectionWidth="180px"
-        leftSectionPointerEvents="visible"
-        leftSection={
-          <Group c="inherit" gap="sm" justify="left" h="100%">
-            <MediaThumb width={36} height={36} adUnit={image} />
-            <Divider
-              size="xs"
-              orientation="vertical"
-              styles={{ root: { borderColor: 'inherit' } }}
-            />
-            <CustomBadge
-              color={hasError ? 'warning' : 'brand'}
-              text={`${image.banner?.format.w}x${image.banner?.format.h}`}
-            />
-          </Group>
-        }
-        rightSectionPointerEvents="visible"
-        rightSection={
-          (!preview || onDelete) && (
-            <ActionIcon
-              mr="sm"
-              title="Remove"
-              color="secondaryText"
-              variant="transparent"
-              onClick={() => onDelete && typeof index !== 'undefined' && onDelete(index)}
-            >
-              <DeleteIcon size="24px" />
-            </ActionIcon>
-          )
-        }
-      />
-    </>
+          <Divider
+            size="xs"
+            orientation="vertical"
+            mr="sm"
+            color={hasError ? 'warning' : undefined}
+            styles={{ root: { borderColor: 'inherit', opacity: 'inherit' } }}
+          />
+
+          <CustomBadge
+            p="sm"
+            color={hasError ? 'warning' : 'brand'}
+            text={`${image.banner?.format.w}x${image.banner?.format.h}`}
+          />
+        </Group>
+      }
+      rightSectionPointerEvents="visible"
+      rightSection={
+        (!preview || onDelete) && (
+          <ActionIcon
+            mr="sm"
+            title="Remove"
+            color={hasFormatError ? 'warning' : 'secondaryText'}
+            variant={hasFormatError ? 'light' : 'transparent'}
+            size="xl"
+            onClick={() => onDelete && typeof index !== 'undefined' && onDelete(index)}
+          >
+            <DeleteIcon size="24px" />
+          </ActionIcon>
+        )
+      }
+    />
   )
 }
 
