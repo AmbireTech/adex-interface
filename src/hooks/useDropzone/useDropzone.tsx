@@ -33,98 +33,84 @@ const useDropzone = () => {
     [setUploadedFiles]
   )
 
+  const getAdUnitFromFile = useCallback(
+    async (file: FileWithPath): Promise<AdUnit> => {
+      try {
+        const blob = new Blob([file], { type: file.type })
+        let ipfsUrl: string = ''
+        if (file.type === 'application/zip') {
+          ipfsUrl = (await uploadZipMedia(blob, file.name))?.root.ipfsUrl
+        } else {
+          ipfsUrl = (await uploadMedia(blob, file.name))?.ipfsUrl
+        }
+
+        if (!ipfsUrl) {
+          console.error('Failed to upload to ipfs')
+          throw new Error('Failed to upload to ipfs')
+        }
+
+        const adUnit = {
+          // TODO: unit id
+          id: `${file.name.replace(/\s+/g, '')}-${Date.now().toString(16)}`,
+          title: file.name,
+          type: isVideoMedia(file.type) ? AdUnitType.Video : AdUnitType.Banner,
+          banner: {
+            format: {
+              w: 0,
+              h: 0
+            },
+            mime: file.type === 'application/zip' ? 'text/html' : file.type,
+            mediaUrl: ipfsUrl,
+            targetUrl: '',
+            created: BigInt(new Date().getTime())
+          }
+        }
+
+        let result: HTMLBannerDimensions | ImageSizes | null
+        const mediaUrlWithProv = getMediaUrlWithProvider(ipfsUrl, IPFS_GATEWAY)
+        if (file.type === 'application/zip') {
+          result = await getHTMLBannerDimensions(mediaUrlWithProv)
+
+          if (!result) {
+            throw new Error('Failed getting dimensions')
+          }
+
+          adUnit.banner.format = {
+            w: Number(result.width),
+            h: Number(result.height)
+          }
+        } else {
+          result = await getMediaSize(file.type, mediaUrlWithProv)
+          if (!result) {
+            throw new Error('Failed getting dimensions')
+          }
+          adUnit.banner.format = { w: result.width, h: result.height }
+        }
+
+        return adUnit
+      } catch (error: any) {
+        console.error('ERROR processing media:', error)
+        throw new Error(`ERROR processing media: ${error?.message || error}`)
+      }
+    },
+    [uploadMedia, uploadZipMedia]
+  )
+
   const getBanners = useCallback(
     async (files: FileWithPath[]) => {
       if (!files || files.length === 0) return
 
-      setIsLoading(true)
+      const newFiles = files.filter((x) => {
+        const isAlradyUploaded = adUnits.some((u) => u.title === x.name)
+        isAlradyUploaded && showNotification('info', 'Already uploaded!', x.name)
+        return !isAlradyUploaded
+      })
 
-      const adUnitsToAdd: AdUnit[] = []
+      console.log({ newFiles })
 
       try {
-        await Promise.all(
-          files.map((file: FileWithPath) => {
-            return new Promise<void>((resolve, reject) => {
-              const reader = new FileReader()
-
-              reader.onload = async (e: ProgressEvent<FileReader>) => {
-                const blob = new Blob([file], { type: file.type })
-                let response
-                let ipfsUrl: string = ''
-
-                try {
-                  if (file.type === 'application/zip') {
-                    response = await uploadZipMedia(blob, file.name)
-                    ipfsUrl = response?.root.ipfsUrl
-                  } else {
-                    response = await uploadMedia(blob, file.name)
-                    ipfsUrl = response?.ipfsUrl
-                  }
-
-                  if (!response || !ipfsUrl) {
-                    console.error('No Response')
-                    reject(new Error('No Response'))
-                    return
-                  }
-                } catch (err: any) {
-                  console.error('ERROR during upload: ', err)
-                  reject(new Error(`ERROR during upload: ${err.message || err}`))
-                  return
-                }
-
-                const adUnit = {
-                  id: `${file.name.replace(/\s+/g, '')}-${Date.now().toString(16)}`,
-                  title: file.name,
-                  type: isVideoMedia(file.type) ? AdUnitType.Video : AdUnitType.Banner,
-                  banner: {
-                    format: {
-                      w: 0,
-                      h: 0
-                    },
-                    mime: file.type === 'application/zip' ? 'text/html' : file.type,
-                    mediaUrl: ipfsUrl,
-                    targetUrl: '',
-                    created: BigInt(new Date().getTime())
-                  }
-                }
-
-                try {
-                  let result: HTMLBannerDimensions | ImageSizes | null
-                  if (file.type === 'application/zip') {
-                    const mediaUrlWithProv = getMediaUrlWithProvider(ipfsUrl, IPFS_GATEWAY)
-                    result = await getHTMLBannerDimensions(mediaUrlWithProv)
-
-                    if (!result) {
-                      throw new Error('Failed getting dimensions')
-                    }
-
-                    adUnit.banner.format = {
-                      w: Number(result.width),
-                      h: Number(result.height)
-                    }
-                  } else {
-                    result = await getMediaSize(file.type, e.target?.result as string)
-                    if (!result) {
-                      throw new Error('Failed getting dimensions')
-                    }
-                    adUnit.banner.format = { w: result.width, h: result.height }
-                  }
-
-                  adUnitsToAdd.push(adUnit)
-                  resolve()
-                } catch (err: any) {
-                  console.error('ERROR getting dimensions: ', err)
-                  reject(new Error(`ERROR getting dimensions: ${err.message || err}`))
-                }
-              }
-
-              reader.onerror = () => {
-                reject(new Error('File reading failed'))
-              }
-
-              reader.readAsDataURL(file)
-            })
-          })
+        const adUnitsToAdd: AdUnit[] = await Promise.all(
+          newFiles.map((file: FileWithPath) => getAdUnitFromFile(file))
         )
 
         const updatedAdUnits = adUnits.concat(adUnitsToAdd)
@@ -132,17 +118,17 @@ const useDropzone = () => {
       } catch (err: any) {
         console.error('ERROR in getBanners: ', err)
         showNotification('error', `Failed to upload creative: ${err.message || err}`)
-      } finally {
-        setIsLoading(false)
       }
 
+      setIsLoading(false)
       setUploadedFiles(null)
     },
-    [uploadZipMedia, uploadMedia, updateCampaign, adUnits, showNotification]
+    [adUnits, showNotification, updateCampaign, getAdUnitFromFile]
   )
 
   useEffect(() => {
     if (uploadedFiles) {
+      setIsLoading(true)
       getBanners(uploadedFiles)
     }
   }, [uploadedFiles, getBanners])
