@@ -15,7 +15,7 @@ const BannerSizesList = () => {
   )
 
   return popularBannerSizes ? (
-    <Alert icon={<InfoIcon style={{ marginTop: 0 }} />} c="attention" variant="outline">
+    <Alert icon={<InfoIcon style={{ marginTop: 0 }} />} color="attention" variant="outline">
       <Flex justify="space-between">
         <Text>Recommended banner sizes: {popularBannerSizes.join(', ')}</Text>
         <CustomAnchor
