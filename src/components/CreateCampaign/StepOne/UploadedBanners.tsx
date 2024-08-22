@@ -16,8 +16,7 @@ const UploadedBanners = () => {
         }
       }
     },
-    form,
-    removeAdUnit
+    form
   } = useCreateCampaignContext()
 
   return adUnits.length > 0 ? (
@@ -29,7 +28,7 @@ const UploadedBanners = () => {
       />
 
       {adUnits.map((image: AdUnit, index: number) => {
-        return <ImageUrlInput image={image} onDelete={removeAdUnit} index={index} form={form} />
+        return <ImageUrlInput image={image} index={index} form={form} />
       })}
     </Stack>
   ) : null

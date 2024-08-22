@@ -333,13 +333,6 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
     }
   }, []) // eslint-disable-line
 
-  const removeAdUnit = useCallback(
-    (index: number) => {
-      form.removeListItem('adUnits', index)
-    },
-    [form]
-  )
-
   const addUTMToTargetURLS = useCallback(() => {
     const {
       adUnits,
@@ -497,7 +490,6 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
       updateCampaign,
       publishCampaign,
       resetCampaign,
-      removeAdUnit,
       allowedBannerSizes,
       saveToDraftCampaign,
       updateCampaignFromDraft,
@@ -514,7 +506,6 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
       updateCampaign,
       publishCampaign,
       resetCampaign,
-      removeAdUnit,
       allowedBannerSizes,
       saveToDraftCampaign,
       updateCampaignFromDraft,

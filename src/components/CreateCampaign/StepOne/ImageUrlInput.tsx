@@ -10,13 +10,12 @@ import InfoCurlyBorder from 'resources/icons/InfoCurlyBorder'
 
 type ImageUrlInputProps = FlexProps & {
   image: AdUnit
-  onDelete?: (index: number) => void
   preview?: boolean
   index?: number
   form?: UseFormReturnType<CampaignUI, (values: CampaignUI) => CampaignUI>
 }
 
-const ImageUrlInput = ({ image, onDelete, preview, index, form }: ImageUrlInputProps) => {
+const ImageUrlInput = ({ image, preview, index, form }: ImageUrlInputProps) => {
   const hasFormatError: boolean = useMemo(
     () => !!form?.errors[`adUnits.${index}.banner.format`],
     [form?.errors, index]
@@ -94,7 +93,8 @@ const ImageUrlInput = ({ image, onDelete, preview, index, form }: ImageUrlInputP
         }
       }}
       rightSection={
-        (!preview || onDelete) && (
+        !preview &&
+        form && (
           <ActionIcon
             // mr="sm"
             h="100%"
@@ -102,7 +102,7 @@ const ImageUrlInput = ({ image, onDelete, preview, index, form }: ImageUrlInputP
             color="secondaryText"
             variant="subtle"
             size="xl"
-            onClick={() => onDelete && typeof index !== 'undefined' && onDelete(index)}
+            onClick={() => typeof index !== 'undefined' && form.removeListItem('adUnits', index)}
           >
             <DeleteIcon size="24px" />
           </ActionIcon>
