@@ -252,17 +252,12 @@ const themeOverride: MantineThemeOverride = createTheme({
       })
     }),
     Input: Input.extend({
-      // TODO: why styles not defaultProps
+      defaultProps: {
+        radius: 'md'
+      },
       styles: (theme) => ({
         input: {
-          backgroundColor: theme.colors.lightBackground[DEFAULT_PRIMARY_SHADE],
-          // TODO: check how to override it properly
-          // borderColor: theme.colors.nonDecorativeBorders[DEFAULT_PRIMARY_SHADE],
-          borderRadius: theme.radius.md
-        },
-        icon: {
-          borderRight: '1px solid',
-          borderColor: theme.colors.nonDecorativeBorders[DEFAULT_PRIMARY_SHADE]
+          backgroundColor: theme.colors.lightBackground[DEFAULT_PRIMARY_SHADE]
         }
       })
     }),
