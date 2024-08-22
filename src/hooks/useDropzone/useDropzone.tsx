@@ -114,7 +114,13 @@ const useDropzone = () => {
           newFiles.map((file: FileWithPath) => getAdUnitFromFile(file))
         )
 
-        adUnitsToAdd.forEach((u) => form.insertListItem('adUnits', u))
+        adUnitsToAdd.forEach((u, i) => {
+          form.insertListItem('adUnits', u)
+          // TODO: add context fn if needed in other place
+          // This is special case where we need to validate format immediately but keep
+          // urls as untouched to avoid showing error on upload
+          form.validateField(`adUnits.${adUnits.length + i}.banner.format`)
+        })
 
         // const updatedAdUnits = adUnits.concat(adUnitsToAdd)
         // adUnitsToAdd.length && updateCampaign({ adUnits: updatedAdUnits }, true)
