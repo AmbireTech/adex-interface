@@ -38,6 +38,7 @@ const ImageUrlInput = ({ image, onDelete, preview, index, form }: ImageUrlInputP
       defaultValue={!form ? image.banner?.targetUrl : undefined}
       disabled={disable}
       placeholder="Please enter a target URL starting with https://"
+      // withErrorStyles={false}
       size="lg"
       {...(hasFormatError
         ? {
@@ -87,13 +88,19 @@ const ImageUrlInput = ({ image, onDelete, preview, index, form }: ImageUrlInputP
         </Group>
       }
       rightSectionPointerEvents="visible"
+      rightSectionProps={{
+        style: {
+          justifyContent: 'end'
+        }
+      }}
       rightSection={
         (!preview || onDelete) && (
           <ActionIcon
-            mr="sm"
+            // mr="sm"
+            h="100%"
             title="Remove"
-            color={hasFormatError ? 'warning' : 'secondaryText'}
-            variant={hasFormatError ? 'light' : 'transparent'}
+            color="secondaryText"
+            variant="subtle"
             size="xl"
             onClick={() => onDelete && typeof index !== 'undefined' && onDelete(index)}
           >

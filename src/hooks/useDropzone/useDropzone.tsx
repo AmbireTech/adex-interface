@@ -21,7 +21,8 @@ const useDropzone = () => {
 
   const {
     campaign: { adUnits },
-    updateCampaign
+    // updateCampaign,
+    form
   } = useCreateCampaignContext()
   const { uploadMedia, uploadZipMedia } = useMediaUpload()
 
@@ -113,8 +114,10 @@ const useDropzone = () => {
           newFiles.map((file: FileWithPath) => getAdUnitFromFile(file))
         )
 
-        const updatedAdUnits = adUnits.concat(adUnitsToAdd)
-        adUnitsToAdd.length && updateCampaign({ adUnits: updatedAdUnits }, true)
+        adUnitsToAdd.forEach((u) => form.insertListItem('adUnits', u))
+
+        // const updatedAdUnits = adUnits.concat(adUnitsToAdd)
+        // adUnitsToAdd.length && updateCampaign({ adUnits: updatedAdUnits }, true)
       } catch (err: any) {
         console.error('ERROR in getBanners: ', err)
         showNotification('error', `Failed to upload creative: ${err.message || err}`)
@@ -123,7 +126,7 @@ const useDropzone = () => {
       setIsLoading(false)
       setUploadedFiles(null)
     },
-    [adUnits, showNotification, updateCampaign, getAdUnitFromFile]
+    [adUnits, showNotification, getAdUnitFromFile, form]
   )
 
   useEffect(() => {

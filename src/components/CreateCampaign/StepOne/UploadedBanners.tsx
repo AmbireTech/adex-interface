@@ -17,17 +17,15 @@ const UploadedBanners = () => {
       }
     },
     form,
-    removeAdUnit,
-    getInputProps,
-    key
+    removeAdUnit
   } = useCreateCampaignContext()
 
   return adUnits.length > 0 ? (
     <Stack align="stretch" justify="center">
       <Checkbox
         label={<UtmInfo title="Auto UTM tracking *" placement={placement} />}
-        key={key('autoUTMChecked')}
-        {...getInputProps('autoUTMChecked', { type: 'checkbox' })}
+        key={form.key('autoUTMChecked')}
+        {...form.getInputProps('autoUTMChecked', { type: 'checkbox' })}
       />
 
       {adUnits.map((image: AdUnit, index: number) => {
