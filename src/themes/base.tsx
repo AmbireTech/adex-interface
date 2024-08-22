@@ -262,9 +262,11 @@ const themeOverride: MantineThemeOverride = createTheme({
       })
     }),
     Dropzone: Dropzone.extend({
-      styles: (theme: MantineTheme) => ({
+      styles: (theme) => ({
         root: {
-          backgroundColor: theme.colors.lightBackground[DEFAULT_PRIMARY_SHADE]
+          '&:not(:where([data-reject]))&:not(:where([data-accept]))': {
+            backgroundColor: parseThemeColor({ color: 'lightBackground', theme }).value
+          }
         }
       })
     }),
