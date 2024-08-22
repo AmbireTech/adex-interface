@@ -27,10 +27,7 @@ const StepThree = () => {
   const {
     campaign: { currency },
     selectedBidFloors,
-    getInputProps,
-    updateCampaignField,
-    key,
-    errors
+    form: { key, getInputProps, errors, setFieldValue }
   } = useCreateCampaignContext()
 
   const recommendedPaymentBounds = useMemo(() => {
@@ -93,7 +90,7 @@ const StepThree = () => {
         </Text>
         <SelectCurrency
           defaultValue={currency}
-          onChange={(value) => updateCampaignField('currency', value)}
+          onChange={(value) => setFieldValue('currency', value)}
           error={(errors.currency && errors.currency) || ''}
         />
       </Grid.Col>

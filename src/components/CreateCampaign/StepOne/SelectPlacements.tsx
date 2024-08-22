@@ -12,8 +12,7 @@ const SelectPlacements = () => {
         }
       }
     },
-    getInputProps,
-    key
+    form
   } = useCreateCampaignContext()
 
   return (
@@ -25,8 +24,8 @@ const SelectPlacements = () => {
       }
       name="placement"
       defaultValue={placement}
-      key={key('targetingInput.inputs.placements.in.0')}
-      {...getInputProps('targetingInput.inputs.placements.in.0')}
+      key={form.key('targetingInput.inputs.placements.in.0')}
+      {...form.getInputProps('targetingInput.inputs.placements.in.0')}
     >
       <Radio label="Websites" value="site" mb="xs" />
       <Radio label="Applications" value="app" />

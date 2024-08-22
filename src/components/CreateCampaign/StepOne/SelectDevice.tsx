@@ -8,16 +8,17 @@ import { Devices } from 'types'
 const SelectDevice = () => {
   const {
     campaign: { devices },
-    updateCampaign
+    form
   } = useCreateCampaignContext()
 
   const toggleDeviceSelection = (device: Devices) => {
-    const isSelected = devices.includes(device)
-    const updatedDevices = isSelected
-      ? devices.filter((selectedDevice) => selectedDevice !== device)
-      : [...devices, device]
+    const index = devices.indexOf(device)
 
-    updateCampaign({ devices: updatedDevices })
+    if (index > -1) {
+      form.removeListItem('devices', devices.indexOf(device))
+    } else {
+      form.insertListItem('devices', device)
+    }
   }
 
   return (

@@ -14,8 +14,6 @@ const BannerSizesList = () => {
     [allowedBannerSizes]
   )
 
-  console.log({ popularBannerSizes })
-
   return popularBannerSizes ? (
     <Alert icon={<InfoIcon style={{ marginTop: 0 }} />} c="attention" variant="outline">
       <Flex justify="space-between">

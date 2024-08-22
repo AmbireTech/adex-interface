@@ -20,19 +20,18 @@ const StepTwo = () => {
         }
       }
     },
-    updateCampaignField,
-    errors
+    form: { setFieldValue, errors }
   } = useCreateCampaignContext()
 
   const handleSelect = useCallback(
     (selectedRadio: TargetingInputApplyProp, values: string[], path: string) => {
-      updateCampaignField(path, {
+      setFieldValue(path, {
         apply: selectedRadio,
         in: selectedRadio === 'in' ? values : [],
         nin: selectedRadio === 'nin' ? values : []
       })
     },
-    [updateCampaignField]
+    [setFieldValue]
   )
 
   return (

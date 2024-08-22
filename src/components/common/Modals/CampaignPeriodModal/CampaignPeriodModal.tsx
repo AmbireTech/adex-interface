@@ -55,7 +55,7 @@ const useStyles = createStyles((theme: MantineTheme) => {
 const CampaignPeriodModal = ({ opened, close }: { opened: boolean; close: () => void }) => {
   const allLocales = useMemo(() => initAllLocales(), [])
   const {
-    updateCampaign,
+    form: { setFieldValue },
     campaign: { startsAt, endsAt }
   } = useCreateCampaignContext()
 
@@ -86,18 +86,22 @@ const CampaignPeriodModal = ({ opened, close }: { opened: boolean; close: () => 
   )
 
   const handleApplyBtnClicked = useCallback(() => {
-    updateCampaign({
-      startsAt: dayjs(startDate)
+    setFieldValue(
+      'startsAt',
+      dayjs(startDate)
         .hour(parseInt(startTime.split(':')[0], 10))
         .minute(parseInt(startTime.split(':')[1], 10))
-        .toDate(),
-      endsAt: dayjs(endDate)
+        .toDate()
+    )
+    setFieldValue(
+      'endsAt',
+      dayjs(endDate)
         .hour(parseInt(endTime.split(':')[0], 10))
         .minute(parseInt(endTime.split(':')[1], 10))
         .toDate()
-    })
+    )
     close()
-  }, [updateCampaign, startDate, startTime, endDate, endTime, close])
+  }, [setFieldValue, startDate, startTime, endDate, endTime, close])
 
   return (
     <Modal
