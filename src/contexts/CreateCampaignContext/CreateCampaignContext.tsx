@@ -108,7 +108,7 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
 
   const form = useForm({
     initialValues: defaultValue,
-    // validateInputOnChange: ['budget'],
+    validateInputOnChange: ['adUnits'],
     validateInputOnBlur: true,
     initialDirty: {
       adUnits: true
@@ -268,8 +268,10 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
   })
 
   const campaign = useMemo(() => form.getValues(), [form])
-  const { getInputProps, key, errors } = form
 
+  // NOTE: using this type of update removes current validations!!
+  // TODO: use only form.setFieldValue, form.removeListItem, form.insertListItem
+  // using this + form.validate() has strange behavior as does not work correctly with touched/dirty
   const updateCampaign = useCallback(
     (value: Partial<CampaignUI>, validate?: boolean) => {
       form.setValues((prev) => ({
@@ -278,13 +280,9 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
       }))
       // NOTE: as this fn is used to update values out from inputs,
       // validateInputOnBlur and validateInputOnChange are not working when setValues is used
-      validate && form.validate()
+      form.validate()
+      console.log(validate)
     },
-    [form]
-  )
-
-  const updateCampaignField = useCallback(
-    (field: string, value: any) => form.setFieldValue(field, value),
     [form]
   )
 
@@ -507,10 +505,6 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
       addUTMToTargetURLS,
       selectedBidFloors,
       form,
-      updateCampaignField,
-      getInputProps,
-      key,
-      errors,
       step,
       nextStep,
       prevStep
@@ -528,10 +522,6 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
       addUTMToTargetURLS,
       selectedBidFloors,
       form,
-      updateCampaignField,
-      getInputProps,
-      key,
-      errors,
       step,
       nextStep,
       prevStep

@@ -1,7 +1,6 @@
 import { Campaign } from 'adex-common/dist/types/Dsp/Campaign'
 import { Alpha3Code } from 'adex-common'
-// import { UseFormReturnType } from '@mantine/form'
-import { FormErrors, GetInputProps, Key, UseFormReturnType } from '@mantine/form/lib/types'
+import { UseFormReturnType } from '@mantine/form'
 import { Devices } from './createCampaign'
 
 export type SelectData = { value: string | Alpha3Code; label: string; group?: string }
@@ -55,7 +54,7 @@ export type CreateCampaignType = {
   prevStep: () => void
   // stepsCount: number
   campaign: CampaignUI
-  updateCampaign: (camp: Partial<CampaignUI>, validate?: boolean) => void
+  // updateCampaign: (camp: Partial<CampaignUI>, validate?: boolean) => void
   publishCampaign: () => Promise<any>
   resetCampaign: () => void
   removeAdUnit: (index: number) => void
@@ -65,10 +64,5 @@ export type CreateCampaignType = {
   defaultValue: CampaignUI
   addUTMToTargetURLS: () => void
   selectedBidFloors: SupplyStatsDetails[] | SupplyStatsDetails[][]
-  form: UseFormReturnType<CampaignUI, (values: CampaignUI) => CampaignUI>
-  // TODO: fix the types
-  updateCampaignField: (field: string, value: any) => void
-  getInputProps: GetInputProps<CampaignUI>
-  key: Key<CampaignUI>
-  errors: FormErrors
+  form: UseFormReturnType<CampaignUI>
 }
