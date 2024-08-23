@@ -58,7 +58,7 @@ export type CreateCampaignType = {
   resetCampaign: () => void
   allowedBannerSizes: string[]
   saveToDraftCampaign: () => Promise<void>
-  updateCampaignFromDraft: (draftCampaign: Campaign) => void
+  updateCampaignFromDraft: (draftCampaign: Campaign, isClone?: boolean) => void
   defaultValue: CampaignUI
   addUTMToTargetURLS: () => void
   selectedBidFloors: SupplyStatsDetails[] | SupplyStatsDetails[][]

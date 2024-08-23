@@ -111,8 +111,8 @@ const CreateCampaign = () => {
 
   return (
     <form onSubmit={form.onSubmit(confirmLaunch)}>
-      <Flex direction="row" gap="xl" justify="stretch" wrap="wrap">
-        <Paper p="md" shadow="xs" style={{ flexGrow: 69 }}>
+      <Flex direction="row" gap="xl" wrap="wrap" align="flex-start">
+        <Paper p="md" shadow="xs" style={{ flexGrow: 10 }}>
           <Stack gap="xl">
             <CustomStepper stepsCount={4} />
             <Box maw={720}>
@@ -121,7 +121,7 @@ const CreateCampaign = () => {
           </Stack>
         </Paper>
 
-        <Paper p="md" shadow="sm" miw={330} style={{ flexGrow: 1 }}>
+        <Paper p="md" shadow="sm" w={360} style={{ flexGrow: 1 }}>
           <CampaignSummary />
         </Paper>
       </Flex>

@@ -432,7 +432,7 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
   }, [adexServicesRequest, form, showNotification])
 
   const updateCampaignFromDraft = useCallback(
-    (draftCampaign: Campaign) => {
+    (draftCampaign: Campaign, isClone?: boolean) => {
       const mappedDraftCampaign: CampaignUI = {
         ...draftCampaign,
         devices: ['mobile', 'desktop'],
@@ -464,7 +464,7 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
       }
 
       updateCampaign(mappedDraftCampaign)
-      form.resetDirty()
+      !isClone && form.resetDirty()
     },
     [balanceToken.name, form, updateCampaign]
   )
