@@ -36,7 +36,7 @@ const ImageUrlInput = ({ image, preview, index, form }: ImageUrlInputProps) => {
       onKeyDown={(event) => event.key === 'Enter' && event.preventDefault()}
       defaultValue={!form ? image.banner?.targetUrl : undefined}
       disabled={disable}
-      placeholder="Please enter a target URL starting with https://"
+      placeholder="Creative target URL (https://...)"
       // withErrorStyles={false}
       size="lg"
       {...(hasFormatError

@@ -50,15 +50,16 @@ const MIN_CAMPAIGN_BUDGET_VALUE = 300
 const MIN_CPM_VALUE = 0.1
 
 const isValidHttpUrl = (inputURL: string) => {
-  let url
-
   try {
-    url = new URL(inputURL)
+    const url = new URL(inputURL)
+
+    return (
+      ['http:', 'https:'].includes(url.protocol) &&
+      (inputURL.startsWith('http://') || inputURL.startsWith('https://'))
+    )
   } catch (_) {
     return false
   }
-
-  return url.protocol === 'http:' || url.protocol === 'https:'
 }
 
 const validateBudget = (value: number, availableBalance: bigint, decimals: number) => {
@@ -123,7 +124,7 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
           targetUrl: (value, { adUnits }) => {
             console.log({ adUnits })
             if (step === 0 && !isValidHttpUrl(value)) {
-              return 'Please enter a valid URL'
+              return 'Please enter a valid URL (https://...)'
             }
           }
         }
