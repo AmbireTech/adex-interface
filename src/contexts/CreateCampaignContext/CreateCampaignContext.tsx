@@ -374,12 +374,12 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
   }, [updateCampaign, campaign])
 
   const resetCampaign = useCallback(() => {
-    form.reset()
     form.setInitialValues({
       ...defaultValue,
       startsAt: new Date(Date.now() + MINUTE * 10),
       endsAt: new Date(Date.now() + WEEK)
     })
+    form.reset()
     setStep(0)
     localStorage.removeItem(LS_KEY_CREATE_CAMPAIGN)
 
@@ -407,19 +407,23 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
       preparedCampaign.title || `Draft Campaign ${formatDateTime(new Date())}`
 
     try {
-      const res = await adexServicesRequest<{ success?: boolean }>('backend', {
-        route: '/dsp/campaigns/draft',
-        method: 'POST',
-        body: preparedCampaign,
-        headers: {
-          'Content-Type': 'application/json'
+      const res = await adexServicesRequest<{ success?: boolean; campaign: { id: string } }>(
+        'backend',
+        {
+          route: '/dsp/campaigns/draft',
+          method: 'POST',
+          body: preparedCampaign,
+          headers: {
+            'Content-Type': 'application/json'
+          }
         }
-      })
+      )
 
-      if (!res?.success) {
+      if (!res?.success || !res?.campaign.id) {
         throw new Error('Error on saving draft campaign')
       }
       form.resetDirty()
+      form.setFieldValue('id', res?.campaign.id)
       showNotification('info', 'Draft saved')
     } catch (err) {
       showNotification('error', 'Creating campaign failed', 'Data error')
