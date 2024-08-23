@@ -1,59 +1,37 @@
 import { Grid, Text } from '@mantine/core'
-import {
-  CAMPAIGN_CATEGORIES_INPUT,
-  CAMPAIGN_LOCATION_INPUT,
-  CATEGORIES,
-  CAT_GROUPS,
-  COUNTRIES,
-  REGION_GROUPS
-} from 'constants/createCampaign'
-import { useCallback, useMemo } from 'react'
+import { CATEGORIES, CAT_GROUPS, COUNTRIES, REGION_GROUPS } from 'constants/createCampaign'
+import { useCallback } from 'react'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import { TargetingInputApplyProp } from 'adex-common/dist/types'
-import {
-  findArrayWithLengthInObjectAsValue,
-  updateCatsLocsObject
-} from 'helpers/createCampaignHelpers'
 import MultiSelectAndRadioButtons from './MultiSelectAndRadioButtons'
+
+const CATEGORIES_PATH = 'targetingInput.inputs.categories'
+const LOCATION_PATH = 'targetingInput.inputs.location'
 
 const StepTwo = () => {
   const {
     campaign: {
       targetingInput: {
-        inputs: { location, categories }
+        inputs: {
+          location,
+          categories,
+          categories: { apply: categoriesRadioValue },
+          location: { apply: locationRadioValue }
+        }
       }
     },
-    updateCampaignWithPrevStateNested
+    form: { setFieldValue, errors }
   } = useCreateCampaignContext()
 
-  const handleCategories = useCallback(
-    (selectedRadio: TargetingInputApplyProp, categoriesValue: string[]) => {
-      updateCampaignWithPrevStateNested(
-        CAMPAIGN_CATEGORIES_INPUT,
-        updateCatsLocsObject(selectedRadio, categoriesValue)
-      )
+  const handleSelect = useCallback(
+    (selectedRadio: TargetingInputApplyProp, values: string[], path: string) => {
+      setFieldValue(path, {
+        apply: selectedRadio,
+        in: selectedRadio === 'in' ? values : [],
+        nin: selectedRadio === 'nin' ? values : []
+      })
     },
-    [updateCampaignWithPrevStateNested]
-  )
-
-  const handleCountries = useCallback(
-    (selectedRadio: TargetingInputApplyProp, locationsValue: string[]) => {
-      updateCampaignWithPrevStateNested(
-        CAMPAIGN_LOCATION_INPUT,
-        updateCatsLocsObject(selectedRadio, locationsValue)
-      )
-    },
-    [updateCampaignWithPrevStateNested]
-  )
-
-  const catSelectedRadioAndValuesArray = useMemo(
-    () => findArrayWithLengthInObjectAsValue(categories),
-    [categories]
-  )
-
-  const locSelectedRadioAndValuesArray = useMemo(
-    () => findArrayWithLengthInObjectAsValue(location),
-    [location]
+    [setFieldValue]
   )
 
   return (
@@ -63,17 +41,17 @@ const StepTwo = () => {
           1. Categories
         </Text>
         <MultiSelectAndRadioButtons
-          onCategoriesChange={handleCategories}
-          multiSelectData={CATEGORIES}
-          defaultRadioValue={
-            catSelectedRadioAndValuesArray &&
-            (catSelectedRadioAndValuesArray[0] as TargetingInputApplyProp)
+          onCategoriesChange={(selectedRadio, values) =>
+            handleSelect(selectedRadio, values, CATEGORIES_PATH)
           }
+          multiSelectData={CATEGORIES}
+          defaultRadioValue={categoriesRadioValue}
           defaultSelectValue={
-            catSelectedRadioAndValuesArray && (catSelectedRadioAndValuesArray[1] as string[])
+            categoriesRadioValue !== 'all' ? categories[categoriesRadioValue] : []
           }
           groups={CAT_GROUPS}
           label="Categories"
+          error={errors[CATEGORIES_PATH]?.toString()}
         />
       </Grid.Col>
       <Grid.Col>
@@ -81,17 +59,15 @@ const StepTwo = () => {
           2. Countries
         </Text>
         <MultiSelectAndRadioButtons
-          onCategoriesChange={handleCountries}
-          defaultRadioValue={
-            locSelectedRadioAndValuesArray &&
-            (locSelectedRadioAndValuesArray[0] as TargetingInputApplyProp)
+          onCategoriesChange={(selectedRadio, values) =>
+            handleSelect(selectedRadio, values, LOCATION_PATH)
           }
-          defaultSelectValue={
-            locSelectedRadioAndValuesArray && (locSelectedRadioAndValuesArray[1] as string[])
-          }
+          defaultRadioValue={locationRadioValue}
+          defaultSelectValue={locationRadioValue !== 'all' ? location[locationRadioValue] : []}
           multiSelectData={COUNTRIES}
           groups={REGION_GROUPS}
           label="Countries"
+          error={errors[LOCATION_PATH]?.toString()}
         />
       </Grid.Col>
     </Grid>

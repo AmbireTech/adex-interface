@@ -3,7 +3,13 @@ import '@mantine/dates/styles.css'
 import '@mantine/notifications/styles.css'
 import '@mantine/dropzone/styles.css'
 
-import { ColorSchemeScript, MantineProvider, MantineTheme, Progress } from '@mantine/core'
+import {
+  CSSVariablesResolver,
+  ColorSchemeScript,
+  MantineProvider,
+  MantineTheme,
+  Progress
+} from '@mantine/core'
 import { ModalsProvider } from '@mantine/modals'
 import { AccountProvider } from 'contexts/AccountContext'
 import { AdminProvider } from 'contexts/AdminContext'
@@ -47,6 +53,18 @@ const EnvBanner = () => (
   </Progress.Root>
 )
 
+const resolver: CSSVariablesResolver = (theme) => ({
+  variables: {
+    '--mantine-color-error': theme.colors.error[3]
+  },
+  light: {
+    '--mantine-color-error': theme.colors.error[3]
+  },
+  dark: {
+    '--mantine-color-error': theme.colors.error[4]
+  }
+})
+
 ReactGA.initialize('G-PX5B4P9KKM')
 
 function App() {
@@ -57,6 +75,7 @@ function App() {
           <ColorSchemeScript forceColorScheme="light" />
           <MantineProvider
             theme={lightTheme}
+            cssVariablesResolver={resolver}
             stylesTransform={emotionTransform}
             forceColorScheme="light"
           >

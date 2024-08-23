@@ -47,6 +47,7 @@ type ExtendedCustomColors =
   | 'nonDecorativeBorders'
   | 'stopped'
   | 'paused'
+  | 'error'
   | DefaultMantineColor
 
 type Tuple<T, N extends number> = [T, ...T[]] & { length: N }
@@ -251,27 +252,30 @@ const themeOverride: MantineThemeOverride = createTheme({
       })
     }),
     Input: Input.extend({
+      defaultProps: {
+        radius: 'md'
+      },
       styles: (theme) => ({
         input: {
-          backgroundColor: theme.colors.lightBackground[DEFAULT_PRIMARY_SHADE],
-          // TODO: check how to override it properly
-          // borderColor: theme.colors.nonDecorativeBorders[DEFAULT_PRIMARY_SHADE],
-          borderRadius: theme.radius.md
-        },
-        icon: {
-          borderRight: '1px solid',
-          borderColor: theme.colors.nonDecorativeBorders[DEFAULT_PRIMARY_SHADE]
-        }
-      })
-    }),
-    Dropzone: Dropzone.extend({
-      styles: (theme: MantineTheme) => ({
-        root: {
           backgroundColor: theme.colors.lightBackground[DEFAULT_PRIMARY_SHADE]
         }
       })
     }),
+    Dropzone: Dropzone.extend({
+      styles: (theme) => ({
+        root: {
+          '&:not(:where([data-reject]))&:not(:where([data-accept]))': {
+            backgroundColor: parseThemeColor({ color: 'lightBackground', theme }).value
+          }
+        }
+      })
+    }),
     Paper: Paper.extend({
+      styles: {
+        root: {
+          overflow: 'hidden'
+        }
+      },
       defaultProps: {
         shadow: 'none'
       }

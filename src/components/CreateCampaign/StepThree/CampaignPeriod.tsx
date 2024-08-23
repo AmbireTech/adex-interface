@@ -7,14 +7,16 @@ import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import { useMemo } from 'react'
 import CalendarIcon from 'resources/icons/Calendar'
 
-const useStyles = createStyles((theme: MantineTheme) => {
+const useStyles = createStyles((theme: MantineTheme, { hasErrors }: { hasErrors: boolean }) => {
   const colorScheme = useColorScheme()
   const primaryShade = getPrimaryShade(theme, colorScheme)
   return {
     wrapper: {
       backgroundColor: theme.colors.lightBackground[primaryShade],
       border: '1px solid',
-      borderColor: theme.colors.decorativeBorders[primaryShade],
+      borderColor: hasErrors
+        ? theme.colors.error[primaryShade]
+        : theme.colors.decorativeBorders[primaryShade],
       borderRadius: theme.radius.md,
       padding: theme.spacing.sm
     }
@@ -23,41 +25,55 @@ const useStyles = createStyles((theme: MantineTheme) => {
 
 const CampaignPeriod = () => {
   const {
-    campaign: { startsAt, endsAt }
+    campaign: { startsAt, endsAt },
+    form: {
+      errors: { startsAt: errorStartsAt, endsAt: errorEndsAt }
+    }
   } = useCreateCampaignContext()
 
   const startDateTime = useMemo(() => startsAt && formatDateTime(startsAt), [startsAt])
   const endDateTime = useMemo(() => endsAt && formatDateTime(endsAt), [endsAt])
-  const { classes } = useStyles()
+  const { classes } = useStyles({ hasErrors: !!errorStartsAt || !!errorEndsAt })
 
   const [opened, { open, close }] = useDisclosure(false)
 
   return (
-    <Flex
-      wrap="wrap"
-      direction="row"
-      justify="space-between"
-      maw={{ sm: '100%', lg: '50%' }}
-      align="center"
-      className={classes.wrapper}
-    >
-      <Flex direction="column">
-        <Text c="secondaryText" size="xs">
-          Start Date
-        </Text>
-        <Text size="md">{startDateTime}</Text>
+    <>
+      <Flex
+        wrap="wrap"
+        direction="row"
+        justify="space-between"
+        align="center"
+        className={classes.wrapper}
+      >
+        <Flex direction="column" c={errorStartsAt ? 'error' : undefined}>
+          <Text c="secondaryText" size="xs">
+            Start Date
+          </Text>
+          <Text size="md">{startDateTime}</Text>
+        </Flex>
+        <Flex direction="column" c={errorEndsAt ? 'error' : undefined}>
+          <Text c="secondaryText" size="xs">
+            End Date
+          </Text>
+          <Text size="md">{endDateTime}</Text>
+        </Flex>
+        <ActionIcon variant="transparent" size="lg" onClick={open}>
+          <CalendarIcon size="24px" color="mainText" />
+        </ActionIcon>
+        <CampaignPeriodModal opened={opened} close={close} />
       </Flex>
-      <Flex direction="column">
-        <Text c="secondaryText" size="xs">
-          End Date
+      {errorStartsAt && (
+        <Text size="sm" c="error">
+          {errorStartsAt}
         </Text>
-        <Text size="md">{endDateTime}</Text>
-      </Flex>
-      <ActionIcon variant="transparent" size="lg" onClick={open}>
-        <CalendarIcon size="24px" color="mainText" />
-      </ActionIcon>
-      <CampaignPeriodModal opened={opened} close={close} />
-    </Flex>
+      )}
+      {errorEndsAt && (
+        <Text size="sm" c="error">
+          {errorEndsAt}
+        </Text>
+      )}
+    </>
   )
 }
 

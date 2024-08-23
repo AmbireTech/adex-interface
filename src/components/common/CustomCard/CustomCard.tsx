@@ -1,4 +1,4 @@
-import { Box, Flex, rem, Title, Group, lighten, MantineTheme, getPrimaryShade } from '@mantine/core'
+import { Box, Flex, rem, Title, lighten, MantineTheme, getPrimaryShade } from '@mantine/core'
 import { createStyles } from '@mantine/emotion'
 import { useColorScheme } from '@mantine/hooks'
 import CheckMarkIcon from 'resources/icons/CheckMark'
@@ -126,11 +126,13 @@ const CustomCard = ({
       component={component}
       to={to}
       onClick={!disabled ? action : () => {}}
+      p="xs"
+      pos="relative"
     >
       {hasCheckMark && (
-        <Group justify="right" pr="xs" pt="xs">
+        <Box pos="absolute" right={4} top={4}>
           {active ? <CheckMarkFilledIcon size="20px" /> : <CheckMarkIcon size="20px" />}
-        </Group>
+        </Box>
       )}
       <Flex
         mih={50}

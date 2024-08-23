@@ -9,38 +9,82 @@ import {
 } from 'react'
 import { CREATE_CAMPAIGN_DEFAULT_VALUE, dateNowPlusThirtyDays } from 'constants/createCampaign'
 import superjson from 'superjson'
-import {
-  CampaignUI,
-  CreateCampaignType,
-  SupplyStatsDetails,
-  Devices,
-  ErrorsTargetURLValidations
-} from 'types'
+import { CampaignUI, CreateCampaignType, SupplyStatsDetails, Devices } from 'types'
 import useAccount from 'hooks/useAccount'
 import { useAdExApi } from 'hooks/useAdexServices'
 import {
   addUrlUtmTracking,
-  deepEqual,
+  // deepEqual,
   hasUtmCampaign,
-  prepareCampaignObject,
-  removeProperty,
   selectBannerSizes
 } from 'helpers/createCampaignHelpers'
-import { parseFromBigNumPrecision } from 'helpers/balances'
-import { AdUnit, Campaign, Placement } from 'adex-common'
-import { formatDateTime, WEEK } from 'helpers'
-import { isValidHttpUrl } from 'helpers/validators'
+import {
+  parseBigNumTokenAmountToDecimal,
+  parseFromBigNumPrecision,
+  parseToBigNumPrecision
+} from 'helpers/balances'
+import { Campaign, Placement } from 'adex-common'
+import { formatDateTime, MINUTE, WEEK } from 'helpers'
 import { useCampaignsData } from 'hooks/useCampaignsData'
+import { hasLength, isNotEmpty, useForm } from '@mantine/form'
+import useCustomNotifications from 'hooks/useCustomNotifications'
+
+type Modify<T, R> = Omit<T, keyof R> & R
+
+type ReducedCampaign = Omit<
+  Modify<Campaign, { id?: string; activeFrom: bigint | null; activeTo: bigint | null }>,
+  | 'created'
+  | 'owner'
+  | 'validators'
+  | 'targetingRules'
+  | 'status'
+  | 'reviewStatus'
+  | 'modified'
+  | 'archived'
+  | 'createdBy'
+  | 'lastModifiedBy'
+>
+
+const MIN_CAMPAIGN_BUDGET_VALUE_ADMIN = 20
+const MIN_CAMPAIGN_BUDGET_VALUE = 300
+const MIN_CPM_VALUE = 0.1
+const LS_KEY_CREATE_CAMPAIGN = 'createCampaign'
+const LS_KEY_CREATE_CAMPAIGN_STEP = 'createCampaignStep'
+
+const isValidHttpUrl = (inputURL: string) => {
+  try {
+    const url = new URL(inputURL)
+
+    return (
+      ['http:', 'https:'].includes(url.protocol) &&
+      (inputURL.startsWith('http://') || inputURL.startsWith('https://'))
+    )
+  } catch (_) {
+    return false
+  }
+}
+
+const validateBudget = (value: number, availableBalance: bigint, decimals: number) => {
+  const parsedBalance = Number(parseBigNumTokenAmountToDecimal(availableBalance, decimals))
+  return parsedBalance < value
+}
 
 const CreateCampaignContext = createContext<CreateCampaignType | null>(null)
 
 const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
   const { adexServicesRequest } = useAdExApi()
   const { supplyStats, updateSupplyStats } = useCampaignsData()
+  const { showNotification } = useCustomNotifications()
+  const [step, setStep] = useState(0)
   // TODO: the address will be fixed and will always has a default value
   const {
     adexAccount,
-    adexAccount: { balanceToken }
+    adexAccount: {
+      availableBalance,
+      balanceToken,
+      balanceToken: { decimals }
+    },
+    isAdmin
   } = useAccount()
 
   const defaultValue = useMemo(
@@ -53,20 +97,230 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
       outpaceAddr: adexAccount?.address || '0x',
       outpaceAssetDecimals: balanceToken.decimals,
       outpaceChainId: balanceToken.chainId,
-      startsAt: new Date(),
-      endsAt: new Date(Date.now() + WEEK),
-      errorsTargetURLValidations: {}
+      startsAt: new Date(Date.now() + MINUTE * 10),
+      endsAt: new Date(Date.now() + WEEK)
     }),
     [adexAccount?.address, balanceToken?.address, balanceToken?.decimals, balanceToken?.chainId]
   )
 
-  const [campaign, setCampaign] = useState<CampaignUI>(defaultValue)
-  const [selectedBannerSizes, setSelectedBannerSizes] = useState<
-    SupplyStatsDetails[] | SupplyStatsDetails[][]
-  >([])
+  const [allowedBannerSizes, setAllowedBannerSizes] = useState<string[]>([])
+
   const [selectedBidFloors, setSelectedBidFloors] = useState<
     SupplyStatsDetails[] | SupplyStatsDetails[][]
   >([])
+
+  const form = useForm({
+    initialValues: defaultValue,
+    validateInputOnBlur: true,
+    validate: {
+      adUnits: {
+        banner: {
+          format: (value) => {
+            if (step === 0) {
+              const format = `${value?.w}x${value?.h}`
+              return !allowedBannerSizes.some((x) => x === format)
+                ? `The banner size (${format}) does not meet the requirements.`
+                : undefined
+            }
+          },
+          targetUrl: (value, { adUnits }) => {
+            console.log({ adUnits })
+            if (step === 0 && !isValidHttpUrl(value)) {
+              return 'Please enter a valid URL (https://...)'
+            }
+          }
+        }
+      },
+      devices: (value, values) => {
+        if (
+          step === 0 &&
+          values.targetingInput.inputs.placements.in.includes('site') &&
+          !value.length
+        ) {
+          return 'Device/s not selected'
+        }
+      },
+      targetingInput: {
+        inputs: {
+          placements: ({ in: isin }, values) => {
+            if (step === 0 && !isin.length) {
+              return 'Placement not selected'
+            }
+
+            // NOTE: ugly temp hack to validate adUnits length other than internal nits validation
+            if (step === 0 && !values.adUnits.length) {
+              return 'Creatives not uploaded'
+            }
+          },
+          categories: ({ apply, in: isin, nin }) => {
+            if (step === 1) {
+              if (apply === 'in' && !isin.length) {
+                return 'Categories list cannot be empty'
+              }
+              if (apply === 'nin' && !nin.length) {
+                return 'Categories list cannot be empty'
+              }
+            }
+          },
+          location: ({ apply, in: isin, nin }) => {
+            if (step === 1) {
+              if (apply === 'in' && !isin.length) {
+                return 'Countries list cannot be empty'
+              }
+              if (apply === 'nin' && !nin.length) {
+                return 'Countries list cannot be empty'
+              }
+            }
+          },
+          advanced: {
+            limitDailyAverageSpending: (value) =>
+              step === 2 && typeof value !== 'boolean' ? 'Invalid value' : undefined
+          }
+        }
+      },
+      startsAt: (value) => {
+        if (step === 2) {
+          if (value.getTime() <= Date.now()) {
+            return 'The start date cannot be set in the past'
+          }
+        }
+      },
+      endsAt: (value) => {
+        if (step === 2) {
+          if (value.getTime() <= Date.now()) {
+            return 'The end date cannot be set in the past'
+          }
+        }
+      },
+      asapStartingDate: (value) =>
+        step === 2 && typeof value !== 'boolean' ? 'Invalid value' : undefined,
+      currency: (value) => step === 2 && isNotEmpty('Select currency')(value),
+      budget: (value) => {
+        if (step === 2) {
+          if (!value || value === 0 || Number.isNaN(value)) {
+            return 'Enter campaign budget or a valid number'
+          }
+
+          const minAmount = isAdmin ? MIN_CAMPAIGN_BUDGET_VALUE_ADMIN : MIN_CAMPAIGN_BUDGET_VALUE
+
+          if (value < minAmount) {
+            return `Campaign budget cannot be lower than ${minAmount}`
+          }
+          if (validateBudget(value, availableBalance, decimals)) {
+            return 'Available balance is lower than the campaign budget'
+          }
+        }
+      },
+      cpmPricingBounds: {
+        min: (value, { cpmPricingBounds: { max } }) => {
+          if (step === 2) {
+            if (Number(value) === 0 || Number.isNaN(Number(value)))
+              return 'Enter CPM min value or a valid number'
+            if (Number(value) <= 0) return 'CPM min should be greater than 0'
+            if (Number(value) < MIN_CPM_VALUE)
+              return `CPM min cannot be lower than ${MIN_CPM_VALUE}`
+            if (max !== '' && Number(value) >= Number(max))
+              return 'CPM min cannot be greater than CPM max'
+          }
+
+          return null
+        },
+        max: (value, { cpmPricingBounds: { min } }) => {
+          if (step === 2) {
+            if (Number(value) === 0 || Number.isNaN(Number(value)))
+              return 'Enter CPM max value or a valid number'
+            if (Number(value) <= 0) return 'CPM max should be greater than 0'
+            if (min !== '' && Number(value) <= Number(min))
+              return 'CPM max cannot be lower than CPM min'
+          }
+
+          return null
+        }
+      },
+      title: (value) =>
+        step === 2 &&
+        hasLength({ min: 2, max: 100 }, 'Campaign name must contain at least 2 characters')(value)
+    },
+    transformValues: (values) => {
+      const transformedValuesToCampaign: ReducedCampaign = {
+        ...(values.id ? { id: values.id } : {}),
+        type: values.type,
+        outpaceAssetAddr: values.outpaceAssetAddr,
+        outpaceAssetDecimals: values.outpaceAssetDecimals,
+        outpaceAddr: values.outpaceAddr,
+        campaignBudget: parseToBigNumPrecision(
+          Math.floor(Number(BigInt(Number(values.budget)))),
+          decimals
+        ),
+        outpaceChainId: values.outpaceChainId,
+        nonce: values.nonce,
+        title: values.title,
+        adUnits: values.adUnits,
+        pricingBounds: {
+          ...values.pricingBounds,
+          IMPRESSION: {
+            min: parseToBigNumPrecision(Number(values.cpmPricingBounds.min) / 1000, decimals),
+            max: parseToBigNumPrecision(Number(values.cpmPricingBounds.max) / 1000, decimals)
+          }
+        },
+        activeFrom: values.asapStartingDate
+          ? BigInt(Date.now())
+          : BigInt(values.startsAt.getTime()),
+        activeTo: BigInt(values.endsAt.getTime()),
+        targetingInput: values.targetingInput
+      }
+
+      return transformedValuesToCampaign
+    }
+  })
+
+  // NOTE: using this type of update removes current validations!!
+  // TODO: use only form.setFieldValue, form.removeListItem, form.insertListItem
+  // using this + form.validate() has strange behavior as does not work correctly with touched/dirty
+  const updateCampaign = useCallback(
+    (value: Partial<CampaignUI>, validate?: boolean) => {
+      form.setValues(value)
+      // NOTE: as this fn is used to update values out from inputs,
+      // validateInputOnBlur and validateInputOnChange are not working when setValues is used
+      validate && form.validate()
+      console.log(validate)
+    },
+    [form]
+  )
+
+  useEffect(() => {
+    window.onbeforeunload = () => {
+      if (form.isDirty()) {
+        localStorage.setItem(LS_KEY_CREATE_CAMPAIGN, superjson.stringify(form.getValues()))
+        step > 0 && localStorage.setItem(LS_KEY_CREATE_CAMPAIGN_STEP, JSON.stringify(step))
+      }
+      return undefined
+    }
+
+    return () => {
+      window.onbeforeunload = null
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [step])
+
+  useEffect(() => {
+    const savedCampaign = localStorage.getItem(LS_KEY_CREATE_CAMPAIGN)
+    const savedStep = localStorage.getItem(LS_KEY_CREATE_CAMPAIGN_STEP)
+    if (savedCampaign) {
+      const parsedCampaign = superjson.parse<CampaignUI>(savedCampaign)
+      if (parsedCampaign) {
+        updateCampaign(parsedCampaign)
+        form.resetDirty()
+        savedStep && setStep(JSON.parse(savedStep))
+      }
+    }
+  }, []) // eslint-disable-line
+
+  const campaign = useMemo(() => form.getValues(), [form])
+
+  useEffect(() => {
+    updateSupplyStats()
+  }, []) // eslint-disable-line
 
   useEffect(() => {
     const placement = campaign.targetingInput.inputs.placements.in[0]
@@ -75,263 +329,66 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
     const selectedPlatforms: Placement | Devices[] = placement === 'app' ? placement : devices
     if (Array.isArray(selectedPlatforms)) {
       const result = selectedPlatforms.map((platform) => mappedSupplyStats[platform][0])
-      setSelectedBannerSizes(result)
+      setAllowedBannerSizes(result.flat().map((x) => x.value))
       setSelectedBidFloors(selectedPlatforms.map((platform) => mappedSupplyStats[platform][1]))
     } else {
-      setSelectedBannerSizes(selectedPlatforms ? mappedSupplyStats[selectedPlatforms][0] : [])
+      setAllowedBannerSizes(
+        (selectedPlatforms ? mappedSupplyStats[selectedPlatforms][0] : []).map((x) => x.value)
+      )
       setSelectedBidFloors(selectedPlatforms ? mappedSupplyStats[selectedPlatforms][1] : [])
     }
   }, [campaign.devices, campaign.targetingInput.inputs.placements.in, supplyStats])
 
-  useEffect(() => {
-    const savedCampaign = localStorage.getItem('createCampaign')
-    if (savedCampaign) {
-      const parsedCampaign = superjson.parse<CampaignUI>(savedCampaign)
-      if (!deepEqual(parsedCampaign, defaultValue)) {
-        setCampaign(parsedCampaign)
+  const addUTMToTargetURLS = useCallback(() => {
+    const {
+      adUnits,
+      autoUTMChecked,
+      title,
+      targetingInput: {
+        inputs: {
+          placements: {
+            in: [placement]
+          }
+        }
       }
-    }
-  }, [defaultValue])
+    } = { ...campaign }
 
-  useEffect(() => {
-    updateSupplyStats()
-  }, []) // eslint-disable-line
-
-  useEffect(() => {
-    window.onbeforeunload = () => {
-      setCampaign((prev) => {
-        localStorage.setItem('createCampaign', superjson.stringify(prev))
-        return prev
-      })
-      return undefined
-    }
-
-    return () => {
-      window.onbeforeunload = null
-    }
-  }, [])
-
-  const addAdUnit = useCallback(
-    (adUnitToAdd: AdUnit) => {
-      setCampaign((prev) => {
-        const { errorsTargetURLValidations } = { ...prev }
-        const nextValidations = { ...errorsTargetURLValidations }
-        errorsTargetURLValidations[adUnitToAdd.id] = {
-          errMsg: '',
-          success: false,
-          isDirty: false
-        }
-        const updated = {
-          ...prev,
-          adUnits: [...prev.adUnits, adUnitToAdd],
-          errorsTargetURLValidations: nextValidations
-        }
-        return updated
-      })
-    },
-    [setCampaign]
-  )
-
-  const removeAdUnit = useCallback(
-    (adUnitIdToRemove: string) => {
-      setCampaign((prev) => {
-        const { errorsTargetURLValidations } = { ...prev }
-        const nextValidations = { ...errorsTargetURLValidations }
-
-        const updated = {
-          ...prev,
-          adUnits: [...prev.adUnits.filter((item) => item.id !== adUnitIdToRemove)],
-          errorsTargetURLValidations: removeProperty(adUnitIdToRemove, nextValidations)
-        }
-        return updated
-      })
-    },
-    [setCampaign]
-  )
-
-  const validateAdUnitTargetURL = useCallback(() => {
-    setCampaign((prev) => {
-      const adUnits = [...prev.adUnits]
-      const errorsTargetURLValidations = { ...prev.errorsTargetURLValidations }
-
-      const mappedAdUnits = adUnits.map((element) => {
+    if (autoUTMChecked) {
+      adUnits.forEach((element) => {
         const elCopy = { ...element }
-
-        if (elCopy.banner?.targetUrl === '') {
-          errorsTargetURLValidations[elCopy.id] = {
-            isDirty: true,
-            errMsg: '',
-            success: false
-          }
-        } else if (elCopy.banner?.targetUrl && !isValidHttpUrl(elCopy.banner?.targetUrl)) {
-          errorsTargetURLValidations[elCopy.id] = {
-            isDirty: true,
-            errMsg: 'Please enter a valid URL',
-            success: false
-          }
-        } else {
-          errorsTargetURLValidations[elCopy.id] = {
-            isDirty: true,
-            errMsg: '',
-            success: true
-          }
+        if (!isValidHttpUrl(elCopy.banner!.targetUrl)) {
+          return elCopy
         }
 
+        elCopy.banner!.targetUrl = addUrlUtmTracking({
+          targetUrl: elCopy.banner!.targetUrl,
+          campaign: title,
+          content: `${elCopy.banner!.format.w}x${elCopy.banner!.format.h}`,
+          term: placement === 'app' ? 'App' : 'Website'
+        })
         return elCopy
       })
+    }
 
-      return {
-        ...prev,
-        adUnits: mappedAdUnits,
-        errorsTargetURLValidations
-      }
-    })
-  }, [setCampaign])
-
-  const addTargetURLToAdUnit = useCallback(
-    (inputText: string, adUnitId: string) => {
-      setCampaign((prev) => {
-        const { adUnits, errorsTargetURLValidations } = { ...prev }
-        const nextValidations = { ...errorsTargetURLValidations }
-        const mappedAdUnits = adUnits.map((element) => {
-          const elCopy = { ...element }
-
-          if (elCopy.id === adUnitId) {
-            elCopy.banner!.targetUrl = inputText
-
-            if (elCopy.banner?.targetUrl === '') {
-              nextValidations[elCopy.id] = { errMsg: '', success: false, isDirty: true }
-            } else if (elCopy.banner?.targetUrl && !isValidHttpUrl(elCopy.banner?.targetUrl)) {
-              nextValidations[elCopy.id] = {
-                errMsg: 'Please enter a valid URL',
-                success: false,
-                isDirty: true
-              }
-            } else {
-              nextValidations[elCopy.id] = { errMsg: '', success: true, isDirty: true }
-            }
-          }
-
-          return elCopy
-        })
-
-        const updated = {
-          ...prev,
-          adUnits: mappedAdUnits,
-          errorsTargetURLValidations: nextValidations
-        }
-        return updated
-      })
-    },
-    [setCampaign]
-  )
-
-  const addUTMToTargetURLS = useCallback(() => {
-    setCampaign((prev) => {
-      const {
-        adUnits,
-        autoUTMChecked,
-        title,
-        targetingInput: {
-          inputs: {
-            placements: {
-              in: [placement]
-            }
-          }
-        }
-      } = { ...prev }
-
-      if (autoUTMChecked) {
-        adUnits.forEach((element) => {
-          const elCopy = { ...element }
-          if (!isValidHttpUrl(elCopy.banner!.targetUrl)) {
-            return elCopy
-          }
-
-          elCopy.banner!.targetUrl = addUrlUtmTracking({
-            targetUrl: elCopy.banner!.targetUrl,
-            campaign: title,
-            content: `${elCopy.banner!.format.w}x${elCopy.banner!.format.h}`,
-            term: placement === 'app' ? 'App' : 'Website'
-          })
-          return elCopy
-        })
-      }
-
-      const updated = {
-        ...prev,
-        adUnits
-      }
-      return updated
-    })
-  }, [setCampaign])
-
-  const updatePartOfCampaign = useCallback(
-    (value: Partial<CampaignUI>) => {
-      setCampaign((prevState) => ({
-        ...prevState,
-        ...value
-      }))
-    },
-    [setCampaign]
-  )
-
-  const updateCampaign = useCallback(
-    <CampaignItemKey extends keyof CampaignUI>(
-      key: CampaignItemKey,
-      value: CampaignUI[CampaignItemKey]
-    ) => {
-      setCampaign((prevState) => {
-        const updated = { ...prevState }
-        updated[key] = value
-        updated.dirty = true
-        return updated
-      })
-    },
-    [setCampaign]
-  )
-
-  // NOTE: what exactly is the purpose fo this fn ??? Why can not work with updateCampaign or updatePartOfCampaign
-  const updateCampaignWithPrevStateNested = useCallback(
-    (nestedKey: string, value: any) => {
-      setCampaign((prevState) => {
-        const updated = { ...prevState }
-        const keys = nestedKey.split('.')
-        let currentLevel: any = updated
-
-        for (let i = 0; i < keys.length - 1; i++) {
-          if (!(keys[i] in currentLevel)) {
-            currentLevel[keys[i]] = {}
-          }
-          currentLevel = currentLevel[keys[i]]
-        }
-
-        currentLevel[keys[keys.length - 1]] = value
-        updated.dirty = true
-        return updated
-      })
-    },
-    [setCampaign]
-  )
+    updateCampaign({ adUnits })
+  }, [updateCampaign, campaign])
 
   const resetCampaign = useCallback(() => {
-    console.log('resetCampaign', defaultValue)
-    const toSetReset = {
+    form.setInitialValues({
       ...defaultValue,
-      // NOTE: tem fix for reset. Looks like default value is mutated with draft campaigns. It needs total re-write of the create campaign logic.
-      // Will not waste more time atm to fix this
-      errorsTargetURLValidations: {},
-      startsAt: new Date(),
-      endsAt: new Date(Date.now() + WEEK),
-      dirty: false
-    }
-    setCampaign(toSetReset)
-    // Do we need this???
-    localStorage.setItem('createCampaign', superjson.stringify(toSetReset))
-  }, [setCampaign, defaultValue])
+      startsAt: new Date(Date.now() + MINUTE * 10),
+      endsAt: new Date(Date.now() + WEEK)
+    })
+    form.reset()
+    setStep(0)
+    localStorage.removeItem(LS_KEY_CREATE_CAMPAIGN)
+
+    // TODO: see why default values keep adUnits
+    // TODO: fix reset right way
+  }, [defaultValue, form])
 
   const publishCampaign = useCallback(() => {
-    const preparedCampaign = prepareCampaignObject(campaign, balanceToken.decimals)
+    const preparedCampaign = form.getTransformedValues()
 
     return adexServicesRequest('backend', {
       route: '/dsp/campaigns',
@@ -341,64 +398,43 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
         'Content-Type': 'application/json'
       }
     })
-  }, [campaign, adexServicesRequest, balanceToken.decimals])
+  }, [form, adexServicesRequest])
 
-  const saveToDraftCampaign = useCallback(
-    async (camp?: CampaignUI) => {
-      const currCampaign = camp || campaign
-      const preparedCampaign = prepareCampaignObject(currCampaign, balanceToken.decimals)
+  const saveToDraftCampaign = useCallback(async () => {
+    const preparedCampaign = form.getTransformedValues()
 
-      preparedCampaign.title =
-        preparedCampaign.title || `Draft Campaign ${formatDateTime(new Date())}`
+    preparedCampaign.title =
+      preparedCampaign.title || `Draft Campaign ${formatDateTime(new Date())}`
 
-      try {
-        const res = await adexServicesRequest('backend', {
+    try {
+      const res = await adexServicesRequest<{ success?: boolean; campaign: { id: string } }>(
+        'backend',
+        {
           route: '/dsp/campaigns/draft',
           method: 'POST',
           body: preparedCampaign,
           headers: {
             'Content-Type': 'application/json'
           }
-        })
-
-        // TODO: resp Type
-        // @ts-ignore
-        if (!res || !res?.success) {
-          throw new Error('Error on saving draft campaign')
         }
-        return res
-      } catch (err) {
+      )
+
+      if (!res?.success || !res?.campaign.id) {
         throw new Error('Error on saving draft campaign')
       }
-    },
-    [campaign, adexServicesRequest, balanceToken.decimals]
-  )
+      form.resetDirty()
+      form.setFieldValue('id', res?.campaign.id)
+      showNotification('info', 'Draft saved')
+    } catch (err) {
+      showNotification('error', 'Creating campaign failed', 'Data error')
+      throw new Error('Error on saving draft campaign')
+    }
+  }, [adexServicesRequest, form, showNotification])
 
   const updateCampaignFromDraft = useCallback(
     (draftCampaign: Campaign) => {
-      const errorsTargetURLValidations = draftCampaign.adUnits.reduce((acc, adUnit) => {
-        const targetUrl = adUnit.banner?.targetUrl || ''
-        const validationResult = {
-          isDirty: false,
-          errMsg: '',
-          success: false
-        }
-
-        if (targetUrl === '') {
-          validationResult.errMsg = ''
-        } else if (!isValidHttpUrl(targetUrl)) {
-          validationResult.errMsg = 'Please enter a valid URL'
-        } else {
-          validationResult.success = true
-        }
-
-        acc[adUnit.id] = validationResult
-        return acc
-      }, {} as ErrorsTargetURLValidations)
-
       const mappedDraftCampaign: CampaignUI = {
         ...draftCampaign,
-        step: 0,
         devices: ['mobile', 'desktop'],
         paymentModel: 'cpm',
         autoUTMChecked: draftCampaign.adUnits.every((adUnit) =>
@@ -421,57 +457,70 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
             draftCampaign.outpaceAssetDecimals
           ).toString()
         },
-        campaignBudget: BigInt(
-          parseFromBigNumPrecision(
-            BigInt(Math.floor(Number(draftCampaign.campaignBudget))),
-            draftCampaign.outpaceAssetDecimals
-          )
-        ),
-        dirty: false,
-        errorsTargetURLValidations
+        budget: parseFromBigNumPrecision(
+          BigInt(Math.floor(Number(draftCampaign.campaignBudget))),
+          draftCampaign.outpaceAssetDecimals
+        )
       }
 
-      setCampaign(mappedDraftCampaign)
+      updateCampaign(mappedDraftCampaign)
+      form.resetDirty()
     },
-    [balanceToken.name]
+    [balanceToken.name, form, updateCampaign]
+  )
+
+  const nextStep = useCallback(
+    () =>
+      setStep((current) => {
+        if (form.validate().hasErrors) {
+          return current
+        }
+
+        if (current === 2 && form.getValues().autoUTMChecked) {
+          addUTMToTargetURLS()
+        }
+        return current < 4 ? current + 1 : current
+      }),
+    [addUTMToTargetURLS, form]
+  )
+
+  const prevStep = useCallback(
+    () => setStep((current) => (current > 0 ? current - 1 : current)),
+    []
   )
 
   const contextValue = useMemo(
     () => ({
       campaign,
-      updatePartOfCampaign,
       updateCampaign,
-      updateCampaignWithPrevStateNested,
       publishCampaign,
       resetCampaign,
-      addAdUnit,
-      removeAdUnit,
-      addTargetURLToAdUnit,
-      selectedBannerSizes,
+      allowedBannerSizes,
       saveToDraftCampaign,
       updateCampaignFromDraft,
       defaultValue,
       addUTMToTargetURLS,
       selectedBidFloors,
-      validateAdUnitTargetURL
+      form,
+      step,
+      nextStep,
+      prevStep
     }),
     [
       campaign,
-      updatePartOfCampaign,
       updateCampaign,
-      updateCampaignWithPrevStateNested,
       publishCampaign,
       resetCampaign,
-      addAdUnit,
-      removeAdUnit,
-      addTargetURLToAdUnit,
-      selectedBannerSizes,
+      allowedBannerSizes,
       saveToDraftCampaign,
       updateCampaignFromDraft,
       defaultValue,
       addUTMToTargetURLS,
       selectedBidFloors,
-      validateAdUnitTargetURL
+      form,
+      step,
+      nextStep,
+      prevStep
     ]
   )
 

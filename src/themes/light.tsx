@@ -284,11 +284,19 @@ const theme: MantineThemeOverride = createTheme({
       '#5D5229',
       '#4F4729',
       '#433E28'
+    ],
+    error: [
+      '#C4485E',
+      '#C72C48',
+      '#C71636',
+      '#C90024', // Error
+      '#A3122C',
+      '#861D30',
+      '#6F2431',
+      '#5D2731',
+      '#4F282F',
+      '#43272C'
     ]
-    // NOTE: needs 10 shades to work https://mantine.dev/theming/colors/
-    // attention: ['#FFBE4D', '#FFBE4D', '#FFBE4D'],
-    // warning: ['#FF6A42', '#FF6A42', '#FF6A421A'],
-    // error: ['#FB185C', '#FB185C80', '#FB185C80']
   },
   primaryColor: 'brand',
   defaultGradient: {

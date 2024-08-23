@@ -27,7 +27,7 @@ const useCreateCampaignData = () => {
       },
       cpmPricingBounds,
       adUnits,
-      campaignBudget,
+      budget,
       title,
       startsAt,
       endsAt
@@ -120,7 +120,7 @@ const useCreateCampaignData = () => {
     [uniqueSizesWithCount]
   )
 
-  const campaignBudgetFormatted = useMemo(() => campaignBudget.toString(), [campaignBudget])
+  const campaignBudgetFormatted = useMemo(() => budget.toString(), [budget])
   const campaignNameFormatted = useMemo(() => title, [title])
   const adUnitsFormatted = useMemo(
     () => (
