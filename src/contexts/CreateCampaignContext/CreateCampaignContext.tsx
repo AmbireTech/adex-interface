@@ -48,6 +48,8 @@ type ReducedCampaign = Omit<
 const MIN_CAMPAIGN_BUDGET_VALUE_ADMIN = 20
 const MIN_CAMPAIGN_BUDGET_VALUE = 300
 const MIN_CPM_VALUE = 0.1
+const LS_KEY_CREATE_CAMPAIGN = 'createCampaign'
+const LS_KEY_CREATE_CAMPAIGN_STEP = 'createCampaignStep'
 
 const isValidHttpUrl = (inputURL: string) => {
   try {
@@ -289,6 +291,10 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
   )
 
   useEffect(() => {
+    updateSupplyStats()
+  }, []) // eslint-disable-line
+
+  useEffect(() => {
     const placement = campaign.targetingInput.inputs.placements.in[0]
     const devices = campaign.devices
     const mappedSupplyStats: Record<string, SupplyStatsDetails[][]> = selectBannerSizes(supplyStats)
@@ -306,27 +312,24 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
   }, [campaign.devices, campaign.targetingInput.inputs.placements.in, supplyStats])
 
   useEffect(() => {
-    const savedCampaign = localStorage.getItem('createCampaign')
-    const savedStep = localStorage.getItem('createCampaignStep')
+    const savedCampaign = localStorage.getItem(LS_KEY_CREATE_CAMPAIGN)
+    const savedStep = localStorage.getItem(LS_KEY_CREATE_CAMPAIGN_STEP)
     if (savedCampaign) {
       const parsedCampaign = superjson.parse<CampaignUI>(savedCampaign)
       if (parsedCampaign) {
         updateCampaign(parsedCampaign)
         form.resetDirty()
+        savedStep && setStep(JSON.parse(savedStep))
       }
-      savedStep && setStep(JSON.parse(savedStep))
     }
-  }, []) // eslint-disable-line
-
-  useEffect(() => {
-    updateSupplyStats()
   }, []) // eslint-disable-line
 
   useEffect(() => {
     window.onbeforeunload = () => {
       if (form.isDirty()) {
-        localStorage.setItem('createCampaign', superjson.stringify(form.getValues()))
-        step > 0 && localStorage.setItem('createCampaignStep', JSON.stringify(step))
+        console.log('save dirty campaign')
+        localStorage.setItem(LS_KEY_CREATE_CAMPAIGN, superjson.stringify(form.getValues()))
+        step > 0 && localStorage.setItem(LS_KEY_CREATE_CAMPAIGN_STEP, JSON.stringify(step))
       }
       return undefined
     }
@@ -334,7 +337,8 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
     return () => {
       window.onbeforeunload = null
     }
-  }, [form, step])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [step])
 
   const addUTMToTargetURLS = useCallback(() => {
     const {
@@ -373,6 +377,9 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
   const resetCampaign = useCallback(() => {
     form.reset()
     setStep(0)
+    localStorage.removeItem(LS_KEY_CREATE_CAMPAIGN)
+    // TODO: see why default values keep adUnits
+    // TODO: fix reset right way
   }, [form])
 
   const publishCampaign = useCallback(() => {
