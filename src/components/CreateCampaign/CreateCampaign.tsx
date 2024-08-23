@@ -1,4 +1,4 @@
-import { Grid, Stack, Paper, Text } from '@mantine/core'
+import { Flex, Stack, Paper, Text } from '@mantine/core'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { modals } from '@mantine/modals'
@@ -111,21 +111,18 @@ const CreateCampaign = () => {
 
   return (
     <form onSubmit={form.onSubmit(confirmLaunch)}>
-      <Grid columns={24} mr="xl" ml="xl" mt="md">
-        <Grid.Col span={{ sm: 24, lg: 18 }}>
-          <Paper p="md" shadow="xs">
-            <Stack gap="xl">
-              <CustomStepper stepsCount={4} />
-              <Wizard step={step} />
-            </Stack>
-          </Paper>
-        </Grid.Col>
-        <Grid.Col span={{ sm: 24, lg: 6 }}>
-          <Paper p="md" shadow="sm">
-            <CampaignSummary />
-          </Paper>
-        </Grid.Col>
-      </Grid>
+      <Flex direction="row" gap="xl" justify="stretch" wrap="wrap">
+        <Paper p="md" shadow="xs" style={{ flexGrow: 69 }}>
+          <Stack gap="xl">
+            <CustomStepper stepsCount={4} />
+            <Wizard step={step} />
+          </Stack>
+        </Paper>
+
+        <Paper p="md" shadow="sm" miw={330} style={{ flexGrow: 1 }}>
+          <CampaignSummary />
+        </Paper>
+      </Flex>
       <SuccessModal
         text={
           <Text p="md">
