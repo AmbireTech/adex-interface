@@ -35,7 +35,7 @@ const CampaignSummary = () => {
 
   return (
     <>
-      <Stack align="stretch">
+      <Stack>
         <CampaignDetailsRow
           lighterColor
           title="Budget"

@@ -9,7 +9,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import CustomTable, { TableElement, TableRowAction } from 'components/common/CustomTable'
 import { useNavigate } from 'react-router-dom'
 import { useCampaignsData } from 'hooks/useCampaignsData'
-import { parseBigNumTokenAmountToDecimal, maskAddress, periodNumberToDate } from 'helpers'
+import { parseBigNumTokenAmountToDecimal, maskAddress, periodNumberToDate, MINUTE } from 'helpers'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import useCustomNotifications from 'hooks/useCustomNotifications'
 import { modals } from '@mantine/modals'
@@ -238,17 +238,20 @@ const Dashboard = ({ isAdminPanel, accountId }: { isAdminPanel?: boolean; accoun
       }
 
       if (data.campaign) {
-        updateCampaignFromDraft({
-          ...data.campaign,
-          ...(isDuplicate && {
-            id: '',
-            title: `Copy - ${data.campaign.title}`,
-            activeFrom: BigInt(Date.now()),
-            activeTo:
-              BigInt(Date.now()) + BigInt(data.campaign.activeTo - data.campaign.activeFrom),
-            status: CampaignStatus.created
-          })
-        })
+        updateCampaignFromDraft(
+          {
+            ...data.campaign,
+            ...(isDuplicate && {
+              id: '',
+              title: `Copy - ${data.campaign.title}`,
+              activeFrom: BigInt(Date.now() + 10 * MINUTE),
+              activeTo:
+                BigInt(Date.now()) + BigInt(data.campaign.activeTo - data.campaign.activeFrom),
+              status: CampaignStatus.created
+            })
+          },
+          true
+        )
         navigate('/dashboard/create-campaign', {})
       } else {
         showNotification('error', 'Editing draft campaign failed', 'Editing draft campaign failed')
