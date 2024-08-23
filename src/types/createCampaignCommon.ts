@@ -57,7 +57,7 @@ export type CreateCampaignType = {
   publishCampaign: () => Promise<any>
   resetCampaign: () => void
   allowedBannerSizes: string[]
-  saveToDraftCampaign: () => Promise<any>
+  saveToDraftCampaign: () => Promise<void>
   updateCampaignFromDraft: (draftCampaign: Campaign) => void
   defaultValue: CampaignUI
   addUTMToTargetURLS: () => void

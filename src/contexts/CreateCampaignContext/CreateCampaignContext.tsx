@@ -274,8 +274,6 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
     }
   })
 
-  const campaign = useMemo(() => form.getValues(), [form])
-
   // NOTE: using this type of update removes current validations!!
   // TODO: use only form.setFieldValue, form.removeListItem, form.insertListItem
   // using this + form.validate() has strange behavior as does not work correctly with touched/dirty
@@ -289,6 +287,36 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
     },
     [form]
   )
+
+  useEffect(() => {
+    window.onbeforeunload = () => {
+      if (form.isDirty()) {
+        localStorage.setItem(LS_KEY_CREATE_CAMPAIGN, superjson.stringify(form.getValues()))
+        step > 0 && localStorage.setItem(LS_KEY_CREATE_CAMPAIGN_STEP, JSON.stringify(step))
+      }
+      return undefined
+    }
+
+    return () => {
+      window.onbeforeunload = null
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [step])
+
+  useEffect(() => {
+    const savedCampaign = localStorage.getItem(LS_KEY_CREATE_CAMPAIGN)
+    const savedStep = localStorage.getItem(LS_KEY_CREATE_CAMPAIGN_STEP)
+    if (savedCampaign) {
+      const parsedCampaign = superjson.parse<CampaignUI>(savedCampaign)
+      if (parsedCampaign) {
+        updateCampaign(parsedCampaign)
+        form.resetDirty()
+        savedStep && setStep(JSON.parse(savedStep))
+      }
+    }
+  }, []) // eslint-disable-line
+
+  const campaign = useMemo(() => form.getValues(), [form])
 
   useEffect(() => {
     updateSupplyStats()
@@ -310,35 +338,6 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
       setSelectedBidFloors(selectedPlatforms ? mappedSupplyStats[selectedPlatforms][1] : [])
     }
   }, [campaign.devices, campaign.targetingInput.inputs.placements.in, supplyStats])
-
-  useEffect(() => {
-    const savedCampaign = localStorage.getItem(LS_KEY_CREATE_CAMPAIGN)
-    const savedStep = localStorage.getItem(LS_KEY_CREATE_CAMPAIGN_STEP)
-    if (savedCampaign) {
-      const parsedCampaign = superjson.parse<CampaignUI>(savedCampaign)
-      if (parsedCampaign) {
-        updateCampaign(parsedCampaign)
-        form.resetDirty()
-        savedStep && setStep(JSON.parse(savedStep))
-      }
-    }
-  }, []) // eslint-disable-line
-
-  useEffect(() => {
-    window.onbeforeunload = () => {
-      if (form.isDirty()) {
-        console.log('save dirty campaign')
-        localStorage.setItem(LS_KEY_CREATE_CAMPAIGN, superjson.stringify(form.getValues()))
-        step > 0 && localStorage.setItem(LS_KEY_CREATE_CAMPAIGN_STEP, JSON.stringify(step))
-      }
-      return undefined
-    }
-
-    return () => {
-      window.onbeforeunload = null
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [step])
 
   const addUTMToTargetURLS = useCallback(() => {
     const {
@@ -376,11 +375,17 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
 
   const resetCampaign = useCallback(() => {
     form.reset()
+    form.setInitialValues({
+      ...defaultValue,
+      startsAt: new Date(Date.now() + MINUTE * 10),
+      endsAt: new Date(Date.now() + WEEK)
+    })
     setStep(0)
     localStorage.removeItem(LS_KEY_CREATE_CAMPAIGN)
+
     // TODO: see why default values keep adUnits
     // TODO: fix reset right way
-  }, [form])
+  }, [defaultValue, form])
 
   const publishCampaign = useCallback(() => {
     const preparedCampaign = form.getTransformedValues()
@@ -411,12 +416,11 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
         }
       })
 
-      if (!res || !res?.success) {
-        showNotification('info', 'Draft saved')
+      if (!res?.success) {
         throw new Error('Error on saving draft campaign')
       }
       form.resetDirty()
-      return res
+      showNotification('info', 'Draft saved')
     } catch (err) {
       showNotification('error', 'Creating campaign failed', 'Data error')
       throw new Error('Error on saving draft campaign')
