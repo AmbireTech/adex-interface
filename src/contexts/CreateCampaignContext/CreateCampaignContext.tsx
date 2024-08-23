@@ -61,9 +61,9 @@ const isValidHttpUrl = (inputURL: string) => {
   return url.protocol === 'http:' || url.protocol === 'https:'
 }
 
-const validateBudget = (value: bigint, availableBalance: bigint, decimals: number) => {
-  const formattedToken = Number(parseBigNumTokenAmountToDecimal(availableBalance, decimals))
-  return formattedToken < Number(value)
+const validateBudget = (value: number, availableBalance: bigint, decimals: number) => {
+  const parsedBalance = Number(parseBigNumTokenAmountToDecimal(availableBalance, decimals))
+  return parsedBalance < value
 }
 
 const CreateCampaignContext = createContext<CreateCampaignType | null>(null)
@@ -194,16 +194,16 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
       currency: (value) => step === 2 && isNotEmpty('Select currency')(value),
       budget: (value) => {
         if (step === 2) {
-          if (!value || Number(value) === 0 || Number.isNaN(Number(value))) {
+          if (!value || value === 0 || Number.isNaN(value)) {
             return 'Enter campaign budget or a valid number'
           }
 
           const minAmount = isAdmin ? MIN_CAMPAIGN_BUDGET_VALUE_ADMIN : MIN_CAMPAIGN_BUDGET_VALUE
 
-          if (Number(value) < minAmount) {
+          if (value < minAmount) {
             return `Campaign budget cannot be lower than ${minAmount}`
           }
-          if (validateBudget(BigInt(Number(value)), availableBalance, decimals)) {
+          if (validateBudget(value, availableBalance, decimals)) {
             return 'Available balance is lower than the campaign budget'
           }
         }
@@ -419,7 +419,6 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
     (draftCampaign: Campaign) => {
       const mappedDraftCampaign: CampaignUI = {
         ...draftCampaign,
-        step: 0,
         devices: ['mobile', 'desktop'],
         paymentModel: 'cpm',
         autoUTMChecked: draftCampaign.adUnits.every((adUnit) =>
@@ -445,7 +444,7 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
         budget: parseFromBigNumPrecision(
           BigInt(Math.floor(Number(draftCampaign.campaignBudget))),
           draftCampaign.outpaceAssetDecimals
-        ).toString()
+        )
       }
 
       updateCampaign(mappedDraftCampaign)

@@ -5,6 +5,7 @@ import {
   Flex,
   Grid,
   Group,
+  NumberInput,
   Radio,
   Text,
   TextInput,
@@ -96,7 +97,9 @@ const StepThree = () => {
       </Grid.Col>
       <Grid.Col mb="md">
         <Flex justify="space-between" align="flex-start">
-          <TextInput
+          <NumberInput
+            allowDecimal
+            hideControls
             label={
               <Text c="secondaryText" size="sm" fw="bold" mb="xs">
                 4. Campaign Budget
@@ -104,7 +107,7 @@ const StepThree = () => {
             }
             size="md"
             w={{ sm: '100%', lg: '50%' }}
-            placeholder="Campaign Budget"
+            placeholder="Enter campaign budget"
             // TODO: Should get/calculate estimated fee
             // description={`Estimated fee: 0.15 ${balanceToken.name}`}
             inputWrapperOrder={['label', 'input', 'description', 'error']}

@@ -53,7 +53,6 @@ export const DEFAULT_PLACEMENTS_VALUE: TargetingPlacementInput = {
 export const CREATE_CAMPAIGN_DEFAULT_VALUE: CampaignUI = {
   id: '',
   type: 0,
-  step: 0,
   devices: ['desktop', 'mobile'],
   paymentModel: 'cpm',
   startsAt: new Date(),
@@ -61,7 +60,7 @@ export const CREATE_CAMPAIGN_DEFAULT_VALUE: CampaignUI = {
   currency: '',
   autoUTMChecked: false,
   asapStartingDate: false,
-  budget: '',
+  budget: 0,
   outpaceAssetAddr: '',
   outpaceAssetDecimals: 0,
   outpaceAddr: '',

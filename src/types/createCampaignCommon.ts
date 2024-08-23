@@ -8,7 +8,6 @@ export type SelectData = { value: string | Alpha3Code; label: string; group?: st
 export type PaymentModelType = 'cpm' | 'cpc'
 
 export type CampaignUI = Campaign & {
-  step: number
   devices: Devices[]
   paymentModel: PaymentModelType
   startsAt: Date
@@ -22,7 +21,7 @@ export type CampaignUI = Campaign & {
   updated?: string
   autoUTMChecked: boolean
   asapStartingDate: boolean
-  budget: string
+  budget: number
 }
 
 export type ImageSizes = {
