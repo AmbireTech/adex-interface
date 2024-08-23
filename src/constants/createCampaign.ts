@@ -54,7 +54,7 @@ export const CREATE_CAMPAIGN_DEFAULT_VALUE: CampaignUI = {
   id: '',
   type: 0,
   step: 0,
-  devices: [],
+  devices: ['desktop', 'mobile'],
   paymentModel: 'cpm',
   startsAt: new Date(),
   endsAt: dateNowPlusThirtyDays(),

@@ -14,7 +14,7 @@ import useAccount from 'hooks/useAccount'
 import { useAdExApi } from 'hooks/useAdexServices'
 import {
   addUrlUtmTracking,
-  deepEqual,
+  // deepEqual,
   hasUtmCampaign,
   selectBannerSizes
 } from 'helpers/createCampaignHelpers'
@@ -24,7 +24,7 @@ import {
   parseToBigNumPrecision
 } from 'helpers/balances'
 import { Campaign, Placement } from 'adex-common'
-import { formatDateTime, WEEK } from 'helpers'
+import { formatDateTime, MINUTE, WEEK } from 'helpers'
 import { useCampaignsData } from 'hooks/useCampaignsData'
 import { hasLength, isNotEmpty, useForm } from '@mantine/form'
 import useCustomNotifications from 'hooks/useCustomNotifications'
@@ -94,7 +94,7 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
       outpaceAddr: adexAccount?.address || '0x',
       outpaceAssetDecimals: balanceToken.decimals,
       outpaceChainId: balanceToken.chainId,
-      startsAt: new Date(),
+      startsAt: new Date(Date.now() + MINUTE * 10),
       endsAt: new Date(Date.now() + WEEK)
     }),
     [adexAccount?.address, balanceToken?.address, balanceToken?.decimals, balanceToken?.chainId]
@@ -108,11 +108,7 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
 
   const form = useForm({
     initialValues: defaultValue,
-    validateInputOnChange: ['adUnits'],
     validateInputOnBlur: true,
-    initialDirty: {
-      adUnits: true
-    },
     validate: {
       adUnits: {
         banner: {
@@ -125,12 +121,20 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
             }
           },
           targetUrl: (value, { adUnits }) => {
-            console.log({ value })
             console.log({ adUnits })
             if (step === 0 && !isValidHttpUrl(value)) {
               return 'Please enter a valid URL'
             }
           }
+        }
+      },
+      devices: (value, values) => {
+        if (
+          step === 0 &&
+          values.targetingInput.inputs.placements.in.includes('site') &&
+          !value.length
+        ) {
+          return 'Device/s not selected'
         }
       },
       targetingInput: {
@@ -142,7 +146,7 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
 
             // NOTE: ugly temp hack to validate adUnits length other than internal nits validation
             if (step === 0 && !values.adUnits.length) {
-              return 'Ad units not selected'
+              return 'Creatives not uploaded'
             }
           },
           categories: ({ apply, in: isin, nin }) => {
@@ -274,13 +278,10 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
   // using this + form.validate() has strange behavior as does not work correctly with touched/dirty
   const updateCampaign = useCallback(
     (value: Partial<CampaignUI>, validate?: boolean) => {
-      form.setValues((prev) => ({
-        ...prev,
-        ...value
-      }))
+      form.setValues(value)
       // NOTE: as this fn is used to update values out from inputs,
       // validateInputOnBlur and validateInputOnChange are not working when setValues is used
-      form.validate()
+      validate && form.validate()
       console.log(validate)
     },
     [form]
@@ -305,11 +306,14 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
 
   useEffect(() => {
     const savedCampaign = localStorage.getItem('createCampaign')
+    const savedStep = localStorage.getItem('createCampaignStep')
     if (savedCampaign) {
       const parsedCampaign = superjson.parse<CampaignUI>(savedCampaign)
-      if (!deepEqual(parsedCampaign, defaultValue)) {
+      if (parsedCampaign) {
         updateCampaign(parsedCampaign)
+        form.resetDirty()
       }
+      savedStep && setStep(JSON.parse(savedStep))
     }
   }, []) // eslint-disable-line
 
@@ -317,21 +321,19 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
     updateSupplyStats()
   }, []) // eslint-disable-line
 
-  // useEffect(() => {
-  //   form.validate()
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [step])
-
   useEffect(() => {
     window.onbeforeunload = () => {
-      localStorage.setItem('createCampaign', superjson.stringify(form.getValues()))
+      if (form.isDirty()) {
+        localStorage.setItem('createCampaign', superjson.stringify(form.getValues()))
+        step > 0 && localStorage.setItem('createCampaignStep', JSON.stringify(step))
+      }
       return undefined
     }
 
     return () => {
       window.onbeforeunload = null
     }
-  }, []) // eslint-disable-line
+  }, [form, step])
 
   const addUTMToTargetURLS = useCallback(() => {
     const {
@@ -368,19 +370,9 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
   }, [updateCampaign, campaign])
 
   const resetCampaign = useCallback(() => {
-    form.resetTouched()
-    form.resetDirty()
     form.reset()
-    const toSetReset = {
-      ...defaultValue,
-      startsAt: new Date(),
-      endsAt: new Date(Date.now() + WEEK),
-      dirty: false
-    }
-    updateCampaign(toSetReset)
-    // Do we need this???
-    localStorage.setItem('createCampaign', superjson.stringify(toSetReset))
-  }, [form, defaultValue, updateCampaign])
+    setStep(0)
+  }, [form])
 
   const publishCampaign = useCallback(() => {
     const preparedCampaign = form.getTransformedValues()
@@ -402,7 +394,7 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
       preparedCampaign.title || `Draft Campaign ${formatDateTime(new Date())}`
 
     try {
-      const res = await adexServicesRequest('backend', {
+      const res = await adexServicesRequest<{ success?: boolean }>('backend', {
         route: '/dsp/campaigns/draft',
         method: 'POST',
         body: preparedCampaign,
@@ -411,8 +403,6 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
         }
       })
 
-      // TODO: resp Type
-      // @ts-ignore
       if (!res || !res?.success) {
         showNotification('info', 'Draft saved')
         throw new Error('Error on saving draft campaign')

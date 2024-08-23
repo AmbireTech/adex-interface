@@ -28,7 +28,7 @@ const UploadedBanners = () => {
       />
 
       {adUnits.map((image: AdUnit, index: number) => {
-        return <ImageUrlInput image={image} index={index} form={form} />
+        return <ImageUrlInput key={image.id} image={image} index={index} form={form} />
       })}
     </Stack>
   ) : null

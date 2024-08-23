@@ -1,32 +1,37 @@
-import { Flex, Text } from '@mantine/core'
+import { Group, Stack, Text } from '@mantine/core'
 import CustomCard from 'components/common/CustomCard'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import DesktopIcon from 'resources/icons/Desktop'
 import MobileIcon from 'resources/icons/Mobile'
 import { Devices } from 'types'
+import InfoAlertMessage from 'components/common/InfoAlertMessage'
 
 const SelectDevice = () => {
   const {
     campaign: { devices },
-    form
+    form: { removeListItem, insertListItem, validateField, errors }
   } = useCreateCampaignContext()
 
   const toggleDeviceSelection = (device: Devices) => {
     const index = devices.indexOf(device)
 
     if (index > -1) {
-      form.removeListItem('devices', devices.indexOf(device))
+      removeListItem('devices', devices.indexOf(device))
     } else {
-      form.insertListItem('devices', device)
+      insertListItem('devices', device)
     }
+
+    // TODO: add context fn or use it as custom validation on change
+    // NOTE: in order validateField to work with specific field, the field has to be form in validate props
+    validateField('devices')
   }
 
   return (
-    <>
-      <Text c="secondaryText" size="sm" fw="bold" mb="xs">
+    <Stack gap="xs">
+      <Text c="secondaryText" size="sm" fw="bold">
         2. Select device
       </Text>
-      <Flex gap={20} justify="space-between">
+      <Group justify="space-between">
         <CustomCard
           width="48%"
           height={100}
@@ -49,8 +54,9 @@ const SelectDevice = () => {
           variant="shadow"
           hasCheckMark
         />
-      </Flex>
-    </>
+      </Group>
+      {errors.devices && <InfoAlertMessage message={errors.devices} />}
+    </Stack>
   )
 }
 

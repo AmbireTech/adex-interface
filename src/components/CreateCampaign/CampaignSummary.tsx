@@ -21,8 +21,7 @@ const CampaignSummary = () => {
     saveToDraftCampaign,
     step,
     nextStep,
-    prevStep,
-    form
+    prevStep
   } = useCreateCampaignContext()
   const {
     formattedSelectedDevice,
@@ -101,7 +100,7 @@ const CampaignSummary = () => {
             Launch Campaign
           </Button>
         ) : (
-          <Button disabled={!form.isValid()} size="lg" variant="filled" onClick={nextStep}>
+          <Button size="lg" variant="filled" onClick={nextStep}>
             Next Step
           </Button>
         )}

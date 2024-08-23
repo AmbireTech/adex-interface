@@ -9,10 +9,11 @@ import {
   parseThemeColor,
   useMantineTheme
 } from '@mantine/core'
+import { ReactNode } from 'react'
 
 import InfoCurlyBorder from 'resources/icons/InfoCurlyBorder'
 
-const InfoAlertMessage = ({ message }: { message: string }) => {
+const InfoAlertMessage = ({ message }: { message: ReactNode }) => {
   // NOTE: just testing, need better color handle
   const theme = useMantineTheme()
   const parsedColor = parseThemeColor({ color: 'warning', theme })
