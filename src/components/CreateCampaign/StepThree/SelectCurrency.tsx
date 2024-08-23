@@ -28,7 +28,6 @@ const SelectCurrency = ({ defaultValue, onChange, error }: SelectCurrencyProps) 
       onChange={onChange}
       error={error}
       placeholder="Select Currency"
-      maw={{ sm: '100%', lg: '50%' }}
     />
   )
 }

@@ -43,7 +43,6 @@ const CampaignPeriod = () => {
         wrap="wrap"
         direction="row"
         justify="space-between"
-        maw={{ sm: '100%', lg: '50%' }}
         align="center"
         className={classes.wrapper}
       >

@@ -19,7 +19,7 @@ const InfoAlertMessage = ({ message }: { message: ReactNode }) => {
   const parsedColor = parseThemeColor({ color: 'warning', theme })
   return (
     <Paper withBorder shadow="xs">
-      <Group align="center">
+      <Group align="center" wrap="nowrap">
         <Box
           p="sm"
           bg={lighten(
@@ -34,7 +34,9 @@ const InfoAlertMessage = ({ message }: { message: ReactNode }) => {
           </Center>
         </Box>
 
-        <Text size="sm">{message}</Text>
+        <Text size="sm" span>
+          {message?.toString()}
+        </Text>
       </Group>
     </Paper>
   )
