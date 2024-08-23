@@ -39,7 +39,7 @@ const StepThree = () => {
   )
 
   return (
-    <Stack gap="xl" maw={666}>
+    <Stack gap="xl">
       <Stack gap="xs">
         <Text c="secondaryText" size="sm" fw="bold">
           1. Campaign Period

@@ -31,10 +31,10 @@ const SelectDevice = () => {
       <Text c="secondaryText" size="sm" fw="bold">
         2. Select device
       </Text>
-      <Group justify="space-between">
+      <Group grow wrap="wrap">
         <CustomCard
-          width="48%"
-          height={100}
+          width="auto"
+          height="auto"
           text="Mobile"
           iconLeft={<MobileIcon size="24px" />}
           color="brand"
@@ -44,8 +44,8 @@ const SelectDevice = () => {
           hasCheckMark
         />
         <CustomCard
-          width="48%"
-          height={100}
+          width="auto"
+          height="auto"
           iconLeft={<DesktopIcon size="24px" />}
           text="Desktop"
           color="brand"

@@ -1,4 +1,4 @@
-import { Flex, Stack, Paper, Text } from '@mantine/core'
+import { Flex, Stack, Paper, Text, Box } from '@mantine/core'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { modals } from '@mantine/modals'
@@ -115,7 +115,9 @@ const CreateCampaign = () => {
         <Paper p="md" shadow="xs" style={{ flexGrow: 69 }}>
           <Stack gap="xl">
             <CustomStepper stepsCount={4} />
-            <Wizard step={step} />
+            <Box maw={720}>
+              <Wizard step={step} />
+            </Box>
           </Stack>
         </Paper>
 
