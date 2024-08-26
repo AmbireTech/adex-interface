@@ -267,14 +267,13 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
         <Paper p="lg" shadow="xs">
           <Grid gutter="lg">
             <Grid.Col span={{ md: 12, xl: 6 }}>
-              <Stack>
+              <Stack gap="xl">
                 <Text fw="bold" size="sm" c="dimmed">
                   Overview
                 </Text>
                 <Paper bg="lightBackground" p="md" withBorder>
                   {isAdminPanel && (
                     <CampaignDetailsRow
-                      lineHeight="sm"
                       textSize="sm"
                       title="Owner"
                       value={
@@ -289,20 +288,9 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
                       }
                     />
                   )}
+                  <CampaignDetailsRow textSize="sm" title="Title" value={campaign?.title} />
+                  <CampaignDetailsRow textSize="sm" title="Id" value={campaign?.id} />
                   <CampaignDetailsRow
-                    lineHeight="sm"
-                    textSize="sm"
-                    title="Title"
-                    value={campaign?.title}
-                  />
-                  <CampaignDetailsRow
-                    lineHeight="sm"
-                    textSize="sm"
-                    title="Id"
-                    value={campaign?.id}
-                  />
-                  <CampaignDetailsRow
-                    lineHeight="sm"
                     textSize="sm"
                     title="Status"
                     value={
@@ -315,7 +303,6 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
                   />
                   {/* TODO: Add data for it */}
                   <CampaignDetailsRow
-                    lineHeight="sm"
                     textSize="sm"
                     title="Served"
                     // value={campaignData?.share}
@@ -323,7 +310,6 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
                   />
                   {/* TODO: Add data for it */}
                   <CampaignDetailsRow
-                    lineHeight="sm"
                     textSize="sm"
                     title="Budget"
                     value={
@@ -336,12 +322,10 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
                     }
                   />
                   <CampaignDetailsRow
-                    lineHeight="sm"
                     title="Created"
                     value={formatDateTime(new Date(Number(campaign.created)))}
                   />
                   <CampaignDetailsRow
-                    lineHeight="sm"
                     textSize="sm"
                     title="Starts"
                     value={
@@ -351,7 +335,6 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
                     }
                   />
                   <CampaignDetailsRow
-                    lineHeight="sm"
                     textSize="sm"
                     title="Ends"
                     value={
@@ -361,7 +344,6 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
                     }
                   />
                   <CampaignDetailsRow
-                    lineHeight="sm"
                     title="CPM min"
                     value={
                       campaign.pricingBounds.IMPRESSION?.min && (
@@ -376,7 +358,6 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
                     }
                   />
                   <CampaignDetailsRow
-                    lineHeight="sm"
                     title="CPM max"
                     value={
                       campaign.pricingBounds.IMPRESSION?.max && (
@@ -391,7 +372,6 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
                     }
                   />
                   <CampaignDetailsRow
-                    lineHeight="sm"
                     textSize="sm"
                     title="Limit average daily spending"
                     value={
@@ -401,7 +381,6 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
                     }
                   />
                   <CampaignDetailsRow
-                    lineHeight="sm"
                     textSize="sm"
                     title="Last modified by"
                     noBorder
@@ -451,7 +430,6 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
                           return (
                             <CampaignDetailsRow
                               key={item.id}
-                              lineHeight="sm"
                               textSize="sm"
                               title={`${item.banner?.format.w}x${item.banner?.format.h}`}
                               value={
