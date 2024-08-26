@@ -439,6 +439,7 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
                                   title={`Target URL: ${item.banner?.targetUrl}`}
                                 />
                               }
+                              align="center"
                               noBorder={isLast}
                             />
                           )

@@ -1,5 +1,13 @@
-import { Divider, Flex, Text } from '@mantine/core'
-import { CampaignDetailsRowProps } from 'types'
+import { Divider, Flex, Text, FlexProps, MantineFontSize } from '@mantine/core'
+
+export type CampaignDetailsRowProps = FlexProps & {
+  title: string
+  value: any | undefined
+  lighterColor?: boolean | undefined
+  textSize?: MantineFontSize
+  noBorder?: boolean
+  column?: boolean
+}
 
 const CampaignDetailsRow = ({
   title,
@@ -7,7 +15,8 @@ const CampaignDetailsRow = ({
   lighterColor,
   textSize = 'md',
   noBorder = false,
-  column = false
+  column = false,
+  ...flexProps
 }: CampaignDetailsRowProps) => {
   return (
     <>
@@ -18,6 +27,7 @@ const CampaignDetailsRow = ({
         c={lighterColor ? 'secondaryText' : 'mainText'}
         gap="xs"
         p="xs"
+        {...flexProps}
       >
         <Text fw="bold" size={textSize} c="secondaryText">
           {title}
