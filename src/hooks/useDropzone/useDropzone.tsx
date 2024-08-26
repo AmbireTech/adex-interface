@@ -11,6 +11,7 @@ import {
 import { FileWithPath } from '@mantine/dropzone'
 import useMediaUpload from 'hooks/useMediaUpload'
 import useCustomNotifications from 'hooks/useCustomNotifications'
+import { getRandomHexString } from 'helpers'
 
 const IPFS_GATEWAY = process.env.REACT_APP_IPFS_GATEWAY || ''
 
@@ -21,8 +22,7 @@ const useDropzone = () => {
 
   const {
     campaign: { adUnits },
-    // updateCampaign,
-    form
+    form: { insertListItem, validateField }
   } = useCreateCampaignContext()
   const { uploadMedia, uploadZipMedia } = useMediaUpload()
 
@@ -51,8 +51,7 @@ const useDropzone = () => {
         }
 
         const adUnit = {
-          // TODO: unit id
-          id: `${file.name.replace(/\s+/g, '')}-${Date.now().toString(16)}`,
+          id: getRandomHexString(32),
           title: file.name,
           type: isVideoMedia(file.type) ? AdUnitType.Video : AdUnitType.Banner,
           banner: {
@@ -107,19 +106,17 @@ const useDropzone = () => {
         return !isAlradyUploaded
       })
 
-      console.log({ newFiles })
-
       try {
         const adUnitsToAdd: AdUnit[] = await Promise.all(
           newFiles.map((file: FileWithPath) => getAdUnitFromFile(file))
         )
 
         adUnitsToAdd.forEach((u, i) => {
-          form.insertListItem('adUnits', u)
+          insertListItem('adUnits', u)
           // TODO: add context fn if needed in other place
           // This is special case where we need to validate format immediately but keep
           // urls as untouched to avoid showing error on upload
-          form.validateField(`adUnits.${adUnits.length + i}.banner.format`)
+          validateField(`adUnits.${adUnits.length + i}.banner.format`)
         })
 
         // const updatedAdUnits = adUnits.concat(adUnitsToAdd)
@@ -132,7 +129,7 @@ const useDropzone = () => {
       setIsLoading(false)
       setUploadedFiles(null)
     },
-    [adUnits, showNotification, getAdUnitFromFile, form]
+    [adUnits, showNotification, getAdUnitFromFile, insertListItem, validateField]
   )
 
   useEffect(() => {
