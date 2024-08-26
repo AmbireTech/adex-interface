@@ -1,17 +1,13 @@
 import {
   ScrollArea,
-  Box,
+  Stack,
   UnstyledButton,
   Text,
-  useMantineTheme,
-  rem,
   AppShell,
-  MantineTheme,
-  getPrimaryShade,
-  MantineColorShade
+  Center,
+  Divider,
+  Box
 } from '@mantine/core'
-import { createStyles } from '@mantine/emotion'
-import { useColorScheme } from '@mantine/hooks'
 import { useMatch, useLocation, useResolvedPath, Link } from 'react-router-dom'
 import useAccount from 'hooks/useAccount'
 import DashboardIcon from 'resources/icons/Dashboard'
@@ -26,32 +22,6 @@ import NavLink from './NavLink'
 import Balance from './Balance'
 import CreateCampaignBtn from './CreateCampaignBtn'
 
-const useStyles = createStyles(
-  (theme: MantineTheme, { primaryShade }: { primaryShade: MantineColorShade }) => {
-    return {
-      logo: {
-        display: 'block',
-        width: rem(103),
-        height: rem(40),
-        marginTop: theme.spacing.md,
-        marginBottom: theme.spacing.md
-      },
-      balance: {
-        borderBottom: `1px solid ${theme.colors.decorativeBorders[primaryShade]}`,
-        paddingTop: theme.spacing.sm,
-        paddingBottom: theme.spacing.sm
-      },
-      newCampaign: {
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        marginTop: theme.spacing.xl,
-        marginBottom: theme.spacing.xl
-      }
-    }
-  }
-)
-
 function SideNav() {
   const {
     isAdmin,
@@ -61,10 +31,6 @@ function SideNav() {
   const location = useLocation()
   const match = useMatch(location.pathname)
   const year = useMemo(() => new Date().getFullYear(), [])
-  const colorScheme = useColorScheme()
-  const theme = useMantineTheme()
-  const primaryShade = getPrimaryShade(theme, colorScheme)
-  const { classes } = useStyles({ primaryShade })
 
   const hasAvailableBalance = useMemo(
     () => availableBalance && availableBalance > 0,
@@ -73,20 +39,24 @@ function SideNav() {
 
   return (
     <>
-      <AppShell.Section>
-        <UnstyledButton component={Link} to="" className={classes.logo}>
-          {/* <AdExLogo text={colorScheme === 'dark' ? theme.white : theme.colors.brandDarker[primaryShade]} /> */}
-          <AdExLogo text={theme.colors.brandDarker[primaryShade]} />
+      <AppShell.Section py="md">
+        <UnstyledButton component={Link} to="">
+          <Box c="brandDarker" w="110px">
+            <AdExLogo />
+          </Box>
         </UnstyledButton>
       </AppShell.Section>
-      <AppShell.Section className={classes.balance}>
+      <AppShell.Section py="md">
         <Balance />
+        <Divider mt="sm" />
       </AppShell.Section>
-      <AppShell.Section className={classes.newCampaign}>
-        <CreateCampaignBtn hasPopover={isManualDepositing && !hasAvailableBalance} />
+      <AppShell.Section py="md">
+        <Center>
+          <CreateCampaignBtn hasPopover={isManualDepositing && !hasAvailableBalance} />
+        </Center>
       </AppShell.Section>
       <AppShell.Section mx="-xs" grow component={ScrollArea}>
-        <Box>
+        <Stack gap="0" w="100%" justify="flex-start" pr="8" pl="0">
           <NavLink
             to="/dashboard"
             icon={<DashboardIcon />}
@@ -98,7 +68,6 @@ function SideNav() {
             icon={<DepositIcon />}
             label="Top Up Account"
             active={useResolvedPath('deposit').pathname === match?.pathname}
-            hasPopover={false}
           />
           <NavLink
             to="/dashboard/billing"
@@ -121,7 +90,7 @@ function SideNav() {
               active={useResolvedPath('admin/campaigns').pathname === match?.pathname}
             />
           )}
-        </Box>
+        </Stack>
       </AppShell.Section>
       <AppShell.Section mx="xs" mt="xl">
         <Text c="secondaryText" size="sm">
