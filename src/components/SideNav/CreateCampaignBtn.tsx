@@ -1,8 +1,11 @@
-import { Button } from '@mantine/core'
+import { Button, ThemeIcon } from '@mantine/core'
 import TopUpAccountModal from 'components/common/TopUpAccountModal'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import { useCallback, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import CampaignIcon from 'resources/icons/Campaign'
+
+CampaignIcon
 
 type CreateCampaignBtnProps = {
   hasPopover: boolean
@@ -23,7 +26,17 @@ const CreateCampaignBtn = ({ hasPopover }: CreateCampaignBtnProps) => {
   }, [hasPopover, handleModalClicked, resetCampaign, navigate])
   return (
     <>
-      <Button variant="filled" color="secondaryAccent" size="md" onClick={handleBtnClicked}>
+      <Button
+        variant="filled"
+        color="secondaryAccent"
+        size="md"
+        onClick={handleBtnClicked}
+        leftSection={
+          <ThemeIcon variant="transparent" c="inherit">
+            <CampaignIcon />
+          </ThemeIcon>
+        }
+      >
         New Campaign
       </Button>
       <TopUpAccountModal
