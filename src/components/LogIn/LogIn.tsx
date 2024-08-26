@@ -7,9 +7,8 @@ import {
   ThemeIcon,
   Flex,
   rem,
-  useMantineTheme,
   LoadingOverlay,
-  getPrimaryShade
+  Box
 } from '@mantine/core'
 import { createStyles } from '@mantine/emotion'
 import LogInBackground from 'resources/backgrounds/pattern.svg'
@@ -22,7 +21,6 @@ import CustomAnchor from 'components/common/customAnchor/CustomAnchor'
 import { useNavigate } from 'react-router-dom'
 import useAccount from 'hooks/useAccount'
 import { appVersion } from 'helpers'
-import { useColorScheme } from '@mantine/hooks'
 
 const useStyles = createStyles(() => {
   return {
@@ -30,9 +28,6 @@ const useStyles = createStyles(() => {
       backgroundImage: `url(${LowerShape}), url(${UpperShape}), url(${LogInBackground})`,
       backgroundRepeat: 'no-repeat',
       backgroundSize: 'contain, contain, 120%'
-    },
-    logoContainer: {
-      width: rem(191)
     },
     icon: {
       border: 'none',
@@ -48,10 +43,7 @@ function LogIn() {
   const { classes } = useStyles()
   const { connectWallet, authenticated, isLoading } = useAccount()
   const year = useMemo(() => new Date().getFullYear(), [])
-  const theme = useMantineTheme()
   const navigate = useNavigate()
-  const colorScheme = useColorScheme()
-  const primaryShade = getPrimaryShade(theme, colorScheme)
 
   useEffect(() => {
     if (authenticated) navigate('/dashboard', { replace: true })
@@ -66,12 +58,9 @@ function LogIn() {
         overlayProps={{ blur: 2 }}
       />
       <Flex h="100%" pt="xl" pb="xl" direction="column" justify="space-around" align="center">
-        <div className={classes.logoContainer}>
-          <AdExLogo
-            // text={colorScheme === 'dark' ? theme.white : theme.colors.brandDarker[primaryShade]}
-            text={theme.colors.brandDarker[primaryShade]}
-          />
-        </div>
+        <Box c="white" w={191}>
+          <AdExLogo />
+        </Box>
         <div>
           <Title ta="center" order={1}>
             Welcome to AdEx
