@@ -56,7 +56,7 @@ function SideNav() {
         </Center>
       </AppShell.Section>
       <AppShell.Section mx="-xs" grow component={ScrollArea}>
-        <Stack gap="0" w="100%" justify="flex-start" pr="8" pl="0">
+        <Stack gap="xs" w="100%" justify="flex-start" pr="8" pl="0">
           <NavLink
             to="/dashboard"
             icon={<DashboardIcon />}
