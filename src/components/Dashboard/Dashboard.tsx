@@ -11,7 +11,6 @@ import { useNavigate } from 'react-router-dom'
 import { useCampaignsData } from 'hooks/useCampaignsData'
 import { parseBigNumTokenAmountToDecimal, maskAddress, periodNumberToDate, MINUTE } from 'helpers'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
-import useCustomNotifications from 'hooks/useCustomNotifications'
 import { modals } from '@mantine/modals'
 import VisibilityIcon from 'resources/icons/Visibility'
 import AnalyticsIcon from 'resources/icons/Analytics'
@@ -79,8 +78,6 @@ const Dashboard = ({ isAdminPanel, accountId }: { isAdminPanel?: boolean; accoun
     toggleArchived
   } = useCampaignsData()
   const { updateCampaignFromDraft } = useCreateCampaignContext()
-  const { showNotification } = useCustomNotifications()
-
   const [showArchived, setShowArchived] = useState(false)
   const filteredCampaignData = useMemo(() => {
     let archivedCount = 0
@@ -237,7 +234,7 @@ const Dashboard = ({ isAdminPanel, accountId }: { isAdminPanel?: boolean; accoun
         return
       }
 
-      if (data.campaign) {
+      data.campaign &&
         updateCampaignFromDraft(
           {
             ...data.campaign,
@@ -250,14 +247,11 @@ const Dashboard = ({ isAdminPanel, accountId }: { isAdminPanel?: boolean; accoun
               status: CampaignStatus.created
             })
           },
-          true
+          isDuplicate
         )
-        navigate('/dashboard/create-campaign', {})
-      } else {
-        showNotification('error', 'Editing draft campaign failed', 'Editing draft campaign failed')
-      }
+      navigate('/dashboard/create-campaign', {})
     },
-    [isAdminPanel, updateCampaignFromDraft, navigate, showNotification]
+    [isAdminPanel, updateCampaignFromDraft, navigate]
   )
 
   const handleEdit = useCallback(
