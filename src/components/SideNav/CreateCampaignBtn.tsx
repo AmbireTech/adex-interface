@@ -14,7 +14,7 @@ const CreateCampaignBtn = ({ hasPopover }: { hasPopover: boolean }) => {
     if (hasPopover) {
       handleModalClicked()
     } else {
-      resetCampaign('Create new campaign', () => navigate('/dashboard/create-campaign'))
+      resetCampaign('Start over', () => navigate('/dashboard/create-campaign'))
     }
   }, [hasPopover, handleModalClicked, resetCampaign, navigate])
   return (
