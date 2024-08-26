@@ -5,13 +5,7 @@ import { useCallback, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import CampaignIcon from 'resources/icons/Campaign'
 
-CampaignIcon
-
-type CreateCampaignBtnProps = {
-  hasPopover: boolean
-}
-
-const CreateCampaignBtn = ({ hasPopover }: CreateCampaignBtnProps) => {
+const CreateCampaignBtn = ({ hasPopover }: { hasPopover: boolean }) => {
   const { resetCampaign } = useCreateCampaignContext()
   const navigate = useNavigate()
   const [opened, setOpened] = useState(false)
@@ -20,8 +14,7 @@ const CreateCampaignBtn = ({ hasPopover }: CreateCampaignBtnProps) => {
     if (hasPopover) {
       handleModalClicked()
     } else {
-      resetCampaign()
-      navigate('/dashboard/create-campaign')
+      resetCampaign('Create new campaign', () => navigate('/dashboard/create-campaign'))
     }
   }, [hasPopover, handleModalClicked, resetCampaign, navigate])
   return (

@@ -29,6 +29,9 @@ import { useCampaignsData } from 'hooks/useCampaignsData'
 import { hasLength, isNotEmpty, useForm } from '@mantine/form'
 import useCustomNotifications from 'hooks/useCustomNotifications'
 
+import { defaultConfirmModalProps } from 'components/common/Modals/CustomConfirmModal'
+import { modals } from '@mantine/modals'
+
 type Modify<T, R> = Omit<T, keyof R> & R
 
 type ReducedCampaign = Omit<
@@ -373,20 +376,6 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
     updateCampaign({ adUnits })
   }, [updateCampaign, campaign])
 
-  const resetCampaign = useCallback(() => {
-    form.setInitialValues({
-      ...defaultValue,
-      startsAt: new Date(Date.now() + MINUTE * 10),
-      endsAt: new Date(Date.now() + WEEK)
-    })
-    form.reset()
-    setStep(0)
-    localStorage.removeItem(LS_KEY_CREATE_CAMPAIGN)
-
-    // TODO: see why default values keep adUnits
-    // TODO: fix reset right way
-  }, [defaultValue, form])
-
   const publishCampaign = useCallback(() => {
     const preparedCampaign = form.getTransformedValues()
 
@@ -487,6 +476,43 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
   const prevStep = useCallback(
     () => setStep((current) => (current > 0 ? current - 1 : current)),
     []
+  )
+
+  const resetCampaign = useCallback(
+    (reasonMsg?: string, onReset?: () => void) => {
+      const reset = () => {
+        form.setInitialValues({
+          ...defaultValue,
+          startsAt: new Date(Date.now() + MINUTE * 10),
+          endsAt: new Date(Date.now() + WEEK)
+        })
+        form.reset()
+        setStep(0)
+        localStorage.removeItem(LS_KEY_CREATE_CAMPAIGN)
+        onReset && onReset()
+      }
+      if (form.isDirty()) {
+        modals.openConfirmModal(
+          defaultConfirmModalProps({
+            text: 'You have unsaved changes. Do you want to save them as a draft?',
+            color: 'attention',
+            labels: { confirm: reasonMsg || 'Continue without saving', cancel: 'Save draft' },
+            onConfirm: () => {
+              reset()
+            },
+            onCancel: () => {
+              saveToDraftCampaign()
+              reset()
+            }
+          })
+        )
+      } else {
+        reset()
+      }
+
+      // TODO: see why default values keep adUnits
+    },
+    [defaultValue, form, saveToDraftCampaign]
   )
 
   const contextValue = useMemo(

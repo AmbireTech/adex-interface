@@ -38,36 +38,21 @@ const CreateCampaign = () => {
   const [isSuccessModalOpened, SetIsSuccessModalOpened] = useState(false)
   const { updateBalance } = useAccount()
   const navigate = useNavigate()
-  const { saveToDraftCampaign, publishCampaign, resetCampaign, form, step } =
-    useCreateCampaignContext()
+  const { publishCampaign, resetCampaign, form, step } = useCreateCampaignContext()
   const { showNotification } = useCustomNotifications()
 
   const shouldBlock = useCallback<BlockerFunction>(
-    ({ currentLocation, nextLocation }) =>
-      currentLocation.pathname !== nextLocation.pathname && form.isDirty(),
-    [form]
+    ({ currentLocation, nextLocation }) => currentLocation.pathname !== nextLocation.pathname,
+    []
   )
 
   const blocker: Blocker = useBlocker(shouldBlock)
 
   useEffect(() => {
     if (blocker.state === 'blocked') {
-      modals.openConfirmModal(
-        defaultConfirmModalProps({
-          text: 'You have unsaved changes. Do you want to save them as a draft?',
-          color: 'attention',
-          labels: { confirm: 'Leave the page', cancel: 'Save draft' },
-          onConfirm: () => {
-            blocker.proceed()
-          },
-          onCancel: () => {
-            saveToDraftCampaign()
-            blocker.proceed()
-          }
-        })
-      )
+      resetCampaign('Leave without saving', () => blocker.proceed())
     }
-  }, [blocker, saveToDraftCampaign])
+  }, [blocker, resetCampaign])
 
   const launchCampaign = useCallback(async () => {
     try {
