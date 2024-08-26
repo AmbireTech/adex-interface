@@ -23,11 +23,14 @@ import {
   parseFromBigNumPrecision,
   parseToBigNumPrecision
 } from 'helpers/balances'
-import { Campaign, Placement } from 'adex-common'
+import { AdUnit, Campaign, Placement } from 'adex-common'
 import { formatDateTime, MINUTE, WEEK } from 'helpers'
 import { useCampaignsData } from 'hooks/useCampaignsData'
 import { hasLength, isNotEmpty, useForm } from '@mantine/form'
 import useCustomNotifications from 'hooks/useCustomNotifications'
+
+import { defaultConfirmModalProps } from 'components/common/Modals/CustomConfirmModal'
+import { modals } from '@mantine/modals'
 
 type Modify<T, R> = Omit<T, keyof R> & R
 
@@ -274,20 +277,6 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
     }
   })
 
-  // NOTE: using this type of update removes current validations!!
-  // TODO: use only form.setFieldValue, form.removeListItem, form.insertListItem
-  // using this + form.validate() has strange behavior as does not work correctly with touched/dirty
-  const updateCampaign = useCallback(
-    (value: Partial<CampaignUI>, validate?: boolean) => {
-      form.setValues(value)
-      // NOTE: as this fn is used to update values out from inputs,
-      // validateInputOnBlur and validateInputOnChange are not working when setValues is used
-      validate && form.validate()
-      console.log(validate)
-    },
-    [form]
-  )
-
   useEffect(() => {
     window.onbeforeunload = () => {
       if (form.isDirty()) {
@@ -309,7 +298,7 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
     if (savedCampaign) {
       const parsedCampaign = superjson.parse<CampaignUI>(savedCampaign)
       if (parsedCampaign) {
-        updateCampaign(parsedCampaign)
+        form.setValues(parsedCampaign)
         form.resetDirty()
         savedStep && setStep(JSON.parse(savedStep))
       }
@@ -354,38 +343,33 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
     } = { ...campaign }
 
     if (autoUTMChecked) {
-      adUnits.forEach((element) => {
-        const elCopy = { ...element }
-        if (!isValidHttpUrl(elCopy.banner!.targetUrl)) {
-          return elCopy
+      const updatedUnits = [...adUnits].map((unit) => {
+        const currentUrl = unit.banner?.targetUrl.trim() || ''
+        if (!unit?.banner || !isValidHttpUrl(currentUrl)) {
+          return unit
         }
 
-        elCopy.banner!.targetUrl = addUrlUtmTracking({
-          targetUrl: elCopy.banner!.targetUrl,
+        const targetUrl = addUrlUtmTracking({
+          targetUrl: currentUrl,
           campaign: title,
-          content: `${elCopy.banner!.format.w}x${elCopy.banner!.format.h}`,
+          content: `${unit.banner.format.w}x${unit.banner.format.h}`,
           term: placement === 'app' ? 'App' : 'Website'
         })
-        return elCopy
+
+        const withUtms: AdUnit = {
+          ...unit,
+          banner: {
+            ...unit.banner,
+            targetUrl
+          }
+        }
+
+        return withUtms
       })
+
+      form.setFieldValue('adUnits', updatedUnits)
     }
-
-    updateCampaign({ adUnits })
-  }, [updateCampaign, campaign])
-
-  const resetCampaign = useCallback(() => {
-    form.setInitialValues({
-      ...defaultValue,
-      startsAt: new Date(Date.now() + MINUTE * 10),
-      endsAt: new Date(Date.now() + WEEK)
-    })
-    form.reset()
-    setStep(0)
-    localStorage.removeItem(LS_KEY_CREATE_CAMPAIGN)
-
-    // TODO: see why default values keep adUnits
-    // TODO: fix reset right way
-  }, [defaultValue, form])
+  }, [campaign, form])
 
   const publishCampaign = useCallback(() => {
     const preparedCampaign = form.getTransformedValues()
@@ -463,10 +447,10 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
         )
       }
 
-      updateCampaign(mappedDraftCampaign)
+      form.setValues(mappedDraftCampaign)
       !isClone && form.resetDirty()
     },
-    [balanceToken.name, form, updateCampaign]
+    [balanceToken.name, form]
   )
 
   const nextStep = useCallback(
@@ -489,10 +473,46 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
     []
   )
 
+  const resetCampaign = useCallback(
+    (reasonMsg?: string, onReset?: () => void) => {
+      const reset = () => {
+        form.setInitialValues({
+          ...defaultValue,
+          startsAt: new Date(Date.now() + MINUTE * 10),
+          endsAt: new Date(Date.now() + WEEK)
+        })
+        form.reset()
+        setStep(0)
+        localStorage.removeItem(LS_KEY_CREATE_CAMPAIGN)
+        onReset && onReset()
+      }
+      if (form.isDirty()) {
+        modals.openConfirmModal(
+          defaultConfirmModalProps({
+            text: 'You have unsaved changes. Do you want to save them as a draft?',
+            color: 'attention',
+            labels: { confirm: reasonMsg || 'Continue without saving', cancel: 'Save draft' },
+            onConfirm: () => {
+              reset()
+            },
+            onCancel: () => {
+              saveToDraftCampaign()
+              reset()
+            }
+          })
+        )
+      } else {
+        reset()
+      }
+
+      // TODO: see why default values keep adUnits
+    },
+    [defaultValue, form, saveToDraftCampaign]
+  )
+
   const contextValue = useMemo(
     () => ({
       campaign,
-      updateCampaign,
       publishCampaign,
       resetCampaign,
       allowedBannerSizes,
@@ -508,7 +528,6 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
     }),
     [
       campaign,
-      updateCampaign,
       publishCampaign,
       resetCampaign,
       allowedBannerSizes,

@@ -1,4 +1,4 @@
-import { Flex, Grid, MantineTheme, Space, Table, Text, getPrimaryShade } from '@mantine/core'
+import { Flex, Grid, MantineTheme, Space, Table, Text, Box, getPrimaryShade } from '@mantine/core'
 import { createStyles } from '@mantine/emotion'
 import { Placement } from 'adex-common'
 import {
@@ -82,9 +82,6 @@ const useStyles = createStyles((theme: MantineTheme) => {
       color: 'white',
       textAlign: 'end'
     },
-    logo: {
-      width: 200
-    },
     footer: {
       borderTop: '1px solid',
       borderColor: theme.colors.decorativeBorders[primaryShade]
@@ -109,9 +106,9 @@ const BillingBlank = ({ children, header, seller, buyer, title }: DetailsProps) 
     <Grid grow align="center" className={classes.smallFontSize} p={0} m={0}>
       <Grid.Col span={12} className={classes.head}>
         <Flex justify="space-between" align="center">
-          <div className={classes.logo}>
-            <AdExLogo text="white" />
-          </div>
+          <Box c="white" w={200}>
+            <AdExLogo />
+          </Box>
           {/* TODO: fix the size to be without px */}
           <Text size="64px" fw="bold">
             {title}

@@ -1,15 +1,21 @@
 import React from 'react'
 
-const AdExLogo: React.FC<{ primary?: string; secondary?: string; text?: string }> = ({
+// NOTE: for text use wrapper with c='desired color'
+// e.g.     <Box c="brandDarker">
+
+const AdExLogo: React.FC<{ primary?: string; secondary?: string }> = ({
   primary = '#2C5CDE',
-  secondary = '#7298fe',
-  text = '#0F50BF'
+  secondary = '#7298fe'
 }) => {
   return (
-    <svg viewBox="0 0 103.418 39.999" xmlns="http://www.w3.org/2000/svg" data-name="logo ot light">
+    <svg
+      viewBox="0 0 103.418 39.999"
+      xmlns="http://www.w3.org/2000/svg"
+      data-name="AdEx Network logo"
+    >
       <g data-name="Group 1109">
         {/* TEXT */}
-        <g fill={text} data-name="Group 1104">
+        <g fill="currentColor" data-name="Group 1104">
           <path
             d="M31.582 29.81H36.4l1.748-4.555h7.349l1.724 4.555h5.007L44.61 10.943h-5.3zm7.967-8.248l2.314-6.038 2.262 6.038z"
             data-name="Path 3065"

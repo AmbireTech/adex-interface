@@ -38,36 +38,21 @@ const CreateCampaign = () => {
   const [isSuccessModalOpened, SetIsSuccessModalOpened] = useState(false)
   const { updateBalance } = useAccount()
   const navigate = useNavigate()
-  const { saveToDraftCampaign, publishCampaign, resetCampaign, form, step } =
-    useCreateCampaignContext()
+  const { publishCampaign, resetCampaign, form, step } = useCreateCampaignContext()
   const { showNotification } = useCustomNotifications()
 
   const shouldBlock = useCallback<BlockerFunction>(
-    ({ currentLocation, nextLocation }) =>
-      currentLocation.pathname !== nextLocation.pathname && form.isDirty(),
-    [form]
+    ({ currentLocation, nextLocation }) => currentLocation.pathname !== nextLocation.pathname,
+    []
   )
 
   const blocker: Blocker = useBlocker(shouldBlock)
 
   useEffect(() => {
     if (blocker.state === 'blocked') {
-      modals.openConfirmModal(
-        defaultConfirmModalProps({
-          text: 'You have unsaved changes. Do you want to save them as a draft?',
-          color: 'attention',
-          labels: { confirm: 'Leave the page', cancel: 'Save draft' },
-          onConfirm: () => {
-            blocker.proceed()
-          },
-          onCancel: () => {
-            saveToDraftCampaign()
-            blocker.proceed()
-          }
-        })
-      )
+      resetCampaign('Leave without saving', () => blocker.proceed())
     }
-  }, [blocker, saveToDraftCampaign])
+  }, [blocker, resetCampaign])
 
   const launchCampaign = useCallback(async () => {
     try {
@@ -112,16 +97,16 @@ const CreateCampaign = () => {
   return (
     <form onSubmit={form.onSubmit(confirmLaunch)}>
       <Flex direction="row" gap="xl" wrap="wrap" align="flex-start">
-        <Paper p="md" shadow="xs" style={{ flexGrow: 10 }}>
+        <Paper p="md" shadow="xs" style={{ flexGrow: 10 }} w={720} maw="100%">
           <Stack gap="xl">
             <CustomStepper stepsCount={4} />
-            <Box maw={720}>
+            <Box>
               <Wizard step={step} />
             </Box>
           </Stack>
         </Paper>
 
-        <Paper p="md" shadow="sm" w={360} style={{ flexGrow: 1 }}>
+        <Paper p="md" shadow="sm" w={345} style={{ flexGrow: 1 }}>
           <CampaignSummary />
         </Paper>
       </Flex>

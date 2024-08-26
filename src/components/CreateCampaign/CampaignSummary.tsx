@@ -35,7 +35,7 @@ const CampaignSummary = () => {
 
   return (
     <>
-      <Stack>
+      <Stack gap="xs">
         <CampaignDetailsRow
           lighterColor
           title="Budget"
@@ -62,17 +62,14 @@ const CampaignSummary = () => {
         <CampaignDetailsRow lighterColor title="Countries" value={formattedLocs} textSize="sm" />
         <CampaignDetailsRow
           lighterColor
-          lineHeight="xs"
           title="Limit average daily spending"
           value={advancedTargeInput.limitDailyAverageSpending ? 'Yes' : 'No'}
           textSize="sm"
-          noBorder
           mb="xs"
         />
 
         <CampaignDetailsRow
           lighterColor
-          lineHeight="xs"
           title="Auto UTM tracking"
           value={
             <Group gap="sm">

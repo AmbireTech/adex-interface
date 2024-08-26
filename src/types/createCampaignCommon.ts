@@ -55,7 +55,7 @@ export type CreateCampaignType = {
   campaign: CampaignUI
   // updateCampaign: (camp: Partial<CampaignUI>, validate?: boolean) => void
   publishCampaign: () => Promise<any>
-  resetCampaign: () => void
+  resetCampaign: (reasonMsg?: string, onReset?: () => void) => void
   allowedBannerSizes: string[]
   saveToDraftCampaign: () => Promise<void>
   updateCampaignFromDraft: (draftCampaign: Campaign, isClone?: boolean) => void
