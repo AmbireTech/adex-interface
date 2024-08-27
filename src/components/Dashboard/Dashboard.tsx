@@ -4,14 +4,13 @@ import {
   // CampaignType,
   EventType
 } from 'adex-common'
-import { Container, Flex, Text, Loader, UnstyledButton, Anchor, Box } from '@mantine/core'
+import { Container, Flex, Text, Loader, UnstyledButton, Anchor, Box, Stack } from '@mantine/core'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import CustomTable, { TableElement, TableRowAction } from 'components/common/CustomTable'
 import { useNavigate } from 'react-router-dom'
 import { useCampaignsData } from 'hooks/useCampaignsData'
-import { parseBigNumTokenAmountToDecimal, maskAddress, periodNumberToDate } from 'helpers'
+import { parseBigNumTokenAmountToDecimal, maskAddress, periodNumberToDate, MINUTE } from 'helpers'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
-import useCustomNotifications from 'hooks/useCustomNotifications'
 import { modals } from '@mantine/modals'
 import VisibilityIcon from 'resources/icons/Visibility'
 import AnalyticsIcon from 'resources/icons/Analytics'
@@ -79,8 +78,6 @@ const Dashboard = ({ isAdminPanel, accountId }: { isAdminPanel?: boolean; accoun
     toggleArchived
   } = useCampaignsData()
   const { updateCampaignFromDraft } = useCreateCampaignContext()
-  const { showNotification } = useCustomNotifications()
-
   const [showArchived, setShowArchived] = useState(false)
   const filteredCampaignData = useMemo(() => {
     let archivedCount = 0
@@ -138,7 +135,7 @@ const Dashboard = ({ isAdminPanel, accountId }: { isAdminPanel?: boolean; accoun
               rowColor: archived ? 'red' : undefined,
               id: cmpData.campaignId,
               title: (
-                <Text truncate maw={256}>
+                <Text truncate maw={256} inline size="sm">
                   {archived && (
                     <BadgeStatusCampaign type={cmpData.campaign.status} isArchived={archived} />
                   )}
@@ -146,6 +143,7 @@ const Dashboard = ({ isAdminPanel, accountId }: { isAdminPanel?: boolean; accoun
                   {isAdminPanel && (
                     <Box>
                       <Anchor
+                        inline
                         underline="never"
                         size="xs"
                         href={`/dashboard/admin/user-account/${campaign.owner}`}
@@ -174,42 +172,37 @@ const Dashboard = ({ isAdminPanel, accountId }: { isAdminPanel?: boolean; accoun
               clicks: cmpData.clicks,
               ctr: `${cmpData.ctr || 0} %`,
               period: (
-                <span>
-                  <span>
+                <Stack gap="xs">
+                  <Text size="sm" inline>
                     {cmpData.campaign.activeFrom
                       ? periodNumberToDate(cmpData.campaign.activeFrom)
                       : 'N/A'}
-                  </span>
-                  <br />
-                  <span>
+                  </Text>
+
+                  <Text size="sm" inline>
                     {cmpData.campaign.activeTo
                       ? periodNumberToDate(cmpData.campaign.activeTo)
                       : 'N/A'}
-                  </span>
-                </span>
+                  </Text>
+                </Stack>
               ),
               cpm: (
-                <span>
-                  <span>
-                    {(
+                <Stack gap="xs">
+                  <Text size="sm" inline styles={{ root: { whiteSpace: 'nowrap' } }}>
+                    {`${(
                       parseBigNumTokenAmountToDecimal(
                         cmpData.campaign.pricingBounds[EventType.IMPRESSION]?.min || 0n,
                         decimals
                       ) * 1000
-                    ).toFixed(2)}
-                  </span>
-                  {' - '}{' '}
-                  <span>
-                    {(
+                    ).toFixed(2)} - ${(
                       parseBigNumTokenAmountToDecimal(
                         cmpData.campaign.pricingBounds[EventType.IMPRESSION]?.max || 0n,
                         decimals
                       ) * 1000
-                    ).toFixed(2)}
-                  </span>
-                  <br />
-                  <span>{`(avg: ${cmpData.avgCpm?.toFixed(2) || 0})`}</span>
-                </span>
+                    ).toFixed(2)}`}
+                  </Text>
+                  <Text size="sm" inline>{`(avg: ${cmpData.avgCpm?.toFixed(2) || 0})`}</Text>
+                </Stack>
               )
             }
           })
@@ -237,24 +230,24 @@ const Dashboard = ({ isAdminPanel, accountId }: { isAdminPanel?: boolean; accoun
         return
       }
 
-      if (data.campaign) {
-        updateCampaignFromDraft({
-          ...data.campaign,
-          ...(isDuplicate && {
-            id: '',
-            title: `Copy - ${data.campaign.title}`,
-            activeFrom: BigInt(Date.now()),
-            activeTo:
-              BigInt(Date.now()) + BigInt(data.campaign.activeTo - data.campaign.activeFrom),
-            status: CampaignStatus.created
-          })
-        })
-        navigate('/dashboard/create-campaign', {})
-      } else {
-        showNotification('error', 'Editing draft campaign failed', 'Editing draft campaign failed')
-      }
+      data.campaign &&
+        updateCampaignFromDraft(
+          {
+            ...data.campaign,
+            ...(isDuplicate && {
+              id: '',
+              title: `Copy - ${data.campaign.title}`,
+              activeFrom: BigInt(Date.now() + 10 * MINUTE),
+              activeTo:
+                BigInt(Date.now()) + BigInt(data.campaign.activeTo - data.campaign.activeFrom),
+              status: CampaignStatus.created
+            })
+          },
+          isDuplicate
+        )
+      navigate('/dashboard/create-campaign', {})
     },
-    [isAdminPanel, updateCampaignFromDraft, navigate, showNotification]
+    [isAdminPanel, updateCampaignFromDraft, navigate]
   )
 
   const handleEdit = useCallback(

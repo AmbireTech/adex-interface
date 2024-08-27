@@ -1,22 +1,38 @@
 import { useCallback, useMemo, useState } from 'react'
 import { MantineTheme, MultiSelect, Radio, Stack, Text, getPrimaryShade } from '@mantine/core'
 import { TargetingInputApplyProp } from 'adex-common/dist/types'
-import { MultiSelectAndRadioButtonsProps } from 'types'
 import { useColorScheme } from '@mantine/hooks'
 import { createStyles } from '@mantine/emotion'
 
+type MultiSelectAndRadioButtonsProps = {
+  multiSelectData: { value: string; label: string }[]
+  label: string
+  defaultSelectValue?: string[]
+  defaultRadioValue?: TargetingInputApplyProp
+  onCategoriesChange: (selectedRadio: TargetingInputApplyProp, categories: string[]) => void
+  groups: { [key: string]: string[] }
+  error?: string
+}
+
 const useStyles = createStyles(
-  (theme: MantineTheme, { selectedRadio }: { selectedRadio: TargetingInputApplyProp }) => {
+  (
+    theme: MantineTheme,
+    { selectedRadio, error }: { selectedRadio: TargetingInputApplyProp; error: boolean }
+  ) => {
     const colorScheme = useColorScheme()
     const primaryShade = getPrimaryShade(theme, colorScheme)
 
     return {
       input: {
         textTransform: 'capitalize',
-        borderColor:
-          selectedRadio === 'nin'
-            ? theme.colors.warning[primaryShade]
-            : theme.colors.brand[primaryShade],
+        ...(!error
+          ? {
+              borderColor:
+                selectedRadio === 'nin'
+                  ? theme.colors.warning[primaryShade]
+                  : theme.colors.brand[primaryShade]
+            }
+          : {}),
         backgroundColor: theme.colors.mainBackground[primaryShade],
         boxShadow: theme.shadows.md
       },
@@ -66,7 +82,7 @@ const MultiSelectAndRadioButtons = ({
   const data = useMemo(() => [...extendedData], [extendedData])
   const [selectedRadio, setSelectedRadio] = useState<TargetingInputApplyProp>(defaultRadioValue)
   const [selectedValue, setSelectedValue] = useState<string[]>(defaultSelectValue)
-  const { classes } = useStyles({ selectedRadio })
+  const { classes } = useStyles({ selectedRadio, error: !!error })
 
   const handleRadioChange = useCallback(
     (value: string) => {
@@ -118,10 +134,12 @@ const MultiSelectAndRadioButtons = ({
           <Radio label={`Select All ${label} Except`} value="nin" />
         </Stack>
       </Radio.Group>
-      <Text c="secondaryText" size="sm" fw="bold" mb="xs">
-        {labelText}
-      </Text>
       <MultiSelect
+        label={
+          <Text c="secondaryText" size="sm" fw="bold" mb="xs">
+            {labelText}
+          </Text>
+        }
         searchable
         variant="filled"
         size="lg"

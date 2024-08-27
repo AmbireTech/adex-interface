@@ -1,25 +1,13 @@
-import { Flex, MantineTheme, Text, getPrimaryShade, lighten } from '@mantine/core'
-import { createStyles } from '@mantine/emotion'
-import { useColorScheme } from '@mantine/hooks'
-import { CampaignDetailsRowProps } from 'types'
+import { Divider, Flex, Text, FlexProps, MantineFontSize } from '@mantine/core'
 
-const useStyles = createStyles(
-  (theme: MantineTheme, { lighterColor }: { lighterColor: boolean }) => {
-    const colorScheme = useColorScheme()
-    const primaryShade = getPrimaryShade(theme, colorScheme)
-
-    return {
-      border: {
-        borderBottom: `1px dashed ${theme.colors.decorativeBorders[primaryShade]}`
-      },
-      textColor: {
-        color: !lighterColor
-          ? theme.colors.secondaryText[primaryShade]
-          : lighten(theme.colors.secondaryText[primaryShade], theme.other.shades.lighten.lighter)
-      }
-    }
-  }
-)
+export type CampaignDetailsRowProps = FlexProps & {
+  title: string
+  value: any | undefined
+  lighterColor?: boolean | undefined
+  textSize?: MantineFontSize
+  noBorder?: boolean
+  column?: boolean
+}
 
 const CampaignDetailsRow = ({
   title,
@@ -28,32 +16,32 @@ const CampaignDetailsRow = ({
   textSize = 'md',
   noBorder = false,
   column = false,
-  lineHeight = 'md',
-  ...rest
+  ...flexProps
 }: CampaignDetailsRowProps) => {
-  const { classes, cx } = useStyles({ lighterColor: !!lighterColor })
   return (
-    <Flex
-      direction={column ? 'column' : 'row'}
-      justify={column ? 'center' : 'space-between'}
-      align={column ? 'stretch' : 'center'}
-      className={cx({ [classes.border]: !noBorder })}
-      pt={lineHeight}
-      pb={lineHeight}
-      gap="xs"
-      {...rest}
-    >
-      <Text fw="bold" size={textSize} c="secondaryText">
-        {title}
-      </Text>
-      {typeof value === 'string' ? (
-        <Text ta="end" truncate w={column ? '100%' : 'auto'}>
-          {value}
+    <>
+      <Flex
+        direction={column ? 'column' : 'row'}
+        justify={column ? 'center' : 'space-between'}
+        align={column ? 'stretch' : 'baseline'}
+        c={lighterColor ? 'secondaryText' : 'mainText'}
+        gap="xs"
+        p="xs"
+        {...flexProps}
+      >
+        <Text fw="bold" size={textSize} c="secondaryText">
+          {title}
         </Text>
-      ) : (
-        value
-      )}
-    </Flex>
+        {typeof value === 'string' ? (
+          <Text ta="end" truncate w={column ? '100%' : 'auto'}>
+            {value}
+          </Text>
+        ) : (
+          value
+        )}
+      </Flex>
+      <Divider variant="dashed" hidden={noBorder} m="0" />
+    </>
   )
 }
 

@@ -1,63 +1,44 @@
-import { Text, MantineTheme, lighten, getPrimaryShade, Flex, FlexProps } from '@mantine/core'
-import { createStyles } from '@mantine/emotion'
-import { useColorScheme } from '@mantine/hooks'
+import {
+  Text,
+  Box,
+  Paper,
+  Group,
+  ThemeIcon,
+  Center,
+  lighten,
+  parseThemeColor,
+  useMantineTheme
+} from '@mantine/core'
+import { ReactNode } from 'react'
+
 import InfoCurlyBorder from 'resources/icons/InfoCurlyBorder'
 
-type InfoAlertMessageProps = FlexProps & {
-  message: string
-}
-
-const useStyles = createStyles((theme: MantineTheme) => {
-  const colorScheme = useColorScheme()
-  const primaryShade = getPrimaryShade(theme, colorScheme)
-
-  return {
-    errorWrapper: {
-      alignItems: 'center',
-      border: '1px solid',
-      borderColor: theme.colors.decorativeBorders[primaryShade],
-      boxShadow: theme.shadows.sm,
-      borderRadius: theme.radius.md,
-      background: lighten(theme.colors.warning[primaryShade], theme.other.shades.lighten.lightest)
-    },
-    errorIcon: {
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      width: 50,
-      height: '100%',
-      borderTopLeftRadius: theme.radius.md,
-      borderBottomLeftRadius: theme.radius.md,
-      color: theme.colors.warning[primaryShade],
-      padding: theme.spacing.sm
-    },
-    text: {
-      flexGrow: 3,
-      background: theme.colors.mainBackground[primaryShade],
-      borderTopRightRadius: theme.radius.md,
-      borderBottomRightRadius: theme.radius.md,
-      padding: theme.spacing.md
-    }
-  }
-})
-
-const InfoAlertMessage = ({ message, ...rest }: InfoAlertMessageProps) => {
-  const { classes } = useStyles()
+const InfoAlertMessage = ({ message }: { message: ReactNode }) => {
+  // NOTE: just testing, need better color handle
+  const theme = useMantineTheme()
+  const parsedColor = parseThemeColor({ color: 'warning', theme })
   return (
-    <Flex
-      direction="row"
-      justify="space-between"
-      className={classes.errorWrapper}
-      wrap="nowrap"
-      {...rest}
-    >
-      <div className={classes.errorIcon}>
-        <InfoCurlyBorder size="24px" />
-      </div>
-      <div className={classes.text}>
-        <Text size="sm">{message}</Text>
-      </div>
-    </Flex>
+    <Paper withBorder shadow="xs">
+      <Group align="center" wrap="nowrap">
+        <Box
+          p="sm"
+          bg={lighten(
+            parsedColor.isThemeColor ? `var(${parsedColor.variable})` : parsedColor.value,
+            theme.other.shades.lighten.lightest
+          )}
+        >
+          <Center>
+            <ThemeIcon variant="transparent" color="warning">
+              <InfoCurlyBorder size="24px" />
+            </ThemeIcon>
+          </Center>
+        </Box>
+
+        <Text size="sm" span>
+          {message?.toString()}
+        </Text>
+      </Group>
+    </Paper>
   )
 }
 

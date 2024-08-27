@@ -81,7 +81,9 @@ const Placements = ({ forAdmin, campaignId }: { forAdmin: boolean; campaignId: s
                   <ThemeIcon size="xs" variant="transparent" c="inherit">
                     <BlockIcon size="100%" />
                   </ThemeIcon>{' '}
-                  <Text c="inherit">{srcName}</Text>
+                  <Text size="sm" c="inherit">
+                    {srcName}
+                  </Text>
                 </Group>
               ) : (
                 srcName

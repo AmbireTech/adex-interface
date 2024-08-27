@@ -33,16 +33,8 @@ function ErrorBoundary() {
 }
 
 function RequireAuth({ children, admin }: { children: JSX.Element; admin?: boolean }) {
-  const {
-    authenticated,
-    isAdmin,
-    adexAccount: { loaded, initialLoad }
-  } = useAccount()
+  const { authenticated, isAdmin } = useAccount()
   const location = useLocation()
-
-  if (!loaded && !initialLoad) {
-    return null // Or a loading spinner
-  }
 
   if (!authenticated) {
     return <Navigate to="/login" state={{ from: location }} replace />

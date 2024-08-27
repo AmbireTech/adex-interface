@@ -108,7 +108,7 @@ const Deposit = () => {
           <CustomCombobox
             items={data}
             defaultValue={network}
-            onChange={(event) => event.target.value && setNetwork(event.target.value)}
+            onChange={(value) => value && setNetwork(value)}
             placeholder="Select Network"
             error=""
           />

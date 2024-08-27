@@ -1,5 +1,6 @@
-import { Grid } from '@mantine/core'
+import { Stack } from '@mantine/core'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
+import InfoAlertMessage from 'components/common/InfoAlertMessage'
 import SelectDevice from './SelectDevice'
 import UploadCreative from './UploadCreative'
 import SelectPlacements from './SelectPlacements'
@@ -15,25 +16,21 @@ const StepOne = () => {
           }
         }
       }
-    }
+    },
+    form: { errors }
   } = useCreateCampaignContext()
 
+  console.log({ errors })
+
   return (
-    <Grid>
-      <Grid.Col>
-        <SelectPlacements />
-      </Grid.Col>
-      {placement === 'site' && (
-        <Grid.Col>
-          <SelectDevice />
-        </Grid.Col>
+    <Stack>
+      <SelectPlacements />
+      {placement === 'site' && <SelectDevice />}
+      {(placement === 'app' || devices.length > 0) && <UploadCreative />}
+      {errors['targetingInput.inputs.placements'] && (
+        <InfoAlertMessage message={errors['targetingInput.inputs.placements'].toString() || ''} />
       )}
-      {(placement === 'app' || devices.length > 0) && (
-        <Grid.Col>
-          <UploadCreative />
-        </Grid.Col>
-      )}
-    </Grid>
+    </Stack>
   )
 }
 

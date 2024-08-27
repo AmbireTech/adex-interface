@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import CustomTable from 'components/common/CustomTable'
-import { Flex, Anchor } from '@mantine/core'
+import { Flex, ThemeIcon } from '@mantine/core'
 import UrlIcon from 'resources/icons/Url'
 import { formatCurrency } from 'helpers'
 import { getMediaUrlWithProvider } from 'helpers/createCampaignHelpers'
@@ -8,6 +8,7 @@ import MediaThumb from 'components/common/MediaThumb'
 import DownloadCSV from 'components/common/DownloadCSV'
 
 import { useCampaignsAnalyticsData } from 'hooks/useCampaignAnalytics/useCampaignAnalyticsData'
+import CustomAnchor from 'components/common/customAnchor'
 
 const IPFS_GATEWAY = process.env.REACT_APP_IPFS_GATEWAY
 
@@ -39,10 +40,12 @@ const Creatives = ({ forAdmin, campaignId }: { forAdmin: boolean; campaignId: st
       return {
         media: (
           <Flex align="center">
-            <Anchor href={media} target="_blank" mr="sm" c="brand">
-              <UrlIcon size="25px" color="inherit" />
-            </Anchor>
-            {unitForId && <MediaThumb adUnit={unitForId} previewOnClick />}
+            <CustomAnchor external href={media} mr="sm" c="brand">
+              <ThemeIcon variant="transparent" color="brand">
+                <UrlIcon size="25px" />
+              </ThemeIcon>
+            </CustomAnchor>
+            {unitForId && <MediaThumb width={30} height={30} adUnit={unitForId} previewOnClick />}
           </Flex>
         ),
         size: unitForId?.banner

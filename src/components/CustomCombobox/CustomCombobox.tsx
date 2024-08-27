@@ -13,15 +13,14 @@ import { DIGITS_AFTER_FLOATING_POINT } from 'constants/balances'
 import { formatCurrency } from 'helpers'
 import { parseBigNumTokenAmountToDecimal } from 'helpers/balances'
 import { getTokenIcon, networks } from 'lib/Icons'
-import { ChangeEvent, ReactNode, useCallback, useMemo, useState } from 'react'
+import { ReactNode, useCallback, useMemo, useState } from 'react'
 
 type CustomComboboxProps = ComboboxProps &
   InputBaseProps & {
     items: ItemProps[]
-    defaultValue: string
-    onChange: (event: ChangeEvent<HTMLInputElement>) => void
-    onFocus?: () => void | undefined
-    error?: string
+    defaultValue: string | undefined
+    onChange: (val: string) => void
+    error?: string | ReactNode
     placeholder: string
   }
 
@@ -71,7 +70,6 @@ const CustomCombobox = ({
   items,
   defaultValue,
   onChange,
-  onFocus,
   error,
   placeholder,
   ...props
@@ -86,21 +84,11 @@ const CustomCombobox = ({
 
   const handleOptionSubmit = useCallback(
     (val: string) => {
-      if (val !== value) {
-        const event = {
-          target: {
-            value: val ? val.toString() : null,
-            name: 'currency'
-          }
-        } as ChangeEvent<HTMLInputElement>
-
-        onChange(event)
-      }
-
+      onChange(val)
       setValue(val)
       combobox.closeDropdown()
     },
-    [combobox, setValue, onChange, value]
+    [combobox, setValue, onChange]
   )
 
   const options = items.map((item) => (
@@ -111,8 +99,7 @@ const CustomCombobox = ({
 
   const handleBtnOnClicked = useCallback(() => {
     combobox.toggleDropdown()
-    onFocus && onFocus()
-  }, [combobox, onFocus])
+  }, [combobox])
 
   return (
     <Combobox store={combobox} withinPortal={false} onOptionSubmit={handleOptionSubmit} {...props}>
