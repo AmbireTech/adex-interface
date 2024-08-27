@@ -4,10 +4,10 @@ import {
   // CampaignType,
   EventType
 } from 'adex-common'
-import { Container, Flex, Text, Loader, UnstyledButton, Anchor, Box, Stack } from '@mantine/core'
+import { Container, Flex, Text, Loader, UnstyledButton, Anchor, Stack, Group } from '@mantine/core'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import CustomTable, { TableElement, TableRowAction } from 'components/common/CustomTable'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useCampaignsData } from 'hooks/useCampaignsData'
 import { parseBigNumTokenAmountToDecimal, maskAddress, periodNumberToDate, MINUTE } from 'helpers'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
@@ -132,28 +132,32 @@ const Dashboard = ({ isAdminPanel, accountId }: { isAdminPanel?: boolean; accoun
                   CampaignStatus.rejected
                 ].includes(campaign.status)
               },
-              rowColor: archived ? 'red' : undefined,
+              rowColor: archived ? 'warning' : undefined,
               id: cmpData.campaignId,
               title: (
-                <Text truncate maw={256} inline size="sm">
-                  {archived && (
-                    <BadgeStatusCampaign type={cmpData.campaign.status} isArchived={archived} />
-                  )}
-                  {`${archived ? ' ' : ''}${cmpData.campaign.title}`}
+                <Stack gap="xs">
+                  <Group wrap="nowrap">
+                    {archived && (
+                      <BadgeStatusCampaign type={cmpData.campaign.status} isArchived={archived} />
+                    )}
+                    <Text size="sm" truncate maw={200}>
+                      {cmpData.campaign.title}
+                    </Text>
+                  </Group>
+
                   {isAdminPanel && (
-                    <Box>
-                      <Anchor
-                        inline
-                        underline="never"
-                        size="xs"
-                        href={`/dashboard/admin/user-account/${campaign.owner}`}
-                        c="secondaryText"
-                      >
-                        {maskAddress(campaign.owner)}
-                      </Anchor>
-                    </Box>
+                    <Anchor
+                      component={Link}
+                      inline
+                      underline="never"
+                      size="xs"
+                      to={`/dashboard/admin/user-account/${campaign.owner}`}
+                      c="secondaryText"
+                    >
+                      {maskAddress(campaign.owner)}
+                    </Anchor>
                   )}
-                </Text>
+                </Stack>
               ),
               // type: CampaignType[cmpData.campaign.type],
               placement:
