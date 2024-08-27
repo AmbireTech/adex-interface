@@ -4,7 +4,7 @@ import {
   // CampaignType,
   EventType
 } from 'adex-common'
-import { Container, Flex, Text, Loader, UnstyledButton, Anchor, Box } from '@mantine/core'
+import { Container, Flex, Text, Loader, UnstyledButton, Anchor, Box, Stack } from '@mantine/core'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import CustomTable, { TableElement, TableRowAction } from 'components/common/CustomTable'
 import { useNavigate } from 'react-router-dom'
@@ -135,7 +135,7 @@ const Dashboard = ({ isAdminPanel, accountId }: { isAdminPanel?: boolean; accoun
               rowColor: archived ? 'red' : undefined,
               id: cmpData.campaignId,
               title: (
-                <Text truncate maw={256}>
+                <Text truncate maw={256} inline size="sm">
                   {archived && (
                     <BadgeStatusCampaign type={cmpData.campaign.status} isArchived={archived} />
                   )}
@@ -143,6 +143,7 @@ const Dashboard = ({ isAdminPanel, accountId }: { isAdminPanel?: boolean; accoun
                   {isAdminPanel && (
                     <Box>
                       <Anchor
+                        inline
                         underline="never"
                         size="xs"
                         href={`/dashboard/admin/user-account/${campaign.owner}`}
@@ -171,42 +172,37 @@ const Dashboard = ({ isAdminPanel, accountId }: { isAdminPanel?: boolean; accoun
               clicks: cmpData.clicks,
               ctr: `${cmpData.ctr || 0} %`,
               period: (
-                <span>
-                  <span>
+                <Stack gap="xs">
+                  <Text size="sm" inline>
                     {cmpData.campaign.activeFrom
                       ? periodNumberToDate(cmpData.campaign.activeFrom)
                       : 'N/A'}
-                  </span>
-                  <br />
-                  <span>
+                  </Text>
+
+                  <Text size="sm" inline>
                     {cmpData.campaign.activeTo
                       ? periodNumberToDate(cmpData.campaign.activeTo)
                       : 'N/A'}
-                  </span>
-                </span>
+                  </Text>
+                </Stack>
               ),
               cpm: (
-                <span>
-                  <span>
-                    {(
+                <Stack gap="xs">
+                  <Text size="sm" inline styles={{ root: { whiteSpace: 'nowrap' } }}>
+                    {`${(
                       parseBigNumTokenAmountToDecimal(
                         cmpData.campaign.pricingBounds[EventType.IMPRESSION]?.min || 0n,
                         decimals
                       ) * 1000
-                    ).toFixed(2)}
-                  </span>
-                  {' - '}{' '}
-                  <span>
-                    {(
+                    ).toFixed(2)} - ${(
                       parseBigNumTokenAmountToDecimal(
                         cmpData.campaign.pricingBounds[EventType.IMPRESSION]?.max || 0n,
                         decimals
                       ) * 1000
-                    ).toFixed(2)}
-                  </span>
-                  <br />
-                  <span>{`(avg: ${cmpData.avgCpm?.toFixed(2) || 0})`}</span>
-                </span>
+                    ).toFixed(2)}`}
+                  </Text>
+                  <Text size="sm" inline>{`(avg: ${cmpData.avgCpm?.toFixed(2) || 0})`}</Text>
+                </Stack>
               )
             }
           })

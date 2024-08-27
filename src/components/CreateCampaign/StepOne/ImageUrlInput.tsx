@@ -37,7 +37,6 @@ const ImageUrlInput = ({ image, preview, index, form }: ImageUrlInputProps) => {
       defaultValue={!form ? image.banner?.targetUrl : undefined}
       disabled={disable}
       placeholder="Creative target URL (https://...)"
-      // withErrorStyles={false}
       size="lg"
       {...(hasFormatError
         ? {
@@ -49,7 +48,6 @@ const ImageUrlInput = ({ image, preview, index, form }: ImageUrlInputProps) => {
             key: form?.key(`adUnits.${index}.banner.targetUrl`),
             ...form?.getInputProps(`adUnits.${index}.banner.targetUrl`)
           })}
-      // TODO: fix it
       leftSectionWidth="170px"
       leftSectionPointerEvents="visible"
       leftSectionProps={{
