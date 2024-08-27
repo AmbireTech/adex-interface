@@ -81,6 +81,7 @@ export const CustomTable = ({
 }: CustomTableProps) => {
   const isMobile = useMediaQuery('(max-width: 75rem)')
   const selectedElements = useSet<string>()
+  const hasSelectActions = useMemo(() => !!selectedActions?.length, [selectedActions?.length])
 
   const columns: string[] = useMemo(
     () =>
@@ -124,7 +125,7 @@ export const CustomTable = ({
   )
 
   const masterActionMenu = useMemo(() => {
-    return (
+    return hasSelectActions ? (
       <Group>
         {selectedActions?.map((a) => {
           const label = getLabel(a.label, selectedElements)
@@ -151,25 +152,25 @@ export const CustomTable = ({
           )
         })}
       </Group>
-    )
+    ) : null
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedActions, selectedElements, selectedElements.size])
+  }, [hasSelectActions, selectedActions, selectedElements, selectedElements.size])
 
   const masterSelectAction = useMemo(
     () =>
-      selectedActions && (
+      hasSelectActions && (
         <Checkbox
           size="sm"
           checked={currentPageElementsAllSelected}
           onChange={() => handleCheckboxMaster()}
         />
       ),
-    [currentPageElementsAllSelected, handleCheckboxMaster, selectedActions]
+    [currentPageElementsAllSelected, handleCheckboxMaster, hasSelectActions]
   )
 
   const colHeadings: string[] = useMemo(
-    () => [...(selectedActions ? ['select'] : []), ...headings, ...(actions ? ['actions'] : [])],
-    [actions, headings, selectedActions]
+    () => [...(hasSelectActions ? ['select'] : []), ...headings, ...(actions ? ['actions'] : [])],
+    [actions, headings, hasSelectActions]
   )
 
   const rows = useMemo(() => {
@@ -233,7 +234,7 @@ export const CustomTable = ({
       const rowKey = e.id?.toString() || i
 
       const colsToMap = [
-        ...(selectedActions ? ['select'] : []),
+        ...(hasSelectActions ? ['select'] : []),
         ...columns,
         ...(activeActions.length ? ['actions'] : [])
       ]
@@ -303,7 +304,7 @@ export const CustomTable = ({
 
       {isMobile ? (
         <Stack gap="xl">
-          {selectedActions && (
+          {hasSelectActions && (
             <Group align="center" justify="left" pt="xs">
               Select all: {masterSelectAction}
             </Group>
