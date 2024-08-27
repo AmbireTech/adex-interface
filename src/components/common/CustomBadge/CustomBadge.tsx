@@ -16,6 +16,7 @@ const CustomBadge = ({ color, text, icon, size = 'lg', ...rest }: CustomBadgePro
       color={color}
       tt="capitalize"
       fw="normal"
+      miw="min-content"
       styles={{
         root: {
           borderColor: 'inherit'

@@ -18,7 +18,7 @@ const BadgeStatusCampaign = ({ type, isArchived }: BadgeType) => {
         color: 'secondaryText',
         text: 'Archived',
         icon: <ArchivedIcon size="10px" />,
-        size: 'xs'
+        size: 'md'
       }
     }
     switch (status) {
@@ -99,7 +99,14 @@ const BadgeStatusCampaign = ({ type, isArchived }: BadgeType) => {
     }
   }, [isArchived, type])
 
-  return <CustomBadge color={labelCfg.color} text={labelCfg.text} icon={labelCfg.icon} />
+  return (
+    <CustomBadge
+      color={labelCfg.color}
+      text={labelCfg.text}
+      icon={labelCfg.icon}
+      size={labelCfg.size}
+    />
+  )
 }
 
 export default BadgeStatusCampaign
