@@ -254,7 +254,7 @@ export const CustomTable = ({
 
         const el =
           typeof colElement !== 'object' ? (
-            <Text ta="left" truncate maw={200}>
+            <Text ta="left" size="sm" truncate maw={200}>
               {colElement}
             </Text>
           ) : (
@@ -264,7 +264,7 @@ export const CustomTable = ({
         return isMobile ? (
           <Stack gap="xs">
             <Group key={rowKey + column} grow align="center" px="sm">
-              <Text ta="left" tt="capitalize" fw="bold">
+              <Text ta="left" tt="capitalize" fw="bold" size="sm">
                 {colsToMap[cidx]}:
               </Text>
               {el}
@@ -272,7 +272,7 @@ export const CustomTable = ({
             <Divider hidden={cidx === colsToMap.length - 1} />
           </Stack>
         ) : (
-          <Table.Td key={column} c={color}>
+          <Table.Td key={column} c={color} miw="fit-content">
             {el}
           </Table.Td>
         )
@@ -312,37 +312,39 @@ export const CustomTable = ({
         </Stack>
       ) : (
         <Paper pb="md" w="100%" shadow={shadow}>
-          <ScrollArea scrollbars="x" type="auto" offsetScrollbars>
-            <Table {...tableProps} mih={420} w="100%" highlightOnHover verticalSpacing="sm">
-              <Table.Thead bg="alternativeBackground">
-                <Table.Tr>
-                  {colHeadings.map((h) => (
-                    <Table.Th tt="capitalize" key={h} w={h === 'select' ? 20 : 'auto'}>
-                      {h === 'select' ? masterSelectAction : h}
-                    </Table.Th>
-                  ))}
-                </Table.Tr>
-              </Table.Thead>
-              <Table.Tbody>{rows}</Table.Tbody>
-            </Table>
-          </ScrollArea>
-          <Group w="100%" justify="right" mt="xl" pr="md">
-            <Pagination
-              color="brand"
-              total={maxPages}
-              boundaries={1}
-              defaultValue={defaultPage}
-              onNextPage={onNextPage}
-              onPreviousPage={onPreviousPage}
-              onChange={onChange}
-              size="sm"
-              styles={{
-                control: {
-                  border: 0
-                }
-              }}
-            />
-          </Group>
+          <Stack justify="space-between" mih={420} gap="xl">
+            <ScrollArea scrollbars="x" type="auto" offsetScrollbars>
+              <Table {...tableProps} w="100%" highlightOnHover verticalSpacing="xs">
+                <Table.Thead bg="alternativeBackground">
+                  <Table.Tr>
+                    {colHeadings.map((h) => (
+                      <Table.Th tt="capitalize" key={h} w={h === 'select' ? 20 : 'auto'}>
+                        {h === 'select' ? masterSelectAction : h}
+                      </Table.Th>
+                    ))}
+                  </Table.Tr>
+                </Table.Thead>
+                <Table.Tbody>{rows}</Table.Tbody>
+              </Table>
+            </ScrollArea>
+            <Group w="100%" justify="right" pr="md">
+              <Pagination
+                color="brand"
+                total={maxPages}
+                boundaries={1}
+                defaultValue={defaultPage}
+                onNextPage={onNextPage}
+                onPreviousPage={onPreviousPage}
+                onChange={onChange}
+                size="sm"
+                styles={{
+                  control: {
+                    border: 0
+                  }
+                }}
+              />
+            </Group>
+          </Stack>
         </Paper>
       )}
     </Stack>

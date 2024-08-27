@@ -476,14 +476,14 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
   const resetCampaign = useCallback(
     (reasonMsg?: string, onReset?: () => void) => {
       const reset = () => {
-        form.setInitialValues({
-          ...defaultValue,
+        form.reset()
+        form.setValues({
           startsAt: new Date(Date.now() + MINUTE * 10),
           endsAt: new Date(Date.now() + WEEK)
         })
-        form.reset()
         setStep(0)
         localStorage.removeItem(LS_KEY_CREATE_CAMPAIGN)
+        localStorage.removeItem(LS_KEY_CREATE_CAMPAIGN_STEP)
         onReset && onReset()
       }
       if (form.isDirty()) {
@@ -506,8 +506,10 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
       }
 
       // TODO: see why default values keep adUnits
+      // NOTE: looks like addUTMToTargetURLS was bugging it but maybe there is other issues
+      // Works as expected now  without setting initial vales, just reset()
     },
-    [defaultValue, form, saveToDraftCampaign]
+    [form, saveToDraftCampaign]
   )
 
   const contextValue = useMemo(
