@@ -194,7 +194,7 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
     refreshToken: string
   } | null> => {
     if (!adexAccount.accessToken || !adexAccount.refreshToken) {
-      throw new Error('Missing access tokens')
+      throw new Error(`${UNAUTHORIZED_ERR_STR}: missing access tokens`)
     }
 
     if (isTokenExpired(adexAccount.accessToken)) {
@@ -215,61 +215,63 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
       } catch (error: any) {
         console.error('Updating access token failed:', error)
         showNotification('error', error?.message, 'Updating access token failed')
-        throw new Error(error)
+        throw new Error(`${UNAUTHORIZED_ERR_STR}: ${error}`)
       }
+    } else if (isTokenExpired(adexAccount.refreshToken)) {
+      resetAdexAccount()
+      showNotification('info', 'Please log in!', 'Session expired')
     }
 
     return null
-  }, [adexAccount.accessToken, adexAccount.refreshToken, showNotification])
+  }, [adexAccount.accessToken, adexAccount.refreshToken, resetAdexAccount, showNotification])
 
   const adexServicesRequest = useCallback(
     // Note
     async <R extends any>(service: AdExService, reqOptions: ApiRequestOptions): Promise<R> => {
-      // temp hax for using the same token fot validator auth
-      const authHeaderProp = service === 'backend' ? 'X-DSP-AUTH' : 'authorization'
-
-      // url check
-      // TODO: route instead url in props
-      const baseUrl = (service === 'backend' ? BACKEND_BASE_URL : VALIDATOR_BASE_URL) || ''
-      const urlCheck = reqOptions.route.replace(baseUrl, '').replace(/^\//, '')
-
-      const req: RequestOptions = {
-        url: `${baseUrl}/${urlCheck}`,
-        method: reqOptions.method,
-        body:
-          reqOptions.body instanceof FormData
-            ? reqOptions.body
-            : reqOptions.body && JSON.stringify(SuperJSON.serialize(reqOptions.body).json),
-        queryParams: reqOptions.queryParams,
-        headers: reqOptions.headers
-      }
-
-      // console.log('adexAccount', adexAccount)
-      if (!adexAccount.accessToken) throw new Error('Access token is missing')
-
-      const authHeader = {
-        [authHeaderProp]: `Bearer ${adexAccount.accessToken}`
-      }
-
-      const newAccessTokens = await checkAndGetNewAccessTokens()
-
-      if (newAccessTokens) {
-        setAdexAccount((prev) => {
-          return {
-            ...prev,
-            ...newAccessTokens
-          }
-        })
-        const updatedAccessToken = newAccessTokens.accessToken
-        authHeader[authHeaderProp] = `Bearer ${updatedAccessToken}`
-      }
-
-      req.headers = {
-        ...authHeader,
-        ...req.headers
-      }
-
       try {
+        // temp hax for using the same token fot validator auth
+        const authHeaderProp = service === 'backend' ? 'X-DSP-AUTH' : 'authorization'
+
+        // url check
+        // TODO: route instead url in props
+        const baseUrl = (service === 'backend' ? BACKEND_BASE_URL : VALIDATOR_BASE_URL) || ''
+        const urlCheck = reqOptions.route.replace(baseUrl, '').replace(/^\//, '')
+
+        const req: RequestOptions = {
+          url: `${baseUrl}/${urlCheck}`,
+          method: reqOptions.method,
+          body:
+            reqOptions.body instanceof FormData
+              ? reqOptions.body
+              : reqOptions.body && JSON.stringify(SuperJSON.serialize(reqOptions.body).json),
+          queryParams: reqOptions.queryParams,
+          headers: reqOptions.headers
+        }
+
+        // console.log('adexAccount', adexAccount)
+        if (!adexAccount.accessToken) throw new Error('Access token is missing')
+
+        const authHeader = {
+          [authHeaderProp]: `Bearer ${adexAccount.accessToken}`
+        }
+
+        const newAccessTokens = await checkAndGetNewAccessTokens()
+
+        if (newAccessTokens) {
+          setAdexAccount((prev) => {
+            return {
+              ...prev,
+              ...newAccessTokens
+            }
+          })
+          authHeader[authHeaderProp] = `Bearer ${newAccessTokens.accessToken}`
+        }
+
+        req.headers = {
+          ...authHeader,
+          ...req.headers
+        }
+
         const res = await fetchService(req)
         return await processResponse<R>(res)
       } catch (err: any) {
