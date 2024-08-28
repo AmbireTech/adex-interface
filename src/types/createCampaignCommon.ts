@@ -53,7 +53,7 @@ export type CreateCampaignType = {
   prevStep: () => void
   // stepsCount: number
   campaign: CampaignUI
-  publishCampaign: () => Promise<any>
+  publishCampaign: (onSuccess?: () => void) => Promise<any>
   resetCampaign: (reasonMsg?: string, onReset?: () => void) => void
   allowedBannerSizes: string[]
   saveToDraftCampaign: () => Promise<void>
