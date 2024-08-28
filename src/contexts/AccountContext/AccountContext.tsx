@@ -29,7 +29,7 @@ const ambireLoginSDK = new AmbireLoginSDK({
 
 export const BACKEND_BASE_URL = process.env.REACT_APP_BACKEND_BASE_URL
 export const VALIDATOR_BASE_URL = process.env.REACT_APP_VALIDATOR_BASE_URL
-const UNAUTHORIZED_ERR_STR = 'Unauthorized!'
+const UNAUTHORIZED_ERR_STR = 'Unauthorized'
 
 console.log({ BACKEND_BASE_URL })
 const processResponse = <R extends any>(res: Response): Promise<R> => {
@@ -286,8 +286,7 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
         const res = await fetchService(req)
         return await processResponse<R>(res)
       } catch (err: any) {
-        console.log(err)
-        if (err && err.message && err.message.includes(UNAUTHORIZED_ERR_STR)) {
+        if (service === 'backend' && err && (err?.message || err).includes(UNAUTHORIZED_ERR_STR)) {
           resetAdexAccount()
         }
         showNotification('error', err.message, reqOptions.onErrMsg || 'Data error')
@@ -394,9 +393,11 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
   useEffect(() => {
     ambireSDK.onLoginSuccess(handleRegistrationOrLoginSuccess)
   }, [ambireSDK, handleRegistrationOrLoginSuccess])
+
   useEffect(() => {
     ambireSDK.onAlreadyLoggedIn(handleRegistrationOrLoginSuccess)
   }, [ambireSDK, handleRegistrationOrLoginSuccess])
+
   useEffect(() => {
     ambireSDK.onMsgSigned(({ signature }: any) =>
       setSdkMsgSignature(() => {
