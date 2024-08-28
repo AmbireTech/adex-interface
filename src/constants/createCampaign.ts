@@ -6,7 +6,6 @@ import {
   AllCountries
 } from 'adex-common'
 
-export const CREATE_CAMPAIGN_STEPS = 4
 export const CAMPAIGN_PLACEMENTS_INPUT = 'targetingInput.inputs.placements.in'
 export const CAMPAIGN_INCLUDE_INCENTIVIZED_INPUT =
   'targetingInput.inputs.advanced.includeIncentivized'
