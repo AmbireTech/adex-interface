@@ -87,7 +87,8 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
       balanceToken,
       balanceToken: { decimals }
     },
-    isAdmin
+    isAdmin,
+    updateBalance
   } = useAccount()
 
   const defaultValue = useMemo(
@@ -371,19 +372,6 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
     }
   }, [campaign, form])
 
-  const publishCampaign = useCallback(() => {
-    const preparedCampaign = form.getTransformedValues()
-
-    return adexServicesRequest('backend', {
-      route: '/dsp/campaigns',
-      method: 'POST',
-      body: preparedCampaign,
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    })
-  }, [form, adexServicesRequest])
-
   const saveToDraftCampaign = useCallback(async () => {
     const preparedCampaign = form.getTransformedValues()
 
@@ -463,7 +451,7 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
         if (current === 2 && form.getValues().autoUTMChecked) {
           addUTMToTargetURLS()
         }
-        return current < 4 ? current + 1 : current
+        return current < 3 ? current + 1 : current
       }),
     [addUTMToTargetURLS, form]
   )
@@ -486,6 +474,7 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
         localStorage.removeItem(LS_KEY_CREATE_CAMPAIGN_STEP)
         onReset && onReset()
       }
+
       if (form.isDirty()) {
         modals.openConfirmModal(
           defaultConfirmModalProps({
@@ -510,6 +499,35 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
       // Works as expected now  without setting initial vales, just reset()
     },
     [form, saveToDraftCampaign]
+  )
+
+  const publishCampaign = useCallback(
+    async (onSuccess?: () => void) => {
+      const preparedCampaign = form.getTransformedValues()
+
+      try {
+        const res = await adexServicesRequest<{ success: boolean }>('backend', {
+          route: '/dsp/campaigns',
+          method: 'POST',
+          body: preparedCampaign,
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        })
+
+        if (res && res.success) {
+          form.resetDirty()
+          updateBalance()
+          onSuccess && typeof onSuccess === 'function' && onSuccess()
+        } else {
+          showNotification('warning', 'invalid campaign data response', 'Data error')
+        }
+      } catch (err) {
+        console.error(err)
+        showNotification('error', 'Creating campaign failed', 'Data error')
+      }
+    },
+    [form, adexServicesRequest, updateBalance, showNotification]
   )
 
   const contextValue = useMemo(

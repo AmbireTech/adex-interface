@@ -1,12 +1,11 @@
 import { Button, Group, Stack, Text } from '@mantine/core'
-import { CREATE_CAMPAIGN_STEPS } from 'constants/createCampaign'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import LeftArrowIcon from 'resources/icons/LeftArrow'
 import useCreateCampaignData from 'hooks/useCreateCampaignData/useCreateCampaignData'
 import CampaignDetailsRow from 'components/common/CampainDetailsRow'
 import { UtmInfo } from './CreateCampaignCommon'
 
-const CampaignSummary = () => {
+const CampaignSummary = ({ onLaunchClick }: { onLaunchClick: () => void }) => {
   const {
     campaign: {
       autoUTMChecked,
@@ -92,8 +91,8 @@ const CampaignSummary = () => {
         <Text c="secondaryText">0</Text>
       </Flex> */}
       <Stack align="stretch" justify="space-between" gap="sm" mt="xl" px="md">
-        {step === CREATE_CAMPAIGN_STEPS ? (
-          <Button type="submit" size="lg" variant="filled">
+        {step === 3 ? (
+          <Button onClick={onLaunchClick} size="lg" variant="filled">
             Launch Campaign
           </Button>
         ) : (

@@ -2,14 +2,12 @@ import { Flex, Stack, Paper, Text, Box } from '@mantine/core'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { modals } from '@mantine/modals'
-import useCustomNotifications from 'hooks/useCustomNotifications'
 import type {
   unstable_Blocker as Blocker,
   unstable_BlockerFunction as BlockerFunction
 } from 'react-router-dom'
 import { unstable_useBlocker as useBlocker, useNavigate } from 'react-router-dom'
 import { defaultConfirmModalProps } from 'components/common/Modals/CustomConfirmModal'
-import useAccount from 'hooks/useAccount'
 import throttle from 'lodash.throttle'
 import { SuccessModal } from 'components/common/Modals'
 import CustomStepper from './CampaignStepper'
@@ -35,11 +33,10 @@ const Wizard = ({ step }: { step: number }) => {
 }
 
 const CreateCampaign = () => {
+  // TODO: use modals Providers for this
   const [isSuccessModalOpened, SetIsSuccessModalOpened] = useState(false)
-  const { updateBalance } = useAccount()
   const navigate = useNavigate()
-  const { publishCampaign, resetCampaign, form, step } = useCreateCampaignContext()
-  const { showNotification } = useCustomNotifications()
+  const { publishCampaign, resetCampaign, step } = useCreateCampaignContext()
 
   const shouldBlock = useCallback<BlockerFunction>(
     ({ currentLocation, nextLocation }) => currentLocation.pathname !== nextLocation.pathname,
@@ -55,21 +52,10 @@ const CreateCampaign = () => {
   }, [blocker, resetCampaign])
 
   const launchCampaign = useCallback(async () => {
-    try {
-      const res = await publishCampaign()
-
-      if (res && res.success) {
-        await updateBalance()
-        SetIsSuccessModalOpened(true)
-        resetCampaign()
-      } else {
-        showNotification('warning', 'invalid campaign data response', 'Data error')
-      }
-    } catch (err) {
-      console.error(err)
-      showNotification('error', 'Creating campaign failed', 'Data error')
-    }
-  }, [publishCampaign, resetCampaign, SetIsSuccessModalOpened, showNotification, updateBalance])
+    await publishCampaign(() => {
+      SetIsSuccessModalOpened(true)
+    })
+  }, [publishCampaign])
 
   const throttledLaunchCampaign = useMemo(
     () => throttle(launchCampaign, 1069, { leading: true }),
@@ -95,7 +81,7 @@ const CreateCampaign = () => {
   }, [navigate, SetIsSuccessModalOpened])
 
   return (
-    <form onSubmit={form.onSubmit(confirmLaunch)}>
+    <>
       <Flex direction="row" gap="xl" wrap="wrap" align="flex-start">
         <Paper p="md" shadow="xs" style={{ flexGrow: 10 }} w={720} maw="100%">
           <Stack gap="xl">
@@ -107,7 +93,7 @@ const CreateCampaign = () => {
         </Paper>
 
         <Paper p="md" shadow="sm" w={345} style={{ flexGrow: 1 }}>
-          <CampaignSummary />
+          <CampaignSummary onLaunchClick={confirmLaunch} />
         </Paper>
       </Flex>
       <SuccessModal
@@ -121,7 +107,7 @@ const CreateCampaign = () => {
         opened={isSuccessModalOpened}
         close={handleOnModalClose}
       />
-    </form>
+    </>
   )
 }
 
