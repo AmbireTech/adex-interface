@@ -51,6 +51,7 @@ export const isTokenExpired = (token: string) => {
 
   const timeNowInSeconds = Math.floor(new Date().getTime() / 1000)
   const decodeToken = parseJwt(token)
+  console.log({ decodeToken })
   return decodeToken.exp < timeNowInSeconds
 }
 
@@ -88,21 +89,6 @@ export const verifyLogin = async (body: VerifyLoginProps) => {
       'Content-Type': 'application/json'
     },
     body: JSON.stringify(body)
-  }
-
-  return fetchService(req).then(processResponse)
-}
-
-export const refreshAccessToken = async (refreshToken: string) => {
-  const req: RequestOptions = {
-    url: `${BACKEND_BASE_URL}/dsp/refresh-token`,
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      refreshToken
-    })
   }
 
   return fetchService(req).then(processResponse)

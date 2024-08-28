@@ -9,13 +9,7 @@ import {
   useState
 } from 'react'
 import { Account, BillingDetails, IAdExAccount } from 'types'
-import {
-  getMessageToSign,
-  isAdminToken,
-  isTokenExpired,
-  refreshAccessToken,
-  verifyLogin
-} from 'lib/backend'
+import { getMessageToSign, isAdminToken, isTokenExpired, verifyLogin } from 'lib/backend'
 import { AmbireLoginSDK } from '@ambire/login-sdk-core'
 import { DAPP_ICON_PATH, DAPP_NAME, DEFAULT_CHAIN_ID } from 'constants/login'
 import useCustomNotifications from 'hooks/useCustomNotifications'
@@ -64,7 +58,6 @@ interface IAccountContext {
   isAdmin: boolean
   connectWallet: () => void
   disconnectWallet: () => void
-  updateAccessToken: () => Promise<any>
   resetAdexAccount: () => void
   adexServicesRequest: <R extends any>(
     service: AdExService,
@@ -196,44 +189,38 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
     [ambireSDK]
   )
 
-  const updateAccessToken = useCallback(async () => {
-    if (!adexAccount.accessToken || !adexAccount.refreshToken) return
-
-    if (isTokenExpired(adexAccount.refreshToken)) {
-      resetAdexAccount()
-      showNotification('error', 'Refresh token has been expired', 'Refresh token')
-      return
+  const checkAndGetNewAccessTokens = useCallback(async (): Promise<{
+    accessToken: string
+    refreshToken: string
+  } | null> => {
+    if (!adexAccount.accessToken || !adexAccount.refreshToken) {
+      throw new Error('Missing access tokens')
     }
 
     if (isTokenExpired(adexAccount.accessToken)) {
       try {
-        const response = await refreshAccessToken(adexAccount.refreshToken)
-        if (response) {
-          setAdexAccount((prev) => {
-            const next = {
-              ...prev,
-              accessToken: response.accessToken,
-              refreshToken: response.refreshToken
-            }
-
-            return next
+        const req: RequestOptions = {
+          url: `${BACKEND_BASE_URL}/dsp/refresh-token`,
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            refreshToken: adexAccount.refreshToken
           })
-          return response
         }
-        return null
+
+        const res = await fetchService(req)
+        return await processResponse<{ accessToken: string; refreshToken: string }>(res)
       } catch (error: any) {
         console.error('Updating access token failed:', error)
         showNotification('error', error?.message, 'Updating access token failed')
-        throw error
+        throw new Error(error)
       }
     }
-  }, [
-    adexAccount.accessToken,
-    adexAccount.refreshToken,
-    resetAdexAccount,
-    showNotification,
-    setAdexAccount
-  ])
+
+    return null
+  }, [adexAccount.accessToken, adexAccount.refreshToken, showNotification])
 
   const adexServicesRequest = useCallback(
     // Note
@@ -264,14 +251,16 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
         [authHeaderProp]: `Bearer ${adexAccount.accessToken}`
       }
 
-      // TODO: log-out if no access token
-      // TODO: fix updateAccessToken logic - it returns if there are no access token,
-      // it should throw ot log-out
-      // TODO: if using updateAccessToken triggers some circular updates - account context should be fixed
-      const response = await updateAccessToken()
+      const newAccessTokens = await checkAndGetNewAccessTokens()
 
-      if (response) {
-        const updatedAccessToken = response.accessToken
+      if (newAccessTokens) {
+        setAdexAccount((prev) => {
+          return {
+            ...prev,
+            ...newAccessTokens
+          }
+        })
+        const updatedAccessToken = newAccessTokens.accessToken
         authHeader[authHeaderProp] = `Bearer ${updatedAccessToken}`
       }
 
@@ -279,8 +268,6 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
         ...authHeader,
         ...req.headers
       }
-
-      console.log('req', req)
 
       try {
         const res = await fetchService(req)
@@ -293,7 +280,13 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
         return Promise.reject<R>()
       }
     },
-    [adexAccount.accessToken, resetAdexAccount, showNotification, updateAccessToken]
+    [
+      adexAccount.accessToken,
+      checkAndGetNewAccessTokens,
+      setAdexAccount,
+      showNotification,
+      resetAdexAccount
+    ]
   )
 
   const handleRegistrationOrLoginSuccess = useCallback(
@@ -510,7 +503,6 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
       disconnectWallet,
       signMessage,
       ambireSDK,
-      updateAccessToken,
       resetAdexAccount,
       adexServicesRequest,
       updateBalance,
@@ -525,7 +517,6 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
       disconnectWallet,
       signMessage,
       ambireSDK,
-      updateAccessToken,
       resetAdexAccount,
       adexServicesRequest,
       updateBalance,
