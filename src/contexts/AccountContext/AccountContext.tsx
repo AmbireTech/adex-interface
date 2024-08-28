@@ -58,7 +58,7 @@ interface IAccountContext {
   isAdmin: boolean
   connectWallet: () => void
   disconnectWallet: () => void
-  resetAdexAccount: () => void
+  logOut: () => void
   adexServicesRequest: <R extends any>(
     service: AdExService,
     reqOptions: ApiRequestOptions
@@ -291,6 +291,33 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
     ]
   )
 
+  const logOut = useCallback(async () => {
+    try {
+      const resp = await adexServicesRequest<{}>('backend', {
+        route: '/dsp/logout',
+        method: 'POST',
+        body: {
+          refreshToken: adexAccount.refreshToken
+        }
+      })
+      console.log(resp)
+      if (resp) {
+        disconnectWallet()
+        resetAdexAccount()
+        showNotification('info', 'Successfully logged out', 'Logging out')
+      }
+    } catch (err: any) {
+      console.error('logOut: ', err)
+      showNotification('error', err?.message || err, 'Logging out failed')
+    }
+  }, [
+    adexAccount.refreshToken,
+    adexServicesRequest,
+    disconnectWallet,
+    resetAdexAccount,
+    showNotification
+  ])
+
   const handleRegistrationOrLoginSuccess = useCallback(
     async ({ address, chainId }: any) => {
       if (!address || !chainId) {
@@ -505,11 +532,11 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
       disconnectWallet,
       signMessage,
       ambireSDK,
-      resetAdexAccount,
       adexServicesRequest,
       updateBalance,
       updateBillingDetails,
-      isLoading
+      isLoading,
+      logOut
     }),
     [
       adexAccount,
@@ -519,11 +546,11 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
       disconnectWallet,
       signMessage,
       ambireSDK,
-      resetAdexAccount,
       adexServicesRequest,
       updateBalance,
       updateBillingDetails,
-      isLoading
+      isLoading,
+      logOut
     ]
   )
 
