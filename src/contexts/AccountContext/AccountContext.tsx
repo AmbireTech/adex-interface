@@ -78,7 +78,7 @@ type ApiRequestOptions = Omit<RequestOptions, 'url' | 'body'> & {
 }
 
 interface IAccountContext {
-  adexAccount: IAdExAccount & Account & { loaded: boolean; initialLoad: boolean }
+  adexAccount: IAdExAccount & Account & { loaded: boolean }
   authenticated: boolean
   ambireSDK: AmbireLoginSDK
   isAdmin: boolean
@@ -102,8 +102,6 @@ const defaultValue: IAccountContext['adexAccount'] = {
   accessToken: null,
   refreshToken: null,
   loaded: false,
-  // This ensures there is some obj in the ls
-  initialLoad: false,
   id: '',
   name: '',
   active: false,
@@ -199,14 +197,14 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
     console.log({ lsAcc })
 
     if (!lsAcc) {
-      setAdexAccount({ ...defaultValue, initialLoad: true })
+      setAdexAccount({ ...defaultValue, loaded: true })
     }
   }, [setAdexAccount])
 
   const resetAdexAccount = useCallback(
     (reason?: string) => {
       console.log('reset account: ', reason)
-      setAdexAccount({ ...defaultValue, initialLoad: true })
+      setAdexAccount({ ...defaultValue, loaded: true })
     },
     [setAdexAccount]
   )
@@ -410,7 +408,7 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
         console.log({ authMsgResp })
         setAuthMsg(authMsgResp)
         signMessage('eth_signTypedData', JSON.stringify(authMsgResp.authMsg))
-        setAdexAccount({ ...defaultValue, address, chainId })
+        setAdexAccount({ ...defaultValue, address, chainId, loaded: true })
       } catch (error) {
         console.error('Get message to sign failed', error)
         showNotification('error', 'Get message to sign failed')
@@ -443,7 +441,8 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
         console.error('Error verify login:', error)
         showNotification('error', 'Verify login failed', error?.message || error)
         setAdexAccount({
-          ...defaultValue
+          ...defaultValue,
+          loaded: true
         })
       } finally {
         setIsLoading(false)
