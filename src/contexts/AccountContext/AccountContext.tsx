@@ -14,7 +14,7 @@ import { AmbireLoginSDK } from '@ambire/login-sdk-core'
 import { DAPP_ICON_PATH, DAPP_NAME, DEFAULT_CHAIN_ID } from 'constants/login'
 import useCustomNotifications from 'hooks/useCustomNotifications'
 import { fetchService, getReqErr, RequestOptions } from 'services'
-import SuperJSON from 'superjson'
+// import SuperJSON from 'superjson'
 
 const ambireLoginSDK = new AmbireLoginSDK({
   dappName: DAPP_NAME,
@@ -46,7 +46,7 @@ type AdExService = 'backend' | 'validator'
 
 type ApiRequestOptions = Omit<RequestOptions, 'url' | 'body'> & {
   route: string
-  body?: BodyInit | object | string | null
+  body?: BodyInit | object | string | FormData
   noAuth?: boolean
   onErrMsg?: string
 }
@@ -241,9 +241,9 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
           url: `${baseUrl}/${urlCheck}`,
           method: reqOptions.method,
           body:
-            reqOptions.body instanceof FormData
-              ? reqOptions.body
-              : reqOptions.body && JSON.stringify(SuperJSON.serialize(reqOptions.body).json),
+            !(reqOptions.body instanceof FormData) && typeof reqOptions.body === 'object'
+              ? serializeJSON(reqOptions.body)
+              : reqOptions.body,
           queryParams: reqOptions.queryParams,
           headers: reqOptions.headers
         }
@@ -278,17 +278,10 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
         if (service === 'backend' && err && (err?.message || err).includes(UNAUTHORIZED_ERR_STR)) {
           resetAdexAccount()
         }
-        showNotification('error', err.message, reqOptions.onErrMsg || 'Data error')
-        return Promise.reject<R>()
+        return Promise.reject<R>(err)
       }
     },
-    [
-      adexAccount.accessToken,
-      checkAndGetNewAccessTokens,
-      setAdexAccount,
-      showNotification,
-      resetAdexAccount
-    ]
+    [adexAccount.accessToken, checkAndGetNewAccessTokens, setAdexAccount, resetAdexAccount]
   )
 
   const logOut = useCallback(async () => {
@@ -296,11 +289,13 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
       const resp = await adexServicesRequest<{}>('backend', {
         route: '/dsp/logout',
         method: 'POST',
+        headers: {
+          'content-type': 'application/json'
+        },
         body: {
           refreshToken: adexAccount.refreshToken
         }
       })
-      console.log(resp)
       if (resp) {
         disconnectWallet()
         resetAdexAccount()

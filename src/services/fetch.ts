@@ -1,9 +1,9 @@
-export interface RequestOptions {
+export type RequestOptions = {
   url: string
   method?: 'GET' | 'POST' | 'OPTIONS' | 'PUT' | 'DELETE'
   headers?: Record<string, string>
   queryParams?: Record<string, string>
-  body?: BodyInit | null
+  body?: BodyInit
 }
 
 export async function fetchService(options: RequestOptions): Promise<Response> {
