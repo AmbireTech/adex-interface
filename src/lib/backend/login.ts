@@ -62,3 +62,10 @@ export const isTokenExpired = (token: string, extraSecondsBeforeExpiry: number =
   console.log({ exp, timeNowInSeconds, isAboutToExpire, type })
   return isAboutToExpire
 }
+
+export const getJWTExpireTime = (token: string, extraSecondsBeforeExpiry: number = 0): number => {
+  const { exp, type } = parseJwt(token)
+  const expireTime = (exp - extraSecondsBeforeExpiry) * 1000
+  console.log({ exp, expireTime, type })
+  return expireTime
+}

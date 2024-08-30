@@ -9,7 +9,7 @@ import {
   useState
 } from 'react'
 import { Account, BillingDetails, IAdExAccount } from 'types'
-import { isAdminToken, isTokenExpired } from 'lib/backend'
+import { isAdminToken, isTokenExpired, getJWTExpireTime } from 'lib/backend'
 import { AmbireLoginSDK } from '@ambire/login-sdk-core'
 import { DAPP_ICON_PATH, DAPP_NAME, DEFAULT_CHAIN_ID } from 'constants/login'
 import useCustomNotifications from 'hooks/useCustomNotifications'
@@ -172,14 +172,11 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
       const res = !str
         ? { ...defaultValue, updated: true }
         : { ...defaultValue, ...deserializeJSON(str), loaded: true }
-
-      // console.log({ res })
-
       return res
     },
     serialize: (acc) => {
       const seri = serializeJSON({ ...acc, loaded: true })
-      // console.log({ ser })
+      // console.log({ seri })
 
       return seri
     }
@@ -222,15 +219,12 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
     [ambireSDK]
   )
 
-  const checkAndGetNewAccessTokens = useCallback(async (): Promise<{
-    accessToken: string
-    refreshToken: string
-  } | null> => {
+  const checkAndUpdateNewAccessTokens = useCallback(async (): Promise<void> => {
     if (!adexAccount.accessToken || !adexAccount.refreshToken) {
       throw new Error(`${UNAUTHORIZED_ERR_STR}: missing access tokens`)
     }
 
-    if (isTokenExpired(adexAccount.accessToken, 100)) {
+    if (!isTokenExpired(adexAccount.refreshToken)) {
       console.log('updating access tokens')
       try {
         const req: RequestOptions = {
@@ -245,19 +239,57 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
         }
 
         const res = await fetchService(req)
-        return await processResponse<{ accessToken: string; refreshToken: string }>(res)
+        const newAccessTokens = await processResponse<{
+          accessToken: string
+          refreshToken: string
+        }>(res)
+        setAdexAccount((prev) => {
+          return {
+            ...prev,
+            ...newAccessTokens
+          }
+        })
       } catch (error: any) {
         console.error('Updating access token failed:', error)
         showNotification('error', error?.message, 'Updating access token failed')
         throw new Error(`${UNAUTHORIZED_ERR_STR}: ${error}`)
       }
-    } else if (isTokenExpired(adexAccount.refreshToken)) {
+    } else {
       resetAdexAccount('refresh token expired')
       showNotification('info', 'Please log in!', 'Session expired')
     }
+  }, [
+    adexAccount.accessToken,
+    adexAccount.refreshToken,
+    resetAdexAccount,
+    setAdexAccount,
+    showNotification
+  ])
 
-    return null
-  }, [adexAccount.accessToken, adexAccount.refreshToken, resetAdexAccount, showNotification])
+  // NOTE: updating access tokens some second before the access token expire instead of checking on each request where can have "racing" condition with multiple request at the same time
+  // TODO: add retry functionality
+  useEffect(() => {
+    let updateTokensTimeout: ReturnType<typeof setTimeout>
+
+    if (adexAccount.accessToken) {
+      const now = Date.now()
+      const accessTokenExpireTime = getJWTExpireTime(adexAccount.accessToken, 10)
+      if (now >= accessTokenExpireTime) {
+        checkAndUpdateNewAccessTokens()
+      } else {
+        updateTokensTimeout = setTimeout(
+          () => checkAndUpdateNewAccessTokens(),
+          accessTokenExpireTime - now
+        )
+      }
+    }
+
+    return () => {
+      if (updateTokensTimeout) {
+        clearTimeout(updateTokensTimeout)
+      }
+    }
+  }, [adexAccount.accessToken, checkAndUpdateNewAccessTokens])
 
   const adexServicesRequest = useCallback(
     // Note
@@ -279,31 +311,10 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
               ? serializeJSON(reqOptions.body)
               : reqOptions.body,
           queryParams: reqOptions.queryParams,
-          headers: reqOptions.headers
-        }
-
-        // console.log('adexAccount', adexAccount)
-        if (!adexAccount.accessToken) throw new Error('Access token is missing')
-
-        const authHeader = {
-          [authHeaderProp]: `Bearer ${adexAccount.accessToken}`
-        }
-
-        const newAccessTokens = await checkAndGetNewAccessTokens()
-
-        if (newAccessTokens) {
-          setAdexAccount((prev) => {
-            return {
-              ...prev,
-              ...newAccessTokens
-            }
-          })
-          authHeader[authHeaderProp] = `Bearer ${newAccessTokens.accessToken}`
-        }
-
-        req.headers = {
-          ...authHeader,
-          ...req.headers
+          headers: {
+            ...reqOptions.headers,
+            [authHeaderProp]: `Bearer ${adexAccount.accessToken}`
+          }
         }
 
         const res = await fetchService(req)
@@ -315,7 +326,7 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
         return Promise.reject<R>(err)
       }
     },
-    [adexAccount.accessToken, checkAndGetNewAccessTokens, setAdexAccount, resetAdexAccount]
+    [adexAccount.accessToken, resetAdexAccount]
   )
 
   const logOut = useCallback(async () => {

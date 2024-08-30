@@ -9,7 +9,6 @@ import {
   useEffect
 } from 'react'
 import { useAdExApi } from 'hooks/useAdexServices'
-import useAccount from 'hooks/useAccount'
 import useCustomNotifications from 'hooks/useCustomNotifications'
 import { BaseData, CampaignData, EvAggrData, SupplyStats } from 'types'
 import { CREATE_CAMPAIGN_DEFAULT_VALUE } from 'constants/createCampaign'
@@ -146,7 +145,7 @@ const CampaignsDataProvider: FC<PropsWithChildren & { type: 'user' | 'admin' }> 
   const { showNotification } = useCustomNotifications()
   const { adexServicesRequest } = useAdExApi()
 
-  const { authenticated } = useAccount()
+  // const { authenticated } = useAccount()
   const [initialDataLoading, setInitialDataLoading] = useState(true)
   const [supplyStats, setSupplyStats] = useState<SupplyStats>(defaultSupplyStats)
 
@@ -341,20 +340,6 @@ const CampaignsDataProvider: FC<PropsWithChildren & { type: 'user' | 'admin' }> 
     updateSupplyStats()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
-
-  useEffect(() => {
-    if (authenticated) {
-      const updateCampaigns = async () => {
-        await updateAllCampaignsData(true)
-        // setInitialDataLoading(false)
-      }
-
-      updateCampaigns()
-    } else {
-      setCampaignData(new Map<string, CampaignData>())
-      // setInitialDataLoading(false)
-    }
-  }, [updateAllCampaignsData, authenticated])
 
   // TODO: move to separate context delete and archive
   const deleteDraftCampaign = useCallback(

@@ -310,7 +310,8 @@ const Dashboard = ({ isAdminPanel, accountId }: { isAdminPanel?: boolean; accoun
 
   useEffect(() => {
     updateAllCampaignsData(true)
-  }, [updateAllCampaignsData])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const actions = useMemo(() => {
     const dashboardActions: TableRowAction[] = [

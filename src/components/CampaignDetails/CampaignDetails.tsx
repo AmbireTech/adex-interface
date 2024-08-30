@@ -119,7 +119,8 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
     if (id) {
       updateCampaignDataById(id)
     }
-  }, [id, updateCampaignDataById])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id])
 
   const canArchive = useMemo(() => {
     return (
