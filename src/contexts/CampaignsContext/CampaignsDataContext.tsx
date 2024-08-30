@@ -1,13 +1,5 @@
 import { Campaign, CampaignStatus } from 'adex-common'
-import {
-  createContext,
-  FC,
-  PropsWithChildren,
-  useMemo,
-  useState,
-  useCallback,
-  useEffect
-} from 'react'
+import { createContext, FC, PropsWithChildren, useMemo, useState, useCallback } from 'react'
 import { useAdExApi } from 'hooks/useAdexServices'
 import useCustomNotifications from 'hooks/useCustomNotifications'
 import { BaseData, CampaignData, EvAggrData, SupplyStats } from 'types'
@@ -183,8 +175,7 @@ const CampaignsDataProvider: FC<PropsWithChildren & { type: 'user' | 'admin' }> 
         })
 
         if (!campaignStatusRes.success) {
-          showNotification('error', `changing campaign status with id ${campaignId}`, 'Data error')
-          return
+          throw new Error(`changing campaign status with id ${campaignId}`)
         }
 
         setCampaignData((prev) => {
@@ -202,9 +193,9 @@ const CampaignsDataProvider: FC<PropsWithChildren & { type: 'user' | 'admin' }> 
 
           return next
         })
-      } catch (err) {
+      } catch (err: any) {
         console.log(err)
-        showNotification('error', `changing campaign status with id ${campaignId}`, 'Data error')
+        showNotification('error', err?.message || err, 'Campaign status update error')
       }
     },
     [adexServicesRequest, showNotification]
@@ -220,9 +211,7 @@ const CampaignsDataProvider: FC<PropsWithChildren & { type: 'user' | 'admin' }> 
         })
 
         if (campaignId !== campaignDetailsRes?.id) {
-          // NOTE: skip state update
-          showNotification('error', `getting campaign with id ${campaignId}`, 'Data error')
-          return
+          throw new Error(`Getting campaign with id ${campaignId}`)
         }
 
         // const advData = await getCampaignAdvancedData(campaignId)
@@ -238,9 +227,9 @@ const CampaignsDataProvider: FC<PropsWithChildren & { type: 'user' | 'admin' }> 
           next.set(campaignId, updatedCmp)
           return next
         })
-      } catch (err) {
+      } catch (err: any) {
         console.log(err)
-        showNotification('error', `getting campaign with id ${campaignId}`, 'Data error')
+        showNotification('error', err?.message || err, 'Data error')
       }
     },
     [adexServicesRequest, showNotification]
@@ -284,24 +273,21 @@ const CampaignsDataProvider: FC<PropsWithChildren & { type: 'user' | 'admin' }> 
               next.set(cmp.id, currentCMP)
             })
 
-            prev.forEach((value, key) => {
+            prev.forEach((_value, key) => {
               if (!dataResIds.has(key)) {
                 next.delete(key)
               }
             })
-            // TODO: check it again when dev has been merged
-            setInitialDataLoading(false)
             return next
           })
         } else {
-          showNotification('warning', 'invalid campaigns data response', 'Data error')
-          console.log({ dataRes })
-          setInitialDataLoading(false)
+          throw new Error('Invalid campaigns data response')
         }
-      } catch (err) {
+      } catch (err: any) {
         console.log(err)
-        showNotification('error', 'getting campaigns data', 'Data error')
-        // setInitialDataLoading(false)
+        showNotification('error', err?.message || err, 'Campaigns data error')
+      } finally {
+        setInitialDataLoading(false)
       }
     },
     [adexServicesRequest, showNotification, type]
@@ -317,7 +303,7 @@ const CampaignsDataProvider: FC<PropsWithChildren & { type: 'user' | 'admin' }> 
       })
 
       if (!result) {
-        throw new Error('Getting banner sizes failed.')
+        throw new Error('No supply stats')
       }
 
       const hasEmptyValueResponse = Object.values(result).every(
@@ -325,21 +311,15 @@ const CampaignsDataProvider: FC<PropsWithChildren & { type: 'user' | 'admin' }> 
       )
 
       if (hasEmptyValueResponse) {
-        throw new Error('Supply stats not available')
+        throw new Error('Invalid supply stats response')
       }
 
       setSupplyStats(result as SupplyStats)
-    } catch (e) {
+    } catch (e: any) {
       console.error(e)
-      showNotification('error', 'Getting banner sizes failed', 'Getting banner sizes failed')
+      showNotification('error', e?.message || e, 'Supply stats error')
     }
   }, [adexServicesRequest, showNotification])
-
-  useEffect(() => {
-    console.log('updateSupplyStats')
-    updateSupplyStats()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
 
   // TODO: move to separate context delete and archive
   const deleteDraftCampaign = useCallback(
