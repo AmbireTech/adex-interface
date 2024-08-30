@@ -57,15 +57,13 @@ export const isTokenExpired = (token: string, extraSecondsBeforeExpiry: number =
   }
 
   const timeNowInSeconds = new Date().getTime() / 1000
-  const { exp, type } = parseJwt(token)
+  const { exp } = parseJwt(token)
   const isAboutToExpire = exp - extraSecondsBeforeExpiry < timeNowInSeconds
-  console.log({ exp, timeNowInSeconds, isAboutToExpire, type })
   return isAboutToExpire
 }
 
 export const getJWTExpireTime = (token: string, extraSecondsBeforeExpiry: number = 0): number => {
-  const { exp, type } = parseJwt(token)
+  const { exp } = parseJwt(token)
   const expireTime = (exp - extraSecondsBeforeExpiry) * 1000
-  console.log({ exp, expireTime, type })
   return expireTime
 }

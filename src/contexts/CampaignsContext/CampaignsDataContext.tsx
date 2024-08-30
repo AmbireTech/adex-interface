@@ -245,8 +245,6 @@ const CampaignsDataProvider: FC<PropsWithChildren & { type: 'user' | 'admin' }> 
           queryParams: { all: 'true' }
         })
 
-        console.log({ dataRes })
-
         let advData: EvAggrData[]
 
         // if (updateAdvanced) {
@@ -258,10 +256,8 @@ const CampaignsDataProvider: FC<PropsWithChildren & { type: 'user' | 'admin' }> 
 
         if (updateAdvanced) {
           advData = [...dataRes].map((cmpDataRes) => campaignDataResToAdvData(cmpDataRes))
-          console.log({ advData })
         }
 
-        console.log({ dataRes })
         if (Array.isArray(dataRes)) {
           setCampaignData((prev) => {
             const next = new Map()
