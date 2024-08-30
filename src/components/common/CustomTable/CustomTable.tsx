@@ -263,8 +263,8 @@ export const CustomTable = ({
           )
 
         return isMobile ? (
-          <Stack gap="xs">
-            <Group key={rowKey + column} grow align="center" px="sm">
+          <Stack key={rowKey + column} gap="xs">
+            <Group grow align="center" px="sm">
               <Text ta="left" tt="capitalize" fw="bold" size="sm">
                 {colsToMap[cidx]}:
               </Text>
@@ -281,8 +281,8 @@ export const CustomTable = ({
 
       if (isMobile) {
         return (
-          <Paper py="sm" shadow="xs">
-            <Stack key={rowKey} gap="xs" align="stretch" justify="center">
+          <Paper key={rowKey} py="sm" shadow="xs">
+            <Stack gap="xs" align="stretch" justify="center">
               {/* <Divider color="lightBackground" size={14} /> */}
               {cols}
             </Stack>
