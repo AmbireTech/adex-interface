@@ -9,18 +9,12 @@ import {
   useState
 } from 'react'
 import { Account, BillingDetails, IAdExAccount } from 'types'
-import {
-  getMessageToSign,
-  isAdminToken,
-  isTokenExpired,
-  refreshAccessToken,
-  verifyLogin
-} from 'lib/backend'
+import { isAdminToken, isTokenExpired, getJWTExpireTime } from 'lib/backend'
 import { AmbireLoginSDK } from '@ambire/login-sdk-core'
 import { DAPP_ICON_PATH, DAPP_NAME, DEFAULT_CHAIN_ID } from 'constants/login'
 import useCustomNotifications from 'hooks/useCustomNotifications'
 import { fetchService, getReqErr, RequestOptions } from 'services'
-import SuperJSON from 'superjson'
+// import SuperJSON from 'superjson'
 
 const ambireLoginSDK = new AmbireLoginSDK({
   dappName: DAPP_NAME,
@@ -29,7 +23,7 @@ const ambireLoginSDK = new AmbireLoginSDK({
 
 export const BACKEND_BASE_URL = process.env.REACT_APP_BACKEND_BASE_URL
 export const VALIDATOR_BASE_URL = process.env.REACT_APP_VALIDATOR_BASE_URL
-const UNAUTHORIZED_ERR_STR = 'Unauthorized!'
+const UNAUTHORIZED_ERR_STR = 'Unauthorized'
 
 console.log({ BACKEND_BASE_URL })
 const processResponse = <R extends any>(res: Response): Promise<R> => {
@@ -48,24 +42,49 @@ const processResponse = <R extends any>(res: Response): Promise<R> => {
   })
 }
 
+type AuthMsgResp = {
+  authMsg: {
+    domain: {
+      name: string
+      chainId: any
+    }
+    types: {
+      LoginInfo: {
+        name: string
+        type: string
+      }[]
+    }
+    primaryType: string
+    message: {
+      wallet: string
+      purpose: string
+      requestedAt: Date
+    }
+  }
+}
+
+type AccessTokensResp = {
+  accessToken: string
+  refreshToken: string
+}
+
 type AdExService = 'backend' | 'validator'
 
 type ApiRequestOptions = Omit<RequestOptions, 'url' | 'body'> & {
   route: string
-  body?: BodyInit | object | string | null
+  body?: BodyInit | object | string | FormData
   noAuth?: boolean
   onErrMsg?: string
 }
 
 interface IAccountContext {
-  adexAccount: IAdExAccount & Account & { loaded: boolean; initialLoad: boolean }
+  adexAccount: IAdExAccount & Account & { loaded: boolean }
   authenticated: boolean
   ambireSDK: AmbireLoginSDK
   isAdmin: boolean
   connectWallet: () => void
   disconnectWallet: () => void
-  updateAccessToken: () => Promise<any>
-  resetAdexAccount: () => void
+  logOut: () => void
   adexServicesRequest: <R extends any>(
     service: AdExService,
     reqOptions: ApiRequestOptions
@@ -82,11 +101,7 @@ const defaultValue: IAccountContext['adexAccount'] = {
   chainId: 0,
   accessToken: null,
   refreshToken: null,
-  authenticated: false,
-  authMsgResp: null,
   loaded: false,
-  // This ensures there is some obj in the ls
-  initialLoad: false,
   id: '',
   name: '',
   active: false,
@@ -147,7 +162,8 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
   const { showNotification } = useCustomNotifications()
   const ambireSDK = useMemo(() => ambireLoginSDK, [])
   const [isLoading, setIsLoading] = useState(false)
-  const [sdkMsgSignature, setSdkMsgSignature] = useState<string>('')
+  const [sdkMsgSignature, setSdkMsgSignature] = useState<string | null>(null)
+  const [authMsg, setAuthMsg] = useState<AuthMsgResp | null>(null)
   const [adexAccount, setAdexAccount] = useLocalStorage<IAccountContext['adexAccount']>({
     key: 'adexAccount',
     defaultValue: { ...defaultValue },
@@ -156,38 +172,45 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
       const res = !str
         ? { ...defaultValue, updated: true }
         : { ...defaultValue, ...deserializeJSON(str), loaded: true }
-
-      // console.log({ res })
-
       return res
     },
     serialize: (acc) => {
       const seri = serializeJSON({ ...acc, loaded: true })
-      // console.log({ ser })
+      // console.log({ seri })
 
       return seri
     }
   })
+  const authenticated = useMemo(
+    () => !!adexAccount.accessToken && !!adexAccount.refreshToken,
+    [adexAccount.accessToken, adexAccount.refreshToken]
+  )
 
   // NOTE: hax to ensure there is storage value as there is no way to differentiate the default value from storage value using useLocalStorage
   useEffect(() => {
-    const lsAcc = deserializeJSON(localStorage.getItem('adexAccount') || '')
-    // console.log({ lsAcc })
+    const lsAcc: IAccountContext['adexAccount'] = deserializeJSON(
+      localStorage.getItem('adexAccount') || ''
+    )
+    console.log({ lsAcc })
 
     if (!lsAcc) {
-      setAdexAccount({ ...defaultValue, initialLoad: true })
+      setAdexAccount({ ...defaultValue, loaded: true })
     }
   }, [setAdexAccount])
 
   const resetAdexAccount = useCallback(
-    () => setAdexAccount({ ...defaultValue, initialLoad: true }),
+    (reason?: string) => {
+      console.log('reset account: ', reason)
+      setAdexAccount({ ...defaultValue, loaded: true })
+    },
     [setAdexAccount]
   )
 
   const connectWallet = useCallback(() => {
     console.log({ ambireSDK })
+    resetAdexAccount('connecting new wallet')
     ambireSDK.openLogin({ chainId: DEFAULT_CHAIN_ID })
-  }, [ambireSDK])
+  }, [ambireSDK, resetAdexAccount])
 
   const disconnectWallet = useCallback(() => ambireSDK.openLogout(), [ambireSDK])
 
@@ -196,214 +219,285 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
     [ambireSDK]
   )
 
-  const updateAccessToken = useCallback(async () => {
-    if (!adexAccount.accessToken || !adexAccount.refreshToken) return
-
-    if (isTokenExpired(adexAccount.refreshToken)) {
-      resetAdexAccount()
-      showNotification('error', 'Refresh token has been expired', 'Refresh token')
-      return
+  const checkAndUpdateNewAccessTokens = useCallback(async (): Promise<void> => {
+    if (!adexAccount.accessToken || !adexAccount.refreshToken) {
+      throw new Error(`${UNAUTHORIZED_ERR_STR}: missing access tokens`)
     }
 
-    if (isTokenExpired(adexAccount.accessToken)) {
+    if (!isTokenExpired(adexAccount.refreshToken)) {
+      console.log('updating access tokens')
       try {
-        const response = await refreshAccessToken(adexAccount.refreshToken)
-        if (response) {
-          setAdexAccount((prev) => {
-            const next = {
-              ...prev,
-              accessToken: response.accessToken,
-              refreshToken: response.refreshToken
-            }
-
-            return next
+        const req: RequestOptions = {
+          url: `${BACKEND_BASE_URL}/dsp/refresh-token`,
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            refreshToken: adexAccount.refreshToken
           })
-          return response
         }
-        return null
+
+        const res = await fetchService(req)
+        const newAccessTokens = await processResponse<{
+          accessToken: string
+          refreshToken: string
+        }>(res)
+        setAdexAccount((prev) => {
+          return {
+            ...prev,
+            ...newAccessTokens
+          }
+        })
       } catch (error: any) {
         console.error('Updating access token failed:', error)
         showNotification('error', error?.message, 'Updating access token failed')
-        throw error
+        throw new Error(`${UNAUTHORIZED_ERR_STR}: ${error}`)
       }
+    } else {
+      resetAdexAccount('refresh token expired')
+      showNotification('info', 'Please log in!', 'Session expired')
     }
   }, [
     adexAccount.accessToken,
     adexAccount.refreshToken,
     resetAdexAccount,
-    showNotification,
-    setAdexAccount
+    setAdexAccount,
+    showNotification
   ])
+
+  // NOTE: updating access tokens some second before the access token expire instead of checking on each request where can have "racing" condition with multiple request at the same time
+  // TODO: add retry functionality
+  useEffect(() => {
+    let updateTokensTimeout: ReturnType<typeof setTimeout>
+
+    if (adexAccount.accessToken) {
+      const now = Date.now()
+      const accessTokenExpireTime = getJWTExpireTime(adexAccount.accessToken, 10)
+      if (now >= accessTokenExpireTime) {
+        checkAndUpdateNewAccessTokens()
+      } else {
+        updateTokensTimeout = setTimeout(
+          () => checkAndUpdateNewAccessTokens(),
+          accessTokenExpireTime - now
+        )
+      }
+    }
+
+    return () => {
+      if (updateTokensTimeout) {
+        clearTimeout(updateTokensTimeout)
+      }
+    }
+  }, [adexAccount.accessToken, checkAndUpdateNewAccessTokens])
 
   const adexServicesRequest = useCallback(
     // Note
     async <R extends any>(service: AdExService, reqOptions: ApiRequestOptions): Promise<R> => {
-      // temp hax for using the same token fot validator auth
-      const authHeaderProp = service === 'backend' ? 'X-DSP-AUTH' : 'authorization'
-
-      // url check
-      // TODO: route instead url in props
-      const baseUrl = (service === 'backend' ? BACKEND_BASE_URL : VALIDATOR_BASE_URL) || ''
-      const urlCheck = reqOptions.route.replace(baseUrl, '').replace(/^\//, '')
-
-      const req: RequestOptions = {
-        url: `${baseUrl}/${urlCheck}`,
-        method: reqOptions.method,
-        body:
-          reqOptions.body instanceof FormData
-            ? reqOptions.body
-            : reqOptions.body && JSON.stringify(SuperJSON.serialize(reqOptions.body).json),
-        queryParams: reqOptions.queryParams,
-        headers: reqOptions.headers
-      }
-
-      // console.log('adexAccount', adexAccount)
-      if (!adexAccount.accessToken) throw new Error('Access token is missing')
-
-      const authHeader = {
-        [authHeaderProp]: `Bearer ${adexAccount.accessToken}`
-      }
-
-      // TODO: log-out if no access token
-      // TODO: fix updateAccessToken logic - it returns if there are no access token,
-      // it should throw ot log-out
-      // TODO: if using updateAccessToken triggers some circular updates - account context should be fixed
-      const response = await updateAccessToken()
-
-      if (response) {
-        const updatedAccessToken = response.accessToken
-        authHeader[authHeaderProp] = `Bearer ${updatedAccessToken}`
-      }
-
-      req.headers = {
-        ...authHeader,
-        ...req.headers
-      }
-
-      console.log('req', req)
-
       try {
+        // temp hax for using the same token fot validator auth
+        const authHeaderProp = service === 'backend' ? 'X-DSP-AUTH' : 'authorization'
+
+        // url check
+        // TODO: route instead url in props
+        const baseUrl = (service === 'backend' ? BACKEND_BASE_URL : VALIDATOR_BASE_URL) || ''
+        const urlCheck = reqOptions.route.replace(baseUrl, '').replace(/^\//, '')
+
+        const req: RequestOptions = {
+          url: `${baseUrl}/${urlCheck}`,
+          method: reqOptions.method,
+          body:
+            !(reqOptions.body instanceof FormData) && typeof reqOptions.body === 'object'
+              ? serializeJSON(reqOptions.body)
+              : reqOptions.body,
+          queryParams: reqOptions.queryParams,
+          headers: {
+            ...reqOptions.headers,
+            [authHeaderProp]: `Bearer ${adexAccount.accessToken}`
+          }
+        }
+
         const res = await fetchService(req)
         return await processResponse<R>(res)
       } catch (err: any) {
-        console.log(err)
-        if (err && err.message && err.message.includes(UNAUTHORIZED_ERR_STR)) {
-          resetAdexAccount()
+        if (service === 'backend' && err && (err?.message || err).includes(UNAUTHORIZED_ERR_STR)) {
+          resetAdexAccount(UNAUTHORIZED_ERR_STR)
         }
-        showNotification('error', err.message, reqOptions.onErrMsg || 'Data error')
-        return Promise.reject<R>()
+        return Promise.reject<R>(err)
       }
     },
-    [adexAccount.accessToken, resetAdexAccount, showNotification, updateAccessToken]
+    [adexAccount.accessToken, resetAdexAccount]
   )
 
-  const handleRegistrationOrLoginSuccess = useCallback(
+  const logOut = useCallback(async () => {
+    try {
+      const resp = await adexServicesRequest<{}>('backend', {
+        route: '/dsp/logout',
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json'
+        },
+        body: {
+          refreshToken: adexAccount.refreshToken
+        }
+      })
+      if (resp) {
+        disconnectWallet()
+        resetAdexAccount('Log out btn (backend)')
+        showNotification('info', 'Successfully logged out', 'Logging out')
+      }
+    } catch (err: any) {
+      console.error('logOut: ', err)
+      showNotification('error', err?.message || err, 'Logging out failed')
+    }
+  }, [
+    adexAccount.refreshToken,
+    adexServicesRequest,
+    disconnectWallet,
+    resetAdexAccount,
+    showNotification
+  ])
+
+  const getAuthMsg = useCallback(
+    async ({ wallet, chainId }: { wallet: string; chainId: string }): Promise<AuthMsgResp> => {
+      try {
+        const req: RequestOptions = {
+          url: `${BACKEND_BASE_URL}/dsp/login-msg`,
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            wallet,
+            chainId
+          })
+        }
+
+        const res = await fetchService(req)
+        return await processResponse<AuthMsgResp>(res)
+      } catch (err: any) {
+        console.log(err)
+        throw new Error(err)
+      }
+    },
+    []
+  )
+
+  const verifyLoginMsg = useCallback(
+    async (veryData: AuthMsgResp & { signature: string }): Promise<AccessTokensResp> => {
+      try {
+        const req: RequestOptions = {
+          url: `${BACKEND_BASE_URL}/dsp/login-verify`,
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(veryData)
+        }
+
+        const res = await fetchService(req)
+        return await processResponse<AccessTokensResp>(res)
+      } catch (err: any) {
+        console.log(err)
+        throw new Error(err)
+      }
+    },
+    []
+  )
+
+  const handleSDKAuthSuccess = useCallback(
     async ({ address, chainId }: any) => {
       if (!address || !chainId) {
         showNotification('warning', 'Ambire sdk no address or chain')
         return
       }
 
-      // TODO: this need to be fixed because it can be called more than once
-      // because it's triggered on more than oe event
-      // This check works atm but it's not ok
-      // if (prev.address !== '' && prev.chainId !== 0 && prev.authMsgResp !== null) {
-      //   return prev
-      // }
+      console.log('handleSDKAuthSuccess')
 
       try {
-        console.log('getMessageToSign', { address, chainId })
-        const authMsgRsp = await getMessageToSign({ address, chainId })
-
-        setAdexAccount((prev) => {
-          if (prev.address !== '' && prev.chainId !== 0 && prev.authMsgResp !== null) {
-            return prev
-          }
-
-          const next = { ...prev, address, chainId, authMsgResp: authMsgRsp.authMsg }
-          return next
-        })
+        const authMsgResp = await getAuthMsg({ wallet: address, chainId })
+        console.log({ authMsgResp })
+        setAuthMsg(authMsgResp)
+        signMessage('eth_signTypedData', JSON.stringify(authMsgResp.authMsg))
+        setAdexAccount({ ...defaultValue, address, chainId, loaded: true })
       } catch (error) {
         console.error('Get message to sign failed', error)
         showNotification('error', 'Get message to sign failed')
       }
     },
-    [setAdexAccount, showNotification]
+    [getAuthMsg, setAdexAccount, showNotification, signMessage]
   )
 
   useEffect(() => {
-    if (!sdkMsgSignature || !adexAccount.authMsgResp || adexAccount.authenticated) return
-
     async function verify() {
+      if (!sdkMsgSignature || !authMsg) return
       try {
-        // console.log('verifyLogin')
-        const authResp = await verifyLogin({
-          authMsg: { ...adexAccount.authMsgResp },
+        const authResp = await verifyLoginMsg({
+          ...authMsg,
           signature: sdkMsgSignature
         })
 
-        if (!authResp) {
-          setIsLoading(false)
-          throw new Error('Verify login failed')
+        if (!authResp.accessToken || !authResp.refreshToken) {
+          throw new Error('Verify login failed, invalid tokens response')
         }
 
-        setAdexAccount((prev) => {
-          const { accessToken, refreshToken } = authResp
-          const next = {
+        setAdexAccount((prev: IAccountContext['adexAccount']) => {
+          const next: IAccountContext['adexAccount'] = {
             ...prev,
-            accessToken,
-            refreshToken,
-            authenticated: !!authResp.accessToken && !!authResp.refreshToken
+            ...authResp
           }
-
           return next
         })
-        setIsLoading(false)
-      } catch (error) {
+      } catch (error: any) {
         console.error('Error verify login:', error)
-        showNotification('error', 'Verify login failed')
+        showNotification('error', 'Verify login failed', error?.message || error)
+        setAdexAccount({
+          ...defaultValue,
+          loaded: true
+        })
+      } finally {
         setIsLoading(false)
+        setSdkMsgSignature(null)
+        setAuthMsg(null)
       }
     }
 
     verify()
-  }, [
-    sdkMsgSignature,
-    adexAccount.authMsgResp,
-    adexAccount.authenticated,
-    showNotification,
-    setAdexAccount
-  ])
-
-  const handleMsgRejected = useCallback(() => {
-    disconnectWallet()
-  }, [disconnectWallet])
+  }, [sdkMsgSignature, showNotification, setAdexAccount, verifyLoginMsg, authMsg])
 
   const handleLogoutSuccess = useCallback(() => {
-    resetAdexAccount()
+    resetAdexAccount('Log out SDK')
   }, [resetAdexAccount])
 
-  const handleActionRejected = useCallback(() => {
-    disconnectWallet()
-  }, [disconnectWallet])
+  const handleMsgRejected = useCallback((data: any) => {
+    console.log('message rejected', data)
+  }, [])
+
+  const handleActionRejected = useCallback((data: any) => {
+    console.log('action rejected', data)
+  }, [])
+
+  const handleTxnRejected = useCallback((data: any) => {
+    console.log('action rejected', data)
+  }, [])
 
   useEffect(() => {
-    ambireSDK.onRegistrationSuccess(handleRegistrationOrLoginSuccess)
-  }, [ambireSDK, handleRegistrationOrLoginSuccess])
+    ambireSDK.onRegistrationSuccess(handleSDKAuthSuccess)
+  }, [ambireSDK, handleSDKAuthSuccess])
 
   useEffect(() => {
-    ambireSDK.onLoginSuccess(handleRegistrationOrLoginSuccess)
-  }, [ambireSDK, handleRegistrationOrLoginSuccess])
+    ambireSDK.onLoginSuccess(handleSDKAuthSuccess)
+  }, [ambireSDK, handleSDKAuthSuccess])
+
   useEffect(() => {
-    ambireSDK.onAlreadyLoggedIn(handleRegistrationOrLoginSuccess)
-  }, [ambireSDK, handleRegistrationOrLoginSuccess])
+    ambireSDK.onAlreadyLoggedIn(handleSDKAuthSuccess)
+  }, [ambireSDK, handleSDKAuthSuccess])
+
   useEffect(() => {
-    ambireSDK.onMsgSigned(({ signature }: any) =>
-      setSdkMsgSignature(() => {
-        setIsLoading(true)
-        return signature
-      })
-    )
+    ambireSDK.onMsgSigned((data: { signature: string; type: string }) => {
+      setIsLoading(true)
+      setSdkMsgSignature(data.signature)
+    })
   }, [ambireSDK])
 
   useEffect(() => {
@@ -419,15 +513,8 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
   }, [ambireSDK, handleActionRejected])
 
   useEffect(() => {
-    if (adexAccount.authMsgResp && !adexAccount.authenticated) {
-      signMessage('eth_signTypedData', JSON.stringify(adexAccount.authMsgResp))
-    }
-  }, [adexAccount.authMsgResp, adexAccount.authenticated, signMessage])
-
-  const authenticated = useMemo(
-    () => Boolean(adexAccount.authenticated),
-    [adexAccount.authenticated]
-  )
+    ambireSDK.onTxnRejected(handleTxnRejected)
+  }, [ambireSDK, handleTxnRejected])
 
   const isAdmin = useMemo(
     () => Boolean(isAdminToken(adexAccount.accessToken)),
@@ -493,12 +580,12 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
   )
 
   useEffect(() => {
-    if (adexAccount.authenticated) {
+    if (authenticated) {
       console.log('adexAccount.authenticated')
       updateBalance()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [adexAccount.authenticated])
+  }, [authenticated])
 
   const contextValue = useMemo(
     () => ({
@@ -509,12 +596,11 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
       disconnectWallet,
       signMessage,
       ambireSDK,
-      updateAccessToken,
-      resetAdexAccount,
       adexServicesRequest,
       updateBalance,
       updateBillingDetails,
-      isLoading
+      isLoading,
+      logOut
     }),
     [
       adexAccount,
@@ -524,12 +610,11 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
       disconnectWallet,
       signMessage,
       ambireSDK,
-      updateAccessToken,
-      resetAdexAccount,
       adexServicesRequest,
       updateBalance,
       updateBillingDetails,
-      isLoading
+      isLoading,
+      logOut
     ]
   )
 

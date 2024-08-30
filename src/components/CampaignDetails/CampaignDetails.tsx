@@ -119,7 +119,8 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
     if (id) {
       updateCampaignDataById(id)
     }
-  }, [id, updateCampaignDataById])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id])
 
   const canArchive = useMemo(() => {
     return (
@@ -265,9 +266,9 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
         <EditCampaign campaign={campaign} isAdmin={isAdminPanel} />
       ) : (
         <Paper p="lg" shadow="xs">
-          <Grid gutter="lg">
+          <Grid gutter="lg" align="baseline">
             <Grid.Col span={{ md: 12, xl: 6 }}>
-              <Stack gap="xl">
+              <Stack gap="md">
                 <Text fw="bold" size="sm" c="dimmed">
                   Overview
                 </Text>
@@ -397,8 +398,8 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
               </Stack>
             </Grid.Col>
             <Grid.Col span={{ md: 12, xl: 6 }}>
-              <Stack gap="lg">
-                <Stack>
+              <Stack gap="xl">
+                <Stack gap="md">
                   <Text fw="bold" size="sm" c="dimmed">
                     Targeting
                   </Text>
@@ -419,33 +420,31 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
                   </Paper>
                 </Stack>
                 {!!campaign.adUnits.length && (
-                  <Stack>
-                    <Stack>
-                      <Text fw="bold" size="sm" c="dimmed">
-                        Creatives
-                      </Text>
-                      <Paper bg="lightBackground" p="sm" withBorder>
-                        {campaign.adUnits.map((item: AdUnit, index: number) => {
-                          const isLast = index === campaign.adUnits.length - 1
-                          return (
-                            <CampaignDetailsRow
-                              key={item.id}
-                              textSize="sm"
-                              title={`${item.banner?.format.w}x${item.banner?.format.h}`}
-                              value={
-                                <MediaThumb
-                                  adUnit={item}
-                                  previewOnClick
-                                  title={`Target URL: ${item.banner?.targetUrl}`}
-                                />
-                              }
-                              align="center"
-                              noBorder={isLast}
-                            />
-                          )
-                        })}
-                      </Paper>
-                    </Stack>
+                  <Stack gap="md">
+                    <Text fw="bold" size="sm" c="dimmed">
+                      Creatives
+                    </Text>
+                    <Paper bg="lightBackground" p="sm" withBorder>
+                      {campaign.adUnits.map((item: AdUnit, index: number) => {
+                        const isLast = index === campaign.adUnits.length - 1
+                        return (
+                          <CampaignDetailsRow
+                            key={item.id}
+                            textSize="sm"
+                            title={`${item.banner?.format.w}x${item.banner?.format.h}`}
+                            value={
+                              <MediaThumb
+                                adUnit={item}
+                                previewOnClick
+                                title={`Target URL: ${item.banner?.targetUrl}`}
+                              />
+                            }
+                            align="center"
+                            noBorder={isLast}
+                          />
+                        )
+                      })}
+                    </Paper>
                   </Stack>
                 )}
               </Stack>

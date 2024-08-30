@@ -78,6 +78,4 @@ export interface IAdExAccount {
   address: string
   accessToken: string | null
   refreshToken: string | null
-  authenticated: boolean
-  authMsgResp?: any
 }

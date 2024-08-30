@@ -4,7 +4,7 @@ import {
   // CampaignType,
   EventType
 } from 'adex-common'
-import { Container, Flex, Text, Loader, UnstyledButton, Anchor, Stack, Group } from '@mantine/core'
+import { Container, Flex, Text, UnstyledButton, Anchor, Stack, Group } from '@mantine/core'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import CustomTable, { TableElement, TableRowAction } from 'components/common/CustomTable'
 import { Link, useNavigate } from 'react-router-dom'
@@ -310,7 +310,8 @@ const Dashboard = ({ isAdminPanel, accountId }: { isAdminPanel?: boolean; accoun
 
   useEffect(() => {
     updateAllCampaignsData(true)
-  }, [updateAllCampaignsData])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const actions = useMemo(() => {
     const dashboardActions: TableRowAction[] = [
@@ -403,18 +404,13 @@ const Dashboard = ({ isAdminPanel, accountId }: { isAdminPanel?: boolean; accoun
             </UnstyledButton>
           )}
         </Flex>
-        {!initialDataLoading ? (
-          <CustomTable
-            shadow={!isAdminPanel ? 'xs' : undefined}
-            headings={campaignHeaders}
-            elements={elements}
-            actions={actions}
-          />
-        ) : (
-          <Flex justify="center" align="center" h="60vh">
-            <Loader size="xl" />
-          </Flex>
-        )}
+        <CustomTable
+          shadow={!isAdminPanel ? 'xs' : undefined}
+          headings={campaignHeaders}
+          elements={elements}
+          actions={actions}
+          loading={initialDataLoading}
+        />
       </Flex>
     </Container>
   )

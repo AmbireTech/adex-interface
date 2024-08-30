@@ -15,17 +15,15 @@ import {
 import { createStyles } from '@mantine/emotion'
 import { formatDate, maskAddress } from 'helpers/formatters'
 import useAccount from 'hooks/useAccount'
-import { useCallback, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import DownArrowIcon from 'resources/icons/DownArrow'
 import LogoutIcon from 'resources/icons/Logout'
 // import BellIcon from 'resources/icons/Bell'
 import Blockies from 'components/common/Blockies'
 // import ValidatorsIcon from 'resources/icons/Validators'
 // import WithdrawIcon from 'resources/icons/Withdraw'
-import { useLocation, useNavigate, useParams } from 'react-router-dom'
+import { useLocation, useParams } from 'react-router-dom'
 import StakingIcon from 'resources/icons/Staking'
-import { useAdExApi } from 'hooks/useAdexServices'
-import useCustomNotifications from 'hooks/useCustomNotifications'
 import CopyIcon from 'resources/icons/Copy'
 import { useColorScheme } from '@mantine/hooks'
 
@@ -64,8 +62,7 @@ const formatTitle = (str: string) => {
 
 function TopBar() {
   const { classes, cx } = useStyles()
-  const { adexAccount, disconnectWallet, resetAdexAccount } = useAccount()
-  const { showNotification } = useCustomNotifications()
+  const { adexAccount, logOut } = useAccount()
   const location = useLocation()
   const { id } = useParams()
   const splitPath = useMemo(() => location.pathname.split('/'), [location.pathname])
@@ -80,45 +77,6 @@ function TopBar() {
   )
 
   const [opened, setOpened] = useState<boolean>(false)
-
-  const { adexServicesRequest } = useAdExApi()
-  const navigate = useNavigate()
-
-  const handleLogutBtnClicked = useCallback(() => {
-    if (!adexAccount.accessToken && !adexAccount.refreshToken) return
-
-    adexServicesRequest('backend', {
-      route: '/dsp/logout',
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: {
-        refreshToken: adexAccount.refreshToken
-      }
-    })
-      .then((res) => {
-        if (!res) throw new Error('Logout failed')
-        if (Object.keys(res).length === 0 && res.constructor === Object) {
-          disconnectWallet()
-          resetAdexAccount()
-          showNotification('info', 'Successfully logged out', 'Logging out')
-          navigate('/login', { replace: true })
-        }
-      })
-      .catch((e) => {
-        console.error('Logging out failed', e)
-        showNotification('error', e.message, 'Logging out failed')
-      })
-  }, [
-    disconnectWallet,
-    adexAccount.accessToken,
-    adexAccount.refreshToken,
-    adexServicesRequest,
-    resetAdexAccount,
-    showNotification,
-    navigate
-  ])
 
   return (
     <Flex
@@ -195,10 +153,7 @@ function TopBar() {
             {/* <Menu.Item rightSection={<ValidatorsIcon className={classes.icon} />}>
               Validators
             </Menu.Item> */}
-            <Menu.Item
-              onClick={handleLogutBtnClicked}
-              rightSection={<LogoutIcon className={classes.icon} />}
-            >
+            <Menu.Item onClick={logOut} rightSection={<LogoutIcon className={classes.icon} />}>
               Log out
             </Menu.Item>
           </Menu.Dropdown>
