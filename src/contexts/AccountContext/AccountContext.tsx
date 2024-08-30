@@ -219,12 +219,18 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
     [ambireSDK]
   )
 
-  const checkAndUpdateNewAccessTokens = useCallback(async (): Promise<void> => {
+  const checkAndUpdateNewAccessTokens = useCallback(async (): Promise<{ accessToken: string }> => {
     if (!adexAccount.accessToken || !adexAccount.refreshToken) {
       throw new Error(`${UNAUTHORIZED_ERR_STR}: missing access tokens`)
     }
 
-    if (!isTokenExpired(adexAccount.refreshToken)) {
+    const isAccessTokenExpired = isTokenExpired(adexAccount.accessToken, 10)
+
+    if (!isAccessTokenExpired) {
+      return { accessToken: adexAccount.accessToken }
+    }
+
+    if (isAccessTokenExpired && !isTokenExpired(adexAccount.refreshToken)) {
       console.log('updating access tokens')
       try {
         const req: RequestOptions = {
@@ -239,24 +245,29 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
         }
 
         const res = await fetchService(req)
-        const newAccessTokens = await processResponse<{
-          accessToken: string
-          refreshToken: string
-        }>(res)
+        const { accessToken, refreshToken } = await processResponse<AccessTokensResp>(res)
         setAdexAccount((prev) => {
           return {
             ...prev,
-            ...newAccessTokens
+            accessToken,
+            refreshToken
           }
         })
+
+        return { accessToken }
       } catch (error: any) {
         console.error('Updating access token failed:', error)
-        showNotification('error', error?.message, 'Updating access token failed')
+        showNotification(
+          'error',
+          error?.message || error.toString(),
+          'Updating access token failed'
+        )
         throw new Error(`${UNAUTHORIZED_ERR_STR}: ${error}`)
       }
     } else {
       resetAdexAccount('refresh token expired')
       showNotification('info', 'Please log in!', 'Session expired')
+      throw new Error('Session expired!')
     }
   }, [
     adexAccount.accessToken,
@@ -270,18 +281,18 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
   // TODO: add retry functionality
   useEffect(() => {
     let updateTokensTimeout: ReturnType<typeof setTimeout>
+    try {
+      if (adexAccount.accessToken) {
+        const now = Date.now()
+        const accessTokenExpireTime = getJWTExpireTime(adexAccount.accessToken, 15)
 
-    if (adexAccount.accessToken) {
-      const now = Date.now()
-      const accessTokenExpireTime = getJWTExpireTime(adexAccount.accessToken, 10)
-      if (now >= accessTokenExpireTime) {
-        checkAndUpdateNewAccessTokens()
-      } else {
         updateTokensTimeout = setTimeout(
           () => checkAndUpdateNewAccessTokens(),
-          accessTokenExpireTime - now
+          now >= accessTokenExpireTime ? 0 : accessTokenExpireTime - now
         )
       }
+    } catch (err: any) {
+      showNotification('info', err?.message || err.toString(), 'Updating session error')
     }
 
     return () => {
@@ -289,7 +300,7 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
         clearTimeout(updateTokensTimeout)
       }
     }
-  }, [adexAccount.accessToken, checkAndUpdateNewAccessTokens])
+  }, [adexAccount.accessToken, checkAndUpdateNewAccessTokens, showNotification])
 
   const adexServicesRequest = useCallback(
     // Note
@@ -303,6 +314,9 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
         const baseUrl = (service === 'backend' ? BACKEND_BASE_URL : VALIDATOR_BASE_URL) || ''
         const urlCheck = reqOptions.route.replace(baseUrl, '').replace(/^\//, '')
 
+        // NOTE: needed because the page can "sleep" and the refresh timeout might not work
+        const { accessToken } = await checkAndUpdateNewAccessTokens()
+
         const req: RequestOptions = {
           url: `${baseUrl}/${urlCheck}`,
           method: reqOptions.method,
@@ -313,20 +327,24 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
           queryParams: reqOptions.queryParams,
           headers: {
             ...reqOptions.headers,
-            [authHeaderProp]: `Bearer ${adexAccount.accessToken}`
+            [authHeaderProp]: `Bearer ${accessToken}`
           }
         }
 
         const res = await fetchService(req)
         return await processResponse<R>(res)
       } catch (err: any) {
-        if (service === 'backend' && err && (err?.message || err).includes(UNAUTHORIZED_ERR_STR)) {
-          resetAdexAccount(UNAUTHORIZED_ERR_STR)
+        if (
+          service === 'backend' &&
+          err &&
+          (err?.message || err.toString()).includes(UNAUTHORIZED_ERR_STR)
+        ) {
+          await checkAndUpdateNewAccessTokens()
         }
         return Promise.reject<R>(err)
       }
     },
-    [adexAccount.accessToken, resetAdexAccount]
+    [checkAndUpdateNewAccessTokens]
   )
 
   const logOut = useCallback(async () => {
@@ -348,7 +366,7 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
       }
     } catch (err: any) {
       console.error('logOut: ', err)
-      showNotification('error', err?.message || err, 'Logging out failed')
+      showNotification('error', err?.message || err.toString(), 'Logging out failed')
     }
   }, [
     adexAccount.refreshToken,
@@ -450,7 +468,7 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
         })
       } catch (error: any) {
         console.error('Error verify login:', error)
-        showNotification('error', 'Verify login failed', error?.message || error)
+        showNotification('error', error?.message || error.toString(), 'Verify login failed')
         setAdexAccount({
           ...defaultValue,
           loaded: true
