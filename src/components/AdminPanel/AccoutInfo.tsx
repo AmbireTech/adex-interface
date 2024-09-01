@@ -43,7 +43,7 @@ function AccountInfo({ accountData }: { accountData: Account }) {
           showNotification('info', 'Account data updated!')
         },
         (err) => {
-          showNotification('error', err, 'Error on account Account data updated!')
+          showNotification('error', err.toString(), 'Error on account Account data updated!')
         }
       )
 
