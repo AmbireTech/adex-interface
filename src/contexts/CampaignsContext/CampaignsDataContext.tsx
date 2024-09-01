@@ -195,7 +195,7 @@ const CampaignsDataProvider: FC<PropsWithChildren & { type: 'user' | 'admin' }> 
         })
       } catch (err: any) {
         console.log(err)
-        showNotification('error', err?.message || err, 'Campaign status update error')
+        showNotification('error', err?.message || err.toString(), 'Campaign status update error')
       }
     },
     [adexServicesRequest, showNotification]
@@ -229,7 +229,7 @@ const CampaignsDataProvider: FC<PropsWithChildren & { type: 'user' | 'admin' }> 
         })
       } catch (err: any) {
         console.log(err)
-        showNotification('error', err?.message || err, 'Data error')
+        showNotification('error', err?.message || err.toString(), 'Data error')
       }
     },
     [adexServicesRequest, showNotification]
@@ -245,8 +245,6 @@ const CampaignsDataProvider: FC<PropsWithChildren & { type: 'user' | 'admin' }> 
           queryParams: { all: 'true' }
         })
 
-        console.log({ dataRes })
-
         let advData: EvAggrData[]
 
         // if (updateAdvanced) {
@@ -258,10 +256,8 @@ const CampaignsDataProvider: FC<PropsWithChildren & { type: 'user' | 'admin' }> 
 
         if (updateAdvanced) {
           advData = [...dataRes].map((cmpDataRes) => campaignDataResToAdvData(cmpDataRes))
-          console.log({ advData })
         }
 
-        console.log({ dataRes })
         if (Array.isArray(dataRes)) {
           setCampaignData((prev) => {
             const next = new Map()
@@ -285,7 +281,7 @@ const CampaignsDataProvider: FC<PropsWithChildren & { type: 'user' | 'admin' }> 
         }
       } catch (err: any) {
         console.log(err)
-        showNotification('error', err?.message || err, 'Campaigns data error')
+        showNotification('error', err?.message || err.toString(), 'Campaigns data error')
       } finally {
         setInitialDataLoading(false)
       }
@@ -317,7 +313,7 @@ const CampaignsDataProvider: FC<PropsWithChildren & { type: 'user' | 'admin' }> 
       setSupplyStats(result as SupplyStats)
     } catch (e: any) {
       console.error(e)
-      showNotification('error', e?.message || e, 'Supply stats error')
+      showNotification('error', e?.message || e.toString(), 'Supply stats error')
     }
   }, [adexServicesRequest, showNotification])
 
