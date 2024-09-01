@@ -24,6 +24,7 @@ const ambireLoginSDK = new AmbireLoginSDK({
 export const BACKEND_BASE_URL = process.env.REACT_APP_BACKEND_BASE_URL
 export const VALIDATOR_BASE_URL = process.env.REACT_APP_VALIDATOR_BASE_URL
 const UNAUTHORIZED_ERR_STR = 'Unauthorized'
+const TOKEN_CHECK_SECONDS_BEFORE_EXPIRE = process.env.NODE_ENV === 'production' ? 69 : 10
 
 console.log({ BACKEND_BASE_URL })
 const processResponse = <R extends any>(res: Response): Promise<R> => {
@@ -224,7 +225,10 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
       throw new Error(`${UNAUTHORIZED_ERR_STR}: missing access tokens`)
     }
 
-    const isAccessTokenExpired = isTokenExpired(adexAccount.accessToken, 10)
+    const isAccessTokenExpired = isTokenExpired(
+      adexAccount.accessToken,
+      TOKEN_CHECK_SECONDS_BEFORE_EXPIRE * 1.5
+    )
 
     if (!isAccessTokenExpired) {
       return { accessToken: adexAccount.accessToken }
@@ -284,10 +288,15 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
     try {
       if (adexAccount.accessToken) {
         const now = Date.now()
-        const accessTokenExpireTime = getJWTExpireTime(adexAccount.accessToken, 15)
+        const accessTokenExpireTime = getJWTExpireTime(
+          adexAccount.accessToken,
+          TOKEN_CHECK_SECONDS_BEFORE_EXPIRE * 1
+        )
 
         updateTokensTimeout = setTimeout(
-          () => checkAndUpdateNewAccessTokens(),
+          async () => {
+            await checkAndUpdateNewAccessTokens()
+          },
           now >= accessTokenExpireTime ? 0 : accessTokenExpireTime - now
         )
       }
@@ -296,7 +305,7 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
     }
 
     return () => {
-      if (updateTokensTimeout) {
+      if (updateTokensTimeout !== undefined) {
         clearTimeout(updateTokensTimeout)
       }
     }
@@ -424,17 +433,15 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
   )
 
   const handleSDKAuthSuccess = useCallback(
-    async ({ address, chainId }: any) => {
+    async ({ address, chainId }: any, type: string) => {
+      console.log('handleSDKAuthSuccess: ', type)
       if (!address || !chainId) {
         showNotification('warning', 'Ambire sdk no address or chain')
         return
       }
 
-      console.log('handleSDKAuthSuccess')
-
       try {
         const authMsgResp = await getAuthMsg({ wallet: address, chainId })
-        console.log({ authMsgResp })
         setAuthMsg(authMsgResp)
         signMessage('eth_signTypedData', JSON.stringify(authMsgResp.authMsg))
         setAdexAccount({ ...defaultValue, address, chainId, loaded: true })
@@ -499,16 +506,19 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
     console.log('action rejected', data)
   }, [])
 
+  // TODO: types for success data
   useEffect(() => {
-    ambireSDK.onRegistrationSuccess(handleSDKAuthSuccess)
+    ambireSDK.onRegistrationSuccess((data: any) =>
+      handleSDKAuthSuccess(data, 'handleSDKAuthSuccess')
+    )
   }, [ambireSDK, handleSDKAuthSuccess])
 
   useEffect(() => {
-    ambireSDK.onLoginSuccess(handleSDKAuthSuccess)
+    ambireSDK.onLoginSuccess((data: any) => handleSDKAuthSuccess(data, 'onLoginSuccess'))
   }, [ambireSDK, handleSDKAuthSuccess])
 
   useEffect(() => {
-    ambireSDK.onAlreadyLoggedIn(handleSDKAuthSuccess)
+    ambireSDK.onAlreadyLoggedIn((data: any) => handleSDKAuthSuccess(data, 'onAlreadyLoggedIn'))
   }, [ambireSDK, handleSDKAuthSuccess])
 
   useEffect(() => {
@@ -562,7 +572,7 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
       }
     } catch (err: any) {
       console.error('Updating account balance failed:', err)
-      showNotification('error', err, 'Updating account balance failed')
+      showNotification('error', err?.message || err.toString(), 'Updating account balance failed')
     }
   }, [adexServicesRequest, setAdexAccount, showNotification])
 
