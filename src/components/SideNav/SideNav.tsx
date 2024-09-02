@@ -18,6 +18,7 @@ import AdExLogo from 'resources/logos/AdExLogo'
 import { useMemo } from 'react'
 import { appVersion } from 'helpers'
 import { IS_MANUAL_DEPOSITING } from 'constants/balances'
+import CustomAnchor from 'components/common/customAnchor'
 import NavLink from './NavLink'
 import Balance from './Balance'
 import CreateCampaignBtn from './CreateCampaignBtn'
@@ -78,7 +79,7 @@ function SideNav() {
 
           <NavLink
             to="https://help.adex.network/hc/en-us"
-            target="_blank"
+            external
             icon={<HelpIcon />}
             label="Help Center"
           />
@@ -93,9 +94,9 @@ function SideNav() {
         </Stack>
       </AppShell.Section>
       <AppShell.Section mx="xs" mt="xl">
-        <Text c="secondaryText" size="sm">
+        <CustomAnchor c="secondaryText" size="sm" external href="https://adex.network">
           ©{year} AdEx.
-        </Text>
+        </CustomAnchor>
         <Text c="secondaryText" size="sm">
           All Rights Reserved.
         </Text>
