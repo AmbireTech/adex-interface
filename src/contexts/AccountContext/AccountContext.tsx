@@ -192,7 +192,6 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
     const lsAcc: IAccountContext['adexAccount'] = deserializeJSON(
       localStorage.getItem('adexAccount') || ''
     )
-    console.log({ lsAcc })
 
     if (!lsAcc) {
       setAdexAccount({ ...defaultValue, loaded: true })
@@ -208,7 +207,6 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
   )
 
   const connectWallet = useCallback(() => {
-    console.log({ ambireSDK })
     resetAdexAccount('connecting new wallet')
     ambireSDK.openLogin({ chainId: DEFAULT_CHAIN_ID })
   }, [ambireSDK, resetAdexAccount])
@@ -358,7 +356,7 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
       if (resp) {
         disconnectWallet()
         resetAdexAccount('Log out btn (backend)')
-        showNotification('info', 'Successfully logged out', 'Logging out')
+        showNotification('info', 'Logged out', 'Success')
       }
     } catch (err: any) {
       console.error('logOut: ', err)
@@ -421,9 +419,9 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
 
   const handleSDKAuthSuccess = useCallback(
     async ({ address, chainId }: any, type: string) => {
-      console.log('handleSDKAuthSuccess: ', type)
+      console.log('sdk auth success: ', type)
       if (!address || !chainId) {
-        showNotification('warning', 'Ambire sdk no address or chain')
+        showNotification('warning', 'Ambire sdk no address or chain selected')
         return
       }
 
@@ -432,9 +430,9 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
         setAuthMsg(authMsgResp)
         signMessage('eth_signTypedData', JSON.stringify(authMsgResp.authMsg))
         setAdexAccount({ ...defaultValue, address, chainId, loaded: true })
-      } catch (error) {
+      } catch (error: any) {
         console.error('Get message to sign failed', error)
-        showNotification('error', 'Get message to sign failed')
+        showNotification('error', error?.message || error.toString(), 'Message sign failed')
       }
     },
     [getAuthMsg, setAdexAccount, showNotification, signMessage]
@@ -481,17 +479,29 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
     resetAdexAccount('Log out SDK')
   }, [resetAdexAccount])
 
-  const handleMsgRejected = useCallback((data: any) => {
-    console.log('message rejected', data)
-  }, [])
+  const handleMsgRejected = useCallback(
+    (data: any) => {
+      console.log('message rejected', data)
+      showNotification('info', 'Message rejected')
+    },
+    [showNotification]
+  )
 
-  const handleActionRejected = useCallback((data: any) => {
-    console.log('action rejected', data)
-  }, [])
+  const handleActionRejected = useCallback(
+    (data: any) => {
+      console.log('action rejected', data)
+      showNotification('info', 'Action rejected')
+    },
+    [showNotification]
+  )
 
-  const handleTxnRejected = useCallback((data: any) => {
-    console.log('action rejected', data)
-  }, [])
+  const handleTxnRejected = useCallback(
+    (data: any) => {
+      console.log('action rejected', data)
+      showNotification('info', 'Transaction rejected')
+    },
+    [showNotification]
+  )
 
   // TODO: types for success data
   useEffect(() => {
@@ -543,23 +553,17 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
         method: 'GET'
       })
 
-      console.log({ accountData })
-
       if (accountData) {
         setAdexAccount((prev) => {
           const next = { ...prev, ...accountData }
           return next
         })
       } else {
-        showNotification(
-          'error',
-          'Updating account balance failed',
-          'Updating account balance failed'
-        )
+        throw new Error('Invalid response')
       }
     } catch (err: any) {
       console.error('Updating account balance failed:', err)
-      showNotification('error', err?.message || err.toString(), 'Updating account balance failed')
+      showNotification('error', err?.message || err.toString(), 'Updating account balance')
     }
   }, [adexServicesRequest, setAdexAccount, showNotification])
 
@@ -578,17 +582,13 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
             const next = { ...prev, billingDetails }
             return next
           })
-          showNotification('info', 'Billing details updated', 'Successfully')
+          showNotification('info', 'Updating billing details', 'Success')
         } else {
-          showNotification(
-            'error',
-            'Updating billing details failed',
-            'Updating billing details failed'
-          )
+          throw new Error('Invalid response')
         }
       } catch (err: any) {
         console.error('Updating billing details failed:', err)
-        showNotification('error', 'Updating billing details failed')
+        showNotification('error', err?.err || err?.toString(), 'Updating billing details')
       }
     },
     [adexServicesRequest, setAdexAccount, showNotification]
