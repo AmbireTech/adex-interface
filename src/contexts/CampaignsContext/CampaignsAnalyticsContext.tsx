@@ -208,10 +208,14 @@ const CampaignsAnalyticsProvider: FC<PropsWithChildren> = ({ children }) => {
           next.set(dataKey, nextAggr)
           return next
         })
-      } catch (err) {
+      } catch (err: any) {
         console.log(err)
         // TODO: see how to use campaignId out of segment
-        showNotification('error', `getting analytics ${params.timeframe}`, 'Data error')
+        showNotification(
+          'error',
+          err?.message || err.toString(),
+          `Fetching analytics${forAdmin ? ' (admin)' : ''}`
+        )
       }
 
       return dataKey
