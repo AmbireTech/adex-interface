@@ -235,7 +235,6 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
     }
 
     if (isAccessTokenExpired && !isTokenExpired(adexAccount.refreshToken)) {
-      console.log('updating access tokens')
       try {
         const req: RequestOptions = {
           url: `${BACKEND_BASE_URL}/dsp/refresh-token`,
@@ -261,25 +260,13 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
         return { accessToken }
       } catch (error: any) {
         console.error('Updating access token failed:', error)
-        showNotification(
-          'error',
-          error?.message || error.toString(),
-          'Updating access token failed'
-        )
-        throw new Error(`${UNAUTHORIZED_ERR_STR}: ${error}`)
+        throw new Error(`Updating access token failed: ${error?.message || error.toString()}`)
       }
     } else {
       resetAdexAccount('refresh token expired')
-      showNotification('info', 'Please log in!', 'Session expired')
-      throw new Error('Session expired!')
+      throw new Error(`${UNAUTHORIZED_ERR_STR}: Session expired!`)
     }
-  }, [
-    adexAccount.accessToken,
-    adexAccount.refreshToken,
-    resetAdexAccount,
-    setAdexAccount,
-    showNotification
-  ])
+  }, [adexAccount.accessToken, adexAccount.refreshToken, resetAdexAccount, setAdexAccount])
 
   // NOTE: updating access tokens some second before the access token expire instead of checking on each request where can have "racing" condition with multiple request at the same time
   // TODO: add retry functionality
