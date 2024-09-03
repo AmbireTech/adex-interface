@@ -224,8 +224,8 @@ const CampaignsAnalyticsProvider: FC<PropsWithChildren> = ({ children }) => {
   )
 
   const updateCampaignAnalyticsByQuery = useCallback(
-    (query: AnalyticsDataQuery, dataKey: string, forAdmin?: boolean): void => {
-      updateAnalytics(query, dataKey, forAdmin)
+    async (query: AnalyticsDataQuery, dataKey: string, forAdmin?: boolean): Promise<void> => {
+      await updateAnalytics(query, dataKey, forAdmin)
     },
     [updateAnalytics]
   )
@@ -305,10 +305,10 @@ const CampaignsAnalyticsProvider: FC<PropsWithChildren> = ({ children }) => {
         // NOTE: use in case to call the queries in some intervals
         // eslint-disable-next-line no-restricted-syntax
         for (const [i, q] of queries.entries()) {
-          updateCampaignAnalyticsByQuery(q, keys[i], forAdmin)
+          const update = updateCampaignAnalyticsByQuery(q, keys[i], forAdmin)
           if (i < queries.length) {
             // eslint-disable-next-line no-await-in-loop
-            await timeout(69)
+            await Promise.race([update, timeout(69)])
           }
         }
 

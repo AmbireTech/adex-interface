@@ -54,15 +54,21 @@ export function useCampaignsAnalyticsData({
   )
 
   useEffect(() => {
-    if (campaignId) {
+    console.log('useCampaignsAnalyticsData', { campaignId, analyticsType, forAdmin })
+  }, [analyticsType, campaignId, forAdmin])
+
+  useEffect(() => {
+    if (campaignId && !campaign?.id) {
       console.log({ campaignId })
       updateCampaignDataById(campaignId)
     }
-  }, [campaignId, updateCampaignDataById])
+  }, [campaign?.id, campaignId, updateCampaignDataById])
 
   useEffect(() => {
-    if (!campaign) return
+    if (!campaign?.id) return
     setAnalyticsKey(undefined)
+
+    console.log('KURAMIIIII', { analyticsType, campaign, forAdmin })
 
     const checkAnalytics = async () => {
       const key = await getAnalyticsKeyAndUpdate(analyticsType, campaign, !!forAdmin)
