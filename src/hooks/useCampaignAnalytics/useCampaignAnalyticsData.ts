@@ -14,7 +14,8 @@ export function useCampaignsAnalyticsData({
   analyticsType: AnalyticsType
   forAdmin?: boolean
 }) {
-  const { getAnalyticsKeyAndUpdate, mappedAnalytics } = useCampaignAnalytics()
+  const { getAnalyticsKeyAndUpdate, mappedAnalytics, initialAnalyticsLoading } =
+    useCampaignAnalytics()
   const { campaignsData, updateCampaignDataById } = useCampaignsData()
   const [analyticsKey, setAnalyticsKey] = useState<
     | {
@@ -49,7 +50,7 @@ export function useCampaignsAnalyticsData({
   )
 
   const campaignMappedAnalytics: BaseAnalyticsData[] | undefined = useMemo(
-    () => mappedAnalytics.get(analyticsKey?.key || ''),
+    () => mappedAnalytics.get(analyticsKey?.key || '')?.data,
     [analyticsKey, mappedAnalytics]
   )
 
@@ -68,8 +69,6 @@ export function useCampaignsAnalyticsData({
     if (!campaign?.id) return
     setAnalyticsKey(undefined)
 
-    console.log('KURAMIIIII', { analyticsType, campaign, forAdmin })
-
     const checkAnalytics = async () => {
       const key = await getAnalyticsKeyAndUpdate(analyticsType, campaign, !!forAdmin)
       setAnalyticsKey(key)
@@ -80,8 +79,8 @@ export function useCampaignsAnalyticsData({
   }, [analyticsType, campaign, getAnalyticsKeyAndUpdate, forAdmin])
 
   const loading = useMemo(
-    () => !analyticsKey || !campaignMappedAnalytics,
-    [analyticsKey, campaignMappedAnalytics]
+    () => initialAnalyticsLoading || !analyticsKey || !campaignMappedAnalytics,
+    [analyticsKey, campaignMappedAnalytics, initialAnalyticsLoading]
   )
 
   return { campaignMappedAnalytics, totalPaid, campaign, loading, currencyName, analyticsKey }
