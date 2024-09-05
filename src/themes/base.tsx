@@ -17,7 +17,8 @@ import {
   Paper,
   defaultVariantColorsResolver,
   VariantColorsResolver,
-  parseThemeColor
+  parseThemeColor,
+  LoadingOverlay
 } from '@mantine/core'
 import { Dropzone } from '@mantine/dropzone'
 import DownArrowIcon from 'resources/icons/DownArrow'
@@ -278,6 +279,14 @@ const themeOverride: MantineThemeOverride = createTheme({
       },
       defaultProps: {
         shadow: 'none'
+      }
+    }),
+    LoadingOverlay: LoadingOverlay.extend({
+      defaultProps: {
+        overlayProps: {
+          backgroundOpacity: 0,
+          blur: 2
+        }
       }
     })
   },

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useCallback, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Loader, Box, Badge, TextInput, Stack, Group } from '@mantine/core'
+import { Box, Badge, TextInput, Stack, Group, LoadingOverlay } from '@mantine/core'
 
 import CustomTable from 'components/common/CustomTable'
 import useAdmin from 'hooks/useAdmin'
@@ -125,11 +125,10 @@ const AdminAnalytics = () => {
     ]
   }, [handlePreview])
 
-  return initialDataLoading ? (
-    <Loader size="xl" type="dots" color="violet" />
-  ) : (
+  return (
     <Stack>
-      <Group align="center" justify="left" gap="xs" mb="md" wrap="wrap">
+      <Group align="center" justify="left" gap="sm" mb="md" wrap="wrap" pos="relative">
+        <LoadingOverlay visible={initialDataLoading} loaderProps={{ children: ' ' }} />
         <Box>Totals: </Box>
         <Badge leftSection="Accounts" size="lg">
           ({data.totalAccounts})
@@ -148,7 +147,13 @@ const AdminAnalytics = () => {
           miw={420}
         />
       </Group>
-      <CustomTable headings={headings} elements={data.elements} pageSize={10} actions={actions} />
+      <CustomTable
+        headings={headings}
+        elements={data.elements}
+        pageSize={10}
+        actions={actions}
+        loading={initialDataLoading}
+      />
     </Stack>
   )
 }

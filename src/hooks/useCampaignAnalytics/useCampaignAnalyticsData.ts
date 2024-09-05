@@ -79,8 +79,12 @@ export function useCampaignsAnalyticsData({
   }, [analyticsType, campaign, getAnalyticsKeyAndUpdate, forAdmin])
 
   const loading = useMemo(
-    () => initialAnalyticsLoading || !analyticsKey || !campaignMappedAnalytics,
-    [analyticsKey, campaignMappedAnalytics, initialAnalyticsLoading]
+    () =>
+      initialAnalyticsLoading ||
+      !analyticsKey ||
+      !campaignMappedAnalytics ||
+      mappedAnalytics.get(analyticsKey?.key)?.status === 'loading',
+    [analyticsKey, campaignMappedAnalytics, initialAnalyticsLoading, mappedAnalytics]
   )
 
   const error = useMemo(

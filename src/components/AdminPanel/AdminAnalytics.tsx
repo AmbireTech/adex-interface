@@ -1,5 +1,15 @@
 import { useEffect, useState, useMemo, useCallback } from 'react'
-import { Select, Loader, Flex, Box, Text, Badge, ActionIcon, Stack, Group } from '@mantine/core'
+import {
+  Select,
+  Flex,
+  Box,
+  Text,
+  Badge,
+  ActionIcon,
+  Stack,
+  Group,
+  LoadingOverlay
+} from '@mantine/core'
 import { AnalyticsPeriod, Timeframe, AnalyticsType, SSPs } from 'types'
 import useCampaignAnalytics from 'hooks/useCampaignAnalytics'
 import CustomTable from 'components/common/CustomTable'
@@ -262,67 +272,65 @@ const AdminAnalytics = () => {
         />
       </Flex>
 
-      {loading ? (
-        <Loader size="xl" type="dots" color="violet" />
-      ) : (
-        <Stack>
-          <Group align="center" justify="left" gap="xs">
-            <Box>Totals: </Box>
-            <Badge
-              leftSection={
-                <ActionIcon size="sm" color="brand">
-                  <BillingIcon />
-                </ActionIcon>
-              }
-              size="lg"
-            >
-              {typeof data.paid === 'number'
-                ? Number(data.paid.toFixed(2)).toLocaleString()
-                : data.paid}
-            </Badge>
-
-            <Badge
-              size="lg"
-              leftSection={
-                <ActionIcon size="sm" color="brand">
-                  <VisibilityIcon />
-                </ActionIcon>
-              }
-            >
-              {data.imps.toLocaleString()}
-            </Badge>
-
-            <Badge
-              size="lg"
-              leftSection={
-                <ActionIcon size="sm" color="brand">
-                  <CheckMarkFilledIcon />
-                </ActionIcon>
-              }
-            >
-              {data.clicks.toLocaleString()}
-            </Badge>
-
-            <DownloadCSV
-              data={adminMappedAnalytics?.data}
-              mapHeadersToDataProperties={{ [analType]: 'segment', ...csvHeaders }}
-              filename={`${analyticsKey?.key || 'admin-data-export'}.csv`}
-              disabled={loading}
-            />
-          </Group>
-          <CustomTable
-            error={
-              adminMappedAnalytics?.status === 'error'
-                ? 'Error occurred while loading analytics'
-                : undefined
+      <Stack>
+        <Group align="center" justify="left" gap="xs" pos="relative">
+          <LoadingOverlay visible={loading} loaderProps={{ children: ' ' }} />
+          <Box>Totals: </Box>
+          <Badge
+            leftSection={
+              <ActionIcon size="sm" color="brand">
+                <BillingIcon />
+              </ActionIcon>
             }
-            headings={headings}
-            elements={data.elements}
-            pageSize={10}
-            actions={analType === 'campaignId' ? actions : undefined}
+            size="lg"
+          >
+            {typeof data.paid === 'number'
+              ? Number(data.paid.toFixed(2)).toLocaleString()
+              : data.paid}
+          </Badge>
+
+          <Badge
+            size="lg"
+            leftSection={
+              <ActionIcon size="sm" color="brand">
+                <VisibilityIcon />
+              </ActionIcon>
+            }
+          >
+            {data.imps.toLocaleString()}
+          </Badge>
+
+          <Badge
+            size="lg"
+            leftSection={
+              <ActionIcon size="sm" color="brand">
+                <CheckMarkFilledIcon />
+              </ActionIcon>
+            }
+          >
+            {data.clicks.toLocaleString()}
+          </Badge>
+
+          <DownloadCSV
+            data={adminMappedAnalytics?.data}
+            mapHeadersToDataProperties={{ [analType]: 'segment', ...csvHeaders }}
+            filename={`${analyticsKey?.key || 'admin-data-export'}.csv`}
+            disabled={loading}
           />
-        </Stack>
-      )}
+        </Group>
+        <CustomTable
+          error={
+            adminMappedAnalytics?.status === 'error'
+              ? 'Error occurred while loading analytics'
+              : undefined
+          }
+          loading={loading}
+          headings={headings}
+          elements={data.elements}
+          pageSize={10}
+          actions={analType === 'campaignId' ? actions : undefined}
+        />
+      </Stack>
     </>
   )
 }

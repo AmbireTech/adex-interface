@@ -309,7 +309,9 @@ export const CustomTable = ({
         />
       )}
 
-      {!error && !rows.length && <Alert variant="outline" color="info" title="No data found" />}
+      {!error && !loading && !rows.length && (
+        <Alert variant="outline" color="info" title="No data found" />
+      )}
       <Group align="center" justify={selectedElements.size ? 'space-between' : 'right'}>
         {selectedElements.size && masterActionMenu}
         {tableActions}
