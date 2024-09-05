@@ -24,7 +24,7 @@ type PlacementsTableElement = Omit<TableElement, 'actionData'> & {
 }
 
 const Placements = ({ forAdmin, campaignId }: { forAdmin: boolean; campaignId: string }) => {
-  const { campaignMappedAnalytics, campaign, currencyName, loading, analyticsKey } =
+  const { campaignMappedAnalytics, campaign, currencyName, loading, analyticsKey, error } =
     useCampaignsAnalyticsData({
       campaignId,
       forAdmin,
@@ -165,6 +165,7 @@ const Placements = ({ forAdmin, campaignId }: { forAdmin: boolean; campaignId: s
 
   return (
     <CustomTable
+      error={error}
       headings={headings}
       elements={elements}
       loading={loading}

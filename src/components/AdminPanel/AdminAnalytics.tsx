@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo, useCallback } from 'react'
 import { Select, Loader, Flex, Box, Text, Badge, ActionIcon, Stack, Group } from '@mantine/core'
-import { BaseAnalyticsData, AnalyticsPeriod, Timeframe, AnalyticsType, SSPs } from 'types'
+import { AnalyticsPeriod, Timeframe, AnalyticsType, SSPs } from 'types'
 import useCampaignAnalytics from 'hooks/useCampaignAnalytics'
 import CustomTable from 'components/common/CustomTable'
 import { CountryData } from 'helpers/countries'
@@ -124,7 +124,7 @@ const AdminAnalytics = () => {
     [analyticsData, analyticsKey]
   )
 
-  const adminMappedAnalytics: BaseAnalyticsData[] | undefined = useMemo(
+  const adminMappedAnalytics = useMemo(
     () => mappedAnalytics.get(analyticsKey?.key || ''),
     [analyticsKey, mappedAnalytics]
   )
@@ -132,7 +132,8 @@ const AdminAnalytics = () => {
   useEffect(() => {
     console.log({ analytics })
     console.log({ mappedAnalytics })
-  }, [analytics, mappedAnalytics])
+    console.log({ adminMappedAnalytics })
+  }, [analytics, mappedAnalytics, adminMappedAnalytics])
 
   useEffect(() => {
     setAnalyticsKey(undefined)
@@ -159,21 +160,26 @@ const AdminAnalytics = () => {
     checkAnalytics()
   }, [analType, getAnalyticsKeyAndUpdate, ssp, startDate, timeframe])
 
-  const loading = useMemo(
-    () => !analyticsKey || !adminMappedAnalytics,
-    [analyticsKey, adminMappedAnalytics]
-  )
+  const loading = useMemo(() => adminMappedAnalytics?.status === 'loading', [adminMappedAnalytics])
 
   const data = useMemo(() => {
-    const paid = adminMappedAnalytics?.reduce((sum, i) => sum + i.paid, 0) || 0
-    const imps = adminMappedAnalytics?.reduce((sum, i) => sum + i.impressions, 0) || 0
-    const clicks = adminMappedAnalytics?.reduce((sum, i) => sum + i.clicks, 0) || 0
+    if (!adminMappedAnalytics?.data || adminMappedAnalytics?.status !== 'processed')
+      return {
+        paid: 'N/A',
+        imps: 'N/A',
+        clicks: 'N/A',
+        elements: []
+      }
+
+    const paid = adminMappedAnalytics.data.reduce((sum, i) => sum + i.paid, 0) || 0
+    const imps = adminMappedAnalytics.data.reduce((sum, i) => sum + i.impressions, 0) || 0
+    const clicks = adminMappedAnalytics.data.reduce((sum, i) => sum + i.clicks, 0) || 0
     return {
       paid,
       imps,
       clicks,
       elements:
-        adminMappedAnalytics?.map((item) => ({
+        adminMappedAnalytics.data.map((item) => ({
           id: item.segment.toString(),
           segment: mapSegmentLabel(analType, item.segment).segementLabel,
           share: `${((item.paid / (paid || 1)) * 100).toFixed(2)} %`,
@@ -270,7 +276,9 @@ const AdminAnalytics = () => {
               }
               size="lg"
             >
-              {Number(data.paid.toFixed(2)).toLocaleString()}
+              {typeof data.paid === 'number'
+                ? Number(data.paid.toFixed(2)).toLocaleString()
+                : data.paid}
             </Badge>
 
             <Badge
@@ -296,14 +304,18 @@ const AdminAnalytics = () => {
             </Badge>
 
             <DownloadCSV
-              data={adminMappedAnalytics}
+              data={adminMappedAnalytics?.data}
               mapHeadersToDataProperties={{ [analType]: 'segment', ...csvHeaders }}
               filename={`${analyticsKey?.key || 'admin-data-export'}.csv`}
               disabled={loading}
             />
           </Group>
-
           <CustomTable
+            error={
+              adminMappedAnalytics?.status === 'error'
+                ? 'Error occurred while loading analytics'
+                : undefined
+            }
             headings={headings}
             elements={data.elements}
             pageSize={10}

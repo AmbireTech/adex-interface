@@ -22,7 +22,7 @@ const csvHeaders = {
 
 const Regions = ({ forAdmin, campaignId }: { forAdmin: boolean; campaignId: string }) => {
   const [isMapVisible, setIsMapVisible] = useState<boolean>(false)
-  const { campaignMappedAnalytics, currencyName, analyticsKey, loading } =
+  const { campaignMappedAnalytics, currencyName, analyticsKey, loading, error } =
     useCampaignsAnalyticsData({
       campaignId,
       forAdmin,
@@ -52,6 +52,7 @@ const Regions = ({ forAdmin, campaignId }: { forAdmin: boolean; campaignId: stri
   return (
     <Box>
       <CustomTable
+        error={error}
         headings={headings}
         elements={elements}
         loading={loading}
