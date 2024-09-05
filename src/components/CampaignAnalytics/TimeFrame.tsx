@@ -96,7 +96,7 @@ export const TimeFrame = ({ forAdmin, campaignId }: { forAdmin: boolean; campaig
             title={typeof error === 'string' ? error : 'Error loading data'}
           />
         )}
-        {!error && !filteredData.length && (
+        {!error && !loading && !filteredData.length && (
           <Alert variant="outline" color="info" title="No data found" />
         )}
 
