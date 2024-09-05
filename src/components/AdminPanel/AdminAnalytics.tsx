@@ -1,16 +1,5 @@
 import { useEffect, useState, useMemo, useCallback } from 'react'
-import {
-  Select,
-  Loader,
-  Flex,
-  Box,
-  Text,
-  Badge,
-  ActionIcon,
-  Stack,
-  Group,
-  Alert
-} from '@mantine/core'
+import { Select, Loader, Flex, Box, Text, Badge, ActionIcon, Stack, Group } from '@mantine/core'
 import { AnalyticsPeriod, Timeframe, AnalyticsType, SSPs } from 'types'
 import useCampaignAnalytics from 'hooks/useCampaignAnalytics'
 import CustomTable from 'components/common/CustomTable'
@@ -321,11 +310,12 @@ const AdminAnalytics = () => {
               disabled={loading}
             />
           </Group>
-          {adminMappedAnalytics?.status === 'error' && (
-            <Alert variant="outline" color="error" title="Error occurred while loading analytics" />
-          )}
-
           <CustomTable
+            error={
+              adminMappedAnalytics?.status === 'error'
+                ? 'Error occurred while loading analytics'
+                : undefined
+            }
             headings={headings}
             elements={data.elements}
             pageSize={10}
