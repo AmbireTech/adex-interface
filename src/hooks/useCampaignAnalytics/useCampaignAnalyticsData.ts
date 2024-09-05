@@ -83,5 +83,18 @@ export function useCampaignsAnalyticsData({
     [analyticsKey, campaignMappedAnalytics, initialAnalyticsLoading]
   )
 
-  return { campaignMappedAnalytics, totalPaid, campaign, loading, currencyName, analyticsKey }
+  const error = useMemo(
+    () => mappedAnalytics.get(analyticsKey?.key || '')?.status === 'error',
+    [analyticsKey?.key, mappedAnalytics]
+  )
+
+  return {
+    campaignMappedAnalytics,
+    totalPaid,
+    campaign,
+    loading,
+    currencyName,
+    analyticsKey,
+    error
+  }
 }
