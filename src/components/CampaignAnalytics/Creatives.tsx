@@ -22,7 +22,7 @@ const csvHeaders = {
 }
 
 const Creatives = ({ forAdmin, campaignId }: { forAdmin: boolean; campaignId: string }) => {
-  const { campaignMappedAnalytics, currencyName, campaign, analyticsKey, loading } =
+  const { campaignMappedAnalytics, currencyName, campaign, analyticsKey, loading, error } =
     useCampaignsAnalyticsData({
       campaignId,
       forAdmin,
@@ -62,6 +62,7 @@ const Creatives = ({ forAdmin, campaignId }: { forAdmin: boolean; campaignId: st
 
   return (
     <CustomTable
+      error={error}
       headings={headings}
       elements={elements}
       loading={loading}

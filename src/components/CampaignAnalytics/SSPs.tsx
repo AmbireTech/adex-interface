@@ -5,7 +5,7 @@ import { useCampaignsAnalyticsData } from 'hooks/useCampaignAnalytics/useCampaig
 const headings = ['SSP', 'Impressions', 'Clicks', 'CTR', 'Average CPM', 'Spent']
 
 const SSPs = ({ forAdmin, campaignId }: { forAdmin: boolean; campaignId: string }) => {
-  const { campaignMappedAnalytics, currencyName } = useCampaignsAnalyticsData({
+  const { campaignMappedAnalytics, currencyName, error, loading } = useCampaignsAnalyticsData({
     campaignId,
     forAdmin,
     analyticsType: 'ssp'
@@ -28,7 +28,7 @@ const SSPs = ({ forAdmin, campaignId }: { forAdmin: boolean; campaignId: string 
   if (!campaignMappedAnalytics?.length) {
     return <div>No placement found</div>
   }
-  return <CustomTable headings={headings} elements={elements} />
+  return <CustomTable headings={headings} elements={elements} error={error} loading={loading} />
 }
 
 export default SSPs
