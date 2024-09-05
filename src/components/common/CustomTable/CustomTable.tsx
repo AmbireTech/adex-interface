@@ -17,7 +17,8 @@ import {
   LoadingOverlay,
   Checkbox,
   // CheckIcon,
-  Button
+  Button,
+  Alert
 } from '@mantine/core'
 import { useSet, useMediaQuery } from '@mantine/hooks'
 import usePagination from 'hooks/usePagination'
@@ -50,6 +51,7 @@ export type CustomTableProps = PropsWithChildren &
     loading?: boolean
     selectedActions?: TableRowAction[]
     tableActions?: ReactNode
+    error?: string | boolean
   }
 
 const getLabel = (label: TableRowAction['label'], actionData?: TableElement['actionData']) => {
@@ -77,6 +79,7 @@ export const CustomTable = ({
   loading,
   selectedActions,
   tableActions,
+  error,
   ...tableProps
 }: CustomTableProps) => {
   const isMobile = useMediaQuery('(max-width: 75rem)')
@@ -291,12 +294,22 @@ export const CustomTable = ({
       }
       return <Table.Tr key={rowKey}>{cols}</Table.Tr>
     })
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [list, actions, isMobile, columns, selectedElements, selectedElements.size, headings])
 
   return (
     <Stack align="stretch" w="100%" pos="relative">
       <LoadingOverlay visible={loading} />
+      {error && (
+        <Alert
+          variant="outline"
+          color="error"
+          title={typeof error === 'string' ? error : 'Error loading data'}
+        />
+      )}
+
+      {!error && !rows.length && <Alert variant="outline" color="info" title="No data found" />}
       <Group align="center" justify={selectedElements.size ? 'space-between' : 'right'}>
         {selectedElements.size && masterActionMenu}
         {tableActions}
