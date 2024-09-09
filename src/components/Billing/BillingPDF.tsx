@@ -1,4 +1,17 @@
-import { Flex, Grid, MantineTheme, Space, Table, Text, Box, getPrimaryShade } from '@mantine/core'
+import {
+  Flex,
+  Grid,
+  MantineTheme,
+  Space,
+  Table,
+  Text,
+  Box,
+  getPrimaryShade,
+  Group,
+  Stack,
+  Title,
+  Divider
+} from '@mantine/core'
 import { createStyles } from '@mantine/emotion'
 import { Placement } from 'adex-common'
 import {
@@ -8,8 +21,6 @@ import {
   parseBigNumTokenAmountToDecimal,
   formatCurrency
 } from 'helpers'
-// TODO: delete mock data
-// import { invoiceDetails } from 'components/Billing/mockedData'
 import { PropsWithChildren, ReactNode } from 'react'
 import AdExLogo from 'resources/logos/AdExLogo'
 import { IInvoiceDetails, InvoiceCompanyDetails, OperationEntry, StatementData } from 'types'
@@ -40,52 +51,13 @@ const useStyles = createStyles((theme: MantineTheme) => {
   const colorScheme = useColorScheme()
   const primaryShade = getPrimaryShade(theme, colorScheme)
   return {
-    wrapper: {
-      color: theme.colors.secondaryText[primaryShade],
-      fontSize: theme.fontSizes.xs,
-      span: {
-        display: 'block',
-        wordBreak: 'break-word'
-      }
-    },
-    title: {
-      fontSize: theme.fontSizes.sm,
-      fontWeight: theme.other.fontWeights.bold
-    },
-    right: {
-      textAlign: 'end'
-    },
-    bold: {
-      fontWeight: theme.other.fontWeights.bold,
-      color: theme.colors.mainText[primaryShade]
-    },
-    italic: {
-      fontStyle: 'italic'
-    },
     wrap: {
       wordBreak: 'break-word'
     },
     noWrap: {
       whiteSpace: 'nowrap'
     },
-    smallFontSize: {
-      fontSize: theme.fontSizes.xs
-    },
-    borderBottom: { borderBottom: '1px solid black', width: '100%', height: '70%' },
-    signature: { display: 'flex', justifyContent: 'center', fontSize: theme.fontSizes.xs },
-    rightAlignedText: {
-      textAlign: 'end'
-    },
-    head: {
-      background: theme.black,
-      padding: theme.spacing.xl,
-      color: 'white',
-      textAlign: 'end'
-    },
-    footer: {
-      borderTop: '1px solid',
-      borderColor: theme.colors.decorativeBorders[primaryShade]
-    },
+
     tableHeader: {
       backgroundColor: theme.colors.alternativeBackground[primaryShade]
     },
@@ -100,73 +72,72 @@ const useStyles = createStyles((theme: MantineTheme) => {
 })
 
 const BillingBlank = ({ children, header, seller, buyer, title }: DetailsProps) => {
-  const { classes, cx } = useStyles()
+  const { classes } = useStyles()
 
   return (
-    <Grid grow align="center" className={classes.smallFontSize} p={0} m={0}>
-      <Grid.Col span={12} className={classes.head}>
-        <Flex justify="space-between" align="center">
-          <Box c="white" w={200}>
-            <AdExLogo />
-          </Box>
-          {/* TODO: fix the size to be without px */}
-          <Text size="64px" fw="bold">
-            {title}
-          </Text>
-        </Flex>
-      </Grid.Col>
-      <Grid.Col span={12}>
-        <Grid p="xl">
-          <Grid.Col span={6}>
-            <div className={classes.wrapper}>
+    <Stack fz="xs" p="xs" m={0} gap="lg">
+      <Group justify="space-between" align="center">
+        <Box w={160}>
+          <AdExLogo />
+        </Box>
+        {/* TODO: fix the size to be without px */}
+        <Title order={2} fw="bold">
+          {title}
+        </Title>
+      </Group>
+
+      <Stack>
+        <Group grow align="top">
+          <Stack>
+            <Stack gap="0">
               <span>{`${title} to:`} </span>
               <span className={classes.bold}>{buyer.companyName}</span>
-              <Space h="lg" />
+              <Space h="md" />
               <span>{buyer.companyAddress}</span>
               <span>{buyer.companyCity}</span>
               <span>{buyer.companyCountry}</span>
-            </div>
-            <Space h="lg" />
-            <div className={classes.wrapper}>
+            </Stack>
+
+            <Stack gap="0">
               <span>Reg. No.: {buyer.companyNumber}</span>
               <span>VAT Reg. No.: {buyer.companyNumberPrim}</span>
               <span>ETH Address: {buyer.ethAddress}</span>
-            </div>
-          </Grid.Col>
-          <Grid.Col span={6}>{header}</Grid.Col>
-          <Grid.Col span={12}>
-            <Space h="lg" />
-            {children}
-          </Grid.Col>
-          <Grid.Col span={12} className={classes.footer}>
-            <Grid>
-              <Grid.Col span={5}>
-                <div className={classes.wrapper}>
-                  <span className={classes.bold}>{seller.companyName}</span>
-                  <Space h="md" />
-                  <span>{seller.companyAddress}</span>
-                  <span>{seller.companyCity}</span>
-                  <span>{seller.companyCountry}</span>
-                </div>
-              </Grid.Col>
-              <Grid.Col span={7}>
-                <div className={cx(classes.wrapper, classes.right)}>
-                  <Flex justify="space-between" w="100%">
-                    <span>Email: {seller.email}</span>
-                    <span>Website: {seller.website}</span>
-                  </Flex>
-                  <Space h="md" />
-                  <span>Reg. No.: {seller.companyNumber}</span>
-                  <span>VAT Reg. No.: {seller.companyNumberPrim}</span>
-                  <span>ETH Address: {seller.ethAddress}</span>
-                </div>
-              </Grid.Col>
-            </Grid>
-            <Space h="lg" />
-          </Grid.Col>
-        </Grid>
-      </Grid.Col>
-    </Grid>
+            </Stack>
+          </Stack>
+
+          <div className={classes.wrapper}>{header}</div>
+        </Group>
+
+        <Space h="md" />
+        {children}
+        <Space h="lg" />
+        <Divider />
+        <Stack className={classes.footer}>
+          <Group grow>
+            <Stack gap="0">
+              <Text size="sm" fw="bold">
+                {seller.companyName}
+              </Text>
+              <Space h="md" />
+              <Space h="md" />
+              <span>{seller.companyAddress}</span>
+              <span>{seller.companyCity}</span>
+              <span>{seller.companyCountry}</span>
+            </Stack>
+
+            <Stack ta="right" gap="0" className={classes.wrap}>
+              <span>Email: {seller.email}</span>
+              <span>Website: {seller.website}</span>
+
+              <Space h="md" />
+              <span>Reg. No.: {seller.companyNumber}</span>
+              <span>VAT Reg. No.: {seller.companyNumberPrim}</span>
+              <span>ETH Address: {seller.ethAddress}</span>
+            </Stack>
+          </Group>
+        </Stack>
+      </Stack>
+    </Stack>
   )
 }
 
@@ -181,31 +152,38 @@ export const InvoicesPDF = ({ invoiceDetails, placement }: InvoicesPDFProps) => 
       seller={invoiceDetails.seller}
       buyer={invoiceDetails.buyer}
       header={
-        <>
-          <Flex
+        <Stack gap="0">
+          <Group
             justify="space-between"
-            className={cx(classes.tableHeader, classes.tableWrapper, classes.wrap)}
+            align="baseline"
+            className={cx(classes.tableHeader, classes.tableWrapper)}
             p="xs"
+            wrap="nowrap"
           >
-            <Text c="secondaryText">Invoice No.:</Text>
-            <Text fw="bold">{invoiceDetails.invoiceId}</Text>
-          </Flex>
-          <Flex justify="space-between" pl="xs" pr="xs">
+            <Text c="secondaryText" className={classes.noWrap}>
+              Invoice No.:
+            </Text>
+            <Text size="sm" fw="bold" className={classes.wrap}>
+              {invoiceDetails.invoiceId}
+            </Text>
+          </Group>
+          <Space h="md" />
+          <Group justify="space-between">
             <Text c="secondaryText">Invoice Date:</Text>
             <Text c="secondaryText">
               {invoiceDetails.invoiceDate ? formatDate(invoiceDetails.invoiceDate) : 'N/A'}
             </Text>
-          </Flex>
-          <Flex justify="space-between" pl="xs" pr="xs">
+          </Group>
+          <Group justify="space-between">
             <Text c="secondaryText">Payment Date:</Text>
             <Text c="secondaryText">
               {invoiceDetails.paymentDate ? formatDate(invoiceDetails.paymentDate) : 'N/A'}
             </Text>
-          </Flex>
-        </>
+          </Group>
+        </Stack>
       }
     >
-      <>
+      <Stack align="end">
         <Table
           fs="xs"
           verticalSpacing="xs"
@@ -248,37 +226,35 @@ export const InvoicesPDF = ({ invoiceDetails, placement }: InvoicesPDFProps) => 
             </Table.Tr>
           </Table.Tbody>
         </Table>
-        <Grid.Col span={12}>
-          <Grid justify="end">
-            <Grid.Col span={10} className={cx(classes.right)}>
-              Subtotal
-            </Grid.Col>
-            <Grid.Col span={2} className={cx(classes.right)}>
-              {invoiceDetails.amount.toFixed(2)}
-            </Grid.Col>
-            <Grid.Col span={10} className={cx(classes.right)}>
-              {`VAT ${invoiceDetails.vatPercentageInUSD} %`}
-            </Grid.Col>
-            <Grid.Col span={2} className={cx(classes.right, classes.borderBottom)}>
+
+        <Stack w="50%" gap="xs">
+          <Group grow justify="space-between">
+            <Text>Subtotal</Text>
+            <Text ta="end">{invoiceDetails.amount.toFixed(2)} </Text>
+          </Group>
+          <Group grow justify="space-between">
+            <Text> {`VAT ${invoiceDetails.vatPercentageInUSD} %`}</Text>
+            <Text ta="end">
               {`${calculatedVatValue.toFixed(2)}${
                 invoiceDetails.vatPercentageInUSD === 0 ? '*' : ''
               }`}
-            </Grid.Col>
-            <Grid.Col span={10} className={cx(classes.right, classes.bold)}>
-              {`Invoice total (${invoiceDetails.currencyName})`}
-            </Grid.Col>
-            <Grid.Col span={2} className={cx(classes.right, classes.bold)}>
-              {invoiceTotal.toFixed(2)}
-            </Grid.Col>
-            {invoiceDetails.vatPercentageInUSD === 0 && (
-              <Grid.Col span={10} className={cx(classes.right)}>
-                * Services subject to reverse charge-VAT to be accounted for by the recipient as per
-                Art.196 Council Directive 2006/112/EC
-              </Grid.Col>
-            )}
-          </Grid>
-        </Grid.Col>
-      </>
+            </Text>
+          </Group>
+          <Divider />
+          <Group grow justify="space-between">
+            <Text fw="bold">{`Invoice total (${invoiceDetails.currencyName})`}</Text>
+            <Text fw="bold" ta="end">
+              {invoiceTotal.toFixed(2)}{' '}
+            </Text>
+          </Group>
+        </Stack>
+        {invoiceDetails.vatPercentageInUSD === 0 && (
+          <Text size="xs" ta="end">
+            * Services subject to reverse charge-VAT to be accounted for by the recipient as per
+            Art.196 Council Directive 2006/112/EC
+          </Text>
+        )}
+      </Stack>
     </BillingBlank>
   )
 }
@@ -365,7 +341,7 @@ export const StatementsPDF = ({ statement, seller, buyer }: StatementsPDFProps) 
         <Grid.Col span={12}>
           <Space h="xl" />
           <Space h="xl" />
-          <div className={classes.borderBottom} />
+          <Divider variant="solid" />
         </Grid.Col>
         <Grid.Col span={12}>This is not a bill.</Grid.Col>
         <Grid.Col span={12}>
