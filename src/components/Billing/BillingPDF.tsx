@@ -1,18 +1,4 @@
-import {
-  Flex,
-  Grid,
-  MantineTheme,
-  Space,
-  Table,
-  Text,
-  Box,
-  getPrimaryShade,
-  Group,
-  Stack,
-  Title,
-  Divider
-} from '@mantine/core'
-import { createStyles } from '@mantine/emotion'
+import { Space, Table, Text, Box, Group, Stack, Title, Divider } from '@mantine/core'
 import { Placement } from 'adex-common'
 import {
   formatDate,
@@ -25,7 +11,6 @@ import { PropsWithChildren, ReactNode } from 'react'
 import AdExLogo from 'resources/logos/AdExLogo'
 import { IInvoiceDetails, InvoiceCompanyDetails, OperationEntry, StatementData } from 'types'
 import { networks } from 'lib/Icons'
-import { useColorScheme } from '@mantine/hooks'
 
 type InvoicesPDFProps = { invoiceDetails: IInvoiceDetails; placement: Placement }
 type SidesDetails = {
@@ -47,40 +32,13 @@ const formatTokenAmount = (amount: bigint, token: OperationEntry['token']): stri
   return `${formatCurrency(parseBigNumTokenAmountToDecimal(amount, token.decimals), 2)}`
 }
 
-const useStyles = createStyles((theme: MantineTheme) => {
-  const colorScheme = useColorScheme()
-  const primaryShade = getPrimaryShade(theme, colorScheme)
-  return {
-    wrap: {
-      wordBreak: 'break-word'
-    },
-    noWrap: {
-      whiteSpace: 'nowrap'
-    },
-
-    tableHeader: {
-      backgroundColor: theme.colors.alternativeBackground[primaryShade]
-    },
-    tableBody: {
-      backgroundColor: theme.colors.lightBackground[primaryShade]
-    },
-    tableWrapper: {
-      borderRadius: theme.radius.sm,
-      overflow: 'hidden'
-    }
-  }
-})
-
 const BillingBlank = ({ children, header, seller, buyer, title }: DetailsProps) => {
-  const { classes } = useStyles()
-
   return (
-    <Stack fz="xs" p="xs" m={0} gap="lg">
+    <Stack fz="sm" p="xs" m={0} gap="lg">
       <Group justify="space-between" align="center">
         <Box w={160}>
           <AdExLogo />
         </Box>
-        {/* TODO: fix the size to be without px */}
         <Title order={2} fw="bold">
           {title}
         </Title>
@@ -91,7 +49,7 @@ const BillingBlank = ({ children, header, seller, buyer, title }: DetailsProps) 
           <Stack>
             <Stack gap="0">
               <span>{`${title} to:`} </span>
-              <span className={classes.bold}>{buyer.companyName}</span>
+              <span>{buyer.companyName}</span>
               <Space h="md" />
               <span>{buyer.companyAddress}</span>
               <span>{buyer.companyCity}</span>
@@ -105,15 +63,15 @@ const BillingBlank = ({ children, header, seller, buyer, title }: DetailsProps) 
             </Stack>
           </Stack>
 
-          <div className={classes.wrapper}>{header}</div>
+          <Box>{header}</Box>
         </Group>
 
         <Space h="md" />
         {children}
         <Space h="lg" />
         <Divider />
-        <Stack className={classes.footer}>
-          <Group grow>
+        <Stack>
+          <Group grow align="baseline">
             <Stack gap="0">
               <Text size="sm" fw="bold">
                 {seller.companyName}
@@ -125,7 +83,7 @@ const BillingBlank = ({ children, header, seller, buyer, title }: DetailsProps) 
               <span>{seller.companyCountry}</span>
             </Stack>
 
-            <Stack ta="right" gap="0" className={classes.wrap}>
+            <Stack ta="right" gap="0">
               <span>Email: {seller.email}</span>
               <span>Website: {seller.website}</span>
 
@@ -142,8 +100,6 @@ const BillingBlank = ({ children, header, seller, buyer, title }: DetailsProps) 
 }
 
 export const InvoicesPDF = ({ invoiceDetails, placement }: InvoicesPDFProps) => {
-  const { classes, cx } = useStyles()
-
   const calculatedVatValue = invoiceDetails.amount * (invoiceDetails.vatPercentageInUSD / 100)
   const invoiceTotal = invoiceDetails.amount + calculatedVatValue
   return (
@@ -153,17 +109,11 @@ export const InvoicesPDF = ({ invoiceDetails, placement }: InvoicesPDFProps) => 
       buyer={invoiceDetails.buyer}
       header={
         <Stack gap="0">
-          <Group
-            justify="space-between"
-            align="baseline"
-            className={cx(classes.tableHeader, classes.tableWrapper)}
-            p="xs"
-            wrap="nowrap"
-          >
-            <Text c="secondaryText" className={classes.noWrap}>
-              Invoice No.:
+          <Group justify="space-between" align="baseline" wrap="nowrap">
+            <Text c="secondaryText" ta="left">
+              Invoice:
             </Text>
-            <Text size="sm" fw="bold" className={classes.wrap}>
+            <Text size="xs" fw="bold" style={{ wordBreak: 'break-word' }}>
               {invoiceDetails.invoiceId}
             </Text>
           </Group>
@@ -184,45 +134,33 @@ export const InvoicesPDF = ({ invoiceDetails, placement }: InvoicesPDFProps) => 
       }
     >
       <Stack align="end">
-        <Table
-          fs="xs"
-          verticalSpacing="xs"
-          w="100%"
-          className={classes.tableWrapper}
-          withColumnBorders
-        >
-          <Table.Thead className={classes.tableHeader}>
+        <Table fs="xs" verticalSpacing="xs" w="100%" withColumnBorders>
+          <Table.Thead bg="alternativeBackground">
             <Table.Tr>
               <Table.Th>Placement</Table.Th>
-              <Table.Th className={classes.rightAlignedText}>Impressions</Table.Th>
-              <Table.Th className={classes.rightAlignedText}>Clicks</Table.Th>
-              <Table.Th>CTR %</Table.Th>
-              <Table.Th>
+              <Table.Th ta="right">Impressions</Table.Th>
+              <Table.Th ta="right">Clicks</Table.Th>
+              <Table.Th ta="right">CTR %</Table.Th>
+              <Table.Th ta="right">
                 <span>Average CPM</span>
                 <br />
                 <span>({invoiceDetails.currencyName})</span>
               </Table.Th>
-              <Table.Th>
+              <Table.Th ta="right">
                 <span>Spent</span>
                 <br />
                 <span>({invoiceDetails.currencyName})</span>
               </Table.Th>
             </Table.Tr>
           </Table.Thead>
-          <Table.Tbody className={classes.tableBody}>
+          <Table.Tbody bg="lightBackground">
             <Table.Tr>
-              <Table.Td className={classes.wrap}>{placement}</Table.Td>
-              <Table.Td className={classes.rightAlignedText}>
-                {invoiceDetails.impressions.toLocaleString()}
-              </Table.Td>
-              <Table.Td className={classes.rightAlignedText}>
-                {invoiceDetails.clicks.toLocaleString()}
-              </Table.Td>
-              <Table.Td className={classes.rightAlignedText}>{invoiceDetails.ctr}</Table.Td>
-              <Table.Td className={classes.rightAlignedText}>{invoiceDetails.avgCpm}</Table.Td>
-              <Table.Td className={classes.rightAlignedText}>
-                {invoiceDetails.amount.toFixed(4)}
-              </Table.Td>
+              <Table.Td>{placement}</Table.Td>
+              <Table.Td ta="right">{invoiceDetails.impressions.toLocaleString()}</Table.Td>
+              <Table.Td ta="right">{invoiceDetails.clicks.toLocaleString()}</Table.Td>
+              <Table.Td ta="right">{invoiceDetails.ctr}</Table.Td>
+              <Table.Td ta="right">{invoiceDetails.avgCpm}</Table.Td>
+              <Table.Td ta="right">{invoiceDetails.amount.toFixed(4)}</Table.Td>
             </Table.Tr>
           </Table.Tbody>
         </Table>
@@ -260,65 +198,53 @@ export const InvoicesPDF = ({ invoiceDetails, placement }: InvoicesPDFProps) => 
 }
 
 export const StatementsPDF = ({ statement, seller, buyer }: StatementsPDFProps) => {
-  const { classes, cx } = useStyles()
-
   return (
     <BillingBlank
       title="Statement"
       seller={seller}
       buyer={buyer}
       header={
-        <>
-          <Flex
-            justify="space-between"
-            className={cx(classes.tableHeader, classes.tableWrapper)}
-            p="xs"
-          >
+        <Stack gap="0">
+          <Group justify="space-between">
             <Text c="secondaryText">Statement Period:</Text>
             <Text fw="bold">
               {getMonthRangeString(monthPeriodIndexToDate(statement.periodIndex))}
             </Text>
-          </Flex>
-          <Flex justify="space-between" pl="xs" pr="xs">
+          </Group>
+          <Group justify="space-between">
             <Text c="secondaryText">Currency / Token:</Text>
             <Text c="secondaryText">
               {statement.token.name} (chain: {networks[statement.token.chainId]})
             </Text>
-          </Flex>
-          <Flex justify="space-between" pl="xs" pr="xs">
+          </Group>
+
+          <Group justify="space-between" mt="lg">
             <Text c="secondaryText">Start balance:</Text>
-            <Text c="secondaryText">
+            <Text c="secondaryText" fw="bold">
               {formatTokenAmount(statement.startBalance, statement.token)}
             </Text>
-          </Flex>
-          <Flex justify="space-between" pl="xs" pr="xs">
+          </Group>
+          <Group justify="space-between">
             <Text c="secondaryText">End balance:</Text>
-            <Text c="secondaryText">
+            <Text c="secondaryText" fw="bold">
               {formatTokenAmount(statement.endBalance, statement.token)}
             </Text>
-          </Flex>
-        </>
+          </Group>
+        </Stack>
       }
     >
       <>
-        {/* <Table fontSize="xs" verticalSpacing="xs" w="100%" className={classes.tableWrapper}> */}
-        <Table
-          fs="xs"
-          verticalSpacing="xs"
-          w="100%"
-          className={classes.tableWrapper}
-          withColumnBorders
-        >
-          <Table.Thead className={classes.tableHeader}>
+        <Table fs="xs" verticalSpacing="xs" w="100%" withColumnBorders>
+          <Table.Thead bg="alternativeBackground">
             <Table.Tr>
               <Table.Th>#</Table.Th>
               <Table.Th>Date</Table.Th>
               <Table.Th>Type</Table.Th>
               <Table.Th>Description</Table.Th>
-              <Table.Th>amount ({statement.token.name})</Table.Th>
+              <Table.Th ta="right">amount ({statement.token.name})</Table.Th>
             </Table.Tr>
           </Table.Thead>
-          <Table.Tbody className={classes.tableBody}>
+          <Table.Tbody bg="lightBackground">
             {statement.operations.map((e, index) => (
               // eslint-disable-next-line
               <Table.Tr key={index}>
@@ -327,8 +253,8 @@ export const StatementsPDF = ({ statement, seller, buyer }: StatementsPDFProps) 
                 <Table.Td>
                   <Text tt="capitalize">{e.name}</Text>
                 </Table.Td>
-                <Table.Td className={classes.wrap}>{e.id}</Table.Td>
-                <Table.Td className={cx(classes.rightAlignedText, classes.noWrap)}>
+                <Table.Td style={{ wordBreak: 'break-word' }}>{e.id}</Table.Td>
+                <Table.Td ta="right">
                   {`${e.type === 'campaignOpen' ? '-' : '+'}   ${formatTokenAmount(
                     e.amount,
                     statement.token
@@ -338,15 +264,15 @@ export const StatementsPDF = ({ statement, seller, buyer }: StatementsPDFProps) 
             ))}
           </Table.Tbody>
         </Table>
-        <Grid.Col span={12}>
-          <Space h="xl" />
-          <Space h="xl" />
-          <Divider variant="solid" />
-        </Grid.Col>
-        <Grid.Col span={12}>This is not a bill.</Grid.Col>
-        <Grid.Col span={12}>
-          This is a summary of account activity for the time period stated above
-        </Grid.Col>
+        <Divider />
+        <Stack gap="xs">
+          <Text fz="xs" inline>
+            This is not a bill.
+          </Text>
+          <Text fz="xs" inline>
+            This is a summary of account activity for the time period stated above
+          </Text>
+        </Stack>
       </>
     </BillingBlank>
   )
