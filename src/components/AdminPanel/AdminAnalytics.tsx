@@ -1,15 +1,5 @@
 import { useEffect, useState, useMemo, useCallback } from 'react'
-import {
-  Select,
-  Flex,
-  Box,
-  Text,
-  Badge,
-  ActionIcon,
-  Stack,
-  Group,
-  LoadingOverlay
-} from '@mantine/core'
+import { Select, Box, Text, Badge, ActionIcon, Stack, Group, LoadingOverlay } from '@mantine/core'
 import { AnalyticsPeriod, Timeframe, AnalyticsType, SSPs } from 'types'
 import useCampaignAnalytics from 'hooks/useCampaignAnalytics'
 import CustomTable from 'components/common/CustomTable'
@@ -222,17 +212,17 @@ const AdminAnalytics = () => {
   }, [handlePreview])
 
   return (
-    <>
-      <Text size="sm">
+    <Stack gap="xs">
+      <Text size="sm" inline>
         * This analytics are for the actual user campaign, representing placed impressions, clicks,
         etc. (NOT the stats form received requests form the SSPs)
       </Text>
-      <Text size="sm" mb="md" c="info">
+      <Text size="sm" mb="md" c="info" inline>
         * Amounts include AdEx validator fees 7% (total amounts paid by the users). For amounts
         payed to ssp divide by 1.07 (for records after 22.06.24)
       </Text>
 
-      <Flex direction="row" align="start" justify="left" gap="xl" mb="md">
+      <Group align="start" justify="left" gap="xs">
         <Select
           label="Type"
           value={analType}
@@ -270,7 +260,7 @@ const AdminAnalytics = () => {
           withSeconds
           size="md"
         />
-      </Flex>
+      </Group>
 
       <Stack>
         <Group align="center" justify="left" gap="xs" pos="relative">
@@ -331,7 +321,7 @@ const AdminAnalytics = () => {
           actions={analType === 'campaignId' ? actions : undefined}
         />
       </Stack>
-    </>
+    </Stack>
   )
 }
 

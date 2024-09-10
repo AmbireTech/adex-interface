@@ -29,11 +29,8 @@ function GlobalStyles() {
     <Global
       styles={(theme: MantineTheme) => ({
         [theme.other.media.print]: {
-          body: {
-            visibility: 'hidden'
-          },
-          'body #printable': {
-            visibility: 'visible'
+          '#root': {
+            display: 'none'
           }
         }
       })}
