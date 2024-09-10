@@ -134,8 +134,8 @@ export const InvoicesPDF = ({ invoiceDetails, placement }: InvoicesPDFProps) => 
       }
     >
       <Stack align="end">
-        <Table fs="xs" verticalSpacing="xs" w="100%" withColumnBorders>
-          <Table.Thead bg="alternativeBackground">
+        <Table fs="xs" verticalSpacing="xs" w="100%" withColumnBorders withTableBorder>
+          <Table.Thead bg="alternativeBackground" tt="capitalize">
             <Table.Tr>
               <Table.Th>Placement</Table.Th>
               <Table.Th ta="right">Impressions</Table.Th>
@@ -234,14 +234,14 @@ export const StatementsPDF = ({ statement, seller, buyer }: StatementsPDFProps) 
       }
     >
       <>
-        <Table fs="xs" verticalSpacing="xs" w="100%" withColumnBorders>
-          <Table.Thead bg="alternativeBackground">
+        <Table fs="xs" verticalSpacing="xs" w="100%" withColumnBorders withTableBorder>
+          <Table.Thead bg="alternativeBackground" tt="capitalize">
             <Table.Tr>
               <Table.Th>#</Table.Th>
               <Table.Th>Date</Table.Th>
               <Table.Th>Type</Table.Th>
               <Table.Th>Description</Table.Th>
-              <Table.Th ta="right">amount ({statement.token.name})</Table.Th>
+              <Table.Th ta="right">Amount ({statement.token.name})</Table.Th>
             </Table.Tr>
           </Table.Thead>
           <Table.Tbody bg="lightBackground">
