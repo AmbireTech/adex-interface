@@ -94,15 +94,17 @@ function SideNav() {
         </Stack>
       </AppShell.Section>
       <AppShell.Section mx="xs" mt="xl">
-        <CustomAnchor c="secondaryText" size="sm" external href="https://adex.network">
-          ©{year} AdEx.
-        </CustomAnchor>
-        <Text c="secondaryText" size="sm">
-          All Rights Reserved.
-        </Text>
-        <Text c="secondaryText" size="sm">
-          V.{appVersion}-beta
-        </Text>
+        <Stack gap="xs" c="secondaryText">
+          <CustomAnchor c="secondaryText" inline size="sm" external href="https://adex.network">
+            ©{year} AdEx
+          </CustomAnchor>
+          <Text inline size="sm">
+            All Rights Reserved
+          </Text>
+          <Text inline size="sm">
+            V.{appVersion}-beta
+          </Text>
+        </Stack>
       </AppShell.Section>
     </>
   )

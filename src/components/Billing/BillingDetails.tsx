@@ -7,8 +7,7 @@ import {
   Space,
   Select,
   Fieldset,
-  ThemeIcon,
-  Box
+  ThemeIcon
 } from '@mantine/core'
 import { useForm } from '@mantine/form'
 import useAccount from 'hooks/useAccount'
@@ -139,47 +138,47 @@ const BillingDetails = () => {
           </Group>
 
           <Space />
-          <Group>
+          <Stack align="baseline" gap="xs">
             {billingDetails.verified ? (
-              <Box>
-                <Button
-                  miw={260}
-                  size="lg"
-                  type="submit"
-                  leftSection={
-                    <ThemeIcon size="xl" variant="transparent" radius="xl" color="success">
-                      <CheckMarkIcon size="36px" />{' '}
-                    </ThemeIcon>
-                  }
-                  color="success"
-                  variant="outline"
-                >
-                  Verified
-                </Button>
-                <Text mt="md">
-                  Your billing details are verified and cannot be changed here. If there is a
-                  mistake and changes need to be made, please contact us at &nbsp;
-                  <CustomAnchor external href="mailto:contactus@adex.network">
-                    contactus@adex.network
-                  </CustomAnchor>
-                  .
-                </Text>
-              </Box>
+              <Button
+                miw={260}
+                size="lg"
+                type="submit"
+                leftSection={
+                  <ThemeIcon size="xl" variant="transparent" radius="xl" color="success">
+                    <CheckMarkIcon size="36px" />{' '}
+                  </ThemeIcon>
+                }
+                color="success"
+                variant="outline"
+              >
+                Verified
+              </Button>
             ) : (
-              <Box>
-                <Button miw={260} size="lg" type="submit" color="secondary" variant="outline">
-                  Confirm details
-                </Button>
-                <Text mt="md">
-                  Fill in your billing details and contact us at &nbsp;
-                  <CustomAnchor external href="mailto:contactus@adex.network">
-                    contactus@adex.network
-                  </CustomAnchor>
-                  &nbsp; to verify the data.
-                </Text>
-              </Box>
+              <Button miw={260} size="lg" type="submit" color="secondary" variant="outline">
+                Confirm details
+              </Button>
             )}
-          </Group>
+
+            {billingDetails.verified ? (
+              <Text mt="md">
+                Your billing details are verified and cannot be changed here. If there is a mistake
+                and changes need to be made, please contact us at &nbsp;
+                <CustomAnchor external href="mailto:contactus@adex.network">
+                  contactus@adex.network
+                </CustomAnchor>
+                .
+              </Text>
+            ) : (
+              <Text mt="md">
+                Fill in your billing details and contact us at &nbsp;
+                <CustomAnchor external href="mailto:contactus@adex.network">
+                  contactus@adex.network
+                </CustomAnchor>
+                &nbsp; to verify the data.
+              </Text>
+            )}
+          </Stack>
         </Stack>
       </form>
     </Fieldset>
