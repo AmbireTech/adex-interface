@@ -299,7 +299,7 @@ export const CustomTable = ({
   }, [list, actions, isMobile, columns, selectedElements, selectedElements.size, headings])
 
   return (
-    <Stack align="stretch" w="100%" pos="relative">
+    <Stack align="stretch" w="100%" pos="relative" gap="sm">
       <LoadingOverlay visible={loading} />
       {error && (
         <Alert
@@ -312,10 +312,13 @@ export const CustomTable = ({
       {!error && !loading && !rows.length && (
         <Alert variant="outline" color="info" title="No data found" />
       )}
-      <Group align="center" justify={selectedElements.size ? 'space-between' : 'right'}>
-        {selectedElements.size && masterActionMenu}
-        {tableActions}
-      </Group>
+
+      {((!!selectedElements.size && !!masterActionMenu) || tableActions) && (
+        <Group align="center" justify={selectedElements.size ? 'space-between' : 'right'}>
+          {selectedElements.size && masterActionMenu}
+          {tableActions}
+        </Group>
+      )}
 
       {isMobile ? (
         <Stack gap="xl">

@@ -1,5 +1,5 @@
 import { useEffect, useMemo } from 'react'
-import { SimpleGrid, Box, Title, Paper, Loader, Center } from '@mantine/core'
+import { SimpleGrid, Box, Loader, Center, Fieldset } from '@mantine/core'
 import useAdmin from 'hooks/useAdmin'
 import { useParams } from 'react-router-dom'
 import Dashboard from 'components/Dashboard'
@@ -39,34 +39,22 @@ function AccountDetails() {
         //   { maxWidth: 'md', cols: 1, spacing: 'xl' }
         // ]}
       >
-        <Paper p="sm" withBorder>
-          <Title order={5} c="brand">
-            Account info form
-          </Title>
+        <Fieldset legend="Account info form">
           <AccountInfo accountData={accountData} />
-        </Paper>
-        <Paper p="sm" withBorder>
-          <Title order={5} c="brand">
-            Deposit form
-          </Title>
+        </Fieldset>
+        <Fieldset legend="Deposit form">
           <AdminDeposit accountData={accountData} />
-        </Paper>
+        </Fieldset>
       </SimpleGrid>
       <SimpleGrid spacing="xl" mt="xl">
-        <Paper p="sm" withBorder>
-          <Title order={5} c="brand">
-            Activity
-          </Title>
+        <Fieldset legend="Activity">
           <FundsActivity accountData={accountData} />
-        </Paper>
+        </Fieldset>
       </SimpleGrid>
       <SimpleGrid spacing="xl" mt="xl">
-        <Paper p="sm" withBorder>
-          <Title order={5} c="brand">
-            Campaigns
-          </Title>
+        <Fieldset legend="Campaigns">
           <Dashboard isAdminPanel accountId={accountId} />
-        </Paper>
+        </Fieldset>
       </SimpleGrid>
     </Box>
   )
