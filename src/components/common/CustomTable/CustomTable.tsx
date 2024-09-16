@@ -25,26 +25,32 @@ import usePagination from 'hooks/usePagination'
 import { useMemo, PropsWithChildren, ReactNode, useCallback } from 'react'
 import Dots from 'resources/icons/TreeDotsMenu'
 
-export type TableElement = {
-  id?: string
+export type ColumnElement = {
+  value: string | number | boolean | Date | BigInt
+  element?: string | ReactNode
+  label?: string
+}
+
+export type DataElement = {
+  id: string
   rowColor?: MantineColor
   actionData?: any
-  [index: string]: any
+  columns: ColumnElement[]
 }
 
 export type TableRowAction = {
-  action: (e: TableElement['actionData']) => any
-  label: ((e: TableElement['actionData']) => string) | string
+  action: (e: DataElement['actionData']) => any
+  label: ((e: DataElement['actionData']) => string) | string
   color?: MantineColor
-  icon?: ((e: TableElement['actionData']) => ReactNode) | ReactNode
-  disabled?: (e?: TableElement['actionData']) => boolean
-  hide?: (e?: TableElement['actionData']) => boolean
+  icon?: ((e: DataElement['actionData']) => ReactNode) | ReactNode
+  disabled?: (e?: DataElement['actionData']) => boolean
+  hide?: (e?: DataElement['actionData']) => boolean
 }
 
 export type CustomTableProps = PropsWithChildren &
   TableProps & {
     headings: string[]
-    elements: Array<TableElement>
+    data: DataElement[]
     pageSize?: number
     actions?: TableRowAction[]
     shadow?: MantineShadow
@@ -54,7 +60,7 @@ export type CustomTableProps = PropsWithChildren &
     error?: string | boolean
   }
 
-const getLabel = (label: TableRowAction['label'], actionData?: TableElement['actionData']) => {
+const getLabel = (label: TableRowAction['label'], actionData?: DataElement['actionData']) => {
   if (typeof label === 'function') {
     return label(actionData)
   }
@@ -62,7 +68,7 @@ const getLabel = (label: TableRowAction['label'], actionData?: TableElement['act
   return label
 }
 
-const getIcon = (icon: TableRowAction['icon'], actionData?: TableElement['actionData']) => {
+const getIcon = (icon: TableRowAction['icon'], actionData?: DataElement['actionData']) => {
   if (typeof icon === 'function') {
     return icon(actionData)
   }
@@ -72,7 +78,7 @@ const getIcon = (icon: TableRowAction['icon'], actionData?: TableElement['action
 
 export const CustomTable = ({
   headings,
-  elements,
+  data,
   pageSize,
   actions,
   shadow = 'none',
@@ -86,25 +92,15 @@ export const CustomTable = ({
   const selectedElements = useSet<string>()
   const hasSelectActions = useMemo(() => !!selectedActions?.length, [selectedActions?.length])
 
-  const columns: string[] = useMemo(
-    () =>
-      typeof elements[0] === 'object'
-        ? Object.keys(elements[0]).filter(
-            (e: string) => e !== 'id' && e !== 'rowColor' && e !== 'actionData'
-          )
-        : [],
-    [elements]
-  )
-
-  const maxItemsPerPage = pageSize || (isMobile ? elements.length : 10)
+  const maxItemsPerPage = pageSize || (isMobile ? data.length : 10)
   const { maxPages, defaultPage, startIndex, endIndex, onNextPage, onPreviousPage, onChange } =
     usePagination({
-      elementsLength: elements.length,
+      elementsLength: data.length,
       maxItemsPerPage
     })
   const list = useMemo(() => {
-    return elements.slice(startIndex, endIndex)
-  }, [elements, startIndex, endIndex])
+    return data.slice(startIndex, endIndex)
+  }, [data, startIndex, endIndex])
 
   const handleCheckbox = useCallback(
     (checked: boolean, id: string) => {
@@ -121,10 +117,10 @@ export const CustomTable = ({
 
   const handleCheckboxMaster = useCallback(
     (all?: boolean) =>
-      [...(all ? elements : list)].forEach((x) =>
+      [...(all ? data : list)].forEach((x) =>
         selectedElements[currentPageElementsAllSelected ? 'delete' : 'add'](x.id || '')
       ),
-    [currentPageElementsAllSelected, elements, list, selectedElements]
+    [currentPageElementsAllSelected, data, list, selectedElements]
   )
 
   const masterActionMenu = useMemo(() => {
@@ -142,7 +138,7 @@ export const CustomTable = ({
                 onClick={() => {
                   a.action(
                     Array.from(selectedElements.values()).map(
-                      (id) => elements.find((x) => x.id === id)?.actionData
+                      (id) => data.find((x) => x.id === id)?.actionData
                     )
                   )
                   selectedElements.clear()
@@ -177,24 +173,24 @@ export const CustomTable = ({
   )
 
   const rows = useMemo(() => {
-    return list.map((e, i) => {
-      const activeActions = [...(actions || [])].filter((a) => !a.hide?.(e.actionData))
+    return list.map((rowData, index) => {
+      const activeActions = [...(actions || [])].filter((a) => !a.hide?.(rowData.actionData))
       const maxActions = isMobile ? activeActions.length : 3
 
-      const actionsMenu = activeActions?.length && (
+      const actionsMenu = activeActions?.length ? (
         <Group justify={isMobile ? 'auto' : 'right'} gap="sm" wrap="nowrap">
           {activeActions.slice(0, maxActions).map((a) => {
-            const label = getLabel(a.label, e.actionData)
+            const label = getLabel(a.label, rowData.actionData)
             return (
               <Tooltip key={label} label={label}>
                 <ActionIcon
                   size="sm"
                   variant="transparent"
                   color={a.color || 'mainText'}
-                  onClick={() => a.action(e.actionData || e)}
-                  disabled={a.disabled?.(e.actionData || e)}
+                  onClick={() => a.action(rowData.actionData || rowData)}
+                  disabled={a.disabled?.(rowData.actionData || rowData)}
                 >
-                  {getIcon(a.icon, e.actionData)}
+                  {getIcon(a.icon, rowData.actionData)}
                 </ActionIcon>
               </Tooltip>
             )
@@ -209,18 +205,18 @@ export const CustomTable = ({
 
               <Menu.Dropdown>
                 {activeActions.slice(maxActions).map((a) => {
-                  const label = getLabel(a.label, e.actionData)
-                  const disabled = a.disabled?.(e.actionData || e)
+                  const label = getLabel(a.label, rowData.actionData)
+                  const disabled = a.disabled?.(rowData.actionData || rowData)
                   return (
                     <Menu.Item
                       color={a.color || 'mainText'}
                       key={label}
                       leftSection={
                         <ThemeIcon size="sm" variant="transparent" color={a.color || 'mainText'}>
-                          {getIcon(a.icon, e.actionData)}
+                          {getIcon(a.icon, rowData.actionData)}
                         </ThemeIcon>
                       }
-                      onClick={() => a.action(e.actionData || e)}
+                      onClick={() => a.action(rowData.actionData || rowData)}
                       disabled={disabled}
                     >
                       {label}
@@ -231,30 +227,19 @@ export const CustomTable = ({
             </Menu>
           )}
         </Group>
-      )
+      ) : null
 
-      const color = e.rowColor
-      const rowKey = e.id?.toString() || i
+      const color = rowData.rowColor
+      const rowKey = rowData.id?.toString() || index
 
       const colsToMap = [
-        ...(hasSelectActions ? ['select'] : []),
-        ...columns,
-        ...(activeActions.length ? ['actions'] : [])
+        // ...(hasSelectActions ? ['select'] : []),
+        ...rowData.columns
+        // ...(activeActions.length ? ['actions'] : [])
       ]
 
-      const cols = colsToMap.map((column, cidx) => {
-        const colElement =
-          e[column]?.element ||
-          e[column] ||
-          (column === 'select' && (
-            <Checkbox
-              size="sm"
-              aria-label="Select row"
-              checked={selectedElements.has(e.id || '')}
-              onChange={(el) => handleCheckbox(el.currentTarget.checked, e.id || '')}
-            />
-          )) ||
-          (column === 'actions' && actionsMenu)
+      const cols = rowData.columns.map((column, cidx) => {
+        const colElement = column?.label
 
         const el =
           typeof colElement !== 'object' ? (
@@ -266,21 +251,36 @@ export const CustomTable = ({
           )
 
         return isMobile ? (
-          <Stack key={rowKey + column} gap="xs">
+          <Stack key={rowKey + cidx.toString()} gap="xs">
             <Group grow align="center" px="sm">
               <Text ta="left" tt="capitalize" fw="bold" size="sm">
-                {colsToMap[cidx]}:
+                {headings[cidx]}:
               </Text>
               {el}
             </Group>
             <Divider hidden={cidx === colsToMap.length - 1} />
           </Stack>
         ) : (
-          <Table.Td key={column} c={color} miw="fit-content">
+          <Table.Td key={rowKey + cidx.toString()} c={color} miw="fit-content">
             {el}
           </Table.Td>
         )
       })
+
+      if (hasSelectActions) {
+        cols.unshift(
+          <Checkbox
+            size="sm"
+            aria-label="Select row"
+            checked={selectedElements.has(rowData.id || '')}
+            onChange={(el) => handleCheckbox(el.currentTarget.checked, rowData.id || '')}
+          />
+        )
+      }
+
+      if (activeActions && actionsMenu) {
+        cols.push(actionsMenu)
+      }
 
       if (isMobile) {
         return (
@@ -296,7 +296,7 @@ export const CustomTable = ({
     })
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [list, actions, isMobile, columns, selectedElements, selectedElements.size, headings])
+  }, [list, actions, isMobile, selectedElements, selectedElements.size, headings])
 
   return (
     <Stack align="stretch" w="100%" pos="relative" gap="sm">
