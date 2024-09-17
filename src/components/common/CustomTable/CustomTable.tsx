@@ -26,7 +26,7 @@ import { useMemo, PropsWithChildren, ReactNode, useCallback } from 'react'
 import Dots from 'resources/icons/TreeDotsMenu'
 
 export type ColumnElement = {
-  value: string | number | boolean | Date | BigInt
+  value?: string | number | boolean | Date | BigInt | undefined
   element?: string | ReactNode
   label?: string
 }

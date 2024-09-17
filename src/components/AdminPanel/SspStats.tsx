@@ -8,11 +8,16 @@ import { parseRange } from 'helpers/createCampaignHelpers'
 const toTableDta = (stats: SupplyStatsDetails[], title: string, isCpmRange?: boolean) => {
   return {
     headings: [title, 'count'],
-    elements: stats.slice(0, 200).map(({ value, count }) => ({
-      value: isCpmRange
-        ? JSON.stringify(parseRange(value), null, 4).replace(/\{|\}|"/g, '')
-        : value,
-      count: count.toLocaleString()
+    data: stats.slice(0, 200).map(({ value, count }) => ({
+      id: value,
+      columns: [
+        {
+          value: isCpmRange
+            ? JSON.stringify(parseRange(value), null, 4).replace(/\{|\}|"/g, '')
+            : value
+        },
+        { value: count.toLocaleString() }
+      ]
     }))
   }
 }

@@ -181,15 +181,17 @@ const AdminAnalytics = () => {
       elements:
         adminMappedAnalytics.data.map((item) => ({
           id: item.segment.toString(),
-          segment: mapSegmentLabel(analType, item.segment).segementLabel,
-          share: `${((item.paid / (paid || 1)) * 100).toFixed(2)} %`,
-          shareImps: `${((item.impressions / (imps || 1)) * 100).toFixed(2)} %`,
-          impressions: item.impressions,
-          clicks: item.clicks,
-          ctr: `${item.ctr} %`,
-          avgCpm: `${item.avgCpm}`,
-          avgCPC: `${item.avgCpc}`,
-          paid: `${item.paid.toFixed(4)}`
+          columns: [
+            { value: mapSegmentLabel(analType, item.segment).segementLabel },
+            { value: `${((item.paid / (paid || 1)) * 100).toFixed(2)} %` },
+            { value: `${((item.impressions / (imps || 1)) * 100).toFixed(2)} %` },
+            { value: item.impressions },
+            { value: item.clicks },
+            { value: `${item.ctr} %` },
+            { value: `${item.avgCpm}` },
+            { value: `${item.avgCpc}` },
+            { value: `${item.paid.toFixed(4)}` }
+          ]
         })) || []
     }
   }, [adminMappedAnalytics, analType])
@@ -316,7 +318,7 @@ const AdminAnalytics = () => {
           }
           loading={loading}
           headings={headings}
-          elements={data.elements}
+          data={data.elements}
           pageSize={10}
           actions={analType === 'campaignId' ? actions : undefined}
         />

@@ -37,15 +37,20 @@ const Invoices = () => {
         .map((campaign) => {
           return {
             id: campaign.campaignId,
-            companyName,
-            campaign: campaign.campaign.title,
-            campaignPeriod: (
-              <span>
-                <span>{formatDateShort(new Date(Number(campaign.campaign.activeFrom)))} </span>
-                <br />
-                <span>{formatDateShort(new Date(Number(campaign.campaign.activeTo)))} </span>
-              </span>
-            )
+            columns: [
+              { value: companyName },
+              { value: campaign.campaign.title },
+              {
+                value: campaign.campaign.activeFrom,
+                element: (
+                  <span>
+                    <span>{formatDateShort(new Date(Number(campaign.campaign.activeFrom)))} </span>
+                    <br />
+                    <span>{formatDateShort(new Date(Number(campaign.campaign.activeTo)))} </span>
+                  </span>
+                )
+              }
+            ]
           }
         }),
     [campaigns, companyName]
@@ -78,7 +83,7 @@ const Invoices = () => {
     <>
       <CustomTable
         headings={columnTitles}
-        elements={invoiceElements}
+        data={invoiceElements}
         actions={actions}
         shadow="xs"
         loading={initialDataLoading}
