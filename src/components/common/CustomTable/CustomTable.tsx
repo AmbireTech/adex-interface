@@ -19,9 +19,9 @@ import {
   Button,
   Alert
 } from '@mantine/core'
-import { useSet, useMediaQuery } from '@mantine/hooks'
+import { useSet } from '@mantine/hooks'
 import usePagination from 'hooks/usePagination'
-import { useMemo, PropsWithChildren, ReactNode, useCallback, useState } from 'react'
+import { useMemo, PropsWithChildren, ReactNode, useCallback, useState, useEffect } from 'react'
 import DownArrowIcon from 'resources/icons/DownArrow'
 import Dots from 'resources/icons/TreeDotsMenu'
 
@@ -88,7 +88,6 @@ export const CustomTable = ({
   error,
   ...tableProps
 }: CustomTableProps) => {
-  const isMobile = useMediaQuery('(max-width: 75rem)')
   const selectedElements = useSet<string>()
   const hasSelectActions = useMemo(() => !!selectedActions?.length, [selectedActions?.length])
 
@@ -100,29 +99,31 @@ export const CustomTable = ({
     })
 
   const [tableData, setTableData] = useState(data)
+  const [sorting, setSorting] = useState({ sortIndex: 0, sortDirection: 1 })
 
   const list = useMemo(() => {
     return tableData.slice(startIndex, endIndex)
   }, [tableData, startIndex, endIndex])
 
-  const sortTableData = useCallback((colIndex: number, sort: number) => {
+  useEffect(() => {
+    const { sortIndex, sortDirection } = sorting
     setTableData((prev) => {
       const next = [...prev].sort((a, b) => {
-        const aVal = a.columns[colIndex]?.value || 1
-        const bVal = b.columns[colIndex]?.value || 1
+        const aVal = a.columns[sortIndex]?.value || 1
+        const bVal = b.columns[sortIndex]?.value || 1
 
         if (aVal > bVal) {
-          return 1 * sort
+          return 1 * sortDirection
         }
         if (aVal < bVal) {
-          return -1 * sort
+          return -1 * sortDirection
         }
         return 0
       })
 
       return next
     })
-  }, [])
+  }, [sorting])
 
   const handleCheckbox = useCallback(
     (checked: boolean, id: string) => {
@@ -197,10 +198,10 @@ export const CustomTable = ({
   const { rows, actionHeadings } = useMemo(() => {
     const tableRows = list.map((rowData, index) => {
       const activeActions = [...(actions || [])].filter((a) => !a.hide?.(rowData.actionData))
-      const maxActions = isMobile ? activeActions.length : 3
+      const maxActions = 3
 
       const actionsMenu = activeActions?.length ? (
-        <Group justify={isMobile ? 'auto' : 'right'} gap="sm" wrap="nowrap">
+        <Group justify="right" gap="sm" wrap="nowrap">
           {activeActions.slice(0, maxActions).map((a) => {
             const label = getLabel(a.label, rowData.actionData)
             return (
@@ -217,7 +218,7 @@ export const CustomTable = ({
               </Tooltip>
             )
           })}
-          {!isMobile && activeActions.length > maxActions && (
+          {activeActions.length > maxActions && (
             <Menu shadow="lg" withArrow>
               <Menu.Target>
                 <ActionIcon size="23px" variant="transparent" color="mainText" component="div">
@@ -281,26 +282,6 @@ export const CustomTable = ({
         cols.push(actionsMenu)
       }
 
-      if (isMobile) {
-        return (
-          <Paper key={rowKey} py="sm" shadow="xs">
-            <Stack gap="xs" align="stretch" justify="center">
-              {/* <Divider color="lightBackground" size={14} /> */}
-              {cols.map((c, cidx) => (
-                <Stack key={rowKey + cidx.toString()} gap="xs">
-                  <Group grow align="center" px="sm" c={color}>
-                    <Text ta="left" tt="capitalize" fw="bold" size="sm">
-                      {colHeadings[cidx] || 'Actions'}:
-                    </Text>
-                    {c}
-                  </Group>
-                </Stack>
-              ))}
-            </Stack>
-          </Paper>
-        )
-      }
-
       return (
         <Table.Tr key={rowKey}>
           {cols.map((c, cidx) => (
@@ -314,27 +295,38 @@ export const CustomTable = ({
 
     return {
       rows: tableRows,
-      actionHeadings: colHeadings.map((heading, index) =>
-        list[0]?.columns[index]?.value ? (
-          <Group wrap="nowrap" gap="xs" align="baseline">
-            {heading}
+      actionHeadings: colHeadings.map((heading, index) => (
+        <Group wrap="nowrap" gap="xs" align="center">
+          {sorting.sortIndex === index && (
             <ActionIcon
               variant="transparent"
               c="mainText"
               size={14}
-              onClick={() => sortTableData(index, -1)}
+              onClick={() =>
+                setSorting((prev) => ({ ...prev, sortDirection: prev.sortDirection * -1 }))
+              }
             >
-              <DownArrowIcon />
+              <DownArrowIcon
+                style={{ transform: sorting.sortDirection > 0 ? 'rotate(180deg)' : undefined }}
+              />
             </ActionIcon>
-          </Group>
-        ) : (
-          heading
-        )
-      )
+          )}
+          <Button
+            px="0"
+            tt="capitalize"
+            variant="transparent"
+            size="xs"
+            c="mainText"
+            onClick={() => setSorting((prev) => ({ ...prev, sortIndex: index }))}
+          >
+            {heading}
+          </Button>
+        </Group>
+      ))
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [list, actions, isMobile, selectedElements, selectedElements.size, headings])
+  }, [list, actions, selectedElements, selectedElements.size, headings])
 
   return (
     <Stack align="stretch" w="100%" pos="relative" gap="sm">
@@ -354,43 +346,30 @@ export const CustomTable = ({
       {((!!selectedElements.size && !!masterActionMenu) || tableActions) && (
         <Group align="center" justify={selectedElements.size ? 'space-between' : 'right'}>
           {selectedElements.size && masterActionMenu}
+
           {tableActions}
         </Group>
       )}
 
-      {isMobile ? (
-        <Stack gap="xl">
-          {hasSelectActions && (
-            <Group align="center" justify="left" pt="xs">
-              Select all: {masterSelectAction}
-            </Group>
-          )}
-          {rows}
+      <Paper pb="md" w="100%" shadow={shadow}>
+        <Stack justify="space-between" mih={420} gap="xl">
+          <ScrollArea scrollbars="x" type="auto" offsetScrollbars>
+            <Table {...tableProps} w="100%" highlightOnHover verticalSpacing="xs">
+              <Table.Thead bg="alternativeBackground">
+                <Table.Tr>
+                  {colHeadings.map((h, i) => (
+                    <Table.Th tt="capitalize" key={colHeadings[i]} w={h === 'select' ? 20 : 'auto'}>
+                      {h === 'select' ? masterSelectAction : actionHeadings[i]}
+                    </Table.Th>
+                  ))}
+                </Table.Tr>
+              </Table.Thead>
+              <Table.Tbody>{rows}</Table.Tbody>
+            </Table>
+          </ScrollArea>
         </Stack>
-      ) : (
-        <Paper pb="md" w="100%" shadow={shadow}>
-          <Stack justify="space-between" mih={420} gap="xl">
-            <ScrollArea scrollbars="x" type="auto" offsetScrollbars>
-              <Table {...tableProps} w="100%" highlightOnHover verticalSpacing="xs">
-                <Table.Thead bg="alternativeBackground">
-                  <Table.Tr>
-                    {actionHeadings.map((h, i) => (
-                      <Table.Th
-                        tt="capitalize"
-                        key={colHeadings[i]}
-                        w={h === 'select' ? 20 : 'auto'}
-                      >
-                        {h === 'select' ? masterSelectAction : h}
-                      </Table.Th>
-                    ))}
-                  </Table.Tr>
-                </Table.Thead>
-                <Table.Tbody>{rows}</Table.Tbody>
-              </Table>
-            </ScrollArea>
-          </Stack>
-        </Paper>
-      )}
+      </Paper>
+
       <Group w="100%" justify="right" pr="md">
         <Pagination
           color="brand"
