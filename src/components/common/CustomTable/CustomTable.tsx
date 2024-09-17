@@ -21,11 +21,12 @@ import {
 } from '@mantine/core'
 import { useSet, useMediaQuery } from '@mantine/hooks'
 import usePagination from 'hooks/usePagination'
-import { useMemo, PropsWithChildren, ReactNode, useCallback } from 'react'
+import { useMemo, PropsWithChildren, ReactNode, useCallback, useState } from 'react'
+import DownArrowIcon from 'resources/icons/DownArrow'
 import Dots from 'resources/icons/TreeDotsMenu'
 
 export type ColumnElement = {
-  value?: string | number | boolean | Date | BigInt | undefined
+  value?: string | number | bigint | undefined
   element?: string | ReactNode
   label?: string
 }
@@ -97,9 +98,31 @@ export const CustomTable = ({
       elementsLength: data.length,
       maxItemsPerPage
     })
+
+  const [tableData, setTableData] = useState(data)
+
   const list = useMemo(() => {
-    return data.slice(startIndex, endIndex)
-  }, [data, startIndex, endIndex])
+    return tableData.slice(startIndex, endIndex)
+  }, [tableData, startIndex, endIndex])
+
+  const sortTableData = useCallback((colIndex: number, sort: number) => {
+    setTableData((prev) => {
+      const next = [...prev].sort((a, b) => {
+        const aVal = a.columns[colIndex]?.value || 1
+        const bVal = b.columns[colIndex]?.value || 1
+
+        if (aVal > bVal) {
+          return 1 * sort
+        }
+        if (aVal < bVal) {
+          return -1 * sort
+        }
+        return 0
+      })
+
+      return next
+    })
+  }, [])
 
   const handleCheckbox = useCallback(
     (checked: boolean, id: string) => {
@@ -171,8 +194,8 @@ export const CustomTable = ({
     [actions, headings, hasSelectActions]
   )
 
-  const rows = useMemo(() => {
-    return list.map((rowData, index) => {
+  const { rows, actionHeadings } = useMemo(() => {
+    const tableRows = list.map((rowData, index) => {
       const activeActions = [...(actions || [])].filter((a) => !a.hide?.(rowData.actionData))
       const maxActions = isMobile ? activeActions.length : 3
 
@@ -267,7 +290,7 @@ export const CustomTable = ({
                 <Stack key={rowKey + cidx.toString()} gap="xs">
                   <Group grow align="center" px="sm" c={color}>
                     <Text ta="left" tt="capitalize" fw="bold" size="sm">
-                      {headings[cidx + (hasSelectActions ? -1 : 0)] || 'Actions'}:
+                      {colHeadings[cidx] || 'Actions'}:
                     </Text>
                     {c}
                   </Group>
@@ -288,6 +311,27 @@ export const CustomTable = ({
         </Table.Tr>
       )
     })
+
+    return {
+      rows: tableRows,
+      actionHeadings: colHeadings.map((heading, index) =>
+        list[0]?.columns[index]?.value ? (
+          <Group wrap="nowrap" gap="xs" align="baseline">
+            {heading}
+            <ActionIcon
+              variant="transparent"
+              c="mainText"
+              size={14}
+              onClick={() => sortTableData(index, -1)}
+            >
+              <DownArrowIcon />
+            </ActionIcon>
+          </Group>
+        ) : (
+          heading
+        )
+      )
+    }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [list, actions, isMobile, selectedElements, selectedElements.size, headings])
@@ -330,8 +374,12 @@ export const CustomTable = ({
               <Table {...tableProps} w="100%" highlightOnHover verticalSpacing="xs">
                 <Table.Thead bg="alternativeBackground">
                   <Table.Tr>
-                    {colHeadings.map((h) => (
-                      <Table.Th tt="capitalize" key={h} w={h === 'select' ? 20 : 'auto'}>
+                    {actionHeadings.map((h, i) => (
+                      <Table.Th
+                        tt="capitalize"
+                        key={colHeadings[i]}
+                        w={h === 'select' ? 20 : 'auto'}
+                      >
                         {h === 'select' ? masterSelectAction : h}
                       </Table.Th>
                     ))}
