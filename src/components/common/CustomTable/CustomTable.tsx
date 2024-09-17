@@ -2,7 +2,6 @@ import {
   Group,
   Pagination,
   Table,
-  Divider,
   Text,
   Stack,
   Menu,
@@ -92,7 +91,7 @@ export const CustomTable = ({
   const selectedElements = useSet<string>()
   const hasSelectActions = useMemo(() => !!selectedActions?.length, [selectedActions?.length])
 
-  const maxItemsPerPage = pageSize || (isMobile ? data.length : 10)
+  const maxItemsPerPage = pageSize || 10
   const { maxPages, defaultPage, startIndex, endIndex, onNextPage, onPreviousPage, onChange } =
     usePagination({
       elementsLength: data.length,
@@ -232,38 +231,15 @@ export const CustomTable = ({
       const color = rowData.rowColor
       const rowKey = rowData.id?.toString() || index
 
-      const colsToMap = [
-        // ...(hasSelectActions ? ['select'] : []),
-        ...rowData.columns
-        // ...(activeActions.length ? ['actions'] : [])
-      ]
+      const cols = rowData.columns.map((column) => {
+        const colElement = column?.element || column?.value?.toString()
 
-      const cols = rowData.columns.map((column, cidx) => {
-        const colElement = column?.label
-
-        const el =
-          typeof colElement !== 'object' ? (
-            <Text ta="left" size="sm" truncate maw={200}>
-              {colElement}
-            </Text>
-          ) : (
-            colElement
-          )
-
-        return isMobile ? (
-          <Stack key={rowKey + cidx.toString()} gap="xs">
-            <Group grow align="center" px="sm">
-              <Text ta="left" tt="capitalize" fw="bold" size="sm">
-                {headings[cidx]}:
-              </Text>
-              {el}
-            </Group>
-            <Divider hidden={cidx === colsToMap.length - 1} />
-          </Stack>
+        return typeof colElement !== 'object' ? (
+          <Text ta="left" size="sm" truncate maw={200}>
+            {colElement}
+          </Text>
         ) : (
-          <Table.Td key={rowKey + cidx.toString()} c={color} miw="fit-content">
-            {el}
-          </Table.Td>
+          colElement
         )
       })
 
@@ -287,12 +263,30 @@ export const CustomTable = ({
           <Paper key={rowKey} py="sm" shadow="xs">
             <Stack gap="xs" align="stretch" justify="center">
               {/* <Divider color="lightBackground" size={14} /> */}
-              {cols}
+              {cols.map((c, cidx) => (
+                <Stack key={rowKey + cidx.toString()} gap="xs">
+                  <Group grow align="center" px="sm" c={color}>
+                    <Text ta="left" tt="capitalize" fw="bold" size="sm">
+                      {headings[cidx + (hasSelectActions ? -1 : 0)] || 'Actions'}:
+                    </Text>
+                    {c}
+                  </Group>
+                </Stack>
+              ))}
             </Stack>
           </Paper>
         )
       }
-      return <Table.Tr key={rowKey}>{cols}</Table.Tr>
+
+      return (
+        <Table.Tr key={rowKey}>
+          {cols.map((c, cidx) => (
+            <Table.Td key={rowKey + cidx.toString()} c={color} miw="fit-content">
+              {c}
+            </Table.Td>
+          ))}
+        </Table.Tr>
+      )
     })
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -346,26 +340,26 @@ export const CustomTable = ({
                 <Table.Tbody>{rows}</Table.Tbody>
               </Table>
             </ScrollArea>
-            <Group w="100%" justify="right" pr="md">
-              <Pagination
-                color="brand"
-                total={maxPages}
-                boundaries={1}
-                defaultValue={defaultPage}
-                onNextPage={onNextPage}
-                onPreviousPage={onPreviousPage}
-                onChange={onChange}
-                size="sm"
-                styles={{
-                  control: {
-                    border: 0
-                  }
-                }}
-              />
-            </Group>
           </Stack>
         </Paper>
       )}
+      <Group w="100%" justify="right" pr="md">
+        <Pagination
+          color="brand"
+          total={maxPages}
+          boundaries={1}
+          defaultValue={defaultPage}
+          onNextPage={onNextPage}
+          onPreviousPage={onPreviousPage}
+          onChange={onChange}
+          size="sm"
+          styles={{
+            control: {
+              border: 0
+            }
+          }}
+        />
+      </Group>
     </Stack>
   )
 }
