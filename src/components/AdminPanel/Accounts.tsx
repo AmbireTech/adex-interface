@@ -82,22 +82,27 @@ const AdminAnalytics = () => {
           id: a.id,
           columns: [
             { value: a.name || a.id },
-            { value: a?.billingDetails?.verified ? '✅' : '❌' },
+            {
+              value: a?.billingDetails?.verified ? 1 : 0,
+              element: a?.billingDetails?.verified ? '✅' : '❌'
+            },
             { value: a.info?.email || '' },
             {
-              value: parseBigNumTokenAmountToDecimal(
+              value: a.availableBalance,
+              element: parseBigNumTokenAmountToDecimal(
                 a.availableBalance,
                 a.balanceToken.decimals
               ).toFixed(2)
             },
             { value: a.fundsOnCampaigns.perCampaign.length },
             {
-              value: parseBigNumTokenAmountToDecimal(
+              value: a.fundsOnCampaigns.total - a.refundsFromCampaigns.total,
+              element: parseBigNumTokenAmountToDecimal(
                 a.fundsOnCampaigns.total - a.refundsFromCampaigns.total,
                 a.balanceToken.decimals
               ).toFixed(2)
             },
-            { value: new Date(a.created).toLocaleDateString() }
+            { value: a.created.getTime(), element: new Date(a.created).toLocaleDateString() }
           ]
         }
       })

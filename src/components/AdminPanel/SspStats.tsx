@@ -12,11 +12,12 @@ const toTableDta = (stats: SupplyStatsDetails[], title: string, isCpmRange?: boo
       id: value,
       columns: [
         {
-          value: isCpmRange
+          value,
+          element: isCpmRange
             ? JSON.stringify(parseRange(value), null, 4).replace(/\{|\}|"/g, '')
             : value
         },
-        { value: count.toLocaleString() }
+        { value: count, element: count.toLocaleString() }
       ]
     }))
   }

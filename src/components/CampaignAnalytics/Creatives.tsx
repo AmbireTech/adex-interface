@@ -60,10 +60,10 @@ const Creatives = ({ forAdmin, campaignId }: { forAdmin: boolean; campaignId: st
               ? `${unitForId?.banner?.format.w}x${unitForId?.banner?.format.h}`
               : ''
           },
-          { value: formatCurrency(item.impressions, 0) },
-          { value: formatCurrency(item.clicks, 0) },
-          { value: `${item.ctr}` },
-          { value: `${item.paid.toFixed(2)} ${currencyName}` },
+          { value: item.impressions, element: formatCurrency(item.impressions, 0) },
+          { value: item.clicks, element: formatCurrency(item.clicks, 0) },
+          { value: item.ctr, element: `${item.ctr}` },
+          { value: item.paid, element: `${item.paid.toFixed(2)} ${currencyName}` },
           { value: unitForId?.banner?.targetUrl }
         ]
       }

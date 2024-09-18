@@ -17,11 +17,11 @@ const SSPs = ({ forAdmin, campaignId }: { forAdmin: boolean; campaignId: string 
         id: item.segment,
         columns: [
           { value: item.segment },
-          { value: item.impressions.toLocaleString() },
-          { value: item.clicks.toLocaleString() },
-          { value: `${item.ctr} %` },
-          { value: `${item.avgCpm} ${currencyName}` },
-          { value: `${item.paid.toFixed(4)} ${currencyName}` }
+          { value: item.impressions, element: item.impressions.toLocaleString() },
+          { value: item.clicks, element: item.clicks.toLocaleString() },
+          { value: item.ctr, element: `${item.ctr} %` },
+          { value: item.avgCpm, element: `${item.avgCpm} ${currencyName}` },
+          { value: item.paid, element: `${item.paid.toFixed(4)} ${currencyName}` }
         ]
       })) || [],
     [campaignMappedAnalytics, currencyName]

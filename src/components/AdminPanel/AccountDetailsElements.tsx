@@ -23,8 +23,9 @@ export const FundsActivity = ({ accountData }: { accountData: Account }) => {
           id: x.name,
           columns: [
             { element: <Text c={color} tt="capitalize" fw="bold">{`${sign} ${x.name}`}</Text> },
-            { value: x.date?.toLocaleDateString() || '' },
+            { value: x.date.getTime(), element: x.date?.toLocaleDateString() || '' },
             {
+              value: x.amount,
               element: (
                 <Text
                   c={color}

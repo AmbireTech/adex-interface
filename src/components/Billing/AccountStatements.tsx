@@ -112,7 +112,10 @@ const Statements = () => {
       .map((st, index) => ({
         id: index.toString(),
         columns: [
-          { value: getMonthRangeString(monthPeriodIndexToDate(st.periodIndex)) },
+          {
+            value: st.periodIndex,
+            element: getMonthRangeString(monthPeriodIndexToDate(st.periodIndex))
+          },
           { value: st.operations[0].token.name }
         ]
       }))
