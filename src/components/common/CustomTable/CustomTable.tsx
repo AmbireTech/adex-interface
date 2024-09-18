@@ -21,7 +21,7 @@ import {
 } from '@mantine/core'
 import { useSet } from '@mantine/hooks'
 import usePagination from 'hooks/usePagination'
-import { useMemo, PropsWithChildren, ReactNode, useCallback, useState, useEffect } from 'react'
+import { useMemo, PropsWithChildren, ReactNode, useCallback, useState } from 'react'
 import DownArrowIcon from 'resources/icons/DownArrow'
 import Dots from 'resources/icons/TreeDotsMenu'
 
@@ -58,6 +58,7 @@ export type CustomTableProps = PropsWithChildren &
     selectedActions?: TableRowAction[]
     tableActions?: ReactNode
     error?: string | boolean
+    defaultSortIndex?: number
   }
 
 const getLabel = (label: TableRowAction['label'], actionData?: DataElement['actionData']) => {
@@ -86,31 +87,56 @@ export const CustomTable = ({
   selectedActions,
   tableActions,
   error,
+  defaultSortIndex,
   ...tableProps
 }: CustomTableProps) => {
   const selectedElements = useSet<string>()
   const hasSelectActions = useMemo(() => !!selectedActions?.length, [selectedActions?.length])
 
   const maxItemsPerPage = pageSize || 10
-  const { maxPages, defaultPage, startIndex, endIndex, onNextPage, onPreviousPage, onChange } =
-    usePagination({
-      elementsLength: data.length,
-      maxItemsPerPage
-    })
 
-  const [tableData, setTableData] = useState(data)
-  const [sorting, setSorting] = useState({ sortIndex: 0, sortDirection: 1 })
+  const {
+    maxPages,
+    page,
+    startIndex,
+    endIndex,
+    onNextPage,
+    onPreviousPage,
+    onChange: setPage
+  } = usePagination({
+    elementsLength: data.length,
+    maxItemsPerPage
+  })
 
-  const list = useMemo(() => {
-    return tableData.slice(startIndex, endIndex)
-  }, [tableData, startIndex, endIndex])
+  const [sorting, setSorting] = useState<{ sortIndex: number; sortDirection: -1 | 1 }>({
+    sortIndex: defaultSortIndex || -1,
+    sortDirection: -1
+  })
 
-  useEffect(() => {
+  const filteredData = useMemo(() => {
     const { sortIndex, sortDirection } = sorting
-    setTableData((prev) => {
-      const next = [...prev].sort((a, b) => {
-        const aVal = a.columns[sortIndex]?.value || 1
-        const bVal = b.columns[sortIndex]?.value || 1
+
+    console.log({ sortIndex })
+
+    const next = [...data]
+      .sort((a, b) => {
+        if (sortIndex < 0) {
+          return 0
+        }
+
+        const aVal = a.columns[sortIndex]?.value || 0
+        const bVal = b.columns[sortIndex]?.value || 0
+
+        if (typeof aVal === 'string' && typeof bVal === 'string') {
+          return aVal.localeCompare(bVal) * sortDirection
+        }
+
+        if (typeof aVal === 'number' && typeof bVal === 'number') {
+          return (aVal - bVal) * sortDirection
+        }
+        if (typeof aVal === 'bigint' && typeof bVal === 'bigint') {
+          return Number(aVal - bVal) * sortDirection
+        }
 
         if (aVal > bVal) {
           return 1 * sortDirection
@@ -120,10 +146,10 @@ export const CustomTable = ({
         }
         return 0
       })
+      .slice(startIndex, endIndex)
 
-      return next
-    })
-  }, [sorting])
+    return next
+  }, [sorting, data, startIndex, endIndex])
 
   const handleCheckbox = useCallback(
     (checked: boolean, id: string) => {
@@ -133,17 +159,17 @@ export const CustomTable = ({
   )
 
   const currentPageElementsAllSelected: boolean = useMemo(
-    () => !!selectedElements.size && list.every((x) => selectedElements.has(x.id || '')),
+    () => !!selectedElements.size && filteredData.every((x) => selectedElements.has(x.id || '')),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [list, selectedElements, selectedElements.size]
+    [filteredData, selectedElements, selectedElements.size]
   )
 
   const handleCheckboxMaster = useCallback(
     (all?: boolean) =>
-      [...(all ? data : list)].forEach((x) =>
+      [...(all ? data : filteredData)].forEach((x) =>
         selectedElements[currentPageElementsAllSelected ? 'delete' : 'add'](x.id || '')
       ),
-    [currentPageElementsAllSelected, data, list, selectedElements]
+    [currentPageElementsAllSelected, data, filteredData, selectedElements]
   )
 
   const masterActionMenu = useMemo(() => {
@@ -190,13 +216,8 @@ export const CustomTable = ({
     [currentPageElementsAllSelected, handleCheckboxMaster, hasSelectActions]
   )
 
-  const colHeadings: string[] = useMemo(
-    () => [...(hasSelectActions ? ['select'] : []), ...headings, ...(actions ? ['actions'] : [])],
-    [actions, headings, hasSelectActions]
-  )
-
   const { rows, actionHeadings } = useMemo(() => {
-    const tableRows = list.map((rowData, index) => {
+    const tableRows = filteredData.map((rowData, index) => {
       const activeActions = [...(actions || [])].filter((a) => !a.hide?.(rowData.actionData))
       const maxActions = 3
 
@@ -285,7 +306,7 @@ export const CustomTable = ({
       return (
         <Table.Tr key={rowKey}>
           {cols.map((c, cidx) => (
-            <Table.Td key={rowKey + cidx.toString()} c={color} miw="fit-content">
+            <Table.Td key={rowKey + cidx.toString()} c={color}>
               {c}
             </Table.Td>
           ))}
@@ -293,40 +314,61 @@ export const CustomTable = ({
       )
     })
 
+    const colHeadings: string[] = [...headings]
+    let headingOffset = 0
+    if (hasSelectActions) {
+      colHeadings.unshift('select')
+      headingOffset = -1
+    }
+
+    if (actions?.length) {
+      colHeadings.push('actions')
+    }
+
     return {
       rows: tableRows,
       actionHeadings: colHeadings.map((heading, index) => (
-        <Group wrap="nowrap" gap="xs" align="center">
-          {sorting.sortIndex === index && (
-            <ActionIcon
-              variant="transparent"
-              c="mainText"
-              size={14}
-              onClick={() =>
-                setSorting((prev) => ({ ...prev, sortDirection: prev.sortDirection * -1 }))
-              }
-            >
-              <DownArrowIcon
-                style={{ transform: sorting.sortDirection > 0 ? 'rotate(180deg)' : undefined }}
-              />
-            </ActionIcon>
+        <Table.Th tt="capitalize" key={heading} w="auto">
+          {heading === 'select' ? (
+            masterSelectAction
+          ) : (
+            <Group wrap="nowrap" gap="xs" align="center">
+              <Button
+                px="0"
+                tt="capitalize"
+                variant="transparent"
+                size="xs"
+                c="mainText"
+                disabled={filteredData[0]?.columns[index]?.value === undefined}
+                onClick={() => {
+                  setSorting((prev) => ({
+                    sortIndex: index + headingOffset,
+                    sortDirection: prev.sortDirection < 0 ? 1 : -1
+                  }))
+                  setPage(1)
+                }}
+                rightSection={
+                  sorting.sortIndex === index + headingOffset && (
+                    <ActionIcon variant="transparent" c="mainText" size={14}>
+                      <DownArrowIcon
+                        style={{
+                          transform: sorting.sortDirection > 0 ? 'rotate(180deg)' : undefined
+                        }}
+                      />
+                    </ActionIcon>
+                  )
+                }
+              >
+                {heading}
+              </Button>
+            </Group>
           )}
-          <Button
-            px="0"
-            tt="capitalize"
-            variant="transparent"
-            size="xs"
-            c="mainText"
-            onClick={() => setSorting((prev) => ({ ...prev, sortIndex: index }))}
-          >
-            {heading}
-          </Button>
-        </Group>
+        </Table.Th>
       ))
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [list, actions, selectedElements, selectedElements.size, headings])
+  }, [filteredData, actions, selectedElements, selectedElements.size, headings])
 
   return (
     <Stack align="stretch" w="100%" pos="relative" gap="sm">
@@ -356,13 +398,7 @@ export const CustomTable = ({
           <ScrollArea scrollbars="x" type="auto" offsetScrollbars>
             <Table {...tableProps} w="100%" highlightOnHover verticalSpacing="xs">
               <Table.Thead bg="alternativeBackground">
-                <Table.Tr>
-                  {colHeadings.map((h, i) => (
-                    <Table.Th tt="capitalize" key={colHeadings[i]} w={h === 'select' ? 20 : 'auto'}>
-                      {h === 'select' ? masterSelectAction : actionHeadings[i]}
-                    </Table.Th>
-                  ))}
-                </Table.Tr>
+                <Table.Tr>{actionHeadings}</Table.Tr>
               </Table.Thead>
               <Table.Tbody>{rows}</Table.Tbody>
             </Table>
@@ -375,10 +411,11 @@ export const CustomTable = ({
           color="brand"
           total={maxPages}
           boundaries={1}
-          defaultValue={defaultPage}
+          value={page}
+          // defaultValue={defaultPage}
           onNextPage={onNextPage}
           onPreviousPage={onPreviousPage}
-          onChange={onChange}
+          onChange={setPage}
           size="sm"
           styles={{
             control: {
