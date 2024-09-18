@@ -333,34 +333,37 @@ export const CustomTable = ({
             masterSelectAction
           ) : (
             <Group wrap="nowrap" gap="xs" align="center">
-              <Button
-                px="0"
-                tt="capitalize"
-                variant="transparent"
-                size="xs"
-                c="mainText"
-                disabled={filteredData[0]?.columns[index]?.value === undefined}
-                onClick={() => {
-                  setSorting((prev) => ({
-                    sortIndex: index + headingOffset,
-                    sortDirection: prev.sortDirection < 0 ? 1 : -1
-                  }))
-                  setPage(1)
-                }}
-                rightSection={
-                  sorting.sortIndex === index + headingOffset && (
-                    <ActionIcon variant="transparent" c="mainText" size={14}>
-                      <DownArrowIcon
-                        style={{
-                          transform: sorting.sortDirection > 0 ? 'rotate(180deg)' : undefined
-                        }}
-                      />
-                    </ActionIcon>
-                  )
-                }
-              >
-                {heading}
-              </Button>
+              {filteredData[0]?.columns[index]?.value !== undefined ? (
+                <Button
+                  px="0"
+                  tt="capitalize"
+                  variant="transparent"
+                  size="xs"
+                  c="mainText"
+                  onClick={() => {
+                    setSorting((prev) => ({
+                      sortIndex: index + headingOffset,
+                      sortDirection: prev.sortDirection < 0 ? 1 : -1
+                    }))
+                    setPage(1)
+                  }}
+                  rightSection={
+                    sorting.sortIndex === index + headingOffset && (
+                      <ActionIcon variant="transparent" c="mainText" size={14}>
+                        <DownArrowIcon
+                          style={{
+                            transform: sorting.sortDirection > 0 ? 'rotate(180deg)' : undefined
+                          }}
+                        />
+                      </ActionIcon>
+                    )
+                  }
+                >
+                  {heading}
+                </Button>
+              ) : (
+                heading
+              )}
             </Group>
           )}
         </Table.Th>

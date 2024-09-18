@@ -102,7 +102,10 @@ const AdminAnalytics = () => {
                 a.balanceToken.decimals
               ).toFixed(2)
             },
-            { value: a.created.getTime(), element: new Date(a.created).toLocaleDateString() }
+            {
+              value: new Date(a.created).getTime(),
+              element: new Date(a.created).toLocaleDateString()
+            }
           ]
         }
       })
