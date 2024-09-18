@@ -125,6 +125,8 @@ const Dashboard = ({ isAdminPanel, accountId }: { isAdminPanel?: boolean; accoun
 
             const archived = cmpData.campaign.archived
 
+            const served = cmpData.paid && budget ? Math.round((cmpData.paid / budget) * 100) : 0
+
             return {
               actionData: {
                 campaign,
@@ -182,16 +184,14 @@ const Dashboard = ({ isAdminPanel, accountId }: { isAdminPanel?: boolean; accoun
                   element: <BadgeStatusCampaign type={cmpData.campaign.status} />
                 },
                 {
-                  value:
-                    cmpData.paid && budget
-                      ? `${Math.round((cmpData.paid / budget) * 100)} %`
-                      : '0 %'
+                  value: served,
+                  element: `${served} %`
                 },
                 // TODO: get token name
-                { value: `${budget} USDC` },
+                { value: budget, element: `${budget} USDC` },
                 { value: cmpData.impressions },
                 { value: cmpData.clicks },
-                { value: `${cmpData.ctr || 0} %` },
+                { value: Number(cmpData.ctr), element: `${cmpData.ctr || 0} %` },
                 {
                   value: cmpData.campaign.activeFrom,
                   element: (

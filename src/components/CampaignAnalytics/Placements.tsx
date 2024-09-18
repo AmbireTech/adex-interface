@@ -78,6 +78,7 @@ const Placements = ({ forAdmin, campaignId }: { forAdmin: boolean; campaignId: s
               id: item.segment,
               columns: [
                 {
+                  value: srcName,
                   element: isBlocked ? (
                     <Group align="center">
                       <ThemeIcon size="xs" variant="transparent" c="inherit">
@@ -91,11 +92,11 @@ const Placements = ({ forAdmin, campaignId }: { forAdmin: boolean; campaignId: s
                     srcName
                   )
                 },
-                { value: item.impressions.toLocaleString() },
-                { value: item.clicks.toLocaleString() },
-                { value: `${item.ctr} %` },
-                { value: `${item.avgCpm} ${currencyName}` },
-                { value: `${item.paid.toFixed(4)} ${currencyName}` }
+                { value: item.impressions, element: item.impressions.toLocaleString() },
+                { value: item.clicks, element: item.clicks.toLocaleString() },
+                { value: item.ctr, element: `${item.ctr} %` },
+                { value: item.avgCpm, element: `${item.avgCpm} ${currencyName}` },
+                { value: item.paid, element: `${item.paid.toFixed(4)} ${currencyName}` }
               ]
             }
 

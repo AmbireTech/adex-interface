@@ -41,12 +41,15 @@ const Regions = ({ forAdmin, campaignId }: { forAdmin: boolean; campaignId: stri
         id: item.segment,
         columns: [
           { value: CountryData.get(item.segment)?.name },
-          { value: `${((item.paid / paid) * 100).toFixed(2)} %` },
+          {
+            value: item.paid / paid,
+            element: `${((item.paid / paid) * 100).toFixed(2)} %`
+          },
           { value: item.impressions },
           { value: item.clicks },
-          { value: `${item.ctr} %` },
-          { value: `${item.avgCpm} ${currencyName}` },
-          { value: `${item.paid.toFixed(4)} ${currencyName}` }
+          { value: item.ctr, element: `${item.ctr} %` },
+          { value: item.avgCpm, element: `${item.avgCpm} ${currencyName}` },
+          { value: item.paid, element: `${item.paid.toFixed(4)} ${currencyName}` }
         ]
       })) || []
     )
