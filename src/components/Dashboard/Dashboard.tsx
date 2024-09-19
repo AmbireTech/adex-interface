@@ -193,7 +193,7 @@ const Dashboard = ({ isAdminPanel, accountId }: { isAdminPanel?: boolean; accoun
                 { value: cmpData.clicks },
                 { value: Number(cmpData.ctr), element: `${cmpData.ctr || 0} %` },
                 {
-                  value: cmpData.campaign.activeFrom,
+                  value: cmpData.campaign.created,
                   element: (
                     <Stack gap="xs">
                       <Text size="sm" inline>
