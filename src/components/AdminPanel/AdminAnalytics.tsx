@@ -183,14 +183,17 @@ const AdminAnalytics = () => {
           id: item.segment.toString(),
           columns: [
             { value: mapSegmentLabel(analType, item.segment).segementLabel },
-            { value: `${((item.paid / (paid || 1)) * 100).toFixed(2)} %` },
-            { value: `${((item.impressions / (imps || 1)) * 100).toFixed(2)} %` },
-            { value: item.impressions },
-            { value: item.clicks },
-            { value: `${item.ctr} %` },
-            { value: `${item.avgCpm}` },
-            { value: `${item.avgCpc}` },
-            { value: `${item.paid.toFixed(4)}` }
+            { value: item.paid, element: `${((item.paid / (paid || 1)) * 100).toFixed(2)} %` },
+            {
+              value: item.impressions,
+              element: `${((item.impressions / (imps || 1)) * 100).toFixed(2)} %`
+            },
+            { value: item.impressions, element: item.impressions.toLocaleString() },
+            { value: item.clicks, element: item.clicks.toLocaleString() },
+            { value: item.ctr, element: `${item.ctr?.toLocaleString()} %` },
+            { value: item.avgCpm, element: item.avgCpm?.toLocaleString() },
+            { value: item.avgCpc, element: item.avgCpc?.toLocaleString() },
+            { value: item.paid, element: `${item.paid.toFixed(4)}` }
           ]
         })) || []
     }
