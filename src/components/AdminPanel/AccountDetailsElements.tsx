@@ -2,12 +2,12 @@ import { useMemo } from 'react'
 import { Account } from 'types'
 import { Box, Text, MantineColor } from '@mantine/core'
 
-import CustomTable, { TableElement } from 'components/common/CustomTable'
+import CustomTable, { DataElement } from 'components/common/CustomTable'
 import { parseBigNumTokenAmountToDecimal, toOperationEntry } from 'helpers'
 
 export const FundsActivity = ({ accountData }: { accountData: Account }) => {
   const elements = useMemo(() => {
-    const data: TableElement['elements'] = [
+    const data: DataElement[] = [
       ...accountData.fundsDeposited.deposits.map((x) => toOperationEntry('deposit', x)),
       ...accountData.fundsOnCampaigns.perCampaign.map((x) => toOperationEntry('campaignOpen', x)),
       ...accountData.refundsFromCampaigns.perCampaign.map((x) =>
@@ -20,17 +20,24 @@ export const FundsActivity = ({ accountData }: { accountData: Account }) => {
         const sign = x.type === 'campaignOpen' ? '-' : '+'
         const color: MantineColor = sign === '-' ? 'darkred' : 'darkgreen'
         return {
-          name: <Text c={color} tt="capitalize" fw="bold">{`${sign} ${x.name}`}</Text>,
-          date: x.date?.toLocaleDateString() || '',
-          amount: (
-            <Text c={color} tt="capitalize" fw="bold">{`${sign} ${parseBigNumTokenAmountToDecimal(
-              x.amount,
-              x.token.decimals
-            )}`}</Text>
-          ),
+          id: x.name,
+          columns: [
+            { element: <Text c={color} tt="capitalize" fw="bold">{`${sign} ${x.name}`}</Text> },
+            { value: x.date.getTime(), element: x.date?.toLocaleDateString() || '' },
+            {
+              value: x.amount,
+              element: (
+                <Text
+                  c={color}
+                  tt="capitalize"
+                  fw="bold"
+                >{`${sign} ${parseBigNumTokenAmountToDecimal(x.amount, x.token.decimals)}`}</Text>
+              )
+            },
 
-          token: x.token.name,
-          actionId: x.id
+            { value: x.token.name },
+            { value: x.id }
+          ]
         }
       })
 
@@ -43,7 +50,7 @@ export const FundsActivity = ({ accountData }: { accountData: Account }) => {
     <Box>
       <CustomTable
         headings={['Type', 'Date', 'Amount', 'Token', 'Tx/Campaign id']}
-        elements={elements}
+        data={elements}
         pageSize={10}
       />
     </Box>

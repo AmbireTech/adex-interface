@@ -1,27 +1,27 @@
 import { CampaignStatus } from 'adex-common'
-import CustomTable, { TableElement, TableRowAction } from 'components/common/CustomTable'
+import CustomTable, { DataElement, TableRowAction } from 'components/common/CustomTable'
 import { getHumneSrcName } from 'helpers'
-import { ReactNode, useCallback, useMemo } from 'react'
+import { useCallback, useMemo } from 'react'
 import { useCampaignsData } from 'hooks/useCampaignsData'
 import { useCampaignsAnalyticsData } from 'hooks/useCampaignAnalytics/useCampaignAnalyticsData'
 import { Group, ThemeIcon, Text } from '@mantine/core'
 import DownloadCSV from 'components/common/DownloadCSV'
 import BlockIcon from 'resources/icons/Block'
 
-type PlacementsTableElement = Omit<TableElement, 'actionData'> & {
-  actionData: {
-    srcId: string
-    isBlocked: boolean
-    srcName: string
-  }
-  id: string
-  placementName: string | ReactNode
-  impressions: string
-  clicks: string
-  ctr: string
-  avgCpm: string
-  paid: string
-}
+// type PlacementsTableElement = Omit<TableElement, 'actionData'> & {
+//   actionData: {
+//     srcId: string
+//     isBlocked: boolean
+//     srcName: string
+//   }
+//   id: string
+//   placementName: string | ReactNode
+//   impressions: string
+//   clicks: string
+//   ctr: string
+//   avgCpm: string
+//   paid: string
+// }
 
 const Placements = ({ forAdmin, campaignId }: { forAdmin: boolean; campaignId: string }) => {
   const { campaignMappedAnalytics, campaign, currencyName, loading, analyticsKey, error } =
@@ -61,14 +61,14 @@ const Placements = ({ forAdmin, campaignId }: { forAdmin: boolean; campaignId: s
     [placement]
   )
 
-  const elements: PlacementsTableElement[] = useMemo(
+  const elements: DataElement[] = useMemo(
     () =>
       !campaign?.id || !campaignMappedAnalytics
         ? []
         : campaignMappedAnalytics.map((item) => {
             const isBlocked = !!campaign.targetingInput.inputs.publishers.nin.includes(item.segment)
             const srcName = getHumneSrcName(item.segment, placement)
-            const data: PlacementsTableElement = {
+            const data: DataElement = {
               rowColor: isBlocked ? 'warning' : 'inherit',
               actionData: {
                 srcName,
@@ -76,23 +76,28 @@ const Placements = ({ forAdmin, campaignId }: { forAdmin: boolean; campaignId: s
                 srcId: item.segment
               },
               id: item.segment,
-              placementName: isBlocked ? (
-                <Group align="center">
-                  <ThemeIcon size="xs" variant="transparent" c="inherit">
-                    <BlockIcon size="100%" />
-                  </ThemeIcon>{' '}
-                  <Text size="sm" c="inherit">
-                    {srcName}
-                  </Text>
-                </Group>
-              ) : (
-                srcName
-              ),
-              impressions: item.impressions.toLocaleString(),
-              clicks: item.clicks.toLocaleString(),
-              ctr: `${item.ctr} %`,
-              avgCpm: `${item.avgCpm} ${currencyName}`,
-              paid: `${item.paid.toFixed(4)} ${currencyName}`
+              columns: [
+                {
+                  value: srcName,
+                  element: isBlocked ? (
+                    <Group align="center">
+                      <ThemeIcon size="xs" variant="transparent" c="inherit">
+                        <BlockIcon size="100%" />
+                      </ThemeIcon>{' '}
+                      <Text size="sm" c="inherit">
+                        {srcName}
+                      </Text>
+                    </Group>
+                  ) : (
+                    srcName
+                  )
+                },
+                { value: item.impressions, element: item.impressions.toLocaleString() },
+                { value: item.clicks, element: item.clicks.toLocaleString() },
+                { value: item.ctr, element: `${item.ctr} %` },
+                { value: item.avgCpm, element: `${item.avgCpm} ${currencyName}` },
+                { value: item.paid, element: `${item.paid.toFixed(4)} ${currencyName}` }
+              ]
             }
 
             return data
@@ -128,7 +133,7 @@ const Placements = ({ forAdmin, campaignId }: { forAdmin: boolean; campaignId: s
     ].includes(campaign.status)
       ? [
           {
-            action: (props: PlacementsTableElement['actionData'][]) =>
+            action: (props: DataElement['actionData'][]) =>
               filterSrc({
                 action: 'exclude',
                 sources: props.map(({ srcId, srcName }) => ({
@@ -145,7 +150,7 @@ const Placements = ({ forAdmin, campaignId }: { forAdmin: boolean; campaignId: s
             color: 'warning'
           },
           {
-            action: (props: PlacementsTableElement['actionData'][]) =>
+            action: (props: DataElement['actionData'][]) =>
               filterSrc({
                 action: 'include',
                 sources: props.map(({ srcId, srcName }) => ({
@@ -167,7 +172,7 @@ const Placements = ({ forAdmin, campaignId }: { forAdmin: boolean; campaignId: s
     <CustomTable
       error={error}
       headings={headings}
-      elements={elements}
+      data={elements}
       loading={loading}
       selectedActions={selectedActions}
       tableActions={

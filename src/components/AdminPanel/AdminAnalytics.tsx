@@ -181,15 +181,20 @@ const AdminAnalytics = () => {
       elements:
         adminMappedAnalytics.data.map((item) => ({
           id: item.segment.toString(),
-          segment: mapSegmentLabel(analType, item.segment).segementLabel,
-          share: `${((item.paid / (paid || 1)) * 100).toFixed(2)} %`,
-          shareImps: `${((item.impressions / (imps || 1)) * 100).toFixed(2)} %`,
-          impressions: item.impressions,
-          clicks: item.clicks,
-          ctr: `${item.ctr} %`,
-          avgCpm: `${item.avgCpm}`,
-          avgCPC: `${item.avgCpc}`,
-          paid: `${item.paid.toFixed(4)}`
+          columns: [
+            { value: mapSegmentLabel(analType, item.segment).segementLabel },
+            { value: item.paid, element: `${((item.paid / (paid || 1)) * 100).toFixed(2)} %` },
+            {
+              value: item.impressions,
+              element: `${((item.impressions / (imps || 1)) * 100).toFixed(2)} %`
+            },
+            { value: item.impressions, element: item.impressions.toLocaleString() },
+            { value: item.clicks, element: item.clicks.toLocaleString() },
+            { value: item.ctr, element: `${item.ctr?.toLocaleString()} %` },
+            { value: item.avgCpm, element: item.avgCpm?.toLocaleString() },
+            { value: item.avgCpc, element: item.avgCpc?.toLocaleString() },
+            { value: item.paid, element: `${item.paid.toFixed(4)}` }
+          ]
         })) || []
     }
   }, [adminMappedAnalytics, analType])
@@ -316,7 +321,7 @@ const AdminAnalytics = () => {
           }
           loading={loading}
           headings={headings}
-          elements={data.elements}
+          data={data.elements}
           pageSize={10}
           actions={analType === 'campaignId' ? actions : undefined}
         />

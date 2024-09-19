@@ -229,7 +229,8 @@ const EditCampaign = ({ campaign, isAdmin }: { campaign: Campaign; isAdmin?: boo
       }
       const inputs: Partial<Campaign['targetingInput']['inputs']> = {
         categories: values.targetingInput.inputs.categories,
-        location: values.targetingInput.inputs.location
+        location: values.targetingInput.inputs.location,
+        advanced: values.targetingInput.inputs.advanced
       }
 
       const { success } = await editCampaign(campaign.id, pricingBounds, inputs)
