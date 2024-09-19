@@ -1,10 +1,11 @@
 import { useMemo } from 'react'
+import { createStyles } from '@mantine/emotion'
 import * as topojson from 'topojson-client'
 import { scaleQuantize } from '@visx/scale'
 import { CustomProjection, Graticule } from '@visx/geo'
 import { Zoom } from '@visx/zoom'
 import { geoNaturalEarth1 } from 'd3-geo'
-import { Tooltip, createStyles } from '@mantine/core'
+import { Tooltip } from '@mantine/core'
 import { BaseAnalyticsData } from 'types'
 import topology from './world-topo.json'
 

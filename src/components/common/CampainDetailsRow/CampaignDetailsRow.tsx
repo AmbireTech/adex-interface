@@ -1,24 +1,13 @@
-import { Flex, Text, createStyles } from '@mantine/core'
-import { CampaignDetailsRowProps } from 'types'
+import { Divider, Flex, Text, FlexProps, MantineFontSize } from '@mantine/core'
 
-const useStyles = createStyles((theme, { lighterColor }: { lighterColor: boolean }) => ({
-  border: {
-    borderBottom: `1px dashed ${theme.colors.decorativeBorders[theme.fn.primaryShade()]}`
-  },
-  textColor: {
-    color: !lighterColor
-      ? theme.colors.secondaryText[theme.fn.primaryShade()]
-      : theme.colors.secondaryText[theme.fn.primaryShade()] +
-        theme.other.shades.hexColorSuffix.lighter
-  },
-  fullWidth: {
-    width: '100%'
-  },
-  marginBottom: {
-    marginBottom: theme.spacing.sm
-  },
-  text: { whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }
-}))
+export type CampaignDetailsRowProps = FlexProps & {
+  title: string
+  value: any | undefined
+  lighterColor?: boolean | undefined
+  textSize?: MantineFontSize
+  noBorder?: boolean
+  column?: boolean
+}
 
 const CampaignDetailsRow = ({
   title,
@@ -27,32 +16,32 @@ const CampaignDetailsRow = ({
   textSize = 'md',
   noBorder = false,
   column = false,
-  lineHeight = 'lg',
-  nowrap = false
+  ...flexProps
 }: CampaignDetailsRowProps) => {
-  const { classes, cx } = useStyles({ lighterColor: !!lighterColor })
   return (
-    <Flex
-      justify={column ? 'flex-start' : 'space-between'}
-      direction={column ? 'column' : 'row'}
-      align="center"
-      className={cx({ [classes.border]: !noBorder })}
-      pt={lineHeight}
-      pb={lineHeight}
-      gap="sm"
-    >
-      <Text
-        className={cx(classes.textColor, {
-          [classes.fullWidth]: column,
-          [classes.marginBottom]: column
-        })}
-        weight="bold"
-        size={textSize}
+    <>
+      <Flex
+        direction={column ? 'column' : 'row'}
+        justify={column ? 'center' : 'space-between'}
+        align={column ? 'stretch' : 'baseline'}
+        c={lighterColor ? 'secondaryText' : 'mainText'}
+        gap="xs"
+        p="xs"
+        {...flexProps}
       >
-        {title}
-      </Text>
-      <Text className={cx({ [classes.fullWidth]: column, [classes.text]: !!nowrap })}>{value}</Text>
-    </Flex>
+        <Text fw="bold" size={textSize} c="secondaryText">
+          {title}
+        </Text>
+        {typeof value === 'string' ? (
+          <Text ta="end" truncate w={column ? '100%' : 'auto'}>
+            {value}
+          </Text>
+        ) : (
+          value
+        )}
+      </Flex>
+      <Divider variant="dashed" hidden={noBorder} m="0" />
+    </>
   )
 }
 

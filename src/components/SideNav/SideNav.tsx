@@ -1,12 +1,12 @@
 import {
-  Navbar,
   ScrollArea,
-  Box,
+  Stack,
   UnstyledButton,
   Text,
-  useMantineTheme,
-  createStyles,
-  rem
+  AppShell,
+  Center,
+  Divider,
+  Box
 } from '@mantine/core'
 import { useMatch, useLocation, useResolvedPath, Link } from 'react-router-dom'
 import useAccount from 'hooks/useAccount'
@@ -18,31 +18,10 @@ import AdExLogo from 'resources/logos/AdExLogo'
 import { useMemo } from 'react'
 import { appVersion } from 'helpers'
 import { IS_MANUAL_DEPOSITING } from 'constants/balances'
+import CustomAnchor from 'components/common/customAnchor'
 import NavLink from './NavLink'
 import Balance from './Balance'
 import CreateCampaignBtn from './CreateCampaignBtn'
-
-const useStyles = createStyles((theme) => ({
-  logo: {
-    display: 'block',
-    width: rem(103),
-    height: rem(40),
-    marginTop: theme.spacing.md,
-    marginBottom: theme.spacing.md
-  },
-  balance: {
-    borderBottom: `1px solid ${theme.colors.decorativeBorders[theme.fn.primaryShade()]}`,
-    paddingTop: theme.spacing.sm,
-    paddingBottom: theme.spacing.sm
-  },
-  newCampaign: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: theme.spacing.xl,
-    marginBottom: theme.spacing.xl
-  }
-}))
 
 function SideNav() {
   const {
@@ -53,8 +32,6 @@ function SideNav() {
   const location = useLocation()
   const match = useMatch(location.pathname)
   const year = useMemo(() => new Date().getFullYear(), [])
-  const theme = useMantineTheme()
-  const { classes } = useStyles()
 
   const hasAvailableBalance = useMemo(
     () => availableBalance && availableBalance > 0,
@@ -63,25 +40,24 @@ function SideNav() {
 
   return (
     <>
-      <Navbar.Section>
-        <UnstyledButton component={Link} to="" className={classes.logo}>
-          <AdExLogo
-            text={
-              theme.colorScheme === 'dark'
-                ? theme.white
-                : theme.colors.brandDarker[theme.fn.primaryShade()]
-            }
-          />
+      <AppShell.Section py="md">
+        <UnstyledButton component={Link} to="">
+          <Box c="brandDarker" w="110px">
+            <AdExLogo />
+          </Box>
         </UnstyledButton>
-      </Navbar.Section>
-      <Navbar.Section className={classes.balance}>
+      </AppShell.Section>
+      <AppShell.Section py="md">
         <Balance />
-      </Navbar.Section>
-      <Navbar.Section className={classes.newCampaign}>
-        <CreateCampaignBtn hasPopover={isManualDepositing && !hasAvailableBalance} />
-      </Navbar.Section>
-      <Navbar.Section mx="-xs" grow component={ScrollArea}>
-        <Box>
+        <Divider mt="sm" />
+      </AppShell.Section>
+      <AppShell.Section py="md">
+        <Center>
+          <CreateCampaignBtn hasPopover={isManualDepositing && !hasAvailableBalance} />
+        </Center>
+      </AppShell.Section>
+      <AppShell.Section mx="-xs" grow component={ScrollArea}>
+        <Stack gap="xs" w="100%" justify="flex-start" pr="8" pl="0">
           <NavLink
             to="/dashboard"
             icon={<DashboardIcon />}
@@ -93,7 +69,6 @@ function SideNav() {
             icon={<DepositIcon />}
             label="Top Up Account"
             active={useResolvedPath('deposit').pathname === match?.pathname}
-            hasPopover={false}
           />
           <NavLink
             to="/dashboard/billing"
@@ -104,31 +79,33 @@ function SideNav() {
 
           <NavLink
             to="https://help.adex.network/hc/en-us"
-            target="_blank"
+            external
             icon={<HelpIcon />}
             label="Help Center"
           />
           {isAdmin && (
             <NavLink
-              to="/dashboard/admin"
+              to="/dashboard/admin/campaigns"
               // icon={<BillingIcon />}
               label="Admin Panel"
-              active={useResolvedPath('admin').pathname === match?.pathname}
+              active={useResolvedPath('admin/campaigns').pathname === match?.pathname}
             />
           )}
-        </Box>
-      </Navbar.Section>
-      <Navbar.Section mx="xs" mt="xl">
-        <Text color="secondaryText" size="sm">
-          ©{year} AdEx.
-        </Text>
-        <Text color="secondaryText" size="sm">
-          All Rights Reserved.
-        </Text>
-        <Text color="secondaryText" size="sm">
-          V.{appVersion}-beta
-        </Text>
-      </Navbar.Section>
+        </Stack>
+      </AppShell.Section>
+      <AppShell.Section mx="xs" mt="xl">
+        <Stack gap="xs" c="secondaryText">
+          <CustomAnchor c="secondaryText" inline size="sm" external href="https://adex.network">
+            ©{year} AdEx
+          </CustomAnchor>
+          <Text inline size="sm">
+            All Rights Reserved
+          </Text>
+          <Text inline size="sm">
+            V.{appVersion}-beta
+          </Text>
+        </Stack>
+      </AppShell.Section>
     </>
   )
 }

@@ -1,68 +1,31 @@
-import { ActionIcon, Alert, Button, Checkbox, Grid, Group, Text, Tooltip } from '@mantine/core'
-import { ChangeEvent, useCallback, useMemo, useState } from 'react'
+import {
+  ActionIcon,
+  Alert,
+  Checkbox,
+  Stack,
+  Group,
+  NumberInput,
+  Radio,
+  Text,
+  TextInput,
+  Tooltip
+} from '@mantine/core'
+import { useMemo } from 'react'
 import InfoFilledIcon from 'resources/icons/InfoFilled'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
-import useAccount from 'hooks/useAccount'
-import {
-  validateCPMMax,
-  validateCPMMin,
-  validateCampaignBudget,
-  validateCurrency,
-  validatePaymentModel,
-  validateTitle
-} from 'helpers/validators'
-import { CampaignUI } from 'types'
+import InfoAlertMessage from 'components/common/InfoAlertMessage'
 import { parseRange } from 'helpers/createCampaignHelpers'
 import InfoIcon from 'resources/icons/Info'
+import DefaultCustomAnchor from 'components/common/customAnchor'
 import CampaignPeriod from './CampaignPeriod'
-import PaymentModel from './PaymentModel'
 import SelectCurrency from './SelectCurrency'
-import CampaignBudget from './CampaignBudget'
-import CpmMinMax from './CpmMinMax'
-import CampaignName from './CampaignName'
-
-type FormErrorsProps = {
-  paymentModel: string
-  currency: string
-  campaignBudget: string
-  cpmPricingBoundsMin: string
-  cpmPricingBoundsMax: string
-  title: string
-}
-
-const DEFAULT_ERROR_VALUES: FormErrorsProps = {
-  paymentModel: '',
-  currency: '',
-  campaignBudget: '',
-  cpmPricingBoundsMin: '',
-  cpmPricingBoundsMax: '',
-  title: ''
-}
 
 const StepThree = () => {
   const {
-    campaign: {
-      step,
-      paymentModel,
-      currency,
-      campaignBudget,
-      cpmPricingBounds: { min, max },
-      title,
-      asapStartingDate
-    },
-    updatePartOfCampaign,
-    updateCampaign,
-    selectedBidFloors
+    campaign: { currency },
+    selectedBidFloors,
+    form: { key, getInputProps, errors, setFieldValue }
   } = useCreateCampaignContext()
-
-  const {
-    adexAccount: { availableBalance, balanceToken },
-    isAdmin
-  } = useAccount()
-
-  const [errors, setErrors] = useState<FormErrorsProps>({
-    ...DEFAULT_ERROR_VALUES
-  })
 
   const recommendedPaymentBounds = useMemo(() => {
     const rangeUnparsed = selectedBidFloors.flat().sort((a, b) => b.count - a.count)[0]?.value
@@ -70,204 +33,167 @@ const StepThree = () => {
     return rangeUnparsed ? parseRange(rangeUnparsed) : { min: 'N/A', max: 'N/A' }
   }, [selectedBidFloors])
 
-  const handleChange = useCallback(
-    (event: ChangeEvent<HTMLInputElement>) => {
-      const { name, value } = event.target
-      let updatedValue: Partial<CampaignUI>
-      if (name === 'cpmPricingBoundsMin') {
-        if (Number.isNaN(parseFloat(value))) return
-        updatedValue = {
-          cpmPricingBounds: {
-            min: value,
-            max
-          }
-        }
-      } else if (name === 'cpmPricingBoundsMax') {
-        if (Number.isNaN(parseFloat(value))) return
-        updatedValue = {
-          cpmPricingBounds: {
-            min,
-            max: value
-          }
-        }
-      } else {
-        updatedValue = { [name]: value }
-      }
-
-      updatePartOfCampaign({ ...updatedValue })
-    },
-    [updatePartOfCampaign, min, max]
+  const budgetIsGreaterThanBalance = useMemo(
+    () => errors && errors.budget === 'Available balance is lower than the campaign budget',
+    [errors]
   )
-
-  const handleOnFocus = useCallback(
-    (name: string) => {
-      setErrors((prevErrors) => ({
-        ...prevErrors,
-        [name]: ''
-      }))
-    },
-
-    []
-  )
-
-  // TODO: Move the validateFields in other file
-  const validateFields = useCallback(() => {
-    const newErrors = { ...DEFAULT_ERROR_VALUES }
-
-    const paymentModelValidation = validatePaymentModel(paymentModel)
-    if (!paymentModelValidation.isValid) newErrors.paymentModel = paymentModelValidation.errMsg
-
-    const currencyValidation = validateCurrency(currency)
-    if (!currencyValidation.isValid) newErrors.currency = currencyValidation.errMsg
-    console.log({ isAdmin })
-    const campaignBudgetValidation = validateCampaignBudget(
-      campaignBudget,
-      availableBalance,
-      balanceToken.decimals,
-      isAdmin
-    )
-    if (!campaignBudgetValidation.isValid)
-      newErrors.campaignBudget = campaignBudgetValidation.errMsg
-
-    const cpmPricingBoundsMinValidation = validateCPMMin(min, max)
-    if (!cpmPricingBoundsMinValidation.isValid)
-      newErrors.cpmPricingBoundsMin = cpmPricingBoundsMinValidation.errMsg
-
-    const cpmPricingBoundsMaxValidation = validateCPMMax(min, max)
-    if (!cpmPricingBoundsMaxValidation.isValid)
-      newErrors.cpmPricingBoundsMax = cpmPricingBoundsMaxValidation.errMsg
-
-    const titleValidation = validateTitle(title)
-    if (!titleValidation.isValid) newErrors.title = titleValidation.errMsg
-
-    setErrors(newErrors)
-
-    return Object.values(newErrors).every((error) => !error)
-  }, [
-    paymentModel,
-    currency,
-    campaignBudget,
-    availableBalance,
-    balanceToken.decimals,
-    isAdmin,
-    min,
-    max,
-    title
-  ])
-
-  const submitForm = useCallback(() => {
-    const isValid = validateFields()
-
-    if (isValid) {
-      const updatedProps = {
-        step: step + 1
-      }
-
-      updatePartOfCampaign(updatedProps)
-    }
-  }, [validateFields, step, updatePartOfCampaign])
 
   return (
-    <>
-      <Grid>
-        <Grid.Col mb="md">
-          <Text color="secondaryText" size="sm" weight="bold" mb="xs">
-            1. Campaign Period
+    <Stack gap="xl" maw={720}>
+      <Stack gap="xs">
+        <Text c="secondaryText" size="sm" fw="bold">
+          1. Campaign Period
+        </Text>
+        <CampaignPeriod />
+
+        <Alert icon={<InfoIcon style={{ marginTop: 0 }} />} color="attention" variant="outline">
+          <Text>
+            The campaigns go through a approval process and if you select &quot;As soon as
+            possible&quot; the campaign will be launched once it is approved.
           </Text>
-          <CampaignPeriod />
-        </Grid.Col>
-        <Grid.Col>
-          <Alert icon={<InfoIcon style={{ marginTop: 0 }} />} color="attention" variant="outline">
-            <Text>
-              The campaigns go through a approval process and if you select &quot;As soon as
-              possible&quot; the campaign will be launched once it is approved.
-            </Text>
-          </Alert>
-        </Grid.Col>
-        <Grid.Col>
-          <Checkbox
-            checked={asapStartingDate}
-            label="As soon as possible"
-            onChange={(event) => updateCampaign('asapStartingDate', event.currentTarget.checked)}
-          />
-        </Grid.Col>
-        <Grid.Col mb="md">
-          <Text color="secondaryText" size="sm" weight="bold" mb="xs">
+        </Alert>
+
+        <Checkbox
+          label="As soon as possible"
+          key={key('asapStartingDate')}
+          {...getInputProps('asapStartingDate', {
+            type: 'checkbox'
+          })}
+        />
+      </Stack>
+
+      <Radio.Group
+        label={
+          <Text c="secondaryText" size="sm" fw="bold">
             2. Payment Model
           </Text>
-          <PaymentModel
-            defaultValue={paymentModel}
-            onChange={handleChange}
-            error={errors.paymentModel}
-          />
-        </Grid.Col>
-        <Grid.Col mb="md">
-          <Text color="secondaryText" size="sm" weight="bold" mb="xs">
-            3. Currency
-          </Text>
-          <SelectCurrency
-            defaultValue={currency}
-            onChange={handleChange}
-            error={errors.currency}
-            onFocus={() => handleOnFocus('currency')}
-          />
-        </Grid.Col>
-        <Grid.Col mb="md">
-          <Text color="secondaryText" size="sm" weight="bold" mb="xs">
-            4. Campaign Budget
-          </Text>
-          <CampaignBudget
-            defaultValue={Number(campaignBudget)}
-            onChange={handleChange}
-            onFocus={() => handleOnFocus('campaignBudget')}
-            error={errors.campaignBudget}
-            isAdmin={isAdmin}
-          />
-        </Grid.Col>
-        <Grid.Col mb="md">
-          <Group mb="xs" spacing="xs">
-            <Text color="secondaryText" size="sm" weight="bold">
-              5. CPM
+        }
+        key={key('paymentModel')}
+        {...getInputProps('paymentModel')}
+      >
+        <Group mt="xs">
+          <Radio value="cpm" label="CPM" />
+          {/* Disabled at the moment */}
+          {/* <Radio value="cpc" label="CPC" /> */}
+        </Group>
+      </Radio.Group>
+
+      <Stack gap="xs">
+        <Text c="secondaryText" size="sm" fw="bold">
+          3. Currency
+        </Text>
+        <SelectCurrency
+          defaultValue={currency}
+          onChange={(value) => setFieldValue('currency', value)}
+          error={(errors.currency && errors.currency) || ''}
+        />
+      </Stack>
+
+      <Stack gap="xs">
+        <NumberInput
+          allowDecimal
+          hideControls
+          label={
+            <Text c="secondaryText" size="sm" fw="bold" mb="xs">
+              4. Campaign Budget
             </Text>
-            <Tooltip
-              label={`Recommended CPM in USD: Min - ${recommendedPaymentBounds.min}; Max - ${recommendedPaymentBounds.max}`}
-              ml="sm"
-            >
-              <ActionIcon color="secondaryText" size="xs">
-                <InfoFilledIcon />
-              </ActionIcon>
-            </Tooltip>
-          </Group>
-          <CpmMinMax
-            defaultValueMin={Number(min)}
-            defaultValueMax={Number(max)}
-            onChangeMin={handleChange}
-            onChangeMax={handleChange}
-            errorMin={errors.cpmPricingBoundsMin}
-            errorMax={errors.cpmPricingBoundsMax}
-            onFocusMin={() => handleOnFocus('cpmPricingBoundsMin')}
-            onFocusMax={() => handleOnFocus('cpmPricingBoundsMax')}
+          }
+          size="md"
+          placeholder="Enter campaign budget"
+          // TODO: Should get/calculate estimated fee
+          // description={`Estimated fee: 0.15 ${balanceToken.name}`}
+          inputWrapperOrder={['label', 'input', 'description', 'error']}
+          name="budget"
+          key={key('budget')}
+          {...getInputProps('budget')}
+        />
+        {budgetIsGreaterThanBalance && (
+          <InfoAlertMessage message="You have insufficient funds in your account for launching a campaign. You can save the campaign as draft and launch it when your account is topped up." />
+        )}
+
+        <Group>
+          <Checkbox
+            label="Limit average daily spending"
+            key={key('targetingInput.inputs.advanced.limitDailyAverageSpending')}
+            {...getInputProps('targetingInput.inputs.advanced.limitDailyAverageSpending', {
+              type: 'checkbox'
+            })}
           />
-        </Grid.Col>
-        <Grid.Col mb="md">
-          <Text color="secondaryText" size="sm" weight="bold" mb="xs">
+          <DefaultCustomAnchor
+            href="https://help.adex.network/hc/en-us/articles/15014607423260-How-to-limit-your-average-daily-spend"
+            external
+            c="blue"
+            size="sm"
+          >
+            (learn more)
+          </DefaultCustomAnchor>
+        </Group>
+      </Stack>
+
+      <Stack gap="xs">
+        <Group gap="xs">
+          <Text c="secondaryText" size="sm" fw="bold">
+            5. CPM
+          </Text>
+          <Tooltip
+            label={`Recommended CPM in USD: Min - ${recommendedPaymentBounds.min}; Max - ${recommendedPaymentBounds.max}`}
+            ml="sm"
+          >
+            <ActionIcon variant="transparent" color="secondaryText" size="xs">
+              <InfoFilledIcon />
+            </ActionIcon>
+          </Tooltip>
+        </Group>
+
+        <Group wrap="nowrap" justify="stretch" grow>
+          <TextInput
+            size="md"
+            placeholder="CPM min"
+            // Temporary disabled until we are ready to get real data
+            // description="Approx. ~ $0.10"
+            inputWrapperOrder={['input', 'description', 'error']}
+            rightSection={
+              <Text c="brand" mr="sm" size="sm">
+                Min
+              </Text>
+            }
+            rightSectionWidth="auto"
+            name="cpmPricingBounds.min"
+            key={key('cpmPricingBounds.min')}
+            {...getInputProps('cpmPricingBounds.min')}
+          />
+          <TextInput
+            size="md"
+            placeholder="CPM max"
+            // Temporary disabled until we are ready to get real data
+            // description="Approx. ~ $0.50"
+            inputWrapperOrder={['input', 'description', 'error']}
+            rightSection={
+              <Text c="brand" mr="sm" size="sm">
+                Max
+              </Text>
+            }
+            rightSectionWidth="md"
+            name="cpmPricingBounds.max"
+            key={key('cpmPricingBounds.max')}
+            {...getInputProps('cpmPricingBounds.max')}
+          />
+        </Group>
+      </Stack>
+
+      <TextInput
+        label={
+          <Text c="secondaryText" size="sm" fw="bold" mb="xs">
             6. Campaign Name
           </Text>
-          <CampaignName
-            defaultValue={title}
-            onChange={handleChange}
-            onFocus={() => handleOnFocus('title')}
-            error={errors.title}
-          />
-        </Grid.Col>
-      </Grid>
-      <Button
-        type="button"
-        onClick={submitForm}
-        style={{ display: 'none' }}
-        id="createCampaignSubmitBtn1"
+        }
+        size="md"
+        placeholder="Campaign Name"
+        name="title"
+        key={key('title')}
+        {...getInputProps('title')}
       />
-    </>
+    </Stack>
   )
 }
 

@@ -1,34 +1,40 @@
-import { Flex, Text } from '@mantine/core'
+import { Group, Stack, Text } from '@mantine/core'
 import CustomCard from 'components/common/CustomCard'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import DesktopIcon from 'resources/icons/Desktop'
 import MobileIcon from 'resources/icons/Mobile'
 import { Devices } from 'types'
+import InfoAlertMessage from 'components/common/InfoAlertMessage'
 
 const SelectDevice = () => {
   const {
     campaign: { devices },
-    updateCampaign
+    form: { removeListItem, insertListItem, validateField, errors }
   } = useCreateCampaignContext()
 
   const toggleDeviceSelection = (device: Devices) => {
-    const isSelected = devices.includes(device)
-    const updatedDevices = isSelected
-      ? devices.filter((selectedDevice) => selectedDevice !== device)
-      : [...devices, device]
+    const index = devices.indexOf(device)
 
-    updateCampaign('devices', updatedDevices)
+    if (index > -1) {
+      removeListItem('devices', devices.indexOf(device))
+    } else {
+      insertListItem('devices', device)
+    }
+
+    // TODO: add context fn or use it as custom validation on change
+    // NOTE: in order validateField to work with specific field, the field has to be form in validate props
+    validateField('devices')
   }
 
   return (
-    <>
-      <Text color="secondaryText" size="sm" weight="bold" mb="xs">
+    <Stack gap="xs">
+      <Text c="secondaryText" size="sm" fw="bold">
         2. Select device
       </Text>
-      <Flex gap={20} justify="space-between">
+      <Group grow wrap="wrap">
         <CustomCard
-          width="48%"
-          height={100}
+          width="auto"
+          height="auto"
           text="Mobile"
           iconLeft={<MobileIcon size="24px" />}
           color="brand"
@@ -38,8 +44,8 @@ const SelectDevice = () => {
           hasCheckMark
         />
         <CustomCard
-          width="48%"
-          height={100}
+          width="auto"
+          height="auto"
           iconLeft={<DesktopIcon size="24px" />}
           text="Desktop"
           color="brand"
@@ -48,8 +54,9 @@ const SelectDevice = () => {
           variant="shadow"
           hasCheckMark
         />
-      </Flex>
-    </>
+      </Group>
+      {errors.devices && <InfoAlertMessage message={errors.devices} />}
+    </Stack>
   )
 }
 

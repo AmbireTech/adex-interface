@@ -1,5 +1,7 @@
 import { AnchorProps } from '@mantine/core'
+import { PropsWithChildren } from 'react'
 
-export interface CustomAnchorProps extends AnchorProps {
-  external?: boolean
-}
+export type CustomAnchorProps = PropsWithChildren &
+  AnchorProps & {
+    external?: boolean
+  }

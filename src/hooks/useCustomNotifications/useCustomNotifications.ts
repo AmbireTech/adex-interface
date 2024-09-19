@@ -6,8 +6,6 @@ type NotificationSeverity = 'error' | 'warning' | 'info'
 const useCustomNotifications = () => {
   const showNotification = useCallback(
     (severity: NotificationSeverity, message: string, title?: string) => {
-      console.log({ message })
-
       let color = ''
       let notificationTitle = ''
       // eslint-disable-next-line default-case
@@ -27,8 +25,9 @@ const useCustomNotifications = () => {
       }
       console.log({ notificationTitle })
       notifications.show({
-        title: notificationTitle,
-        message,
+        // NOTE: just in case if somewhere is passed error objet
+        title: notificationTitle.toString(),
+        message: message.toString(),
         color
       })
     },

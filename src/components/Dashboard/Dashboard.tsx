@@ -4,16 +4,20 @@ import {
   // CampaignType,
   EventType
 } from 'adex-common'
-import { Container, Flex, Text, Loader } from '@mantine/core'
-import { useCallback, useEffect, useMemo } from 'react'
-import CustomTable from 'components/common/CustomTable'
-import { periodNumberToDate } from 'helpers'
-import { useNavigate } from 'react-router-dom'
+import { Container, Flex, Text, UnstyledButton, Anchor, Stack, Group } from '@mantine/core'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import CustomTable, { TableElement, TableRowAction } from 'components/common/CustomTable'
+import { Link, useNavigate } from 'react-router-dom'
 import { useCampaignsData } from 'hooks/useCampaignsData'
-import { parseBigNumTokenAmountToDecimal } from 'helpers/balances'
+import { parseBigNumTokenAmountToDecimal, maskAddress, periodNumberToDate, MINUTE } from 'helpers'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
-import useCustomNotifications from 'hooks/useCustomNotifications'
-
+import { modals } from '@mantine/modals'
+import VisibilityIcon from 'resources/icons/Visibility'
+import AnalyticsIcon from 'resources/icons/Analytics'
+import DuplicateIcon from 'resources/icons/Duplicate'
+import DeleteIcon from 'resources/icons/Delete'
+import EditIcon from 'resources/icons/Edit'
+import { defaultConfirmModalProps } from 'components/common/Modals/CustomConfirmModal'
 import BadgeStatusCampaign from './BadgeStatusCampaign'
 
 const campaignHeaders = [
@@ -33,10 +37,7 @@ const campaignHeaders = [
 const statusOrder = {
   inReview: 0,
   draft: 1,
-  active: 2,
-  paused: 3,
-  stopped: 4,
-  completed: 5
+  other: 2
 }
 
 const getStatusOrder = (status: CampaignStatus) => {
@@ -45,58 +46,119 @@ const getStatusOrder = (status: CampaignStatus) => {
       return statusOrder.inReview
     case CampaignStatus.draft:
       return statusOrder.draft
-    case CampaignStatus.active:
-    case CampaignStatus.ready:
-      return statusOrder.active
-    case CampaignStatus.paused:
-      return statusOrder.paused
-    case CampaignStatus.closedByUser:
-    case CampaignStatus.expired:
-    case CampaignStatus.exhausted:
-      return statusOrder.stopped
     default:
-      return statusOrder.completed
+      return statusOrder.other
   }
 }
 
-const Dashboard = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
-  const navigate = useNavigate()
-  const { campaignsData, initialDataLoading, updateAllCampaignsData } = useCampaignsData()
-  const { updateCampaignFromDraft } = useCreateCampaignContext()
-  const { showNotification } = useCustomNotifications()
-  // Temporary disabled show/hide archived until no functionality implemented
-  // const [showArchived, setShowArchived] = useState(false)
-  const filteredCampaignData = useMemo(() => {
-    // if (!showArchived) {
-    //   // TODO: change 'CampaignStatus.expired' to 'CampaignStatus.archived' when has been added to the model
-    //   return campaignsData && Array.from(campaignsData.values()).length > 0
-    //     ? Array.from(campaignsData.values()).filter(
-    //         (campaign) => campaign.campaign.status !== CampaignStatus.expired
-    //       )
-    //     : []
-    // }
-    return Array.from(campaignsData.values()).sort((a, b) => {
-      const statusOrderDiff = getStatusOrder(a.campaign.status) - getStatusOrder(b.campaign.status)
-      if (statusOrderDiff !== 0) {
-        return statusOrderDiff
-      }
-      return Number(b.campaign.created) - Number(a.campaign.created)
-    })
-  }, [campaignsData])
+type DashboardTableElement = Omit<TableElement, 'actionData'> & {
+  actionData: { campaign: Campaign; isDraft: boolean; canArchive: boolean }
+  title: string | JSX.Element
+  placement: string
+  status: {
+    value: CampaignStatus
+    element: JSX.Element
+  }
+  served: string
+  budget: string
+  impressions: number
+  clicks: number
+  ctr: string
+  period: JSX.Element
+  cpm: JSX.Element
+}
 
-  const elements = useMemo(
+const Dashboard = ({ isAdminPanel, accountId }: { isAdminPanel?: boolean; accountId?: string }) => {
+  const navigate = useNavigate()
+  const {
+    campaignsData,
+    initialDataLoading,
+    updateAllCampaignsData,
+    deleteDraftCampaign,
+    toggleArchived
+  } = useCampaignsData()
+  const { updateCampaignFromDraft } = useCreateCampaignContext()
+  const [showArchived, setShowArchived] = useState(false)
+  const filteredCampaignData = useMemo(() => {
+    let archivedCount = 0
+    const campaignData = Array.from(campaignsData.values())
+      .filter((x) => {
+        const matchFilter =
+          isAdminPanel && accountId
+            ? x.campaign.owner.toLowerCase() === accountId.toLowerCase()
+            : true
+
+        const isArchived = matchFilter && x.campaign.archived
+        if (isArchived) archivedCount++
+
+        return matchFilter && ((!showArchived && !isArchived) || (showArchived && isArchived))
+      })
+      .sort((a, b) => {
+        const statusOrderDiff =
+          getStatusOrder(a.campaign.status) - getStatusOrder(b.campaign.status)
+        if (statusOrderDiff !== 0) {
+          return statusOrderDiff
+        }
+        return Number(b.campaign.created) - Number(a.campaign.created)
+      })
+
+    return {
+      archivedCount,
+      campaignData
+    }
+  }, [campaignsData, isAdminPanel, accountId, showArchived])
+
+  const elements: DashboardTableElement[] = useMemo(
     () =>
-      filteredCampaignData.length
-        ? filteredCampaignData.map((cmpData) => {
+      filteredCampaignData.campaignData.length
+        ? filteredCampaignData.campaignData.map((cmpData) => {
+            const campaign = cmpData.campaign
             const decimals = cmpData.campaign.outpaceAssetDecimals
             const budget = parseBigNumTokenAmountToDecimal(
               cmpData.campaign.campaignBudget,
               decimals
             )
 
+            const archived = cmpData.campaign.archived
+
             return {
+              actionData: {
+                campaign,
+                isDraft: campaign.status === CampaignStatus.draft,
+                canArchive: [
+                  CampaignStatus.closedByUser,
+                  CampaignStatus.exhausted,
+                  CampaignStatus.expired,
+                  CampaignStatus.rejected
+                ].includes(campaign.status)
+              },
+              rowColor: archived ? 'warning' : undefined,
               id: cmpData.campaignId,
-              title: cmpData.campaign.title,
+              title: (
+                <Stack gap="xs">
+                  <Group wrap="nowrap">
+                    {archived && (
+                      <BadgeStatusCampaign type={cmpData.campaign.status} isArchived={archived} />
+                    )}
+                    <Text size="sm" truncate maw={200}>
+                      {cmpData.campaign.title}
+                    </Text>
+                  </Group>
+
+                  {isAdminPanel && (
+                    <Anchor
+                      component={Link}
+                      inline
+                      underline="never"
+                      size="xs"
+                      to={`/dashboard/admin/user-account/${campaign.owner}`}
+                      c="secondaryText"
+                    >
+                      {maskAddress(campaign.owner)}
+                    </Anchor>
+                  )}
+                </Stack>
+              ),
               // type: CampaignType[cmpData.campaign.type],
               placement:
                 cmpData.campaign.targetingInput.inputs.placements.in[0] === 'app'
@@ -114,148 +176,241 @@ const Dashboard = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
               clicks: cmpData.clicks,
               ctr: `${cmpData.ctr || 0} %`,
               period: (
-                <span>
-                  <span>
+                <Stack gap="xs">
+                  <Text size="sm" inline>
                     {cmpData.campaign.activeFrom
                       ? periodNumberToDate(cmpData.campaign.activeFrom)
                       : 'N/A'}
-                  </span>
-                  <br />
-                  <span>
+                  </Text>
+
+                  <Text size="sm" inline>
                     {cmpData.campaign.activeTo
                       ? periodNumberToDate(cmpData.campaign.activeTo)
                       : 'N/A'}
-                  </span>
-                </span>
+                  </Text>
+                </Stack>
               ),
               cpm: (
-                <span>
-                  <span>
-                    {(
+                <Stack gap="xs">
+                  <Text size="sm" inline styles={{ root: { whiteSpace: 'nowrap' } }}>
+                    {`${(
                       parseBigNumTokenAmountToDecimal(
                         cmpData.campaign.pricingBounds[EventType.IMPRESSION]?.min || 0n,
                         decimals
                       ) * 1000
-                    ).toFixed(2)}
-                  </span>
-                  {' - '}{' '}
-                  <span>
-                    {(
+                    ).toFixed(2)} - ${(
                       parseBigNumTokenAmountToDecimal(
                         cmpData.campaign.pricingBounds[EventType.IMPRESSION]?.max || 0n,
                         decimals
                       ) * 1000
-                    ).toFixed(2)}
-                  </span>
-                  <br />
-                  <span>{`(avg: ${cmpData.avgCpm?.toFixed(2) || 0})`}</span>
-                </span>
+                    ).toFixed(2)}`}
+                  </Text>
+                  <Text size="sm" inline>{`(avg: ${cmpData.avgCpm?.toFixed(2) || 0})`}</Text>
+                </Stack>
               )
             }
           })
         : [],
-    [filteredCampaignData]
+    [filteredCampaignData.campaignData, isAdminPanel]
   )
 
   const handlePreview = useCallback(
-    (item: Campaign) => {
-      navigate(`/dashboard/campaign-details/${isAdminPanel ? 'admin/' : ''}${item.id}`, {})
+    (data: DashboardTableElement['actionData']) => {
+      navigate(`/dashboard/campaign-details/${isAdminPanel ? 'admin/' : ''}${data.campaign.id}`, {})
     },
     [isAdminPanel, navigate]
   )
 
   const handleAnalytics = useCallback(
-    (item: Campaign) => {
-      navigate(`/dashboard/campaign-analytics/${item.id}`)
+    (data: DashboardTableElement['actionData']) => {
+      navigate(`/dashboard/campaign-analytics/${isAdminPanel ? 'admin/' : ''}${data.campaign.id}`)
     },
-    [navigate]
+    [isAdminPanel, navigate]
   )
 
-  const handleEdit = useCallback(
-    (item: Campaign) => {
+  const handleEditDraft = useCallback(
+    (data: DashboardTableElement['actionData'], isDuplicate?: boolean) => {
       if (isAdminPanel) {
         return
       }
-      const selectedCampaign = filteredCampaignData.find(
-        (campaign) => campaign.campaignId === item.id
-      )?.campaign
 
-      if (selectedCampaign) {
-        updateCampaignFromDraft(selectedCampaign)
-        navigate('/dashboard/create-campaign')
-      } else {
-        showNotification('error', 'Editing draft campaign failed', 'Editing draft campaign failed')
-      }
+      data.campaign &&
+        updateCampaignFromDraft(
+          {
+            ...data.campaign,
+            ...(isDuplicate && {
+              id: '',
+              title: `Copy - ${data.campaign.title}`,
+              activeFrom: BigInt(Date.now() + 10 * MINUTE),
+              activeTo:
+                BigInt(Date.now()) + BigInt(data.campaign.activeTo - data.campaign.activeFrom),
+              status: CampaignStatus.created
+            })
+          },
+          isDuplicate
+        )
+      navigate('/dashboard/create-campaign', {})
     },
-    [isAdminPanel, filteredCampaignData, updateCampaignFromDraft, navigate, showNotification]
+    [isAdminPanel, updateCampaignFromDraft, navigate]
   )
 
-  // const handleDuplicate = useCallback((item: Campaign) => {
-  //   // TODO: Implement duplication logic
-  //   console.log('item', item)
-  // }, [])
+  const handleEdit = useCallback(
+    (data: DashboardTableElement['actionData']) =>
+      navigate(`/dashboard/campaign-details/${data.campaign.id}/budget?edit=true`, {}),
+    [navigate]
+  )
 
-  // const handleDelete = useCallback((item: Campaign) => {
-  //   // TODO: Implement deletion logic
-  //   console.log('item', item)
-  // }, [])
+  const handleDuplicate = useCallback(
+    (campaign: DashboardTableElement['actionDta']) => {
+      return handleEditDraft(campaign, true)
+    },
+    [handleEditDraft]
+  )
 
-  // const toggleShowArchived = useCallback(() => {
-  //   setShowArchived((prevShowArchived) => !prevShowArchived)
-  // }, [])
+  const handleDelete = useCallback(
+    (data: DashboardTableElement['actionData']) =>
+      modals.openConfirmModal(
+        defaultConfirmModalProps({
+          text: `Are you sure want to delete draft "${data.campaign.title}"`,
+          color: 'warning',
+          labels: { confirm: 'Delete', cancel: 'Cancel' },
+          onConfirm: () => deleteDraftCampaign(data.campaign.id)
+        })
+      ),
+    [deleteDraftCampaign]
+  )
 
-  // useEffect(() => {
-  //   if (filteredCampaignData.length === 0) {
-  //     navigate('/dashboard/get-started', { replace: true })
-  //   }
-  // }, [navigate, filteredCampaignData.length])
+  const handleArchive = useCallback(
+    (data: DashboardTableElement['actionData']) => {
+      const cmp = data.campaign
+      const confirm = cmp?.archived ? 'Unarchive' : 'Archive'
+
+      modals.openConfirmModal(
+        defaultConfirmModalProps({
+          text: `Are you sure want to ${confirm} campaign "${cmp?.title}"`,
+          color: cmp?.archived ? 'brand' : 'attention',
+          labels: { confirm, cancel: 'Cancel' },
+          onConfirm: () => toggleArchived(cmp?.id || '')
+        })
+      )
+    },
+    [toggleArchived]
+  )
+
+  const toggleShowArchived = useCallback(() => {
+    setShowArchived((prevShowArchived) => !prevShowArchived)
+  }, [])
 
   // NOTE: redirect to get-started page id no campaigns found
   useEffect(() => {
-    if (!filteredCampaignData.length && !initialDataLoading) {
+    if (!accountId && !filteredCampaignData.campaignData.length && !initialDataLoading) {
       navigate('/dashboard/get-started', { replace: true })
     }
-  }, [filteredCampaignData, initialDataLoading, navigate])
+  }, [accountId, filteredCampaignData, initialDataLoading, navigate])
 
   useEffect(() => {
     updateAllCampaignsData(true)
-  }, [updateAllCampaignsData])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  const actions = useMemo(() => {
+    const dashboardActions: TableRowAction[] = [
+      {
+        action: handlePreview,
+        label: 'Show Details',
+        icon: <VisibilityIcon />
+      },
+      {
+        action: handleAnalytics,
+        label: 'Show Analytics',
+        icon: <AnalyticsIcon />,
+        disabled: (ada: DashboardTableElement['actionData']) =>
+          ada.isDraft ||
+          [
+            CampaignStatus.rejected,
+            CampaignStatus.ready,
+            CampaignStatus.inReview,
+            CampaignStatus.created
+          ].includes(ada.campaign.status)
+      }
+    ]
+
+    if (!isAdminPanel) {
+      dashboardActions.push(
+        ...[
+          {
+            action: handleEditDraft,
+            label: 'Continue Edit',
+            icon: <EditIcon />,
+            hide: (ada: DashboardTableElement['actionData']) => !ada.isDraft
+          },
+          {
+            action: handleEdit,
+            disabled: (ada: DashboardTableElement['actionData']) =>
+              ![CampaignStatus.active, CampaignStatus.paused].includes(ada.campaign.status),
+            label: 'Edit',
+            icon: <EditIcon />,
+            hide: (ada: DashboardTableElement['actionData']) => ada.isDraft
+          },
+          {
+            action: handleDuplicate,
+            label: 'Clone and create new',
+            icon: <DuplicateIcon />
+          },
+          {
+            action: handleArchive,
+            label: (ada: DashboardTableElement['actionData']) =>
+              `${ada.campaign.archived ? 'Unarchive' : 'Archive'}  Campaign`,
+            icon: <DeleteIcon />,
+            hide: (ada: DashboardTableElement['actionData']) => !ada.canArchive
+          },
+          {
+            action: handleDelete,
+            label: 'Delete Draft',
+            icon: <DeleteIcon />,
+            color: 'red',
+            hide: (ada: DashboardTableElement['actionData']) => !ada.isDraft
+          }
+        ]
+      )
+    }
+
+    return dashboardActions
+  }, [
+    handleAnalytics,
+    handleArchive,
+    handleDelete,
+    handleDuplicate,
+    handleEdit,
+    handleEditDraft,
+    handlePreview,
+    isAdminPanel
+  ])
 
   return (
     <Container fluid>
       <Flex direction="column" justify="start">
         <Flex justify="space-between" align="center">
-          {isAdminPanel ? (
-            ''
-          ) : (
-            <Text size="sm" color="secondaryText" weight="bold" mb="md">
-              All Campaigns
-            </Text>
+          <Text size="sm" color="secondaryText" fw="bold" mb="md">
+            {isAdminPanel ? '* admin' : 'All campaigns'}
+          </Text>
+
+          {!!filteredCampaignData.archivedCount && (
+            <UnstyledButton onClick={toggleShowArchived}>
+              <Text size="sm" td="underline" c="secondaryText">
+                {showArchived ? 'Hide Archived' : 'Show Archived'} (
+                {filteredCampaignData.archivedCount})
+              </Text>
+            </UnstyledButton>
           )}
-          {/* Temporary disabled show/hide archived until no functionality implemented */}
-          {/* <UnstyledButton onClick={toggleShowArchived}>
-            <Text size="sm" underline color="secondaryText">
-              {showArchived ? 'Hide Archived' : 'Show Archived'}
-            </Text>
-          </UnstyledButton> */}
         </Flex>
-        {!initialDataLoading ? (
-          <CustomTable
-            background
-            headings={campaignHeaders}
-            elements={elements}
-            onPreview={handlePreview}
-            onAnalytics={handleAnalytics}
-            onEdit={handleEdit}
-            // Temporary disabled until no functionality implemented
-            // onDuplicate={handleDuplicate}
-            // onDelete={handleDelete}
-          />
-        ) : (
-          <Flex justify="center" align="center" h="60vh">
-            <Loader size="xl" />
-          </Flex>
-        )}
+        <CustomTable
+          shadow={!isAdminPanel ? 'xs' : undefined}
+          headings={campaignHeaders}
+          elements={elements}
+          actions={actions}
+          loading={initialDataLoading}
+        />
       </Flex>
     </Container>
   )

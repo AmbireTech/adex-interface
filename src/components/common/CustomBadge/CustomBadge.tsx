@@ -1,29 +1,37 @@
-import { Badge, BadgeProps, Flex, MantineColor, Text, createStyles } from '@mantine/core'
+import { Badge, BadgeProps, MantineColor, MantineSize, ThemeIcon } from '@mantine/core'
 import { ReactNode } from 'react'
-
-const useStyles = createStyles((theme, { color }: { color: string }) => ({
-  wrapper: {
-    background:
-      theme.colors[color][theme.fn.primaryShade()] + theme.other.shades.hexColorSuffix.lightest,
-    fontWeight: 'normal',
-    textTransform: 'capitalize'
-  }
-}))
 
 type CustomBadgeProps = BadgeProps & {
   color: MantineColor
   text: string
   icon?: ReactNode
+  size?: MantineSize
 }
 
-const CustomBadge = ({ color, text, icon, ...rest }: CustomBadgeProps) => {
-  const { classes } = useStyles({ color })
+const CustomBadge = ({ color, text, icon, size = 'lg', ...rest }: CustomBadgeProps) => {
   return (
-    <Badge size="lg" variant="outline" color={color} className={classes.wrapper} {...rest}>
-      <Flex align="center" wrap="nowrap">
-        <Text mr={icon ? 'xs' : undefined}>{text}</Text>
-        {icon}
-      </Flex>
+    <Badge
+      size={size}
+      variant="light"
+      color={color}
+      tt="capitalize"
+      fw="normal"
+      miw="min-content"
+      styles={{
+        root: {
+          borderColor: 'inherit'
+        }
+      }}
+      rightSection={
+        icon && (
+          <ThemeIcon variant="transparent" c="inherit">
+            {icon}
+          </ThemeIcon>
+        )
+      }
+      {...rest}
+    >
+      {text}
     </Badge>
   )
 }

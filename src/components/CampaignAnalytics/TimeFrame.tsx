@@ -1,27 +1,11 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { Grid, Title, createStyles, Flex, Text } from '@mantine/core'
+import { Title, Flex, Text, Box, LoadingOverlay, Alert, Stack, Group, Paper } from '@mantine/core'
 import TimeFrameChart from 'components/common/Chart/TimeFrameChart'
-import { BaseAnalyticsData, AnalyticsPeriod, FilteredAnalytics, MetricsToShow } from 'types'
+import { BaseAnalyticsData, FilteredAnalytics, MetricsToShow } from 'types'
 import { formatCurrency } from 'helpers'
 import { useViewportSize } from '@mantine/hooks'
+import { useCampaignsAnalyticsData } from 'hooks/useCampaignAnalytics/useCampaignAnalyticsData'
 import ChartControlBtn from './ChartControlBtn'
-
-const useStyles = createStyles((theme) => ({
-  wrapper: {
-    background: theme.colors.mainBackground[theme.fn.primaryShade()],
-    borderRadius: theme.radius.md,
-    padding: theme.spacing.lg,
-    marginBottom: theme.spacing.md,
-    boxShadow: theme.shadows.sm
-  },
-  lighterGray: {
-    color: theme.fn.lighten(
-      theme.colors.mainText[theme.fn.primaryShade()],
-      theme.other.shades.lighten.lighter
-    ),
-    fontSize: theme.fontSizes.sm
-  }
-}))
 
 function sumArrayProperties(analytics: BaseAnalyticsData[]) {
   const sums = analytics.reduce(
@@ -43,16 +27,14 @@ function sumArrayProperties(analytics: BaseAnalyticsData[]) {
   }
 }
 
-export const TimeFrame = ({
-  timeFrames,
-  period,
-  currencyName
-}: {
-  timeFrames: BaseAnalyticsData[] | undefined
-  period: AnalyticsPeriod | undefined
-  currencyName: string
-}) => {
-  const { classes } = useStyles()
+export const TimeFrame = ({ forAdmin, campaignId }: { forAdmin: boolean; campaignId: string }) => {
+  const { campaignMappedAnalytics, analyticsKey, currencyName, loading, error } =
+    useCampaignsAnalyticsData({
+      campaignId,
+      forAdmin,
+      analyticsType: 'timeframe'
+    })
+
   const { width: windowWidth } = useViewportSize()
   const [filteredData, setFilteredData] = useState<FilteredAnalytics[]>([])
 
@@ -68,8 +50,8 @@ export const TimeFrame = ({
   })
 
   useEffect(() => {
-    if (timeFrames) {
-      const result = timeFrames.map((obj) => {
+    if (campaignMappedAnalytics) {
+      const result = campaignMappedAnalytics.map((obj) => {
         const filteredObj: FilteredAnalytics = {
           segment: new Date(Number(obj.segment)).toLocaleString()
         }
@@ -87,30 +69,39 @@ export const TimeFrame = ({
       })
       setFilteredData(result)
     }
-  }, [timeFrames, metricsToShow])
+  }, [metricsToShow, campaignMappedAnalytics])
 
   const totalSum = useMemo(
     () =>
-      timeFrames
-        ? sumArrayProperties(timeFrames)
+      campaignMappedAnalytics
+        ? sumArrayProperties(campaignMappedAnalytics)
         : // TODO: default
           { clicks: 0, impressions: 0, avgCpm: 0, ctr: 0, paid: 0 },
-    [timeFrames]
+    [campaignMappedAnalytics]
   )
 
   const handleMetricClick = useCallback((value: boolean, propNameToRemove: keyof MetricsToShow) => {
     setMetricsToShow((prev) => ({ ...prev, [propNameToRemove]: value }))
   }, [])
 
-  if (!timeFrames?.length) {
-    return <div>No time frame data found 🙈</div>
-  }
-
   return (
-    <Grid p="xs">
-      <Grid.Col className={classes.wrapper}>
-        <Grid>
-          <Grid.Col span="content">
+    <Box pos="relative">
+      <LoadingOverlay visible={loading} />
+
+      <Stack>
+        {error && (
+          <Alert
+            variant="outline"
+            color="error"
+            title={typeof error === 'string' ? error : 'Error loading data'}
+          />
+        )}
+        {!error && !loading && !filteredData.length && (
+          <Alert variant="outline" color="info" title="No data found" />
+        )}
+
+        <Paper p="sm">
+          <Group>
             <ChartControlBtn
               value={formatCurrency(totalSum.impressions, 0)}
               text="Total impressions"
@@ -118,8 +109,7 @@ export const TimeFrame = ({
               onClick={(v: boolean) => handleMetricClick(v, 'impressions')}
               whiteFontColor
             />
-          </Grid.Col>
-          <Grid.Col span="content">
+
             <ChartControlBtn
               value={`${formatCurrency(totalSum.clicks, 0)} (${formatCurrency(
                 totalSum.ctr,
@@ -130,8 +120,7 @@ export const TimeFrame = ({
               onClick={(v: boolean) => handleMetricClick(v, 'clicks')}
               whiteFontColor
             />
-          </Grid.Col>
-          <Grid.Col span="content">
+
             <ChartControlBtn
               value={`~ ${formatCurrency(totalSum.avgCpm, 3)} ${currencyName} / CPM`}
               text="Average CPM"
@@ -139,32 +128,33 @@ export const TimeFrame = ({
               onClick={(v: boolean) => handleMetricClick(v, 'avgCpm')}
               whiteFontColor
             />
-          </Grid.Col>
-          <Grid.Col span="content">
+
             <ChartControlBtn
               value={`~ ${formatCurrency(totalSum.paid, 2)} ${currencyName}`}
               text="Total spent"
               bgColor="chartColorFour"
               onClick={(v: boolean) => handleMetricClick(v, 'paid')}
             />
-          </Grid.Col>
-        </Grid>
-      </Grid.Col>
-      <Grid.Col className={classes.wrapper}>
-        <Title order={5}>Chart</Title>
-        <TimeFrameChart
-          width={windowWidth >= 768 ? windowWidth - 315 : windowWidth - 100}
-          height={420}
-          timeFrameData={filteredData}
-          metricsToShow={metricsToShow}
-        />
-        {period && (
-          <Flex align="center" justify="space-between" ml="xl" mr="xl">
-            <Text className={classes.lighterGray}>Starts: {period.start?.toString()}</Text>
-            <Text className={classes.lighterGray}>Ends: {period.end?.toString()}</Text>
-          </Flex>
-        )}
-      </Grid.Col>
-    </Grid>
+          </Group>
+        </Paper>
+
+        <Paper p="sm">
+          <Title order={5}>Chart</Title>
+
+          <TimeFrameChart
+            width={windowWidth >= 768 ? windowWidth - 315 : windowWidth - 100}
+            height={420}
+            timeFrameData={filteredData}
+            metricsToShow={metricsToShow}
+          />
+          {analyticsKey?.period && (
+            <Flex align="center" justify="space-between" ml="xl" mr="xl">
+              <Text c="dimmed">Starts: {analyticsKey?.period.start?.toString()}</Text>
+              <Text c="dimmed">Ends: {analyticsKey?.period.end?.toString()}</Text>
+            </Flex>
+          )}
+        </Paper>
+      </Stack>
+    </Box>
   )
 }

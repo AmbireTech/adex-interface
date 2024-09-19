@@ -6,7 +6,7 @@ import Billing from 'components/Billing'
 import GetStarted from 'components/GetStarted'
 import CampaignAnalytics from 'components/CampaignAnalytics'
 import { createBrowserRouter, Navigate, useLocation, useRouteError, Link } from 'react-router-dom'
-import { Button } from '@mantine/core'
+import { Button, Loader, Center } from '@mantine/core'
 
 import useAccount from 'hooks/useAccount'
 import Deposit from 'components/Deposit'
@@ -15,6 +15,7 @@ import { CreateCampaignContextProvider } from 'contexts/CreateCampaignContext/Cr
 import { CampaignsDataProvider, CampaignsAnalyticsProvider } from 'contexts/CampaignsContext'
 import NotFound404 from 'components/404/404'
 // import AdminPanel from './admin/Admin'
+import { AccountDetails } from 'components/AdminPanel/AccountDetails'
 import CampaignDetails from './components/CampaignDetails'
 
 function ErrorBoundary() {
@@ -35,19 +36,24 @@ function RequireAuth({ children, admin }: { children: JSX.Element; admin?: boole
   const {
     authenticated,
     isAdmin,
-    adexAccount: { loaded, initialLoad }
+    adexAccount: { loaded }
   } = useAccount()
+
   const location = useLocation()
 
-  if (!loaded && !initialLoad) {
-    return null // Or a loading spinner
+  if (!loaded) {
+    return (
+      <Center>
+        <Loader type="dots" />
+      </Center>
+    )
   }
 
   if (!authenticated) {
     return <Navigate to="/login" state={{ from: location }} replace />
   }
 
-  if (admin && isAdmin) {
+  if (admin && !isAdmin) {
     return <Navigate to="/404" state={{ from: location }} replace />
   }
 
@@ -85,9 +91,16 @@ export const router = createBrowserRouter(
           path: '',
           element: <Dashboard />
         },
-        { path: 'campaign-analytics/:id', element: <CampaignAnalytics /> },
-        { path: 'campaign-details/:id', element: <CampaignDetails /> },
-        { path: 'campaign-details/admin/:id', element: <CampaignDetails isAdminPanel /> },
+        { path: 'campaign-analytics/:id/:activeTab?', element: <CampaignAnalytics /> },
+        {
+          path: 'campaign-analytics/admin/:id/:activeTab?',
+          element: <CampaignAnalytics isAdminPanel />
+        },
+        { path: 'campaign-details/:id/:tabValue?', element: <CampaignDetails /> },
+        {
+          path: 'campaign-details/admin/:id/:tabValue?',
+          element: <CampaignDetails isAdminPanel />
+        },
         {
           path: 'billing',
           element: <Billing />
@@ -105,14 +118,20 @@ export const router = createBrowserRouter(
           element: <CreateCampaign />
         },
         {
-          path: 'admin',
+          path: 'admin/:tabValue',
           element: (
-            <RequireAuth>
+            <RequireAuth admin>
               <CampaignsDataProvider type="admin">
                 <AdminPanel />
               </CampaignsDataProvider>
             </RequireAuth>
-          )
+          ),
+          children: [
+            {
+              path: ':accountId',
+              element: <AccountDetails />
+            }
+          ]
         }
       ]
     },

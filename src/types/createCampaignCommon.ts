@@ -1,17 +1,13 @@
-import { AdUnit, Campaign } from 'adex-common/dist/types/Dsp/Campaign'
+import { Campaign } from 'adex-common/dist/types/Dsp/Campaign'
 import { Alpha3Code } from 'adex-common'
-import { Devices, ErrorTargetUrl } from './createCampaign'
+import { UseFormReturnType } from '@mantine/form'
+import { Devices } from './createCampaign'
 
 export type SelectData = { value: string | Alpha3Code; label: string; group?: string }
 
 export type PaymentModelType = 'cpm' | 'cpc'
 
-export type ErrorsTargetURLValidations = {
-  [key: string]: ErrorTargetUrl
-}
-
 export type CampaignUI = Campaign & {
-  step: number
   devices: Devices[]
   paymentModel: PaymentModelType
   startsAt: Date
@@ -25,8 +21,7 @@ export type CampaignUI = Campaign & {
   updated?: string
   autoUTMChecked: boolean
   asapStartingDate: boolean
-  draftModified: boolean
-  errorsTargetURLValidations: ErrorsTargetURLValidations
+  budget: number
 }
 
 export type ImageSizes = {
@@ -53,24 +48,18 @@ export type SupplyStats = {
 }
 
 export type CreateCampaignType = {
+  step: number
+  nextStep: () => void
+  prevStep: () => void
+  // stepsCount: number
   campaign: CampaignUI
-  setCampaign: (val: CampaignUI | ((prevState: CampaignUI) => CampaignUI)) => void
-  updateCampaign: <CampaignItemKey extends keyof CampaignUI>(
-    key: CampaignItemKey,
-    value: CampaignUI[CampaignItemKey]
-  ) => void
-  updateCampaignWithPrevStateNested: (nestedKey: string, value: any) => void
-  updatePartOfCampaign: (camp: Partial<CampaignUI>) => void
-  publishCampaign: () => Promise<any>
-  resetCampaign: () => void
-  addAdUnit: (adUnitToAdd: AdUnit) => void
-  removeAdUnit: (adUnitIdToRemove: string) => void
-  addTargetURLToAdUnit: (inputText: string, adUnitId: string) => void
-  selectedBannerSizes: SupplyStatsDetails[] | SupplyStatsDetails[][]
-  saveToDraftCampaign: (camp?: CampaignUI) => Promise<any>
-  updateCampaignFromDraft: (draftCampaign: Campaign) => void
+  publishCampaign: (onSuccess?: () => void) => Promise<any>
+  resetCampaign: (reasonMsg?: string, onReset?: () => void) => void
+  allowedBannerSizes: string[]
+  saveToDraftCampaign: () => Promise<void>
+  updateCampaignFromDraft: (draftCampaign: Campaign, isClone?: boolean) => void
   defaultValue: CampaignUI
   addUTMToTargetURLS: () => void
   selectedBidFloors: SupplyStatsDetails[] | SupplyStatsDetails[][]
-  validateAdUnitTargetURL: () => void
+  form: UseFormReturnType<CampaignUI>
 }

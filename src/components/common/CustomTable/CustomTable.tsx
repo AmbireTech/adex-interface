@@ -1,68 +1,102 @@
-import { Flex, Group, Pagination, Table, createStyles, Grid, Divider, Text } from '@mantine/core'
-import { useMediaQuery } from '@mantine/hooks'
-import VisibilityIcon from 'resources/icons/Visibility'
-import { ICustomTableProps } from 'types'
+import {
+  Group,
+  Pagination,
+  Table,
+  Divider,
+  Text,
+  Stack,
+  Menu,
+  ActionIcon,
+  TableProps,
+  MantineColor,
+  Tooltip,
+  Paper,
+  ScrollArea,
+  MantineShadow,
+  ThemeIcon,
+  LoadingOverlay,
+  Checkbox,
+  // CheckIcon,
+  Button,
+  Alert
+} from '@mantine/core'
+import { useSet, useMediaQuery } from '@mantine/hooks'
 import usePagination from 'hooks/usePagination'
-import { Fragment, useMemo } from 'react'
-import AnalyticsIcon from 'resources/icons/Analytics'
-import DuplicateIcon from 'resources/icons/Duplicate'
-import DeleteIcon from 'resources/icons/Delete'
-import { CampaignStatus } from 'adex-common'
-import EditIcon from 'resources/icons/Edit'
-import ActionButton from './ActionButton/ActionButton'
+import { useMemo, PropsWithChildren, ReactNode, useCallback } from 'react'
+import Dots from 'resources/icons/TreeDotsMenu'
 
-const useStyles = createStyles((theme) => ({
-  header: {
-    backgroundColor: theme.colors.alternativeBackground[theme.fn.primaryShade()]
-  },
-  border: {
-    borderRadius: theme.radius.md,
-    overflow: 'hidden'
-  },
-  background: {
-    backgroundColor: theme.colors.mainBackground[theme.fn.primaryShade()],
-    boxShadow: theme.shadows.xs
-  },
-  tableWrapper: {
-    width: '100%',
-    overflow: 'hidden',
-    overflowX: 'auto'
-  },
-  mobileTableWrapper: {
-    borderBottom: `1px solid ${theme.colors.decorativeBorders[theme.fn.primaryShade()]}`,
-    textAlign: 'center'
-  },
-  gridRow: { borderBottom: `1px solid ${theme.colors.decorativeBorders[theme.fn.primaryShade()]}` },
-  cell: {
-    overflow: 'hidden',
-    whiteSpace: 'nowrap',
-    textOverflow: 'ellipsis',
-    maxWidth: 200
+export type TableElement = {
+  id?: string
+  rowColor?: MantineColor
+  actionData?: any
+  [index: string]: any
+}
+
+export type TableRowAction = {
+  action: (e: TableElement['actionData']) => any
+  label: ((e: TableElement['actionData']) => string) | string
+  color?: MantineColor
+  icon?: ((e: TableElement['actionData']) => ReactNode) | ReactNode
+  disabled?: (e?: TableElement['actionData']) => boolean
+  hide?: (e?: TableElement['actionData']) => boolean
+}
+
+export type CustomTableProps = PropsWithChildren &
+  TableProps & {
+    headings: string[]
+    elements: Array<TableElement>
+    pageSize?: number
+    actions?: TableRowAction[]
+    shadow?: MantineShadow
+    loading?: boolean
+    selectedActions?: TableRowAction[]
+    tableActions?: ReactNode
+    error?: string | boolean
   }
-}))
 
-const CustomTable = ({
-  background,
+const getLabel = (label: TableRowAction['label'], actionData?: TableElement['actionData']) => {
+  if (typeof label === 'function') {
+    return label(actionData)
+  }
+
+  return label
+}
+
+const getIcon = (icon: TableRowAction['icon'], actionData?: TableElement['actionData']) => {
+  if (typeof icon === 'function') {
+    return icon(actionData)
+  }
+
+  return icon
+}
+
+export const CustomTable = ({
   headings,
   elements,
   pageSize,
-  onPreview,
-  onAnalytics,
-  onDuplicate,
-  onDelete,
-  onEdit
-}: ICustomTableProps) => {
+  actions,
+  shadow = 'none',
+  loading,
+  selectedActions,
+  tableActions,
+  error,
+  ...tableProps
+}: CustomTableProps) => {
   const isMobile = useMediaQuery('(max-width: 75rem)')
+  const selectedElements = useSet<string>()
+  const hasSelectActions = useMemo(() => !!selectedActions?.length, [selectedActions?.length])
 
-  const { classes, cx } = useStyles()
   const columns: string[] = useMemo(
     () =>
       typeof elements[0] === 'object'
-        ? Object.keys(elements[0]).filter((e: string) => e !== 'id')
+        ? Object.keys(elements[0]).filter(
+            (e: string) => e !== 'id' && e !== 'rowColor' && e !== 'actionData'
+          )
         : [],
     [elements]
   )
-  const maxItemsPerPage = pageSize || 10
+
+  const maxItemsPerPage = pageSize || (isMobile ? elements.length : 10)
   const { maxPages, defaultPage, startIndex, endIndex, onNextPage, onPreviousPage, onChange } =
     usePagination({
       elementsLength: elements.length,
@@ -72,196 +106,266 @@ const CustomTable = ({
     return elements.slice(startIndex, endIndex)
   }, [elements, startIndex, endIndex])
 
-  const head = useMemo(
-    () =>
-      headings.map((heading) =>
-        isMobile ? (
-          <Grid.Col span={6} key={heading}>
-            {heading}
-          </Grid.Col>
-        ) : (
-          <th key={heading}>{heading}</th>
-        )
-      ),
-    [isMobile, headings]
+  const handleCheckbox = useCallback(
+    (checked: boolean, id: string) => {
+      selectedElements[checked ? 'add' : 'delete'](id || '')
+    },
+    [selectedElements]
   )
 
-  const hasAction = !!onPreview || !!onAnalytics || !!onDuplicate || !!onDelete || !!onEdit
+  const currentPageElementsAllSelected: boolean = useMemo(
+    () => !!selectedElements.size && list.every((x) => selectedElements.has(x.id || '')),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [list, selectedElements, selectedElements.size]
+  )
+
+  const handleCheckboxMaster = useCallback(
+    (all?: boolean) =>
+      [...(all ? elements : list)].forEach((x) =>
+        selectedElements[currentPageElementsAllSelected ? 'delete' : 'add'](x.id || '')
+      ),
+    [currentPageElementsAllSelected, elements, list, selectedElements]
+  )
+
+  const masterActionMenu = useMemo(() => {
+    return hasSelectActions ? (
+      <Group>
+        {selectedActions?.map((a) => {
+          const label = getLabel(a.label, selectedElements)
+
+          return (
+            <Tooltip key={label} label={label}>
+              <Button
+                size="sm"
+                variant="light"
+                color={a.color || 'mainText'}
+                onClick={() => {
+                  a.action(
+                    Array.from(selectedElements.values()).map(
+                      (id) => elements.find((x) => x.id === id)?.actionData
+                    )
+                  )
+                  selectedElements.clear()
+                }}
+                leftSection={getIcon(a.icon, selectedElements)}
+              >
+                {label}
+              </Button>
+            </Tooltip>
+          )
+        })}
+      </Group>
+    ) : null
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hasSelectActions, selectedActions, selectedElements, selectedElements.size])
+
+  const masterSelectAction = useMemo(
+    () =>
+      hasSelectActions && (
+        <Checkbox
+          size="sm"
+          checked={currentPageElementsAllSelected}
+          onChange={() => handleCheckboxMaster()}
+        />
+      ),
+    [currentPageElementsAllSelected, handleCheckboxMaster, hasSelectActions]
+  )
+
+  const colHeadings: string[] = useMemo(
+    () => [...(hasSelectActions ? ['select'] : []), ...headings, ...(actions ? ['actions'] : [])],
+    [actions, headings, hasSelectActions]
+  )
 
   const rows = useMemo(() => {
-    if (isMobile)
-      return list.map((e) => {
-        const isDraftCampaign = e.status?.value === CampaignStatus.draft
-        return (
-          <>
-            <Divider bg="#EBEEFA" m="1px 0" w="100%" p="15px" />
-            {columns.map((column, i) => {
-              const columnParsed = column === 'status' ? e[column].element : e[column]
-              return (
-                <Grid className={classes.gridRow} m="1px 0" w="100%" key={column}>
-                  {head[i]}
+    return list.map((e, i) => {
+      const activeActions = [...(actions || [])].filter((a) => !a.hide?.(e.actionData))
+      const maxActions = isMobile ? activeActions.length : 3
 
-                  <Grid.Col span={6}>{columnParsed}</Grid.Col>
-                </Grid>
-              )
-            })}
-            {hasAction && (
-              <Grid.Col span={12}>
-                <Flex justify="center" mb="2rem">
-                  {!!onPreview && (
-                    <ActionButton
-                      title="View PDF"
-                      icon={<VisibilityIcon size="20px" />}
-                      action={() => onPreview(e)}
-                    />
-                  )}
-                  {!!onAnalytics && !isDraftCampaign && (
-                    <ActionButton
-                      title="View Analytics"
-                      icon={<AnalyticsIcon size="20px" />}
-                      action={() => onAnalytics(e)}
-                    />
-                  )}
-                  {!!onDuplicate && (
-                    <ActionButton
-                      title="Duplicate"
-                      icon={<DuplicateIcon size="20px" />}
-                      action={() => onDuplicate(e)}
-                    />
-                  )}
-                  {!!onDelete && (
-                    <ActionButton
-                      title="Delete"
-                      icon={<DeleteIcon size="20px" />}
-                      action={() => onDelete(e)}
-                    />
-                  )}
-                  {!!onEdit && isDraftCampaign && (
-                    <ActionButton
-                      title="Edit"
-                      icon={<EditIcon size="20px" />}
-                      action={() => onEdit(e)}
-                    />
-                  )}
-                </Flex>
-              </Grid.Col>
-            )}
-          </>
-        )
-      })
-    return list.map((e) => {
-      const isDraftCampaign = e.status?.value === CampaignStatus.draft
-      return (
-        <tr key={e.id}>
-          {columns.map((column: string) => {
-            const columnParsed = column === 'status' ? e[column].element : e[column]
-
+      const actionsMenu = activeActions?.length && (
+        <Group justify={isMobile ? 'auto' : 'right'} gap="sm" wrap="nowrap">
+          {activeActions.slice(0, maxActions).map((a) => {
+            const label = getLabel(a.label, e.actionData)
             return (
-              <td key={column} className={classes.cell}>
-                {columnParsed}
-              </td>
+              <Tooltip key={label} label={label}>
+                <ActionIcon
+                  size="sm"
+                  variant="transparent"
+                  color={a.color || 'mainText'}
+                  onClick={() => a.action(e.actionData || e)}
+                  disabled={a.disabled?.(e.actionData || e)}
+                >
+                  {getIcon(a.icon, e.actionData)}
+                </ActionIcon>
+              </Tooltip>
             )
           })}
-          {hasAction && (
-            <td>
-              <Group>
-                {!!onPreview && (
-                  <ActionButton
-                    title="View PDF"
-                    icon={<VisibilityIcon size="20px" />}
-                    action={() => onPreview(e)}
-                  />
-                )}
-                {!!onAnalytics && !isDraftCampaign && (
-                  <ActionButton
-                    title="View Analytics"
-                    icon={<AnalyticsIcon size="20px" />}
-                    action={() => onAnalytics(e)}
-                  />
-                )}
-                {!!onDuplicate && (
-                  <ActionButton
-                    title="Duplicate"
-                    icon={<DuplicateIcon size="20px" />}
-                    action={() => onDuplicate(e)}
-                  />
-                )}
-                {!!onDelete && (
-                  <ActionButton
-                    title="Delete"
-                    icon={<DeleteIcon size="20px" />}
-                    action={() => onDelete(e)}
-                  />
-                )}
-                {!!onEdit && isDraftCampaign && (
-                  <ActionButton
-                    title="Edit"
-                    icon={<EditIcon size="20px" />}
-                    action={() => onEdit(e)}
-                  />
-                )}
-              </Group>
-            </td>
-          )}
-        </tr>
-      )
-    })
-  }, [
-    isMobile,
-    list,
-    columns,
-    hasAction,
-    onPreview,
-    onAnalytics,
-    onDuplicate,
-    onDelete,
-    onEdit,
-    classes.gridRow,
-    classes.cell,
-    head
-  ])
+          {!isMobile && activeActions.length > maxActions && (
+            <Menu shadow="lg" withArrow>
+              <Menu.Target>
+                <ActionIcon size="23px" variant="transparent" color="mainText" component="div">
+                  <Dots />
+                </ActionIcon>
+              </Menu.Target>
 
-  if (!elements.length) return <Text>No data found</Text>
+              <Menu.Dropdown>
+                {activeActions.slice(maxActions).map((a) => {
+                  const label = getLabel(a.label, e.actionData)
+                  const disabled = a.disabled?.(e.actionData || e)
+                  return (
+                    <Menu.Item
+                      color={a.color || 'mainText'}
+                      key={label}
+                      leftSection={
+                        <ThemeIcon size="sm" variant="transparent" color={a.color || 'mainText'}>
+                          {getIcon(a.icon, e.actionData)}
+                        </ThemeIcon>
+                      }
+                      onClick={() => a.action(e.actionData || e)}
+                      disabled={disabled}
+                    >
+                      {label}
+                    </Menu.Item>
+                  )
+                })}
+              </Menu.Dropdown>
+            </Menu>
+          )}
+        </Group>
+      )
+
+      const color = e.rowColor
+      const rowKey = e.id?.toString() || i
+
+      const colsToMap = [
+        ...(hasSelectActions ? ['select'] : []),
+        ...columns,
+        ...(activeActions.length ? ['actions'] : [])
+      ]
+
+      const cols = colsToMap.map((column, cidx) => {
+        const colElement =
+          e[column]?.element ||
+          e[column] ||
+          (column === 'select' && (
+            <Checkbox
+              size="sm"
+              aria-label="Select row"
+              checked={selectedElements.has(e.id || '')}
+              onChange={(el) => handleCheckbox(el.currentTarget.checked, e.id || '')}
+            />
+          )) ||
+          (column === 'actions' && actionsMenu)
+
+        const el =
+          typeof colElement !== 'object' ? (
+            <Text ta="left" size="sm" truncate maw={200}>
+              {colElement}
+            </Text>
+          ) : (
+            colElement
+          )
+
+        return isMobile ? (
+          <Stack key={rowKey + column} gap="xs">
+            <Group grow align="center" px="sm">
+              <Text ta="left" tt="capitalize" fw="bold" size="sm">
+                {colsToMap[cidx]}:
+              </Text>
+              {el}
+            </Group>
+            <Divider hidden={cidx === colsToMap.length - 1} />
+          </Stack>
+        ) : (
+          <Table.Td key={column} c={color} miw="fit-content">
+            {el}
+          </Table.Td>
+        )
+      })
+
+      if (isMobile) {
+        return (
+          <Paper key={rowKey} py="sm" shadow="xs">
+            <Stack gap="xs" align="stretch" justify="center">
+              {/* <Divider color="lightBackground" size={14} /> */}
+              {cols}
+            </Stack>
+          </Paper>
+        )
+      }
+      return <Table.Tr key={rowKey}>{cols}</Table.Tr>
+    })
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [list, actions, isMobile, columns, selectedElements, selectedElements.size, headings])
+
   return (
-    <Flex h="100%" w="100%" justify="space-between" direction="column" align="center">
-      {isMobile ? (
-        <Grid mt="xs" className={classes.mobileTableWrapper}>
-          {rows.map((row, idx) => (
-            // eslint-disable-next-line react/no-array-index-key
-            <Fragment key={idx}>{row}</Fragment>
-          ))}
-        </Grid>
-      ) : (
-        <div className={classes.tableWrapper}>
-          <Table
-            miw="max-content"
-            w="100%"
-            highlightOnHover
-            verticalSpacing={15}
-            className={cx(classes.border, { [classes.background]: background })}
-          >
-            <thead className={classes.header}>
-              <tr>
-                {head}
-                {hasAction && <th key="Action">Action</th>}
-              </tr>
-            </thead>
-            <tbody>{rows}</tbody>
-          </Table>
-        </div>
-      )}
-      <Group w="100%" position="right" mt="xl">
-        <Pagination
-          total={maxPages}
-          boundaries={1}
-          defaultValue={defaultPage}
-          onNextPage={onNextPage}
-          onPreviousPage={onPreviousPage}
-          onChange={(value) => onChange(value)}
+    <Stack align="stretch" w="100%" pos="relative" gap="sm">
+      <LoadingOverlay visible={loading} />
+      {error && (
+        <Alert
+          variant="outline"
+          color="error"
+          title={typeof error === 'string' ? error : 'Error loading data'}
         />
-      </Group>
-    </Flex>
+      )}
+
+      {!error && !loading && !rows.length && (
+        <Alert variant="outline" color="info" title="No data found" />
+      )}
+
+      {((!!selectedElements.size && !!masterActionMenu) || tableActions) && (
+        <Group align="center" justify={selectedElements.size ? 'space-between' : 'right'}>
+          {selectedElements.size && masterActionMenu}
+          {tableActions}
+        </Group>
+      )}
+
+      {isMobile ? (
+        <Stack gap="xl">
+          {hasSelectActions && (
+            <Group align="center" justify="left" pt="xs">
+              Select all: {masterSelectAction}
+            </Group>
+          )}
+          {rows}
+        </Stack>
+      ) : (
+        <Paper pb="md" w="100%" shadow={shadow}>
+          <Stack justify="space-between" mih={420} gap="xl">
+            <ScrollArea scrollbars="x" type="auto" offsetScrollbars>
+              <Table {...tableProps} w="100%" highlightOnHover verticalSpacing="xs">
+                <Table.Thead bg="alternativeBackground">
+                  <Table.Tr>
+                    {colHeadings.map((h) => (
+                      <Table.Th tt="capitalize" key={h} w={h === 'select' ? 20 : 'auto'}>
+                        {h === 'select' ? masterSelectAction : h}
+                      </Table.Th>
+                    ))}
+                  </Table.Tr>
+                </Table.Thead>
+                <Table.Tbody>{rows}</Table.Tbody>
+              </Table>
+            </ScrollArea>
+            <Group w="100%" justify="right" pr="md">
+              <Pagination
+                color="brand"
+                total={maxPages}
+                boundaries={1}
+                defaultValue={defaultPage}
+                onNextPage={onNextPage}
+                onPreviousPage={onPreviousPage}
+                onChange={onChange}
+                size="sm"
+                styles={{
+                  control: {
+                    border: 0
+                  }
+                }}
+              />
+            </Group>
+          </Stack>
+        </Paper>
+      )}
+    </Stack>
   )
 }
-
-export default CustomTable

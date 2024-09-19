@@ -1,19 +1,15 @@
-import { useMemo, useCallback } from 'react'
-import { Flex, Text } from '@mantine/core'
-import {
-  checkSelectedDevices,
-  findDuplicates,
-  formatCatsAndLocsData
-} from 'helpers/createCampaignHelpers'
+import { useMemo } from 'react'
+import { Flex, Text, Stack } from '@mantine/core'
+import { checkSelectedDevices, findDuplicates } from 'helpers/createCampaignHelpers'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import DesktopIcon from 'resources/icons/Desktop'
 import MobileIcon from 'resources/icons/Mobile'
-import { AdUnit, TargetingInputSingle } from 'adex-common/dist/types'
-import { SelectData } from 'types'
+import { AdUnit } from 'adex-common/dist/types'
 import { CATEGORIES, COUNTRIES } from 'constants/createCampaign'
 import ImageUrlInput from 'components/CreateCampaign/StepOne/ImageUrlInput'
 import RangeText from 'components/common/RangeText'
 import dayjs from 'dayjs'
+import CatsLocsFormatted from 'components/CampaignDetails/CatsLocsFormatted'
 
 const useCreateCampaignData = () => {
   const {
@@ -21,6 +17,7 @@ const useCreateCampaignData = () => {
       devices,
       targetingInput: {
         inputs: {
+          advanced,
           location,
           categories,
           placements: {
@@ -30,7 +27,7 @@ const useCreateCampaignData = () => {
       },
       cpmPricingBounds,
       adUnits,
-      campaignBudget,
+      budget,
       title,
       startsAt,
       endsAt
@@ -63,12 +60,11 @@ const useCreateCampaignData = () => {
         </Flex>
       )
     }
-    return <Text align="end">N/A</Text>
+    return <Text ta="end">N/A</Text>
   }, [selectedDevices])
 
   const formattedSelectedPlacement = useMemo(() => {
-    if (placement)
-      return <Text align="end">{placement === 'app' ? 'Applications' : 'Websites'}</Text>
+    if (placement) return <Text ta="end">{placement === 'app' ? 'Applications' : 'Websites'}</Text>
     return null
   }, [placement])
 
@@ -99,58 +95,41 @@ const useCreateCampaignData = () => {
     [startsAtFormatted, endsAtFormatted]
   )
 
-  const formatCatsAndLocs = useCallback((inputValues: TargetingInputSingle, lib: SelectData[]) => {
-    const [key, labels] = formatCatsAndLocsData(inputValues, lib)
-    if (!key) return
-    if (key === 'all') {
-      return <Text align="end">All</Text>
-    }
-    if (key === 'in') {
-      return <Text align="end">{labels}</Text>
-    }
-    if (key === 'nin') {
-      return (
-        <>
-          <Text align="end" color="warning">
-            All except:{' '}
-          </Text>
-          <Text align="end">{labels}</Text>
-        </>
-      )
-    }
-  }, [])
-
   const formattedCats = useMemo(
-    () => formatCatsAndLocs(categories, CATEGORIES),
-    [formatCatsAndLocs, categories]
+    () => <CatsLocsFormatted inputValues={categories} selectData={CATEGORIES} align="end" />,
+    [categories]
   )
   const formattedLocs = useMemo(
-    () => formatCatsAndLocs(location, COUNTRIES),
-    [formatCatsAndLocs, location]
+    () => <CatsLocsFormatted inputValues={location} selectData={COUNTRIES} align="end" />,
+    [location]
   )
 
   const sizes = useMemo(
-    () => adUnits.map((adUnit) => `${adUnit.banner?.format.w}x${adUnit.banner?.format.h}`),
+    () => adUnits.map((adUnit: AdUnit) => `${adUnit.banner?.format.w}x${adUnit.banner?.format.h}`),
     [adUnits]
   )
   const uniqueSizesWithCount = useMemo(() => findDuplicates(sizes), [sizes])
   const adFormats = useMemo(
-    () =>
-      uniqueSizesWithCount.map((size) => (
-        <Text align="end" key={`${size.count}${size.value}`}>{`${size.count}x ${size.value}`}</Text>
-      )),
+    () => (
+      <Stack gap={0} align="end">
+        {uniqueSizesWithCount.map((size) => (
+          <Text key={`${size.count}${size.value}`}>{`${size.count}x ${size.value}`}</Text>
+        ))}
+      </Stack>
+    ),
     [uniqueSizesWithCount]
   )
-  const campaignBudgetFormatted = useMemo(
-    () => <Text align="end">{campaignBudget.toString()}</Text>,
-    [campaignBudget]
-  )
-  const campaignNameFormatted = useMemo(() => <Text align="end">{title}</Text>, [title])
+
+  const campaignBudgetFormatted = useMemo(() => budget.toString(), [budget])
+  const campaignNameFormatted = useMemo(() => title, [title])
   const adUnitsFormatted = useMemo(
-    () =>
-      adUnits.map((image: AdUnit) => {
-        return <ImageUrlInput key={image.id} image={image} mb="sm" preview />
-      }),
+    () => (
+      <Stack gap="xs">
+        {adUnits.map((image: AdUnit) => {
+          return <ImageUrlInput key={image.id} image={image} preview />
+        })}
+      </Stack>
+    ),
     [adUnits]
   )
 
@@ -160,6 +139,7 @@ const useCreateCampaignData = () => {
     formattedCats,
     formattedLocs,
     adFormats,
+    advancedTargeInput: advanced,
     campaignBudgetFormatted,
     campaignNameFormatted,
     adUnitsFormatted,

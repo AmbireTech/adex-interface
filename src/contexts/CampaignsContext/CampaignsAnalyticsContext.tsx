@@ -18,7 +18,8 @@ import {
   AnalyticsType,
   BaseAnalyticsData,
   AnalyticsPeriod,
-  Timeframe
+  Timeframe,
+  SSPs
 } from 'types'
 import {
   timeout,
@@ -32,14 +33,7 @@ import {
 
 import { dashboardTableElements } from 'components/Dashboard/mockData'
 
-const keySeparator = '👩🏼'
-
-type DataStatus = 'loading' | 'updating' | 'processed'
-
-type QueryStatusAndType = {
-  dataStatus: DataStatus
-  analyticsType: AnalyticsType
-}
+type DataStatus = 'loading' | 'updating' | 'processed' | 'error'
 
 const defaultRefreshQuery = 1 * MINUTE
 
@@ -103,11 +97,15 @@ const analyticsDataToMappedAnalytics = (
 
     nexSegment.impressions += Number(impElement.value)
     nexSegment.clicks += Number(
-      clickCounts.find((x) => x[segmentField] === impElement[segmentField])?.value || 0
+      clickCounts.find(
+        (x) => x.time === impElement.time && x[segmentField] === impElement[segmentField]
+      )?.value || 0
     )
 
     nexSegment.paid += Number(
-      impPaid.find((x) => x[segmentField] === impElement[segmentField])?.value || 0
+      impPaid.find(
+        (x) => x.time === impElement.time && x[segmentField] === impElement[segmentField]
+      )?.value || 0
     )
     //  + Number(clickPaid.find((x) => x[segmentField] === impElement[segmentField])?.value || 0)
 
@@ -115,17 +113,15 @@ const analyticsDataToMappedAnalytics = (
   }, new Map<string, BaseAnalyticsData>())
 
   const resMap = Array.from(mapped, ([segment, value]) => {
-    const paid = value.paid
+    const { paid, clicks, impressions } = value
+
     return {
       ...value,
       segment,
-      paid,
       analyticsType,
-      ctr:
-        value.clicks && value.impressions
-          ? Number(((value.clicks / value.impressions) * 100).toFixed(2))
-          : 0,
-      avgCpm: paid && value.impressions ? Number(((paid / value.impressions) * 1000).toFixed(2)) : 0
+      ctr: clicks && impressions ? Number(((clicks / impressions) * 100).toFixed(2)) : 0,
+      avgCpm: paid && impressions ? Number(((paid / impressions) * 1000).toFixed(2)) : 0,
+      avgCpc: clicks ? Number((paid / clicks).toFixed(4)) : 0
     }
   })
     // TODO: remove the sort when table sorting
@@ -140,8 +136,15 @@ const analyticsDataToMappedAnalytics = (
   return resMap
 }
 
+type MappedAnalyticsRecord = {
+  status: DataStatus
+  analyticsType: AnalyticsType
+  aggrKeys: string[]
+  data: BaseAnalyticsData[]
+}
+
 interface ICampaignsAnalyticsContext {
-  analyticsData: Map<string, AnalyticsData[]>
+  analyticsData: Map<string, { status: DataStatus; data: AnalyticsData[] }>
   // TODO: all campaigns event aggregations by account
   getAnalyticsKeyAndUpdate: (
     analyticsType: AnalyticsType,
@@ -149,10 +152,11 @@ interface ICampaignsAnalyticsContext {
     forAdmin?: boolean,
     timeframe?: Timeframe,
     startFrom?: Date,
-    endTo?: Date
+    endTo?: Date,
+    ssp?: SSPs
   ) => Promise<{ key: string; period: AnalyticsPeriod } | undefined>
   initialAnalyticsLoading: boolean
-  mappedAnalytics: Map<string, BaseAnalyticsData[]>
+  mappedAnalytics: Map<string, MappedAnalyticsRecord>
 }
 
 const CampaignsAnalyticsContext = createContext<ICampaignsAnalyticsContext | null>(null)
@@ -165,16 +169,13 @@ const CampaignsAnalyticsProvider: FC<PropsWithChildren> = ({ children }) => {
   const [initialAnalyticsLoading, setInitialAnalyticsLoading] = useState(true)
   const [mappedAnalytics, setMappedAnalytics] = useState<
     ICampaignsAnalyticsContext['mappedAnalytics']
-  >(new Map<string, BaseAnalyticsData[]>())
-  const [dataToMapStatus, setDataToMapStatus] = useState<Map<string, QueryStatusAndType>>(
-    new Map<string, QueryStatusAndType>()
-  )
+  >(new Map<string, MappedAnalyticsRecord>())
 
   const [analyticsData, setAnalyticsData] = useState<ICampaignsAnalyticsContext['analyticsData']>(
-    new Map<string, AnalyticsData[]>()
+    new Map<string, { status: DataStatus; data: AnalyticsData[] }>()
   )
 
-  const updateAnalytics = useCallback(
+  const updateCampaignAnalyticsByQuery = useCallback(
     async (params: AnalyticsDataQuery, dataKey: string, forAdmin?: boolean) => {
       try {
         const analyticsDataRes = await adexServicesRequest<AnalyticsDataRes>('validator', {
@@ -194,32 +195,39 @@ const CampaignsAnalyticsProvider: FC<PropsWithChildren> = ({ children }) => {
 
         console.log({ analyticsDataRes })
 
-        // if (!analyticsDataRes?.aggr) {
-        //   throw new Error('invalid analytics data response')
-        // }
+        if (!analyticsDataRes?.aggr) {
+          throw new Error('invalid analytics data response')
+        }
 
         setAnalyticsData((prev) => {
           const next = new Map(prev)
-          const nextAggr = analyticsDataRes?.aggr || prev.get(dataKey) || []
+          const nextAggr: { status: DataStatus; data: AnalyticsData[] } =
+            { status: 'processed', data: analyticsDataRes?.aggr } || prev.get(dataKey)
           next.set(dataKey, nextAggr)
           return next
         })
-      } catch (err) {
+      } catch (err: any) {
         console.log(err)
         // TODO: see how to use campaignId out of segment
-        showNotification('error', `getting analytics ${params.timeframe}`, 'Data error')
+        setAnalyticsData((prev) => {
+          const next = new Map(prev)
+          const nextAggr: { status: DataStatus; data: AnalyticsData[] } = {
+            status: 'error',
+            data: prev.get(dataKey)?.data || []
+          }
+          next.set(dataKey, nextAggr)
+          return next
+        })
+        showNotification(
+          'error',
+          err?.message || err.toString(),
+          `Fetching analytics${forAdmin ? ' (admin)' : ''}`
+        )
       }
 
       return dataKey
     },
     [adexServicesRequest, showNotification]
-  )
-
-  const updateCampaignAnalyticsByQuery = useCallback(
-    (query: AnalyticsDataQuery, dataKey: string, forAdmin?: boolean): void => {
-      updateAnalytics(query, dataKey, forAdmin)
-    },
-    [updateAnalytics]
   )
 
   const getAnalyticsKeyAndUpdate = useCallback(
@@ -229,7 +237,8 @@ const CampaignsAnalyticsProvider: FC<PropsWithChildren> = ({ children }) => {
       forAdmin?: boolean,
       selectedTimeframe?: Timeframe,
       startFrom?: Date,
-      endTo?: Date
+      endTo?: Date,
+      ssp?: SSPs
     ): Promise<{ key: string; period: AnalyticsPeriod } | undefined> => {
       if (!analyticsType || (!forAdmin && !campaign?.id)) {
         return
@@ -269,13 +278,14 @@ const CampaignsAnalyticsProvider: FC<PropsWithChildren> = ({ children }) => {
 
       // TODO: alg to set the timeframe depending on campaign start/end and current date
       const baseQuery: AnalyticsDataQuery = {
-        ...(!forAdmin && { campaignId: campaign?.id }),
+        ...(!!campaign && { campaignId: campaign?.id }),
         ...period,
         metric: 'paid',
         eventType: 'CLICK',
         limit: 100000,
         timezone: 'UTC',
         timeframe,
+        ...{ ssp },
         segmentBy: analyticsType === 'timeframe' ? undefined : analyticsType
       }
 
@@ -288,30 +298,36 @@ const CampaignsAnalyticsProvider: FC<PropsWithChildren> = ({ children }) => {
         // { ...baseQuery, eventType: 'CLICK', metric: 'paid' }
       ]
 
-      const keys: string[] = queries.map((q) => getAnalyticsKeyFromQuery(q))
-      const dataStatusKey = keys.join(keySeparator)
+      const aggrKeys: string[] = queries.map((q) => getAnalyticsKeyFromQuery(q))
+      const mappedDataKey = getAnalyticsKeyFromQuery(baseQuery)
 
-      if (!dataToMapStatus.get(dataStatusKey)) {
+      if (!mappedAnalytics.get(mappedDataKey)) {
+        setMappedAnalytics((prev) => {
+          const next = new Map(prev)
+          const nextMapped: MappedAnalyticsRecord = {
+            status: 'loading',
+            analyticsType,
+            aggrKeys,
+            data: []
+          }
+          next.set(mappedDataKey, nextMapped)
+          console.log({ next })
+          return next
+        })
         // NOTE: use in case to call the queries in some intervals
         // eslint-disable-next-line no-restricted-syntax
         for (const [i, q] of queries.entries()) {
-          updateCampaignAnalyticsByQuery(q, keys[i], forAdmin)
+          const update = updateCampaignAnalyticsByQuery(q, aggrKeys[i], forAdmin)
           if (i < queries.length) {
             // eslint-disable-next-line no-await-in-loop
-            await timeout(69)
+            await Promise.race([update, timeout(69)])
           }
         }
-
-        setDataToMapStatus((prev) => {
-          const next = new Map(prev)
-          next.set(dataStatusKey, { dataStatus: 'loading', analyticsType })
-          return next
-        })
       }
 
-      return { key: dataStatusKey, period }
+      return { key: mappedDataKey, period }
     },
-    [dataToMapStatus, updateCampaignAnalyticsByQuery]
+    [mappedAnalytics, updateCampaignAnalyticsByQuery]
   )
 
   useEffect(() => {
@@ -322,60 +338,39 @@ const CampaignsAnalyticsProvider: FC<PropsWithChildren> = ({ children }) => {
 
       updateCampaigns()
     } else {
-      setAnalyticsData(new Map<string, AnalyticsData[]>())
+      setAnalyticsData(new Map<string, { status: DataStatus; data: AnalyticsData[] }>())
       setInitialAnalyticsLoading(false)
     }
   }, [authenticated])
 
   useEffect(() => {
-    setDataToMapStatus((prev) => {
-      let update = false
-      const nextMappedData = new Map<string, BaseAnalyticsData[]>()
-      const nextMapStatuses = new Map(prev)
+    setMappedAnalytics((prev) => {
+      const nextMappedData = new Map(prev)
 
-      prev.forEach((status, statusKey) => {
-        const analyticsKeys = statusKey.split(keySeparator)
+      prev.forEach(({ aggrKeys, analyticsType, data }, mappedDataKey) => {
+        if (aggrKeys.every((aKey) => analyticsData.get(aKey)?.status === 'processed')) {
+          const analyticsDataAggregates = aggrKeys.map((key) => analyticsData.get(key)!.data)
 
-        if (status.dataStatus === 'loading') {
-          const isLoaded = analyticsKeys.every((aKey) => !!analyticsData.get(aKey))
-          if (isLoaded) {
-            const analyticsDataAggregates = analyticsKeys.map(
-              (key) => analyticsData.get(key) as unknown as AnalyticsData[]
-            )
+          const mapped = analyticsDataToMappedAnalytics(analyticsDataAggregates, analyticsType)
 
-            const mapped = analyticsDataToMappedAnalytics(
-              analyticsDataAggregates,
-              status.analyticsType
-            )
-
-            if (mapped) {
-              // TODO: map data
-              nextMappedData.set(statusKey, mapped)
-
-              nextMapStatuses.set(statusKey, { ...status, dataStatus: 'processed' })
-              update = true
-            }
+          if (mapped) {
+            nextMappedData.set(mappedDataKey, {
+              aggrKeys,
+              analyticsType,
+              status: 'processed',
+              data: mapped
+            })
+          } else {
+            nextMappedData.set(mappedDataKey, { data, aggrKeys, analyticsType, status: 'error' })
           }
+        } else if (aggrKeys.some((aKey) => analyticsData.get(aKey)?.status === 'error')) {
+          nextMappedData.set(mappedDataKey, { data, aggrKeys, analyticsType, status: 'error' })
         }
       })
 
-      if (update) {
-        // TODO: process data - map to dev friendly format
-        setMappedAnalytics((prevMapped) => {
-          const nextMapped = new Map(prevMapped)
-          nextMappedData.forEach((value, key) => {
-            nextMapped.set(key, value)
-          })
-
-          return nextMapped
-        })
-
-        return new Map(nextMapStatuses)
-      }
-
-      return prev
+      return nextMappedData
     })
-  }, [analyticsData, dataToMapStatus])
+  }, [analyticsData])
 
   const contextValue = useMemo(
     () => ({

@@ -6,10 +6,12 @@ import {
   AllCountries
 } from 'adex-common'
 
-export const CREATE_CAMPAIGN_STEPS = 4
-export const CAMPAIGN_CATEGORIES_INPUT = 'targetingInput.inputs.categories'
-export const CAMPAIGN_LOCATION_INPUT = 'targetingInput.inputs.location'
 export const CAMPAIGN_PLACEMENTS_INPUT = 'targetingInput.inputs.placements.in'
+export const CAMPAIGN_INCLUDE_INCENTIVIZED_INPUT =
+  'targetingInput.inputs.advanced.includeIncentivized'
+export const CAMPAIGN_DISABLE_FREQUENCY_CAPPING_INPUT =
+  'targetingInput.inputs.advanced.disableFrequencyCapping'
+
 const THIRTY_DAYS_IN_MILLISECONDS = 2592000000
 
 export const dateNowPlusThirtyDays = () => {
@@ -50,14 +52,14 @@ export const DEFAULT_PLACEMENTS_VALUE: TargetingPlacementInput = {
 export const CREATE_CAMPAIGN_DEFAULT_VALUE: CampaignUI = {
   id: '',
   type: 0,
-  step: 0,
-  devices: [],
+  devices: ['desktop', 'mobile'],
   paymentModel: 'cpm',
   startsAt: new Date(),
   endsAt: dateNowPlusThirtyDays(),
   currency: '',
   autoUTMChecked: false,
   asapStartingDate: false,
+  budget: 0,
   outpaceAssetAddr: '',
   outpaceAssetDecimals: 0,
   outpaceAddr: '',
@@ -94,7 +96,7 @@ export const CREATE_CAMPAIGN_DEFAULT_VALUE: CampaignUI = {
       publishers: DEFAULT_CATS_LOCS_VALUE,
       placements: DEFAULT_PLACEMENTS_VALUE,
       advanced: {
-        includeIncentivized: true,
+        includeIncentivized: false,
         disableFrequencyCapping: false,
         limitDailyAverageSpending: false
       }
@@ -105,22 +107,20 @@ export const CREATE_CAMPAIGN_DEFAULT_VALUE: CampaignUI = {
   modified: BigInt(Date.now()),
   archived: false,
   createdBy: '',
-  lastModifiedBy: '',
-  draftModified: false,
-  errorsTargetURLValidations: {}
+  lastModifiedBy: ''
 }
 
 export const CATEGORIES: SelectData[] = parseCats()
 export const COUNTRIES: SelectData[] = parseLocs()
 
 export const CAT_GROUPS = {
-  finance: ['IAB13', 'IAB13-7'],
-  gaming: ['IAB1', 'IAB9', 'IAB17'],
-  streaming: ['IAB1', 'IAB9', 'IAB17', 'IAB19']
+  Finance: ['IAB13', 'IAB13-7'],
+  Gaming: ['IAB1', 'IAB9', 'IAB17'],
+  Streaming: ['IAB1', 'IAB9', 'IAB17', 'IAB19']
 }
 
 export const REGION_GROUPS = {
-  africa: [
+  Africa: [
     'DZA',
     'AGO',
     'BEN',
@@ -176,7 +176,7 @@ export const REGION_GROUPS = {
     'ZMB',
     'ZWE'
   ],
-  asia: [
+  Asia: [
     'AFG',
     'ARM',
     'AZE',
@@ -227,7 +227,7 @@ export const REGION_GROUPS = {
     'VNM',
     'YEM'
   ],
-  europe: [
+  Europe: [
     'ALB',
     'AND',
     'AUT',
@@ -275,7 +275,7 @@ export const REGION_GROUPS = {
     'GBR',
     'VAT'
   ],
-  northAmerica: [
+  'North America': [
     'ATG',
     'BHS',
     'BRB',
@@ -300,7 +300,7 @@ export const REGION_GROUPS = {
     'TTO',
     'USA'
   ],
-  oceania: [
+  Oceania: [
     'AUS',
     'FJI',
     'KIR',
@@ -316,5 +316,18 @@ export const REGION_GROUPS = {
     'TUV',
     'VUT'
   ],
-  southAmerica: ['ARG', 'BOL', 'BRA', 'CHL', 'COL', 'ECU', 'GUY', 'PRY', 'PER', 'SUR', 'URY', 'VEN']
+  'South America': [
+    'ARG',
+    'BOL',
+    'BRA',
+    'CHL',
+    'COL',
+    'ECU',
+    'GUY',
+    'PRY',
+    'PER',
+    'SUR',
+    'URY',
+    'VEN'
+  ]
 }

@@ -1,10 +1,10 @@
-import { MantineThemeOverride } from '@mantine/core'
-import { baseTheme } from './base'
+import { MantineThemeOverride, createTheme, mergeMantineTheme } from '@mantine/core'
+import { baseTheme, DEFAULT_PRIMARY_SHADE } from './base'
 
-export const darkTheme: MantineThemeOverride = {
-  ...baseTheme,
-  colorScheme: 'dark',
+const theme: MantineThemeOverride = createTheme({
+  // colorScheme: 'dark',
   //   TODO: Change all the colors/shades with the dark ones
+
   colors: {
     brand: [
       '#ECEFF7',
@@ -100,5 +100,8 @@ export const darkTheme: MantineThemeOverride = {
     from: 'brand',
     to: 'secondary',
     deg: 90
-  }
-}
+  },
+  primaryShade: DEFAULT_PRIMARY_SHADE
+})
+
+export const darkTheme = mergeMantineTheme(baseTheme, theme)

@@ -10,7 +10,7 @@ const dashboardTableElements: (CampaignData & {
       title: 'Campaign Name Long',
       status: 2
     },
-    served: '100%',
+    served: 100,
     budget: '3000.00 DAI',
     impressions: 999999999,
     clicks: 999999,

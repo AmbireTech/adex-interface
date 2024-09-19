@@ -1,5 +1,18 @@
 import { PropsWithChildren } from 'react'
-import { Button, Flex, Group, Loader, Modal, createStyles } from '@mantine/core'
+import {
+  Button,
+  Center,
+  Group,
+  Loader,
+  MantineTheme,
+  Modal,
+  getPrimaryShade,
+  ScrollArea,
+  Portal,
+  Box
+} from '@mantine/core'
+import { createStyles } from '@mantine/emotion'
+import { useColorScheme } from '@mantine/hooks'
 
 type DetailsProps = PropsWithChildren & {
   title: string
@@ -8,75 +21,89 @@ type DetailsProps = PropsWithChildren & {
   close: () => void
 }
 
-const useStyles = createStyles((theme) => ({
-  wrapper: {
-    border: '1px solid',
-    borderRadius: theme.radius.sm,
-    borderColor: theme.colors.decorativeBorders[theme.fn.primaryShade()]
-    // padding: theme.spacing.lg
-  },
-  header: {
-    backgroundColor: theme.colors.lightBackground[theme.fn.primaryShade()],
-    padding: theme.spacing.xl
-  },
-  title: {
-    fontSize: theme.fontSizes.xl,
-    fontWeight: theme.other.fontWeights.bold
-  },
-  close: {
-    color: theme.colors.mainText[theme.fn.primaryShade()]
-  },
-  printable: {
-    [theme.other.media.print]: {
-      // NOTE: it's not fixed/absolute to body but modal.inner
-      overflow: 'visible',
-      position: 'absolute',
-      top: 0,
-      left: 0,
-      bottom: 0,
-      width: '100%'
-      // padding: theme.spacing.xl
+const useStyles = createStyles((theme: MantineTheme) => {
+  const colorScheme = useColorScheme()
+  const primaryShade = getPrimaryShade(theme, colorScheme)
+
+  return {
+    wrapper: {
+      border: '1px solid',
+      borderRadius: theme.radius.sm,
+      borderColor: theme.colors.decorativeBorders[primaryShade]
+      // padding: theme.spacing.lg
+    },
+    header: {
+      backgroundColor: theme.colors.lightBackground[primaryShade],
+      padding: theme.spacing.xl
+    },
+    title: {
+      fontSize: theme.fontSizes.xl,
+      fontWeight: theme.other.fontWeights.bold
+    },
+    close: {
+      color: theme.colors.mainText[primaryShade]
+    },
+    printableModal: {
+      [theme.other.media.print]: {
+        display: 'none'
+      }
+    },
+    printable: {
+      display: 'none',
+      [theme.other.media.print]: {
+        // border: '1px solid yellow',
+        display: 'block'
+      }
     }
   }
-}))
+})
 
 export const BillingDetailsModal = ({ children, loading, title, opened, close }: DetailsProps) => {
   const { classes } = useStyles()
   return (
-    <Modal
-      title={title}
-      size="xl"
-      opened={opened}
-      onClose={close}
-      centered
-      radius="sm"
-      classNames={{
-        header: classes.header,
-        title: classes.title,
-        close: classes.close
-      }}
-    >
-      <div>
+    <>
+      <Modal
+        className={classes.printableModal}
+        title={
+          <Group>
+            <Button
+              mt="md"
+              mb="md"
+              onClick={async () => {
+                window.print()
+              }}
+            >
+              Print
+            </Button>
+            {title}
+          </Group>
+        }
+        size="xl"
+        opened={opened}
+        onClose={close}
+        centered
+        radius="sm"
+        padding="md"
+        classNames={{
+          header: classes.header,
+          title: classes.title,
+          close: classes.close
+        }}
+        scrollAreaComponent={ScrollArea.Autosize}
+      >
         {loading ? (
-          <Flex justify="center" align="center" h="60vh">
+          <Center h="100%">
             <Loader size="xl" />
-          </Flex>
+          </Center>
         ) : (
-          <>
-            <Group position="right">
-              <Button mt="md" mb="md" onClick={() => window.print()}>
-                Print
-              </Button>
-            </Group>
-
-            <div className={classes.wrapper}>
-              <div id="printable" className={classes.printable}>
-                {children}
-              </div>
-            </div>
-          </>
+          <Box p="sm"> {children}</Box>
         )}
-      </div>
-    </Modal>
+      </Modal>
+      <Portal>
+        <Box id="printable" className={classes.printable}>
+          {children}
+        </Box>
+      </Portal>
+    </>
   )
 }

@@ -1,18 +1,12 @@
-import { AdUnit, TargetingInputApplyProp, TargetingInputSingle } from 'adex-common/dist/types'
-import { DEFAULT_CATS_LOCS_VALUE } from 'constants/createCampaign'
 import { Campaign } from 'adex-common'
 import {
   Devices,
-  SelectData,
   ImageSizes,
   FileWithPath,
   HTMLBannerDimensions,
-  CampaignUI,
   SupplyStats,
   SupplyStatsDetails
 } from 'types'
-import dayjs from 'dayjs'
-import { parseToBigNumPrecision } from 'helpers'
 
 export const checkSelectedDevices = (devices: Devices[]) => {
   if (!devices.length) return null
@@ -22,53 +16,8 @@ export const checkSelectedDevices = (devices: Devices[]) => {
   if (devices.length === 2) return 'both'
 }
 
-export const formatCatsAndLocsData = (inputValues: TargetingInputSingle, lib: SelectData[]) => {
-  const selectedCats = Object.entries(inputValues).find(
-    ([, value]) => Array.isArray(value) && value.length > 0
-  )
-
-  if (inputValues.apply === 'all' && typeof selectedCats === 'undefined') return ['all', null]
-
-  if (!selectedCats) return [null, null]
-  const [key, values] = selectedCats
-
-  const labels = lib
-    .map((item) => (!!values.length && values.includes(item.value) ? item.label : null))
-    .filter((x) => !!x)
-    .join(', ')
-
-  return [key, labels]
-}
-
-export const updateCatsLocsObject = (selectedRadio: TargetingInputApplyProp, values: string[]) => {
-  // const updated = { ...DEFAULT_CATS_LOCS_VALUE }
-  const updated = structuredClone(DEFAULT_CATS_LOCS_VALUE)
-  if (selectedRadio !== 'all') {
-    updated[selectedRadio] = values
-    updated.apply = selectedRadio
-  }
-  return updated
-}
-
 export const findArrayWithLengthInObjectAsValue = (obj: object) =>
   Object.entries(obj).find(([, value]) => Array.isArray(value) && value.length > 0)
-
-export const checkBannerSizes = (
-  bannerSizes: {
-    value: string
-    count: number
-    checked?: boolean
-  }[],
-  adUnits: AdUnit[]
-) =>
-  bannerSizes.map((item) => {
-    const copy = { ...item }
-    adUnits.forEach((adUnit) => {
-      copy.checked = !!(item.value === `${adUnit.banner?.format.w}x${adUnit.banner?.format.h}`)
-    })
-
-    return copy
-  })
 
 export const selectBannerSizes = (
   supplyStats: SupplyStats
@@ -130,9 +79,28 @@ export const getHTMLBannerDimensions = async (
           return
         }
 
+        // NOTE: we need meta tag in this format - add it to help center and info in the upload menu
+        // <meta name="ad.size" content="width=320,height=50">
+
+        // @ts-ignore
+        const sizeContent = iframeDocument.head.querySelector('meta[name="ad.size"]')?.content || ''
+        const match = sizeContent.match(/width=([0-9]+),height=([0-9]+)/)
+
+        if (
+          !match ||
+          !match[1] ||
+          !match[2] ||
+          Number.isInteger(match[1]) ||
+          Number.isInteger(match[2])
+        ) {
+          throw new Error(
+            'Invalid html banner - missing ad size meta tag in format <meta name="ad.size" content="width=320,height=50">'
+          )
+        }
+
         const dimensions = {
-          width: iframeDocument.body.scrollWidth,
-          height: iframeDocument.body.scrollHeight
+          width: Number(match[1]),
+          height: Number(match[2])
         }
 
         document.body.removeChild(tempIframe)
@@ -140,6 +108,7 @@ export const getHTMLBannerDimensions = async (
         resolve(dimensions)
       }
       tempIframe.onerror = (error) => {
+        console.log(error)
         document.body.removeChild(tempIframe)
         URL.revokeObjectURL(blobUrl)
         reject(error)
@@ -199,85 +168,6 @@ export const initAllLocales = () => {
   return allLocales
 }
 
-export type Modify<T, R> = Omit<T, keyof R> & R
-
-type ReducedCampaign = Omit<
-  Modify<Campaign, { id?: string }>,
-  | 'created'
-  | 'owner'
-  | 'validators'
-  | 'targetingRules'
-  | 'status'
-  | 'reviewStatus'
-  | 'modified'
-  | 'archived'
-  | 'createdBy'
-  | 'lastModifiedBy'
->
-
-export const mapCampaignUItoCampaign = (campaignUI: CampaignUI): ReducedCampaign => {
-  const campaign: ReducedCampaign = {
-    ...(campaignUI.id ? { id: campaignUI.id } : {}),
-    type: campaignUI.type,
-    outpaceAssetAddr: campaignUI.outpaceAssetAddr,
-    outpaceAssetDecimals: campaignUI.outpaceAssetDecimals,
-    outpaceAddr: campaignUI.outpaceAddr,
-    campaignBudget: campaignUI.campaignBudget,
-    outpaceChainId: campaignUI.outpaceChainId,
-    nonce: campaignUI.nonce,
-    title: campaignUI.title,
-    adUnits: campaignUI.adUnits,
-    pricingBounds: campaignUI.pricingBounds,
-    activeFrom: campaignUI.activeFrom,
-    activeTo: campaignUI.activeTo,
-    targetingInput: campaignUI.targetingInput
-  }
-
-  return campaign
-}
-
-export const removeProperty = (propKey: any, { [propKey]: propValue, ...rest }) => rest
-
-export const prepareCampaignObject = (campaign: CampaignUI, decimals: number) => {
-  // TODO: fix the type
-  let mappedCampaign: any = mapCampaignUItoCampaign(campaign)
-
-  // NOTE: only for draft but it will come from BE
-  // mappedCampaign.id = `${campaign.title}-${Date.now().toString(16)}`
-  mappedCampaign.campaignBudget = parseToBigNumPrecision(
-    Math.floor(Number(mappedCampaign.campaignBudget)),
-    decimals
-  )
-  mappedCampaign.pricingBounds.IMPRESSION!.min = parseToBigNumPrecision(
-    Number(campaign.cpmPricingBounds.min) / 1000,
-    decimals
-  )
-  mappedCampaign.pricingBounds.IMPRESSION!.max = parseToBigNumPrecision(
-    Number(campaign.cpmPricingBounds.max) / 1000,
-    decimals
-  )
-  mappedCampaign.activeFrom = campaign.asapStartingDate
-    ? BigInt(Date.now())
-    : BigInt(campaign.startsAt.getTime())
-  mappedCampaign.activeTo = BigInt(campaign.endsAt.getTime())
-
-  if (mappedCampaign.id === '') {
-    mappedCampaign = removeProperty('id', mappedCampaign)
-  }
-  // eslint-disable-next-line no-underscore-dangle
-  if (mappedCampaign._id) {
-    mappedCampaign = removeProperty('_id', mappedCampaign)
-  }
-
-  return mappedCampaign
-}
-
-export const isPastDateTime = (dateTime: Date | string) => {
-  const givenDateTime = dayjs(dateTime)
-  const currentDateTime = dayjs()
-  return givenDateTime.isBefore(currentDateTime)
-}
-
 export function deepEqual<T>(obj1: T, obj2: T): boolean {
   if (obj1 === obj2) return true
 
@@ -297,7 +187,7 @@ export function deepEqual<T>(obj1: T, obj2: T): boolean {
 
 const UTM_PARAMS = {
   utm_source: 'AdEx',
-  utm_medium: 'CPM',
+  // utm_medium: '', // NOTE: utm_medium will be appended at BE
   utm_term: '',
   utm_campaign: '',
   utm_content: ''
@@ -359,18 +249,40 @@ export const hasUtmCampaign = (url: string) => {
   }
 }
 
-export const capitalize = (s: string) => s && s[0].toUpperCase() + s.slice(1)
-
 export const parseRange = (str: string): { min: number; max: number } => {
   const pattern = /^(\d+)_(\d+)-(\d+)_(\d+)$/
   const match = str.match(pattern)
 
-  if (!match) {
-    throw new Error('Invalid input format. Expected format: "0_20-0_30"')
-  }
+  // if (!match) {
+  //   throw new Error('Invalid input format. Expected format: "0_20-0_30"')
+  // }
 
-  const min = parseFloat(`${match[1]}.${match[2]}`)
-  const max = parseFloat(`${match[3]}.${match[4]}`)
+  const min = parseFloat(`${match?.[1]}.${match?.[2]}`)
+  const max = parseFloat(`${match?.[3]}.${match?.[4]}`)
 
   return { min, max }
+}
+
+export const getRecommendedCPMRange = (supplyStats: SupplyStats, campaign: Campaign) => {
+  if (!supplyStats || !campaign) {
+    return { min: 0, max: 0 }
+  }
+  const mostRequests = campaign.targetingInput.inputs.placements.in
+    .map((placement) => {
+      switch (placement) {
+        case 'app':
+          return supplyStats.appBidFloors
+
+        case 'site':
+          return [...supplyStats.siteDesktopBidFloors, ...supplyStats.siteMobileBidFloors]
+        default:
+          return []
+      }
+    })
+    .flat()
+    .sort((a, b) => b.count - a.count)?.[0]
+
+  return {
+    ...parseRange(mostRequests?.value || '0_42-0_69')
+  }
 }

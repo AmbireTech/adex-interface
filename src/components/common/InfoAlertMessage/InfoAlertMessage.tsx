@@ -1,50 +1,44 @@
-import { Grid, Text, createStyles, MantineStyleSystemProps } from '@mantine/core'
+import {
+  Text,
+  Box,
+  Paper,
+  Group,
+  ThemeIcon,
+  Center,
+  lighten,
+  parseThemeColor,
+  useMantineTheme
+} from '@mantine/core'
+import { ReactNode } from 'react'
+
 import InfoCurlyBorder from 'resources/icons/InfoCurlyBorder'
 
-type InfoAlertMessageProps = MantineStyleSystemProps & {
-  message: string
-}
-
-const useStyles = createStyles((theme) => ({
-  errorWrapper: {
-    alignItems: 'center',
-    border: '1px solid',
-    borderColor: theme.colors.decorativeBorders[theme.fn.primaryShade()],
-    boxShadow: theme.shadows.sm,
-    borderRadius: theme.radius.md,
-    marginBottom: theme.spacing.xs,
-    background:
-      theme.colors.warning[theme.fn.primaryShade()] + theme.other.shades.hexColorSuffix.lightest
-  },
-  errorIcon: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: 50,
-    borderTopLeftRadius: theme.radius.md,
-    borderBottomLeftRadius: theme.radius.md,
-    color: theme.colors.warning[theme.fn.primaryShade()]
-  },
-  text: {
-    background: theme.colors.mainBackground[theme.fn.primaryShade()],
-    borderTopRightRadius: theme.radius.md,
-    borderBottomRightRadius: theme.radius.md
-  }
-}))
-
-const InfoAlertMessage = ({ message, ...rest }: InfoAlertMessageProps) => {
-  const { classes } = useStyles()
+const InfoAlertMessage = ({ message }: { message: ReactNode }) => {
+  // NOTE: just testing, need better color handle
+  const theme = useMantineTheme()
+  const parsedColor = parseThemeColor({ color: 'warning', theme })
   return (
-    <Grid className={classes.errorWrapper} {...rest}>
-      <Grid.Col span="content" className={classes.errorIcon} p={0}>
-        <InfoCurlyBorder size="24px" />
-      </Grid.Col>
-      <Grid.Col span="auto" className={classes.text} p={0}>
-        <Text size="sm" m="md">
-          {message}
+    <Paper withBorder shadow="xs">
+      <Group align="center" wrap="nowrap">
+        <Box
+          p="sm"
+          bg={lighten(
+            parsedColor.isThemeColor ? `var(${parsedColor.variable})` : parsedColor.value,
+            theme.other.shades.lighten.lightest
+          )}
+        >
+          <Center>
+            <ThemeIcon variant="transparent" color="warning">
+              <InfoCurlyBorder size="24px" />
+            </ThemeIcon>
+          </Center>
+        </Box>
+
+        <Text size="sm" span>
+          {message?.toString()}
         </Text>
-      </Grid.Col>
-    </Grid>
+      </Group>
+    </Paper>
   )
 }
 

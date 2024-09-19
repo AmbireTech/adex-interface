@@ -1,24 +1,16 @@
 import { Campaign, CampaignStatus } from 'adex-common'
-import {
-  createContext,
-  FC,
-  PropsWithChildren,
-  useMemo,
-  useState,
-  useCallback,
-  useEffect
-} from 'react'
+import { createContext, FC, PropsWithChildren, useMemo, useState, useCallback } from 'react'
 import { useAdExApi } from 'hooks/useAdexServices'
-import useAccount from 'hooks/useAccount'
 import useCustomNotifications from 'hooks/useCustomNotifications'
-import {
-  BaseData,
-  CampaignData,
-  //  EventAggregatesDataRes,
-  EvAggrData
-} from 'types/campaignsData'
+import { BaseData, CampaignData, EvAggrData, SupplyStats } from 'types'
 import { CREATE_CAMPAIGN_DEFAULT_VALUE } from 'constants/createCampaign'
 import { parseBigNumTokenAmountToDecimal } from 'helpers/balances'
+import { defaultSupplyStats } from './defaultData'
+
+type NotificationMsg = {
+  title?: string
+  msg?: string
+}
 
 const defaultCampaignData: CampaignData = {
   campaignId: '',
@@ -111,13 +103,29 @@ const getURLSubRouteByCampaignStatus = (status: CampaignStatus) => {
 }
 interface ICampaignsDataContext {
   campaignsData: Map<string, CampaignData>
+  supplyStats: SupplyStats
   // TODO: all campaigns event aggregations by account
   // eventAggregates: Map<Campaign['id'], EvAggrData>
   updateCampaignDataById: (params: Campaign['id']) => void
   updateAllCampaignsData: (updateAdvanced?: boolean) => void
+  updateSupplyStats: () => void
   // updateEventAggregates: (params: Campaign['id']) => void
   initialDataLoading: boolean
   changeCampaignStatus: (status: CampaignStatus, campaignId: Campaign['id']) => void
+  deleteDraftCampaign: (id: string) => void
+  editCampaign: (
+    campaignId: string,
+    pricingBounds?: Partial<Campaign['pricingBounds']>,
+    inputs?: Partial<Campaign['targetingInput']['inputs']>,
+    successMsg?: NotificationMsg,
+    errMsg?: NotificationMsg
+  ) => Promise<{ success: boolean }>
+  toggleArchived: (id: string) => void
+  filterSources: (
+    action: 'include' | 'exclude',
+    campaignId: Campaign['id'],
+    sources: { srcId: string; srcName: string }[]
+  ) => Promise<void>
 }
 
 const CampaignsDataContext = createContext<ICampaignsDataContext | null>(null)
@@ -129,8 +137,9 @@ const CampaignsDataProvider: FC<PropsWithChildren & { type: 'user' | 'admin' }> 
   const { showNotification } = useCustomNotifications()
   const { adexServicesRequest } = useAdExApi()
 
-  const { authenticated } = useAccount()
+  // const { authenticated } = useAccount()
   const [initialDataLoading, setInitialDataLoading] = useState(true)
+  const [supplyStats, setSupplyStats] = useState<SupplyStats>(defaultSupplyStats)
 
   const [campaignsData, setCampaignData] = useState<ICampaignsDataContext['campaignsData']>(
     new Map<Campaign['id'], CampaignData>()
@@ -166,8 +175,7 @@ const CampaignsDataProvider: FC<PropsWithChildren & { type: 'user' | 'admin' }> 
         })
 
         if (!campaignStatusRes.success) {
-          showNotification('error', `changing campaign status with id ${campaignId}`, 'Data error')
-          return
+          throw new Error(`changing campaign status with id ${campaignId}`)
         }
 
         setCampaignData((prev) => {
@@ -185,9 +193,9 @@ const CampaignsDataProvider: FC<PropsWithChildren & { type: 'user' | 'admin' }> 
 
           return next
         })
-      } catch (err) {
+      } catch (err: any) {
         console.log(err)
-        showNotification('error', `changing campaign status with id ${campaignId}`, 'Data error')
+        showNotification('error', err?.message || err.toString(), 'Campaign status update error')
       }
     },
     [adexServicesRequest, showNotification]
@@ -203,9 +211,7 @@ const CampaignsDataProvider: FC<PropsWithChildren & { type: 'user' | 'admin' }> 
         })
 
         if (campaignId !== campaignDetailsRes?.id) {
-          // NOTE: skip state update
-          showNotification('error', `getting campaign with id ${campaignId}`, 'Data error')
-          return
+          throw new Error(`Getting campaign with id ${campaignId}`)
         }
 
         // const advData = await getCampaignAdvancedData(campaignId)
@@ -221,9 +227,9 @@ const CampaignsDataProvider: FC<PropsWithChildren & { type: 'user' | 'admin' }> 
           next.set(campaignId, updatedCmp)
           return next
         })
-      } catch (err) {
+      } catch (err: any) {
         console.log(err)
-        showNotification('error', `getting campaign with id ${campaignId}`, 'Data error')
+        showNotification('error', err?.message || err.toString(), 'Data error')
       }
     },
     [adexServicesRequest, showNotification]
@@ -239,8 +245,6 @@ const CampaignsDataProvider: FC<PropsWithChildren & { type: 'user' | 'admin' }> 
           queryParams: { all: 'true' }
         })
 
-        console.log({ dataRes })
-
         let advData: EvAggrData[]
 
         // if (updateAdvanced) {
@@ -252,10 +256,8 @@ const CampaignsDataProvider: FC<PropsWithChildren & { type: 'user' | 'admin' }> 
 
         if (updateAdvanced) {
           advData = [...dataRes].map((cmpDataRes) => campaignDataResToAdvData(cmpDataRes))
-          console.log({ advData })
         }
 
-        console.log({ dataRes })
         if (Array.isArray(dataRes)) {
           setCampaignData((prev) => {
             const next = new Map()
@@ -267,61 +269,218 @@ const CampaignsDataProvider: FC<PropsWithChildren & { type: 'user' | 'admin' }> 
               next.set(cmp.id, currentCMP)
             })
 
-            prev.forEach((value, key) => {
+            prev.forEach((_value, key) => {
               if (!dataResIds.has(key)) {
                 next.delete(key)
               }
             })
-            // TODO: check it again when dev has been merged
-            setInitialDataLoading(false)
             return next
           })
         } else {
-          showNotification('warning', 'invalid campaigns data response', 'Data error')
-          console.log({ dataRes })
-          setInitialDataLoading(false)
+          throw new Error('Invalid campaigns data response')
         }
-      } catch (err) {
+      } catch (err: any) {
         console.log(err)
-        showNotification('error', 'getting campaigns data', 'Data error')
-        // setInitialDataLoading(false)
+        showNotification('error', err?.message || err.toString(), 'Campaigns data error')
+      } finally {
+        setInitialDataLoading(false)
       }
     },
     [adexServicesRequest, showNotification, type]
   )
 
-  useEffect(() => {
-    console.log({ type })
-  }, [type])
+  const updateSupplyStats = useCallback(async () => {
+    let result
 
-  useEffect(() => {
-    if (authenticated) {
-      const updateCampaigns = async () => {
-        await updateAllCampaignsData(true)
-        // setInitialDataLoading(false)
+    try {
+      result = await adexServicesRequest('backend', {
+        route: '/dsp/stats/common',
+        method: 'GET'
+      })
+
+      if (!result) {
+        throw new Error('No supply stats')
       }
 
-      updateCampaigns()
-    } else {
-      setCampaignData(new Map<string, CampaignData>())
-      // setInitialDataLoading(false)
+      const hasEmptyValueResponse = Object.values(result).every(
+        (value) => Array.isArray(value) && value.length === 0
+      )
+
+      if (hasEmptyValueResponse) {
+        throw new Error('Invalid supply stats response')
+      }
+
+      setSupplyStats(result as SupplyStats)
+    } catch (e: any) {
+      console.error(e)
+      showNotification('error', e?.message || e.toString(), 'Supply stats error')
     }
-  }, [updateAllCampaignsData, authenticated])
+  }, [adexServicesRequest, showNotification])
+
+  // TODO: move to separate context delete and archive
+  const deleteDraftCampaign = useCallback(
+    async (id: string) => {
+      try {
+        await adexServicesRequest('backend', {
+          route: `/dsp/campaigns/draft/${id}`,
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          onErrMsg: `Can not delete ${id}`
+        })
+
+        setCampaignData((prev) => {
+          const next = new Map(prev)
+          next.delete(id)
+
+          return next
+        })
+      } catch (err) {
+        console.log(err)
+      }
+    },
+    [adexServicesRequest]
+  )
+
+  const toggleArchived = useCallback(
+    async (id: string) => {
+      await adexServicesRequest('backend', {
+        route: `/dsp/campaigns/togglearchive/${id}`,
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        onErrMsg: `Can not toggle archive ${id}`
+      })
+      updateCampaignDataById(id)
+    },
+    [adexServicesRequest, updateCampaignDataById]
+  )
+
+  const editCampaign = useCallback(
+    async (
+      campaignId: string,
+      pricingBounds?: Partial<Campaign['pricingBounds']>,
+      inputs?: Partial<Campaign['targetingInput']['inputs']>,
+      successMsg?: NotificationMsg,
+      errMsg?: NotificationMsg
+    ) => {
+      const campaign = campaignsData.get(campaignId)?.campaign
+
+      if (!campaign) {
+        throw new Error('invalid campaign')
+      }
+
+      const body: Pick<Campaign, 'pricingBounds' | 'targetingInput'> = {
+        pricingBounds: { ...campaign.pricingBounds, ...pricingBounds },
+        targetingInput: {
+          ...campaign.targetingInput,
+          inputs: {
+            ...campaign.targetingInput.inputs,
+            ...(inputs?.location && { location: inputs.location }),
+            ...(inputs?.categories && {
+              categories: inputs.categories
+            }),
+            ...(inputs?.publishers && {
+              publishers: inputs.publishers
+            }),
+            // NOTE: uncomment if we decide that changing placements will be editable on the UI
+            // ...(targetingInput?.inputs?.placements && { placements: targetingInput.inputs.placements}),
+            ...(inputs?.advanced && { advanced: inputs.advanced })
+          }
+        }
+      }
+
+      try {
+        const res = await adexServicesRequest<{ success?: boolean }>('backend', {
+          route: `/dsp/campaigns/edit/${campaign.id}`,
+          method: 'PUT',
+          body,
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        })
+
+        if (!res?.success) {
+          throw new Error('Error on updating campaign data')
+        }
+
+        showNotification(
+          'info',
+          successMsg?.msg || 'Successfully updated Campaign data!',
+          successMsg?.title
+        )
+        updateCampaignDataById(campaign.id)
+        return { success: true }
+      } catch {
+        showNotification(
+          'error',
+          errMsg?.msg || "Couldn't update the Campaign data!",
+          errMsg?.title
+        )
+        return { success: false }
+      }
+    },
+    [campaignsData, adexServicesRequest, showNotification, updateCampaignDataById]
+  )
+
+  const filterSources: ICampaignsDataContext['filterSources'] = useCallback(
+    async (action, campaignId, sources): Promise<void> => {
+      const campaign = campaignsData.get(campaignId)?.campaign
+      if (!campaign) {
+        throw new Error('invalid campaign ')
+      }
+
+      console.log({ sources })
+      const cleanNin = [...campaign.targetingInput.inputs.publishers.nin].filter(
+        (x) => !sources.some((s) => s.srcId === x)
+      )
+
+      const blockedPublishers: Campaign['targetingInput']['inputs']['publishers'] = {
+        ...campaign.targetingInput.inputs.publishers,
+        apply: 'nin',
+        nin: action === 'include' ? cleanNin : [...cleanNin, ...sources.map((x) => x.srcId)]
+      }
+
+      const inputs: Partial<Campaign['targetingInput']['inputs']> = {
+        publishers: { ...blockedPublishers }
+      }
+
+      await editCampaign(campaignId, undefined, inputs, {
+        title: action === 'exclude' ? 'Blocked' : 'Unblocked',
+        msg: sources.length === 1 ? sources[0].srcName : `${sources.length} placements`
+      })
+    },
+    [campaignsData, editCampaign]
+  )
 
   const contextValue = useMemo(
     () => ({
       campaignsData,
+      supplyStats,
       updateCampaignDataById,
       updateAllCampaignsData,
       initialDataLoading,
-      changeCampaignStatus
+      changeCampaignStatus,
+      deleteDraftCampaign,
+      toggleArchived,
+      updateSupplyStats,
+      editCampaign,
+      filterSources
     }),
     [
       campaignsData,
+      supplyStats,
       updateCampaignDataById,
       updateAllCampaignsData,
       initialDataLoading,
-      changeCampaignStatus
+      changeCampaignStatus,
+      deleteDraftCampaign,
+      toggleArchived,
+      updateSupplyStats,
+      editCampaign,
+      filterSources
     ]
   )
 

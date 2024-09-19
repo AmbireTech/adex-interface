@@ -1,8 +1,24 @@
-import { Button, Flex, Grid, TextInput, createStyles, Text } from '@mantine/core'
+import {
+  Button,
+  Group,
+  TextInput,
+  Text,
+  Stack,
+  Space,
+  Select,
+  Fieldset,
+  ThemeIcon,
+  getPrimaryShade
+} from '@mantine/core'
+import { createStyles } from '@mantine/emotion'
 import { useForm } from '@mantine/form'
+import { useColorScheme } from '@mantine/hooks'
+import CustomAnchor from 'components/common/customAnchor'
+import { CountryNames } from 'helpers/countries'
 import useAccount from 'hooks/useAccount'
 import useCustomNotifications from 'hooks/useCustomNotifications'
 import { useCallback } from 'react'
+import CheckMarkIcon from 'resources/icons/CheckMark'
 import { fetchService } from 'services'
 import { BillingDetailsProps } from 'types'
 
@@ -42,15 +58,19 @@ enum CountryCodes {
   'Northern Ireland' = 'XI'
 }
 
-const useStyles = createStyles((theme) => ({
-  container: {
-    backgroundColor: theme.colors.mainBackground[theme.fn.primaryShade()],
-    borderRadius: theme.radius.sm,
-    boxShadow: theme.shadows.xs,
-    overflow: 'hidden',
-    padding: theme.spacing.lg
+const useStyles = createStyles((theme) => {
+  const colorScheme = useColorScheme()
+  const primaryShade = getPrimaryShade(theme, colorScheme)
+  return {
+    container: {
+      backgroundColor: theme.colors.mainBackground[primaryShade],
+      borderRadius: theme.radius.sm,
+      boxShadow: theme.shadows.xs,
+      overflow: 'hidden',
+      padding: theme.spacing.lg
+    }
   }
-}))
+})
 
 const isValidCountryCode = (code: string): code is keyof typeof CountryCodes => {
   return code in CountryCodes
@@ -99,6 +119,7 @@ const BillingDetails = () => {
   const { showNotification } = useCustomNotifications()
   const form = useForm({
     initialValues: billingDetails,
+    validateInputOnBlur: true,
     validate: {
       firstName: (value: string) => {
         if (value.length > 0 && value.length < 2) {
@@ -157,30 +178,27 @@ const BillingDetails = () => {
   )
 
   return (
-    <form className={classes.container} onSubmit={form.onSubmit((values) => handleSubmit(values))}>
-      <Grid gutter="xs">
-        <Grid.Col>
-          <Text size="sm" color="secondaryText" weight="bold">
+    <Fieldset disabled={billingDetails.verified}>
+      <form
+        className={classes.container}
+        onSubmit={form.onSubmit((values) => handleSubmit(values))}
+      >
+        <Stack>
+          <Text size="sm" c="dimmed" fw="bold">
             Company details
           </Text>
-        </Grid.Col>
-        <Grid.Col>
           <TextInput
             radius="sm"
             size="lg"
             placeholder="First name"
             {...form.getInputProps('firstName')}
           />
-        </Grid.Col>
-        <Grid.Col>
           <TextInput
             radius="sm"
             size="lg"
             placeholder="Last name"
             {...form.getInputProps('lastName')}
           />
-        </Grid.Col>
-        <Grid.Col>
           <TextInput
             radius="sm"
             size="lg"
@@ -188,30 +206,25 @@ const BillingDetails = () => {
             placeholder="Company name"
             {...form.getInputProps('companyName')}
           />
-        </Grid.Col>
-        <Grid.Col span={6}>
-          <TextInput
-            radius="sm"
-            size="lg"
-            required
-            placeholder="Registration number"
-            {...form.getInputProps('companyNumber')}
-          />
-        </Grid.Col>
-        <Grid.Col span={6}>
-          <TextInput
-            radius="sm"
-            size="lg"
-            placeholder="VAT number"
-            {...form.getInputProps('companyNumberPrim')}
-          />
-        </Grid.Col>
-        <Grid.Col>
-          <Text size="sm" color="secondaryText" weight="bold">
+          <Group grow>
+            <TextInput
+              radius="sm"
+              size="lg"
+              required
+              placeholder="Registration number"
+              {...form.getInputProps('companyNumber')}
+            />
+            <TextInput
+              radius="sm"
+              size="lg"
+              placeholder="VAT number"
+              {...form.getInputProps('companyNumberPrim')}
+            />
+          </Group>
+          <Space />
+          <Text size="sm" c="dimmed" fw="bold">
             Company address
           </Text>
-        </Grid.Col>
-        <Grid.Col>
           <TextInput
             radius="sm"
             size="lg"
@@ -219,24 +232,14 @@ const BillingDetails = () => {
             placeholder="Address"
             {...form.getInputProps('companyAddress')}
           />
-        </Grid.Col>
-        <Grid.Col>
-          {/* <Select
+          <Select
             size="lg"
             required
-            data={['Country 1', 'Country 2', 'Country 3']}
+            searchable
+            data={CountryNames}
             placeholder="Select Country"
             {...form.getInputProps('companyCountry')}
-          /> */}
-          <TextInput
-            radius="sm"
-            size="lg"
-            required
-            placeholder="Country"
-            {...form.getInputProps('companyCountry')}
           />
-        </Grid.Col>
-        <Grid.Col span={6}>
           {/* <Select
             size="lg"
             required
@@ -244,33 +247,69 @@ const BillingDetails = () => {
             placeholder="Select City"
             {...form.getInputProps('companyCity')}
           /> */}
-          <TextInput
-            radius="sm"
-            size="lg"
-            required
-            placeholder="City"
-            {...form.getInputProps('companyCity')}
-          />
-        </Grid.Col>
-        <Grid.Col span={6}>
-          <TextInput
-            radius="sm"
-            size="lg"
-            required
-            // hideControls
-            // TODO: change the placeholder
-            // Check if the input should be Number
-            placeholder="Zip Code"
-            {...form.getInputProps('companyZipCode')}
-          />
-        </Grid.Col>
-      </Grid>
-      <Flex mih={200} justify="center" align="end" wrap="wrap">
-        <Button miw={260} size="lg" type="submit" color="secondary" variant="filled">
-          Confirmed
-        </Button>
-      </Flex>
-    </form>
+
+          <Group grow>
+            <TextInput
+              radius="sm"
+              size="lg"
+              required
+              placeholder="City"
+              {...form.getInputProps('companyCity')}
+            />
+            <TextInput
+              radius="sm"
+              size="lg"
+              required
+              placeholder="Zip Code"
+              {...form.getInputProps('companyZipCode')}
+            />
+          </Group>
+
+          <Space />
+          <Stack align="baseline" gap="xs">
+            {billingDetails.verified ? (
+              <Button
+                miw={260}
+                size="lg"
+                type="submit"
+                leftSection={
+                  <ThemeIcon size="xl" variant="transparent" radius="xl" color="success">
+                    <CheckMarkIcon size="36px" />{' '}
+                  </ThemeIcon>
+                }
+                color="success"
+                variant="outline"
+              >
+                Verified
+              </Button>
+            ) : (
+              <Button miw={260} size="lg" type="submit" color="secondary" variant="outline">
+                Confirm details
+              </Button>
+            )}
+
+            {billingDetails.verified ? (
+              <Text mt="md">
+                Your billing details are verified and cannot be changed here. If there is a mistake
+                and changes need to be made, please contact us at &nbsp;
+                <CustomAnchor external href="mailto:contactus@adex.network">
+                  contactus@adex.network
+                </CustomAnchor>
+                .
+              </Text>
+            ) : (
+              <Text mt="md">
+                Fill in your billing details and contact us at &nbsp;
+                <CustomAnchor external href="mailto:contactus@adex.network">
+                  contactus@adex.network
+                </CustomAnchor>
+                &nbsp; to verify the data.
+              </Text>
+            )}
+          </Stack>
+        </Stack>
+      </form>
+    </Fieldset>
   )
 }
 

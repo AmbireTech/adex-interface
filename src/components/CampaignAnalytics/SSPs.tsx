@@ -1,26 +1,19 @@
 import CustomTable from 'components/common/CustomTable'
 import { useMemo } from 'react'
-import { BaseAnalyticsData } from 'types'
+import { useCampaignsAnalyticsData } from 'hooks/useCampaignAnalytics/useCampaignAnalyticsData'
 
-const SSPs = ({
-  data,
-  currencyName
-}: {
-  data: BaseAnalyticsData[] | undefined
-  currencyName: string
-}) => {
-  if (!data?.length) {
-    return <div>No placement found</div>
-  }
+const headings = ['SSP', 'Impressions', 'Clicks', 'CTR', 'Average CPM', 'Spent']
 
-  const headings = useMemo(
-    () => ['SSP', 'Impressions', 'Clicks', 'CTR', 'Average CPM', 'Spent'],
-    []
-  )
+const SSPs = ({ forAdmin, campaignId }: { forAdmin: boolean; campaignId: string }) => {
+  const { campaignMappedAnalytics, currencyName, error, loading } = useCampaignsAnalyticsData({
+    campaignId,
+    forAdmin,
+    analyticsType: 'ssp'
+  })
 
   const elements = useMemo(
     () =>
-      data?.map((item) => ({
+      campaignMappedAnalytics?.map((item) => ({
         id: item.segment,
         segment: item.segment,
         impressions: item.impressions.toLocaleString(),
@@ -29,9 +22,13 @@ const SSPs = ({
         avgCpm: `${item.avgCpm} ${currencyName}`,
         paid: `${item.paid.toFixed(4)} ${currencyName}`
       })) || [],
-    [data, currencyName]
+    [campaignMappedAnalytics, currencyName]
   )
-  return <CustomTable background headings={headings} elements={elements} />
+
+  if (!campaignMappedAnalytics?.length) {
+    return <div>No placement found</div>
+  }
+  return <CustomTable headings={headings} elements={elements} error={error} loading={loading} />
 }
 
 export default SSPs

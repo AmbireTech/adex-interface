@@ -1,8 +1,8 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
-import { Container, Grid, createStyles, Text, Flex, Box } from '@mantine/core'
+import { useCallback, useEffect, useMemo } from 'react'
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
+import { Grid, Text, Button, Paper, Stack, Group, Divider, Box, Anchor } from '@mantine/core'
+import { modals } from '@mantine/modals'
 import BadgeStatusCampaign from 'components/Dashboard/BadgeStatusCampaign'
-import { formatCatsAndLocsData } from 'helpers/createCampaignHelpers'
 import { CATEGORIES, COUNTRIES } from 'constants/createCampaign'
 import { AdUnit, CampaignStatus } from 'adex-common/dist/types'
 import MediaThumb from 'components/common/MediaThumb'
@@ -11,132 +11,287 @@ import GoBack from 'components/common/GoBack'
 import CampaignDetailsRow from 'components/common/CampainDetailsRow/CampaignDetailsRow'
 import { useCampaignsData } from 'hooks/useCampaignsData'
 import ActiveIcon from 'resources/icons/Active'
-import CampaignActionBtn from 'components/CampaignAnalytics/CampaignActionBtn'
-// import StopIcon from 'resources/icons/Stop'
+import StopIcon from 'resources/icons/Stop'
 import ArchivedIcon from 'resources/icons/Archived'
 import FormattedAmount from 'components/common/FormattedAmount/FormattedAmount'
+import PausedIcon from 'resources/icons/Paused'
 import EditIcon from 'resources/icons/Edit'
-import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
+import AnalyticsIcon from 'resources/icons/Analytics'
 import useCustomNotifications from 'hooks/useCustomNotifications'
-import { CustomConfirmModal } from 'components/common/Modals'
 import { AdminBadge } from 'components/common/AdminBadge'
+import EditCampaign from 'components/EditCampaign'
+import { defaultConfirmModalProps } from 'components/common/Modals/CustomConfirmModal'
+import DeleteIcon from 'resources/icons/Delete'
+import { StickyPanel } from 'components/TopBar/TopBarStickyPanel'
+import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import CatsLocsFormatted from './CatsLocsFormatted'
 import { AdminActions } from './AdminActions'
 
-const useStyles = createStyles((theme) => ({
-  wrapper: {
-    background: theme.colors.mainBackground[theme.fn.primaryShade()],
-    borderRadius: theme.radius.md,
-    padding: theme.spacing.lg,
-    margin: theme.spacing.md,
-    boxShadow: theme.shadows.sm
-  },
-  innerWrapper: {
-    background: theme.colors.lightBackground[theme.fn.primaryShade()],
-    border: '1px solid',
-    borderRadius: theme.radius.md,
-    borderColor: theme.colors.decorativeBorders[theme.fn.primaryShade()],
-    maxWidth: '100%',
-    padding: `${theme.spacing.xs} ${theme.spacing.md}`
-  },
-  lighterColor: {
-    color:
-      theme.colors.secondaryText[theme.fn.primaryShade()] +
-      theme.other.shades.hexColorSuffix.lighter
-  },
-  scrollableContainer: {
-    maxHeight: 300,
-    overflowY: 'auto'
-  },
-  separator: {
-    borderBottom: `1px dashed ${theme.colors.decorativeBorders[theme.fn.primaryShade()]}`,
-    margin: `${theme.spacing.sm} 0`
-  }
-}))
-
 const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
-  const { classes, cx } = useStyles()
-  const { campaignsData, updateCampaignDataById, changeCampaignStatus } = useCampaignsData()
+  const {
+    campaignsData,
+    updateCampaignDataById,
+    changeCampaignStatus,
+    toggleArchived,
+    deleteDraftCampaign
+  } = useCampaignsData()
   const { updateCampaignFromDraft } = useCreateCampaignContext()
-  const navigate = useNavigate()
   const { showNotification } = useCustomNotifications()
-
+  const navigate = useNavigate()
+  const [params, setParams] = useSearchParams()
   const { id } = useParams()
 
   if (!id) {
     return <div>Missing ID</div>
   }
 
-  const campaignData = useMemo(
-    () => campaignsData.get(id),
-
-    [id, campaignsData]
-  )
-
+  const campaignData = useMemo(() => campaignsData.get(id), [id, campaignsData])
   const campaign = useMemo(() => campaignData?.campaign, [campaignData])
 
-  const handleEdit = useCallback(() => {
-    if (campaign) {
-      updateCampaignFromDraft(campaign)
-      navigate('/dashboard/create-campaign')
-    } else {
-      showNotification('error', 'Editing draft campaign failed', 'Editing draft campaign failed')
+  const isEditMode = useMemo(() => params.get('edit'), [params])
+  const isDraft = useMemo(() => campaign?.status === CampaignStatus.draft, [campaign?.status])
+
+  const handleArchive = useCallback(() => {
+    if (!campaign?.id) {
+      return
     }
-  }, [updateCampaignFromDraft, navigate, showNotification, campaign])
+
+    const confirm = campaign?.archived ? 'Unarchive' : 'Archive'
+
+    modals.openConfirmModal(
+      defaultConfirmModalProps({
+        text: `Are you sure want to ${confirm} campaign "${campaign?.title}"`,
+        color: campaign?.archived ? 'brand' : 'warning',
+        labels: { confirm, cancel: 'Cancel' },
+        onConfirm: () => {
+          toggleArchived(campaign?.id || '')
+          showNotification('info', `Campaign ${campaign?.archived ? 'Unarchived' : 'Archived'}`)
+        }
+      })
+    )
+  }, [campaign?.archived, campaign?.id, campaign?.title, showNotification, toggleArchived])
+
+  const handleStopOrDelete = useCallback(() => {
+    if (!campaign?.id || !campaign?.status) {
+      return
+    }
+
+    const confirmLabel = isDraft ? 'Delete Draft' : 'Stop'
+    const onConfirm = isDraft
+      ? () => {
+          deleteDraftCampaign(campaign.id)
+          showNotification('info', 'Draft campaign deleted!')
+          navigate('/dashboard')
+        }
+      : () => {
+          changeCampaignStatus(CampaignStatus.closedByUser, campaign.id)
+          showNotification('info', 'Campaign stopped!')
+        }
+
+    modals.openConfirmModal(
+      defaultConfirmModalProps({
+        text: `Are you sure want to ${confirmLabel} campaign "${campaign?.title}. This action is irreversible!"`,
+        color: isDraft ? 'warning' : 'brand',
+        labels: { confirm: 'Yes', cancel: 'Cancel' },
+        onConfirm
+      })
+    )
+  }, [
+    campaign?.id,
+    campaign?.status,
+    campaign?.title,
+    changeCampaignStatus,
+    deleteDraftCampaign,
+    isDraft,
+    navigate,
+    showNotification
+  ])
+
+  const handleEditDraft = useCallback(() => {
+    campaign &&
+      updateCampaignFromDraft({
+        ...campaign
+      })
+    navigate('/dashboard/create-campaign', {})
+  }, [campaign, updateCampaignFromDraft, navigate])
 
   useEffect(() => {
     if (id) {
       updateCampaignDataById(id)
     }
-  }, [id, updateCampaignDataById])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id])
 
-  const [open, setOpen] = useState(false)
+  const canArchive = useMemo(() => {
+    return (
+      !isEditMode &&
+      !isAdminPanel &&
+      campaign?.status &&
+      [
+        CampaignStatus.closedByUser,
+        CampaignStatus.exhausted,
+        CampaignStatus.expired,
+        CampaignStatus.rejected
+      ].includes(campaign?.status)
+    )
+  }, [campaign?.status, isAdminPanel, isEditMode])
 
-  const updateOpenState = useCallback(() => setOpen((prev) => !prev), [])
+  const canStop = useMemo(() => {
+    return (
+      !isEditMode &&
+      campaign?.status &&
+      [CampaignStatus.active, CampaignStatus.paused].includes(campaign?.status)
+    )
+  }, [campaign?.status, isEditMode])
 
-  const handleActionBtnClicked = useCallback(() => {
-    updateOpenState()
-  }, [updateOpenState])
+  const canActivate = useMemo(() => {
+    return !isEditMode && campaign?.status === CampaignStatus.paused
+  }, [campaign?.status, isEditMode])
 
-  const handleConfirmBtnClicked = useCallback(() => {
-    campaign && changeCampaignStatus(CampaignStatus.closedByUser, campaign?.id)
-    updateOpenState()
-  }, [changeCampaignStatus, updateOpenState, campaign])
+  const canPause = useMemo(() => {
+    return !isEditMode && campaign?.status === CampaignStatus.active
+  }, [campaign?.status, isEditMode])
 
-  useEffect(() => {
-    console.log({ campaignsData })
-  }, [campaignsData])
+  const canEdit = useMemo(() => {
+    return (
+      campaign?.status && [CampaignStatus.active, CampaignStatus.paused].includes(campaign?.status)
+    )
+  }, [campaign?.status])
 
+  const canEditDraft = useMemo(() => {
+    return !isAdminPanel && isDraft
+  }, [isAdminPanel, isDraft])
+
+  if (!campaign) return <div>Invalid Campaign Id</div>
   return (
-    <>
-      <Box p="md">
-        <GoBack title="Dashboard" fixed />
-      </Box>
-      {campaign && (
-        <>
-          <Container fluid className={classes.wrapper}>
-            {isAdminPanel && <AdminBadge title="Admin Details" />}
-            <Grid>
-              <Grid.Col md={12} xl={6}>
-                <Text weight="bold" size="sm" pb="sm" className={classes.lighterColor}>
+    <Stack gap="xl">
+      <StickyPanel>
+        <Paper mx="auto" shadow="lg" radius="xl">
+          <Group align="center" justify="space-between">
+            <GoBack title="Dashboard" />
+            <Box>
+              <Group gap="xs" p={4} justify="center" w="100%">
+                <Button
+                  rightSection={<ActiveIcon size="15px" />}
+                  onClick={() =>
+                    canActivate && changeCampaignStatus(CampaignStatus.active, campaign.id)
+                  }
+                  color="success"
+                  disabled={!canActivate}
+                  variant="light"
+                >
+                  Activate
+                </Button>
+
+                <Button
+                  rightSection={<PausedIcon size="15px" />}
+                  onClick={() =>
+                    canPause && changeCampaignStatus(CampaignStatus.paused, campaign.id)
+                  }
+                  color="paused"
+                  variant="subtle"
+                  disabled={!canPause}
+                >
+                  Pause
+                </Button>
+
+                <Button
+                  rightSection={<StopIcon size="15px" />}
+                  onClick={handleStopOrDelete}
+                  disabled={!canStop}
+                  color="secondaryText"
+                  variant="subtle"
+                >
+                  Stop
+                </Button>
+
+                {campaign.status === CampaignStatus.draft ? (
+                  <Button
+                    rightSection={<DeleteIcon size="15px" />}
+                    onClick={handleStopOrDelete}
+                    disabled={isAdminPanel}
+                    color="warning"
+                    variant="subtle"
+                  >
+                    Delete draft
+                  </Button>
+                ) : (
+                  <Button
+                    rightSection={<ArchivedIcon size="15px" />}
+                    onClick={handleArchive}
+                    disabled={!canArchive}
+                    color="secondaryText"
+                    variant="subtle"
+                  >
+                    {campaign.archived ? 'Unarchive' : 'Archive'}
+                  </Button>
+                )}
+
+                <Button
+                  disabled={isDraft ? !canEditDraft : !canEdit}
+                  rightSection={<EditIcon size="15px" />}
+                  variant={isEditMode ? 'filled' : 'subtle'}
+                  color={isEditMode ? 'brand' : 'mainText'}
+                  onClick={() =>
+                    isDraft
+                      ? canEditDraft && handleEditDraft()
+                      : canEdit &&
+                        setParams(params.get('edit') ? '' : 'edit=true', { replace: true })
+                  }
+                >
+                  {isDraft ? 'Edit draft' : 'Edit'}
+                </Button>
+              </Group>
+            </Box>
+            <Button
+              fw="normal"
+              variant="transparent"
+              color="mainText"
+              rightSection={<AnalyticsIcon size="26px" />}
+              onClick={() =>
+                navigate(
+                  `/dashboard/campaign-analytics/${isAdminPanel ? 'admin/' : ''}${campaign.id}`
+                )
+              }
+              disabled={campaign?.status === CampaignStatus.draft}
+            >
+              Campaign Analytics
+            </Button>
+          </Group>
+        </Paper>
+        {isAdminPanel && <AdminBadge title="Admin campaign details" />}
+      </StickyPanel>
+
+      {isEditMode ? (
+        <EditCampaign campaign={campaign} isAdmin={isAdminPanel} />
+      ) : (
+        <Paper p="lg" shadow="xs">
+          <Grid gutter="lg" align="baseline">
+            <Grid.Col span={{ md: 12, xl: 6 }}>
+              <Stack gap="md">
+                <Text fw="bold" size="sm" c="dimmed">
                   Overview
                 </Text>
-                <div className={classes.innerWrapper}>
+                <Paper bg="lightBackground" p="md" withBorder>
+                  {isAdminPanel && (
+                    <CampaignDetailsRow
+                      textSize="sm"
+                      title="Owner"
+                      value={
+                        <Anchor
+                          underline="never"
+                          size="inherit"
+                          href={`/dashboard/admin/user-account/${campaign.owner}`}
+                          c="secondaryText"
+                        >
+                          {campaign.owner}
+                        </Anchor>
+                      }
+                    />
+                  )}
+                  <CampaignDetailsRow textSize="sm" title="Title" value={campaign?.title} />
+                  <CampaignDetailsRow textSize="sm" title="Id" value={campaign?.id} />
                   <CampaignDetailsRow
-                    lineHeight="sm"
-                    textSize="sm"
-                    title="Title"
-                    value={campaign?.title}
-                  />
-                  <CampaignDetailsRow
-                    lineHeight="sm"
-                    textSize="sm"
-                    title="Id"
-                    nowrap
-                    value={campaign?.id}
-                  />
-                  <CampaignDetailsRow
-                    lineHeight="sm"
                     textSize="sm"
                     title="Status"
                     value={
@@ -149,15 +304,13 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
                   />
                   {/* TODO: Add data for it */}
                   <CampaignDetailsRow
-                    lineHeight="sm"
                     textSize="sm"
                     title="Served"
-                    // value={campaignDetails?.served}
+                    // value={campaignData?.share}
                     value=""
                   />
                   {/* TODO: Add data for it */}
                   <CampaignDetailsRow
-                    lineHeight="sm"
                     textSize="sm"
                     title="Budget"
                     value={
@@ -170,12 +323,10 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
                     }
                   />
                   <CampaignDetailsRow
-                    lineHeight="sm"
                     title="Created"
                     value={formatDateTime(new Date(Number(campaign.created)))}
                   />
                   <CampaignDetailsRow
-                    lineHeight="sm"
                     textSize="sm"
                     title="Starts"
                     value={
@@ -185,7 +336,6 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
                     }
                   />
                   <CampaignDetailsRow
-                    lineHeight="sm"
                     textSize="sm"
                     title="Ends"
                     value={
@@ -195,7 +345,6 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
                     }
                   />
                   <CampaignDetailsRow
-                    lineHeight="sm"
                     title="CPM min"
                     value={
                       campaign.pricingBounds.IMPRESSION?.min && (
@@ -210,7 +359,6 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
                     }
                   />
                   <CampaignDetailsRow
-                    lineHeight="sm"
                     title="CPM max"
                     value={
                       campaign.pricingBounds.IMPRESSION?.max && (
@@ -225,7 +373,6 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
                     }
                   />
                   <CampaignDetailsRow
-                    lineHeight="sm"
                     textSize="sm"
                     title="Limit average daily spending"
                     value={
@@ -235,160 +382,88 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
                     }
                   />
                   <CampaignDetailsRow
-                    lineHeight="sm"
                     textSize="sm"
-                    title="Disable frequency capping"
-                    value={
-                      campaign.targetingInput.inputs.advanced.disableFrequencyCapping ? 'Yes' : 'No'
-                    }
+                    title="Last modified by"
                     noBorder
+                    value={
+                      <Stack gap="xs" align="end">
+                        <Text size="sm">{campaign.lastModifiedBy}</Text>
+                        <Text size="xs" c="dimmed">
+                          {new Date(Number(campaign.modified)).toLocaleString()}
+                        </Text>
+                      </Stack>
+                    }
                   />
-                </div>
-              </Grid.Col>
-              <Grid.Col md={12} xl={6}>
-                <Grid>
-                  <Grid.Col span={12}>
-                    <Text weight="bold" size="sm" pb="sm" className={classes.lighterColor}>
-                      Targeting
-                    </Text>
-                    <div className={classes.innerWrapper}>
+                </Paper>
+              </Stack>
+            </Grid.Col>
+            <Grid.Col span={{ md: 12, xl: 6 }}>
+              <Stack gap="xl">
+                <Stack gap="md">
+                  <Text fw="bold" size="sm" c="dimmed">
+                    Targeting
+                  </Text>
+                  <Paper bg="lightBackground" p="sm" withBorder>
+                    <Stack>
                       <CatsLocsFormatted
                         title="Selected Categories"
-                        arr={formatCatsAndLocsData(
-                          campaign.targetingInput.inputs.categories,
-                          CATEGORIES
-                        )}
+                        inputValues={campaign.targetingInput.inputs.categories}
+                        selectData={CATEGORIES}
                       />
+                      <Divider />
                       <CatsLocsFormatted
                         title="Selected Countries"
-                        arr={formatCatsAndLocsData(
-                          campaign.targetingInput.inputs.location,
-                          COUNTRIES
-                        )}
+                        inputValues={campaign.targetingInput.inputs.location}
+                        selectData={COUNTRIES}
                       />
-                    </div>
-                  </Grid.Col>
-                </Grid>
-                {campaign.adUnits.length ? (
-                  <>
-                    <Grid>
-                      <Grid.Col span={12}>
-                        <Text weight="bold" size="sm" pb="sm" className={classes.lighterColor}>
-                          Creatives
-                        </Text>
-                      </Grid.Col>
-                    </Grid>
-                    <Grid>
-                      <Grid.Col span={12}>
-                        <div className={cx(classes.innerWrapper, classes.scrollableContainer)}>
-                          {campaign.adUnits.map((item: AdUnit, index) => {
-                            const isLast = index === campaign.adUnits.length - 1
-                            return (
-                              <CampaignDetailsRow
-                                key={item.id}
-                                lineHeight="sm"
-                                textSize="sm"
-                                title={`${item.banner?.format.w}x${item.banner?.format.h}`}
-                                value={
-                                  <MediaThumb
-                                    adUnit={item}
-                                    previewOnClick
-                                    title={`Target URL: ${item.banner?.targetUrl}`}
-                                  />
-                                }
-                                noBorder={isLast}
+                    </Stack>
+                  </Paper>
+                </Stack>
+                {!!campaign.adUnits.length && (
+                  <Stack gap="md">
+                    <Text fw="bold" size="sm" c="dimmed">
+                      Creatives
+                    </Text>
+                    <Paper bg="lightBackground" p="sm" withBorder>
+                      {campaign.adUnits.map((item: AdUnit, index: number) => {
+                        const isLast = index === campaign.adUnits.length - 1
+                        return (
+                          <CampaignDetailsRow
+                            key={item.id}
+                            textSize="sm"
+                            title={`${item.banner?.format.w}x${item.banner?.format.h}`}
+                            value={
+                              <MediaThumb
+                                adUnit={item}
+                                previewOnClick
+                                title={`Target URL: ${item.banner?.targetUrl}`}
                               />
-                            )
-                          })}
-                        </div>
-                      </Grid.Col>
-                    </Grid>
-                  </>
-                ) : null}
-                <Grid>
-                  <Grid.Col>
-                    <Flex justify="flex-end" align="center" gap="xs" mt="xl">
-                      {campaign.status === CampaignStatus.paused && (
-                        <CampaignActionBtn
-                          text="Activate"
-                          icon={<ActiveIcon size="13px" />}
-                          color="success"
-                          onBtnClicked={() =>
-                            changeCampaignStatus(CampaignStatus.active, campaign.id)
-                          }
-                        />
-                      )}
-                      {/* {campaign.status === CampaignStatus.active && (
-                        <CampaignActionBtn
-                          text="Pause"
-                          icon={<StopIcon size="13px" />}
-                          color="paused"
-                          onBtnClicked={() =>
-                            changeCampaignStatus(CampaignStatus.paused, campaign.id)
-                          }
-                        />
-                      )} */}
-                      {(campaign.status === CampaignStatus.paused ||
-                        campaign.status === CampaignStatus.active) && (
-                        <CampaignActionBtn
-                          text="Close"
-                          icon={<ArchivedIcon size="13px" />}
-                          color="secondaryText"
-                          onBtnClicked={() => handleActionBtnClicked()}
-                        />
-                      )}
-                      {campaign.status === CampaignStatus.draft && (
-                        <CampaignActionBtn
-                          text="Edit"
-                          icon={<EditIcon size="13px" />}
-                          color="draft"
-                          onBtnClicked={handleEdit}
-                        />
-                      )}
-                      {campaign.status === CampaignStatus.inReview && (
-                        <CampaignActionBtn
-                          text="Cancel"
-                          icon={<ArchivedIcon size="13px" />}
-                          color="secondaryText"
-                          // onBtnClicked={() =>
-                          //   changeCampaignStatus(CampaignStatus.closedByUser, campaign.id)
-                          // }
-                          onBtnClicked={() => handleActionBtnClicked()}
-                        />
-                      )}
-                    </Flex>
-                  </Grid.Col>
-                </Grid>
-              </Grid.Col>
+                            }
+                            align="center"
+                            noBorder={isLast}
+                          />
+                        )
+                      })}
+                    </Paper>
+                  </Stack>
+                )}
+              </Stack>
+            </Grid.Col>
 
-              {isAdminPanel && (
-                <Grid.Col md={12} xl={6} pt="xl">
-                  <Grid>
-                    <Grid.Col span={12}>
-                      <Text weight="bold" size="xl" pb="sm" color="attention">
-                        Admin actions
-                      </Text>
-                    </Grid.Col>
-                    <Grid.Col>
-                      <AdminActions item={campaign} />
-                    </Grid.Col>
-                  </Grid>
-                </Grid.Col>
-              )}
-            </Grid>
-          </Container>
-          <CustomConfirmModal
-            cancelBtnLabel="No"
-            confirmBtnLabel="Yes"
-            onCancelClicked={() => updateOpenState()}
-            onConfirmClicked={() => handleConfirmBtnClicked()}
-            color="attention"
-            text="Are you sure you want to stop or cancel the campaign?"
-            opened={open}
-          />
-        </>
+            {isAdminPanel && (
+              <Grid.Col span={{ md: 12, xl: 6 }} pt="xl">
+                <Stack>
+                  <Text fw="bold" size="xl" pb="sm" c="attention">
+                    Admin actions
+                  </Text>
+                  <AdminActions item={campaign} />
+                </Stack>
+              </Grid.Col>
+            )}
+          </Grid>
+        </Paper>
       )}
-    </>
+    </Stack>
   )
 }
 

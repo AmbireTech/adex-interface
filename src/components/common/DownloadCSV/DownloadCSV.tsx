@@ -1,18 +1,24 @@
-import { Flex, Text, UnstyledButton } from '@mantine/core'
+import { Button, ThemeIcon } from '@mantine/core'
 import { AdUnit } from 'adex-common'
 import DownloadIcon from 'resources/icons/Download'
 import { BaseAnalyticsData, Country, Hostname } from 'types'
 
+type GenericHeader = { [key: string]: string }
 export type CSVDataType = BaseAnalyticsData[]
-export type CSVHeadersType = Hostname | Country | AdUnit
-
+export type CSVHeadersType = Hostname | Country | AdUnit | GenericHeader
 interface DownloadCSVProps {
   data: CSVDataType | undefined
   filename: string
   mapHeadersToDataProperties: CSVHeadersType
+  disabled?: boolean
 }
 
-const DownloadCSV = ({ data, filename, mapHeadersToDataProperties }: DownloadCSVProps) => {
+const DownloadCSV = ({
+  data,
+  filename,
+  mapHeadersToDataProperties,
+  disabled
+}: DownloadCSVProps) => {
   const convertToCSV = (
     dataToConvert: CSVDataType | undefined,
     mappingHeaders?: CSVHeadersType | undefined
@@ -62,14 +68,20 @@ const DownloadCSV = ({ data, filename, mapHeadersToDataProperties }: DownloadCSV
     downloadCSV(data, filename, mapHeadersToDataProperties)
   }
   return (
-    <UnstyledButton onClick={handleDownload}>
-      <Flex align="center">
-        <Text size="sm" mr="sm">
-          Download CSV
-        </Text>
-        <DownloadIcon size="24px" />
-      </Flex>
-    </UnstyledButton>
+    <Button
+      onClick={handleDownload}
+      disabled={disabled}
+      size="sm"
+      color="mainText"
+      variant="transparent"
+      rightSection={
+        <ThemeIcon size="sm" variant="transparent" c="inherit">
+          <DownloadIcon size="100%" />
+        </ThemeIcon>
+      }
+    >
+      .CSV
+    </Button>
   )
 }
 
