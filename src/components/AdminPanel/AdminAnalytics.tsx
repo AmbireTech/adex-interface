@@ -319,6 +319,7 @@ const AdminAnalytics = () => {
               ? 'Error occurred while loading analytics'
               : undefined
           }
+          defaultSortIndex={3}
           loading={loading}
           headings={headings}
           data={data.elements}

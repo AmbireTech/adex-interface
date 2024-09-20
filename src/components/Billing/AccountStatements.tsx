@@ -153,6 +153,7 @@ const Statements = () => {
       </BillingDetailsModal>
       <CustomTable
         headings={columnTitles}
+        defaultSortIndex={0}
         data={elements}
         actions={actions}
         shadow="xs"

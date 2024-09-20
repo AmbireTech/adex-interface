@@ -173,6 +173,7 @@ const Placements = ({ forAdmin, campaignId }: { forAdmin: boolean; campaignId: s
       error={error}
       headings={headings}
       data={elements}
+      defaultSortIndex={1}
       loading={loading}
       selectedActions={selectedActions}
       tableActions={

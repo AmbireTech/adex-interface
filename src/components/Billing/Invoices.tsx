@@ -85,6 +85,7 @@ const Invoices = () => {
         headings={columnTitles}
         data={invoiceElements}
         actions={actions}
+        defaultSortIndex={2}
         shadow="xs"
         loading={initialDataLoading}
       />

@@ -59,6 +59,7 @@ export type CustomTableProps = PropsWithChildren &
     tableActions?: ReactNode
     error?: string | boolean
     defaultSortIndex?: number
+    defaultSortDirection?: 1 | -1
   }
 
 const getLabel = (label: TableRowAction['label'], actionData?: DataElement['actionData']) => {
@@ -88,10 +89,12 @@ export const CustomTable = ({
   tableActions,
   error,
   defaultSortIndex,
+  defaultSortDirection,
   ...tableProps
 }: CustomTableProps) => {
   const selectedElements = useSet<string>()
   const hasSelectActions = useMemo(() => !!selectedActions?.length, [selectedActions?.length])
+  const headingIndexOffset = useMemo(() => (hasSelectActions ? -1 : 0), [hasSelectActions])
 
   const maxItemsPerPage = pageSize || 10
 
@@ -109,8 +112,8 @@ export const CustomTable = ({
   })
 
   const [sorting, setSorting] = useState<{ sortIndex: number; sortDirection: -1 | 1 }>({
-    sortIndex: defaultSortIndex || -1,
-    sortDirection: -1
+    sortIndex: defaultSortIndex !== undefined ? defaultSortIndex : -1,
+    sortDirection: defaultSortDirection !== undefined ? defaultSortDirection : -1
   })
 
   const filteredData = useMemo(() => {
@@ -280,7 +283,7 @@ export const CustomTable = ({
         const colElement = column?.element || column?.value?.toString()
 
         return typeof colElement !== 'object' ? (
-          <Text ta="left" size="sm" truncate maw={200}>
+          <Text size="sm" truncate maw={200}>
             {colElement}
           </Text>
         ) : (
@@ -306,7 +309,17 @@ export const CustomTable = ({
       return (
         <Table.Tr key={rowKey}>
           {cols.map((c, cidx) => (
-            <Table.Td key={rowKey + cidx.toString()} c={color}>
+            <Table.Td
+              ta={
+                ['number', 'bigint'].includes(
+                  typeof rowData?.columns?.[cidx + headingIndexOffset]?.value
+                )
+                  ? 'right'
+                  : 'left'
+              }
+              key={rowKey + cidx.toString()}
+              c={color}
+            >
               {c}
             </Table.Td>
           ))}
@@ -315,10 +328,8 @@ export const CustomTable = ({
     })
 
     const colHeadings: string[] = [...headings]
-    let headingOffset = 0
     if (hasSelectActions) {
       colHeadings.unshift('select')
-      headingOffset = -1
     }
 
     if (actions?.length) {
@@ -332,8 +343,19 @@ export const CustomTable = ({
           {heading === 'select' ? (
             masterSelectAction
           ) : (
-            <Group wrap="nowrap" gap="xs" align="center">
-              {filteredData[0]?.columns[index]?.value !== undefined ? (
+            <Group
+              wrap="nowrap"
+              gap="xs"
+              align="center"
+              justify={
+                ['number', 'bigint'].includes(
+                  typeof filteredData[0]?.columns[index + headingIndexOffset]?.value
+                )
+                  ? 'right'
+                  : undefined
+              }
+            >
+              {filteredData[0]?.columns[index + headingIndexOffset]?.value !== undefined ? (
                 <Button
                   px="0"
                   tt="capitalize"
@@ -342,20 +364,20 @@ export const CustomTable = ({
                   c="mainText"
                   onClick={() => {
                     setSorting((prev) => ({
-                      sortIndex: index + headingOffset,
+                      sortIndex: index + headingIndexOffset,
                       sortDirection: prev.sortDirection < 0 ? 1 : -1
                     }))
                     setPage(1)
                   }}
                   rightSection={
-                    sorting.sortIndex === index + headingOffset && (
-                      <ActionIcon variant="transparent" c="mainText" size={14}>
+                    sorting.sortIndex === index + headingIndexOffset && (
+                      <ThemeIcon variant="transparent" c="mainText" size={14}>
                         <DownArrowIcon
                           style={{
                             transform: sorting.sortDirection > 0 ? 'rotate(180deg)' : undefined
                           }}
                         />
-                      </ActionIcon>
+                      </ThemeIcon>
                     )
                   }
                 >

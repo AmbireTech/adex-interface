@@ -16,21 +16,25 @@ export const FundsActivity = ({ accountData }: { accountData: Account }) => {
     ]
       .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
 
-      .map((x) => {
+      .map((x, i) => {
         const sign = x.type === 'campaignOpen' ? '-' : '+'
         const color: MantineColor = sign === '-' ? 'darkred' : 'darkgreen'
         return {
-          id: x.name,
+          id: x.id + i,
           columns: [
-            { element: <Text c={color} tt="capitalize" fw="bold">{`${sign} ${x.name}`}</Text> },
+            {
+              value: x.type,
+              element: <Text c={color} tt="capitalize" fw="bold">{`${sign} ${x.name}`}</Text>
+            },
             { value: x.date.getTime(), element: x.date?.toLocaleDateString() || '' },
             {
-              value: x.amount,
+              value: Number(x.amount),
               element: (
                 <Text
                   c={color}
                   tt="capitalize"
                   fw="bold"
+                  style={{ whiteSpace: 'nowrap' }}
                 >{`${sign} ${parseBigNumTokenAmountToDecimal(x.amount, x.token.decimals)}`}</Text>
               )
             },
@@ -51,6 +55,7 @@ export const FundsActivity = ({ accountData }: { accountData: Account }) => {
       <CustomTable
         headings={['Type', 'Date', 'Amount', 'Token', 'Tx/Campaign id']}
         data={elements}
+        defaultSortIndex={1}
         pageSize={10}
       />
     </Box>
