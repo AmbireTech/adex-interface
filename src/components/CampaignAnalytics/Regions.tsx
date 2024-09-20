@@ -62,6 +62,7 @@ const Regions = ({ forAdmin, campaignId }: { forAdmin: boolean; campaignId: stri
         headings={headings}
         data={elements}
         loading={loading}
+        defaultSortIndex={1}
         tableActions={
           <Group align="center" justify="end" gap="xs">
             <Button

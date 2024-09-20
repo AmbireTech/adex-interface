@@ -75,6 +75,7 @@ const Creatives = ({ forAdmin, campaignId }: { forAdmin: boolean; campaignId: st
       error={error}
       headings={headings}
       data={elements}
+      defaultSortIndex={2}
       loading={loading}
       tableActions={
         <DownloadCSV

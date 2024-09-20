@@ -59,6 +59,7 @@ export type CustomTableProps = PropsWithChildren &
     tableActions?: ReactNode
     error?: string | boolean
     defaultSortIndex?: number
+    defaultSortDirection?: 1 | -1
   }
 
 const getLabel = (label: TableRowAction['label'], actionData?: DataElement['actionData']) => {
@@ -88,6 +89,7 @@ export const CustomTable = ({
   tableActions,
   error,
   defaultSortIndex,
+  defaultSortDirection,
   ...tableProps
 }: CustomTableProps) => {
   const selectedElements = useSet<string>()
@@ -109,8 +111,8 @@ export const CustomTable = ({
   })
 
   const [sorting, setSorting] = useState<{ sortIndex: number; sortDirection: -1 | 1 }>({
-    sortIndex: defaultSortIndex || -1,
-    sortDirection: -1
+    sortIndex: defaultSortIndex !== undefined ? defaultSortIndex : -1,
+    sortDirection: defaultSortDirection !== undefined ? defaultSortDirection : -1
   })
 
   const filteredData = useMemo(() => {

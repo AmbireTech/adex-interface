@@ -180,7 +180,7 @@ const Dashboard = ({ isAdminPanel, accountId }: { isAdminPanel?: boolean; accoun
                       : 'Website'
                 },
                 {
-                  value: cmpData.campaign.status.toString(),
+                  value: getStatusOrder(cmpData.campaign.status),
                   element: <BadgeStatusCampaign type={cmpData.campaign.status} />
                 },
                 {
@@ -430,6 +430,8 @@ const Dashboard = ({ isAdminPanel, accountId }: { isAdminPanel?: boolean; accoun
         </Flex>
         <CustomTable
           shadow={!isAdminPanel ? 'xs' : undefined}
+          defaultSortIndex={2}
+          defaultSortDirection={1}
           headings={campaignHeaders}
           data={elements}
           actions={actions}
