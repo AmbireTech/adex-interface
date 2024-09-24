@@ -61,6 +61,14 @@ const sspsData: Array<{ value: SSPs; label: string }> = [
   { value: 'Qortex', label: 'Qortex' }
 ]
 
+type Placements = '' | 'app' | 'site'
+
+const placementData: Array<{ value: Placements; label: string }> = [
+  { value: '', label: 'All Placements' },
+  { value: 'app', label: 'App' },
+  { value: 'site', label: 'Site' }
+]
+
 const mapSegmentLabel = (analType: AnalyticsType, segment: string): { segementLabel: string } => {
   let segementLabel = segment
 
@@ -103,6 +111,7 @@ const AdminAnalytics = () => {
   const [timeframe, setTimeframe] = useState<Timeframe>('month')
   const [analType, setAnalType] = useState<AnalyticsType>('ssp')
   const [ssp, setSsp] = useState<SSPs>('')
+  const [placement, setPlacement] = useState<Placements>('')
   const [startDate, setStartDate] = useState<Date | null>(
     dayjs().subtract(1, 'month').startOf('month').toDate()
   )
@@ -151,14 +160,15 @@ const AdminAnalytics = () => {
         timeframe,
         startDate || undefined,
         end || undefined,
-        ssp || undefined
+        ssp || undefined,
+        placement || undefined
       )
       setAnalyticsKey(key)
       console.log('key', key)
     }
 
     checkAnalytics()
-  }, [analType, getAnalyticsKeyAndUpdate, ssp, startDate, timeframe])
+  }, [analType, getAnalyticsKeyAndUpdate, placement, ssp, startDate, timeframe])
 
   const loading = useMemo(() => adminMappedAnalytics?.status === 'loading', [adminMappedAnalytics])
 
@@ -240,6 +250,14 @@ const AdminAnalytics = () => {
           value={ssp}
           onChange={(val) => setSsp(val as SSPs)}
           data={sspsData}
+          size="md"
+        />
+        <Select
+          label="Placement"
+          value={placement}
+          // @ts-ignore
+          onChange={(val) => setPlacement(val as Placements)}
+          data={placementData}
           size="md"
         />
         <Select
