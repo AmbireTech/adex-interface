@@ -38,6 +38,7 @@ import InfoFilledIcon from 'resources/icons/InfoFilled'
 import throttle from 'lodash.throttle'
 import { defaultConfirmModalProps } from 'components/common/Modals/CustomConfirmModal'
 import Placements from 'components/CampaignAnalytics/Placements'
+import DefaultCustomAnchor from 'components/common/customAnchor'
 
 type TargetingInputEdit = {
   version: string
@@ -320,22 +321,41 @@ const EditCampaign = ({ campaign, isAdmin }: { campaign: Campaign; isAdmin?: boo
                 <Text c="secondaryText" size="sm" fw="bold">
                   Advanced
                 </Text>
-
-                <Checkbox
-                  label="Limit average daily spending"
-                  {...form.getInputProps(
-                    'targetingInput.inputs.advanced.limitDailyAverageSpending',
-                    {
+                <Group>
+                  <Checkbox
+                    label="Limit average daily spending"
+                    {...form.getInputProps(
+                      'targetingInput.inputs.advanced.limitDailyAverageSpending',
+                      {
+                        type: 'checkbox'
+                      }
+                    )}
+                  />
+                  <DefaultCustomAnchor
+                    href="https://help.adex.network/hc/en-us/articles/15014607423260-How-to-limit-your-average-daily-spend"
+                    external
+                    c="blue"
+                    size="sm"
+                  >
+                    (learn more)
+                  </DefaultCustomAnchor>
+                </Group>
+                <Group>
+                  <Checkbox
+                    label="Aggressive bidding mode"
+                    {...form.getInputProps('targetingInput.inputs.advanced.aggressiveBidding', {
                       type: 'checkbox'
-                    }
-                  )}
-                />
-                <Checkbox
-                  label="Aggressive bidding mode"
-                  {...form.getInputProps('targetingInput.inputs.advanced.aggressiveBidding', {
-                    type: 'checkbox'
-                  })}
-                />
+                    })}
+                  />
+                  <DefaultCustomAnchor
+                    href="https://help.adex.network/hc/en-us/articles/16075705207068-What-is-aggressive-bidding"
+                    external
+                    c="blue"
+                    size="sm"
+                  >
+                    (learn more)
+                  </DefaultCustomAnchor>
+                </Group>
               </Stack>
 
               <Button disabled={!form.isDirty()} size="lg" type="submit" maw={200}>
