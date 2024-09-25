@@ -1,4 +1,4 @@
-import { Paper } from '@mantine/core'
+import { Paper, Stack } from '@mantine/core'
 import CampaignDetailsRow from 'components/common/CampainDetailsRow/CampaignDetailsRow'
 import useCreateCampaignData from 'hooks/useCreateCampaignData/useCreateCampaignData'
 import { useMemo } from 'react'
@@ -24,17 +24,21 @@ const StepFour = () => {
       { title: 'Campaign Name', value: campaignNameFormatted },
       { title: 'Campaign Budget', value: campaignBudgetFormatted },
       { title: 'CPM', value: priceBoundsFormatted },
+      {
+        title: 'Limit average daily spending',
+        value: advancedTargeInput.limitDailyAverageSpending ? 'Yes' : 'No'
+      },
+      {
+        title: 'Aggressive bidding',
+        value: advancedTargeInput.aggressiveBidding ? 'Yes' : 'No'
+      },
       { title: 'Campaign Period', value: campaignPeriodFormatted },
       { title: 'Placements', value: formattedSelectedPlacement },
       { title: 'Device Type', value: formattedSelectedDevice },
       { title: 'Ad Format', value: adFormats },
       { title: 'Creatives', value: adUnitsFormatted, isColumn: true },
       { title: 'Selected Categories', value: formattedCats },
-      { title: 'Selected Countries', value: formattedLocs },
-      {
-        title: 'Limit average daily spending',
-        value: advancedTargeInput.limitDailyAverageSpending ? 'Yes' : 'No'
-      }
+      { title: 'Selected Countries', value: formattedLocs }
     ],
     [
       campaignNameFormatted,
@@ -47,15 +51,16 @@ const StepFour = () => {
       adUnitsFormatted,
       formattedCats,
       formattedLocs,
-      advancedTargeInput.limitDailyAverageSpending
+      advancedTargeInput.limitDailyAverageSpending,
+      advancedTargeInput.aggressiveBidding
     ]
   )
 
   const rows = useMemo(
     () =>
-      campaignOverview.map((item: CreateCampaignOverview, i) => {
+      campaignOverview.map((item: CreateCampaignOverview) => {
         const isLast = item === campaignOverview[campaignOverview.length - 1]
-        const fullTitle = `${i + 1}. ${item.title}`
+        const fullTitle = `${item.title}`
 
         return (
           <CampaignDetailsRow
@@ -74,7 +79,7 @@ const StepFour = () => {
 
   return (
     <Paper p="md" withBorder bg="lightBackground">
-      {rows}
+      <Stack gap="xs">{rows}</Stack>
     </Paper>
   )
 }

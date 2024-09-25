@@ -33,56 +33,60 @@ const CampaignSummary = ({ onLaunchClick }: { onLaunchClick: () => void }) => {
   } = useCreateCampaignData()
 
   return (
-    <>
-      <Stack gap="xs">
+    <Stack gap="xs">
+      <CampaignDetailsRow
+        lighterColor
+        title="Budget"
+        value={campaignBudgetFormatted}
+        textSize="sm"
+      />
+      <CampaignDetailsRow lighterColor title="CPM" value={priceBoundsFormatted} textSize="sm" />
+      <CampaignDetailsRow
+        lighterColor
+        title="Placement"
+        value={placement === 'site' ? 'Website' : 'App'}
+        textSize="sm"
+      />
+      {placement === 'site' && (
         <CampaignDetailsRow
           lighterColor
-          title="Budget"
-          value={campaignBudgetFormatted}
+          title="Device"
           textSize="sm"
+          value={formattedSelectedDevice}
         />
-        <CampaignDetailsRow lighterColor title="CPM" value={priceBoundsFormatted} textSize="sm" />
-        <CampaignDetailsRow
-          lighterColor
-          title="Placement"
-          value={placement === 'site' ? 'Website' : 'App'}
-          textSize="sm"
-        />
-        {placement === 'site' && (
-          <CampaignDetailsRow
-            lighterColor
-            title="Device"
-            textSize="sm"
-            value={formattedSelectedDevice}
-          />
-        )}
-        <CampaignDetailsRow lighterColor title="Ad Format" value={adFormats} textSize="sm" />
-        <CampaignDetailsRow lighterColor title="Categories" value={formattedCats} textSize="sm" />
-        <CampaignDetailsRow lighterColor title="Countries" value={formattedLocs} textSize="sm" />
-        <CampaignDetailsRow
-          lighterColor
-          title="Limit average daily spending"
-          value={advancedTargeInput.limitDailyAverageSpending ? 'Yes' : 'No'}
-          textSize="sm"
-          mb="xs"
-        />
+      )}
+      <CampaignDetailsRow lighterColor title="Ad Format" value={adFormats} textSize="sm" />
+      <CampaignDetailsRow lighterColor title="Categories" value={formattedCats} textSize="sm" />
+      <CampaignDetailsRow lighterColor title="Countries" value={formattedLocs} textSize="sm" />
+      <CampaignDetailsRow
+        lighterColor
+        title="Limit average daily spending"
+        value={advancedTargeInput.limitDailyAverageSpending ? 'Yes' : 'No'}
+        textSize="sm"
+      />
+      <CampaignDetailsRow
+        lighterColor
+        title="Aggressive bidding"
+        value={advancedTargeInput.aggressiveBidding ? 'Yes' : 'No'}
+        textSize="sm"
+      />
 
-        <CampaignDetailsRow
-          lighterColor
-          title="Auto UTM tracking"
-          value={
-            <Group gap="sm">
-              <Text size="inherit" c={autoUTMChecked ? 'success' : 'warning'}>
-                {autoUTMChecked ? 'Enabled' : 'Disabled'}
-              </Text>
-              <UtmInfo title="" placement={placement} />
-            </Group>
-          }
-          textSize="sm"
-          noBorder
-          mb="xs"
-        />
-      </Stack>
+      <CampaignDetailsRow
+        lighterColor
+        title="Auto UTM tracking"
+        value={
+          <Group gap="sm">
+            <Text size="inherit" c={autoUTMChecked ? 'success' : 'warning'}>
+              {autoUTMChecked ? 'Enabled' : 'Disabled'}
+            </Text>
+            <UtmInfo title="" placement={placement} />
+          </Group>
+        }
+        textSize="sm"
+        noBorder
+        mb="xs"
+      />
+
       {/* Temporary disabled */}
       {/* <Flex justify="space-between" className={classes.bg} p="lg">
         <Text c="secondaryText" fw="bold">
@@ -115,7 +119,7 @@ const CampaignSummary = ({ onLaunchClick }: { onLaunchClick: () => void }) => {
           </Button>
         )}
       </Stack>
-    </>
+    </Stack>
   )
 }
 export default CampaignSummary
