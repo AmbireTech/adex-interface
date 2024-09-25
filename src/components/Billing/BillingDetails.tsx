@@ -87,21 +87,16 @@ const validateVAT = async (
 
   try {
     const response = await fetchService({
-      url: `https://ec.europa.eu/taxation_customs/vies/rest-api/ms/${countryCode}/vat/${vat}`,
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*'
-      }
+      url: `https://ec.europa.eu/taxation_customs/vies/rest-api/ms/${countryCode}/vat/${vat}`
     })
 
     const result = await response.json()
 
     if (!response.ok) {
-      throw new Error('Invalid response from VAT validation API')
+      throw new Error('Error checking VAT, try again later')
     }
 
-    isValid = result.valid
+    isValid = result.isValid
   } catch (e: any) {
     console.error(e.message || e)
     error = e.message || e
@@ -139,6 +134,8 @@ const BillingDetails = () => {
         value.length < 2 ? 'Company name must have at least 2 characters' : null,
       companyNumber: (value: string) =>
         value.length === 0 ? 'Registration number is required' : null,
+      companyNumberPrim: (value) =>
+        !value || value.length === 0 ? 'VAT number is required' : null,
       companyAddress: (value: string) =>
         value.length === 0 ? 'Company address is required' : null,
       companyCountry: (value: string) => (value.length === 0 ? 'Country is required' : null),
@@ -149,10 +146,10 @@ const BillingDetails = () => {
 
   const handleSubmit = useCallback(
     async (values: BillingDetailsProps) => {
-      try {
-        const { companyNumberPrim, companyCountry } = values
+      const { companyNumberPrim, companyCountry } = values
 
-        if (companyNumberPrim && companyCountry && isValidCountryCode(companyCountry)) {
+      if (companyNumberPrim && companyCountry && isValidCountryCode(companyCountry)) {
+        try {
           const { isValid, error } = await validateVAT(
             companyCountry as keyof typeof CountryCodes,
             companyNumberPrim
@@ -162,17 +159,17 @@ const BillingDetails = () => {
             showNotification('error', error || 'Validating VAT number', 'Validating VAT number')
             return
           }
+        } catch (e: any) {
+          console.error(e)
+          showNotification(
+            'error',
+            'Validating VAT number',
+            e.message || e || 'Validating VAT number'
+          )
         }
-
-        updateBillingDetails(values)
-      } catch (e: any) {
-        console.error(e)
-        showNotification(
-          'error',
-          'Validating VAT number',
-          e.message || e || 'Validating VAT number'
-        )
       }
+
+      updateBillingDetails(values)
     },
     [updateBillingDetails, form, showNotification]
   )
