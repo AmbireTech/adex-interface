@@ -188,7 +188,7 @@ const StepThree = () => {
             })}
           />
           <DefaultCustomAnchor
-            href="https://help.adex.network/hc/en-us/articles/15014607423260-Aggressive-bidding-mode"
+            href="https://help.adex.network/hc/en-us/articles/16075705207068-What-is-aggressive-bidding"
             external
             c="blue"
             size="sm"
