@@ -179,6 +179,23 @@ const StepThree = () => {
             {...getInputProps('cpmPricingBounds.max')}
           />
         </Group>
+        <Group>
+          <Checkbox
+            label="Aggressive bidding mode"
+            key={key('targetingInput.inputs.advanced.limitDailyAverageSpending')}
+            {...getInputProps('targetingInput.inputs.advanced.aggressiveBidding', {
+              type: 'checkbox'
+            })}
+          />
+          <DefaultCustomAnchor
+            href="https://help.adex.network/hc/en-us/articles/15014607423260-Aggressive-bidding-mode"
+            external
+            c="blue"
+            size="sm"
+          >
+            (learn more)
+          </DefaultCustomAnchor>
+        </Group>
       </Stack>
 
       <TextInput
