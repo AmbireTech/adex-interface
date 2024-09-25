@@ -384,6 +384,13 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
                     />
                     <CampaignDetailsRow
                       textSize="sm"
+                      title="Aggressive bidding"
+                      value={
+                        campaign.targetingInput.inputs.advanced.aggressiveBidding ? 'Yes' : 'No'
+                      }
+                    />
+                    <CampaignDetailsRow
+                      textSize="sm"
                       title="Last modified by"
                       noBorder
                       value={
