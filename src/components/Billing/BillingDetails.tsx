@@ -116,31 +116,34 @@ const BillingDetails = () => {
     initialValues: billingDetails,
     validateInputOnBlur: true,
     validate: {
-      firstName: (value: string) => {
-        if (value.length > 0 && value.length < 2) {
-          return 'First name must have at least 2 letters'
-        }
+      firstName: (value) => {
+        if (!value) return 'First name is required'
 
-        return null
+        return value.length > 0 && value.length < 2
+          ? 'First name must have at least 2 letters'
+          : null
       },
-      lastName: (value: string) => {
-        if (value.length > 0 && value.length < 2) {
-          return 'Last name must have at least 2 letters'
-        }
+      lastName: (value) => {
+        if (!value) return 'Last name is required'
 
-        return null
+        return value.length > 0 && value.length < 2
+          ? 'Last name must have at least 2 letters'
+          : null
       },
-      companyName: (value: string) =>
-        value.length < 2 ? 'Company name must have at least 2 characters' : null,
-      companyNumber: (value: string) =>
-        value.length === 0 ? 'Registration number is required' : null,
+      companyName: (value) => {
+        if (!value) return 'Company name is required'
+
+        return value.length < 2 ? 'Company name must have at least 2 characters' : null
+      },
+      companyNumber: (value) =>
+        !value || value.length === 0 ? 'Registration number is required' : null,
       companyNumberPrim: (value) =>
         !value || value.length === 0 ? 'VAT number is required' : null,
-      companyAddress: (value: string) =>
-        value.length === 0 ? 'Company address is required' : null,
-      companyCountry: (value: string) => (value.length === 0 ? 'Country is required' : null),
-      companyCity: (value: string) => (value.length === 0 ? 'City is required' : null),
-      companyZipCode: (value: string) => (value.length === 0 ? 'Zip code is required' : null) // Zip code can be alphanumeric
+      companyAddress: (value) =>
+        !value || value.length === 0 ? 'Company address is required' : null,
+      companyCountry: (value) => (!value || value.length === 0 ? 'Country is required' : null),
+      companyCity: (value) => (!value || value.length === 0 ? 'City is required' : null),
+      companyZipCode: (value) => (!value || value.length === 0 ? 'Zip code is required' : null) // Zip code can be alphanumeric
     }
   })
 
