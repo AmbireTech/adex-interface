@@ -144,7 +144,8 @@ const EditCampaign = ({ campaign, isAdmin }: { campaign: Campaign; isAdmin?: boo
             disableFrequencyCapping: (value) =>
               typeof value !== 'boolean' ? 'Invalid value' : null,
             limitDailyAverageSpending: (value) =>
-              typeof value !== 'boolean' ? 'Invalid value' : null
+              typeof value !== 'boolean' ? 'Invalid value' : null,
+            aggressiveBidding: (value) => (typeof value !== 'boolean' ? 'Invalid value' : null)
           }
         }
       }
@@ -288,7 +289,7 @@ const EditCampaign = ({ campaign, isAdmin }: { campaign: Campaign; isAdmin?: boo
                     size="md"
                     placeholder="CPM min"
                     rightSection={
-                      <Text color="brand" mr="sm" size="sm">
+                      <Text c="brand" mr="sm" size="sm">
                         Min
                       </Text>
                     }
@@ -319,17 +320,22 @@ const EditCampaign = ({ campaign, isAdmin }: { campaign: Campaign; isAdmin?: boo
                 <Text c="secondaryText" size="sm" fw="bold">
                   Advanced
                 </Text>
-                <Group>
-                  <Checkbox
-                    label="Limit average daily spending"
-                    {...form.getInputProps(
-                      'targetingInput.inputs.advanced.limitDailyAverageSpending',
-                      {
-                        type: 'checkbox'
-                      }
-                    )}
-                  />
-                </Group>
+
+                <Checkbox
+                  label="Limit average daily spending"
+                  {...form.getInputProps(
+                    'targetingInput.inputs.advanced.limitDailyAverageSpending',
+                    {
+                      type: 'checkbox'
+                    }
+                  )}
+                />
+                <Checkbox
+                  label="Aggressive bidding mode"
+                  {...form.getInputProps('targetingInput.inputs.advanced.aggressiveBidding', {
+                    type: 'checkbox'
+                  })}
+                />
               </Stack>
 
               <Button disabled={!form.isDirty()} size="lg" type="submit" maw={200}>
