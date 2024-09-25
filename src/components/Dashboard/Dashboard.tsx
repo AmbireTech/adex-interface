@@ -1,12 +1,16 @@
 import {
-  Campaign,
+  // Campaign,
   CampaignStatus,
   // CampaignType,
   EventType
 } from 'adex-common'
 import { Container, Flex, Text, UnstyledButton, Anchor, Stack, Group } from '@mantine/core'
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import CustomTable, { TableElement, TableRowAction } from 'components/common/CustomTable'
+import CustomTable, {
+  DataElement,
+  TableRowAction
+  // TableElement
+} from 'components/common/CustomTable'
 import { Link, useNavigate } from 'react-router-dom'
 import { useCampaignsData } from 'hooks/useCampaignsData'
 import { parseBigNumTokenAmountToDecimal, maskAddress, periodNumberToDate, MINUTE } from 'helpers'
@@ -51,22 +55,22 @@ const getStatusOrder = (status: CampaignStatus) => {
   }
 }
 
-type DashboardTableElement = Omit<TableElement, 'actionData'> & {
-  actionData: { campaign: Campaign; isDraft: boolean; canArchive: boolean }
-  title: string | JSX.Element
-  placement: string
-  status: {
-    value: CampaignStatus
-    element: JSX.Element
-  }
-  served: string
-  budget: string
-  impressions: number
-  clicks: number
-  ctr: string
-  period: JSX.Element
-  cpm: JSX.Element
-}
+// type DashboardTableElement = Omit<TableElement, 'actionData'> & {
+//   actionData: { campaign: Campaign; isDraft: boolean; canArchive: boolean }
+//   title: string | JSX.Element
+//   placement: string
+//   status: {
+//     value: CampaignStatus
+//     element: JSX.Element
+//   }
+//   served: string
+//   budget: string
+//   impressions: number
+//   clicks: number
+//   ctr: string
+//   period: JSX.Element
+//   cpm: JSX.Element
+// }
 
 const Dashboard = ({ isAdminPanel, accountId }: { isAdminPanel?: boolean; accountId?: string }) => {
   const navigate = useNavigate()
@@ -108,7 +112,7 @@ const Dashboard = ({ isAdminPanel, accountId }: { isAdminPanel?: boolean; accoun
     }
   }, [campaignsData, isAdminPanel, accountId, showArchived])
 
-  const elements: DashboardTableElement[] = useMemo(
+  const elements: DataElement[] = useMemo(
     () =>
       filteredCampaignData.campaignData.length
         ? filteredCampaignData.campaignData.map((cmpData) => {
@@ -120,6 +124,8 @@ const Dashboard = ({ isAdminPanel, accountId }: { isAdminPanel?: boolean; accoun
             )
 
             const archived = cmpData.campaign.archived
+
+            const served = cmpData.paid && budget ? Math.round((cmpData.paid / budget) * 100) : 0
 
             return {
               actionData: {
@@ -134,80 +140,98 @@ const Dashboard = ({ isAdminPanel, accountId }: { isAdminPanel?: boolean; accoun
               },
               rowColor: archived ? 'warning' : undefined,
               id: cmpData.campaignId,
-              title: (
-                <Stack gap="xs">
-                  <Group wrap="nowrap">
-                    {archived && (
-                      <BadgeStatusCampaign type={cmpData.campaign.status} isArchived={archived} />
-                    )}
-                    <Text size="sm" truncate maw={200}>
-                      {cmpData.campaign.title}
-                    </Text>
-                  </Group>
+              columns: [
+                {
+                  value: cmpData.campaign.title,
+                  element: (
+                    <Stack gap="xs">
+                      <Group wrap="nowrap">
+                        {archived && (
+                          <BadgeStatusCampaign
+                            type={cmpData.campaign.status}
+                            isArchived={archived}
+                          />
+                        )}
+                        <Text size="sm" truncate maw={200}>
+                          {cmpData.campaign.title}
+                        </Text>
+                      </Group>
 
-                  {isAdminPanel && (
-                    <Anchor
-                      component={Link}
-                      inline
-                      underline="never"
-                      size="xs"
-                      to={`/dashboard/admin/user-account/${campaign.owner}`}
-                      c="secondaryText"
-                    >
-                      {maskAddress(campaign.owner)}
-                    </Anchor>
-                  )}
-                </Stack>
-              ),
-              // type: CampaignType[cmpData.campaign.type],
-              placement:
-                cmpData.campaign.targetingInput.inputs.placements.in[0] === 'app'
-                  ? 'App'
-                  : 'Website',
-              status: {
-                value: cmpData.campaign.status,
-                element: <BadgeStatusCampaign type={cmpData.campaign.status} />
-              },
-              served:
-                cmpData.paid && budget ? `${Math.round((cmpData.paid / budget) * 100)} %` : '0 %',
-              // TODO: get token name
-              budget: `${budget} USDC`,
-              impressions: cmpData.impressions,
-              clicks: cmpData.clicks,
-              ctr: `${cmpData.ctr || 0} %`,
-              period: (
-                <Stack gap="xs">
-                  <Text size="sm" inline>
-                    {cmpData.campaign.activeFrom
-                      ? periodNumberToDate(cmpData.campaign.activeFrom)
-                      : 'N/A'}
-                  </Text>
+                      {isAdminPanel && (
+                        <Anchor
+                          component={Link}
+                          inline
+                          underline="never"
+                          size="xs"
+                          to={`/dashboard/admin/user-account/${campaign.owner}`}
+                          c="secondaryText"
+                        >
+                          {maskAddress(campaign.owner)}
+                        </Anchor>
+                      )}
+                    </Stack>
+                  )
+                },
+                // type: CampaignType[cmpData.campaign.type],
+                {
+                  value:
+                    cmpData.campaign.targetingInput.inputs.placements.in[0] === 'app'
+                      ? 'App'
+                      : 'Website'
+                },
+                {
+                  value: getStatusOrder(cmpData.campaign.status),
+                  element: <BadgeStatusCampaign type={cmpData.campaign.status} />
+                },
+                {
+                  value: served,
+                  element: `${served} %`
+                },
+                // TODO: get token name
+                { value: budget, element: `${budget} USDC` },
+                { value: cmpData.impressions },
+                { value: cmpData.clicks },
+                { value: Number(cmpData.ctr), element: `${cmpData.ctr || 0} %` },
+                {
+                  value: cmpData.campaign.created,
+                  element: (
+                    <Stack gap="xs">
+                      <Text size="sm" inline>
+                        {cmpData.campaign.activeFrom
+                          ? periodNumberToDate(cmpData.campaign.activeFrom)
+                          : 'N/A'}
+                      </Text>
 
-                  <Text size="sm" inline>
-                    {cmpData.campaign.activeTo
-                      ? periodNumberToDate(cmpData.campaign.activeTo)
-                      : 'N/A'}
-                  </Text>
-                </Stack>
-              ),
-              cpm: (
-                <Stack gap="xs">
-                  <Text size="sm" inline styles={{ root: { whiteSpace: 'nowrap' } }}>
-                    {`${(
-                      parseBigNumTokenAmountToDecimal(
-                        cmpData.campaign.pricingBounds[EventType.IMPRESSION]?.min || 0n,
-                        decimals
-                      ) * 1000
-                    ).toFixed(2)} - ${(
-                      parseBigNumTokenAmountToDecimal(
-                        cmpData.campaign.pricingBounds[EventType.IMPRESSION]?.max || 0n,
-                        decimals
-                      ) * 1000
-                    ).toFixed(2)}`}
-                  </Text>
-                  <Text size="sm" inline>{`(avg: ${cmpData.avgCpm?.toFixed(2) || 0})`}</Text>
-                </Stack>
-              )
+                      <Text size="sm" inline>
+                        {cmpData.campaign.activeTo
+                          ? periodNumberToDate(cmpData.campaign.activeTo)
+                          : 'N/A'}
+                      </Text>
+                    </Stack>
+                  )
+                },
+                {
+                  value: cmpData.campaign.pricingBounds[EventType.IMPRESSION]?.min,
+                  element: (
+                    <Stack gap="xs">
+                      <Text size="sm" inline styles={{ root: { whiteSpace: 'nowrap' } }}>
+                        {`${(
+                          parseBigNumTokenAmountToDecimal(
+                            cmpData.campaign.pricingBounds[EventType.IMPRESSION]?.min || 0n,
+                            decimals
+                          ) * 1000
+                        ).toFixed(2)} - ${(
+                          parseBigNumTokenAmountToDecimal(
+                            cmpData.campaign.pricingBounds[EventType.IMPRESSION]?.max || 0n,
+                            decimals
+                          ) * 1000
+                        ).toFixed(2)}`}
+                      </Text>
+                      <Text size="sm" inline>{`(avg: ${cmpData.avgCpm?.toFixed(2) || 0})`}</Text>
+                    </Stack>
+                  )
+                }
+              ]
             }
           })
         : [],
@@ -215,21 +239,21 @@ const Dashboard = ({ isAdminPanel, accountId }: { isAdminPanel?: boolean; accoun
   )
 
   const handlePreview = useCallback(
-    (data: DashboardTableElement['actionData']) => {
+    (data: DataElement['actionData']) => {
       navigate(`/dashboard/campaign-details/${isAdminPanel ? 'admin/' : ''}${data.campaign.id}`, {})
     },
     [isAdminPanel, navigate]
   )
 
   const handleAnalytics = useCallback(
-    (data: DashboardTableElement['actionData']) => {
+    (data: DataElement['actionData']) => {
       navigate(`/dashboard/campaign-analytics/${isAdminPanel ? 'admin/' : ''}${data.campaign.id}`)
     },
     [isAdminPanel, navigate]
   )
 
   const handleEditDraft = useCallback(
-    (data: DashboardTableElement['actionData'], isDuplicate?: boolean) => {
+    (data: DataElement['actionData'], isDuplicate?: boolean) => {
       if (isAdminPanel) {
         return
       }
@@ -255,20 +279,20 @@ const Dashboard = ({ isAdminPanel, accountId }: { isAdminPanel?: boolean; accoun
   )
 
   const handleEdit = useCallback(
-    (data: DashboardTableElement['actionData']) =>
+    (data: DataElement['actionData']) =>
       navigate(`/dashboard/campaign-details/${data.campaign.id}/budget?edit=true`, {}),
     [navigate]
   )
 
   const handleDuplicate = useCallback(
-    (campaign: DashboardTableElement['actionDta']) => {
+    (campaign: DataElement['actionData']) => {
       return handleEditDraft(campaign, true)
     },
     [handleEditDraft]
   )
 
   const handleDelete = useCallback(
-    (data: DashboardTableElement['actionData']) =>
+    (data: DataElement['actionData']) =>
       modals.openConfirmModal(
         defaultConfirmModalProps({
           text: `Are you sure want to delete draft "${data.campaign.title}"`,
@@ -281,7 +305,7 @@ const Dashboard = ({ isAdminPanel, accountId }: { isAdminPanel?: boolean; accoun
   )
 
   const handleArchive = useCallback(
-    (data: DashboardTableElement['actionData']) => {
+    (data: DataElement['actionData']) => {
       const cmp = data.campaign
       const confirm = cmp?.archived ? 'Unarchive' : 'Archive'
 
@@ -324,7 +348,7 @@ const Dashboard = ({ isAdminPanel, accountId }: { isAdminPanel?: boolean; accoun
         action: handleAnalytics,
         label: 'Show Analytics',
         icon: <AnalyticsIcon />,
-        disabled: (ada: DashboardTableElement['actionData']) =>
+        disabled: (ada: DataElement['actionData']) =>
           ada.isDraft ||
           [
             CampaignStatus.rejected,
@@ -342,15 +366,15 @@ const Dashboard = ({ isAdminPanel, accountId }: { isAdminPanel?: boolean; accoun
             action: handleEditDraft,
             label: 'Continue Edit',
             icon: <EditIcon />,
-            hide: (ada: DashboardTableElement['actionData']) => !ada.isDraft
+            hide: (ada: DataElement['actionData']) => !ada.isDraft
           },
           {
             action: handleEdit,
-            disabled: (ada: DashboardTableElement['actionData']) =>
+            disabled: (ada: DataElement['actionData']) =>
               ![CampaignStatus.active, CampaignStatus.paused].includes(ada.campaign.status),
             label: 'Edit',
             icon: <EditIcon />,
-            hide: (ada: DashboardTableElement['actionData']) => ada.isDraft
+            hide: (ada: DataElement['actionData']) => ada.isDraft
           },
           {
             action: handleDuplicate,
@@ -359,17 +383,17 @@ const Dashboard = ({ isAdminPanel, accountId }: { isAdminPanel?: boolean; accoun
           },
           {
             action: handleArchive,
-            label: (ada: DashboardTableElement['actionData']) =>
+            label: (ada: DataElement['actionData']) =>
               `${ada.campaign.archived ? 'Unarchive' : 'Archive'}  Campaign`,
             icon: <DeleteIcon />,
-            hide: (ada: DashboardTableElement['actionData']) => !ada.canArchive
+            hide: (ada: DataElement['actionData']) => !ada.canArchive
           },
           {
             action: handleDelete,
             label: 'Delete Draft',
             icon: <DeleteIcon />,
             color: 'red',
-            hide: (ada: DashboardTableElement['actionData']) => !ada.isDraft
+            hide: (ada: DataElement['actionData']) => !ada.isDraft
           }
         ]
       )
@@ -391,7 +415,7 @@ const Dashboard = ({ isAdminPanel, accountId }: { isAdminPanel?: boolean; accoun
     <Container fluid>
       <Flex direction="column" justify="start">
         <Flex justify="space-between" align="center">
-          <Text size="sm" color="secondaryText" fw="bold" mb="md">
+          <Text size="sm" c="secondaryText" fw="bold" mb="md">
             {isAdminPanel ? '* admin' : 'All campaigns'}
           </Text>
 
@@ -406,8 +430,10 @@ const Dashboard = ({ isAdminPanel, accountId }: { isAdminPanel?: boolean; accoun
         </Flex>
         <CustomTable
           shadow={!isAdminPanel ? 'xs' : undefined}
+          defaultSortIndex={2}
+          defaultSortDirection={1}
           headings={campaignHeaders}
-          elements={elements}
+          data={elements}
           actions={actions}
           loading={initialDataLoading}
         />

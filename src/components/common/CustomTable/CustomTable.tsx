@@ -2,7 +2,6 @@ import {
   Group,
   Pagination,
   Table,
-  Divider,
   Text,
   Stack,
   Menu,
@@ -20,31 +19,38 @@ import {
   Button,
   Alert
 } from '@mantine/core'
-import { useSet, useMediaQuery } from '@mantine/hooks'
+import { useSet } from '@mantine/hooks'
 import usePagination from 'hooks/usePagination'
-import { useMemo, PropsWithChildren, ReactNode, useCallback } from 'react'
+import { useMemo, PropsWithChildren, ReactNode, useCallback, useState } from 'react'
+import DownArrowIcon from 'resources/icons/DownArrow'
 import Dots from 'resources/icons/TreeDotsMenu'
 
-export type TableElement = {
-  id?: string
+export type ColumnElement = {
+  value?: string | number | bigint | undefined
+  element?: string | ReactNode
+  label?: string
+}
+
+export type DataElement = {
+  id: string
   rowColor?: MantineColor
   actionData?: any
-  [index: string]: any
+  columns: ColumnElement[]
 }
 
 export type TableRowAction = {
-  action: (e: TableElement['actionData']) => any
-  label: ((e: TableElement['actionData']) => string) | string
+  action: (e: DataElement['actionData']) => any
+  label: ((e: DataElement['actionData']) => string) | string
   color?: MantineColor
-  icon?: ((e: TableElement['actionData']) => ReactNode) | ReactNode
-  disabled?: (e?: TableElement['actionData']) => boolean
-  hide?: (e?: TableElement['actionData']) => boolean
+  icon?: ((e: DataElement['actionData']) => ReactNode) | ReactNode
+  disabled?: (e?: DataElement['actionData']) => boolean
+  hide?: (e?: DataElement['actionData']) => boolean
 }
 
 export type CustomTableProps = PropsWithChildren &
   TableProps & {
     headings: string[]
-    elements: Array<TableElement>
+    data: DataElement[]
     pageSize?: number
     actions?: TableRowAction[]
     shadow?: MantineShadow
@@ -52,9 +58,11 @@ export type CustomTableProps = PropsWithChildren &
     selectedActions?: TableRowAction[]
     tableActions?: ReactNode
     error?: string | boolean
+    defaultSortIndex?: number
+    defaultSortDirection?: 1 | -1
   }
 
-const getLabel = (label: TableRowAction['label'], actionData?: TableElement['actionData']) => {
+const getLabel = (label: TableRowAction['label'], actionData?: DataElement['actionData']) => {
   if (typeof label === 'function') {
     return label(actionData)
   }
@@ -62,7 +70,7 @@ const getLabel = (label: TableRowAction['label'], actionData?: TableElement['act
   return label
 }
 
-const getIcon = (icon: TableRowAction['icon'], actionData?: TableElement['actionData']) => {
+const getIcon = (icon: TableRowAction['icon'], actionData?: DataElement['actionData']) => {
   if (typeof icon === 'function') {
     return icon(actionData)
   }
@@ -72,7 +80,7 @@ const getIcon = (icon: TableRowAction['icon'], actionData?: TableElement['action
 
 export const CustomTable = ({
   headings,
-  elements,
+  data,
   pageSize,
   actions,
   shadow = 'none',
@@ -80,31 +88,71 @@ export const CustomTable = ({
   selectedActions,
   tableActions,
   error,
+  defaultSortIndex,
+  defaultSortDirection,
   ...tableProps
 }: CustomTableProps) => {
-  const isMobile = useMediaQuery('(max-width: 75rem)')
   const selectedElements = useSet<string>()
   const hasSelectActions = useMemo(() => !!selectedActions?.length, [selectedActions?.length])
+  const headingIndexOffset = useMemo(() => (hasSelectActions ? -1 : 0), [hasSelectActions])
 
-  const columns: string[] = useMemo(
-    () =>
-      typeof elements[0] === 'object'
-        ? Object.keys(elements[0]).filter(
-            (e: string) => e !== 'id' && e !== 'rowColor' && e !== 'actionData'
-          )
-        : [],
-    [elements]
-  )
+  const maxItemsPerPage = pageSize || 10
 
-  const maxItemsPerPage = pageSize || (isMobile ? elements.length : 10)
-  const { maxPages, defaultPage, startIndex, endIndex, onNextPage, onPreviousPage, onChange } =
-    usePagination({
-      elementsLength: elements.length,
-      maxItemsPerPage
-    })
-  const list = useMemo(() => {
-    return elements.slice(startIndex, endIndex)
-  }, [elements, startIndex, endIndex])
+  const {
+    maxPages,
+    page,
+    startIndex,
+    endIndex,
+    onNextPage,
+    onPreviousPage,
+    onChange: setPage
+  } = usePagination({
+    elementsLength: data.length,
+    maxItemsPerPage
+  })
+
+  const [sorting, setSorting] = useState<{ sortIndex: number; sortDirection: -1 | 1 }>({
+    sortIndex: defaultSortIndex !== undefined ? defaultSortIndex : -1,
+    sortDirection: defaultSortDirection !== undefined ? defaultSortDirection : -1
+  })
+
+  const filteredData = useMemo(() => {
+    const { sortIndex, sortDirection } = sorting
+
+    console.log({ sortIndex })
+
+    const next = [...data]
+      .sort((a, b) => {
+        if (sortIndex < 0) {
+          return 0
+        }
+
+        const aVal = a.columns[sortIndex]?.value || 0
+        const bVal = b.columns[sortIndex]?.value || 0
+
+        if (typeof aVal === 'string' && typeof bVal === 'string') {
+          return aVal.localeCompare(bVal) * sortDirection
+        }
+
+        if (typeof aVal === 'number' && typeof bVal === 'number') {
+          return (aVal - bVal) * sortDirection
+        }
+        if (typeof aVal === 'bigint' && typeof bVal === 'bigint') {
+          return Number(aVal - bVal) * sortDirection
+        }
+
+        if (aVal > bVal) {
+          return 1 * sortDirection
+        }
+        if (aVal < bVal) {
+          return -1 * sortDirection
+        }
+        return 0
+      })
+      .slice(startIndex, endIndex)
+
+    return next
+  }, [sorting, data, startIndex, endIndex])
 
   const handleCheckbox = useCallback(
     (checked: boolean, id: string) => {
@@ -114,17 +162,17 @@ export const CustomTable = ({
   )
 
   const currentPageElementsAllSelected: boolean = useMemo(
-    () => !!selectedElements.size && list.every((x) => selectedElements.has(x.id || '')),
+    () => !!selectedElements.size && filteredData.every((x) => selectedElements.has(x.id || '')),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [list, selectedElements, selectedElements.size]
+    [filteredData, selectedElements, selectedElements.size]
   )
 
   const handleCheckboxMaster = useCallback(
     (all?: boolean) =>
-      [...(all ? elements : list)].forEach((x) =>
+      [...(all ? data : filteredData)].forEach((x) =>
         selectedElements[currentPageElementsAllSelected ? 'delete' : 'add'](x.id || '')
       ),
-    [currentPageElementsAllSelected, elements, list, selectedElements]
+    [currentPageElementsAllSelected, data, filteredData, selectedElements]
   )
 
   const masterActionMenu = useMemo(() => {
@@ -142,7 +190,7 @@ export const CustomTable = ({
                 onClick={() => {
                   a.action(
                     Array.from(selectedElements.values()).map(
-                      (id) => elements.find((x) => x.id === id)?.actionData
+                      (id) => data.find((x) => x.id === id)?.actionData
                     )
                   )
                   selectedElements.clear()
@@ -171,35 +219,30 @@ export const CustomTable = ({
     [currentPageElementsAllSelected, handleCheckboxMaster, hasSelectActions]
   )
 
-  const colHeadings: string[] = useMemo(
-    () => [...(hasSelectActions ? ['select'] : []), ...headings, ...(actions ? ['actions'] : [])],
-    [actions, headings, hasSelectActions]
-  )
+  const { rows, actionHeadings } = useMemo(() => {
+    const tableRows = filteredData.map((rowData, index) => {
+      const activeActions = [...(actions || [])].filter((a) => !a.hide?.(rowData.actionData))
+      const maxActions = 3
 
-  const rows = useMemo(() => {
-    return list.map((e, i) => {
-      const activeActions = [...(actions || [])].filter((a) => !a.hide?.(e.actionData))
-      const maxActions = isMobile ? activeActions.length : 3
-
-      const actionsMenu = activeActions?.length && (
-        <Group justify={isMobile ? 'auto' : 'right'} gap="sm" wrap="nowrap">
+      const actionsMenu = activeActions?.length ? (
+        <Group justify="right" gap="sm" wrap="nowrap">
           {activeActions.slice(0, maxActions).map((a) => {
-            const label = getLabel(a.label, e.actionData)
+            const label = getLabel(a.label, rowData.actionData)
             return (
               <Tooltip key={label} label={label}>
                 <ActionIcon
                   size="sm"
                   variant="transparent"
                   color={a.color || 'mainText'}
-                  onClick={() => a.action(e.actionData || e)}
-                  disabled={a.disabled?.(e.actionData || e)}
+                  onClick={() => a.action(rowData.actionData || rowData)}
+                  disabled={a.disabled?.(rowData.actionData || rowData)}
                 >
-                  {getIcon(a.icon, e.actionData)}
+                  {getIcon(a.icon, rowData.actionData)}
                 </ActionIcon>
               </Tooltip>
             )
           })}
-          {!isMobile && activeActions.length > maxActions && (
+          {activeActions.length > maxActions && (
             <Menu shadow="lg" withArrow>
               <Menu.Target>
                 <ActionIcon size="23px" variant="transparent" color="mainText" component="div">
@@ -209,18 +252,18 @@ export const CustomTable = ({
 
               <Menu.Dropdown>
                 {activeActions.slice(maxActions).map((a) => {
-                  const label = getLabel(a.label, e.actionData)
-                  const disabled = a.disabled?.(e.actionData || e)
+                  const label = getLabel(a.label, rowData.actionData)
+                  const disabled = a.disabled?.(rowData.actionData || rowData)
                   return (
                     <Menu.Item
                       color={a.color || 'mainText'}
                       key={label}
                       leftSection={
                         <ThemeIcon size="sm" variant="transparent" color={a.color || 'mainText'}>
-                          {getIcon(a.icon, e.actionData)}
+                          {getIcon(a.icon, rowData.actionData)}
                         </ThemeIcon>
                       }
-                      onClick={() => a.action(e.actionData || e)}
+                      onClick={() => a.action(rowData.actionData || rowData)}
                       disabled={disabled}
                     >
                       {label}
@@ -231,72 +274,126 @@ export const CustomTable = ({
             </Menu>
           )}
         </Group>
-      )
+      ) : null
 
-      const color = e.rowColor
-      const rowKey = e.id?.toString() || i
+      const color = rowData.rowColor
+      const rowKey = rowData.id?.toString() || index
 
-      const colsToMap = [
-        ...(hasSelectActions ? ['select'] : []),
-        ...columns,
-        ...(activeActions.length ? ['actions'] : [])
-      ]
+      const cols = rowData.columns.map((column) => {
+        const colElement = column?.element || column?.value?.toString()
 
-      const cols = colsToMap.map((column, cidx) => {
-        const colElement =
-          e[column]?.element ||
-          e[column] ||
-          (column === 'select' && (
-            <Checkbox
-              size="sm"
-              aria-label="Select row"
-              checked={selectedElements.has(e.id || '')}
-              onChange={(el) => handleCheckbox(el.currentTarget.checked, e.id || '')}
-            />
-          )) ||
-          (column === 'actions' && actionsMenu)
-
-        const el =
-          typeof colElement !== 'object' ? (
-            <Text ta="left" size="sm" truncate maw={200}>
-              {colElement}
-            </Text>
-          ) : (
-            colElement
-          )
-
-        return isMobile ? (
-          <Stack key={rowKey + column} gap="xs">
-            <Group grow align="center" px="sm">
-              <Text ta="left" tt="capitalize" fw="bold" size="sm">
-                {colsToMap[cidx]}:
-              </Text>
-              {el}
-            </Group>
-            <Divider hidden={cidx === colsToMap.length - 1} />
-          </Stack>
+        return typeof colElement !== 'object' ? (
+          <Text size="sm" truncate maw={200}>
+            {colElement}
+          </Text>
         ) : (
-          <Table.Td key={column} c={color} miw="fit-content">
-            {el}
-          </Table.Td>
+          colElement
         )
       })
 
-      if (isMobile) {
-        return (
-          <Paper key={rowKey} py="sm" shadow="xs">
-            <Stack gap="xs" align="stretch" justify="center">
-              {/* <Divider color="lightBackground" size={14} /> */}
-              {cols}
-            </Stack>
-          </Paper>
+      if (hasSelectActions) {
+        cols.unshift(
+          <Checkbox
+            size="sm"
+            aria-label="Select row"
+            checked={selectedElements.has(rowData.id || '')}
+            onChange={(el) => handleCheckbox(el.currentTarget.checked, rowData.id || '')}
+          />
         )
       }
-      return <Table.Tr key={rowKey}>{cols}</Table.Tr>
+
+      if (activeActions && actionsMenu) {
+        cols.push(actionsMenu)
+      }
+
+      return (
+        <Table.Tr key={rowKey}>
+          {cols.map((c, cidx) => (
+            <Table.Td
+              ta={
+                ['number', 'bigint'].includes(
+                  typeof rowData?.columns?.[cidx + headingIndexOffset]?.value
+                )
+                  ? 'right'
+                  : 'left'
+              }
+              key={rowKey + cidx.toString()}
+              c={color}
+            >
+              {c}
+            </Table.Td>
+          ))}
+        </Table.Tr>
+      )
     })
 
+    const colHeadings: string[] = [...headings]
+    if (hasSelectActions) {
+      colHeadings.unshift('select')
+    }
+
+    if (actions?.length) {
+      colHeadings.push('actions')
+    }
+
+    return {
+      rows: tableRows,
+      actionHeadings: colHeadings.map((heading, index) => (
+        <Table.Th tt="capitalize" key={heading} w="auto">
+          {heading === 'select' ? (
+            masterSelectAction
+          ) : (
+            <Group
+              wrap="nowrap"
+              gap="xs"
+              align="center"
+              justify={
+                ['number', 'bigint'].includes(
+                  typeof filteredData[0]?.columns[index + headingIndexOffset]?.value
+                )
+                  ? 'right'
+                  : undefined
+              }
+            >
+              {filteredData[0]?.columns[index + headingIndexOffset]?.value !== undefined ? (
+                <Button
+                  px="0"
+                  tt="capitalize"
+                  variant="transparent"
+                  size="xs"
+                  c="mainText"
+                  onClick={() => {
+                    setSorting((prev) => ({
+                      sortIndex: index + headingIndexOffset,
+                      sortDirection: prev.sortDirection < 0 ? 1 : -1
+                    }))
+                    setPage(1)
+                  }}
+                  rightSection={
+                    sorting.sortIndex === index + headingIndexOffset && (
+                      <ThemeIcon variant="transparent" c="mainText" size={14}>
+                        <DownArrowIcon
+                          style={{
+                            transform: sorting.sortDirection > 0 ? 'rotate(180deg)' : undefined
+                          }}
+                        />
+                      </ThemeIcon>
+                    )
+                  }
+                >
+                  {heading}
+                </Button>
+              ) : (
+                heading
+              )}
+            </Group>
+          )}
+        </Table.Th>
+      ))
+    }
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [list, actions, isMobile, columns, selectedElements, selectedElements.size, headings])
+  }, [filteredData, actions, selectedElements, selectedElements.size, headings])
 
   return (
     <Stack align="stretch" w="100%" pos="relative" gap="sm">
@@ -316,56 +413,42 @@ export const CustomTable = ({
       {((!!selectedElements.size && !!masterActionMenu) || tableActions) && (
         <Group align="center" justify={selectedElements.size ? 'space-between' : 'right'}>
           {selectedElements.size && masterActionMenu}
+
           {tableActions}
         </Group>
       )}
 
-      {isMobile ? (
-        <Stack gap="xl">
-          {hasSelectActions && (
-            <Group align="center" justify="left" pt="xs">
-              Select all: {masterSelectAction}
-            </Group>
-          )}
-          {rows}
+      <Paper pb="md" w="100%" shadow={shadow}>
+        <Stack justify="space-between" mih={420} gap="xl">
+          <ScrollArea scrollbars="x" type="auto" offsetScrollbars>
+            <Table {...tableProps} w="100%" highlightOnHover verticalSpacing="xs">
+              <Table.Thead bg="alternativeBackground">
+                <Table.Tr>{actionHeadings}</Table.Tr>
+              </Table.Thead>
+              <Table.Tbody>{rows}</Table.Tbody>
+            </Table>
+          </ScrollArea>
         </Stack>
-      ) : (
-        <Paper pb="md" w="100%" shadow={shadow}>
-          <Stack justify="space-between" mih={420} gap="xl">
-            <ScrollArea scrollbars="x" type="auto" offsetScrollbars>
-              <Table {...tableProps} w="100%" highlightOnHover verticalSpacing="xs">
-                <Table.Thead bg="alternativeBackground">
-                  <Table.Tr>
-                    {colHeadings.map((h) => (
-                      <Table.Th tt="capitalize" key={h} w={h === 'select' ? 20 : 'auto'}>
-                        {h === 'select' ? masterSelectAction : h}
-                      </Table.Th>
-                    ))}
-                  </Table.Tr>
-                </Table.Thead>
-                <Table.Tbody>{rows}</Table.Tbody>
-              </Table>
-            </ScrollArea>
-            <Group w="100%" justify="right" pr="md">
-              <Pagination
-                color="brand"
-                total={maxPages}
-                boundaries={1}
-                defaultValue={defaultPage}
-                onNextPage={onNextPage}
-                onPreviousPage={onPreviousPage}
-                onChange={onChange}
-                size="sm"
-                styles={{
-                  control: {
-                    border: 0
-                  }
-                }}
-              />
-            </Group>
-          </Stack>
-        </Paper>
-      )}
+      </Paper>
+
+      <Group w="100%" justify="right" pr="md">
+        <Pagination
+          color="brand"
+          total={maxPages}
+          boundaries={1}
+          value={page}
+          // defaultValue={defaultPage}
+          onNextPage={onNextPage}
+          onPreviousPage={onPreviousPage}
+          onChange={setPage}
+          size="sm"
+          styles={{
+            control: {
+              border: 0
+            }
+          }}
+        />
+      </Group>
     </Stack>
   )
 }

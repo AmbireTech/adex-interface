@@ -57,7 +57,7 @@ function LogIn() {
         overlayProps={{ blur: 2 }}
       />
       <Flex h="100%" pt="xl" pb="xl" direction="column" justify="space-around" align="center">
-        <Box c="white" w={191}>
+        <Box c="brandDarker" w={191}>
           <AdExLogo />
         </Box>
         <div>

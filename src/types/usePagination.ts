@@ -3,6 +3,7 @@ export interface IUsePagination {
   defaultPage: number
   startIndex: number
   endIndex: number
+  page: number
   onNextPage: () => void
   onPreviousPage: () => void
   onChange: (value: number) => void

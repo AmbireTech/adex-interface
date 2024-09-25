@@ -1,4 +1,4 @@
-import { Campaign } from 'adex-common'
+import { Campaign, Placement } from 'adex-common'
 import {
   createContext,
   FC,
@@ -153,7 +153,8 @@ interface ICampaignsAnalyticsContext {
     timeframe?: Timeframe,
     startFrom?: Date,
     endTo?: Date,
-    ssp?: SSPs
+    ssp?: SSPs,
+    placement?: Placement
   ) => Promise<{ key: string; period: AnalyticsPeriod } | undefined>
   initialAnalyticsLoading: boolean
   mappedAnalytics: Map<string, MappedAnalyticsRecord>
@@ -238,7 +239,8 @@ const CampaignsAnalyticsProvider: FC<PropsWithChildren> = ({ children }) => {
       selectedTimeframe?: Timeframe,
       startFrom?: Date,
       endTo?: Date,
-      ssp?: SSPs
+      ssp?: SSPs,
+      placement?: Placement
     ): Promise<{ key: string; period: AnalyticsPeriod } | undefined> => {
       if (!analyticsType || (!forAdmin && !campaign?.id)) {
         return
@@ -286,6 +288,7 @@ const CampaignsAnalyticsProvider: FC<PropsWithChildren> = ({ children }) => {
         timezone: 'UTC',
         timeframe,
         ...{ ssp },
+        ...{ placement },
         segmentBy: analyticsType === 'timeframe' ? undefined : analyticsType
       }
 

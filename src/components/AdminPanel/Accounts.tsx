@@ -2,7 +2,7 @@ import { useEffect, useMemo, useCallback, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Box, Badge, TextInput, Stack, Group, LoadingOverlay } from '@mantine/core'
 
-import CustomTable from 'components/common/CustomTable'
+import CustomTable, { DataElement } from 'components/common/CustomTable'
 import useAdmin from 'hooks/useAdmin'
 import VisibilityIcon from 'resources/icons/Visibility'
 
@@ -49,7 +49,7 @@ const AdminAnalytics = () => {
     ).toLocaleString()
     const totalAccounts = accArr.length
 
-    const elements = accArr
+    const elements: DataElement[] = accArr
       .filter((x) =>
         (
           x.name +
@@ -80,19 +80,33 @@ const AdminAnalytics = () => {
       .map((a) => {
         return {
           id: a.id,
-          accountId: a.name || a.id,
-          verified: a?.billingDetails?.verified ? '✅' : '❌',
-          email: a.info?.email,
-          balance: parseBigNumTokenAmountToDecimal(
-            a.availableBalance,
-            a.balanceToken.decimals
-          ).toFixed(2),
-          campaigns: a.fundsOnCampaigns.perCampaign.length,
-          fudsOnCampaigns: parseBigNumTokenAmountToDecimal(
-            a.fundsOnCampaigns.total - a.refundsFromCampaigns.total,
-            a.balanceToken.decimals
-          ).toFixed(2),
-          created: new Date(a.created).toLocaleDateString()
+          columns: [
+            { value: a.name || a.id },
+            {
+              value: a?.billingDetails?.verified ? 1 : 0,
+              element: a?.billingDetails?.verified ? '✅' : '❌'
+            },
+            { value: a.info?.email || '' },
+            {
+              value: a.availableBalance,
+              element: parseBigNumTokenAmountToDecimal(
+                a.availableBalance,
+                a.balanceToken.decimals
+              ).toFixed(2)
+            },
+            { value: a.fundsOnCampaigns.perCampaign.length },
+            {
+              value: a.fundsOnCampaigns.total - a.refundsFromCampaigns.total,
+              element: parseBigNumTokenAmountToDecimal(
+                a.fundsOnCampaigns.total - a.refundsFromCampaigns.total,
+                a.balanceToken.decimals
+              ).toFixed(2)
+            },
+            {
+              value: new Date(a.created).getTime(),
+              element: new Date(a.created).toLocaleDateString()
+            }
+          ]
         }
       })
 
@@ -149,7 +163,7 @@ const AdminAnalytics = () => {
       </Group>
       <CustomTable
         headings={headings}
-        elements={data.elements}
+        data={data.elements}
         pageSize={10}
         actions={actions}
         loading={initialDataLoading}

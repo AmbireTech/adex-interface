@@ -111,8 +111,13 @@ const Statements = () => {
     return statements
       .map((st, index) => ({
         id: index.toString(),
-        date: getMonthRangeString(monthPeriodIndexToDate(st.periodIndex)),
-        token: st.operations[0].token.name
+        columns: [
+          {
+            value: st.periodIndex,
+            element: getMonthRangeString(monthPeriodIndexToDate(st.periodIndex))
+          },
+          { value: st.operations[0].token.name }
+        ]
       }))
       .reverse()
   }, [statements])
@@ -148,7 +153,8 @@ const Statements = () => {
       </BillingDetailsModal>
       <CustomTable
         headings={columnTitles}
-        elements={elements}
+        defaultSortIndex={0}
+        data={elements}
         actions={actions}
         shadow="xs"
         loading={isLoading}
