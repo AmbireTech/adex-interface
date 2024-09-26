@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo, useCallback } from 'react'
-import { Select, Loader, Flex, Box, Text, Badge, ActionIcon, Stack, Group } from '@mantine/core'
-import { BaseAnalyticsData, AnalyticsPeriod, Timeframe, AnalyticsType, SSPs } from 'types'
+import { Select, Box, Text, Badge, ActionIcon, Stack, Group, LoadingOverlay } from '@mantine/core'
+import { AnalyticsPeriod, Timeframe, AnalyticsType, SSPs } from 'types'
 import useCampaignAnalytics from 'hooks/useCampaignAnalytics'
 import CustomTable from 'components/common/CustomTable'
 import { CountryData } from 'helpers/countries'
@@ -61,6 +61,14 @@ const sspsData: Array<{ value: SSPs; label: string }> = [
   { value: 'Qortex', label: 'Qortex' }
 ]
 
+type Placements = '' | 'app' | 'site'
+
+const placementData: Array<{ value: Placements; label: string }> = [
+  { value: '', label: 'All Placements' },
+  { value: 'app', label: 'App' },
+  { value: 'site', label: 'Site' }
+]
+
 const mapSegmentLabel = (analType: AnalyticsType, segment: string): { segementLabel: string } => {
   let segementLabel = segment
 
@@ -103,6 +111,7 @@ const AdminAnalytics = () => {
   const [timeframe, setTimeframe] = useState<Timeframe>('month')
   const [analType, setAnalType] = useState<AnalyticsType>('ssp')
   const [ssp, setSsp] = useState<SSPs>('')
+  const [placement, setPlacement] = useState<Placements>('')
   const [startDate, setStartDate] = useState<Date | null>(
     dayjs().subtract(1, 'month').startOf('month').toDate()
   )
@@ -124,7 +133,7 @@ const AdminAnalytics = () => {
     [analyticsData, analyticsKey]
   )
 
-  const adminMappedAnalytics: BaseAnalyticsData[] | undefined = useMemo(
+  const adminMappedAnalytics = useMemo(
     () => mappedAnalytics.get(analyticsKey?.key || ''),
     [analyticsKey, mappedAnalytics]
   )
@@ -132,7 +141,8 @@ const AdminAnalytics = () => {
   useEffect(() => {
     console.log({ analytics })
     console.log({ mappedAnalytics })
-  }, [analytics, mappedAnalytics])
+    console.log({ adminMappedAnalytics })
+  }, [analytics, mappedAnalytics, adminMappedAnalytics])
 
   useEffect(() => {
     setAnalyticsKey(undefined)
@@ -150,40 +160,51 @@ const AdminAnalytics = () => {
         timeframe,
         startDate || undefined,
         end || undefined,
-        ssp || undefined
+        ssp || undefined,
+        placement || undefined
       )
       setAnalyticsKey(key)
       console.log('key', key)
     }
 
     checkAnalytics()
-  }, [analType, getAnalyticsKeyAndUpdate, ssp, startDate, timeframe])
+  }, [analType, getAnalyticsKeyAndUpdate, placement, ssp, startDate, timeframe])
 
-  const loading = useMemo(
-    () => !analyticsKey || !adminMappedAnalytics,
-    [analyticsKey, adminMappedAnalytics]
-  )
+  const loading = useMemo(() => adminMappedAnalytics?.status === 'loading', [adminMappedAnalytics])
 
   const data = useMemo(() => {
-    const paid = adminMappedAnalytics?.reduce((sum, i) => sum + i.paid, 0) || 0
-    const imps = adminMappedAnalytics?.reduce((sum, i) => sum + i.impressions, 0) || 0
-    const clicks = adminMappedAnalytics?.reduce((sum, i) => sum + i.clicks, 0) || 0
+    if (!adminMappedAnalytics?.data || adminMappedAnalytics?.status !== 'processed')
+      return {
+        paid: 'N/A',
+        imps: 'N/A',
+        clicks: 'N/A',
+        elements: []
+      }
+
+    const paid = adminMappedAnalytics.data.reduce((sum, i) => sum + i.paid, 0) || 0
+    const imps = adminMappedAnalytics.data.reduce((sum, i) => sum + i.impressions, 0) || 0
+    const clicks = adminMappedAnalytics.data.reduce((sum, i) => sum + i.clicks, 0) || 0
     return {
       paid,
       imps,
       clicks,
       elements:
-        adminMappedAnalytics?.map((item) => ({
+        adminMappedAnalytics.data.map((item) => ({
           id: item.segment.toString(),
-          segment: mapSegmentLabel(analType, item.segment).segementLabel,
-          share: `${((item.paid / (paid || 1)) * 100).toFixed(2)} %`,
-          shareImps: `${((item.impressions / (imps || 1)) * 100).toFixed(2)} %`,
-          impressions: item.impressions,
-          clicks: item.clicks,
-          ctr: `${item.ctr} %`,
-          avgCpm: `${item.avgCpm}`,
-          avgCPC: `${item.avgCpc}`,
-          paid: `${item.paid.toFixed(4)}`
+          columns: [
+            { value: mapSegmentLabel(analType, item.segment).segementLabel },
+            { value: item.paid, element: `${((item.paid / (paid || 1)) * 100).toFixed(2)} %` },
+            {
+              value: item.impressions,
+              element: `${((item.impressions / (imps || 1)) * 100).toFixed(2)} %`
+            },
+            { value: item.impressions, element: item.impressions.toLocaleString() },
+            { value: item.clicks, element: item.clicks.toLocaleString() },
+            { value: item.ctr, element: `${item.ctr?.toLocaleString()} %` },
+            { value: item.avgCpm, element: item.avgCpm?.toLocaleString() },
+            { value: item.avgCpc, element: item.avgCpc?.toLocaleString() },
+            { value: item.paid, element: `${item.paid.toFixed(4)}` }
+          ]
         })) || []
     }
   }, [adminMappedAnalytics, analType])
@@ -206,17 +227,17 @@ const AdminAnalytics = () => {
   }, [handlePreview])
 
   return (
-    <>
-      <Text size="sm">
+    <Stack gap="xs">
+      <Text size="sm" inline>
         * This analytics are for the actual user campaign, representing placed impressions, clicks,
         etc. (NOT the stats form received requests form the SSPs)
       </Text>
-      <Text size="sm" mb="md" c="info">
+      <Text size="sm" mb="md" c="info" inline>
         * Amounts include AdEx validator fees 7% (total amounts paid by the users). For amounts
         payed to ssp divide by 1.07 (for records after 22.06.24)
       </Text>
 
-      <Flex direction="row" align="start" justify="left" gap="xl" mb="md">
+      <Group align="start" justify="left" gap="xs">
         <Select
           label="Type"
           value={analType}
@@ -229,6 +250,14 @@ const AdminAnalytics = () => {
           value={ssp}
           onChange={(val) => setSsp(val as SSPs)}
           data={sspsData}
+          size="md"
+        />
+        <Select
+          label="Placement"
+          value={placement}
+          // @ts-ignore
+          onChange={(val) => setPlacement(val as Placements)}
+          data={placementData}
           size="md"
         />
         <Select
@@ -254,64 +283,69 @@ const AdminAnalytics = () => {
           withSeconds
           size="md"
         />
-      </Flex>
+      </Group>
 
-      {loading ? (
-        <Loader size="xl" type="dots" color="violet" />
-      ) : (
-        <Stack>
-          <Group align="center" justify="left" gap="xs">
-            <Box>Totals: </Box>
-            <Badge
-              leftSection={
-                <ActionIcon size="sm" color="brand">
-                  <BillingIcon />
-                </ActionIcon>
-              }
-              size="lg"
-            >
-              {Number(data.paid.toFixed(2)).toLocaleString()}
-            </Badge>
+      <Stack>
+        <Group align="center" justify="left" gap="xs" pos="relative">
+          <LoadingOverlay visible={loading} loaderProps={{ children: ' ' }} />
+          <Box>Totals: </Box>
+          <Badge
+            leftSection={
+              <ActionIcon size="sm" color="brand">
+                <BillingIcon />
+              </ActionIcon>
+            }
+            size="lg"
+          >
+            {typeof data.paid === 'number'
+              ? Number(data.paid.toFixed(2)).toLocaleString()
+              : data.paid}
+          </Badge>
 
-            <Badge
-              size="lg"
-              leftSection={
-                <ActionIcon size="sm" color="brand">
-                  <VisibilityIcon />
-                </ActionIcon>
-              }
-            >
-              {data.imps.toLocaleString()}
-            </Badge>
+          <Badge
+            size="lg"
+            leftSection={
+              <ActionIcon size="sm" color="brand">
+                <VisibilityIcon />
+              </ActionIcon>
+            }
+          >
+            {data.imps.toLocaleString()}
+          </Badge>
 
-            <Badge
-              size="lg"
-              leftSection={
-                <ActionIcon size="sm" color="brand">
-                  <CheckMarkFilledIcon />
-                </ActionIcon>
-              }
-            >
-              {data.clicks.toLocaleString()}
-            </Badge>
+          <Badge
+            size="lg"
+            leftSection={
+              <ActionIcon size="sm" color="brand">
+                <CheckMarkFilledIcon />
+              </ActionIcon>
+            }
+          >
+            {data.clicks.toLocaleString()}
+          </Badge>
 
-            <DownloadCSV
-              data={adminMappedAnalytics}
-              mapHeadersToDataProperties={{ [analType]: 'segment', ...csvHeaders }}
-              filename={`${analyticsKey?.key || 'admin-data-export'}.csv`}
-              disabled={loading}
-            />
-          </Group>
-
-          <CustomTable
-            headings={headings}
-            elements={data.elements}
-            pageSize={10}
-            actions={analType === 'campaignId' ? actions : undefined}
+          <DownloadCSV
+            data={adminMappedAnalytics?.data}
+            mapHeadersToDataProperties={{ [analType]: 'segment', ...csvHeaders }}
+            filename={`${analyticsKey?.key || 'admin-data-export'}.csv`}
+            disabled={loading}
           />
-        </Stack>
-      )}
-    </>
+        </Group>
+        <CustomTable
+          error={
+            adminMappedAnalytics?.status === 'error'
+              ? 'Error occurred while loading analytics'
+              : undefined
+          }
+          defaultSortIndex={3}
+          loading={loading}
+          headings={headings}
+          data={data.elements}
+          pageSize={10}
+          actions={analType === 'campaignId' ? actions : undefined}
+        />
+      </Stack>
+    </Stack>
   )
 }
 

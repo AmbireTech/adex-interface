@@ -22,7 +22,7 @@ const csvHeaders = {
 
 const Regions = ({ forAdmin, campaignId }: { forAdmin: boolean; campaignId: string }) => {
   const [isMapVisible, setIsMapVisible] = useState<boolean>(false)
-  const { campaignMappedAnalytics, currencyName, analyticsKey, loading } =
+  const { campaignMappedAnalytics, currencyName, analyticsKey, loading, error } =
     useCampaignsAnalyticsData({
       campaignId,
       forAdmin,
@@ -38,13 +38,19 @@ const Regions = ({ forAdmin, campaignId }: { forAdmin: boolean; campaignId: stri
 
     return (
       campaignMappedAnalytics?.map((item) => ({
-        segment: CountryData.get(item.segment)?.name,
-        share: `${((item.paid / paid) * 100).toFixed(2)} %`,
-        impressions: item.impressions,
-        clicks: item.clicks,
-        ctr: `${item.ctr} %`,
-        avgCpm: `${item.avgCpm} ${currencyName}`,
-        paid: `${item.paid.toFixed(4)} ${currencyName}`
+        id: item.segment,
+        columns: [
+          { value: CountryData.get(item.segment)?.name },
+          {
+            value: item.paid / paid,
+            element: `${((item.paid / paid) * 100).toFixed(2)} %`
+          },
+          { value: item.impressions },
+          { value: item.clicks },
+          { value: item.ctr, element: `${item.ctr} %` },
+          { value: item.avgCpm, element: `${item.avgCpm} ${currencyName}` },
+          { value: item.paid, element: `${item.paid.toFixed(4)} ${currencyName}` }
+        ]
       })) || []
     )
   }, [campaignMappedAnalytics, currencyName])
@@ -52,9 +58,11 @@ const Regions = ({ forAdmin, campaignId }: { forAdmin: boolean; campaignId: stri
   return (
     <Box>
       <CustomTable
+        error={error}
         headings={headings}
-        elements={elements}
+        data={elements}
         loading={loading}
+        defaultSortIndex={1}
         tableActions={
           <Group align="center" justify="end" gap="xs">
             <Button

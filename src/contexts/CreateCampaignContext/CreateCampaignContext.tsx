@@ -7,7 +7,7 @@ import {
   useMemo,
   useState
 } from 'react'
-import { CREATE_CAMPAIGN_DEFAULT_VALUE, dateNowPlusThirtyDays } from 'constants/createCampaign'
+import { CREATE_CAMPAIGN_DEFAULT_VALUE } from 'constants/createCampaign'
 import superjson from 'superjson'
 import { CampaignUI, CreateCampaignType, SupplyStatsDetails, Devices } from 'types'
 import useAccount from 'hooks/useAccount'
@@ -23,8 +23,8 @@ import {
   parseFromBigNumPrecision,
   parseToBigNumPrecision
 } from 'helpers/balances'
-import { AdUnit, Campaign, Placement } from 'adex-common'
-import { formatDateTime, MINUTE, WEEK } from 'helpers'
+import { AdUnit, Campaign, CampaignStatus, Placement } from 'adex-common'
+import { formatDateTime, MINUTE, WEEK, DAY } from 'helpers'
 import { useCampaignsData } from 'hooks/useCampaignsData'
 import { hasLength, isNotEmpty, useForm } from '@mantine/form'
 import useCustomNotifications from 'hooks/useCustomNotifications'
@@ -101,7 +101,9 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
       outpaceAddr: adexAccount?.address || '0x',
       outpaceAssetDecimals: balanceToken.decimals,
       outpaceChainId: balanceToken.chainId,
-      startsAt: new Date(Date.now() + MINUTE * 10),
+      activeFrom: BigInt(Date.now() + 10 * MINUTE),
+      activeTo: BigInt(Date.now() + WEEK),
+      startsAt: new Date(Date.now() + 10 * MINUTE),
       endsAt: new Date(Date.now() + WEEK)
     }),
     [adexAccount?.address, balanceToken?.address, balanceToken?.decimals, balanceToken?.chainId]
@@ -405,19 +407,28 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
 
   const updateCampaignFromDraft = useCallback(
     (draftCampaign: Campaign, isClone?: boolean) => {
+      console.log({ draftCampaign })
+      const activeFrom: bigint = isClone
+        ? BigInt(Date.now() + 10 * MINUTE)
+        : BigInt(Math.max(Number(draftCampaign.activeFrom || 0), Date.now()))
+
+      const activeTo: bigint =
+        draftCampaign.activeTo && draftCampaign.activeFrom
+          ? activeFrom + BigInt(draftCampaign.activeTo - draftCampaign.activeFrom)
+          : activeFrom + BigInt(30 * DAY)
+
       const mappedDraftCampaign: CampaignUI = {
         ...draftCampaign,
+        activeFrom,
+        activeTo,
         devices: ['mobile', 'desktop'],
         paymentModel: 'cpm',
         autoUTMChecked: draftCampaign.adUnits.every((adUnit) =>
           hasUtmCampaign(adUnit.banner?.targetUrl || '')
         ),
         asapStartingDate: false,
-        startsAt:
-          (draftCampaign?.activeFrom && new Date(Number(draftCampaign?.activeFrom))) || new Date(),
-        endsAt:
-          (draftCampaign?.activeTo && new Date(Number(draftCampaign?.activeTo))) ||
-          dateNowPlusThirtyDays(),
+        startsAt: new Date(Number(activeFrom)),
+        endsAt: new Date(Number(activeTo)),
         currency: balanceToken.name,
         cpmPricingBounds: {
           min: parseFromBigNumPrecision(
@@ -432,7 +443,12 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
         budget: parseFromBigNumPrecision(
           BigInt(Math.floor(Number(draftCampaign.campaignBudget))),
           draftCampaign.outpaceAssetDecimals
-        )
+        ),
+        ...(isClone && {
+          id: '',
+          title: `Copy - ${draftCampaign.title}`,
+          status: CampaignStatus.created
+        })
       }
 
       form.setValues(mappedDraftCampaign)

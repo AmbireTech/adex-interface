@@ -1,5 +1,4 @@
 import { useMemo, useCallback, useState, SetStateAction } from 'react'
-import { Title } from '@mantine/core'
 import CustomTable from 'components/common/CustomTable'
 import { useDisclosure } from '@mantine/hooks'
 import useAccount from 'hooks/useAccount'
@@ -29,6 +28,7 @@ const getTokenIndex = (token: OperationEntry['token']): string =>
 const Statements = () => {
   const [opened, { open, close }] = useDisclosure(false)
   const {
+    isLoading,
     adexAccount: { address, billingDetails, fundsDeposited, fundsOnCampaigns, refundsFromCampaigns }
   } = useAccount()
 
@@ -111,8 +111,13 @@ const Statements = () => {
     return statements
       .map((st, index) => ({
         id: index.toString(),
-        date: getMonthRangeString(monthPeriodIndexToDate(st.periodIndex)),
-        token: st.operations[0].token.name
+        columns: [
+          {
+            value: st.periodIndex,
+            element: getMonthRangeString(monthPeriodIndexToDate(st.periodIndex))
+          },
+          { value: st.operations[0].token.name }
+        ]
       }))
       .reverse()
   }, [statements])
@@ -135,10 +140,6 @@ const Statements = () => {
     ]
   }, [onPreview])
 
-  if (!statements) {
-    return <Title order={4}>No AccountStatements found.</Title>
-  }
-
   return (
     <>
       <BillingDetailsModal title="Statement" loading={!statement} opened={opened} close={close}>
@@ -150,7 +151,14 @@ const Statements = () => {
           />
         )}
       </BillingDetailsModal>
-      <CustomTable headings={columnTitles} elements={elements} actions={actions} shadow="xs" />
+      <CustomTable
+        headings={columnTitles}
+        defaultSortIndex={0}
+        data={elements}
+        actions={actions}
+        shadow="xs"
+        loading={isLoading}
+      />
     </>
   )
 }

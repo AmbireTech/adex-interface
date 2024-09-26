@@ -26,7 +26,6 @@ const CampaignDetailsRow = ({
         align={column ? 'stretch' : 'baseline'}
         c={lighterColor ? 'secondaryText' : 'mainText'}
         gap="xs"
-        p="xs"
         {...flexProps}
       >
         <Text fw="bold" size={textSize} c="secondaryText">

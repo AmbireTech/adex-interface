@@ -17,7 +17,9 @@ import {
   Paper,
   defaultVariantColorsResolver,
   VariantColorsResolver,
-  parseThemeColor
+  parseThemeColor,
+  LoadingOverlay,
+  Text
 } from '@mantine/core'
 import { Dropzone } from '@mantine/dropzone'
 import DownArrowIcon from 'resources/icons/DownArrow'
@@ -228,26 +230,9 @@ const themeOverride: MantineThemeOverride = createTheme({
       }
     }),
     Modal: Modal.extend({
-      styles: (theme) => ({
+      styles: () => ({
         root: {
-          padding: 0,
-          [theme.other.media.print]: {
-            overflow: 'visible'
-          }
-        },
-        inner: {
-          [theme.other.media.print]: {
-            overflow: 'visible',
-            // Fixes double print, no idea why with fixed it prints twice
-            position: 'absolute',
-            // Fix if used with "centered" modal prop
-            alignItems: 'flex-start'
-          }
-        },
-        content: {
-          [theme.other.media.print]: {
-            overflow: 'visible'
-          }
+          padding: 0
         }
       })
     }),
@@ -278,6 +263,19 @@ const themeOverride: MantineThemeOverride = createTheme({
       },
       defaultProps: {
         shadow: 'none'
+      }
+    }),
+    LoadingOverlay: LoadingOverlay.extend({
+      defaultProps: {
+        overlayProps: {
+          backgroundOpacity: 0,
+          blur: 2
+        }
+      }
+    }),
+    Text: Text.extend({
+      defaultProps: {
+        span: true
       }
     })
   },

@@ -25,7 +25,8 @@ function usePagination({ elementsLength, maxItemsPerPage }: IUsePaginationProps)
     endIndex,
     onNextPage,
     onPreviousPage,
-    onChange
+    onChange,
+    page
   }
 }
 export default usePagination

@@ -22,7 +22,7 @@ const csvHeaders = {
 }
 
 const Creatives = ({ forAdmin, campaignId }: { forAdmin: boolean; campaignId: string }) => {
-  const { campaignMappedAnalytics, currencyName, campaign, analyticsKey, loading } =
+  const { campaignMappedAnalytics, currencyName, campaign, analyticsKey, loading, error } =
     useCampaignsAnalyticsData({
       campaignId,
       forAdmin,
@@ -38,32 +38,44 @@ const Creatives = ({ forAdmin, campaignId }: { forAdmin: boolean; campaignId: st
       const media = getMediaUrlWithProvider(unitForId?.banner?.mediaUrl, IPFS_GATEWAY) || ''
 
       return {
-        media: (
-          <Flex align="center">
-            <CustomAnchor external href={media} mr="sm" c="brand">
-              <ThemeIcon variant="transparent" color="brand">
-                <UrlIcon size="25px" />
-              </ThemeIcon>
-            </CustomAnchor>
-            {unitForId && <MediaThumb width={30} height={30} adUnit={unitForId} previewOnClick />}
-          </Flex>
-        ),
-        size: unitForId?.banner
-          ? `${unitForId?.banner?.format.w}x${unitForId?.banner?.format.h}`
-          : '',
-        impressions: formatCurrency(item.impressions, 0),
-        clicks: formatCurrency(item.clicks, 0),
-        ctr: `${item.ctr}`,
-        paid: `${item.paid.toFixed(2)} ${currencyName}`,
-        link: unitForId?.banner?.targetUrl
+        id: item.segment,
+        columns: [
+          {
+            value: media,
+            element: (
+              <Flex align="center">
+                <CustomAnchor external href={media} mr="sm" c="brand">
+                  <ThemeIcon variant="transparent" color="brand">
+                    <UrlIcon size="25px" />
+                  </ThemeIcon>
+                </CustomAnchor>
+                {unitForId && (
+                  <MediaThumb width={30} height={30} adUnit={unitForId} previewOnClick />
+                )}
+              </Flex>
+            )
+          },
+          {
+            value: unitForId?.banner
+              ? `${unitForId?.banner?.format.w}x${unitForId?.banner?.format.h}`
+              : ''
+          },
+          { value: item.impressions, element: formatCurrency(item.impressions, 0) },
+          { value: item.clicks, element: formatCurrency(item.clicks, 0) },
+          { value: item.ctr, element: `${item.ctr}` },
+          { value: item.paid, element: `${item.paid.toFixed(2)} ${currencyName}` },
+          { value: unitForId?.banner?.targetUrl }
+        ]
       }
     })
   }, [campaign, campaignMappedAnalytics, currencyName, loading])
 
   return (
     <CustomTable
+      error={error}
       headings={headings}
-      elements={elements}
+      data={elements}
+      defaultSortIndex={2}
       loading={loading}
       tableActions={
         <DownloadCSV

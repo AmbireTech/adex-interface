@@ -1,6 +1,6 @@
 import { isInRange, hasLength, matches, useForm } from '@mantine/form'
 import { useCallback, useMemo, useState, FormEvent } from 'react'
-import { Button, Group, TextInput, Box, NumberInput } from '@mantine/core'
+import { Button, Group, TextInput, Box, NumberInput, Stack } from '@mantine/core'
 import { defaultConfirmModalProps } from 'components/common/Modals/CustomConfirmModal'
 import { modals } from '@mantine/modals'
 import useAdmin from 'hooks/useAdmin'
@@ -94,69 +94,74 @@ function AdminDeposit({ accountData }: { accountData: Account }) {
 
   return (
     <Box component="form">
-      <TextInput
-        label="Account address"
-        placeholder="0x000"
-        withAsterisk
-        {...form.getInputProps('accountId')}
-        disabled
-      />
-      <Group mt="sm" justify="left" align="baseline">
-        <NumberInput
-          mt="sm"
-          label="Amount"
-          // type="number"
-          placeholder="Amount"
-          hideControls
-          min={0}
-          {...form.getInputProps('amount')}
-        />
+      <Stack gap="xs">
         <TextInput
-          label="Token name"
-          placeholder="Token name"
+          label="Account address"
+          placeholder="0x000"
           withAsterisk
+          {...form.getInputProps('accountId')}
           disabled
-          {...form.getInputProps('token.name')}
         />
-        <TextInput
-          label="Token addr"
-          placeholder="Token addr"
-          withAsterisk
-          disabled
-          {...form.getInputProps('token.address')}
-        />
-        <TextInput
-          label="Token chain id"
-          placeholder="Token chain id"
-          withAsterisk
-          disabled
-          {...form.getInputProps('token.chainId')}
-        />
-        <NumberInput
-          label="Token decimals"
-          placeholder="token decimals"
-          withAsterisk
-          disabled
-          {...form.getInputProps('token.decimals')}
-        />
-        <TextInput
-          label="Tx hash"
-          placeholder="0x0000000000000000000000000000000000000000000000000000000000000000"
-          withAsterisk
-          {...form.getInputProps('txHash')}
-        />
-      </Group>
+        <Group grow align="baseline">
+          <NumberInput
+            label="Amount"
+            // type="number"
+            placeholder="Amount"
+            hideControls
+            min={0}
+            {...form.getInputProps('amount')}
+          />
+          <TextInput
+            label="Token name"
+            placeholder="Token name"
+            withAsterisk
+            disabled
+            {...form.getInputProps('token.name')}
+          />
+        </Group>
+        <Group grow align="baseline">
+          <TextInput
+            label="Token addr"
+            placeholder="Token addr"
+            withAsterisk
+            disabled
+            {...form.getInputProps('token.address')}
+          />
+          <TextInput
+            label="Token chain id"
+            placeholder="Token chain id"
+            withAsterisk
+            disabled
+            {...form.getInputProps('token.chainId')}
+          />
+        </Group>
+        <Group grow align="baseline">
+          <NumberInput
+            label="Token decimals"
+            placeholder="token decimals"
+            withAsterisk
+            disabled
+            {...form.getInputProps('token.decimals')}
+          />
+          <TextInput
+            label="Tx hash"
+            placeholder="0x0000000000000000000000000000000000000000000000000000000000000000"
+            withAsterisk
+            {...form.getInputProps('txHash')}
+          />
+        </Group>
 
-      <Group justify="left" mt="md">
-        <Button
-          type="submit"
-          loading={loading}
-          disabled={loading || !form.isDirty()}
-          onClick={onSubmit}
-        >
-          Make deposit
-        </Button>
-      </Group>
+        <Group justify="left" mt="md">
+          <Button
+            type="submit"
+            loading={loading}
+            disabled={loading || !form.isDirty()}
+            onClick={onSubmit}
+          >
+            Make deposit
+          </Button>
+        </Group>
+      </Stack>
     </Box>
   )
 }

@@ -1,11 +1,8 @@
-import { Title } from '@mantine/core'
 import CustomTable from 'components/common/CustomTable'
 import { useDisclosure } from '@mantine/hooks'
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { CampaignStatus } from 'adex-common'
 import { useCampaignsData } from 'hooks/useCampaignsData'
-// TODO: Delete mock data
-// import { invoiceElements } from './mockedData'
 import useAccount from 'hooks/useAccount'
 import { formatDateShort } from 'helpers'
 import VisibilityIcon from 'resources/icons/Visibility'
@@ -15,7 +12,7 @@ const columnTitles = ['Company Name', 'Campaign', 'Campaign Period']
 
 const Invoices = () => {
   const [opened, { open, close }] = useDisclosure(false)
-  const { campaignsData } = useCampaignsData()
+  const { campaignsData, updateAllCampaignsData, initialDataLoading } = useCampaignsData()
   const campaigns = useMemo(() => Array.from(campaignsData.values()), [campaignsData])
   const {
     adexAccount: {
@@ -28,28 +25,41 @@ const Invoices = () => {
   const invoiceElements = useMemo(
     () =>
       campaigns
-        .filter((c) =>
-          [CampaignStatus.expired, CampaignStatus.closedByUser, CampaignStatus.exhausted].includes(
-            c.campaign.status
-          )
+        .filter(
+          (c) =>
+            [
+              CampaignStatus.expired,
+              CampaignStatus.closedByUser,
+              CampaignStatus.exhausted
+            ].includes(c.campaign.status) && c.paid > 0
         )
         .sort((a, b) => Number(b.campaign.activeFrom) - Number(a.campaign.activeFrom))
         .map((campaign) => {
           return {
             id: campaign.campaignId,
-            companyName,
-            campaign: campaign.campaign.title,
-            campaignPeriod: (
-              <span>
-                <span>{formatDateShort(new Date(Number(campaign.campaign.activeFrom)))} </span>
-                <br />
-                <span>{formatDateShort(new Date(Number(campaign.campaign.activeTo)))} </span>
-              </span>
-            )
+            columns: [
+              { value: companyName },
+              { value: campaign.campaign.title },
+              {
+                value: campaign.campaign.activeFrom,
+                element: (
+                  <span>
+                    <span>{formatDateShort(new Date(Number(campaign.campaign.activeFrom)))} </span>
+                    <br />
+                    <span>{formatDateShort(new Date(Number(campaign.campaign.activeTo)))} </span>
+                  </span>
+                )
+              }
+            ]
           }
         }),
     [campaigns, companyName]
   )
+
+  useEffect(() => {
+    updateAllCampaignsData(true)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const handlePreview = useCallback(
     (item: { id: string }) => {
@@ -69,19 +79,18 @@ const Invoices = () => {
     ]
   }, [handlePreview])
 
-  return invoiceElements && invoiceElements.length ? (
+  return (
     <>
       <CustomTable
         headings={columnTitles}
-        elements={invoiceElements}
+        data={invoiceElements}
         actions={actions}
+        defaultSortIndex={2}
         shadow="xs"
+        loading={initialDataLoading}
       />
       <InvoicesModal campaignId={selectedCampaignId} opened={opened} close={close} />
     </>
-  ) : (
-    // TODO: needs to be style
-    <Title order={4}>No invoices found.</Title>
   )
 }
 

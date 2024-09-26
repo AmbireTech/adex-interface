@@ -119,7 +119,8 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
     if (id) {
       updateCampaignDataById(id)
     }
-  }, [id, updateCampaignDataById])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id])
 
   const canArchive = useMemo(() => {
     return (
@@ -265,140 +266,149 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
         <EditCampaign campaign={campaign} isAdmin={isAdminPanel} />
       ) : (
         <Paper p="lg" shadow="xs">
-          <Grid gutter="lg">
+          <Grid gutter="lg" align="baseline">
             <Grid.Col span={{ md: 12, xl: 6 }}>
-              <Stack gap="xl">
+              <Stack gap="md">
                 <Text fw="bold" size="sm" c="dimmed">
                   Overview
                 </Text>
                 <Paper bg="lightBackground" p="md" withBorder>
-                  {isAdminPanel && (
+                  <Stack gap="xs">
+                    {isAdminPanel && (
+                      <CampaignDetailsRow
+                        textSize="sm"
+                        title="Owner"
+                        value={
+                          <Anchor
+                            underline="never"
+                            size="inherit"
+                            href={`/dashboard/admin/user-account/${campaign.owner}`}
+                            c="secondaryText"
+                          >
+                            {campaign.owner}
+                          </Anchor>
+                        }
+                      />
+                    )}
+                    <CampaignDetailsRow textSize="sm" title="Title" value={campaign?.title} />
+                    <CampaignDetailsRow textSize="sm" title="Id" value={campaign?.id} />
                     <CampaignDetailsRow
                       textSize="sm"
-                      title="Owner"
+                      title="Status"
                       value={
-                        <Anchor
-                          underline="never"
-                          size="inherit"
-                          href={`/dashboard/admin/user-account/${campaign.owner}`}
-                          c="secondaryText"
-                        >
-                          {campaign.owner}
-                        </Anchor>
+                        <span>
+                          {campaign?.status === CampaignStatus.rejected &&
+                            `${campaign.reviewMessage} `}
+                          <BadgeStatusCampaign type={campaign?.status as number} />
+                        </span>
                       }
                     />
-                  )}
-                  <CampaignDetailsRow textSize="sm" title="Title" value={campaign?.title} />
-                  <CampaignDetailsRow textSize="sm" title="Id" value={campaign?.id} />
-                  <CampaignDetailsRow
-                    textSize="sm"
-                    title="Status"
-                    value={
-                      <span>
-                        {campaign?.status === CampaignStatus.rejected &&
-                          `${campaign.reviewMessage} `}
-                        <BadgeStatusCampaign type={campaign?.status as number} />
-                      </span>
-                    }
-                  />
-                  {/* TODO: Add data for it */}
-                  <CampaignDetailsRow
-                    textSize="sm"
-                    title="Served"
-                    // value={campaignData?.share}
-                    value=""
-                  />
-                  {/* TODO: Add data for it */}
-                  <CampaignDetailsRow
-                    textSize="sm"
-                    title="Budget"
-                    value={
-                      <FormattedAmount
-                        chainId={campaign.outpaceChainId}
-                        tokenAddress={campaign.outpaceAssetAddr}
-                        amount={campaign.campaignBudget}
-                        tokenDecimals={campaign.outpaceAssetDecimals}
-                      />
-                    }
-                  />
-                  <CampaignDetailsRow
-                    title="Created"
-                    value={formatDateTime(new Date(Number(campaign.created)))}
-                  />
-                  <CampaignDetailsRow
-                    textSize="sm"
-                    title="Starts"
-                    value={
-                      campaign.activeFrom
-                        ? formatDateTime(new Date(Number(campaign.activeFrom)))
-                        : 'N/A'
-                    }
-                  />
-                  <CampaignDetailsRow
-                    textSize="sm"
-                    title="Ends"
-                    value={
-                      campaign.activeTo
-                        ? formatDateTime(new Date(Number(campaign.activeTo)))
-                        : 'N/A'
-                    }
-                  />
-                  <CampaignDetailsRow
-                    title="CPM min"
-                    value={
-                      campaign.pricingBounds.IMPRESSION?.min && (
+                    {/* TODO: Add data for it */}
+                    <CampaignDetailsRow
+                      textSize="sm"
+                      title="Served"
+                      // value={campaignData?.share}
+                      value=""
+                    />
+                    {/* TODO: Add data for it */}
+                    <CampaignDetailsRow
+                      textSize="sm"
+                      title="Budget"
+                      value={
                         <FormattedAmount
                           chainId={campaign.outpaceChainId}
                           tokenAddress={campaign.outpaceAssetAddr}
-                          amount={campaign.pricingBounds.IMPRESSION.min}
+                          amount={campaign.campaignBudget}
                           tokenDecimals={campaign.outpaceAssetDecimals}
-                          isCPMAmount
                         />
-                      )
-                    }
-                  />
-                  <CampaignDetailsRow
-                    title="CPM max"
-                    value={
-                      campaign.pricingBounds.IMPRESSION?.max && (
-                        <FormattedAmount
-                          chainId={campaign.outpaceChainId}
-                          tokenAddress={campaign.outpaceAssetAddr}
-                          amount={campaign.pricingBounds.IMPRESSION.max}
-                          tokenDecimals={campaign.outpaceAssetDecimals}
-                          isCPMAmount
-                        />
-                      )
-                    }
-                  />
-                  <CampaignDetailsRow
-                    textSize="sm"
-                    title="Limit average daily spending"
-                    value={
-                      campaign.targetingInput.inputs.advanced.limitDailyAverageSpending
-                        ? 'Yes'
-                        : 'No'
-                    }
-                  />
-                  <CampaignDetailsRow
-                    textSize="sm"
-                    title="Last modified by"
-                    noBorder
-                    value={
-                      <Stack gap="xs" align="end">
-                        <Text size="sm">{campaign.lastModifiedBy}</Text>
-                        <Text size="xs" c="dimmed">
-                          {new Date(Number(campaign.modified)).toLocaleString()}
-                        </Text>
-                      </Stack>
-                    }
-                  />
+                      }
+                    />
+                    <CampaignDetailsRow
+                      title="Created"
+                      value={formatDateTime(new Date(Number(campaign.created)))}
+                    />
+                    <CampaignDetailsRow
+                      textSize="sm"
+                      title="Starts"
+                      value={
+                        campaign.activeFrom
+                          ? formatDateTime(new Date(Number(campaign.activeFrom)))
+                          : 'N/A'
+                      }
+                    />
+                    <CampaignDetailsRow
+                      textSize="sm"
+                      title="Ends"
+                      value={
+                        campaign.activeTo
+                          ? formatDateTime(new Date(Number(campaign.activeTo)))
+                          : 'N/A'
+                      }
+                    />
+                    <CampaignDetailsRow
+                      title="CPM min"
+                      value={
+                        campaign.pricingBounds.IMPRESSION?.min && (
+                          <FormattedAmount
+                            chainId={campaign.outpaceChainId}
+                            tokenAddress={campaign.outpaceAssetAddr}
+                            amount={campaign.pricingBounds.IMPRESSION.min}
+                            tokenDecimals={campaign.outpaceAssetDecimals}
+                            isCPMAmount
+                          />
+                        )
+                      }
+                    />
+                    <CampaignDetailsRow
+                      title="CPM max"
+                      value={
+                        campaign.pricingBounds.IMPRESSION?.max && (
+                          <FormattedAmount
+                            chainId={campaign.outpaceChainId}
+                            tokenAddress={campaign.outpaceAssetAddr}
+                            amount={campaign.pricingBounds.IMPRESSION.max}
+                            tokenDecimals={campaign.outpaceAssetDecimals}
+                            isCPMAmount
+                          />
+                        )
+                      }
+                    />
+                    <CampaignDetailsRow
+                      textSize="sm"
+                      title="Limit average daily spending"
+                      value={
+                        campaign.targetingInput.inputs.advanced.limitDailyAverageSpending
+                          ? 'Yes'
+                          : 'No'
+                      }
+                    />
+                    <CampaignDetailsRow
+                      textSize="sm"
+                      title="Aggressive bidding"
+                      value={
+                        campaign.targetingInput.inputs.advanced.aggressiveBidding ? 'Yes' : 'No'
+                      }
+                    />
+                    <CampaignDetailsRow
+                      textSize="sm"
+                      title="Last modified by"
+                      noBorder
+                      value={
+                        <Stack gap="xs" align="end">
+                          <Text size="sm">{campaign.lastModifiedBy}</Text>
+                          <Text size="xs" c="dimmed">
+                            {new Date(Number(campaign.modified)).toLocaleString()}
+                          </Text>
+                        </Stack>
+                      }
+                    />
+                  </Stack>
                 </Paper>
               </Stack>
             </Grid.Col>
             <Grid.Col span={{ md: 12, xl: 6 }}>
-              <Stack gap="lg">
-                <Stack>
+              <Stack gap="xl">
+                <Stack gap="md">
                   <Text fw="bold" size="sm" c="dimmed">
                     Targeting
                   </Text>
@@ -419,12 +429,12 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
                   </Paper>
                 </Stack>
                 {!!campaign.adUnits.length && (
-                  <Stack>
-                    <Stack>
-                      <Text fw="bold" size="sm" c="dimmed">
-                        Creatives
-                      </Text>
-                      <Paper bg="lightBackground" p="sm" withBorder>
+                  <Stack gap="md">
+                    <Text fw="bold" size="sm" c="dimmed">
+                      Creatives
+                    </Text>
+                    <Paper bg="lightBackground" p="sm" withBorder>
+                      <Stack gap="xs">
                         {campaign.adUnits.map((item: AdUnit, index: number) => {
                           const isLast = index === campaign.adUnits.length - 1
                           return (
@@ -444,8 +454,8 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
                             />
                           )
                         })}
-                      </Paper>
-                    </Stack>
+                      </Stack>
+                    </Paper>
                   </Stack>
                 )}
               </Stack>

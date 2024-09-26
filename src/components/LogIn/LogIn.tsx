@@ -15,7 +15,7 @@ import LogInBackground from 'resources/backgrounds/pattern.svg'
 import LowerShape from 'resources/backgrounds/lowerShape.svg'
 import UpperShape from 'resources/backgrounds/upperShape.svg'
 import AdExLogo from 'resources/logos/AdExLogo'
-import { useCallback, useEffect, useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import HelpIcon from 'resources/icons/Help'
 import CustomAnchor from 'components/common/customAnchor/CustomAnchor'
 import { useNavigate } from 'react-router-dom'
@@ -49,7 +49,6 @@ function LogIn() {
     if (authenticated) navigate('/dashboard', { replace: true })
   }, [authenticated, navigate])
 
-  const handleGetStartedBtnClicked = useCallback(() => connectWallet(), [connectWallet])
   return (
     <Container fluid h="100vh" className={classes.container}>
       <LoadingOverlay
@@ -58,7 +57,7 @@ function LogIn() {
         overlayProps={{ blur: 2 }}
       />
       <Flex h="100%" pt="xl" pb="xl" direction="column" justify="space-around" align="center">
-        <Box c="white" w={191}>
+        <Box c="brandDarker" w={191}>
           <AdExLogo />
         </Box>
         <div>
@@ -69,7 +68,7 @@ function LogIn() {
             Reach Beyond Web3
           </Title>
         </div>
-        <Button variant="filled" size="xl" onClick={handleGetStartedBtnClicked}>
+        <Button variant="filled" size="xl" onClick={connectWallet}>
           Get Started
         </Button>
         <Flex direction="column" align="center">

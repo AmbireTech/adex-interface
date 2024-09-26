@@ -1,7 +1,17 @@
 import { useMemo, useCallback, useState } from 'react'
 import { hasLength, matches, useForm, isEmail } from '@mantine/form'
 
-import { Button, Group, TextInput, Box, NumberInput, Text, Textarea, Switch } from '@mantine/core'
+import {
+  Button,
+  Group,
+  TextInput,
+  Box,
+  NumberInput,
+  Text,
+  Textarea,
+  Switch,
+  Stack
+} from '@mantine/core'
 import throttle from 'lodash.throttle'
 
 import { Account } from 'types'
@@ -43,7 +53,7 @@ function AccountInfo({ accountData }: { accountData: Account }) {
           showNotification('info', 'Account data updated!')
         },
         (err) => {
-          showNotification('error', err, 'Error on account Account data updated!')
+          showNotification('error', err.toString(), 'Error on account Account data updated!')
         }
       )
 
@@ -74,76 +84,93 @@ function AccountInfo({ accountData }: { accountData: Account }) {
         disabled
         {...form.getInputProps('availableBalance')}
       />
-      <Text size="sm" fw={500} mt="xl">
-        Billing details
-      </Text>
-      <Text size="xs">* Just for info, users can edit, admins can verify only</Text>
-      <Group mt="md" justify="left" align="baseline">
-        <TextInput
-          label="First name"
-          disabled
-          {...form.getInputProps('billingDetails.firstName')}
-        />
-        <TextInput label="Last name" disabled {...form.getInputProps('billingDetails.lastName')} />
-        <TextInput
-          label="Company number"
-          disabled
-          {...form.getInputProps('billingDetails.companyNumber')}
-        />
-        <TextInput
-          label="VAT number"
-          disabled
-          {...form.getInputProps('billingDetails.companyNumberPrim')}
-        />
-        <TextInput
-          label="Company address"
-          disabled
-          {...form.getInputProps('billingDetails.companyAddress')}
-        />
-        <TextInput
-          label="Company country"
-          disabled
-          {...form.getInputProps('billingDetails.companyCountry')}
-        />
 
+      <Stack gap="xs">
+        <Text size="sm" fw={500} mt="xl">
+          Billing details
+        </Text>
+        <Text size="xs">* Just for info, users can edit, admins can verify only</Text>
         <TextInput
-          label="Company city"
+          label="Company name"
           disabled
-          {...form.getInputProps('billingDetails.companyCity')}
+          {...form.getInputProps('billingDetails.companyName')}
         />
-        <TextInput
-          label="Company ZIP code"
-          disabled
-          {...form.getInputProps('billingDetails.companyZipCode')}
-        />
+        <Group justify="left" align="baseline" grow>
+          <TextInput
+            label="First name"
+            disabled
+            {...form.getInputProps('billingDetails.firstName')}
+          />
+          <TextInput
+            label="Last name"
+            disabled
+            {...form.getInputProps('billingDetails.lastName')}
+          />
+        </Group>
+        <Group justify="left" align="baseline" grow>
+          <TextInput
+            label="Company number"
+            disabled
+            {...form.getInputProps('billingDetails.companyNumber')}
+          />
+          <TextInput
+            label="VAT number"
+            disabled
+            {...form.getInputProps('billingDetails.companyNumberPrim')}
+          />
+        </Group>
+        <Group justify="left" align="baseline" grow>
+          <TextInput
+            label="Company address"
+            disabled
+            {...form.getInputProps('billingDetails.companyAddress')}
+          />
+          <TextInput
+            label="Company country"
+            disabled
+            {...form.getInputProps('billingDetails.companyCountry')}
+          />
+        </Group>
+        <Group justify="left" align="baseline" grow>
+          <TextInput
+            label="Company city"
+            disabled
+            {...form.getInputProps('billingDetails.companyCity')}
+          />
+          <TextInput
+            label="Company ZIP code"
+            disabled
+            {...form.getInputProps('billingDetails.companyZipCode')}
+          />
+        </Group>
         <Switch
           label="Verified by admin"
           {...form.getInputProps('billingDetails.verified', { type: 'checkbox' })}
         />
-      </Group>
-
-      <Text size="sm" fw={500} mt="xl">
-        Additional info
-      </Text>
-      <Text size="xs">* can be seen and edited only by admins</Text>
-
-      <Group mt="md" justify="left" align="baseline">
-        <TextInput label="Contact email" {...form.getInputProps('info.email')} />
-        <TextInput label="Contact phone" {...form.getInputProps('info.phone')} />
+      </Stack>
+      <Stack gap="xs">
+        <Text size="sm" fw={500} mt="xl">
+          Additional info
+        </Text>
+        <Text size="xs">* can be seen and edited only by admins</Text>
         <TextInput label="Contact person" {...form.getInputProps('info.contactPerson')} />
+        <Group justify="left" grow>
+          <TextInput label="Contact email" {...form.getInputProps('info.email')} />
+          <TextInput label="Contact phone" {...form.getInputProps('info.phone')} />
+        </Group>
         <Textarea
           label="Additional notes"
           w="100%"
           rows={7}
           {...form.getInputProps('info.notes')}
         />
-      </Group>
 
-      <Group justify="left" mt="md">
-        <Button type="submit" loading={loading} disabled={loading || !form.isDirty()}>
-          Update account data
-        </Button>
-      </Group>
+        <Group justify="left" mt="md">
+          <Button type="submit" loading={loading} disabled={loading || !form.isDirty()}>
+            Update account data
+          </Button>
+        </Group>
+      </Stack>
     </Box>
   )
 }

@@ -6,7 +6,7 @@ import Billing from 'components/Billing'
 import GetStarted from 'components/GetStarted'
 import CampaignAnalytics from 'components/CampaignAnalytics'
 import { createBrowserRouter, Navigate, useLocation, useRouteError, Link } from 'react-router-dom'
-import { Button } from '@mantine/core'
+import { Button, Loader, Center } from '@mantine/core'
 
 import useAccount from 'hooks/useAccount'
 import Deposit from 'components/Deposit'
@@ -33,14 +33,27 @@ function ErrorBoundary() {
 }
 
 function RequireAuth({ children, admin }: { children: JSX.Element; admin?: boolean }) {
-  const { authenticated, isAdmin } = useAccount()
+  const {
+    authenticated,
+    isAdmin,
+    adexAccount: { loaded }
+  } = useAccount()
+
   const location = useLocation()
+
+  if (!loaded) {
+    return (
+      <Center>
+        <Loader type="dots" />
+      </Center>
+    )
+  }
 
   if (!authenticated) {
     return <Navigate to="/login" state={{ from: location }} replace />
   }
 
-  if (admin && isAdmin) {
+  if (admin && !isAdmin) {
     return <Navigate to="/404" state={{ from: location }} replace />
   }
 
@@ -107,7 +120,7 @@ export const router = createBrowserRouter(
         {
           path: 'admin/:tabValue',
           element: (
-            <RequireAuth>
+            <RequireAuth admin>
               <CampaignsDataProvider type="admin">
                 <AdminPanel />
               </CampaignsDataProvider>

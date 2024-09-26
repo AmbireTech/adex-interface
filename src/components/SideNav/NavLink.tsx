@@ -7,9 +7,10 @@ type NavLinkProps = LinkProps & {
   label: string
   action?: () => void
   active?: boolean
+  external?: boolean
 }
 
-function NavLink({ to = '', icon, label, action, active }: NavLinkProps) {
+function NavLink({ to = '', icon, label, action, active, external }: NavLinkProps) {
   return (
     <Group wrap="nowrap" align="stretch" justify="stretch" gap="0">
       <Divider orientation="vertical" size={4} color="brand" opacity={active ? '1' : '0'} mr={4} />
@@ -17,6 +18,7 @@ function NavLink({ to = '', icon, label, action, active }: NavLinkProps) {
         radius="sm"
         to={to}
         component={Link}
+        target={external ? '_blank' : undefined}
         title={label}
         onClick={action}
         variant="subtle"
