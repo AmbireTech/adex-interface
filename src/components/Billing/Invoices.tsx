@@ -9,6 +9,9 @@ import VisibilityIcon from 'resources/icons/Visibility'
 import useAdmin from 'hooks/useAdmin'
 import { Account } from 'types'
 import InvisibilityIcon from 'resources/icons/Invisibility'
+import { MonthPickerInput } from '@mantine/dates'
+import dayjs from 'dayjs'
+import { Stack } from '@mantine/core'
 import { InvoicesModal } from './InvoicesModal'
 
 const columnTitles = ['Company Name', 'Campaign', 'Date', 'Campaign Period']
@@ -32,6 +35,7 @@ const Invoices = ({ forAdmin }: { forAdmin?: boolean }) => {
   const campaigns = useMemo(() => Array.from(campaignsData.values()), [campaignsData])
   const { accounts, initialDataLoading, getAllAccounts } = useAdmin()
   const { adexAccount } = useAccount()
+  const [months, setMonths] = useState<Date[]>([])
 
   const [selectedCampaignId, setSelectedCampaignId] = useState('')
   const campaignData = useMemo(
@@ -83,21 +87,22 @@ const Invoices = ({ forAdmin }: { forAdmin?: boolean }) => {
   const invoiceElements: DataElement[] = useMemo(
     () =>
       campaigns
-        .filter(
-          (c) =>
+        .filter((c) => {
+          return (
             [
               CampaignStatus.expired,
               CampaignStatus.closedByUser,
               CampaignStatus.exhausted
             ].includes(c.campaign.status) && c.paid > 0
-        )
+          )
+        })
         .sort((a, b) => Number(b.campaign.activeFrom) - Number(a.campaign.activeFrom))
         .map((campaign) => {
           const accountData = forAdmin ? accounts.get(campaign.campaign.owner) : adexAccount
           const invoiceDate = getInvoiceDate(accountData, campaign.campaign)
           const verifiedAccount = accountData?.billingDetails?.verified
           return {
-            id: campaign.campaignId,
+            id: campaign.campaignId + campaign.campaign.activeFrom + campaign.campaign.activeTo,
             rowColor: verifiedAccount ? undefined : 'error',
             columns: [
               {
@@ -120,8 +125,24 @@ const Invoices = ({ forAdmin }: { forAdmin?: boolean }) => {
               }
             ]
           }
+        })
+        .filter((c) => {
+          if (!months.length) {
+            return true
+          }
+          const monthRanges = months.map((x) => {
+            const start = dayjs(x).unix() * 1000
+            const end = dayjs(x).add(1, 'month').unix() * 1000
+
+            return { start, end }
+          })
+
+          return monthRanges.some(
+            (x: { start: number; end: number }) =>
+              x.start <= Number(c.columns[2].value) && x.end >= Number(c.columns[2].value)
+          )
         }),
-    [accounts, adexAccount, campaigns, forAdmin]
+    [accounts, adexAccount, campaigns, forAdmin, months]
   )
 
   useEffect(() => {
@@ -167,7 +188,13 @@ const Invoices = ({ forAdmin }: { forAdmin?: boolean }) => {
   }, [handlePreview, handlePreviewAndPrint])
 
   return (
-    <>
+    <Stack>
+      <MonthPickerInput
+        placeholder="Select mont if you want select"
+        type="multiple"
+        value={months}
+        onChange={setMonths}
+      />
       <CustomTable
         headings={columnTitles}
         data={invoiceElements}
@@ -183,7 +210,7 @@ const Invoices = ({ forAdmin }: { forAdmin?: boolean }) => {
         account={account}
         close={close}
       />
-    </>
+    </Stack>
   )
 }
 
