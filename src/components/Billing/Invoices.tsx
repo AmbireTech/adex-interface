@@ -1,15 +1,30 @@
-import CustomTable from 'components/common/CustomTable'
+import CustomTable, { DataElement } from 'components/common/CustomTable'
 import { useDisclosure } from '@mantine/hooks'
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { CampaignStatus } from 'adex-common'
+import { Campaign, CampaignStatus } from 'adex-common'
 import { useCampaignsData } from 'hooks/useCampaignsData'
 import useAccount from 'hooks/useAccount'
 import { formatDateShort, parseBigNumTokenAmountToDecimal } from 'helpers'
 import VisibilityIcon from 'resources/icons/Visibility'
 import useAdmin from 'hooks/useAdmin'
+import { Account } from 'types'
+import InvisibilityIcon from 'resources/icons/Invisibility'
 import { InvoicesModal } from './InvoicesModal'
 
-const columnTitles = ['Company Name', 'Campaign', 'Campaign Period']
+const columnTitles = ['Company Name', 'Campaign', 'Date', 'Campaign Period']
+
+const getInvoiceDate = (account?: Account, campaign?: Campaign) => {
+  const to = Number(campaign?.activeTo || 0)
+  const campaignCloseData = account?.refundsFromCampaigns.perCampaign.find(
+    (item) => item.id === campaign?.id
+  )
+
+  const end = new Date(campaignCloseData?.closeDate || to).getTime()
+
+  const invoiceDate = Math.min(end, to)
+
+  return invoiceDate
+}
 
 const Invoices = ({ forAdmin }: { forAdmin?: boolean }) => {
   const [opened, { open, close }] = useDisclosure(false)
@@ -34,8 +49,6 @@ const Invoices = ({ forAdmin }: { forAdmin?: boolean }) => {
   )
 
   const invoiceData = useMemo(() => {
-    const to = Number(selectedCampaign?.activeTo || 0)
-
     const campaignOpenData = account.fundsOnCampaigns.perCampaign.find(
       (item) => item.id === selectedCampaign?.id
     )
@@ -52,8 +65,6 @@ const Invoices = ({ forAdmin }: { forAdmin?: boolean }) => {
       campaignOpenData?.startDate || Number(selectedCampaign?.activeFrom) || 0
     ).getTime()
 
-    const end = new Date(campaignCloseData?.closeDate || to).getTime()
-
     // TODO: discuss the payment and invoice date
 
     const amount = parseBigNumTokenAmountToDecimal(
@@ -62,21 +73,14 @@ const Invoices = ({ forAdmin }: { forAdmin?: boolean }) => {
       decimals
     )
     return {
-      invoiceDate: Math.min(end, to),
+      invoiceDate: getInvoiceDate(account, selectedCampaign),
       paymentDate: start,
       amount,
       currencyName
     }
-  }, [
-    account.fundsOnCampaigns.perCampaign,
-    account.refundsFromCampaigns.perCampaign,
-    selectedCampaign?.activeFrom,
-    selectedCampaign?.activeTo,
-    selectedCampaign?.campaignBudget,
-    selectedCampaign?.id
-  ])
+  }, [account, selectedCampaign])
 
-  const invoiceElements = useMemo(
+  const invoiceElements: DataElement[] = useMemo(
     () =>
       campaigns
         .filter(
@@ -89,15 +93,21 @@ const Invoices = ({ forAdmin }: { forAdmin?: boolean }) => {
         )
         .sort((a, b) => Number(b.campaign.activeFrom) - Number(a.campaign.activeFrom))
         .map((campaign) => {
+          const accountData = forAdmin ? accounts.get(campaign.campaign.owner) : adexAccount
+          const invoiceDate = getInvoiceDate(accountData, campaign.campaign)
+          const verifiedAccount = accountData?.billingDetails?.verified
           return {
             id: campaign.campaignId,
+            rowColor: verifiedAccount ? undefined : 'error',
             columns: [
               {
-                value: forAdmin
-                  ? accounts.get(campaign.campaign.owner)?.billingDetails?.companyName
-                  : adexAccount.billingDetails.companyName
+                value: `${!verifiedAccount ? '* ' : ''}${accountData?.billingDetails?.companyName}`
               },
               { value: campaign.campaign.title },
+              {
+                value: invoiceDate,
+                element: formatDateShort(new Date(invoiceDate))
+              },
               {
                 value: campaign.campaign.activeFrom,
                 element: (
@@ -111,7 +121,7 @@ const Invoices = ({ forAdmin }: { forAdmin?: boolean }) => {
             ]
           }
         }),
-    [accounts, adexAccount.billingDetails.companyName, campaigns, forAdmin]
+    [accounts, adexAccount, campaigns, forAdmin]
   )
 
   useEffect(() => {
@@ -131,15 +141,30 @@ const Invoices = ({ forAdmin }: { forAdmin?: boolean }) => {
     [open]
   )
 
+  const handlePreviewAndPrint = useCallback(
+    (item: { id: string }) => {
+      setSelectedCampaignId(item.id)
+      open()
+      // TODO: close and title
+      window.print()
+    },
+    [open]
+  )
+
   const actions = useMemo(() => {
     return [
       {
         action: handlePreview,
         label: 'Show campaign details',
         icon: <VisibilityIcon />
+      },
+      {
+        action: handlePreviewAndPrint,
+        label: 'Show campaign details',
+        icon: <InvisibilityIcon />
       }
     ]
-  }, [handlePreview])
+  }, [handlePreview, handlePreviewAndPrint])
 
   return (
     <>
