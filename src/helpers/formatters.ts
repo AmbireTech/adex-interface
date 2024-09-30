@@ -20,6 +20,8 @@ export const formatDateShort = (date: Date) =>
     month: 'numeric',
     year: 'numeric'
   })
+export const formatDateShortForDownload = (date: Date) =>
+  `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`
 
 export const formatTimeShort = () => {
   const date = new Date()

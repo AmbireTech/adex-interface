@@ -10,11 +10,13 @@ import useAdmin from 'hooks/useAdmin'
 import { Account } from 'types'
 import { MonthPickerInput } from '@mantine/dates'
 import dayjs from 'dayjs'
-import { Stack, Text } from '@mantine/core'
+import { Stack, Text, Group, ThemeIcon } from '@mantine/core'
 import DownloadIcon from 'resources/icons/Download'
+import CalendarIcon from 'resources/icons/Calendar'
 import { InvoicesModal } from './InvoicesModal'
 
 const columnTitles = ['Company Name', 'Campaign', 'Date', 'Campaign Period']
+const minDate = new Date('2024-04-01')
 
 const getInvoiceDate = (account?: Account, campaign?: Campaign) => {
   const to = Number(campaign?.activeTo || 0)
@@ -37,6 +39,7 @@ const Invoices = ({ forAdmin }: { forAdmin?: boolean }) => {
   const { adexAccount } = useAccount()
   const [months, setMonths] = useState<Date[]>([])
   const [closeAfterPrint, setCloseAfterPrint] = useState<boolean>(false)
+  const now = new Date()
 
   const [selectedCampaignId, setSelectedCampaignId] = useState('')
 
@@ -187,7 +190,7 @@ const Invoices = ({ forAdmin }: { forAdmin?: boolean }) => {
     if (forAdmin) {
       tableActions.push({
         action: handlePreviewAndPrint,
-        label: 'Print',
+        label: 'Print and download',
         icon: <DownloadIcon />
       })
     }
@@ -198,17 +201,26 @@ const Invoices = ({ forAdmin }: { forAdmin?: boolean }) => {
   return (
     <Stack>
       {forAdmin && (
-        <Stack gap="xs">
+        <Group gap="xs">
           <MonthPickerInput
-            placeholder="Select mont if you want select"
+            leftSection={
+              <ThemeIcon size="sm" variant="transparent">
+                <CalendarIcon />
+              </ThemeIcon>
+            }
+            clearable
+            placeholder="Pick month/s"
             type="multiple"
             value={months}
             onChange={setMonths}
+            maxDate={now}
+            minDate={minDate}
           />
           <Text size="sm" c="error" inline>
-            * rows in red can not be downloaded by users - their data is not confirmed
+            * rows in red can not be downloaded by users (Do not send to accounting until not red) -
+            their data is not confirmed
           </Text>
-        </Stack>
+        </Group>
       )}
       <CustomTable
         headings={columnTitles}

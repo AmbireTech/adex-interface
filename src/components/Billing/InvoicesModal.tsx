@@ -2,6 +2,7 @@ import { InvoicesPDF } from 'components/Billing/BillingPDF'
 import { ADEX_COMPANY_DETAILS } from 'constants/adexCompanyDetatils'
 import { Account, CampaignData, IInvoiceDetails } from 'types'
 import { useMemo } from 'react'
+import { formatDateShortForDownload } from 'helpers'
 
 import { BillingDetailsModal } from './BillingDetailsModal'
 
@@ -36,7 +37,7 @@ export const InvoicesModal = ({
     return {
       invoiceId: campaign?.id || '',
       invoiceDate: new Date(invoiceData.invoiceDate),
-      paymentDate: new Date(invoiceData.paymentDate),
+      paymentDate: new Date(invoiceData.invoiceDate),
       seller: ADEX_COMPANY_DETAILS,
       buyer: {
         ...account?.billingDetails,
@@ -58,7 +59,6 @@ export const InvoicesModal = ({
     campaignData?.avgCpm,
     campaign?.id,
     invoiceData.invoiceDate,
-    invoiceData.paymentDate,
     invoiceData.currencyName,
     invoiceData.amount,
     account?.billingDetails,
@@ -68,7 +68,9 @@ export const InvoicesModal = ({
   return (
     <BillingDetailsModal
       title="Invoice"
-      documentTitle={`adex-invoice-${campaign?.id}`}
+      documentTitle={`adex-invoice-${formatDateShortForDownload(
+        new Date(invoiceData.invoiceDate)
+      )}-${campaign?.id}`}
       loading={!campaignData}
       opened={opened}
       close={close}
