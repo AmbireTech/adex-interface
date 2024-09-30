@@ -21,7 +21,7 @@ import {
 } from '@mantine/core'
 import { useSet } from '@mantine/hooks'
 import usePagination from 'hooks/usePagination'
-import { useMemo, PropsWithChildren, ReactNode, useCallback, useState } from 'react'
+import { useMemo, PropsWithChildren, ReactNode, useCallback, useState, useEffect } from 'react'
 import DownArrowIcon from 'resources/icons/DownArrow'
 import Dots from 'resources/icons/TreeDotsMenu'
 
@@ -394,6 +394,10 @@ export const CustomTable = ({
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filteredData, actions, selectedElements, selectedElements.size, headings])
+
+  useEffect(() => {
+    setPage(1)
+  }, [data.length, setPage])
 
   return (
     <Stack align="stretch" w="100%" pos="relative" gap="sm">

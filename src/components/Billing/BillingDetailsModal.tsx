@@ -1,4 +1,4 @@
-import { PropsWithChildren } from 'react'
+import { PropsWithChildren, useEffect, useCallback, useMemo } from 'react'
 import {
   Button,
   Center,
@@ -16,9 +16,11 @@ import { useColorScheme } from '@mantine/hooks'
 
 type DetailsProps = PropsWithChildren & {
   title: string
+  documentTitle: string
   loading: boolean
   opened: boolean
   close: () => void
+  closeAfterPrint?: boolean
 }
 
 const useStyles = createStyles((theme: MantineTheme) => {
@@ -58,21 +60,59 @@ const useStyles = createStyles((theme: MantineTheme) => {
   }
 })
 
-export const BillingDetailsModal = ({ children, loading, title, opened, close }: DetailsProps) => {
+export const BillingDetailsModal = ({
+  children,
+  loading,
+  title,
+  documentTitle,
+  opened,
+  close,
+  closeAfterPrint
+}: DetailsProps) => {
   const { classes } = useStyles()
+  const originalTitle = useMemo(() => {
+    return window.document.title
+  }, [])
+
+  useEffect(() => {
+    window.addEventListener('beforeprint', () => {
+      window.document.title = documentTitle
+    })
+
+    window.addEventListener('afterprint', () => {
+      window.document.title = originalTitle
+
+      if (closeAfterPrint) {
+        close()
+      }
+    })
+
+    return () => {
+      window.removeEventListener('beforeprint', () => {
+        window.document.title = documentTitle
+      })
+
+      window.removeEventListener('afterprint', () => {
+        window.document.title = originalTitle
+
+        if (closeAfterPrint) {
+          close()
+        }
+      })
+    }
+  }, [close, closeAfterPrint, documentTitle, originalTitle])
+
+  const print = useCallback(() => {
+    window.print()
+  }, [])
+
   return (
     <>
       <Modal
         className={classes.printableModal}
         title={
           <Group>
-            <Button
-              mt="md"
-              mb="md"
-              onClick={async () => {
-                window.print()
-              }}
-            >
+            <Button mt="md" mb="md" onClick={print}>
               Print
             </Button>
             {title}

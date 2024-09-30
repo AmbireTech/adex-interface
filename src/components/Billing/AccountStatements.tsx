@@ -142,7 +142,13 @@ const Statements = () => {
 
   return (
     <>
-      <BillingDetailsModal title="Statement" loading={!statement} opened={opened} close={close}>
+      <BillingDetailsModal
+        title="Statement"
+        documentTitle={`adex-statement-${statement.periodIndex}-${statement.token}`}
+        loading={!statement}
+        opened={opened}
+        close={close}
+      >
         {statement && (
           <StatementsPDF
             statement={statement}
