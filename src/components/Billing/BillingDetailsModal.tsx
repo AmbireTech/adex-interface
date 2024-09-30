@@ -1,4 +1,4 @@
-import { PropsWithChildren, useEffect, useState } from 'react'
+import { PropsWithChildren, useEffect, useCallback, useMemo } from 'react'
 import {
   Button,
   Center,
@@ -12,7 +12,7 @@ import {
   Box
 } from '@mantine/core'
 import { createStyles } from '@mantine/emotion'
-import { useColorScheme, useDocumentTitle } from '@mantine/hooks'
+import { useColorScheme } from '@mantine/hooks'
 
 type DetailsProps = PropsWithChildren & {
   title: string
@@ -20,6 +20,7 @@ type DetailsProps = PropsWithChildren & {
   loading: boolean
   opened: boolean
   close: () => void
+  closeAfterPrint?: boolean
 }
 
 const useStyles = createStyles((theme: MantineTheme) => {
@@ -65,19 +66,44 @@ export const BillingDetailsModal = ({
   title,
   documentTitle,
   opened,
-  close
+  close,
+  closeAfterPrint
 }: DetailsProps) => {
   const { classes } = useStyles()
-  const originalTitle = window.document.title
-  const [currentTitile, setTitle] = useState(originalTitle)
-  useDocumentTitle(currentTitile)
+  const originalTitle = useMemo(() => {
+    return window.document.title
+  }, [])
 
   useEffect(() => {
-    setTitle(documentTitle)
+    window.addEventListener('beforeprint', () => {
+      window.document.title = documentTitle
+    })
+
+    window.addEventListener('afterprint', () => {
+      window.document.title = originalTitle
+
+      if (closeAfterPrint) {
+        close()
+      }
+    })
+
     return () => {
-      setTitle(originalTitle)
+      window.removeEventListener('beforeprint', () => {
+        window.document.title = documentTitle
+      })
+
+      window.removeEventListener('afterprint', () => {
+        window.document.title = originalTitle
+
+        if (closeAfterPrint) {
+          close()
+        }
+      })
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [close, closeAfterPrint, documentTitle, originalTitle])
+
+  const print = useCallback(() => {
+    window.print()
   }, [])
 
   return (
@@ -86,13 +112,7 @@ export const BillingDetailsModal = ({
         className={classes.printableModal}
         title={
           <Group>
-            <Button
-              mt="md"
-              mb="md"
-              onClick={() => {
-                window.print()
-              }}
-            >
+            <Button mt="md" mb="md" onClick={print}>
               Print
             </Button>
             {title}

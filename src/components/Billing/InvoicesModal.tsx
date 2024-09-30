@@ -16,6 +16,7 @@ type PrintModalProps = {
   }
   account: Account
   close: () => void
+  closeAfterPrint?: boolean
 }
 
 export const InvoicesModal = ({
@@ -23,7 +24,8 @@ export const InvoicesModal = ({
   invoiceData,
   account,
   opened,
-  close
+  close,
+  closeAfterPrint
 }: PrintModalProps) => {
   const campaign = useMemo(() => campaignData?.campaign, [campaignData])
 
@@ -70,6 +72,7 @@ export const InvoicesModal = ({
       loading={!campaignData}
       opened={opened}
       close={close}
+      closeAfterPrint={closeAfterPrint}
     >
       <InvoicesPDF
         invoiceDetails={elements}

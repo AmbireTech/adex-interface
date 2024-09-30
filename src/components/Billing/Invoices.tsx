@@ -4,13 +4,13 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Campaign, CampaignStatus } from 'adex-common'
 import { useCampaignsData } from 'hooks/useCampaignsData'
 import useAccount from 'hooks/useAccount'
-import { formatDateShort, parseBigNumTokenAmountToDecimal } from 'helpers'
+import { formatDateShort, parseBigNumTokenAmountToDecimal, timeout } from 'helpers'
 import VisibilityIcon from 'resources/icons/Visibility'
 import useAdmin from 'hooks/useAdmin'
 import { Account } from 'types'
 import { MonthPickerInput } from '@mantine/dates'
 import dayjs from 'dayjs'
-import { Stack } from '@mantine/core'
+import { Stack, Text } from '@mantine/core'
 import DownloadIcon from 'resources/icons/Download'
 import { InvoicesModal } from './InvoicesModal'
 
@@ -36,6 +36,7 @@ const Invoices = ({ forAdmin }: { forAdmin?: boolean }) => {
   const { accounts, initialDataLoading, getAllAccounts } = useAdmin()
   const { adexAccount } = useAccount()
   const [months, setMonths] = useState<Date[]>([])
+  const [closeAfterPrint, setCloseAfterPrint] = useState<boolean>(false)
 
   const [selectedCampaignId, setSelectedCampaignId] = useState('')
 
@@ -157,16 +158,18 @@ const Invoices = ({ forAdmin }: { forAdmin?: boolean }) => {
   const handlePreview = useCallback(
     (item: { id: string }) => {
       setSelectedCampaignId(item.id)
+      setCloseAfterPrint(false)
       open()
     },
     [open]
   )
 
   const handlePreviewAndPrint = useCallback(
-    (item: { id: string }) => {
+    async (item: { id: string }) => {
       setSelectedCampaignId(item.id)
+      setCloseAfterPrint(true)
       open()
-      // TODO: close and title
+      await timeout(69)
       window.print()
     },
     [open]
@@ -194,12 +197,19 @@ const Invoices = ({ forAdmin }: { forAdmin?: boolean }) => {
 
   return (
     <Stack>
-      <MonthPickerInput
-        placeholder="Select mont if you want select"
-        type="multiple"
-        value={months}
-        onChange={setMonths}
-      />
+      {forAdmin && (
+        <Stack gap="xs">
+          <MonthPickerInput
+            placeholder="Select mont if you want select"
+            type="multiple"
+            value={months}
+            onChange={setMonths}
+          />
+          <Text size="sm" c="error" inline>
+            * rows in red can not be downloaded by users - their data is not confirmed
+          </Text>
+        </Stack>
+      )}
       <CustomTable
         headings={columnTitles}
         data={invoiceElements}
@@ -214,6 +224,7 @@ const Invoices = ({ forAdmin }: { forAdmin?: boolean }) => {
         invoiceData={invoiceData}
         account={account}
         close={close}
+        closeAfterPrint={closeAfterPrint}
       />
     </Stack>
   )
