@@ -1,4 +1,4 @@
-import { PropsWithChildren } from 'react'
+import { PropsWithChildren, useEffect, useState } from 'react'
 import {
   Button,
   Center,
@@ -12,10 +12,11 @@ import {
   Box
 } from '@mantine/core'
 import { createStyles } from '@mantine/emotion'
-import { useColorScheme } from '@mantine/hooks'
+import { useColorScheme, useDocumentTitle } from '@mantine/hooks'
 
 type DetailsProps = PropsWithChildren & {
   title: string
+  documentTitle: string
   loading: boolean
   opened: boolean
   close: () => void
@@ -58,8 +59,27 @@ const useStyles = createStyles((theme: MantineTheme) => {
   }
 })
 
-export const BillingDetailsModal = ({ children, loading, title, opened, close }: DetailsProps) => {
+export const BillingDetailsModal = ({
+  children,
+  loading,
+  title,
+  documentTitle,
+  opened,
+  close
+}: DetailsProps) => {
   const { classes } = useStyles()
+  const originalTitle = window.document.title
+  const [currentTitile, setTitle] = useState(originalTitle)
+  useDocumentTitle(currentTitile)
+
+  useEffect(() => {
+    setTitle(documentTitle)
+    return () => {
+      setTitle(originalTitle)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   return (
     <>
       <Modal
@@ -69,7 +89,7 @@ export const BillingDetailsModal = ({ children, loading, title, opened, close }:
             <Button
               mt="md"
               mb="md"
-              onClick={async () => {
+              onClick={() => {
                 window.print()
               }}
             >

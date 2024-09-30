@@ -1,9 +1,7 @@
 import { InvoicesPDF } from 'components/Billing/BillingPDF'
 import { ADEX_COMPANY_DETAILS } from 'constants/adexCompanyDetatils'
 import { Account, CampaignData, IInvoiceDetails } from 'types'
-import { useCampaignsData } from 'hooks/useCampaignsData'
 import { useMemo } from 'react'
-// import { parseBigNumTokenAmountToDecimal } from 'helpers'
 
 import { BillingDetailsModal } from './BillingDetailsModal'
 
@@ -27,7 +25,6 @@ export const InvoicesModal = ({
   opened,
   close
 }: PrintModalProps) => {
-  const { campaignsData } = useCampaignsData()
   const campaign = useMemo(() => campaignData?.campaign, [campaignData])
 
   const elements: IInvoiceDetails = useMemo(() => {
@@ -67,7 +64,13 @@ export const InvoicesModal = ({
   ])
 
   return (
-    <BillingDetailsModal title="Invoice" loading={!campaignsData} opened={opened} close={close}>
+    <BillingDetailsModal
+      title="Invoice"
+      documentTitle={`adex-invoice-${campaign?.id}`}
+      loading={!campaignData}
+      opened={opened}
+      close={close}
+    >
       <InvoicesPDF
         invoiceDetails={elements}
         placement={campaign?.targetingInput.inputs.placements.in[0] || 'site'}

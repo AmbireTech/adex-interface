@@ -8,10 +8,10 @@ import { formatDateShort, parseBigNumTokenAmountToDecimal } from 'helpers'
 import VisibilityIcon from 'resources/icons/Visibility'
 import useAdmin from 'hooks/useAdmin'
 import { Account } from 'types'
-import InvisibilityIcon from 'resources/icons/Invisibility'
 import { MonthPickerInput } from '@mantine/dates'
 import dayjs from 'dayjs'
 import { Stack } from '@mantine/core'
+import DownloadIcon from 'resources/icons/Download'
 import { InvoicesModal } from './InvoicesModal'
 
 const columnTitles = ['Company Name', 'Campaign', 'Date', 'Campaign Period']
@@ -38,13 +38,13 @@ const Invoices = ({ forAdmin }: { forAdmin?: boolean }) => {
   const [months, setMonths] = useState<Date[]>([])
 
   const [selectedCampaignId, setSelectedCampaignId] = useState('')
+
   const campaignData = useMemo(
     () => campaignsData.get(selectedCampaignId),
 
     [selectedCampaignId, campaignsData]
   )
 
-  const selectedCampaignData = useMemo(() => campaignData, [campaignData])
   const selectedCampaign = useMemo(() => campaignData?.campaign, [campaignData?.campaign])
 
   const account = useMemo(
@@ -102,7 +102,7 @@ const Invoices = ({ forAdmin }: { forAdmin?: boolean }) => {
           const invoiceDate = getInvoiceDate(accountData, campaign.campaign)
           const verifiedAccount = accountData?.billingDetails?.verified
           return {
-            id: campaign.campaignId + campaign.campaign.activeFrom + campaign.campaign.activeTo,
+            id: campaign.campaignId,
             rowColor: verifiedAccount ? undefined : 'error',
             columns: [
               {
@@ -173,19 +173,24 @@ const Invoices = ({ forAdmin }: { forAdmin?: boolean }) => {
   )
 
   const actions = useMemo(() => {
-    return [
+    const tableActions = [
       {
         action: handlePreview,
         label: 'Show campaign details',
         icon: <VisibilityIcon />
-      },
-      {
-        action: handlePreviewAndPrint,
-        label: 'Show campaign details',
-        icon: <InvisibilityIcon />
       }
     ]
-  }, [handlePreview, handlePreviewAndPrint])
+
+    if (forAdmin) {
+      tableActions.push({
+        action: handlePreviewAndPrint,
+        label: 'Print',
+        icon: <DownloadIcon />
+      })
+    }
+
+    return tableActions
+  }, [forAdmin, handlePreview, handlePreviewAndPrint])
 
   return (
     <Stack>
@@ -204,7 +209,7 @@ const Invoices = ({ forAdmin }: { forAdmin?: boolean }) => {
         loading={initialDataLoading}
       />
       <InvoicesModal
-        campaignData={selectedCampaignData}
+        campaignData={campaignData}
         opened={opened}
         invoiceData={invoiceData}
         account={account}
