@@ -6,19 +6,6 @@ import {
   AllCountries
 } from 'adex-common'
 
-export const CAMPAIGN_PLACEMENTS_INPUT = 'targetingInput.inputs.placements.in'
-export const CAMPAIGN_INCLUDE_INCENTIVIZED_INPUT =
-  'targetingInput.inputs.advanced.includeIncentivized'
-export const CAMPAIGN_DISABLE_FREQUENCY_CAPPING_INPUT =
-  'targetingInput.inputs.advanced.disableFrequencyCapping'
-
-const THIRTY_DAYS_IN_MILLISECONDS = 2592000000
-
-export const dateNowPlusThirtyDays = () => {
-  const currentDate = new Date()
-  return new Date(currentDate.getTime() + THIRTY_DAYS_IN_MILLISECONDS)
-}
-
 const parseCats = () => {
   const arr: SelectData[] = []
 
@@ -55,7 +42,7 @@ export const CREATE_CAMPAIGN_DEFAULT_VALUE: CampaignUI = {
   devices: ['desktop', 'mobile'],
   paymentModel: 'cpm',
   startsAt: new Date(),
-  endsAt: dateNowPlusThirtyDays(),
+  endsAt: new Date(),
   currency: '',
   autoUTMChecked: false,
   asapStartingDate: false,
@@ -98,7 +85,8 @@ export const CREATE_CAMPAIGN_DEFAULT_VALUE: CampaignUI = {
       advanced: {
         includeIncentivized: false,
         disableFrequencyCapping: false,
-        limitDailyAverageSpending: false
+        limitDailyAverageSpending: false,
+        aggressiveBidding: false
       }
     }
   },

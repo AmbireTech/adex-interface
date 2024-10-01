@@ -218,53 +218,57 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
     [ambireSDK]
   )
 
-  const checkAndUpdateNewAccessTokens = useCallback(async (): Promise<{ accessToken: string }> => {
-    if (!adexAccount.accessToken || !adexAccount.refreshToken) {
-      throw new Error(`${UNAUTHORIZED_ERR_STR}: missing access tokens`)
-    }
-
-    const isAccessTokenExpired = isTokenExpired(
-      adexAccount.accessToken,
-      TOKEN_CHECK_SECONDS_BEFORE_EXPIRE * 1.5
-    )
-
-    if (!isAccessTokenExpired) {
-      return { accessToken: adexAccount.accessToken }
-    }
-
-    if (isAccessTokenExpired && !isTokenExpired(adexAccount.refreshToken)) {
-      try {
-        const req: RequestOptions = {
-          url: `${BACKEND_BASE_URL}/dsp/refresh-token`,
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            refreshToken: adexAccount.refreshToken
-          })
-        }
-
-        const res = await fetchService(req)
-        const { accessToken, refreshToken } = await processResponse<AccessTokensResp>(res)
-        setAdexAccount((prev) => {
-          return {
-            ...prev,
-            accessToken,
-            refreshToken
-          }
-        })
-
-        return { accessToken }
-      } catch (error: any) {
-        console.error('Updating access token failed:', error)
-        throw new Error(`Updating access token failed: ${error?.message || error.toString()}`)
+  const checkAndUpdateNewAccessTokens = useCallback(
+    async (checkOnBackend?: boolean): Promise<{ accessToken: string }> => {
+      if (!adexAccount.accessToken || !adexAccount.refreshToken) {
+        throw new Error(`${UNAUTHORIZED_ERR_STR}: missing access tokens`)
       }
-    } else {
-      resetAdexAccount('refresh token expired')
-      throw new Error(`${UNAUTHORIZED_ERR_STR}: Session expired!`)
-    }
-  }, [adexAccount.accessToken, adexAccount.refreshToken, resetAdexAccount, setAdexAccount])
+
+      const isAccessTokenExpired = isTokenExpired(
+        adexAccount.accessToken,
+        TOKEN_CHECK_SECONDS_BEFORE_EXPIRE * 1.5
+      )
+
+      if (!isAccessTokenExpired && !checkOnBackend) {
+        return { accessToken: adexAccount.accessToken }
+      }
+
+      if ((isAccessTokenExpired && !isTokenExpired(adexAccount.refreshToken)) || checkOnBackend) {
+        try {
+          const req: RequestOptions = {
+            url: `${BACKEND_BASE_URL}/dsp/refresh-token`,
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              refreshToken: adexAccount.refreshToken
+            })
+          }
+
+          const res = await fetchService(req)
+          const { accessToken, refreshToken } = await processResponse<AccessTokensResp>(res)
+          setAdexAccount((prev) => {
+            return {
+              ...prev,
+              accessToken,
+              refreshToken
+            }
+          })
+
+          return { accessToken }
+        } catch (error: any) {
+          console.error('Updating access token failed:', error)
+          resetAdexAccount('refresh token expired')
+          throw new Error(`Updating access token failed: ${error?.message || error.toString()}`)
+        }
+      } else {
+        resetAdexAccount('refresh token expired')
+        throw new Error(`${UNAUTHORIZED_ERR_STR}: Session expired!`)
+      }
+    },
+    [adexAccount.accessToken, adexAccount.refreshToken, resetAdexAccount, setAdexAccount]
+  )
 
   // NOTE: updating access tokens some second before the access token expire instead of checking on each request where can have "racing" condition with multiple request at the same time
   // TODO: add retry functionality
@@ -333,7 +337,7 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
           err &&
           (err?.message || err.toString()).includes(UNAUTHORIZED_ERR_STR)
         ) {
-          await checkAndUpdateNewAccessTokens()
+          await checkAndUpdateNewAccessTokens(true)
         }
         return Promise.reject<R>(err)
       }

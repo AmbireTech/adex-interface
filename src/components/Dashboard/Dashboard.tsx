@@ -13,7 +13,7 @@ import CustomTable, {
 } from 'components/common/CustomTable'
 import { Link, useNavigate } from 'react-router-dom'
 import { useCampaignsData } from 'hooks/useCampaignsData'
-import { parseBigNumTokenAmountToDecimal, maskAddress, periodNumberToDate, MINUTE } from 'helpers'
+import { parseBigNumTokenAmountToDecimal, maskAddress, periodNumberToDate } from 'helpers'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import { modals } from '@mantine/modals'
 import VisibilityIcon from 'resources/icons/Visibility'
@@ -258,21 +258,7 @@ const Dashboard = ({ isAdminPanel, accountId }: { isAdminPanel?: boolean; accoun
         return
       }
 
-      data.campaign &&
-        updateCampaignFromDraft(
-          {
-            ...data.campaign,
-            ...(isDuplicate && {
-              id: '',
-              title: `Copy - ${data.campaign.title}`,
-              activeFrom: BigInt(Date.now() + 10 * MINUTE),
-              activeTo:
-                BigInt(Date.now()) + BigInt(data.campaign.activeTo - data.campaign.activeFrom),
-              status: CampaignStatus.created
-            })
-          },
-          isDuplicate
-        )
+      data.campaign && updateCampaignFromDraft({ ...data.campaign }, isDuplicate)
       navigate('/dashboard/create-campaign', {})
     },
     [isAdminPanel, updateCampaignFromDraft, navigate]
