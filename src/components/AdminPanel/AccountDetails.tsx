@@ -42,7 +42,7 @@ function AccountDetails() {
         <Fieldset legend="Account info form">
           <AccountInfo accountData={accountData} />
         </Fieldset>
-        <Fieldset legend="Deposit form">
+        <Fieldset legend="Transfers form">
           <AdminDeposit accountData={accountData} />
         </Fieldset>
       </SimpleGrid>

@@ -1,31 +1,37 @@
 import { isInRange, hasLength, matches, useForm } from '@mantine/form'
 import { useCallback, useMemo, useState, FormEvent } from 'react'
-import { Button, Group, TextInput, Box, NumberInput, Stack } from '@mantine/core'
+import {
+  Button,
+  Group,
+  TextInput,
+  Box,
+  NumberInput,
+  Stack,
+  SegmentedControl,
+  Center,
+  ThemeIcon
+} from '@mantine/core'
 import { defaultConfirmModalProps } from 'components/common/Modals/CustomConfirmModal'
 import { modals } from '@mantine/modals'
 import useAdmin from 'hooks/useAdmin'
 import throttle from 'lodash.throttle'
-import { Account } from 'types'
+import { Account, AdminTransfer, AdminTransferType } from 'types'
 import useCustomNotifications from 'hooks/useCustomNotifications'
+import DepositIcon from 'resources/icons/Deposit'
+import WithdrawIcon from 'resources/icons/Withdraw'
 
-type Deposit = {
-  accountId: string
-  amount: number
-  token: {
-    name: string
-    chainId: number
-    address: string
-    decimals: number
-  }
-  txHash: string
+const transferTypeLabels: { [key in AdminTransferType]: string } = {
+  deposit: 'deposit',
+  credit: 'refund'
 }
 
 function AdminDeposit({ accountData }: { accountData: Account }) {
   const { showNotification } = useCustomNotifications()
-  const { makeDeposit, getAllAccounts } = useAdmin()
+  const { makeTransfer, getAllAccounts } = useAdmin()
   const [loading, setLoading] = useState(false)
+  const [transferType, setTransferType] = useState<AdminTransferType>('deposit')
 
-  const form = useForm<Deposit>({
+  const form = useForm<AdminTransfer>({
     initialValues: {
       accountId: accountData.id,
       amount: 0,
@@ -52,10 +58,11 @@ function AdminDeposit({ accountData }: { accountData: Account }) {
   })
 
   const handleSubmit = useCallback(
-    async (values: Deposit) => {
+    async (values: AdminTransfer) => {
       setLoading(true)
-      await makeDeposit(
+      await makeTransfer(
         values,
+        transferType,
         () => {
           getAllAccounts()
           form.reset()
@@ -68,7 +75,7 @@ function AdminDeposit({ accountData }: { accountData: Account }) {
 
       setLoading(false)
     },
-    [form, makeDeposit, showNotification, getAllAccounts]
+    [makeTransfer, transferType, getAllAccounts, form, showNotification]
   )
 
   const throttledSbm = useMemo(
@@ -95,6 +102,34 @@ function AdminDeposit({ accountData }: { accountData: Account }) {
   return (
     <Box component="form">
       <Stack gap="xs">
+        <SegmentedControl
+          value={transferType}
+          onChange={(val) => setTransferType(val as AdminTransferType)}
+          data={[
+            {
+              label: (
+                <Center style={{ gap: 10 }}>
+                  <ThemeIcon size="sm" variant="transparent" color="mainText">
+                    <DepositIcon />
+                  </ThemeIcon>
+                  <span>Deposit</span>
+                </Center>
+              ),
+              value: 'deposit'
+            },
+            {
+              label: (
+                <Center style={{ gap: 10 }}>
+                  <ThemeIcon size="sm" variant="transparent" color="mainText">
+                    <WithdrawIcon />
+                  </ThemeIcon>
+                  <span>Refund</span>
+                </Center>
+              ),
+              value: 'credit'
+            }
+          ]}
+        />
         <TextInput
           label="Account address"
           placeholder="0x000"
@@ -158,7 +193,7 @@ function AdminDeposit({ accountData }: { accountData: Account }) {
             disabled={loading || !form.isDirty()}
             onClick={onSubmit}
           >
-            Make deposit
+            Make {transferTypeLabels[transferType]}
           </Button>
         </Group>
       </Stack>

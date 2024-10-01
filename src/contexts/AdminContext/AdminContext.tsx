@@ -1,26 +1,15 @@
 import { createContext, FC, PropsWithChildren, useMemo, useState, useCallback } from 'react'
-import { Account } from 'types'
+import { Account, AdminTransfer, AdminTransferType } from 'types'
 import { useAdExApi } from 'hooks/useAdexServices'
 import { removeOptionalEmptyStringProps } from 'helpers'
-
-type Deposit = {
-  accountId: string
-  amount: number
-  token: {
-    name: string
-    chainId: number
-    address: string
-    decimals: number
-  }
-  txHash: string
-}
 
 interface IAdminContext {
   accounts: Map<string, Account>
   getAllAccounts: () => void
   initialDataLoading: boolean
-  makeDeposit: (
-    values: Deposit,
+  makeTransfer: (
+    values: AdminTransfer,
+    type: AdminTransferType,
     onSuccess?: () => void,
     onError?: (err: string) => void
   ) => Promise<void>
@@ -73,14 +62,19 @@ const AdminProvider: FC<PropsWithChildren> = ({ children }) => {
     setLoading(false)
   }, [adexServicesRequest])
 
-  const makeDeposit = useCallback(
-    async (values: Deposit, onSuccess?: () => void, onErr?: (err: string) => void) => {
+  const makeTransfer = useCallback(
+    async (
+      values: AdminTransfer,
+      type: AdminTransferType,
+      onSuccess?: () => void,
+      onErr?: (err: string) => void
+    ) => {
       const submit = async () => {
         try {
           const { accountId, ...body } = values
 
           await adexServicesRequest('backend', {
-            route: `/dsp/admin/accounts/${accountId}/deposit`,
+            route: `/dsp/admin/accounts/${accountId}/${type}`,
             method: 'POST',
             body,
             headers: {
@@ -142,10 +136,10 @@ const AdminProvider: FC<PropsWithChildren> = ({ children }) => {
       accounts,
       getAllAccounts,
       initialDataLoading,
-      makeDeposit,
+      makeTransfer,
       updateAccountInfo
     }),
-    [accounts, initialDataLoading, makeDeposit, getAllAccounts, updateAccountInfo]
+    [accounts, initialDataLoading, makeTransfer, getAllAccounts, updateAccountInfo]
   )
 
   return <AdminContext.Provider value={contextValue}>{children}</AdminContext.Provider>

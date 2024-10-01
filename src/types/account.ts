@@ -79,3 +79,17 @@ export interface IAdExAccount {
   accessToken: string | null
   refreshToken: string | null
 }
+
+export type AdminTransferType = 'deposit' | 'credit'
+
+export type AdminTransfer = {
+  accountId: string
+  amount: number
+  token: {
+    name: string
+    chainId: number
+    address: string
+    decimals: number
+  }
+  txHash: string
+}
