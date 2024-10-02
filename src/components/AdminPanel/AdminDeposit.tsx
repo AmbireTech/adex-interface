@@ -9,7 +9,8 @@ import {
   Stack,
   SegmentedControl,
   Center,
-  ThemeIcon
+  ThemeIcon,
+  MantineColor
 } from '@mantine/core'
 import { defaultConfirmModalProps } from 'components/common/Modals/CustomConfirmModal'
 import { modals } from '@mantine/modals'
@@ -19,10 +20,11 @@ import { Account, AdminTransfer, AdminTransferType } from 'types'
 import useCustomNotifications from 'hooks/useCustomNotifications'
 import DepositIcon from 'resources/icons/Deposit'
 import WithdrawIcon from 'resources/icons/Withdraw'
+import { parseBigNumTokenAmountToDecimal } from 'helpers/balances'
 
-const transferTypeLabels: { [key in AdminTransferType]: string } = {
-  deposit: 'deposit',
-  credit: 'refund'
+const transferTypeLabels: { [key in AdminTransferType]: { label: string; color: MantineColor } } = {
+  deposit: { label: 'deposit', color: 'success' },
+  credit: { label: 'refund', color: 'warning' }
 }
 
 function AdminDeposit({ accountData }: { accountData: Account }) {
@@ -30,6 +32,14 @@ function AdminDeposit({ accountData }: { accountData: Account }) {
   const { makeTransfer, getAllAccounts } = useAdmin()
   const [loading, setLoading] = useState(false)
   const [transferType, setTransferType] = useState<AdminTransferType>('deposit')
+  const balance = useMemo(
+    () =>
+      parseBigNumTokenAmountToDecimal(
+        accountData.availableBalance,
+        accountData.balanceToken.decimals
+      ),
+    [accountData.availableBalance, accountData.balanceToken.decimals]
+  )
 
   const form = useForm<AdminTransfer>({
     initialValues: {
@@ -46,7 +56,16 @@ function AdminDeposit({ accountData }: { accountData: Account }) {
 
     validate: {
       accountId: matches(/^(0x)?[0-9a-fA-F]{40}$/, 'invalid account address'),
-      amount: isInRange({ min: 10, max: 1000000000000 }, 'min 10'),
+      amount:
+        transferType === 'deposit'
+          ? isInRange({ min: 10, max: 100_000_000 }, 'min: 10, max: 100k')
+          : isInRange(
+              {
+                min: 1,
+                max: balance
+              },
+              `min: 1, max: balance ${balance}`
+            ),
       token: {
         name: hasLength({ min: 1 }),
         chainId: isInRange({ min: 0, max: 999999 }),
@@ -89,20 +108,21 @@ function AdminDeposit({ accountData }: { accountData: Account }) {
       !form.validate().hasErrors &&
         modals.openConfirmModal(
           defaultConfirmModalProps({
-            text: `Are you sure you want to deposit ${form.values.amount}  ${form.values.token.name} to ${form.values.accountId}?`,
+            text: `Are you sure you want to ${transferTypeLabels[transferType].label}  ${form.values.amount}  ${form.values.token.name} to ${form.values.accountId}?`,
             color: 'attention',
             labels: { confirm: 'Yes Sir', cancel: 'No' },
             onConfirm: () => form.onSubmit(throttledSbm)()
           })
         )
     },
-    [form, throttledSbm]
+    [form, throttledSbm, transferType]
   )
 
   return (
     <Box component="form">
       <Stack gap="xs">
         <SegmentedControl
+          color={transferTypeLabels[transferType].color}
           value={transferType}
           onChange={(val) => setTransferType(val as AdminTransferType)}
           data={[
@@ -140,6 +160,7 @@ function AdminDeposit({ accountData }: { accountData: Account }) {
         <Group grow align="baseline">
           <NumberInput
             label="Amount"
+            description={transferType === 'credit' ? `available balance: ${balance}` : undefined}
             // type="number"
             placeholder="Amount"
             hideControls
@@ -188,12 +209,13 @@ function AdminDeposit({ accountData }: { accountData: Account }) {
 
         <Group justify="left" mt="md">
           <Button
+            color={transferTypeLabels[transferType].color}
             type="submit"
             loading={loading}
             disabled={loading || !form.isDirty()}
             onClick={onSubmit}
           >
-            Make {transferTypeLabels[transferType]}
+            Make {transferTypeLabels[transferType].label}
           </Button>
         </Group>
       </Stack>
