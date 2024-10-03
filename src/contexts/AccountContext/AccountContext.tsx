@@ -117,6 +117,10 @@ const defaultValue: IAccountContext['adexAccount'] = {
     total: 0n,
     deposits: []
   },
+  fundsWithdrawn: {
+    total: 0n,
+    withdrawals: []
+  },
   fundsOnCampaigns: {
     total: 0n,
     perCampaign: []
