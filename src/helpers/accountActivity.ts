@@ -16,6 +16,7 @@ export const toOperationEntry = (
 
   switch (type) {
     case 'deposit':
+    case 'withdraw':
       date = (el as Deposit).created
       id = (el as Deposit).txHash
       break

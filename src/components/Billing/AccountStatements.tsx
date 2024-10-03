@@ -29,12 +29,23 @@ const Statements = () => {
   const [opened, { open, close }] = useDisclosure(false)
   const {
     isLoading,
-    adexAccount: { address, billingDetails, fundsDeposited, fundsOnCampaigns, refundsFromCampaigns }
+    adexAccount: {
+      address,
+      billingDetails,
+      fundsDeposited,
+      fundsWithdrawn,
+      fundsOnCampaigns,
+      refundsFromCampaigns
+    }
   } = useAccount()
 
   const statements = useMemo(() => {
     const deposits: OperationEntry[] = fundsDeposited.deposits.map((x) =>
       toOperationEntry('deposit', x)
+    )
+
+    const withdraws: OperationEntry[] = fundsWithdrawn.withdrawals.map((x) =>
+      toOperationEntry('withdraw', x)
     )
 
     const campaigns: OperationEntry[] = fundsOnCampaigns.perCampaign.map((x) =>
@@ -47,7 +58,7 @@ const Statements = () => {
 
     const currentPeriodIndex = monthPeriodIndex(new Date())
 
-    const byPeriodAndToken = [...deposits, ...campaigns, ...refunds]
+    const byPeriodAndToken = [...deposits, ...withdraws, ...campaigns, ...refunds]
       // NOTE: statements only for fully ended periods
       .filter((x) => monthPeriodIndex(x.date) < currentPeriodIndex)
       .sort((a, b) => a.date.getTime() - b.date.getTime())
@@ -77,7 +88,7 @@ const Statements = () => {
         const endBalance = current.operations.reduce((bal, el) => {
           let nextBal = bal
 
-          if (el.type === 'campaignOpen') {
+          if (el.type === 'campaignOpen' || el.type === 'withdraw') {
             nextBal -= el.amount
           } else {
             nextBal += el.amount
@@ -99,7 +110,12 @@ const Statements = () => {
       }, [] as StatementData[])
 
     return withBalances
-  }, [fundsDeposited, fundsOnCampaigns, refundsFromCampaigns])
+  }, [
+    fundsDeposited.deposits,
+    fundsOnCampaigns.perCampaign,
+    fundsWithdrawn.withdrawals,
+    refundsFromCampaigns.perCampaign
+  ])
 
   const [stIndex, setStIndex] = useState(0)
 

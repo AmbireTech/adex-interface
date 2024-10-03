@@ -9,6 +9,7 @@ export const FundsActivity = ({ accountData }: { accountData: Account }) => {
   const elements = useMemo(() => {
     const data: DataElement[] = [
       ...accountData.fundsDeposited.deposits.map((x) => toOperationEntry('deposit', x)),
+      ...accountData.fundsWithdrawn.withdrawals.map((x) => toOperationEntry('withdraw', x)),
       ...accountData.fundsOnCampaigns.perCampaign.map((x) => toOperationEntry('campaignOpen', x)),
       ...accountData.refundsFromCampaigns.perCampaign.map((x) =>
         toOperationEntry('campaignRefund', x)
@@ -17,7 +18,7 @@ export const FundsActivity = ({ accountData }: { accountData: Account }) => {
       .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
 
       .map((x, i) => {
-        const sign = x.type === 'campaignOpen' ? '-' : '+'
+        const sign = x.type === 'campaignOpen' || x.type === 'withdraw' ? '-' : '+'
         const color: MantineColor = sign === '-' ? 'darkred' : 'darkgreen'
         return {
           id: x.id + i,
@@ -45,7 +46,7 @@ export const FundsActivity = ({ accountData }: { accountData: Account }) => {
         }
       })
 
-    console.log({ data })
+    // console.log({ data })
 
     return data
   }, [accountData])

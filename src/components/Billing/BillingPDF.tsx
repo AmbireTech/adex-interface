@@ -255,10 +255,9 @@ export const StatementsPDF = ({ statement, seller, buyer }: StatementsPDFProps) 
                 </Table.Td>
                 <Table.Td style={{ wordBreak: 'break-word' }}>{e.id}</Table.Td>
                 <Table.Td ta="right">
-                  {`${e.type === 'campaignOpen' ? '-' : '+'}   ${formatTokenAmount(
-                    e.amount,
-                    statement.token
-                  )}`}
+                  {`${
+                    e.type === 'campaignOpen' || e.type === 'withdraw' ? '-' : '+'
+                  }   ${formatTokenAmount(e.amount, statement.token)}`}
                 </Table.Td>
               </Table.Tr>
             ))}
