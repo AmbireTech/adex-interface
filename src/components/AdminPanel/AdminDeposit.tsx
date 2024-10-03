@@ -24,7 +24,7 @@ import { parseBigNumTokenAmountToDecimal } from 'helpers/balances'
 
 const transferTypeLabels: { [key in AdminTransferType]: { label: string; color: MantineColor } } = {
   deposit: { label: 'deposit', color: 'success' },
-  credit: { label: 'refund', color: 'warning' }
+  withdraw: { label: 'refund', color: 'warning' }
 }
 
 function AdminDeposit({ accountData }: { accountData: Account }) {
@@ -146,7 +146,7 @@ function AdminDeposit({ accountData }: { accountData: Account }) {
                   <span>Refund</span>
                 </Center>
               ),
-              value: 'credit'
+              value: 'withdraw'
             }
           ]}
         />
@@ -160,7 +160,7 @@ function AdminDeposit({ accountData }: { accountData: Account }) {
         <Group grow align="baseline">
           <NumberInput
             label="Amount"
-            description={transferType === 'credit' ? `available balance: ${balance}` : undefined}
+            description={transferType === 'withdraw' ? `available balance: ${balance}` : undefined}
             // type="number"
             placeholder="Amount"
             hideControls

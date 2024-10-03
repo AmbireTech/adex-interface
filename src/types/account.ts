@@ -88,7 +88,7 @@ export interface IAdExAccount {
   refreshToken: string | null
 }
 
-export type AdminTransferType = 'deposit' | 'credit'
+export type AdminTransferType = 'deposit' | 'withdraw'
 
 export type AdminTransfer = {
   accountId: string
