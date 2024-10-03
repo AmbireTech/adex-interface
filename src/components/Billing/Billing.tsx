@@ -9,11 +9,13 @@ import useAccount from 'hooks/useAccount'
 import BillingDetails from './BillingDetails'
 import Invoices from './Invoices'
 import Statements from './AccountStatements'
+import AccountActivity from './AccountActivity'
 
 enum TabType {
   BillingTab,
   InvoicesTab,
-  StatementsTab
+  StatementsTab,
+  ActivityTab
 }
 
 const TabSwitch = ({ selectedTab }: { selectedTab: TabType }) => {
@@ -24,6 +26,8 @@ const TabSwitch = ({ selectedTab }: { selectedTab: TabType }) => {
       return <Invoices />
     case TabType.StatementsTab:
       return <Statements />
+    case TabType.ActivityTab:
+      return <AccountActivity />
     default:
       return <BillingDetails />
   }
@@ -75,6 +79,12 @@ function Billing() {
               active={selectedTab === TabType.StatementsTab}
               action={() => handleTabClicked(TabType.StatementsTab)}
               disabled={!verified}
+            />
+            <BillingCard
+              text="Account Activity"
+              iconLeft={<StatementsIcon size="24px" />}
+              active={selectedTab === TabType.ActivityTab}
+              action={() => handleTabClicked(TabType.ActivityTab)}
             />
           </Stack>
         </Grid.Col>
