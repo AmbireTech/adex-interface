@@ -6,6 +6,7 @@ import BillingDetailsIcon from 'resources/icons/BillingDetails'
 import InvoiceIcon from 'resources/icons/Invoice'
 import StatementsIcon from 'resources/icons/Statements'
 import useAccount from 'hooks/useAccount'
+import CalendarIcon from 'resources/icons/Calendar'
 import BillingDetails from './BillingDetails'
 import Invoices from './Invoices'
 import Statements from './AccountStatements'
@@ -82,7 +83,7 @@ function Billing() {
             />
             <BillingCard
               text="Account Activity"
-              iconLeft={<StatementsIcon size="24px" />}
+              iconLeft={<CalendarIcon size="24px" />}
               active={selectedTab === TabType.ActivityTab}
               action={() => handleTabClicked(TabType.ActivityTab)}
             />
