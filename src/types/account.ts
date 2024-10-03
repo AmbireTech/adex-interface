@@ -20,12 +20,16 @@ export interface Token {
   chainId: number
 }
 
-export interface Deposit {
+export interface UserFunds {
   amount: bigint
   token: Token
   txHash: string
   created: Date
 }
+
+export type Deposit = UserFunds & {}
+
+export type Withdraw = UserFunds & {}
 
 export interface CampaignFunds {
   id: string
@@ -57,6 +61,10 @@ export interface Account {
   fundsDeposited: {
     total: bigint
     deposits: Deposit[]
+  }
+  fundsWithdrawn: {
+    total: bigint
+    withdrawals: Withdraw[]
   }
   fundsOnCampaigns: {
     total: bigint

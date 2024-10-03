@@ -1,4 +1,4 @@
-import { BillingDetails, Deposit, CampaignFundsActive, CampaignRefunds } from 'types'
+import { BillingDetails, Deposit, Withdraw, CampaignFundsActive, CampaignRefunds } from 'types'
 
 export interface IInvoices {
   [index: string]: any
@@ -30,9 +30,9 @@ export interface IInvoiceDetails {
   ctr?: number
 }
 
-export type OperationEntryType = 'deposit' | 'campaignOpen' | 'campaignRefund'
+export type OperationEntryType = 'deposit' | 'withdraw' | 'campaignOpen' | 'campaignRefund'
 
-export type OperationEntry = (Deposit | CampaignFundsActive | CampaignRefunds) & {
+export type OperationEntry = (Deposit | Withdraw | CampaignFundsActive | CampaignRefunds) & {
   id: string
   type: OperationEntryType
   name: string
