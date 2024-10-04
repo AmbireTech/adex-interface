@@ -23,8 +23,8 @@ import { Global, MantineEmotionProvider, emotionTransform } from '@mantine/emoti
 import { emotionCache } from './emotion'
 
 const ENV = process.env.REACT_APP_ENV
-const maintenanceStart = Date.UTC(2024, 9, 4, 7, 45)
-const maintenanceEnd = Date.UTC(2024, 9, 4, 8, 45)
+// const maintenanceStart = Date.UTC(2024, 9, 4, 7, 45)
+// const maintenanceEnd = Date.UTC(2024, 9, 4, 8, 45)
 
 function GlobalStyles() {
   return (
@@ -52,20 +52,20 @@ const EnvBanner = () => (
   </Progress.Root>
 )
 
-const MaintenanceBanner = () => (
-  <Progress.Root
-    radius="xs"
-    size={30}
-    style={{ zIndex: 42069, opacity: 0.5, position: 'fixed', top: 0, left: 0, right: 0 }}
-  >
-    <Progress.Section value={100} color="warning">
-      <Progress.Label>
-        Planned maintenance in progress {new Date(maintenanceStart).toLocaleString()} -{' '}
-        {new Date(maintenanceEnd).toLocaleTimeString()} (Errors may occur)
-      </Progress.Label>
-    </Progress.Section>
-  </Progress.Root>
-)
+// const MaintenanceBanner = () => (
+//   <Progress.Root
+//     radius="xs"
+//     size={30}
+//     style={{ zIndex: 42069, opacity: 0.5, position: 'fixed', top: 0, left: 0, right: 0 }}
+//   >
+//     <Progress.Section value={100} color="warning">
+//       <Progress.Label>
+//         Planned maintenance in progress {new Date(maintenanceStart).toLocaleString()} -{' '}
+//         {new Date(maintenanceEnd).toLocaleTimeString()} (Errors may occur)
+//       </Progress.Label>
+//     </Progress.Section>
+//   </Progress.Root>
+// )
 
 const resolver: CSSVariablesResolver = (theme) => ({
   variables: {
@@ -97,7 +97,7 @@ function App() {
               <GlobalStyles />
               <Notifications />
               {ENV && <EnvBanner />}
-              <MaintenanceBanner />
+              {/* <MaintenanceBanner /> */}
               <RouterProvider router={router} />
             </ModalsProvider>
           </MantineProvider>
