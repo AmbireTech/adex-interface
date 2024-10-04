@@ -1,8 +1,9 @@
 import { useEffect, useMemo } from 'react'
-import { SimpleGrid, Box, Loader, Center, Fieldset } from '@mantine/core'
+import { SimpleGrid, Stack, Loader, Center, Fieldset, NumberFormatter } from '@mantine/core'
 import useAdmin from 'hooks/useAdmin'
 import { useParams } from 'react-router-dom'
 import Dashboard from 'components/Dashboard'
+import { parseBigNumTokenAmountToDecimal } from 'helpers/balances'
 import { FundsActivity } from './AccountDetailsElements'
 import { AccountInfo } from './AccoutInfo'
 import { AdminDeposit } from './AdminDeposit'
@@ -10,8 +11,19 @@ import { AdminDeposit } from './AdminDeposit'
 function AccountDetails() {
   const { accountId = '' } = useParams()
   const { accounts, initialDataLoading, getAllAccounts } = useAdmin()
-  console.log({ accounts })
+
   const accountData = useMemo(() => accounts.get(accountId), [accounts, accountId])
+
+  const balance = useMemo(
+    () =>
+      accountData
+        ? parseBigNumTokenAmountToDecimal(
+            accountData?.availableBalance,
+            accountData?.balanceToken.decimals
+          )
+        : 0,
+    [accountData]
+  )
 
   useEffect(() => {
     initialDataLoading && getAllAccounts()
@@ -30,7 +42,13 @@ function AccountDetails() {
   }
 
   return (
-    <Box>
+    <Stack>
+      <SimpleGrid cols={{ md: 1, xl: 2 }} spacing="xl">
+        <Fieldset legend="Account address">{accountData.id}</Fieldset>
+        <Fieldset legend="Account balance">
+          <NumberFormatter suffix=" USDC" value={balance} thousandSeparator decimalScale={2} />
+        </Fieldset>
+      </SimpleGrid>
       <SimpleGrid
         cols={{ md: 1, xl: 2 }}
         spacing="xl"
@@ -42,21 +60,21 @@ function AccountDetails() {
         <Fieldset legend="Account info form">
           <AccountInfo accountData={accountData} />
         </Fieldset>
-        <Fieldset legend="Deposit form">
+        <Fieldset legend="Transfers form">
           <AdminDeposit accountData={accountData} />
         </Fieldset>
       </SimpleGrid>
-      <SimpleGrid spacing="xl" mt="xl">
+      <SimpleGrid spacing="xl">
         <Fieldset legend="Activity">
           <FundsActivity accountData={accountData} />
         </Fieldset>
       </SimpleGrid>
-      <SimpleGrid spacing="xl" mt="xl">
+      <SimpleGrid spacing="xl">
         <Fieldset legend="Campaigns">
           <Dashboard isAdminPanel accountId={accountId} />
         </Fieldset>
       </SimpleGrid>
-    </Box>
+    </Stack>
   )
 }
 

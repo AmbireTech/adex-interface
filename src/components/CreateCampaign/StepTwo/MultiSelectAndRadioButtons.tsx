@@ -140,6 +140,7 @@ const MultiSelectAndRadioButtons = ({
             {labelText}
           </Text>
         }
+        clearable
         searchable
         variant="filled"
         size="lg"

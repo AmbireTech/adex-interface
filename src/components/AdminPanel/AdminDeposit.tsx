@@ -1,31 +1,47 @@
 import { isInRange, hasLength, matches, useForm } from '@mantine/form'
 import { useCallback, useMemo, useState, FormEvent } from 'react'
-import { Button, Group, TextInput, Box, NumberInput, Stack } from '@mantine/core'
+import {
+  Button,
+  Group,
+  TextInput,
+  Box,
+  NumberInput,
+  Stack,
+  SegmentedControl,
+  Center,
+  ThemeIcon,
+  MantineColor
+} from '@mantine/core'
 import { defaultConfirmModalProps } from 'components/common/Modals/CustomConfirmModal'
 import { modals } from '@mantine/modals'
 import useAdmin from 'hooks/useAdmin'
 import throttle from 'lodash.throttle'
-import { Account } from 'types'
+import { Account, AdminTransfer, AdminTransferType } from 'types'
 import useCustomNotifications from 'hooks/useCustomNotifications'
+import DepositIcon from 'resources/icons/Deposit'
+import WithdrawIcon from 'resources/icons/Withdraw'
+import { parseBigNumTokenAmountToDecimal } from 'helpers/balances'
 
-type Deposit = {
-  accountId: string
-  amount: number
-  token: {
-    name: string
-    chainId: number
-    address: string
-    decimals: number
-  }
-  txHash: string
+const transferTypeLabels: { [key in AdminTransferType]: { label: string; color: MantineColor } } = {
+  deposit: { label: 'deposit', color: 'success' },
+  withdraw: { label: 'refund', color: 'warning' }
 }
 
 function AdminDeposit({ accountData }: { accountData: Account }) {
   const { showNotification } = useCustomNotifications()
-  const { makeDeposit, getAllAccounts } = useAdmin()
+  const { makeTransfer, getAllAccounts } = useAdmin()
   const [loading, setLoading] = useState(false)
+  const [transferType, setTransferType] = useState<AdminTransferType>('deposit')
+  const balance = useMemo(
+    () =>
+      parseBigNumTokenAmountToDecimal(
+        accountData.availableBalance,
+        accountData.balanceToken.decimals
+      ),
+    [accountData.availableBalance, accountData.balanceToken.decimals]
+  )
 
-  const form = useForm<Deposit>({
+  const form = useForm<AdminTransfer>({
     initialValues: {
       accountId: accountData.id,
       amount: 0,
@@ -40,7 +56,16 @@ function AdminDeposit({ accountData }: { accountData: Account }) {
 
     validate: {
       accountId: matches(/^(0x)?[0-9a-fA-F]{40}$/, 'invalid account address'),
-      amount: isInRange({ min: 10, max: 1000000000000 }, 'min 10'),
+      amount:
+        transferType === 'deposit'
+          ? isInRange({ min: 10, max: 100_000_000 }, 'min: 10, max: 100k')
+          : isInRange(
+              {
+                min: 1,
+                max: balance
+              },
+              `min: 1, max: balance ${balance}`
+            ),
       token: {
         name: hasLength({ min: 1 }),
         chainId: isInRange({ min: 0, max: 999999 }),
@@ -52,10 +77,11 @@ function AdminDeposit({ accountData }: { accountData: Account }) {
   })
 
   const handleSubmit = useCallback(
-    async (values: Deposit) => {
+    async (values: AdminTransfer) => {
       setLoading(true)
-      await makeDeposit(
+      await makeTransfer(
         values,
+        transferType,
         () => {
           getAllAccounts()
           form.reset()
@@ -68,7 +94,7 @@ function AdminDeposit({ accountData }: { accountData: Account }) {
 
       setLoading(false)
     },
-    [form, makeDeposit, showNotification, getAllAccounts]
+    [makeTransfer, transferType, getAllAccounts, form, showNotification]
   )
 
   const throttledSbm = useMemo(
@@ -82,19 +108,48 @@ function AdminDeposit({ accountData }: { accountData: Account }) {
       !form.validate().hasErrors &&
         modals.openConfirmModal(
           defaultConfirmModalProps({
-            text: `Are you sure you want to deposit ${form.values.amount}  ${form.values.token.name} to ${form.values.accountId}?`,
+            text: `Are you sure you want to ${transferTypeLabels[transferType].label}  ${form.values.amount}  ${form.values.token.name} to ${form.values.accountId}?`,
             color: 'attention',
             labels: { confirm: 'Yes Sir', cancel: 'No' },
             onConfirm: () => form.onSubmit(throttledSbm)()
           })
         )
     },
-    [form, throttledSbm]
+    [form, throttledSbm, transferType]
   )
 
   return (
     <Box component="form">
       <Stack gap="xs">
+        <SegmentedControl
+          color={transferTypeLabels[transferType].color}
+          value={transferType}
+          onChange={(val) => setTransferType(val as AdminTransferType)}
+          data={[
+            {
+              label: (
+                <Center style={{ gap: 10 }}>
+                  <ThemeIcon size="sm" variant="transparent" color="mainText">
+                    <DepositIcon />
+                  </ThemeIcon>
+                  <span>Deposit</span>
+                </Center>
+              ),
+              value: 'deposit'
+            },
+            {
+              label: (
+                <Center style={{ gap: 10 }}>
+                  <ThemeIcon size="sm" variant="transparent" color="mainText">
+                    <WithdrawIcon />
+                  </ThemeIcon>
+                  <span>Refund</span>
+                </Center>
+              ),
+              value: 'withdraw'
+            }
+          ]}
+        />
         <TextInput
           label="Account address"
           placeholder="0x000"
@@ -105,6 +160,7 @@ function AdminDeposit({ accountData }: { accountData: Account }) {
         <Group grow align="baseline">
           <NumberInput
             label="Amount"
+            description={transferType === 'withdraw' ? `available balance: ${balance}` : undefined}
             // type="number"
             placeholder="Amount"
             hideControls
@@ -153,12 +209,13 @@ function AdminDeposit({ accountData }: { accountData: Account }) {
 
         <Group justify="left" mt="md">
           <Button
+            color={transferTypeLabels[transferType].color}
             type="submit"
             loading={loading}
             disabled={loading || !form.isDirty()}
             onClick={onSubmit}
           >
-            Make deposit
+            Make {transferTypeLabels[transferType].label}
           </Button>
         </Group>
       </Stack>
