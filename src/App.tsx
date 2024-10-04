@@ -82,8 +82,6 @@ const resolver: CSSVariablesResolver = (theme) => ({
 ReactGA.initialize('G-PX5B4P9KKM')
 
 function App() {
-  const showMaintenanceBanner = maintenanceStart < Date.now() && maintenanceEnd > Date.now()
-
   return (
     <AccountProvider>
       <AdminProvider>
@@ -99,7 +97,7 @@ function App() {
               <GlobalStyles />
               <Notifications />
               {ENV && <EnvBanner />}
-              {showMaintenanceBanner && <MaintenanceBanner />}
+              <MaintenanceBanner />
               <RouterProvider router={router} />
             </ModalsProvider>
           </MantineProvider>
