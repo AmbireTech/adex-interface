@@ -263,7 +263,9 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
           return { accessToken }
         } catch (error: any) {
           console.error('Updating access token failed:', error)
-          resetAdexAccount('refresh token expired')
+          if ((error?.message || error.toString()).includes(UNAUTHORIZED_ERR_STR)) {
+            resetAdexAccount('refresh token expired')
+          }
           throw new Error(`Updating access token failed: ${error?.message || error.toString()}`)
         }
       } else {
@@ -341,6 +343,7 @@ const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
           err &&
           (err?.message || err.toString()).includes(UNAUTHORIZED_ERR_STR)
         ) {
+          // NOTE: temp remove the check until
           await checkAndUpdateNewAccessTokens(true)
         }
         return Promise.reject<R>(err)
