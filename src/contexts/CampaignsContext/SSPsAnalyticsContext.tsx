@@ -26,7 +26,7 @@ enum RequestStatPlacement {
   other = 5
 }
 
-export type DspAnalyticsData = {
+export type SSPsAnalyticsData = {
   value: string | number
   count: number
 }
@@ -38,7 +38,7 @@ export type DspAnalyticsData = {
 // "placement": number (valid options: enum RequestStatPlacement see below),
 // "groupBy": string (valid options: bidfloor(default), country, category, placement)
 
-export type DspAnalyticsDataKeys = {
+export type SSPsAnalyticsDataKeys = {
   limit?: number
   date?: string
   category?: typeof IabCategories
@@ -53,13 +53,13 @@ function getRefreshKey(timestamp: number): number {
   return getEpoch(timestamp, defaultRefreshQuery)
 }
 
-const getAnalyticsKeyFromQuery = (queryParams: DspAnalyticsDataKeys): string => {
+const getAnalyticsKeyFromQuery = (queryParams: SSPsAnalyticsDataKeys): string => {
   // TODO: hex or hash
   const mapKey = Object.keys(queryParams)
     .sort()
     .reduce((result: string, key: string) => {
-      if (queryParams[key as keyof DspAnalyticsDataKeys] !== undefined) {
-        const val = queryParams[key as keyof DspAnalyticsDataKeys]
+      if (queryParams[key as keyof SSPsAnalyticsDataKeys] !== undefined) {
+        const val = queryParams[key as keyof SSPsAnalyticsDataKeys]
         return `${result}_${val instanceof Date ? getRefreshKey(val.getTime()) : val?.toString()}`
       }
 
@@ -69,29 +69,29 @@ const getAnalyticsKeyFromQuery = (queryParams: DspAnalyticsDataKeys): string => 
   return mapKey
 }
 
-interface IDspAnalyticsContext {
-  analyticsData: Map<string, { status: DataStatus; data: DspAnalyticsData[] }>
-  getAnalyticsKeyAndUpdate: (filter: DspAnalyticsDataKeys) => Promise<{ key: string } | undefined>
+interface ISSPsAnalyticsContext {
+  analyticsData: Map<string, { status: DataStatus; data: SSPsAnalyticsData[] }>
+  getAnalyticsKeyAndUpdate: (filter: SSPsAnalyticsDataKeys) => Promise<{ key: string } | undefined>
   initialAnalyticsLoading: boolean
 }
 
-const DspAnalyticsContext = createContext<IDspAnalyticsContext | null>(null)
+const SSPsAnalyticsContext = createContext<ISSPsAnalyticsContext | null>(null)
 
-const DspAnalyticsProvider: FC<PropsWithChildren> = ({ children }) => {
+const SSPsAnalyticsProvider: FC<PropsWithChildren> = ({ children }) => {
   const { showNotification } = useCustomNotifications()
   const { adexServicesRequest } = useAdExApi()
 
   const { authenticated } = useAccount()
   const [initialAnalyticsLoading, setInitialAnalyticsLoading] = useState(true)
 
-  const [analyticsData, setAnalyticsData] = useState<IDspAnalyticsContext['analyticsData']>(
-    new Map<string, { status: DataStatus; data: DspAnalyticsData[] }>()
+  const [analyticsData, setAnalyticsData] = useState<ISSPsAnalyticsContext['analyticsData']>(
+    new Map<string, { status: DataStatus; data: SSPsAnalyticsData[] }>()
   )
 
   const updateCampaignAnalyticsByQuery = useCallback(
-    async (params: DspAnalyticsDataKeys, dataKey: string) => {
+    async (params: SSPsAnalyticsDataKeys, dataKey: string) => {
       try {
-        const analyticsDataRes = await adexServicesRequest<DspAnalyticsData[]>('backend', {
+        const analyticsDataRes = await adexServicesRequest<SSPsAnalyticsData[]>('backend', {
           route: '/dsp/stats/advanced',
           method: 'POST',
           body: params
@@ -105,7 +105,7 @@ const DspAnalyticsProvider: FC<PropsWithChildren> = ({ children }) => {
 
         setAnalyticsData((prev) => {
           const next = new Map(prev)
-          const nextAggr: { status: DataStatus; data: DspAnalyticsData[] } =
+          const nextAggr: { status: DataStatus; data: SSPsAnalyticsData[] } =
             { status: 'processed', data: analyticsDataRes } || prev.get(dataKey)
           next.set(dataKey, nextAggr)
           return next
@@ -114,7 +114,7 @@ const DspAnalyticsProvider: FC<PropsWithChildren> = ({ children }) => {
         console.log(err)
         setAnalyticsData((prev) => {
           const next = new Map(prev)
-          const nextAggr: { status: DataStatus; data: DspAnalyticsData[] } = {
+          const nextAggr: { status: DataStatus; data: SSPsAnalyticsData[] } = {
             status: 'error',
             data: prev.get(dataKey)?.data || []
           }
@@ -130,7 +130,7 @@ const DspAnalyticsProvider: FC<PropsWithChildren> = ({ children }) => {
   )
 
   const getAnalyticsKeyAndUpdate = useCallback(
-    async (filter: DspAnalyticsDataKeys): Promise<{ key: string } | undefined> => {
+    async (filter: SSPsAnalyticsDataKeys): Promise<{ key: string } | undefined> => {
       const key = getAnalyticsKeyFromQuery(filter)
 
       updateCampaignAnalyticsByQuery(filter, key)
@@ -148,7 +148,7 @@ const DspAnalyticsProvider: FC<PropsWithChildren> = ({ children }) => {
 
       updateCampaigns()
     } else {
-      setAnalyticsData(new Map<string, { status: DataStatus; data: DspAnalyticsData[] }>())
+      setAnalyticsData(new Map<string, { status: DataStatus; data: SSPsAnalyticsData[] }>())
       setInitialAnalyticsLoading(false)
     }
   }, [authenticated])
@@ -163,8 +163,8 @@ const DspAnalyticsProvider: FC<PropsWithChildren> = ({ children }) => {
   )
 
   return (
-    <DspAnalyticsContext.Provider value={contextValue}>{children}</DspAnalyticsContext.Provider>
+    <SSPsAnalyticsContext.Provider value={contextValue}>{children}</SSPsAnalyticsContext.Provider>
   )
 }
 
-export { DspAnalyticsContext, DspAnalyticsProvider }
+export { SSPsAnalyticsContext, SSPsAnalyticsProvider }
