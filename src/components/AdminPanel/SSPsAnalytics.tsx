@@ -1,15 +1,8 @@
 import { useEffect, useState, useMemo } from 'react'
-import { Select, Stack, Group, Code, Loader } from '@mantine/core'
-import { SSPs } from 'types'
+import { Select, Stack, Group, Code } from '@mantine/core'
+import { SSPs, RequestStatPlacement } from 'types'
 import useSSPsAnalytics from 'hooks/useCampaignAnalytics/useSSPsAnalytics'
-
-enum RequestStatPlacement {
-  app = 1,
-  siteMobile = 2,
-  siteDesktop = 3,
-  siteOther = 4,
-  other = 5
-}
+import CustomTable, { DataElement } from 'components/common/CustomTable'
 
 const sspsData: Array<{ value: SSPs; label: string }> = [
   { value: '', label: 'All SSPs' },
@@ -34,7 +27,7 @@ const SSPsAnalytics = () => {
   >()
 
   const [ssp, setSsp] = useState<SSPs>('')
-  const [placement, setPlacement] = useState<RequestStatPlacement>(RequestStatPlacement.app)
+  const [placement, setPlacement] = useState<RequestStatPlacement | undefined>()
   const { analyticsData, getAnalyticsKeyAndUpdate } = useSSPsAnalytics()
 
   const analytics = useMemo(
@@ -62,6 +55,20 @@ const SSPsAnalytics = () => {
 
   const loading = useMemo(() => analytics?.status === 'loading', [analytics])
 
+  const data: DataElement[] = useMemo(() => {
+    return (
+      analytics?.data.map(({ count, value }) => {
+        return {
+          id: value.toString() + count.toString(),
+          columns: [
+            { value: value.toString(), label: value.toString() },
+            { value: count, label: value.toString() }
+          ]
+        }
+      }) || []
+    )
+  }, [analytics])
+
   return (
     <Stack gap="xs">
       <Group align="start" justify="left" gap="xs">
@@ -74,17 +81,22 @@ const SSPsAnalytics = () => {
         />
         <Select
           label="Placement"
-          value={placement.toString()}
+          value={placement?.toString()}
           // @ts-ignore
-          onChange={(val) => setPlacement(val as string)}
+          onChange={(val) => setPlacement(Number(val))}
           data={placementsData}
           size="md"
         />
       </Group>
 
       <Stack>
-        {loading && <Loader />}
         <Code>{JSON.stringify(analytics?.data, null, 2)}</Code>
+        <CustomTable
+          pageSize={10}
+          headings={[placement?.toString() || 'data', 'count']}
+          data={data}
+          loading={loading}
+        />
       </Stack>
     </Stack>
   )

@@ -1,4 +1,6 @@
-import { Campaign, EventType, Placement } from 'adex-common'
+import { Campaign, EventType, Placement, IabTaxonomyV3 } from 'adex-common'
+
+const IabCategories = Object.values(IabTaxonomyV3)
 
 export type BaseData = {
   impressions: number
@@ -119,3 +121,31 @@ export type BaseAnalyticsData = BaseData & {
 }
 
 export type SSPs = '' | 'Eskimi' | 'Epom' | 'Qortex'
+
+export enum RequestStatPlacement {
+  app = 1,
+  siteMobile = 2,
+  siteDesktop = 3,
+  siteOther = 4,
+  other = 5
+}
+
+export type SSPsAnalyticsData = {
+  value: string | number
+  count: number
+}
+
+export type SSPsAnalyticsDataKeys = {
+  limit?: number
+  date?: string
+  category?: typeof IabCategories
+  publisher?: string
+  placement?: RequestStatPlacement
+  country?: string
+}
+
+export type SSPsAnalyticsDataQuery = SSPsAnalyticsDataKeys & {
+  groupBy?: keyof SSPsAnalyticsDataKeys
+}
+
+export type DataStatus = 'loading' | 'updating' | 'processed' | 'error'

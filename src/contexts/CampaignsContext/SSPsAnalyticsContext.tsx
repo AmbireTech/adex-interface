@@ -1,4 +1,3 @@
-import { IabTaxonomyV3 } from 'adex-common'
 import {
   createContext,
   FC,
@@ -14,22 +13,7 @@ import useCustomNotifications from 'hooks/useCustomNotifications'
 
 import { getEpoch, MINUTE } from 'helpers'
 
-const IabCategories = Object.values(IabTaxonomyV3)
-
-type DataStatus = 'loading' | 'updating' | 'processed' | 'error'
-
-enum RequestStatPlacement {
-  app = 1,
-  siteMobile = 2,
-  siteDesktop = 3,
-  siteOther = 4,
-  other = 5
-}
-
-export type SSPsAnalyticsData = {
-  value: string | number
-  count: number
-}
+import { SSPsAnalyticsDataQuery, DataStatus, SSPsAnalyticsData } from 'types'
 
 // "limit": number,
 // "date": string (date string in format YYYY-MM-DD, defaults to today),
@@ -38,28 +22,19 @@ export type SSPsAnalyticsData = {
 // "placement": number (valid options: enum RequestStatPlacement see below),
 // "groupBy": string (valid options: bidfloor(default), country, category, placement)
 
-export type SSPsAnalyticsDataKeys = {
-  limit?: number
-  date?: string
-  category?: typeof IabCategories
-  publisher?: string
-  placement?: RequestStatPlacement
-  country?: string
-}
-
 const defaultRefreshQuery = 1 * MINUTE
 
 function getRefreshKey(timestamp: number): number {
   return getEpoch(timestamp, defaultRefreshQuery)
 }
 
-const getAnalyticsKeyFromQuery = (queryParams: SSPsAnalyticsDataKeys): string => {
+const getAnalyticsKeyFromQuery = (queryParams: SSPsAnalyticsDataQuery): string => {
   // TODO: hex or hash
   const mapKey = Object.keys(queryParams)
     .sort()
     .reduce((result: string, key: string) => {
-      if (queryParams[key as keyof SSPsAnalyticsDataKeys] !== undefined) {
-        const val = queryParams[key as keyof SSPsAnalyticsDataKeys]
+      if (queryParams[key as keyof SSPsAnalyticsDataQuery] !== undefined) {
+        const val = queryParams[key as keyof SSPsAnalyticsDataQuery]
         return `${result}_${val instanceof Date ? getRefreshKey(val.getTime()) : val?.toString()}`
       }
 
@@ -71,7 +46,7 @@ const getAnalyticsKeyFromQuery = (queryParams: SSPsAnalyticsDataKeys): string =>
 
 interface ISSPsAnalyticsContext {
   analyticsData: Map<string, { status: DataStatus; data: SSPsAnalyticsData[] }>
-  getAnalyticsKeyAndUpdate: (filter: SSPsAnalyticsDataKeys) => Promise<{ key: string } | undefined>
+  getAnalyticsKeyAndUpdate: (filter: SSPsAnalyticsDataQuery) => Promise<{ key: string } | undefined>
   initialAnalyticsLoading: boolean
 }
 
@@ -89,7 +64,7 @@ const SSPsAnalyticsProvider: FC<PropsWithChildren> = ({ children }) => {
   )
 
   const updateCampaignAnalyticsByQuery = useCallback(
-    async (params: SSPsAnalyticsDataKeys, dataKey: string) => {
+    async (params: SSPsAnalyticsDataQuery, dataKey: string) => {
       try {
         const analyticsDataRes = await adexServicesRequest<SSPsAnalyticsData[]>('backend', {
           route: '/dsp/stats/advanced',
@@ -105,8 +80,10 @@ const SSPsAnalyticsProvider: FC<PropsWithChildren> = ({ children }) => {
 
         setAnalyticsData((prev) => {
           const next = new Map(prev)
-          const nextAggr: { status: DataStatus; data: SSPsAnalyticsData[] } =
-            { status: 'processed', data: analyticsDataRes } || prev.get(dataKey)
+          const nextAggr: { status: DataStatus; data: SSPsAnalyticsData[] } = {
+            status: 'processed',
+            data: analyticsDataRes
+          }
           next.set(dataKey, nextAggr)
           return next
         })
@@ -130,7 +107,7 @@ const SSPsAnalyticsProvider: FC<PropsWithChildren> = ({ children }) => {
   )
 
   const getAnalyticsKeyAndUpdate = useCallback(
-    async (filter: SSPsAnalyticsDataKeys): Promise<{ key: string } | undefined> => {
+    async (filter: SSPsAnalyticsDataQuery): Promise<{ key: string } | undefined> => {
       const key = getAnalyticsKeyFromQuery(filter)
 
       updateCampaignAnalyticsByQuery(filter, key)
