@@ -66,14 +66,17 @@ const SSPsAnalyticsProvider: FC<PropsWithChildren> = ({ children }) => {
   const updateCampaignAnalyticsByQuery = useCallback(
     async (params: SSPsAnalyticsDataQuery, dataKey: string) => {
       try {
-        const analyticsDataRes = await adexServicesRequest<SSPsAnalyticsData[]>('backend', {
-          route: '/dsp/stats/advanced',
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: params
-        })
+        const analyticsDataRes = await adexServicesRequest<{ data: SSPsAnalyticsData[] }>(
+          'backend',
+          {
+            route: '/dsp/stats/advanced',
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: params
+          }
+        )
 
         console.log({ analyticsDataRes })
 
@@ -85,7 +88,7 @@ const SSPsAnalyticsProvider: FC<PropsWithChildren> = ({ children }) => {
           const next = new Map(prev)
           const nextAggr: { status: DataStatus; data: SSPsAnalyticsData[] } = {
             status: 'processed',
-            data: analyticsDataRes
+            data: analyticsDataRes.data
           }
           next.set(dataKey, nextAggr)
           return next
@@ -112,6 +115,16 @@ const SSPsAnalyticsProvider: FC<PropsWithChildren> = ({ children }) => {
   const getAnalyticsKeyAndUpdate = useCallback(
     async (filter: SSPsAnalyticsDataQuery): Promise<{ key: string } | undefined> => {
       const key = getAnalyticsKeyFromQuery(filter)
+
+      setAnalyticsData((prev) => {
+        const next = new Map(prev)
+        const nextAggr: { status: DataStatus; data: SSPsAnalyticsData[] } = {
+          status: 'loading',
+          data: next.get(key)?.data || []
+        }
+        next.set(key, nextAggr)
+        return next
+      })
 
       updateCampaignAnalyticsByQuery(filter, key)
 

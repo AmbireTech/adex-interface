@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from 'react'
-import { Select, Stack, Group, Box, Badge } from '@mantine/core'
+import { Select, Stack, Group, Badge, Text, Loader } from '@mantine/core'
 import { SSPs, RequestStatPlacement, SSPsAnalyticsDataQuery } from 'types'
 import useSSPsAnalytics from 'hooks/useCampaignAnalytics/useSSPsAnalytics'
 import CustomTable, { DataElement } from 'components/common/CustomTable'
@@ -24,7 +24,6 @@ const placementsData: Array<{ value: string; label: string }> = [
 const groupByData: Array<{ value: string; label: string }> = [
   { value: 'date', label: 'date' },
   { value: 'category', label: 'category' },
-  { value: 'publisher', label: 'publisher' },
   { value: 'placement', label: 'placement' },
   { value: 'country', label: 'country' },
   { value: 'ssp', label: 'ssp' },
@@ -91,6 +90,10 @@ const SSPsAnalytics = () => {
 
   return (
     <Stack gap="xs">
+      <Text size="sm" inline c="purple">
+        * This analytics are for the actual processed request from our SSRs (oRtb: BidRequest) for
+        the <strong>48 hours</strong>
+      </Text>
       <Group align="start" justify="left" gap="xs">
         <Select
           label="Group by"
@@ -116,16 +119,14 @@ const SSPsAnalytics = () => {
         />
       </Group>
       <Group align="center" justify="left" gap="xs" pos="relative">
-        <Box>Totals: </Box>
-
         <Badge size="lg" leftSection="Total requests">
-          {data.totalRequests.toLocaleString()}
+          {loading ? <Loader type="dots" color="white" /> : data.totalRequests.toLocaleString()}
         </Badge>
 
         <DownloadCSV
           // TODO: fix anal type
           // @ts-ignore
-          data={analytics?.data.map((x) => ({
+          data={analytics?.data?.map((x) => ({
             value: x.count,
             segment: x.value.toString()
           }))}
