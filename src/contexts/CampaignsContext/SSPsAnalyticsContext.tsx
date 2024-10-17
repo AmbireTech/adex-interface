@@ -69,6 +69,9 @@ const SSPsAnalyticsProvider: FC<PropsWithChildren> = ({ children }) => {
         const analyticsDataRes = await adexServicesRequest<SSPsAnalyticsData[]>('backend', {
           route: '/dsp/stats/advanced',
           method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
           body: params
         })
 

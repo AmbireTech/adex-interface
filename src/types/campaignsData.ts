@@ -142,6 +142,7 @@ export type SSPsAnalyticsDataKeys = {
   publisher?: string
   placement?: RequestStatPlacement
   country?: string
+  ssp?: SSPs
 }
 
 export type SSPsAnalyticsDataQuery = SSPsAnalyticsDataKeys & {
