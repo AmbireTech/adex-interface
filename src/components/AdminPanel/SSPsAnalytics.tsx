@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from 'react'
-import { Select, Stack, Group, Badge, Text, Loader } from '@mantine/core'
+import { Select, Stack, Group, Badge, Text, Loader, Code, NumberFormatter } from '@mantine/core'
 import { SSPs, RequestStatPlacement, SSPsAnalyticsDataQuery } from 'types'
 import useSSPsAnalytics from 'hooks/useCampaignAnalytics/useSSPsAnalytics'
 import CustomTable, { DataElement } from 'components/common/CustomTable'
@@ -92,7 +92,7 @@ const SSPsAnalytics = ({
             id: value.toString() + count.toString(),
             columns: [
               { value: value.toString(), label: value.toString() },
-              { value: count, label: value.toString() }
+              { value: count, element: <NumberFormatter value={count} thousandSeparator /> }
             ]
           }
         }) || [],
@@ -144,7 +144,8 @@ const SSPsAnalytics = ({
           }))}
           // mapHeadersToDataProperties={{ [analType]: 'segment', ...csvHeaders }}
           filename={`${analyticsKey?.key || 'admin-data-export'}.csv`}
-          disabled={loading}
+          // disabled={loading}
+          disabled
         />
       </Group>
       <Stack>
@@ -154,6 +155,9 @@ const SSPsAnalytics = ({
           data={data.elements}
           loading={loading}
         />
+        <Code block>
+          {JSON.stringify({ ssp, placement, category, country, format, groupBy }, null, 2)}
+        </Code>
       </Stack>
     </Stack>
   )
