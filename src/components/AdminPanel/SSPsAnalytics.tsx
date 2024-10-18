@@ -22,6 +22,7 @@ const placementsData: Array<{ value: string; label: string }> = [
 ]
 
 const groupByData: Array<{ value: string; label: string }> = [
+  { value: 'bidfloor', label: 'bid Floor' },
   { value: 'date', label: 'date' },
   { value: 'category', label: 'category' },
   { value: 'placement', label: 'placement' },
@@ -30,7 +31,15 @@ const groupByData: Array<{ value: string; label: string }> = [
   { value: 'format', label: 'format' }
 ]
 
-const SSPsAnalytics = () => {
+const SSPsAnalytics = ({
+  country,
+  category,
+  format
+}: {
+  category?: SSPsAnalyticsDataQuery['category']
+  country?: SSPsAnalyticsDataQuery['country']
+  format?: string[]
+}) => {
   const [analyticsKey, setAnalyticsKey] = useState<
     | {
         key: string
@@ -59,7 +68,10 @@ const SSPsAnalytics = () => {
       const key = await getAnalyticsKeyAndUpdate({
         ...removeOptionalEmptyStringProps({
           ssp,
-          placement
+          placement,
+          category,
+          country,
+          format
         }),
         groupBy
       })
@@ -68,7 +80,7 @@ const SSPsAnalytics = () => {
     }
 
     checkAnalytics()
-  }, [getAnalyticsKeyAndUpdate, groupBy, placement, ssp])
+  }, [category, country, format, getAnalyticsKeyAndUpdate, groupBy, placement, ssp])
 
   const loading = useMemo(() => analytics?.status === 'loading', [analytics])
 
