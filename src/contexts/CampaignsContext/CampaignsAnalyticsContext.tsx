@@ -202,8 +202,10 @@ const CampaignsAnalyticsProvider: FC<PropsWithChildren> = ({ children }) => {
 
         setAnalyticsData((prev) => {
           const next = new Map(prev)
-          const nextAggr: { status: DataStatus; data: AnalyticsData[] } =
-            { status: 'processed', data: analyticsDataRes?.aggr } || prev.get(dataKey)
+          const nextAggr: { status: DataStatus; data: AnalyticsData[] } = {
+            status: 'processed',
+            data: analyticsDataRes?.aggr || prev.get(dataKey)?.data
+          }
           next.set(dataKey, nextAggr)
           return next
         })

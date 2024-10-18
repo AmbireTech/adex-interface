@@ -27,9 +27,6 @@ const SSPs = ({ forAdmin, campaignId }: { forAdmin: boolean; campaignId: string 
     [campaignMappedAnalytics, currencyName]
   )
 
-  if (!campaignMappedAnalytics?.length) {
-    return <div>No placement found</div>
-  }
   return <CustomTable headings={headings} data={elements} error={error} loading={loading} />
 }
 

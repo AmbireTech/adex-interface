@@ -6,6 +6,7 @@ import { StickyPanel } from 'components/TopBar/TopBarStickyPanel'
 import Invoices from 'components/Billing/Invoices'
 import AdminAnalytics from './AdminAnalytics'
 import Accounts from './Accounts'
+import SSPsAnalytics from './SSPsAnalytics'
 import { SspStats } from './SspStats'
 // import { AccountDetails } from './AccountDetails'
 
@@ -29,6 +30,7 @@ const AdminPanel = () => {
           <Tabs.Tab value="campaigns">All Campaigns</Tabs.Tab>
           <Tabs.Tab value="invoices">Invoices</Tabs.Tab>
           <Tabs.Tab value="validatorAnalytics">Validator Analytics</Tabs.Tab>
+          <Tabs.Tab value="sspAnalytics">SSPs Analytics</Tabs.Tab>
           <Tabs.Tab value="sspStats">SSP stats</Tabs.Tab>
           <Tabs.Tab value="accounts">Accounts</Tabs.Tab>
           <Tabs.Tab value="user-account" disabled>
@@ -47,6 +49,10 @@ const AdminPanel = () => {
 
           <Tabs.Panel value="validatorAnalytics" pt="xs">
             <AdminAnalytics />
+          </Tabs.Panel>
+
+          <Tabs.Panel value="sspAnalytics" pt="xs">
+            <SSPsAnalytics />
           </Tabs.Panel>
 
           <Tabs.Panel value="sspStats" pt="xs">
