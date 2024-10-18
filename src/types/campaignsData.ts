@@ -138,10 +138,10 @@ export type SSPsAnalyticsData = {
 export type SSPsAnalyticsDataKeys = {
   limit?: number
   date?: string
-  category?: typeof IabCategories
+  category?: { values?: typeof IabCategories; operator?: 'in' | 'nin' }
   publisher?: string
   placement?: RequestStatPlacement
-  country?: string
+  country?: { values?: string[]; operator?: 'in' | 'nin' }
   ssp?: SSPs
 }
 
