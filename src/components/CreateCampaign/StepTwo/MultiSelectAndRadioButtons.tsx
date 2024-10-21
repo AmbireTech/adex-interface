@@ -1,12 +1,5 @@
 import { useCallback, useMemo, useState } from 'react'
-import {
-  MantineTheme,
-  MultiSelect,
-  SegmentedControl,
-  Stack,
-  Text,
-  getPrimaryShade
-} from '@mantine/core'
+import { MantineTheme, MultiSelect, SegmentedControl, Stack, getPrimaryShade } from '@mantine/core'
 import { TargetingInputApplyProp } from 'adex-common/dist/types'
 import { useColorScheme } from '@mantine/hooks'
 import { createStyles } from '@mantine/emotion'
@@ -125,32 +118,21 @@ const MultiSelectAndRadioButtons = ({
     [groups, onCategoriesChange, selectedRadio]
   )
 
-  const labelText = useMemo(() => {
-    if (selectedRadio === 'in') return `Select ${label}`
-    if (selectedRadio === 'nin') return `Select ${label} to exclude`
-    if (selectedRadio === 'all') return 'All selected'
-    return ''
-  }, [selectedRadio, label])
-
   return (
-    <Stack>
+    <Stack gap="xs">
       <SegmentedControl
         color={selectedRadio === 'nin' ? 'warning' : 'brand'}
-        size="xs"
+        size="sm"
         value={selectedRadio}
         onChange={handleRadioChange}
+        withItemsBorders={false}
         data={[
-          { label: 'All', value: 'all' },
-          { label: 'Include', value: 'in' },
-          { label: 'Exclude', value: 'nin' }
+          { label: 'All selected', value: 'all' },
+          { label: 'Include selected', value: 'in' },
+          { label: 'Exclude selected', value: 'nin' }
         ]}
       />
       <MultiSelect
-        label={
-          <Text c="secondaryText" size="sm" fw="bold" mb="xs">
-            {labelText}
-          </Text>
-        }
         clearable
         searchable
         variant="filled"
