@@ -8,7 +8,8 @@ import {
   Loader,
   Code,
   NumberFormatter,
-  Accordion
+  Accordion,
+  MultiSelect
 } from '@mantine/core'
 import { SSPs, RequestStatPlacement, SSPsAnalyticsDataQuery } from 'types'
 import useSSPsAnalytics from 'hooks/useCampaignAnalytics/useSSPsAnalytics'
@@ -19,6 +20,7 @@ import { CountryData } from 'helpers/countries'
 import { IabTaxonomyV3 } from 'adex-common'
 import { CATEGORIES, CAT_GROUPS, COUNTRIES, REGION_GROUPS } from 'constants/createCampaign'
 import MultiSelectAndRadioButtons from 'components/CreateCampaign/StepTwo/MultiSelectAndRadioButtons'
+import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 
 const sspsData: Array<{ value: SSPs | ''; label: string }> = [
   { value: '', label: 'All SSPs' },
@@ -82,6 +84,10 @@ const SSPsAnalytics = ({
   country?: SSPsAnalyticsDataQuery['country']
   format?: string[]
 }) => {
+  // TODO: get all formats once then use it for src
+  // NOTE: temp
+  const { allowedBannerSizes } = useCreateCampaignContext()
+
   const [analyticsKey, setAnalyticsKey] = useState<
     | {
         key: string
@@ -100,14 +106,12 @@ const SSPsAnalytics = ({
     category || { values: [], operator: 'in' }
   )
 
+  const [selectedFormats, setFormats] = useState<string[]>(format || [])
+
   const analytics = useMemo(
     () => analyticsData.get(analyticsKey?.key || ''),
     [analyticsData, analyticsKey]
   )
-
-  useEffect(() => {
-    console.log({ analytics })
-  }, [analytics])
 
   useEffect(() => {
     setAnalyticsKey(undefined)
@@ -190,9 +194,17 @@ const SSPsAnalytics = ({
           data={placementsData}
           size="md"
         />
+        <MultiSelect
+          label="Formats"
+          value={selectedFormats}
+          onChange={setFormats}
+          data={allowedBannerSizes}
+          clearable
+          searchable
+        />
       </Group>
       <Group grow>
-        <Accordion>
+        <Accordion chevronPosition="left">
           <Accordion.Item value="categories">
             <Accordion.Control>Categories</Accordion.Control>
             <Accordion.Panel>
