@@ -3,8 +3,10 @@ import { Select, Stack, Group, Badge, Text, Loader, Code, NumberFormatter } from
 import { SSPs, RequestStatPlacement, SSPsAnalyticsDataQuery } from 'types'
 import useSSPsAnalytics from 'hooks/useCampaignAnalytics/useSSPsAnalytics'
 import CustomTable, { DataElement } from 'components/common/CustomTable'
-import { removeOptionalEmptyStringProps } from 'helpers'
+import { removeOptionalEmptyStringProps, getEnumKeyByValue } from 'helpers'
 import DownloadCSV from 'components/common/DownloadCSV'
+import { CountryData } from 'helpers/countries'
+import { IabTaxonomyV3 } from 'adex-common'
 
 const sspsData: Array<{ value: SSPs | ''; label: string }> = [
   { value: '', label: 'All SSPs' },
@@ -30,6 +32,34 @@ const groupByData: Array<{ value: string; label: string }> = [
   { value: 'ssp', label: 'ssp' },
   { value: 'format', label: 'format' }
 ]
+
+const mapSegmentLabel = (
+  type: SSPsAnalyticsDataQuery['groupBy'],
+  segment: string | number
+): { label: string } => {
+  let label = (segment || '').toString()
+
+  switch (type) {
+    case 'country':
+      label = `${CountryData.get(segment.toString().toUpperCase())?.name} (${segment
+        .toString()
+        .toUpperCase()})`
+      break
+    case 'category':
+      label = `${getEnumKeyByValue(
+        IabTaxonomyV3,
+        segment.toString().toUpperCase() || ''
+      )} (${segment.toString().toUpperCase()})`
+      break
+
+    default:
+      break
+  }
+
+  return {
+    label
+  }
+}
 
 const SSPsAnalytics = ({
   country,
@@ -91,14 +121,17 @@ const SSPsAnalytics = ({
           return {
             id: value.toString() + count.toString(),
             columns: [
-              { value: value.toString(), label: value.toString() },
+              {
+                value: value.toString(),
+                element: mapSegmentLabel(groupBy, value).label
+              },
               { value: count, element: <NumberFormatter value={count} thousandSeparator /> }
             ]
           }
         }) || [],
       totalRequests: analytics?.data.reduce((sum, i) => sum + i.count, 0) || 0
     }
-  }, [analytics])
+  }, [analytics?.data, groupBy])
 
   return (
     <Stack gap="xs">
