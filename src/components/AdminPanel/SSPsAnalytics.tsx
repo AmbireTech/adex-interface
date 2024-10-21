@@ -1,10 +1,27 @@
 import { useEffect, useState, useMemo } from 'react'
-import { Select, Stack, Group, Badge, Text, Loader, Code, NumberFormatter } from '@mantine/core'
+import {
+  Select,
+  Stack,
+  Group,
+  Badge,
+  Text,
+  Loader,
+  Code,
+  NumberFormatter,
+  MultiSelect,
+  Fieldset,
+  Divider
+} from '@mantine/core'
 import { SSPs, RequestStatPlacement, SSPsAnalyticsDataQuery } from 'types'
 import useSSPsAnalytics from 'hooks/useCampaignAnalytics/useSSPsAnalytics'
 import CustomTable, { DataElement } from 'components/common/CustomTable'
-import { removeOptionalEmptyStringProps } from 'helpers'
+import { removeOptionalEmptyStringProps, getEnumKeyByValue } from 'helpers'
 import DownloadCSV from 'components/common/DownloadCSV'
+import { CountryData } from 'helpers/countries'
+import { IabTaxonomyV3 } from 'adex-common'
+import { CATEGORIES, CAT_GROUPS, COUNTRIES, REGION_GROUPS } from 'constants/createCampaign'
+import MultiSelectAndRadioButtons from 'components/CreateCampaign/StepTwo/MultiSelectAndRadioButtons'
+import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 
 const sspsData: Array<{ value: SSPs | ''; label: string }> = [
   { value: '', label: 'All SSPs' },
@@ -31,6 +48,38 @@ const groupByData: Array<{ value: string; label: string }> = [
   { value: 'format', label: 'format' }
 ]
 
+const mapSegmentLabel = (
+  type: SSPsAnalyticsDataQuery['groupBy'],
+  segment: string | number
+): { label: string } => {
+  let label = (segment || '').toString()
+
+  switch (type) {
+    case 'country':
+      label = `${CountryData.get(segment.toString().toUpperCase())?.name} (${segment
+        .toString()
+        .toUpperCase()})`
+      break
+    case 'category':
+      label = `${getEnumKeyByValue(
+        IabTaxonomyV3,
+        segment.toString().toUpperCase() || ''
+      )} (${segment.toString().toUpperCase()})`
+      break
+
+    case 'placement':
+      label = getEnumKeyByValue(RequestStatPlacement, segment)
+      break
+
+    default:
+      break
+  }
+
+  return {
+    label
+  }
+}
+
 const SSPsAnalytics = ({
   country,
   category,
@@ -40,6 +89,10 @@ const SSPsAnalytics = ({
   country?: SSPsAnalyticsDataQuery['country']
   format?: string[]
 }) => {
+  // TODO: get all formats once then use it for src
+  // NOTE: temp
+  const { allowedBannerSizes } = useCreateCampaignContext()
+
   const [analyticsKey, setAnalyticsKey] = useState<
     | {
         key: string
@@ -51,15 +104,19 @@ const SSPsAnalytics = ({
   const [groupBy, setGrop] = useState<SSPsAnalyticsDataQuery['groupBy']>('country')
   const [placement, setPlacement] = useState<RequestStatPlacement | ''>('')
   const { analyticsData, getAnalyticsKeyAndUpdate } = useSSPsAnalytics()
+  const [selectedCountries, setCountries] = useState<SSPsAnalyticsDataQuery['country']>(
+    country || { values: [], operator: 'in' }
+  )
+  const [selectedCategories, setCategories] = useState<SSPsAnalyticsDataQuery['category']>(
+    category || { values: [], operator: 'in' }
+  )
+
+  const [selectedFormats, setFormats] = useState<string[]>(format || [])
 
   const analytics = useMemo(
     () => analyticsData.get(analyticsKey?.key || ''),
     [analyticsData, analyticsKey]
   )
-
-  useEffect(() => {
-    console.log({ analytics })
-  }, [analytics])
 
   useEffect(() => {
     setAnalyticsKey(undefined)
@@ -69,9 +126,9 @@ const SSPsAnalytics = ({
         ...removeOptionalEmptyStringProps({
           ssp,
           placement,
-          category,
-          country,
-          format
+          category: selectedCategories,
+          country: selectedCountries,
+          format: selectedFormats
         }),
         groupBy
       })
@@ -80,7 +137,18 @@ const SSPsAnalytics = ({
     }
 
     checkAnalytics()
-  }, [category, country, format, getAnalyticsKeyAndUpdate, groupBy, placement, ssp])
+  }, [
+    category,
+    country,
+    format,
+    getAnalyticsKeyAndUpdate,
+    groupBy,
+    placement,
+    selectedCategories,
+    selectedCountries,
+    selectedFormats,
+    ssp
+  ])
 
   const loading = useMemo(() => analytics?.status === 'loading', [analytics])
 
@@ -91,14 +159,17 @@ const SSPsAnalytics = ({
           return {
             id: value.toString() + count.toString(),
             columns: [
-              { value: value.toString(), label: value.toString() },
+              {
+                value: value.toString(),
+                element: mapSegmentLabel(groupBy, value).label
+              },
               { value: count, element: <NumberFormatter value={count} thousandSeparator /> }
             ]
           }
         }) || [],
       totalRequests: analytics?.data.reduce((sum, i) => sum + i.count, 0) || 0
     }
-  }, [analytics])
+  }, [analytics?.data, groupBy])
 
   return (
     <Stack gap="xs">
@@ -106,30 +177,85 @@ const SSPsAnalytics = ({
         * This analytics are for the actual processed request from our SSRs (oRtb: BidRequest) for
         the <strong>48 hours</strong>
       </Text>
-      <Group align="start" justify="left" gap="xs">
-        <Select
-          label="Group by"
-          value={groupBy}
-          onChange={(val) => setGrop(val as SSPsAnalyticsDataQuery['groupBy'])}
-          data={groupByData}
-          size="md"
-        />
-        <Select
-          label="SSP"
-          value={ssp}
-          onChange={(val) => setSsp(val as SSPs)}
-          data={sspsData}
-          size="md"
-        />
-        <Select
-          label="Placement"
-          value={placement?.toString()}
-          // @ts-ignore
-          onChange={(val) => setPlacement(val !== '' ? Number(val) : val)}
-          data={placementsData}
-          size="md"
-        />
-      </Group>
+      <Fieldset>
+        <Stack>
+          <Group align="start" justify="left" gap="xl" grow>
+            <Stack gap="xs">
+              <Select
+                label="Group by"
+                value={groupBy}
+                onChange={(val) => setGrop(val as SSPsAnalyticsDataQuery['groupBy'])}
+                data={groupByData}
+                searchable
+                size="sm"
+              />
+              <MultiSelect
+                label="Formats"
+                value={selectedFormats}
+                onChange={setFormats}
+                data={allowedBannerSizes}
+                clearable
+                searchable
+                size="sm"
+              />
+            </Stack>
+            <Stack>
+              <Select
+                label="SSP"
+                value={ssp}
+                onChange={(val) => setSsp(val as SSPs)}
+                data={sspsData}
+                searchable
+                size="sm"
+              />
+              <Select
+                label="Placement"
+                value={placement?.toString()}
+                // @ts-ignore
+                onChange={(val) => setPlacement(val !== '' ? Number(val) : val)}
+                data={placementsData}
+                size="sm"
+              />
+            </Stack>
+          </Group>
+
+          <Group grow gap="xl" align="baseline">
+            <Stack>
+              <Divider size="md" label="Categories" color="mainText" />
+              <MultiSelectAndRadioButtons
+                onCategoriesChange={(selectedRadio, values) =>
+                  setCategories({
+                    values: values as IabTaxonomyV3[],
+                    operator: selectedRadio === 'all' ? undefined : selectedRadio
+                  })
+                }
+                multiSelectData={CATEGORIES}
+                defaultRadioValue={selectedCategories?.operator}
+                defaultSelectValue={selectedCategories?.values}
+                groups={CAT_GROUPS}
+                label="Categories"
+              />
+            </Stack>
+            <Stack>
+              <Divider size="md" label="Countries" color="mainText" />
+
+              <MultiSelectAndRadioButtons
+                onCategoriesChange={(selectedRadio, values) =>
+                  setCountries({
+                    values,
+                    operator: selectedRadio === 'all' ? undefined : selectedRadio
+                  })
+                }
+                defaultRadioValue={selectedCountries?.operator}
+                defaultSelectValue={selectedCountries?.values}
+                multiSelectData={COUNTRIES}
+                groups={REGION_GROUPS}
+                label="Countries"
+              />
+            </Stack>
+          </Group>
+        </Stack>
+      </Fieldset>
       <Group align="center" justify="left" gap="xs" pos="relative">
         <Badge size="lg" leftSection="Total requests">
           {loading ? <Loader type="dots" color="white" /> : data.totalRequests.toLocaleString()}
@@ -156,7 +282,18 @@ const SSPsAnalytics = ({
           loading={loading}
         />
         <Code block>
-          {JSON.stringify({ ssp, placement, category, country, format, groupBy }, null, 2)}
+          {JSON.stringify(
+            {
+              ssp,
+              placement,
+              category: selectedCategories,
+              country: selectedCountries,
+              format,
+              groupBy
+            },
+            null,
+            2
+          )}
         </Code>
       </Stack>
     </Stack>

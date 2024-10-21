@@ -1,4 +1,4 @@
-import { Grid, Text } from '@mantine/core'
+import { Divider, Stack, Text } from '@mantine/core'
 import { CATEGORIES, CAT_GROUPS, COUNTRIES, REGION_GROUPS } from 'constants/createCampaign'
 import { useCallback } from 'react'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
@@ -35,42 +35,37 @@ const StepTwo = () => {
   )
 
   return (
-    <Grid>
-      <Grid.Col>
-        <Text c="secondaryText" size="sm" fw="bold" mb="xs">
-          1. Categories
-        </Text>
-        <MultiSelectAndRadioButtons
-          onCategoriesChange={(selectedRadio, values) =>
-            handleSelect(selectedRadio, values, CATEGORIES_PATH)
-          }
-          multiSelectData={CATEGORIES}
-          defaultRadioValue={categoriesRadioValue}
-          defaultSelectValue={
-            categoriesRadioValue !== 'all' ? categories[categoriesRadioValue] : []
-          }
-          groups={CAT_GROUPS}
-          label="Categories"
-          error={errors[CATEGORIES_PATH]?.toString()}
-        />
-      </Grid.Col>
-      <Grid.Col>
-        <Text c="secondaryText" size="sm" fw="bold" mb="xs">
-          2. Countries
-        </Text>
-        <MultiSelectAndRadioButtons
-          onCategoriesChange={(selectedRadio, values) =>
-            handleSelect(selectedRadio, values, LOCATION_PATH)
-          }
-          defaultRadioValue={locationRadioValue}
-          defaultSelectValue={locationRadioValue !== 'all' ? location[locationRadioValue] : []}
-          multiSelectData={COUNTRIES}
-          groups={REGION_GROUPS}
-          label="Countries"
-          error={errors[LOCATION_PATH]?.toString()}
-        />
-      </Grid.Col>
-    </Grid>
+    <Stack>
+      <Text c="secondaryText" size="sm" fw="bold">
+        1. Categories
+      </Text>
+      <MultiSelectAndRadioButtons
+        onCategoriesChange={(selectedRadio, values) =>
+          handleSelect(selectedRadio, values, CATEGORIES_PATH)
+        }
+        multiSelectData={CATEGORIES}
+        defaultRadioValue={categoriesRadioValue}
+        defaultSelectValue={categoriesRadioValue !== 'all' ? categories[categoriesRadioValue] : []}
+        groups={CAT_GROUPS}
+        label="Categories"
+        error={errors[CATEGORIES_PATH]?.toString()}
+      />
+      <Divider />
+      <Text c="secondaryText" size="sm" fw="bold">
+        2. Countries
+      </Text>
+      <MultiSelectAndRadioButtons
+        onCategoriesChange={(selectedRadio, values) =>
+          handleSelect(selectedRadio, values, LOCATION_PATH)
+        }
+        defaultRadioValue={locationRadioValue}
+        defaultSelectValue={locationRadioValue !== 'all' ? location[locationRadioValue] : []}
+        multiSelectData={COUNTRIES}
+        groups={REGION_GROUPS}
+        label="Countries"
+        error={errors[LOCATION_PATH]?.toString()}
+      />
+    </Stack>
   )
 }
 

@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from 'react'
-import { MantineTheme, MultiSelect, Radio, Stack, Text, getPrimaryShade } from '@mantine/core'
+import { MantineTheme, MultiSelect, SegmentedControl, Stack, getPrimaryShade } from '@mantine/core'
 import { TargetingInputApplyProp } from 'adex-common/dist/types'
 import { useColorScheme } from '@mantine/hooks'
 import { createStyles } from '@mantine/emotion'
@@ -118,33 +118,26 @@ const MultiSelectAndRadioButtons = ({
     [groups, onCategoriesChange, selectedRadio]
   )
 
-  const labelText = useMemo(() => {
-    if (selectedRadio === 'in') return `Select ${label}`
-    if (selectedRadio === 'nin') return `Select ${label} to exclude`
-    if (selectedRadio === 'all') return 'All selected'
-    return ''
-  }, [selectedRadio, label])
-
   return (
-    <>
-      <Radio.Group value={selectedRadio} onChange={handleRadioChange} mb="md">
-        <Stack gap="xs">
-          <Radio label="Select All" value="all" />
-          <Radio label={`Select ${label}`} value="in" />
-          <Radio label={`Select All ${label} Except`} value="nin" />
-        </Stack>
-      </Radio.Group>
+    <Stack gap="xs">
+      <SegmentedControl
+        color={selectedRadio === 'nin' ? 'warning' : 'brand'}
+        size="sm"
+        value={selectedRadio}
+        onChange={handleRadioChange}
+        withItemsBorders={false}
+        data={[
+          { label: 'All selected', value: 'all' },
+          { label: 'Include selected', value: 'in' },
+          { label: 'Exclude selected', value: 'nin' }
+        ]}
+      />
       <MultiSelect
-        label={
-          <Text c="secondaryText" size="sm" fw="bold" mb="xs">
-            {labelText}
-          </Text>
-        }
         clearable
         searchable
         variant="filled"
-        size="lg"
-        radius="lg"
+        size="md"
+        radius="md"
         // NOTE: just visually show the nothing but keeps the value in case of change - will not need to select again
         value={selectedRadio === 'all' ? [] : selectedValue}
         disabled={selectedRadio === 'all'}
@@ -157,7 +150,7 @@ const MultiSelectAndRadioButtons = ({
           pill: classes.pill
         }}
       />
-    </>
+    </Stack>
   )
 }
 
