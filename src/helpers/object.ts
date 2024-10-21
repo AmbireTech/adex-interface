@@ -8,6 +8,6 @@ export const removeOptionalEmptyStringProps = <T>(objToClean: T extends unknown 
   })
   return obj
 }
-export const getEnumKeyByValue = (enumerated: any, value: string) => {
+export const getEnumKeyByValue = (enumerated: any, value: string | number) => {
   return Object.keys(enumerated)[Object.values(enumerated).indexOf(value as typeof enumerated)]
 }

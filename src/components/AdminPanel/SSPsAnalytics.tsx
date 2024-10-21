@@ -8,8 +8,9 @@ import {
   Loader,
   Code,
   NumberFormatter,
-  Accordion,
-  MultiSelect
+  MultiSelect,
+  Fieldset,
+  Divider
 } from '@mantine/core'
 import { SSPs, RequestStatPlacement, SSPsAnalyticsDataQuery } from 'types'
 import useSSPsAnalytics from 'hooks/useCampaignAnalytics/useSSPsAnalytics'
@@ -64,6 +65,10 @@ const mapSegmentLabel = (
         IabTaxonomyV3,
         segment.toString().toUpperCase() || ''
       )} (${segment.toString().toUpperCase()})`
+      break
+
+    case 'placement':
+      label = getEnumKeyByValue(RequestStatPlacement, segment)
       break
 
     default:
@@ -123,7 +128,7 @@ const SSPsAnalytics = ({
           placement,
           category: selectedCategories,
           country: selectedCountries,
-          format
+          format: selectedFormats
         }),
         groupBy
       })
@@ -141,6 +146,7 @@ const SSPsAnalytics = ({
     placement,
     selectedCategories,
     selectedCountries,
+    selectedFormats,
     ssp
   ])
 
@@ -171,43 +177,51 @@ const SSPsAnalytics = ({
         * This analytics are for the actual processed request from our SSRs (oRtb: BidRequest) for
         the <strong>48 hours</strong>
       </Text>
-      <Group align="start" justify="left" gap="xs" grow>
-        <Select
-          label="Group by"
-          value={groupBy}
-          onChange={(val) => setGrop(val as SSPsAnalyticsDataQuery['groupBy'])}
-          data={groupByData}
-          size="md"
-        />
-        <Select
-          label="SSP"
-          value={ssp}
-          onChange={(val) => setSsp(val as SSPs)}
-          data={sspsData}
-          size="md"
-        />
-        <Select
-          label="Placement"
-          value={placement?.toString()}
-          // @ts-ignore
-          onChange={(val) => setPlacement(val !== '' ? Number(val) : val)}
-          data={placementsData}
-          size="md"
-        />
-        <MultiSelect
-          label="Formats"
-          value={selectedFormats}
-          onChange={setFormats}
-          data={allowedBannerSizes}
-          clearable
-          searchable
-        />
-      </Group>
-      <Group grow>
-        <Accordion chevronPosition="left">
-          <Accordion.Item value="categories">
-            <Accordion.Control>Categories</Accordion.Control>
-            <Accordion.Panel>
+      <Fieldset>
+        <Stack>
+          <Group align="start" justify="left" gap="xl" grow>
+            <Stack gap="xs">
+              <Select
+                label="Group by"
+                value={groupBy}
+                onChange={(val) => setGrop(val as SSPsAnalyticsDataQuery['groupBy'])}
+                data={groupByData}
+                searchable
+                size="sm"
+              />
+              <MultiSelect
+                label="Formats"
+                value={selectedFormats}
+                onChange={setFormats}
+                data={allowedBannerSizes}
+                clearable
+                searchable
+                size="sm"
+              />
+            </Stack>
+            <Stack>
+              <Select
+                label="SSP"
+                value={ssp}
+                onChange={(val) => setSsp(val as SSPs)}
+                data={sspsData}
+                searchable
+                size="sm"
+              />
+              <Select
+                label="Placement"
+                value={placement?.toString()}
+                // @ts-ignore
+                onChange={(val) => setPlacement(val !== '' ? Number(val) : val)}
+                data={placementsData}
+                size="sm"
+              />
+            </Stack>
+          </Group>
+
+          <Group grow gap="xl" align="baseline">
+            <Stack>
+              <Divider size="md" label="Categories" color="mainText" />
               <MultiSelectAndRadioButtons
                 onCategoriesChange={(selectedRadio, values) =>
                   setCategories({
@@ -221,11 +235,10 @@ const SSPsAnalytics = ({
                 groups={CAT_GROUPS}
                 label="Categories"
               />
-            </Accordion.Panel>
-          </Accordion.Item>
-          <Accordion.Item value="countries">
-            <Accordion.Control>Countries</Accordion.Control>
-            <Accordion.Panel>
+            </Stack>
+            <Stack>
+              <Divider size="md" label="Countries" color="mainText" />
+
               <MultiSelectAndRadioButtons
                 onCategoriesChange={(selectedRadio, values) =>
                   setCountries({
@@ -239,10 +252,10 @@ const SSPsAnalytics = ({
                 groups={REGION_GROUPS}
                 label="Countries"
               />
-            </Accordion.Panel>
-          </Accordion.Item>
-        </Accordion>
-      </Group>
+            </Stack>
+          </Group>
+        </Stack>
+      </Fieldset>
       <Group align="center" justify="left" gap="xs" pos="relative">
         <Badge size="lg" leftSection="Total requests">
           {loading ? <Loader type="dots" color="white" /> : data.totalRequests.toLocaleString()}
