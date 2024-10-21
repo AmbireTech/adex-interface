@@ -321,7 +321,7 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
     const selectedPlatforms: Placement | Devices[] = placement === 'app' ? placement : devices
     if (Array.isArray(selectedPlatforms)) {
       const result = selectedPlatforms.map((platform) => mappedSupplyStats[platform][0])
-      setAllowedBannerSizes(result.flat().map((x) => x.value))
+      setAllowedBannerSizes([...new Set(result.flat().map((x) => x.value))])
       setSelectedBidFloors(selectedPlatforms.map((platform) => mappedSupplyStats[platform][1]))
     } else {
       setAllowedBannerSizes(
