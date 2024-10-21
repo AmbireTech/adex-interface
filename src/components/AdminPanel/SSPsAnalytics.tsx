@@ -1,5 +1,15 @@
 import { useEffect, useState, useMemo } from 'react'
-import { Select, Stack, Group, Badge, Text, Loader, Code, NumberFormatter } from '@mantine/core'
+import {
+  Select,
+  Stack,
+  Group,
+  Badge,
+  Text,
+  Loader,
+  Code,
+  NumberFormatter,
+  Accordion
+} from '@mantine/core'
 import { SSPs, RequestStatPlacement, SSPsAnalyticsDataQuery } from 'types'
 import useSSPsAnalytics from 'hooks/useCampaignAnalytics/useSSPsAnalytics'
 import CustomTable, { DataElement } from 'components/common/CustomTable'
@@ -7,6 +17,8 @@ import { removeOptionalEmptyStringProps, getEnumKeyByValue } from 'helpers'
 import DownloadCSV from 'components/common/DownloadCSV'
 import { CountryData } from 'helpers/countries'
 import { IabTaxonomyV3 } from 'adex-common'
+import { CATEGORIES, CAT_GROUPS, COUNTRIES, REGION_GROUPS } from 'constants/createCampaign'
+import MultiSelectAndRadioButtons from 'components/CreateCampaign/StepTwo/MultiSelectAndRadioButtons'
 
 const sspsData: Array<{ value: SSPs | ''; label: string }> = [
   { value: '', label: 'All SSPs' },
@@ -81,6 +93,12 @@ const SSPsAnalytics = ({
   const [groupBy, setGrop] = useState<SSPsAnalyticsDataQuery['groupBy']>('country')
   const [placement, setPlacement] = useState<RequestStatPlacement | ''>('')
   const { analyticsData, getAnalyticsKeyAndUpdate } = useSSPsAnalytics()
+  const [selectedCountries, setCountries] = useState<SSPsAnalyticsDataQuery['country']>(
+    country || { values: [], operator: 'in' }
+  )
+  const [selectedCategories, setCategories] = useState<SSPsAnalyticsDataQuery['category']>(
+    category || { values: [], operator: 'in' }
+  )
 
   const analytics = useMemo(
     () => analyticsData.get(analyticsKey?.key || ''),
@@ -99,8 +117,8 @@ const SSPsAnalytics = ({
         ...removeOptionalEmptyStringProps({
           ssp,
           placement,
-          category,
-          country,
+          category: selectedCategories,
+          country: selectedCountries,
           format
         }),
         groupBy
@@ -110,7 +128,17 @@ const SSPsAnalytics = ({
     }
 
     checkAnalytics()
-  }, [category, country, format, getAnalyticsKeyAndUpdate, groupBy, placement, ssp])
+  }, [
+    category,
+    country,
+    format,
+    getAnalyticsKeyAndUpdate,
+    groupBy,
+    placement,
+    selectedCategories,
+    selectedCountries,
+    ssp
+  ])
 
   const loading = useMemo(() => analytics?.status === 'loading', [analytics])
 
@@ -139,7 +167,7 @@ const SSPsAnalytics = ({
         * This analytics are for the actual processed request from our SSRs (oRtb: BidRequest) for
         the <strong>48 hours</strong>
       </Text>
-      <Group align="start" justify="left" gap="xs">
+      <Group align="start" justify="left" gap="xs" grow>
         <Select
           label="Group by"
           value={groupBy}
@@ -162,6 +190,46 @@ const SSPsAnalytics = ({
           data={placementsData}
           size="md"
         />
+      </Group>
+      <Group grow>
+        <Accordion>
+          <Accordion.Item value="categories">
+            <Accordion.Control>Categories</Accordion.Control>
+            <Accordion.Panel>
+              <MultiSelectAndRadioButtons
+                onCategoriesChange={(selectedRadio, values) =>
+                  setCategories({
+                    values: values as IabTaxonomyV3[],
+                    operator: selectedRadio === 'all' ? undefined : selectedRadio
+                  })
+                }
+                multiSelectData={CATEGORIES}
+                defaultRadioValue={selectedCategories?.operator}
+                defaultSelectValue={selectedCategories?.values}
+                groups={CAT_GROUPS}
+                label="Categories"
+              />
+            </Accordion.Panel>
+          </Accordion.Item>
+          <Accordion.Item value="countries">
+            <Accordion.Control>Countries</Accordion.Control>
+            <Accordion.Panel>
+              <MultiSelectAndRadioButtons
+                onCategoriesChange={(selectedRadio, values) =>
+                  setCountries({
+                    values,
+                    operator: selectedRadio === 'all' ? undefined : selectedRadio
+                  })
+                }
+                defaultRadioValue={selectedCountries?.operator}
+                defaultSelectValue={selectedCountries?.values}
+                multiSelectData={COUNTRIES}
+                groups={REGION_GROUPS}
+                label="Countries"
+              />
+            </Accordion.Panel>
+          </Accordion.Item>
+        </Accordion>
       </Group>
       <Group align="center" justify="left" gap="xs" pos="relative">
         <Badge size="lg" leftSection="Total requests">
@@ -189,7 +257,18 @@ const SSPsAnalytics = ({
           loading={loading}
         />
         <Code block>
-          {JSON.stringify({ ssp, placement, category, country, format, groupBy }, null, 2)}
+          {JSON.stringify(
+            {
+              ssp,
+              placement,
+              category: selectedCategories,
+              country: selectedCountries,
+              format,
+              groupBy
+            },
+            null,
+            2
+          )}
         </Code>
       </Stack>
     </Stack>
