@@ -1,5 +1,12 @@
 import { useCallback, useMemo, useState } from 'react'
-import { MantineTheme, MultiSelect, Radio, Stack, Text, getPrimaryShade } from '@mantine/core'
+import {
+  MantineTheme,
+  MultiSelect,
+  SegmentedControl,
+  Stack,
+  Text,
+  getPrimaryShade
+} from '@mantine/core'
 import { TargetingInputApplyProp } from 'adex-common/dist/types'
 import { useColorScheme } from '@mantine/hooks'
 import { createStyles } from '@mantine/emotion'
@@ -126,14 +133,18 @@ const MultiSelectAndRadioButtons = ({
   }, [selectedRadio, label])
 
   return (
-    <>
-      <Radio.Group value={selectedRadio} onChange={handleRadioChange} mb="md">
-        <Stack gap="xs">
-          <Radio label="Select All" value="all" />
-          <Radio label={`Select ${label}`} value="in" />
-          <Radio label={`Select All ${label} Except`} value="nin" />
-        </Stack>
-      </Radio.Group>
+    <Stack>
+      <SegmentedControl
+        color={selectedRadio === 'nin' ? 'warning' : 'brand'}
+        size="xs"
+        value={selectedRadio}
+        onChange={handleRadioChange}
+        data={[
+          { label: 'All', value: 'all' },
+          { label: 'Include', value: 'in' },
+          { label: 'Exclude', value: 'nin' }
+        ]}
+      />
       <MultiSelect
         label={
           <Text c="secondaryText" size="sm" fw="bold" mb="xs">
@@ -143,8 +154,8 @@ const MultiSelectAndRadioButtons = ({
         clearable
         searchable
         variant="filled"
-        size="lg"
-        radius="lg"
+        size="md"
+        radius="md"
         // NOTE: just visually show the nothing but keeps the value in case of change - will not need to select again
         value={selectedRadio === 'all' ? [] : selectedValue}
         disabled={selectedRadio === 'all'}
@@ -157,7 +168,7 @@ const MultiSelectAndRadioButtons = ({
           pill: classes.pill
         }}
       />
-    </>
+    </Stack>
   )
 }
 
