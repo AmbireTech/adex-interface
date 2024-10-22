@@ -1,6 +1,6 @@
 import { Placement, IabTaxonomyV3, Campaign } from 'adex-common'
 import { SSPsAnalyticsDataQuery, CampaignUI, RequestStatPlacement } from 'types'
-import { removeOptionalEmptyStringProps } from 'helpers'
+import { removeOptionalEmptyStringProps } from './object'
 
 const unknownSrc = '🤷🏼‍♂'
 
@@ -65,7 +65,7 @@ export const campaignDataToSSPAnalyticsQuery = (
             ? undefined
             : campaign.targetingInput.inputs.location.apply
       },
-      format: {
+      placement: {
         values:
           campaign.targetingInput.inputs.placements.in?.[0] === 'app'
             ? [RequestStatPlacement.app]
@@ -75,7 +75,8 @@ export const campaignDataToSSPAnalyticsQuery = (
                 RequestStatPlacement.siteOther
               ],
         operator: 'in'
-      }
+      },
+      format: campaign.adUnits.map((x) => `${x.banner?.format.w}x${x.banner?.format.h}`)
 
       // campaign.adUnits.map((x) => `${x.banner?.format.h}x${x.banner?.format.w}`)
     })

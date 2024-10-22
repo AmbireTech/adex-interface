@@ -35,11 +35,11 @@ const sspsData: Array<{ value: SSPs | ''; label: string }> = [
 ]
 
 const placementsData: Array<{ value: string; label: string }> = [
-  { value: '', label: 'All placements' },
   { value: RequestStatPlacement.app.toString(), label: 'App' },
   { value: RequestStatPlacement.siteMobile.toString(), label: 'Site - Mobile' },
   { value: RequestStatPlacement.siteDesktop.toString(), label: 'Site - Desktop' },
-  { value: RequestStatPlacement.other.toString(), label: 'Site - other' }
+  { value: RequestStatPlacement.siteOther.toString(), label: 'Site - other' },
+  { value: RequestStatPlacement.other.toString(), label: 'Other' }
 ]
 
 const groupByData: Array<{ value: string; label: string }> = [
@@ -107,9 +107,9 @@ const SSPsAnalytics = ({
   >()
 
   const [ssp, setSsp] = useState<SSPs>('')
-  const [groupBy, setGrop] = useState<SSPsAnalyticsDataQuery['groupBy']>('country')
+  const [groupBy, setGrop] = useState<SSPsAnalyticsDataQuery['groupBy']>('ssp')
   const [selectedPlacement, setPlacement] = useState<SSPsAnalyticsDataQuery['placement']>(
-    placement || { values: [] }
+    placement || { values: [RequestStatPlacement.siteDesktop], operator: 'in' }
   )
   const { analyticsData, getAnalyticsKeyAndUpdate } = useSSPsAnalytics()
   const [selectedCountries, setCountries] = useState<SSPsAnalyticsDataQuery['country']>(
@@ -133,7 +133,7 @@ const SSPsAnalytics = ({
       const key = await getAnalyticsKeyAndUpdate({
         ...removeOptionalEmptyStringProps({
           ssp,
-          placement,
+          placement: selectedPlacement,
           category: selectedCategories,
           country: selectedCountries,
           format: selectedFormats
@@ -156,6 +156,7 @@ const SSPsAnalytics = ({
     selectedCategories,
     selectedCountries,
     selectedFormats,
+    selectedPlacement,
     ssp
   ])
 
@@ -222,11 +223,12 @@ const SSPsAnalytics = ({
                 value={selectedPlacement?.values?.map((x) => x.toString())}
                 // @ts-ignore
                 onChange={(val) =>
-                  setPlacement((prev) => ({
-                    values: [...new Set([...(prev?.values || []), Number(val)])],
-                    operator: prev?.operator || 'in'
+                  setPlacement(() => ({
+                    values: [...val.map((x) => Number(x))],
+                    operator: 'in'
                   }))
                 }
+                clearable
                 data={placementsData}
                 size="sm"
               />
@@ -327,10 +329,10 @@ const SSPsAnalytics = ({
           {JSON.stringify(
             {
               ssp,
-              placement,
+              placement: selectedPlacement,
               category: selectedCategories,
               country: selectedCountries,
-              format,
+              format: selectedFormats,
               groupBy
             },
             null,
