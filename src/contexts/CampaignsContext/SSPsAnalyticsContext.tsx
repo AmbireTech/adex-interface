@@ -35,7 +35,19 @@ const getAnalyticsKeyFromQuery = (queryParams: SSPsAnalyticsDataQuery): string =
     .reduce((result: string, key: string) => {
       if (queryParams[key as keyof SSPsAnalyticsDataQuery] !== undefined) {
         const val = queryParams[key as keyof SSPsAnalyticsDataQuery]
-        return `${result}_${val instanceof Date ? getRefreshKey(val.getTime()) : val?.toString()}`
+        let valString = ''
+        if (val instanceof Date) {
+          valString = getRefreshKey(val.getTime()).toString()
+        } else if (Array.isArray(val)) {
+          valString = val.join('-')
+        } else if (typeof val === 'object') {
+          // @ts-ignore
+          valString = getAnalyticsKeyFromQuery(val)
+        } else {
+          valString = val?.toString() || ''
+        }
+
+        return `${result}_${valString}`
       }
 
       return result
@@ -117,16 +129,20 @@ const SSPsAnalyticsProvider: FC<PropsWithChildren> = ({ children }) => {
       const key = getAnalyticsKeyFromQuery(filter)
 
       setAnalyticsData((prev) => {
+        if (prev.get(key) && prev.get(key)?.status !== 'error') {
+          return prev
+        }
+
         const next = new Map(prev)
         const nextAggr: { status: DataStatus; data: SSPsAnalyticsData[] } = {
           status: 'loading',
           data: next.get(key)?.data || []
         }
         next.set(key, nextAggr)
+
+        updateCampaignAnalyticsByQuery(filter, key)
         return next
       })
-
-      updateCampaignAnalyticsByQuery(filter, key)
 
       return { key }
     },
