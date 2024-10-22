@@ -10,7 +10,9 @@ import {
   NumberFormatter,
   MultiSelect,
   Fieldset,
-  Divider
+  Divider,
+  ThemeIcon,
+  Center
 } from '@mantine/core'
 import { SSPs, RequestStatPlacement, SSPsAnalyticsDataQuery } from 'types'
 import useSSPsAnalytics from 'hooks/useCampaignAnalytics/useSSPsAnalytics'
@@ -22,6 +24,8 @@ import { IabTaxonomyV3 } from 'adex-common'
 import { CATEGORIES, CAT_GROUPS, COUNTRIES, REGION_GROUPS } from 'constants/createCampaign'
 import MultiSelectAndRadioButtons from 'components/CreateCampaign/StepTwo/MultiSelectAndRadioButtons'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
+import GlobeIcon from 'resources/icons/Globe'
+import InvoiceIcon from 'resources/icons/Invoice'
 
 const sspsData: Array<{ value: SSPs | ''; label: string }> = [
   { value: '', label: 'All SSPs' },
@@ -31,11 +35,11 @@ const sspsData: Array<{ value: SSPs | ''; label: string }> = [
 ]
 
 const placementsData: Array<{ value: string; label: string }> = [
-  { value: '', label: 'All placements' },
   { value: RequestStatPlacement.app.toString(), label: 'App' },
   { value: RequestStatPlacement.siteMobile.toString(), label: 'Site - Mobile' },
   { value: RequestStatPlacement.siteDesktop.toString(), label: 'Site - Desktop' },
-  { value: RequestStatPlacement.other.toString(), label: 'Site - other' }
+  { value: RequestStatPlacement.siteOther.toString(), label: 'Site - other' },
+  { value: RequestStatPlacement.other.toString(), label: 'Other' }
 ]
 
 const groupByData: Array<{ value: string; label: string }> = [
@@ -83,11 +87,13 @@ const mapSegmentLabel = (
 const SSPsAnalytics = ({
   country,
   category,
-  format
+  format,
+  placement
 }: {
   category?: SSPsAnalyticsDataQuery['category']
   country?: SSPsAnalyticsDataQuery['country']
-  format?: string[]
+  format?: SSPsAnalyticsDataQuery['format']
+  placement?: SSPsAnalyticsDataQuery['placement']
 }) => {
   // TODO: get all formats once then use it for src
   // NOTE: temp
@@ -101,8 +107,10 @@ const SSPsAnalytics = ({
   >()
 
   const [ssp, setSsp] = useState<SSPs>('')
-  const [groupBy, setGrop] = useState<SSPsAnalyticsDataQuery['groupBy']>('country')
-  const [placement, setPlacement] = useState<RequestStatPlacement | ''>('')
+  const [groupBy, setGrop] = useState<SSPsAnalyticsDataQuery['groupBy']>('ssp')
+  const [selectedPlacement, setPlacement] = useState<SSPsAnalyticsDataQuery['placement']>(
+    placement || { values: [RequestStatPlacement.siteDesktop], operator: 'in' }
+  )
   const { analyticsData, getAnalyticsKeyAndUpdate } = useSSPsAnalytics()
   const [selectedCountries, setCountries] = useState<SSPsAnalyticsDataQuery['country']>(
     country || { values: [], operator: 'in' }
@@ -111,7 +119,7 @@ const SSPsAnalytics = ({
     category || { values: [], operator: 'in' }
   )
 
-  const [selectedFormats, setFormats] = useState<string[]>(format || [])
+  const [selectedFormats, setFormats] = useState<SSPsAnalyticsDataQuery['format']>(format || [])
 
   const analytics = useMemo(
     () => analyticsData.get(analyticsKey?.key || ''),
@@ -125,11 +133,12 @@ const SSPsAnalytics = ({
       const key = await getAnalyticsKeyAndUpdate({
         ...removeOptionalEmptyStringProps({
           ssp,
-          placement,
+          placement: selectedPlacement,
           category: selectedCategories,
           country: selectedCountries,
           format: selectedFormats
         }),
+        limit: 666,
         groupBy
       })
       setAnalyticsKey(key)
@@ -147,6 +156,7 @@ const SSPsAnalytics = ({
     selectedCategories,
     selectedCountries,
     selectedFormats,
+    selectedPlacement,
     ssp
   ])
 
@@ -208,11 +218,17 @@ const SSPsAnalytics = ({
                 searchable
                 size="sm"
               />
-              <Select
+              <MultiSelect
                 label="Placement"
-                value={placement?.toString()}
+                value={selectedPlacement?.values?.map((x) => x.toString())}
                 // @ts-ignore
-                onChange={(val) => setPlacement(val !== '' ? Number(val) : val)}
+                onChange={(val) =>
+                  setPlacement(() => ({
+                    values: [...val.map((x) => Number(x))],
+                    operator: 'in'
+                  }))
+                }
+                clearable
                 data={placementsData}
                 size="sm"
               />
@@ -221,7 +237,20 @@ const SSPsAnalytics = ({
 
           <Group grow gap="xl" align="baseline">
             <Stack>
-              <Divider size="md" label="Categories" color="mainText" />
+              <Divider
+                mt="xl"
+                labelPosition="left"
+                label={
+                  <Center style={{ gap: 10 }}>
+                    <Text c="mainText" size="sm">
+                      Categories
+                    </Text>
+                    <ThemeIcon size="sm" variant="transparent" color="mainText">
+                      <InvoiceIcon />
+                    </ThemeIcon>
+                  </Center>
+                }
+              />
               <MultiSelectAndRadioButtons
                 onCategoriesChange={(selectedRadio, values) =>
                   setCategories({
@@ -234,10 +263,24 @@ const SSPsAnalytics = ({
                 defaultSelectValue={selectedCategories?.values}
                 groups={CAT_GROUPS}
                 label="Categories"
+                size="sm"
               />
             </Stack>
             <Stack>
-              <Divider size="md" label="Countries" color="mainText" />
+              <Divider
+                mt="xl"
+                labelPosition="left"
+                label={
+                  <Center style={{ gap: 10 }}>
+                    <Text c="mainText" size="sm">
+                      Countries
+                    </Text>
+                    <ThemeIcon size="sm" variant="transparent" color="mainText">
+                      <GlobeIcon />
+                    </ThemeIcon>
+                  </Center>
+                }
+              />
 
               <MultiSelectAndRadioButtons
                 onCategoriesChange={(selectedRadio, values) =>
@@ -251,6 +294,7 @@ const SSPsAnalytics = ({
                 multiSelectData={COUNTRIES}
                 groups={REGION_GROUPS}
                 label="Countries"
+                size="sm"
               />
             </Stack>
           </Group>
@@ -285,10 +329,10 @@ const SSPsAnalytics = ({
           {JSON.stringify(
             {
               ssp,
-              placement,
+              placement: selectedPlacement,
               category: selectedCategories,
               country: selectedCountries,
-              format,
+              format: selectedFormats,
               groupBy
             },
             null,

@@ -10,22 +10,52 @@ import {
   TextInput,
   Tooltip
 } from '@mantine/core'
-import { useMemo } from 'react'
+import { useMemo, useState, useEffect } from 'react'
 import InfoFilledIcon from 'resources/icons/InfoFilled'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import InfoAlertMessage from 'components/common/InfoAlertMessage'
 import { parseRange } from 'helpers/createCampaignHelpers'
 import InfoIcon from 'resources/icons/Info'
 import DefaultCustomAnchor from 'components/common/customAnchor'
+import { campaignDataToSSPAnalyticsQuery } from 'helpers'
+import useSSPsAnalytics from 'hooks/useCampaignAnalytics/useSSPsAnalytics'
 import CampaignPeriod from './CampaignPeriod'
 import SelectCurrency from './SelectCurrency'
 
 const StepThree = () => {
   const {
-    campaign: { currency },
+    campaign,
     selectedBidFloors,
     form: { key, getInputProps, errors, setFieldValue }
   } = useCreateCampaignContext()
+
+  const { analyticsData, getAnalyticsKeyAndUpdate } = useSSPsAnalytics()
+
+  const [analyticsKey, setAnalyticsKey] = useState<
+    | {
+        key: string
+      }
+    | undefined
+  >()
+
+  useEffect(() => {
+    setAnalyticsKey(undefined)
+
+    const checkAnalytics = async () => {
+      const analKey = await getAnalyticsKeyAndUpdate({
+        ...campaignDataToSSPAnalyticsQuery(campaign),
+        limit: 666
+      })
+      setAnalyticsKey(analKey)
+    }
+
+    checkAnalytics()
+  }, [campaign, getAnalyticsKeyAndUpdate])
+
+  const recommendedCPM = useMemo(
+    () => analyticsData.get(analyticsKey?.key || '')?.data[0]?.value || 'N/A',
+    [analyticsData, analyticsKey]
+  )
 
   const recommendedPaymentBounds = useMemo(() => {
     const rangeUnparsed = selectedBidFloors.flat().sort((a, b) => b.count - a.count)[0]?.value
@@ -83,7 +113,7 @@ const StepThree = () => {
           3. Currency
         </Text>
         <SelectCurrency
-          defaultValue={currency}
+          defaultValue={campaign.currency}
           onChange={(value) => setFieldValue('currency', value)}
           error={(errors.currency && errors.currency) || ''}
         />
@@ -144,6 +174,7 @@ const StepThree = () => {
             </ActionIcon>
           </Tooltip>
         </Group>
+        {recommendedCPM}
 
         <Group wrap="nowrap" justify="stretch" grow>
           <TextInput

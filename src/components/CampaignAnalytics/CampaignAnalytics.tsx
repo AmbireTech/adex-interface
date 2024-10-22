@@ -8,7 +8,7 @@ import { StickyPanel } from 'components/TopBar/TopBarStickyPanel'
 import { AdminBadge } from 'components/common/AdminBadge'
 import { useCampaignsData } from 'hooks/useCampaignsData'
 import SSPsAnalytics from 'components/AdminPanel/SSPsAnalytics'
-import { IabTaxonomyV3 } from 'adex-common'
+import { campaignDataToSSPAnalyticsQuery } from 'helpers'
 import Placements from './Placements'
 import Creatives from './Creatives'
 import SSPs from './SSPs'
@@ -91,33 +91,7 @@ const CampaignAnalytics = ({ isAdminPanel = false }: { isAdminPanel?: boolean })
           <SSPs campaignId={id} forAdmin={isAdminPanel} />
         </Tabs.Panel>
         <Tabs.Panel value="sspAnalytics">
-          <SSPsAnalytics
-            category={{
-              values:
-                campaign?.targetingInput.inputs.categories.apply === 'all'
-                  ? []
-                  : (campaign?.targetingInput.inputs.categories[
-                      campaign?.targetingInput.inputs.categories.apply
-                    ] as IabTaxonomyV3[]),
-              operator:
-                campaign?.targetingInput.inputs.categories.apply === 'all'
-                  ? undefined
-                  : campaign?.targetingInput.inputs.categories.apply
-            }}
-            country={{
-              values:
-                campaign?.targetingInput.inputs.location.apply === 'all'
-                  ? []
-                  : campaign?.targetingInput.inputs.location[
-                      campaign?.targetingInput.inputs.location.apply
-                    ],
-              operator:
-                campaign?.targetingInput.inputs.location.apply === 'all'
-                  ? undefined
-                  : campaign?.targetingInput.inputs.location.apply
-            }}
-            format={campaign?.adUnits.map((x) => `${x.banner?.format.h}x${x.banner?.format.w}`)}
-          />
+          <SSPsAnalytics {...(campaign ? campaignDataToSSPAnalyticsQuery(campaign) : {})} />
         </Tabs.Panel>
       </Tabs>
     </Container>
