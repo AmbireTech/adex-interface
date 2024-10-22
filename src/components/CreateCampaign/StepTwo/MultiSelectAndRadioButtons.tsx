@@ -6,7 +6,8 @@ import {
   Stack,
   getPrimaryShade,
   Center,
-  ThemeIcon
+  ThemeIcon,
+  MantineSize
 } from '@mantine/core'
 import { TargetingInputApplyProp } from 'adex-common/dist/types'
 import { useColorScheme } from '@mantine/hooks'
@@ -23,6 +24,7 @@ type MultiSelectAndRadioButtonsProps = {
   onCategoriesChange: (selectedRadio: TargetingInputApplyProp, categories: string[]) => void
   groups: { [key: string]: string[] }
   error?: string
+  size?: MantineSize
 }
 
 const useStyles = createStyles(
@@ -59,7 +61,8 @@ const MultiSelectAndRadioButtons = ({
   defaultRadioValue = 'all',
   onCategoriesChange,
   groups,
-  error
+  error,
+  size = 'md'
 }: MultiSelectAndRadioButtonsProps) => {
   const extendedData = useMemo(() => {
     const groupsArr = [
@@ -136,7 +139,7 @@ const MultiSelectAndRadioButtons = ({
     <Stack gap="xs">
       <SegmentedControl
         color={color}
-        size="sm"
+        size={size}
         value={selectedRadio}
         onChange={handleRadioChange}
         withItemsBorders={false}
@@ -180,7 +183,7 @@ const MultiSelectAndRadioButtons = ({
         clearable
         searchable
         variant="filled"
-        size="md"
+        size={size}
         radius="md"
         // NOTE: just visually show the nothing but keeps the value in case of change - will not need to select again
         value={selectedRadio === 'all' ? [] : selectedValue}

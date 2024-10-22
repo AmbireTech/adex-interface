@@ -252,6 +252,7 @@ const SSPsAnalytics = ({
                 defaultSelectValue={selectedCategories?.values}
                 groups={CAT_GROUPS}
                 label="Categories"
+                size="sm"
               />
             </Stack>
             <Stack>
@@ -282,6 +283,7 @@ const SSPsAnalytics = ({
                 multiSelectData={COUNTRIES}
                 groups={REGION_GROUPS}
                 label="Countries"
+                size="sm"
               />
             </Stack>
           </Group>
