@@ -87,11 +87,13 @@ const mapSegmentLabel = (
 const SSPsAnalytics = ({
   country,
   category,
-  format
+  format,
+  placement
 }: {
   category?: SSPsAnalyticsDataQuery['category']
   country?: SSPsAnalyticsDataQuery['country']
-  format?: string[]
+  format?: SSPsAnalyticsDataQuery['format']
+  placement?: SSPsAnalyticsDataQuery['placement']
 }) => {
   // TODO: get all formats once then use it for src
   // NOTE: temp
@@ -106,7 +108,9 @@ const SSPsAnalytics = ({
 
   const [ssp, setSsp] = useState<SSPs>('')
   const [groupBy, setGrop] = useState<SSPsAnalyticsDataQuery['groupBy']>('country')
-  const [placement, setPlacement] = useState<RequestStatPlacement | ''>('')
+  const [selectedPlacement, setPlacement] = useState<SSPsAnalyticsDataQuery['placement']>(
+    placement || { values: [] }
+  )
   const { analyticsData, getAnalyticsKeyAndUpdate } = useSSPsAnalytics()
   const [selectedCountries, setCountries] = useState<SSPsAnalyticsDataQuery['country']>(
     country || { values: [], operator: 'in' }
@@ -115,7 +119,7 @@ const SSPsAnalytics = ({
     category || { values: [], operator: 'in' }
   )
 
-  const [selectedFormats, setFormats] = useState<string[]>(format || [])
+  const [selectedFormats, setFormats] = useState<SSPsAnalyticsDataQuery['format']>(format || [])
 
   const analytics = useMemo(
     () => analyticsData.get(analyticsKey?.key || ''),
@@ -213,11 +217,16 @@ const SSPsAnalytics = ({
                 searchable
                 size="sm"
               />
-              <Select
+              <MultiSelect
                 label="Placement"
-                value={placement?.toString()}
+                value={selectedPlacement?.values?.map((x) => x.toString())}
                 // @ts-ignore
-                onChange={(val) => setPlacement(val !== '' ? Number(val) : val)}
+                onChange={(val) =>
+                  setPlacement((prev) => ({
+                    values: [...new Set([...(prev?.values || []), Number(val)])],
+                    operator: prev?.operator || 'in'
+                  }))
+                }
                 data={placementsData}
                 size="sm"
               />

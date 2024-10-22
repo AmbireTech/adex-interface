@@ -135,13 +135,16 @@ export type SSPsAnalyticsData = {
   count: number
 }
 
+export type Operator = 'in' | 'nin'
+
 export type SSPsAnalyticsDataKeys = {
   limit?: number
   date?: string
-  category?: { values?: typeof IabCategories; operator?: 'in' | 'nin' }
+  category?: { values?: typeof IabCategories; operator?: Operator }
   publisher?: string
-  placement?: RequestStatPlacement
-  country?: { values?: string[]; operator?: 'in' | 'nin' }
+  placement?: { values?: RequestStatPlacement[]; operator?: Operator }
+  country?: { values?: string[]; operator?: Operator }
+  format?: string[]
   ssp?: SSPs
 }
 
