@@ -10,7 +10,9 @@ import {
   NumberFormatter,
   MultiSelect,
   Fieldset,
-  Divider
+  Divider,
+  ThemeIcon,
+  Center
 } from '@mantine/core'
 import { SSPs, RequestStatPlacement, SSPsAnalyticsDataQuery } from 'types'
 import useSSPsAnalytics from 'hooks/useCampaignAnalytics/useSSPsAnalytics'
@@ -22,6 +24,8 @@ import { IabTaxonomyV3 } from 'adex-common'
 import { CATEGORIES, CAT_GROUPS, COUNTRIES, REGION_GROUPS } from 'constants/createCampaign'
 import MultiSelectAndRadioButtons from 'components/CreateCampaign/StepTwo/MultiSelectAndRadioButtons'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
+import GlobeIcon from 'resources/icons/Globe'
+import InvoiceIcon from 'resources/icons/Invoice'
 
 const sspsData: Array<{ value: SSPs | ''; label: string }> = [
   { value: '', label: 'All SSPs' },
@@ -130,6 +134,7 @@ const SSPsAnalytics = ({
           country: selectedCountries,
           format: selectedFormats
         }),
+        limit: 666,
         groupBy
       })
       setAnalyticsKey(key)
@@ -221,7 +226,20 @@ const SSPsAnalytics = ({
 
           <Group grow gap="xl" align="baseline">
             <Stack>
-              <Divider size="md" label="Categories" color="mainText" />
+              <Divider
+                mt="xl"
+                labelPosition="left"
+                label={
+                  <Center style={{ gap: 10 }}>
+                    <Text c="mainText" size="sm">
+                      Categories
+                    </Text>
+                    <ThemeIcon size="sm" variant="transparent" color="mainText">
+                      <InvoiceIcon />
+                    </ThemeIcon>
+                  </Center>
+                }
+              />
               <MultiSelectAndRadioButtons
                 onCategoriesChange={(selectedRadio, values) =>
                   setCategories({
@@ -237,7 +255,20 @@ const SSPsAnalytics = ({
               />
             </Stack>
             <Stack>
-              <Divider size="md" label="Countries" color="mainText" />
+              <Divider
+                mt="xl"
+                labelPosition="left"
+                label={
+                  <Center style={{ gap: 10 }}>
+                    <Text c="mainText" size="sm">
+                      Countries
+                    </Text>
+                    <ThemeIcon size="sm" variant="transparent" color="mainText">
+                      <GlobeIcon />
+                    </ThemeIcon>
+                  </Center>
+                }
+              />
 
               <MultiSelectAndRadioButtons
                 onCategoriesChange={(selectedRadio, values) =>
