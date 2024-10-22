@@ -50,7 +50,7 @@ const StepTwo = () => {
         label="Categories"
         error={errors[CATEGORIES_PATH]?.toString()}
       />
-      <Divider />
+      <Divider m="xl" variant="dashed" />
       <Text c="secondaryText" size="sm" fw="bold">
         2. Countries
       </Text>
