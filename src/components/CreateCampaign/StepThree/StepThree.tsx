@@ -17,15 +17,14 @@ import InfoAlertMessage from 'components/common/InfoAlertMessage'
 import { parseRange } from 'helpers/createCampaignHelpers'
 import InfoIcon from 'resources/icons/Info'
 import DefaultCustomAnchor from 'components/common/customAnchor'
-import { removeOptionalEmptyStringProps } from 'helpers'
+import { campaignDataToSSPAnalyticsQuery } from 'helpers'
 import useSSPsAnalytics from 'hooks/useCampaignAnalytics/useSSPsAnalytics'
-import { IabTaxonomyV3 } from 'adex-common'
 import CampaignPeriod from './CampaignPeriod'
 import SelectCurrency from './SelectCurrency'
 
 const StepThree = () => {
   const {
-    campaign: { currency, targetingInput, adUnits },
+    campaign,
     selectedBidFloors,
     form: { key, getInputProps, errors, setFieldValue }
   } = useCreateCampaignContext()
@@ -44,43 +43,14 @@ const StepThree = () => {
 
     const checkAnalytics = async () => {
       const analKey = await getAnalyticsKeyAndUpdate({
-        ...removeOptionalEmptyStringProps({
-          category: {
-            values:
-              targetingInput.inputs.categories.apply === 'all'
-                ? []
-                : (targetingInput.inputs.categories[
-                    targetingInput.inputs.categories.apply
-                  ] as IabTaxonomyV3[]),
-            operator:
-              targetingInput.inputs.categories.apply === 'all'
-                ? undefined
-                : targetingInput.inputs.categories.apply
-          },
-          country: {
-            values:
-              targetingInput.inputs.location.apply === 'all'
-                ? []
-                : targetingInput.inputs.location[targetingInput.inputs.location.apply],
-            operator:
-              targetingInput.inputs.location.apply === 'all'
-                ? undefined
-                : targetingInput.inputs.location.apply
-          },
-          format: adUnits.map((x) => `${x.banner?.format.h}x${x.banner?.format.w}`)
-        }),
+        ...campaignDataToSSPAnalyticsQuery(campaign),
         limit: 666
       })
       setAnalyticsKey(analKey)
     }
 
     checkAnalytics()
-  }, [
-    adUnits,
-    getAnalyticsKeyAndUpdate,
-    targetingInput.inputs.categories,
-    targetingInput.inputs.location
-  ])
+  }, [campaign, getAnalyticsKeyAndUpdate])
 
   const recommendedCPM = useMemo(
     () => analyticsData.get(analyticsKey?.key || '')?.data[0]?.value || 'N/A',
@@ -143,7 +113,7 @@ const StepThree = () => {
           3. Currency
         </Text>
         <SelectCurrency
-          defaultValue={currency}
+          defaultValue={campaign.currency}
           onChange={(value) => setFieldValue('currency', value)}
           error={(errors.currency && errors.currency) || ''}
         />
