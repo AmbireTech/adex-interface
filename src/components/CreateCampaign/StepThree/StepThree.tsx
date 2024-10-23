@@ -7,14 +7,12 @@ import {
   NumberInput,
   Radio,
   Text,
-  TextInput,
-  Tooltip
+  TextInput
 } from '@mantine/core'
 import { useMemo, useState, useEffect } from 'react'
 import InfoFilledIcon from 'resources/icons/InfoFilled'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import InfoAlertMessage from 'components/common/InfoAlertMessage'
-import { parseRange } from 'helpers/createCampaignHelpers'
 import InfoIcon from 'resources/icons/Info'
 import DefaultCustomAnchor from 'components/common/customAnchor'
 import { campaignDataToSSPAnalyticsQuery } from 'helpers'
@@ -25,7 +23,6 @@ import SelectCurrency from './SelectCurrency'
 const StepThree = () => {
   const {
     campaign,
-    selectedBidFloors,
     form: { key, getInputProps, errors, setFieldValue }
   } = useCreateCampaignContext()
 
@@ -56,12 +53,6 @@ const StepThree = () => {
     () => analyticsData.get(analyticsKey?.key || '')?.data[0]?.value || 'N/A',
     [analyticsData, analyticsKey]
   )
-
-  const recommendedPaymentBounds = useMemo(() => {
-    const rangeUnparsed = selectedBidFloors.flat().sort((a, b) => b.count - a.count)[0]?.value
-
-    return rangeUnparsed ? parseRange(rangeUnparsed) : { min: 'N/A', max: 'N/A' }
-  }, [selectedBidFloors])
 
   const budgetIsGreaterThanBalance = useMemo(
     () => errors && errors.budget === 'Available balance is lower than the campaign budget',
@@ -165,14 +156,14 @@ const StepThree = () => {
           <Text c="secondaryText" size="sm" fw="bold">
             5. CPM
           </Text>
-          <Tooltip
+          {/* <Tooltip
             label={`Recommended CPM in USD: Min - ${recommendedPaymentBounds.min}; Max - ${recommendedPaymentBounds.max}`}
             ml="sm"
-          >
-            <ActionIcon variant="transparent" color="secondaryText" size="xs">
-              <InfoFilledIcon />
-            </ActionIcon>
-          </Tooltip>
+          > */}
+          <ActionIcon variant="transparent" color="secondaryText" size="xs">
+            <InfoFilledIcon />
+          </ActionIcon>
+          {/* </Tooltip> */}
         </Group>
         {recommendedCPM}
 

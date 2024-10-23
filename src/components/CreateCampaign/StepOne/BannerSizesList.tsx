@@ -1,4 +1,4 @@
-import { Alert, Flex, Text } from '@mantine/core'
+import { Alert, Group, Loader, Text } from '@mantine/core'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import { useMemo } from 'react'
 import InfoIcon from 'resources/icons/Info'
@@ -14,20 +14,25 @@ const BannerSizesList = () => {
     [allowedBannerSizes]
   )
 
+  const loading = useMemo(() => !popularBannerSizes.length, [popularBannerSizes.length])
+
   return popularBannerSizes ? (
     <Alert icon={<InfoIcon style={{ marginTop: 0 }} />} color="attention" variant="outline">
-      <Flex justify="space-between">
-        <Text>Recommended banner sizes: {popularBannerSizes.join(', ')}</Text>
-        <CustomAnchor
-          external
-          underline="always"
-          fw="bold"
-          href="https://help.adex.network/hc/en-us/articles/14499102255772-What-are-the-supported-ad-formats"
-          c="brand"
-        >
-          see all
-        </CustomAnchor>
-      </Flex>
+      <Group align="center">
+        <Text>Recommended banner sizes: {loading ? '' : popularBannerSizes.join(', ')}</Text>
+        {loading && <Loader type="dots" />}
+        {!loading && (
+          <CustomAnchor
+            external
+            underline="always"
+            fw="bold"
+            href="https://help.adex.network/hc/en-us/articles/14499102255772-What-are-the-supported-ad-formats"
+            c="brand"
+          >
+            see all
+          </CustomAnchor>
+        )}
+      </Group>
     </Alert>
   ) : null
 }
