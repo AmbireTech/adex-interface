@@ -7,7 +7,8 @@ import {
   NumberInput,
   Radio,
   Text,
-  TextInput
+  TextInput,
+  Tooltip
 } from '@mantine/core'
 import { useMemo, useState, useEffect } from 'react'
 import InfoFilledIcon from 'resources/icons/InfoFilled'
@@ -17,6 +18,7 @@ import InfoIcon from 'resources/icons/Info'
 import DefaultCustomAnchor from 'components/common/customAnchor'
 import { campaignDataToSSPAnalyticsQuery } from 'helpers'
 import useSSPsAnalytics from 'hooks/useCampaignAnalytics/useSSPsAnalytics'
+import { getRecommendedCPMRangeAdvanced } from 'helpers/createCampaignHelpers'
 import CampaignPeriod from './CampaignPeriod'
 import SelectCurrency from './SelectCurrency'
 
@@ -35,6 +37,11 @@ const StepThree = () => {
     | undefined
   >()
 
+  const analytics = useMemo(
+    () => analyticsData.get(analyticsKey?.key || ''),
+    [analyticsData, analyticsKey]
+  )
+
   useEffect(() => {
     setAnalyticsKey(undefined)
 
@@ -50,8 +57,11 @@ const StepThree = () => {
   }, [campaign, getAnalyticsKeyAndUpdate])
 
   const recommendedCPM = useMemo(
-    () => analyticsData.get(analyticsKey?.key || '')?.data[0]?.value || 'N/A',
-    [analyticsData, analyticsKey]
+    () =>
+      analytics?.data.length
+        ? getRecommendedCPMRangeAdvanced(analytics.data)
+        : { min: 'N/A', max: 'N/A' },
+    [analytics]
   )
 
   const budgetIsGreaterThanBalance = useMemo(
@@ -156,16 +166,16 @@ const StepThree = () => {
           <Text c="secondaryText" size="sm" fw="bold">
             5. CPM
           </Text>
-          {/* <Tooltip
-            label={`Recommended CPM in USD: Min - ${recommendedPaymentBounds.min}; Max - ${recommendedPaymentBounds.max}`}
+          <Tooltip
+            label={`Recommended CPM in USD: Min - ${recommendedCPM.min}; Max - ${recommendedCPM.max}`}
             ml="sm"
-          > */}
-          <ActionIcon variant="transparent" color="secondaryText" size="xs">
-            <InfoFilledIcon />
-          </ActionIcon>
-          {/* </Tooltip> */}
+          >
+            <ActionIcon variant="transparent" color="secondaryText" size="xs">
+              <InfoFilledIcon />
+            </ActionIcon>
+          </Tooltip>
         </Group>
-        {recommendedCPM}
+        {`Recommended CPM in USD: Min - ${recommendedCPM.min}; Max - ${recommendedCPM.max}`}
 
         <Group wrap="nowrap" justify="stretch" grow>
           <TextInput

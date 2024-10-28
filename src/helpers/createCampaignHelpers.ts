@@ -5,7 +5,8 @@ import {
   FileWithPath,
   HTMLBannerDimensions,
   SupplyStats,
-  SupplyStatsDetails
+  SupplyStatsDetails,
+  SSPsAnalyticsData
 } from 'types'
 
 export const checkSelectedDevices = (devices: Devices[]) => {
@@ -285,4 +286,15 @@ export const getRecommendedCPMRange = (supplyStats: SupplyStats, campaign: Campa
   return {
     ...parseRange(mostRequests?.value || '0_42-0_69')
   }
+}
+
+export const getRecommendedCPMRangeAdvanced = (analytics: SSPsAnalyticsData[]) => {
+  const topRanges = analytics.sort((a, b) => b.count - a.count)
+  const [first, second] = topRanges
+
+  const { min, max } = parseRange(first.value.toString())
+  const { min: min2, max: max2 } = parseRange(second.value.toString())
+  const sortedTop = [min, min2, max, max2].sort()
+
+  return { min: sortedTop[0], max: sortedTop[3] }
 }
