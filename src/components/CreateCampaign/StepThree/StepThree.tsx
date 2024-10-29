@@ -8,7 +8,9 @@ import {
   Radio,
   Text,
   TextInput,
-  Tooltip
+  Tooltip,
+  Slider,
+  NumberFormatter
 } from '@mantine/core'
 import { useMemo, useState, useEffect } from 'react'
 import InfoFilledIcon from 'resources/icons/InfoFilled'
@@ -56,12 +58,14 @@ const StepThree = () => {
     checkAnalytics()
   }, [campaign, getAnalyticsKeyAndUpdate])
 
+  const [cpmRange, setCpmRange] = useState<number>(20)
+
   const recommendedCPM = useMemo(
     () =>
       analytics?.data.length
-        ? getRecommendedCPMRangeAdvanced(analytics.data)
-        : { min: 'N/A', max: 'N/A' },
-    [analytics]
+        ? getRecommendedCPMRangeAdvanced(analytics.data, Math.ceil(cpmRange / 10))
+        : { min: 'N/A', max: 'N/A', count: 0 },
+    [analytics?.data, cpmRange]
   )
 
   const budgetIsGreaterThanBalance = useMemo(
@@ -175,8 +179,30 @@ const StepThree = () => {
             </ActionIcon>
           </Tooltip>
         </Group>
-        {`Recommended CPM in USD: Min - ${recommendedCPM.min}; Max - ${recommendedCPM.max}`}
-
+        <Stack gap="xl">
+          <Slider
+            color="blue"
+            size="sm"
+            labelAlwaysOn
+            value={cpmRange}
+            onChange={setCpmRange}
+            marks={[
+              { value: 10, label: '10%' },
+              { value: 20, label: '20%' },
+              { value: 30, label: '30%' },
+              { value: 40, label: '40%' },
+              { value: 50, label: '50%' },
+              { value: 60, label: '60%' },
+              { value: 70, label: '70%' },
+              { value: 80, label: '80%' },
+              { value: 90, label: '90%' }
+            ]}
+          />
+          <Text>
+            {`CPM AI analytics USD: Min - ${recommendedCPM.min}; Max - ${recommendedCPM.max}, possible daily impressions: `}{' '}
+            <NumberFormatter value={Math.floor(recommendedCPM.count / 2)} thousandSeparator />
+          </Text>
+        </Stack>
         <Group wrap="nowrap" justify="stretch" grow>
           <TextInput
             size="md"

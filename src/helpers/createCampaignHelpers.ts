@@ -288,13 +288,25 @@ export const getRecommendedCPMRange = (supplyStats: SupplyStats, campaign: Campa
   }
 }
 
-export const getRecommendedCPMRangeAdvanced = (analytics: SSPsAnalyticsData[]) => {
+export const getRecommendedCPMRangeAdvanced = (analytics: SSPsAnalyticsData[], range: number) => {
   const topRanges = analytics.sort((a, b) => b.count - a.count)
-  const [first, second] = topRanges
+  const inRange = topRanges.slice(0, Math.floor(topRanges.length * (range / 10)))
 
-  const { min, max } = parseRange(first.value.toString())
-  const { min: min2, max: max2 } = parseRange(second.value.toString())
-  const sortedTop = [min, min2, max, max2].sort()
+  const parsed = inRange.map(({ value, count }) => ({
+    ...parseRange(value.toString()),
+    count
+  }))
 
-  return { min: sortedTop[0], max: sortedTop[3] }
+  const rangeAdvancedData = parsed.reduce(
+    (data, current) => {
+      return {
+        min: Math.min(data.min, current.min) || Math.max(data.min, current.min),
+        max: Math.max(data.max, current.max),
+        count: data.count + current.count
+      }
+    },
+    { min: 0, max: 0, count: 0 }
+  )
+
+  return rangeAdvancedData
 }
