@@ -8,24 +8,25 @@ import {
   Radio,
   Text,
   TextInput,
-  Tooltip
+  Tooltip,
+  Slider,
+  NumberFormatter
 } from '@mantine/core'
 import { useMemo, useState, useEffect } from 'react'
 import InfoFilledIcon from 'resources/icons/InfoFilled'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import InfoAlertMessage from 'components/common/InfoAlertMessage'
-import { parseRange } from 'helpers/createCampaignHelpers'
 import InfoIcon from 'resources/icons/Info'
 import DefaultCustomAnchor from 'components/common/customAnchor'
 import { campaignDataToSSPAnalyticsQuery } from 'helpers'
 import useSSPsAnalytics from 'hooks/useCampaignAnalytics/useSSPsAnalytics'
+import { getRecommendedCPMRangeAdvanced } from 'helpers/createCampaignHelpers'
 import CampaignPeriod from './CampaignPeriod'
 import SelectCurrency from './SelectCurrency'
 
 const StepThree = () => {
   const {
     campaign,
-    selectedBidFloors,
     form: { key, getInputProps, errors, setFieldValue }
   } = useCreateCampaignContext()
 
@@ -37,6 +38,11 @@ const StepThree = () => {
       }
     | undefined
   >()
+
+  const analytics = useMemo(
+    () => analyticsData.get(analyticsKey?.key || ''),
+    [analyticsData, analyticsKey]
+  )
 
   useEffect(() => {
     setAnalyticsKey(undefined)
@@ -52,16 +58,15 @@ const StepThree = () => {
     checkAnalytics()
   }, [campaign, getAnalyticsKeyAndUpdate])
 
+  const [cpmRange, setCpmRange] = useState<number>(20)
+
   const recommendedCPM = useMemo(
-    () => analyticsData.get(analyticsKey?.key || '')?.data[0]?.value || 'N/A',
-    [analyticsData, analyticsKey]
+    () =>
+      analytics?.data.length
+        ? getRecommendedCPMRangeAdvanced(analytics.data, Math.ceil(cpmRange / 10))
+        : { min: 'N/A', max: 'N/A', count: 0 },
+    [analytics?.data, cpmRange]
   )
-
-  const recommendedPaymentBounds = useMemo(() => {
-    const rangeUnparsed = selectedBidFloors.flat().sort((a, b) => b.count - a.count)[0]?.value
-
-    return rangeUnparsed ? parseRange(rangeUnparsed) : { min: 'N/A', max: 'N/A' }
-  }, [selectedBidFloors])
 
   const budgetIsGreaterThanBalance = useMemo(
     () => errors && errors.budget === 'Available balance is lower than the campaign budget',
@@ -166,7 +171,7 @@ const StepThree = () => {
             5. CPM
           </Text>
           <Tooltip
-            label={`Recommended CPM in USD: Min - ${recommendedPaymentBounds.min}; Max - ${recommendedPaymentBounds.max}`}
+            label={`Recommended CPM in USD: Min - ${recommendedCPM.min}; Max - ${recommendedCPM.max}`}
             ml="sm"
           >
             <ActionIcon variant="transparent" color="secondaryText" size="xs">
@@ -174,8 +179,30 @@ const StepThree = () => {
             </ActionIcon>
           </Tooltip>
         </Group>
-        {recommendedCPM}
-
+        <Stack gap="xl">
+          <Slider
+            color="blue"
+            size="sm"
+            labelAlwaysOn
+            value={cpmRange}
+            onChange={setCpmRange}
+            marks={[
+              { value: 10, label: '10%' },
+              { value: 20, label: '20%' },
+              { value: 30, label: '30%' },
+              { value: 40, label: '40%' },
+              { value: 50, label: '50%' },
+              { value: 60, label: '60%' },
+              { value: 70, label: '70%' },
+              { value: 80, label: '80%' },
+              { value: 90, label: '90%' }
+            ]}
+          />
+          <Text>
+            {`CPM AI analytics USD: Min - ${recommendedCPM.min}; Max - ${recommendedCPM.max}, possible daily impressions: `}{' '}
+            <NumberFormatter value={Math.floor(recommendedCPM.count / 2)} thousandSeparator />
+          </Text>
+        </Stack>
         <Group wrap="nowrap" justify="stretch" grow>
           <TextInput
             size="md"

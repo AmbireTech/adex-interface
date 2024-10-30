@@ -9,25 +9,24 @@ import {
 } from 'react'
 import { CREATE_CAMPAIGN_DEFAULT_VALUE } from 'constants/createCampaign'
 import superjson from 'superjson'
-import { CampaignUI, CreateCampaignType, SupplyStatsDetails, Devices } from 'types'
+import { CampaignUI, CreateCampaignType, RequestStatPlacement } from 'types'
 import useAccount from 'hooks/useAccount'
 import { useAdExApi } from 'hooks/useAdexServices'
 import {
   addUrlUtmTracking,
   // deepEqual,
-  hasUtmCampaign,
-  selectBannerSizes
+  hasUtmCampaign
 } from 'helpers/createCampaignHelpers'
 import {
   parseBigNumTokenAmountToDecimal,
   parseFromBigNumPrecision,
   parseToBigNumPrecision
 } from 'helpers/balances'
-import { AdUnit, Campaign, CampaignStatus, Placement } from 'adex-common'
-import { formatDateTime, MINUTE, WEEK, DAY } from 'helpers'
-import { useCampaignsData } from 'hooks/useCampaignsData'
+import { AdUnit, Campaign, CampaignStatus } from 'adex-common'
+import { formatDateTime, MINUTE, WEEK, DAY, removeOptionalEmptyStringProps } from 'helpers'
 import { hasLength, isNotEmpty, useForm } from '@mantine/form'
 import useCustomNotifications from 'hooks/useCustomNotifications'
+import useSSPsAnalytics from 'hooks/useCampaignAnalytics/useSSPsAnalytics'
 
 import { defaultConfirmModalProps } from 'components/common/Modals/CustomConfirmModal'
 import { modals } from '@mantine/modals'
@@ -76,9 +75,16 @@ const CreateCampaignContext = createContext<CreateCampaignType | null>(null)
 
 const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
   const { adexServicesRequest } = useAdExApi()
-  const { supplyStats, updateSupplyStats } = useCampaignsData()
+  const { analyticsData, getAnalyticsKeyAndUpdate } = useSSPsAnalytics()
   const { showNotification } = useCustomNotifications()
   const [step, setStep] = useState(0)
+  const [sspAnalKey, setSSPAnalKey] = useState<string | undefined>()
+
+  const formatsData = useMemo(
+    () => analyticsData.get(sspAnalKey || ''),
+    [analyticsData, sspAnalKey]
+  )
+
   // TODO: the address will be fixed and will always has a default value
   const {
     adexAccount,
@@ -110,10 +116,6 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
   )
 
   const [allowedBannerSizes, setAllowedBannerSizes] = useState<string[]>([])
-
-  const [selectedBidFloors, setSelectedBidFloors] = useState<
-    SupplyStatsDetails[] | SupplyStatsDetails[][]
-  >([])
 
   const form = useForm({
     initialValues: defaultValue,
@@ -311,25 +313,49 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
   const campaign = useMemo(() => form.getValues(), [form])
 
   useEffect(() => {
-    updateSupplyStats()
-  }, []) // eslint-disable-line
+    setSSPAnalKey(undefined)
+
+    const checkAnalytics = async () => {
+      const placement = campaign.targetingInput.inputs.placements.in[0]
+      const devices = campaign.devices
+
+      const getStatsForPlacements: RequestStatPlacement[] = []
+      if (placement === 'app') {
+        getStatsForPlacements.push(RequestStatPlacement.app)
+      }
+      if (placement === 'site' && devices.includes('desktop')) {
+        getStatsForPlacements.push(RequestStatPlacement.siteDesktop)
+      }
+      if (placement === 'site' && devices.includes('mobile')) {
+        getStatsForPlacements.push(RequestStatPlacement.siteMobile)
+      }
+      const key = await getAnalyticsKeyAndUpdate({
+        ...removeOptionalEmptyStringProps({
+          placement: {
+            values: getStatsForPlacements,
+            operator: 'in'
+          }
+        }),
+        limit: 150,
+        groupBy: 'format'
+      })
+      setSSPAnalKey(key?.key)
+      console.log('key', key?.key)
+    }
+
+    checkAnalytics()
+  }, [campaign.devices, campaign.targetingInput.inputs.placements.in, getAnalyticsKeyAndUpdate])
 
   useEffect(() => {
-    const placement = campaign.targetingInput.inputs.placements.in[0]
-    const devices = campaign.devices
-    const mappedSupplyStats: Record<string, SupplyStatsDetails[][]> = selectBannerSizes(supplyStats)
-    const selectedPlatforms: Placement | Devices[] = placement === 'app' ? placement : devices
-    if (Array.isArray(selectedPlatforms)) {
-      const result = selectedPlatforms.map((platform) => mappedSupplyStats[platform][0])
-      setAllowedBannerSizes([...new Set(result.flat().map((x) => x.value))])
-      setSelectedBidFloors(selectedPlatforms.map((platform) => mappedSupplyStats[platform][1]))
-    } else {
-      setAllowedBannerSizes(
-        (selectedPlatforms ? mappedSupplyStats[selectedPlatforms][0] : []).map((x) => x.value)
-      )
-      setSelectedBidFloors(selectedPlatforms ? mappedSupplyStats[selectedPlatforms][1] : [])
-    }
-  }, [campaign.devices, campaign.targetingInput.inputs.placements.in, supplyStats])
+    setAllowedBannerSizes(
+      formatsData?.status === 'processed' ? formatsData.data.map((x) => x.value.toString()) : []
+    )
+  }, [
+    campaign.devices,
+    campaign.targetingInput.inputs.placements.in,
+    formatsData?.data,
+    formatsData?.status
+  ])
 
   const addUTMToTargetURLS = useCallback(() => {
     const {
@@ -556,7 +582,6 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
       updateCampaignFromDraft,
       defaultValue,
       addUTMToTargetURLS,
-      selectedBidFloors,
       form,
       step,
       nextStep,
@@ -571,7 +596,6 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
       updateCampaignFromDraft,
       defaultValue,
       addUTMToTargetURLS,
-      selectedBidFloors,
       form,
       step,
       nextStep,

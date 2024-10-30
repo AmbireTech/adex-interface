@@ -109,7 +109,7 @@ const SSPsAnalytics = ({
   const [ssp, setSsp] = useState<SSPs>('')
   const [groupBy, setGrop] = useState<SSPsAnalyticsDataQuery['groupBy']>('ssp')
   const [selectedPlacement, setPlacement] = useState<SSPsAnalyticsDataQuery['placement']>(
-    placement || { values: [RequestStatPlacement.siteDesktop], operator: 'in' }
+    placement || { values: [], operator: 'in' }
   )
   const { analyticsData, getAnalyticsKeyAndUpdate } = useSSPsAnalytics()
   const [selectedCountries, setCountries] = useState<SSPsAnalyticsDataQuery['country']>(

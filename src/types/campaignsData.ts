@@ -130,6 +130,12 @@ export enum RequestStatPlacement {
   other = 5
 }
 
+export type SSPsAnalyticsDataResp = {
+  value: string | number
+  adSlotCount: number
+  reqCount?: number
+}
+
 export type SSPsAnalyticsData = {
   value: string | number
   count: number
