@@ -13,7 +13,7 @@ import useCustomNotifications from 'hooks/useCustomNotifications'
 
 import { getEpoch, MINUTE } from 'helpers'
 
-import { SSPsAnalyticsDataQuery, DataStatus, SSPsAnalyticsData } from 'types'
+import { SSPsAnalyticsDataQuery, DataStatus, SSPsAnalyticsData, SSPsAnalyticsDataResp } from 'types'
 
 // "limit": number,
 // "date": string (date string in format YYYY-MM-DD, defaults to today),
@@ -78,7 +78,7 @@ const SSPsAnalyticsProvider: FC<PropsWithChildren> = ({ children }) => {
   const updateCampaignAnalyticsByQuery = useCallback(
     async (params: SSPsAnalyticsDataQuery, dataKey: string) => {
       try {
-        const analyticsDataRes = await adexServicesRequest<{ data: SSPsAnalyticsData[] }>(
+        const analyticsDataRes = await adexServicesRequest<{ data: SSPsAnalyticsDataResp[] }>(
           'backend',
           {
             route: '/dsp/stats/advanced',
@@ -100,8 +100,13 @@ const SSPsAnalyticsProvider: FC<PropsWithChildren> = ({ children }) => {
           const next = new Map(prev)
           const nextAggr: { status: DataStatus; data: SSPsAnalyticsData[] } = {
             status: 'processed',
-            data: analyticsDataRes.data
+            data: analyticsDataRes.data.map(({ value, adSlotCount, reqCount }) => ({
+              value,
+              count: reqCount !== undefined ? reqCount : adSlotCount
+            }))
           }
+
+          console.log({ nextAggr })
           next.set(dataKey, nextAggr)
           return next
         })
