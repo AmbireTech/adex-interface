@@ -9,7 +9,7 @@ import {
   Text,
   TextInput,
   Tooltip,
-  Slider,
+  RangeSlider,
   NumberFormatter
 } from '@mantine/core'
 import { useMemo, useState, useEffect } from 'react'
@@ -20,9 +20,21 @@ import InfoIcon from 'resources/icons/Info'
 import DefaultCustomAnchor from 'components/common/customAnchor'
 import { campaignDataToSSPAnalyticsQuery } from 'helpers'
 import useSSPsAnalytics from 'hooks/useCampaignAnalytics/useSSPsAnalytics'
-import { getRecommendedCPMRangeAdvanced } from 'helpers/createCampaignHelpers'
+import { getRecommendedCPMRangeAdvanced, parseRange } from 'helpers/createCampaignHelpers'
+import { SSPsAnalyticsData } from 'types'
 import CampaignPeriod from './CampaignPeriod'
 import SelectCurrency from './SelectCurrency'
+
+const getCMPRangeLabel = (analytics: SSPsAnalyticsData[], index: number) => {
+  const cpms = analytics
+    .map((x) => [parseRange(x.value.toString()).min, parseRange(x.value.toString()).max])
+    .flat()
+    .filter((c) => typeof c === 'number' && !Number.isNaN(c))
+    .sort((a, b) => a - b)
+
+  const label = cpms[index]
+  return label
+}
 
 const StepThree = () => {
   const {
@@ -58,12 +70,15 @@ const StepThree = () => {
     checkAnalytics()
   }, [campaign, getAnalyticsKeyAndUpdate])
 
-  const [cpmRange, setCpmRange] = useState<number>(20)
+  const [cpmRange, setCpmRange] = useState<[number, number]>([0, 1])
 
   const recommendedCPM = useMemo(
     () =>
       analytics?.data.length
-        ? getRecommendedCPMRangeAdvanced(analytics.data, Math.ceil(cpmRange / 10))
+        ? getRecommendedCPMRangeAdvanced(analytics.data, [
+            Math.ceil(cpmRange[0] / 10),
+            Math.ceil(cpmRange[1] / 10)
+          ])
         : { min: 'N/A', max: 'N/A', count: 0 },
     [analytics?.data, cpmRange]
   )
@@ -180,23 +195,16 @@ const StepThree = () => {
           </Tooltip>
         </Group>
         <Stack gap="xl">
-          <Slider
+          <RangeSlider
             color="blue"
             size="sm"
-            labelAlwaysOn
             value={cpmRange}
             onChange={setCpmRange}
-            marks={[
-              { value: 10, label: '10%' },
-              { value: 20, label: '20%' },
-              { value: 30, label: '30%' },
-              { value: 40, label: '40%' },
-              { value: 50, label: '50%' },
-              { value: 60, label: '60%' },
-              { value: 70, label: '70%' },
-              { value: 80, label: '80%' },
-              { value: 90, label: '90%' }
-            ]}
+            step={1}
+            min={0}
+            max={(analytics?.data.length || 0) * 2 || 10}
+            scale={(value) => getCMPRangeLabel(analytics?.data || [], value)}
+            label={(value) => getCMPRangeLabel(analytics?.data || [], value)}
           />
           <Text>
             {`CPM AI analytics USD: Min - ${recommendedCPM.min}; Max - ${recommendedCPM.max}, possible daily impressions: `}{' '}

@@ -288,9 +288,17 @@ export const getRecommendedCPMRange = (supplyStats: SupplyStats, campaign: Campa
   }
 }
 
-export const getRecommendedCPMRangeAdvanced = (analytics: SSPsAnalyticsData[], range: number) => {
-  const topRanges = analytics.sort((a, b) => b.count - a.count)
-  const inRange = topRanges.slice(0, Math.floor(topRanges.length * (range / 10)))
+export const getRecommendedCPMRangeAdvanced = (
+  analytics: SSPsAnalyticsData[],
+  range: [number, number]
+) => {
+  const topRanges = analytics.sort(
+    (a, b) => parseRange(a.value.toString()).min - parseRange(b.value.toString()).min
+  )
+  const inRange = topRanges.slice(
+    Math.floor(topRanges.length * (range[0] / 10)),
+    Math.floor(topRanges.length * (range[1] / 10))
+  )
 
   const parsed = inRange.map(({ value, count }) => ({
     ...parseRange(value.toString()),
