@@ -10,7 +10,10 @@ import {
   TextInput,
   Tooltip,
   RangeSlider,
-  NumberFormatter
+  NumberFormatter,
+  RingProgress,
+  Paper,
+  Center
 } from '@mantine/core'
 import { useMemo, useState, useEffect } from 'react'
 import InfoFilledIcon from 'resources/icons/InfoFilled'
@@ -77,17 +80,18 @@ const StepThree = () => {
     checkAnalytics()
   }, [campaign, getAnalyticsKeyAndUpdate])
 
-  const [cpmRange, setCpmRange] = useState<[number, number]>([0, 1])
+  const [cpmSliderRange, setCpmRange] = useState<[number, number]>([0, 1])
 
   const recommendedCPM = useMemo(
     () =>
       analytics?.data.length
-        ? getRecommendedCPMRangeAdvanced(analytics.data, [
-            Math.ceil(cpmRange[0] / 10),
-            Math.ceil(cpmRange[1] / 10)
-          ])
-        : { min: 'N/A', max: 'N/A', count: 0 },
-    [analytics?.data, cpmRange]
+        ? getRecommendedCPMRangeAdvanced(
+            analytics.data,
+            cpmRangeData.find((x) => x.value === cpmSliderRange[0])?.label || 0,
+            cpmRangeData.find((x) => x.value === cpmSliderRange[1])?.label || 0
+          )
+        : { min: 'N/A', max: 'N/A', count: 0, supply: 0 },
+    [analytics?.data, cpmSliderRange, cpmRangeData]
   )
 
   const budgetIsGreaterThanBalance = useMemo(
@@ -192,32 +196,78 @@ const StepThree = () => {
           <Text c="secondaryText" size="sm" fw="bold">
             5. CPM
           </Text>
-          <Tooltip
-            label={`Recommended CPM in USD: Min - ${recommendedCPM.min}; Max - ${recommendedCPM.max}`}
-            ml="sm"
-          >
-            <ActionIcon variant="transparent" color="secondaryText" size="xs">
-              <InfoFilledIcon />
-            </ActionIcon>
-          </Tooltip>
         </Group>
-        <Stack gap="xl">
-          <RangeSlider
-            color="blue"
-            size="sm"
-            value={cpmRange}
-            onChange={setCpmRange}
-            min={0}
-            minRange={0.1}
-            max={cpmRangeData[cpmRangeData.length - 1]?.value}
-            marks={cpmRangeData}
-            label={(value) => cpmRangeData.find((x) => x?.value === value)?.label || ' lll'}
-          />
-          <Text>
-            {`CPM AI analytics USD: Min - ${recommendedCPM.min}; Max - ${recommendedCPM.max}, possible daily impressions: `}{' '}
-            <NumberFormatter value={Math.floor(recommendedCPM.count / 2)} thousandSeparator />
-          </Text>
-        </Stack>
+        <Paper shadow="md" p="md" pt="xl" withBorder>
+          <Stack gap="xl">
+            <Group>
+              <Text>🔮 CPM AI helper ✨</Text>
+              <Tooltip label="Play with the CPM if you want play" ml="sm">
+                <ActionIcon variant="transparent" color="#50baba" size="xs">
+                  <InfoFilledIcon />
+                </ActionIcon>
+              </Tooltip>
+            </Group>
+            <RangeSlider
+              color="#50baba"
+              size="xl"
+              value={cpmSliderRange}
+              onChange={setCpmRange}
+              min={0}
+              minRange={0.1}
+              max={cpmRangeData[cpmRangeData.length - 1]?.value}
+              marks={cpmRangeData}
+              label={(value) => cpmRangeData.find((x) => x?.value === value)?.label || ' lll'}
+            />
+            <Text>
+              {`CPM AI analytics USD: Min - ${recommendedCPM.min}; Max - ${recommendedCPM.max}, supply cover `}{' '}
+              <NumberFormatter value={Math.floor(recommendedCPM.count / 2)} thousandSeparator />
+            </Text>
+            <Group>
+              <Stack>
+                <Text>Supply covered</Text>
+                <RingProgress
+                  size={140}
+                  thickness={16}
+                  roundCaps
+                  sections={[
+                    {
+                      value: (recommendedCPM.count / recommendedCPM.supply) * 100,
+                      color: '#50baba'
+                    }
+                  ]}
+                  label={
+                    <Center>
+                      <Text c="#50baba" fw="bolder" ta="center" size="xl">
+                        {((recommendedCPM.count / recommendedCPM.supply) * 100).toFixed(0)}%
+                      </Text>
+                    </Center>
+                  }
+                />
+              </Stack>
+              <Stack>
+                <Text>Impressions covered</Text>
+                <RingProgress
+                  size={140}
+                  thickness={16}
+                  roundCaps
+                  sections={[
+                    {
+                      value: (recommendedCPM.count / recommendedCPM.supply) * 100,
+                      color: '#50baba'
+                    }
+                  ]}
+                  label={
+                    <Center>
+                      <Text c="#50baba" fw="bolder" ta="center" size="xl">
+                        {((recommendedCPM.count / recommendedCPM.supply) * 100).toFixed(0)}%
+                      </Text>
+                    </Center>
+                  }
+                />
+              </Stack>
+            </Group>
+          </Stack>
+        </Paper>
         <Group wrap="nowrap" justify="stretch" grow>
           <TextInput
             size="md"

@@ -290,31 +290,27 @@ export const getRecommendedCPMRange = (supplyStats: SupplyStats, campaign: Campa
 
 export const getRecommendedCPMRangeAdvanced = (
   analytics: SSPsAnalyticsData[],
-  range: [number, number]
+  min: number,
+  max: number
 ) => {
-  const topRanges = analytics.sort(
-    (a, b) => parseRange(a.value.toString()).min - parseRange(b.value.toString()).min
-  )
-  const inRange = topRanges.slice(
-    Math.floor(topRanges.length * (range[0] / 10)),
-    Math.floor(topRanges.length * (range[1] / 10))
-  )
+  const topRanges = analytics
+    .map(({ value, count }) => ({
+      count,
+      ...parseRange(value.toString())
+    }))
+    .sort((a, b) => a.min - b.min)
+    .filter((x) => x.min >= min && x.max <= max)
+    .reduce(
+      (data, current) => {
+        return {
+          ...data,
+          min: Math.min(data.min, current.min) || Math.max(data.min, current.min),
+          max: Math.max(data.max, current.max),
+          count: data.count + current.count
+        }
+      },
+      { min: 0, max: 0, count: 0 }
+    )
 
-  const parsed = inRange.map(({ value, count }) => ({
-    ...parseRange(value.toString()),
-    count
-  }))
-
-  const rangeAdvancedData = parsed.reduce(
-    (data, current) => {
-      return {
-        min: Math.min(data.min, current.min) || Math.max(data.min, current.min),
-        max: Math.max(data.max, current.max),
-        count: data.count + current.count
-      }
-    },
-    { min: 0, max: 0, count: 0 }
-  )
-
-  return rangeAdvancedData
+  return { ...topRanges, supply: analytics.reduce((sum, cur) => sum + cur.count, 0) }
 }
