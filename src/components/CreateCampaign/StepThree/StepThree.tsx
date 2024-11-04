@@ -25,15 +25,20 @@ import { SSPsAnalyticsData } from 'types'
 import CampaignPeriod from './CampaignPeriod'
 import SelectCurrency from './SelectCurrency'
 
-const getCMPRangeLabel = (analytics: SSPsAnalyticsData[], index: number) => {
+const getCMPRangeLabel = (analytics: SSPsAnalyticsData[]) => {
   const cpms = analytics
     .map((x) => [parseRange(x.value.toString()).min, parseRange(x.value.toString()).max])
     .flat()
     .filter((c) => typeof c === 'number' && !Number.isNaN(c))
     .sort((a, b) => a - b)
-
-  const label = cpms[index]
-  return label
+    .filter((item, pos, self) => {
+      return self.indexOf(item) === pos
+    })
+    .map((x, i) => ({
+      label: x,
+      value: i
+    }))
+  return cpms
 }
 
 const StepThree = () => {
@@ -55,6 +60,8 @@ const StepThree = () => {
     () => analyticsData.get(analyticsKey?.key || ''),
     [analyticsData, analyticsKey]
   )
+
+  const cpmRangeData = useMemo(() => getCMPRangeLabel(analytics?.data || []), [analytics?.data])
 
   useEffect(() => {
     setAnalyticsKey(undefined)
@@ -200,11 +207,11 @@ const StepThree = () => {
             size="sm"
             value={cpmRange}
             onChange={setCpmRange}
-            step={1}
             min={0}
-            max={(analytics?.data.length || 0) * 2 || 10}
-            scale={(value) => getCMPRangeLabel(analytics?.data || [], value)}
-            label={(value) => getCMPRangeLabel(analytics?.data || [], value)}
+            minRange={0.1}
+            max={cpmRangeData[cpmRangeData.length - 1]?.value}
+            marks={cpmRangeData}
+            label={(value) => cpmRangeData.find((x) => x?.value === value)?.label || ' lll'}
           />
           <Text>
             {`CPM AI analytics USD: Min - ${recommendedCPM.min}; Max - ${recommendedCPM.max}, possible daily impressions: `}{' '}
