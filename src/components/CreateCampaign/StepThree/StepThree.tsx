@@ -21,10 +21,11 @@ import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import InfoAlertMessage from 'components/common/InfoAlertMessage'
 import InfoIcon from 'resources/icons/Info'
 import DefaultCustomAnchor from 'components/common/customAnchor'
-import { campaignDataToSSPAnalyticsQuery } from 'helpers'
+import { campaignDataToSSPAnalyticsQuery, DAY } from 'helpers'
 import useSSPsAnalytics from 'hooks/useCampaignAnalytics/useSSPsAnalytics'
 import { getRecommendedCPMRangeAdvanced, parseRange } from 'helpers/createCampaignHelpers'
 import { SSPsAnalyticsData } from 'types'
+import { LineChart } from '@mantine/charts'
 import CampaignPeriod from './CampaignPeriod'
 import SelectCurrency from './SelectCurrency'
 
@@ -39,7 +40,8 @@ const getCMPRangeLabel = (analytics: SSPsAnalyticsData[]) => {
     })
     .map((x, i) => ({
       label: x,
-      value: i
+      value: i,
+      index: 1
     }))
   return cpms
 }
@@ -99,114 +101,234 @@ const StepThree = () => {
     [errors]
   )
 
+  const estimatedMaxImpressions = useMemo(() => {
+    return (campaign.budget / Number(campaign.cpmPricingBounds.min || 1)) * 1000
+  }, [campaign])
+
+  const impressionsCovered = useMemo(() => {
+    return +(
+      (((recommendedCPM.count / 2) * (Number(campaign.activeTo - campaign.activeFrom) / DAY)) /
+        estimatedMaxImpressions) *
+      100
+    ).toPrecision(2)
+  }, [campaign.activeFrom, campaign.activeTo, estimatedMaxImpressions, recommendedCPM.count])
+
+  const cpmDistributionChartData = useMemo(() => {
+    return analytics?.data.length
+      ? cpmRangeData.map((x, i) => ({
+          label: x.label,
+          count: getRecommendedCPMRangeAdvanced(
+            analytics?.data,
+            Number(cpmRangeData[i]?.label),
+            Number(cpmRangeData[i + 1]?.label || cpmRangeData[i]?.label)
+          )?.count,
+          index: 1
+        }))
+      : [{ label: 0, value: 0, index: 1 }]
+  }, [analytics?.data, cpmRangeData])
+
+  console.log({ cpmDistributionChartData })
+
   return (
-    <Stack gap="xl" maw={720}>
-      <Stack gap="xs">
-        <Text c="secondaryText" size="sm" fw="bold">
-          1. Campaign Period
-        </Text>
-        <CampaignPeriod />
-
-        <Alert icon={<InfoIcon style={{ marginTop: 0 }} />} color="attention" variant="outline">
-          <Text>
-            The campaigns go through a approval process and if you select &quot;As soon as
-            possible&quot; the campaign will be launched once it is approved.
-          </Text>
-        </Alert>
-
-        <Checkbox
-          label="As soon as possible"
-          key={key('asapStartingDate')}
-          {...getInputProps('asapStartingDate', {
-            type: 'checkbox'
-          })}
-        />
-      </Stack>
-
-      <Radio.Group
-        label={
+    <Group align="top" grow>
+      <Stack gap="xl">
+        <Stack gap="xs">
           <Text c="secondaryText" size="sm" fw="bold">
-            2. Payment Model
+            1. Campaign Period
           </Text>
-        }
-        key={key('paymentModel')}
-        {...getInputProps('paymentModel')}
-      >
-        <Group mt="xs">
-          <Radio value="cpm" label="CPM" />
-          {/* Disabled at the moment */}
-          {/* <Radio value="cpc" label="CPC" /> */}
-        </Group>
-      </Radio.Group>
+          <CampaignPeriod />
 
-      <Stack gap="xs">
-        <Text c="secondaryText" size="sm" fw="bold">
-          3. Currency
-        </Text>
-        <SelectCurrency
-          defaultValue={campaign.currency}
-          onChange={(value) => setFieldValue('currency', value)}
-          error={(errors.currency && errors.currency) || ''}
-        />
-      </Stack>
-
-      <Stack gap="xs">
-        <NumberInput
-          allowDecimal
-          hideControls
-          label={
-            <Text c="secondaryText" size="sm" fw="bold" mb="xs">
-              4. Campaign Budget
+          <Alert icon={<InfoIcon style={{ marginTop: 0 }} />} color="attention" variant="outline">
+            <Text>
+              The campaigns go through a approval process and if you select &quot;As soon as
+              possible&quot; the campaign will be launched once it is approved.
             </Text>
-          }
-          size="md"
-          placeholder="Enter campaign budget"
-          // TODO: Should get/calculate estimated fee
-          // description={`Estimated fee: 0.15 ${balanceToken.name}`}
-          inputWrapperOrder={['label', 'input', 'description', 'error']}
-          name="budget"
-          key={key('budget')}
-          {...getInputProps('budget')}
-        />
-        {budgetIsGreaterThanBalance && (
-          <InfoAlertMessage message="You have insufficient funds in your account for launching a campaign. You can save the campaign as draft and launch it when your account is topped up." />
-        )}
+          </Alert>
 
-        <Group>
           <Checkbox
-            label="Limit average daily spending"
-            key={key('targetingInput.inputs.advanced.limitDailyAverageSpending')}
-            {...getInputProps('targetingInput.inputs.advanced.limitDailyAverageSpending', {
+            label="As soon as possible"
+            key={key('asapStartingDate')}
+            {...getInputProps('asapStartingDate', {
               type: 'checkbox'
             })}
           />
-          <DefaultCustomAnchor
-            href="https://help.adex.network/hc/en-us/articles/15014607423260-How-to-limit-your-average-daily-spend"
-            external
-            c="blue"
-            size="sm"
-          >
-            (learn more)
-          </DefaultCustomAnchor>
-        </Group>
+        </Stack>
+
+        <Radio.Group
+          label={
+            <Text c="secondaryText" size="sm" fw="bold">
+              2. Payment Model
+            </Text>
+          }
+          key={key('paymentModel')}
+          {...getInputProps('paymentModel')}
+        >
+          <Group mt="xs">
+            <Radio value="cpm" label="CPM" />
+            {/* Disabled at the moment */}
+            {/* <Radio value="cpc" label="CPC" /> */}
+          </Group>
+        </Radio.Group>
+
+        <Stack gap="xs">
+          <Text c="secondaryText" size="sm" fw="bold">
+            3. Currency
+          </Text>
+          <SelectCurrency
+            defaultValue={campaign.currency}
+            onChange={(value) => setFieldValue('currency', value)}
+            error={(errors.currency && errors.currency) || ''}
+          />
+        </Stack>
+
+        <Stack gap="xs">
+          <NumberInput
+            allowDecimal
+            hideControls
+            label={
+              <Text c="secondaryText" size="sm" fw="bold" mb="xs">
+                4. Campaign Budget
+              </Text>
+            }
+            size="md"
+            placeholder="Enter campaign budget"
+            // TODO: Should get/calculate estimated fee
+            // description={`Estimated fee: 0.15 ${balanceToken.name}`}
+            inputWrapperOrder={['label', 'input', 'description', 'error']}
+            name="budget"
+            key={key('budget')}
+            {...getInputProps('budget')}
+          />
+          {budgetIsGreaterThanBalance && (
+            <InfoAlertMessage message="You have insufficient funds in your account for launching a campaign. You can save the campaign as draft and launch it when your account is topped up." />
+          )}
+
+          <Group>
+            <Checkbox
+              label="Limit average daily spending"
+              key={key('targetingInput.inputs.advanced.limitDailyAverageSpending')}
+              {...getInputProps('targetingInput.inputs.advanced.limitDailyAverageSpending', {
+                type: 'checkbox'
+              })}
+            />
+            <DefaultCustomAnchor
+              href="https://help.adex.network/hc/en-us/articles/15014607423260-How-to-limit-your-average-daily-spend"
+              external
+              c="blue"
+              size="sm"
+            >
+              (learn more)
+            </DefaultCustomAnchor>
+          </Group>
+        </Stack>
+
+        <Stack gap="xs">
+          <Group gap="xs">
+            <Text c="secondaryText" size="sm" fw="bold">
+              5. CPM
+            </Text>
+          </Group>
+
+          <Group wrap="nowrap" justify="stretch" grow>
+            <TextInput
+              size="md"
+              placeholder="CPM min"
+              // Temporary disabled until we are ready to get real data
+              // description="Approx. ~ $0.10"
+              inputWrapperOrder={['input', 'description', 'error']}
+              rightSection={
+                <Text c="brand" mr="sm" size="sm">
+                  Min
+                </Text>
+              }
+              rightSectionWidth="auto"
+              name="cpmPricingBounds.min"
+              key={key('cpmPricingBounds.min')}
+              {...getInputProps('cpmPricingBounds.min')}
+            />
+            <TextInput
+              size="md"
+              placeholder="CPM max"
+              // Temporary disabled until we are ready to get real data
+              // description="Approx. ~ $0.50"
+              inputWrapperOrder={['input', 'description', 'error']}
+              rightSection={
+                <Text c="brand" mr="sm" size="sm">
+                  Max
+                </Text>
+              }
+              rightSectionWidth="md"
+              name="cpmPricingBounds.max"
+              key={key('cpmPricingBounds.max')}
+              {...getInputProps('cpmPricingBounds.max')}
+            />
+          </Group>
+          <Group>
+            <Checkbox
+              label="Aggressive bidding mode"
+              key={key('targetingInput.inputs.advanced.limitDailyAverageSpending')}
+              {...getInputProps('targetingInput.inputs.advanced.aggressiveBidding', {
+                type: 'checkbox'
+              })}
+            />
+            <DefaultCustomAnchor
+              href="https://help.adex.network/hc/en-us/articles/16075705207068-What-is-aggressive-bidding"
+              external
+              c="blue"
+              size="sm"
+            >
+              (learn more)
+            </DefaultCustomAnchor>
+          </Group>
+        </Stack>
+
+        <TextInput
+          label={
+            <Text c="secondaryText" size="sm" fw="bold" mb="xs">
+              6. Campaign Name
+            </Text>
+          }
+          size="md"
+          placeholder="Campaign Name"
+          name="title"
+          key={key('title')}
+          {...getInputProps('title')}
+        />
       </Stack>
 
       <Stack gap="xs">
-        <Group gap="xs">
-          <Text c="secondaryText" size="sm" fw="bold">
-            5. CPM
-          </Text>
+        <Group>
+          <Text size="sm">🔮 AI CPM helper ✨</Text>
+          <Tooltip label="Play with the CPM if you want play" ml="sm">
+            <ActionIcon variant="transparent" color="#50baba" size="xs">
+              <InfoFilledIcon />
+            </ActionIcon>
+          </Tooltip>
         </Group>
-        <Paper shadow="md" p="md" pt="xl" withBorder>
-          <Stack gap="xl">
-            <Group>
-              <Text>🔮 CPM AI helper ✨</Text>
-              <Tooltip label="Play with the CPM if you want play" ml="sm">
-                <ActionIcon variant="transparent" color="#50baba" size="xs">
-                  <InfoFilledIcon />
-                </ActionIcon>
-              </Tooltip>
-            </Group>
+        <Paper shadow="md" p="md" pt="xl" withBorder bg="lightBackground">
+          <Stack gap="xs">
+            <LineChart
+              h={120}
+              data={cpmDistributionChartData}
+              series={[{ name: 'count' }]}
+              dataKey="date"
+              type="gradient"
+              gradientStops={[
+                { offset: 0, color: 'red.6' },
+                { offset: 20, color: 'orange.6' },
+                { offset: 40, color: 'yellow.5' },
+                { offset: 70, color: 'lime.5' },
+                { offset: 80, color: 'cyan.5' },
+                { offset: 100, color: 'blue.5' }
+              ]}
+              strokeWidth={5}
+              curveType="natural"
+              yAxisProps={{
+                domain: [cpmRangeData[0]?.label, cpmRangeData[cpmRangeData.length - 1]?.label],
+                hide: true
+              }}
+              valueFormatter={(value) => `${value}`}
+            />
             <RangeSlider
               color="#50baba"
               size="xl"
@@ -218,7 +340,8 @@ const StepThree = () => {
               marks={cpmRangeData}
               label={(value) => cpmRangeData.find((x) => x?.value === value)?.label || ' lll'}
             />
-            <Text>
+
+            <Text mt="xl">
               {`CPM AI analytics USD: Min - ${recommendedCPM.min}; Max - ${recommendedCPM.max}, supply cover `}{' '}
               <NumberFormatter value={Math.floor(recommendedCPM.count / 2)} thousandSeparator />
             </Text>
@@ -228,7 +351,6 @@ const StepThree = () => {
                 <RingProgress
                   size={140}
                   thickness={16}
-                  roundCaps
                   sections={[
                     {
                       value: (recommendedCPM.count / recommendedCPM.supply) * 100,
@@ -238,28 +360,30 @@ const StepThree = () => {
                   label={
                     <Center>
                       <Text c="#50baba" fw="bolder" ta="center" size="xl">
-                        {((recommendedCPM.count / recommendedCPM.supply) * 100).toFixed(0)}%
+                        {((recommendedCPM.count / recommendedCPM.supply) * 100).toPrecision(2)}%
                       </Text>
                     </Center>
                   }
                 />
               </Stack>
               <Stack>
-                <Text>Impressions covered</Text>
+                <Text>
+                  Impressions covered (Max:{' '}
+                  <NumberFormatter value={estimatedMaxImpressions} thousandSeparator />)
+                </Text>
                 <RingProgress
                   size={140}
                   thickness={16}
-                  roundCaps
                   sections={[
                     {
-                      value: (recommendedCPM.count / recommendedCPM.supply) * 100,
+                      value: impressionsCovered > 100 ? 100 : impressionsCovered,
                       color: '#50baba'
                     }
                   ]}
                   label={
                     <Center>
                       <Text c="#50baba" fw="bolder" ta="center" size="xl">
-                        {((recommendedCPM.count / recommendedCPM.supply) * 100).toFixed(0)}%
+                        {impressionsCovered > 100 ? 100 : impressionsCovered}%
                       </Text>
                     </Center>
                   }
@@ -268,72 +392,8 @@ const StepThree = () => {
             </Group>
           </Stack>
         </Paper>
-        <Group wrap="nowrap" justify="stretch" grow>
-          <TextInput
-            size="md"
-            placeholder="CPM min"
-            // Temporary disabled until we are ready to get real data
-            // description="Approx. ~ $0.10"
-            inputWrapperOrder={['input', 'description', 'error']}
-            rightSection={
-              <Text c="brand" mr="sm" size="sm">
-                Min
-              </Text>
-            }
-            rightSectionWidth="auto"
-            name="cpmPricingBounds.min"
-            key={key('cpmPricingBounds.min')}
-            {...getInputProps('cpmPricingBounds.min')}
-          />
-          <TextInput
-            size="md"
-            placeholder="CPM max"
-            // Temporary disabled until we are ready to get real data
-            // description="Approx. ~ $0.50"
-            inputWrapperOrder={['input', 'description', 'error']}
-            rightSection={
-              <Text c="brand" mr="sm" size="sm">
-                Max
-              </Text>
-            }
-            rightSectionWidth="md"
-            name="cpmPricingBounds.max"
-            key={key('cpmPricingBounds.max')}
-            {...getInputProps('cpmPricingBounds.max')}
-          />
-        </Group>
-        <Group>
-          <Checkbox
-            label="Aggressive bidding mode"
-            key={key('targetingInput.inputs.advanced.limitDailyAverageSpending')}
-            {...getInputProps('targetingInput.inputs.advanced.aggressiveBidding', {
-              type: 'checkbox'
-            })}
-          />
-          <DefaultCustomAnchor
-            href="https://help.adex.network/hc/en-us/articles/16075705207068-What-is-aggressive-bidding"
-            external
-            c="blue"
-            size="sm"
-          >
-            (learn more)
-          </DefaultCustomAnchor>
-        </Group>
       </Stack>
-
-      <TextInput
-        label={
-          <Text c="secondaryText" size="sm" fw="bold" mb="xs">
-            6. Campaign Name
-          </Text>
-        }
-        size="md"
-        placeholder="Campaign Name"
-        name="title"
-        key={key('title')}
-        {...getInputProps('title')}
-      />
-    </Stack>
+    </Group>
   )
 }
 
