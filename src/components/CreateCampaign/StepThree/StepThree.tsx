@@ -25,7 +25,7 @@ import { campaignDataToSSPAnalyticsQuery, DAY } from 'helpers'
 import useSSPsAnalytics from 'hooks/useCampaignAnalytics/useSSPsAnalytics'
 import { getRecommendedCPMRangeAdvanced, parseRange } from 'helpers/createCampaignHelpers'
 import { SSPsAnalyticsData } from 'types'
-import { LineChart } from '@mantine/charts'
+import { Sparkline } from '@mantine/charts'
 import CampaignPeriod from './CampaignPeriod'
 import SelectCurrency from './SelectCurrency'
 
@@ -115,16 +115,15 @@ const StepThree = () => {
 
   const cpmDistributionChartData = useMemo(() => {
     return analytics?.data.length
-      ? cpmRangeData.map((x, i) => ({
-          label: x.label,
-          count: getRecommendedCPMRangeAdvanced(
-            analytics?.data,
-            Number(cpmRangeData[i]?.label),
-            Number(cpmRangeData[i + 1]?.label || cpmRangeData[i]?.label)
-          )?.count,
-          index: 1
-        }))
-      : [{ label: 0, value: 0, index: 1 }]
+      ? cpmRangeData.map(
+          (_x, i) =>
+            getRecommendedCPMRangeAdvanced(
+              analytics?.data,
+              Number(cpmRangeData[i]?.label),
+              Number(cpmRangeData[i + 1]?.label || cpmRangeData[i]?.label)
+            )?.count || 1
+        )
+      : []
   }, [analytics?.data, cpmRangeData])
 
   console.log({ cpmDistributionChartData })
@@ -307,27 +306,12 @@ const StepThree = () => {
         </Group>
         <Paper shadow="md" p="md" pt="xl" withBorder bg="lightBackground">
           <Stack gap="xs">
-            <LineChart
-              h={120}
+            <Sparkline
+              h={160}
               data={cpmDistributionChartData}
-              series={[{ name: 'count' }]}
-              dataKey="date"
-              type="gradient"
-              gradientStops={[
-                { offset: 0, color: 'red.6' },
-                { offset: 20, color: 'orange.6' },
-                { offset: 40, color: 'yellow.5' },
-                { offset: 70, color: 'lime.5' },
-                { offset: 80, color: 'cyan.5' },
-                { offset: 100, color: 'blue.5' }
-              ]}
+              color="#50baba"
               strokeWidth={5}
-              curveType="natural"
-              yAxisProps={{
-                domain: [cpmRangeData[0]?.label, cpmRangeData[cpmRangeData.length - 1]?.label],
-                hide: true
-              }}
-              valueFormatter={(value) => `${value}`}
+              curveType="monotone"
             />
             <RangeSlider
               color="#50baba"
