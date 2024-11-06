@@ -29,7 +29,7 @@ import { Sparkline } from '@mantine/charts'
 import CampaignPeriod from './CampaignPeriod'
 import SelectCurrency from './SelectCurrency'
 
-const getCMPRangeLabel = (analytics: SSPsAnalyticsData[]) => {
+const getCMPRangeMarks = (analytics: SSPsAnalyticsData[]) => {
   const cpms = analytics
     .map((x) => [parseRange(x.value.toString()).min, parseRange(x.value.toString()).max])
     .flat()
@@ -39,9 +39,8 @@ const getCMPRangeLabel = (analytics: SSPsAnalyticsData[]) => {
       return self.indexOf(item) === pos
     })
     .map((x, i) => ({
-      label: x,
-      value: i,
-      index: 1
+      label: x.toString(),
+      value: i
     }))
   return cpms
 }
@@ -66,11 +65,9 @@ const StepThree = () => {
     [analyticsData, analyticsKey]
   )
 
-  const cpmRangeData = useMemo(() => getCMPRangeLabel(analytics?.data || []), [analytics?.data])
+  const cpmRangeData = useMemo(() => getCMPRangeMarks(analytics?.data || []), [analytics?.data])
 
   useEffect(() => {
-    setAnalyticsKey(undefined)
-
     const checkAnalytics = async () => {
       const analKey = await getAnalyticsKeyAndUpdate({
         ...campaignDataToSSPAnalyticsQuery(campaign),
@@ -89,8 +86,8 @@ const StepThree = () => {
       analytics?.data.length
         ? getRecommendedCPMRangeAdvanced(
             analytics.data,
-            cpmRangeData.find((x) => x.value === cpmSliderRange[0])?.label || 0,
-            cpmRangeData.find((x) => x.value === cpmSliderRange[1])?.label || 0
+            Number(cpmRangeData.find((x) => x.value === cpmSliderRange[0])?.label) || 0,
+            Number(cpmRangeData.find((x) => x.value === cpmSliderRange[1])?.label) || 0
           )
         : { min: 'N/A', max: 'N/A', count: 0, supply: 0 },
     [analytics?.data, cpmSliderRange, cpmRangeData]
@@ -126,6 +123,8 @@ const StepThree = () => {
       : []
   }, [analytics?.data, cpmRangeData])
 
+  console.log({ cpmRangeData })
+  console.log({ recommendedCPM })
   console.log({ cpmDistributionChartData })
 
   return (
@@ -319,15 +318,20 @@ const StepThree = () => {
               value={cpmSliderRange}
               onChange={setCpmRange}
               min={0}
-              minRange={0.1}
+              minRange={1}
               max={cpmRangeData[cpmRangeData.length - 1]?.value}
               marks={cpmRangeData}
-              label={(value) => cpmRangeData.find((x) => x?.value === value)?.label || ' lll'}
             />
 
             <Text mt="xl">
               {`CPM AI analytics USD: Min - ${recommendedCPM.min}; Max - ${recommendedCPM.max}, supply cover `}{' '}
-              <NumberFormatter value={Math.floor(recommendedCPM.count / 2)} thousandSeparator />
+              <NumberFormatter
+                value={Math.floor(
+                  (recommendedCPM.count / 2) *
+                    (Number(campaign.activeTo - campaign.activeFrom) / DAY)
+                )}
+                thousandSeparator
+              />
             </Text>
             <Group>
               <Stack>
@@ -344,7 +348,7 @@ const StepThree = () => {
                   label={
                     <Center>
                       <Text c="#50baba" fw="bolder" ta="center" size="xl">
-                        {((recommendedCPM.count / recommendedCPM.supply) * 100).toPrecision(2)}%
+                        {((recommendedCPM.count / recommendedCPM.supply) * 100).toFixed(2)}%
                       </Text>
                     </Center>
                   }
