@@ -13,7 +13,9 @@ import {
   NumberFormatter,
   RingProgress,
   Paper,
-  Center
+  Center,
+  Overlay,
+  Loader
 } from '@mantine/core'
 import { useMemo, useState, useEffect } from 'react'
 import InfoFilledIcon from 'resources/icons/InfoFilled'
@@ -122,6 +124,12 @@ const StepThree = () => {
         )
       : []
   }, [analytics?.data, cpmRangeData])
+
+  const cpmDataLoading = useMemo(() => !analytics || analytics?.status === 'loading', [analytics])
+
+  const cpmToolDisabled = useMemo(() => {
+    return cpmDataLoading || !campaign.activeFrom || !campaign.activeTo || !campaign.budget
+  }, [campaign.activeFrom, campaign.activeTo, campaign.budget, cpmDataLoading])
 
   console.log({ cpmRangeData })
   console.log({ recommendedCPM })
@@ -303,7 +311,22 @@ const StepThree = () => {
             </ActionIcon>
           </Tooltip>
         </Group>
-        <Paper shadow="md" p="md" pt="xl" withBorder bg="lightBackground">
+        <Paper shadow="md" p="md" pt="xl" withBorder bg="lightBackground" pos="relative">
+          {cpmToolDisabled && (
+            <Overlay
+              gradient="linear-gradient(145deg, #ffffffaa 0%, #50babaaa 100%)"
+              backgroundOpacity={0.9}
+              blur={3}
+              center
+            >
+              <Stack>
+                {cpmDataLoading && <Loader type="dots" color="brand" />}
+                {!cpmDataLoading && (
+                  <Text size="xl">Fill period and budget to access CPM helper</Text>
+                )}
+              </Stack>
+            </Overlay>
+          )}
           <Stack gap="xs">
             <Sparkline
               h={160}
