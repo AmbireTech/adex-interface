@@ -10,7 +10,6 @@ import {
   TextInput,
   Tooltip,
   RangeSlider,
-  NumberFormatter,
   RingProgress,
   Paper,
   Center,
@@ -30,6 +29,9 @@ import { SSPsAnalyticsData } from 'types'
 import { Sparkline } from '@mantine/charts'
 import CampaignPeriod from './CampaignPeriod'
 import SelectCurrency from './SelectCurrency'
+
+// TODO: get some real time stats about that
+const EXPECTED_WINNING_BIDS_RATE = 0.05
 
 const getCMPRangeMarks = (analytics: SSPsAnalyticsData[]) => {
   const cpms = analytics
@@ -108,8 +110,10 @@ const StepThree = () => {
     return +(
       (((recommendedCPM.count / 2) * (Number(campaign.activeTo - campaign.activeFrom) / DAY)) /
         estimatedMaxImpressions) *
-      100
-    ).toPrecision(2)
+      100 *
+      EXPECTED_WINNING_BIDS_RATE
+    ) // We expect yo
+      .toPrecision(2)
   }, [campaign.activeFrom, campaign.activeTo, estimatedMaxImpressions, recommendedCPM.count])
 
   const cpmDistributionChartData = useMemo(() => {
@@ -346,60 +350,56 @@ const StepThree = () => {
               marks={cpmRangeData}
             />
 
-            <Text mt="xl">
-              {`CPM AI analytics USD: Min - ${recommendedCPM.min}; Max - ${recommendedCPM.max}, supply cover `}{' '}
-              <NumberFormatter
-                value={Math.floor(
-                  (recommendedCPM.count / 2) *
-                    (Number(campaign.activeTo - campaign.activeFrom) / DAY)
-                )}
-                thousandSeparator
-              />
+            <Text size="xl" mt="xl">
+              CPM range: {cpmSliderRange[0]} - {cpmSliderRange[1]}
             </Text>
             <Group>
-              <Stack>
-                <Text>Supply covered</Text>
-                <RingProgress
-                  size={140}
-                  thickness={16}
-                  sections={[
-                    {
-                      value: (recommendedCPM.count / recommendedCPM.supply) * 100,
-                      color: '#50baba'
-                    }
-                  ]}
-                  label={
-                    <Center>
-                      <Text c="#50baba" fw="bolder" ta="center" size="xl">
-                        {((recommendedCPM.count / recommendedCPM.supply) * 100).toFixed(2)}%
-                      </Text>
-                    </Center>
+              <RingProgress
+                size={160}
+                thickness={16}
+                sections={[
+                  {
+                    value: (recommendedCPM.count / recommendedCPM.supply) * 100,
+                    color: '#50baba',
+                    tooltip: `CPM range: ${cpmSliderRange[0]} - ${cpmSliderRange[1]} covers ${(
+                      (recommendedCPM.count / recommendedCPM.supply) *
+                      100
+                    ).toFixed(
+                      2
+                    )}% of the total supply matching campaign targeting and creatives formats`
                   }
-                />
-              </Stack>
-              <Stack>
-                <Text>
-                  Impressions covered (Max:{' '}
-                  <NumberFormatter value={estimatedMaxImpressions} thousandSeparator />)
-                </Text>
-                <RingProgress
-                  size={140}
-                  thickness={16}
-                  sections={[
-                    {
-                      value: impressionsCovered > 100 ? 100 : impressionsCovered,
-                      color: '#50baba'
-                    }
-                  ]}
-                  label={
-                    <Center>
-                      <Text c="#50baba" fw="bolder" ta="center" size="xl">
-                        {impressionsCovered > 100 ? 100 : impressionsCovered}%
-                      </Text>
-                    </Center>
+                ]}
+                label={
+                  <Center>
+                    <Text c="#50baba" fw="bolder" ta="center" size="md">
+                      Supply <br />
+                      {((recommendedCPM.count / recommendedCPM.supply) * 100).toFixed(2)}%
+                    </Text>
+                  </Center>
+                }
+              />
+
+              <RingProgress
+                size={160}
+                thickness={16}
+                sections={[
+                  {
+                    value: impressionsCovered > 100 ? 100 : impressionsCovered,
+                    color: '#50baba',
+                    tooltip: `CPM range: ${cpmSliderRange[0]} - ${cpmSliderRange[1]} covers  ${
+                      impressionsCovered > 100 ? 100 : impressionsCovered
+                    }% of the total expected impressions for the selected budged and period of the campaign`
                   }
-                />
-              </Stack>
+                ]}
+                label={
+                  <Center>
+                    <Text c="#50baba" fw="bolder" ta="center" size="md">
+                      Campaign <br />
+                      {impressionsCovered > 100 ? 100 : impressionsCovered}%
+                    </Text>
+                  </Center>
+                }
+              />
             </Group>
           </Stack>
         </Paper>
