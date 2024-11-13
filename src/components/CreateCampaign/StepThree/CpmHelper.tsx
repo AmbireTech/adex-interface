@@ -41,8 +41,8 @@ const getCMPRangeMarks = (analytics: SSPsAnalyticsData[]) => {
 
 export function CPMHelper() {
   const {
-    campaign
-    // form: { key, getInputProps, errors, setFieldValue }
+    campaign,
+    form: { setFieldValue }
   } = useCreateCampaignContext()
 
   const { analyticsData, getAnalyticsKeyAndUpdate } = useSSPsAnalytics()
@@ -88,17 +88,22 @@ export function CPMHelper() {
   )
 
   const estimatedMaxImpressions = useMemo(() => {
-    return (campaign.budget / Number(campaign.cpmPricingBounds.min || 1)) * 1000
+    const totalImps = (campaign.budget / (Number(campaign.cpmPricingBounds.min) || 0.1)) * 1000
+    return totalImps
   }, [campaign])
 
+  const supplyCovered = useMemo(
+    () => (recommendedCPM.count / recommendedCPM.supply) * 100,
+    [recommendedCPM.count, recommendedCPM.supply]
+  )
+
   const impressionsCovered = useMemo(() => {
-    return +(
-      (((recommendedCPM.count / 2) * (Number(campaign.activeTo - campaign.activeFrom) / DAY)) /
-        estimatedMaxImpressions) *
-      100 *
-      EXPECTED_WINNING_BIDS_RATE
-    ) // We expect yo
-      .toPrecision(2)
+    const dailySupply = (recommendedCPM.count / 2) * EXPECTED_WINNING_BIDS_RATE
+    const campaignDays = Number(campaign.activeTo - campaign.activeFrom) / DAY
+    const dailyImpressions = estimatedMaxImpressions / campaignDays
+    const percentCovered = Number(((dailySupply / dailyImpressions) * 100).toFixed(2))
+
+    return percentCovered > 100 ? 100 : percentCovered
   }, [campaign.activeFrom, campaign.activeTo, estimatedMaxImpressions, recommendedCPM.count])
 
   const cpmDistributionChartData = useMemo(() => {
@@ -157,12 +162,18 @@ export function CPMHelper() {
           <RangeSlider
             color="#50baba"
             size="xl"
+            thumbSize={25}
             value={cpmSliderRange}
-            onChange={setCpmRange}
+            onChange={(val) => {
+              setCpmRange(val)
+              setFieldValue('cpmPricingBounds.min', cpmRangeData[val[0]]?.label)
+              setFieldValue('cpmPricingBounds.max', cpmRangeData[val[1]]?.label)
+            }}
             min={0}
             minRange={1}
             max={cpmRangeData[cpmRangeData.length - 1]?.value}
             marks={cpmRangeData}
+            label={(val) => cpmRangeData[val]?.label}
           />
 
           <Text size="xl" mt="xl">
@@ -174,12 +185,11 @@ export function CPMHelper() {
               thickness={16}
               sections={[
                 {
-                  value: (recommendedCPM.count / recommendedCPM.supply) * 100,
+                  value: supplyCovered,
                   color: '#50baba',
-                  tooltip: `CPM range: ${cpmSliderRange[0]} - ${cpmSliderRange[1]} covers ${(
-                    (recommendedCPM.count / recommendedCPM.supply) *
-                    100
-                  ).toFixed(
+                  tooltip: `CPM range: ${cpmSliderRange[0]} - ${
+                    cpmSliderRange[1]
+                  } covers ${supplyCovered.toFixed(
                     2
                   )}% of the total supply matching campaign targeting and creatives formats`
                 }
@@ -188,7 +198,7 @@ export function CPMHelper() {
                 <Center>
                   <Text c="#50baba" fw="bolder" ta="center" size="md">
                     Supply <br />
-                    {((recommendedCPM.count / recommendedCPM.supply) * 100).toFixed(2)}%
+                    {supplyCovered.toFixed(2)}%
                   </Text>
                 </Center>
               }
@@ -199,18 +209,16 @@ export function CPMHelper() {
               thickness={16}
               sections={[
                 {
-                  value: impressionsCovered > 100 ? 100 : impressionsCovered,
+                  value: impressionsCovered,
                   color: '#50baba',
-                  tooltip: `CPM range: ${cpmSliderRange[0]} - ${cpmSliderRange[1]} covers  ${
-                    impressionsCovered > 100 ? 100 : impressionsCovered
-                  }% of the total expected impressions for the selected budged and period of the campaign`
+                  tooltip: `CPM range: ${cpmSliderRange[0]} - ${cpmSliderRange[1]} covers  ${impressionsCovered}% of the total expected impressions for the selected budged and period of the campaign`
                 }
               ]}
               label={
                 <Center>
                   <Text c="#50baba" fw="bolder" ta="center" size="md">
                     Campaign <br />
-                    {impressionsCovered > 100 ? 100 : impressionsCovered}%
+                    {impressionsCovered}%
                   </Text>
                 </Center>
               }
