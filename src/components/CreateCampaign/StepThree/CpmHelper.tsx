@@ -15,7 +15,9 @@ import {
   Paper,
   Center,
   Overlay,
-  Loader
+  Loader,
+  Space,
+  NumberFormatter
 } from '@mantine/core'
 import InfoFilledIcon from 'resources/icons/InfoFilled'
 import { Sparkline } from '@mantine/charts'
@@ -88,7 +90,16 @@ export function CPMHelper() {
   )
 
   const estimatedMaxImpressions = useMemo(() => {
-    const totalImps = (campaign.budget / (Number(campaign.cpmPricingBounds.min) || 0.1)) * 1000
+    const totalImps = Math.floor(
+      (campaign.budget / (Number(campaign.cpmPricingBounds.min) || 0.1)) * 1000
+    )
+    return totalImps
+  }, [campaign])
+
+  const estimatedMinImpressions = useMemo(() => {
+    const totalImps = Math.floor(
+      (campaign.budget / (Number(campaign.cpmPricingBounds.max) || 0.1)) * 1000
+    )
     return totalImps
   }, [campaign])
 
@@ -130,19 +141,14 @@ export function CPMHelper() {
       <Group>
         <Text size="sm">🔮 AI CPM helper ✨</Text>
         <Tooltip label="Play with the CPM if you want play" ml="sm">
-          <ActionIcon variant="transparent" color="#50baba" size="xs">
+          <ActionIcon variant="transparent" color="info" size="xs">
             <InfoFilledIcon />
           </ActionIcon>
         </Tooltip>
       </Group>
       <Paper shadow="md" p="md" pt="xl" withBorder bg="lightBackground" pos="relative">
         {cpmToolDisabled && (
-          <Overlay
-            gradient="linear-gradient(145deg, #ffffffaa 0%, #50babaaa 100%)"
-            backgroundOpacity={0.9}
-            blur={3}
-            center
-          >
+          <Overlay color="#fff" backgroundOpacity={0.3} blur={3} center>
             <Stack>
               {cpmDataLoading && <Loader type="dots" color="brand" />}
               {!cpmDataLoading && (
@@ -151,16 +157,18 @@ export function CPMHelper() {
             </Stack>
           </Overlay>
         )}
-        <Stack gap="xs">
+        <Stack gap="xs" justify="stretch">
+          <Text>Supply CPM distribution</Text>
           <Sparkline
-            h={160}
+            h={180}
             data={cpmDistributionChartData}
-            color="#50baba"
+            color="info"
             strokeWidth={5}
             curveType="monotone"
           />
+          <Space h="xl" />
           <RangeSlider
-            color="#50baba"
+            color="info"
             size="xl"
             thumbSize={25}
             value={cpmSliderRange}
@@ -174,19 +182,23 @@ export function CPMHelper() {
             max={cpmRangeData[cpmRangeData.length - 1]?.value}
             marks={cpmRangeData}
             label={(val) => cpmRangeData[val]?.label}
+            labelAlwaysOn
           />
-
-          <Text size="xl" mt="xl">
-            CPM range: {cpmSliderRange[0]} - {cpmSliderRange[1]}
+          <Space h="xl" />
+          <Text>
+            {' '}
+            Expected impressions: Min{' '}
+            <NumberFormatter value={estimatedMinImpressions} thousandSeparator /> - Max:{' '}
+            <NumberFormatter value={estimatedMaxImpressions} thousandSeparator />
           </Text>
           <Group>
             <RingProgress
-              size={160}
+              size={200}
               thickness={16}
               sections={[
                 {
                   value: supplyCovered,
-                  color: '#50baba',
+                  color: 'info',
                   tooltip: `CPM range: ${cpmSliderRange[0]} - ${
                     cpmSliderRange[1]
                   } covers ${supplyCovered.toFixed(
@@ -196,7 +208,7 @@ export function CPMHelper() {
               ]}
               label={
                 <Center>
-                  <Text c="#50baba" fw="bolder" ta="center" size="md">
+                  <Text c="info" fw="bolder" ta="center" size="md">
                     Supply <br />
                     {supplyCovered.toFixed(2)}%
                   </Text>
@@ -205,18 +217,18 @@ export function CPMHelper() {
             />
 
             <RingProgress
-              size={160}
+              size={200}
               thickness={16}
               sections={[
                 {
                   value: impressionsCovered,
-                  color: '#50baba',
-                  tooltip: `CPM range: ${cpmSliderRange[0]} - ${cpmSliderRange[1]} covers  ${impressionsCovered}% of the total expected impressions for the selected budged and period of the campaign`
+                  color: 'info',
+                  tooltip: `CPM range: ${cpmSliderRange[0]} - ${cpmSliderRange[1]} covers  ${impressionsCovered}% of the total expected maximum impressions for the selected budged and period of the campaign`
                 }
               ]}
               label={
                 <Center>
-                  <Text c="#50baba" fw="bolder" ta="center" size="md">
+                  <Text c="info" fw="bolder" ta="center" size="md">
                     Campaign <br />
                     {impressionsCovered}%
                   </Text>
