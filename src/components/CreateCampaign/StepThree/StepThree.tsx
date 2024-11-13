@@ -1,48 +1,18 @@
-import {
-  ActionIcon,
-  Alert,
-  Checkbox,
-  Stack,
-  Group,
-  NumberInput,
-  Radio,
-  Text,
-  TextInput,
-  Tooltip,
-  RangeSlider,
-  RingProgress,
-  Paper,
-  Center,
-  Overlay,
-  Loader
-} from '@mantine/core'
+import { Alert, Checkbox, Stack, Group, NumberInput, Radio, Text, TextInput } from '@mantine/core'
 import { useMemo } from 'react'
-import InfoFilledIcon from 'resources/icons/InfoFilled'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import InfoAlertMessage from 'components/common/InfoAlertMessage'
 import InfoIcon from 'resources/icons/Info'
 import DefaultCustomAnchor from 'components/common/customAnchor'
-import { Sparkline } from '@mantine/charts'
-import { useCPMAnalytics } from 'hooks/useCreateCampaignContext/useCPMAnalytics'
 import CampaignPeriod from './CampaignPeriod'
 import SelectCurrency from './SelectCurrency'
+import { CPMHelper } from './CpmHelper'
 
 const StepThree = () => {
   const {
     campaign,
     form: { key, getInputProps, errors, setFieldValue }
   } = useCreateCampaignContext()
-
-  const {
-    cpmRangeData,
-    recommendedCPM,
-    cpmSliderRange,
-    setCpmRange,
-    impressionsCovered,
-    cpmDistributionChartData,
-    cpmDataLoading,
-    cpmToolDisabled
-  } = useCPMAnalytics()
 
   const budgetIsGreaterThanBalance = useMemo(
     () => errors && errors.budget === 'Available balance is lower than the campaign budget',
@@ -215,105 +185,7 @@ const StepThree = () => {
           {...getInputProps('title')}
         />
       </Stack>
-
-      <Stack gap="xs">
-        <Group>
-          <Text size="sm">🔮 AI CPM helper ✨</Text>
-          <Tooltip label="Play with the CPM if you want play" ml="sm">
-            <ActionIcon variant="transparent" color="#50baba" size="xs">
-              <InfoFilledIcon />
-            </ActionIcon>
-          </Tooltip>
-        </Group>
-        <Paper shadow="md" p="md" pt="xl" withBorder bg="lightBackground" pos="relative">
-          {cpmToolDisabled && (
-            <Overlay
-              gradient="linear-gradient(145deg, #ffffffaa 0%, #50babaaa 100%)"
-              backgroundOpacity={0.9}
-              blur={3}
-              center
-            >
-              <Stack>
-                {cpmDataLoading && <Loader type="dots" color="brand" />}
-                {!cpmDataLoading && (
-                  <Text size="xl">Fill period and budget to access CPM helper</Text>
-                )}
-              </Stack>
-            </Overlay>
-          )}
-          <Stack gap="xs">
-            <Sparkline
-              h={160}
-              data={cpmDistributionChartData}
-              color="#50baba"
-              strokeWidth={5}
-              curveType="monotone"
-            />
-            <RangeSlider
-              color="#50baba"
-              size="xl"
-              value={cpmSliderRange}
-              onChange={setCpmRange}
-              min={0}
-              minRange={1}
-              max={cpmRangeData[cpmRangeData.length - 1]?.value}
-              marks={cpmRangeData}
-            />
-
-            <Text size="xl" mt="xl">
-              CPM range: {cpmSliderRange[0]} - {cpmSliderRange[1]}
-            </Text>
-            <Group>
-              <RingProgress
-                size={160}
-                thickness={16}
-                sections={[
-                  {
-                    value: (recommendedCPM.count / recommendedCPM.supply) * 100,
-                    color: '#50baba',
-                    tooltip: `CPM range: ${cpmSliderRange[0]} - ${cpmSliderRange[1]} covers ${(
-                      (recommendedCPM.count / recommendedCPM.supply) *
-                      100
-                    ).toFixed(
-                      2
-                    )}% of the total supply matching campaign targeting and creatives formats`
-                  }
-                ]}
-                label={
-                  <Center>
-                    <Text c="#50baba" fw="bolder" ta="center" size="md">
-                      Supply <br />
-                      {((recommendedCPM.count / recommendedCPM.supply) * 100).toFixed(2)}%
-                    </Text>
-                  </Center>
-                }
-              />
-
-              <RingProgress
-                size={160}
-                thickness={16}
-                sections={[
-                  {
-                    value: impressionsCovered > 100 ? 100 : impressionsCovered,
-                    color: '#50baba',
-                    tooltip: `CPM range: ${cpmSliderRange[0]} - ${cpmSliderRange[1]} covers  ${
-                      impressionsCovered > 100 ? 100 : impressionsCovered
-                    }% of the total expected impressions for the selected budged and period of the campaign`
-                  }
-                ]}
-                label={
-                  <Center>
-                    <Text c="#50baba" fw="bolder" ta="center" size="md">
-                      Campaign <br />
-                      {impressionsCovered > 100 ? 100 : impressionsCovered}%
-                    </Text>
-                  </Center>
-                }
-              />
-            </Group>
-          </Stack>
-        </Paper>
-      </Stack>
+      <CPMHelper />
     </Group>
   )
 }
