@@ -313,10 +313,15 @@ const Dashboard = ({ isAdminPanel, accountId }: { isAdminPanel?: boolean; accoun
 
   // NOTE: redirect to get-started page id no campaigns found
   useEffect(() => {
-    if (!accountId && !filteredCampaignData.campaignData.length && !initialDataLoading) {
+    if (
+      !accountId &&
+      !filteredCampaignData.campaignData.length &&
+      !initialDataLoading &&
+      !isAdminPanel
+    ) {
       navigate('/dashboard/get-started', { replace: true })
     }
-  }, [accountId, filteredCampaignData, initialDataLoading, navigate])
+  }, [accountId, filteredCampaignData, initialDataLoading, isAdminPanel, navigate])
 
   useEffect(() => {
     updateAllCampaignsData(true)
