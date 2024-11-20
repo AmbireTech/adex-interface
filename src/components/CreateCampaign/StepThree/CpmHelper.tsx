@@ -1,9 +1,8 @@
-import { SSPsAnalyticsData } from 'types'
+import { SSPsAnalyticsData, CampaignUI } from 'types'
 import useSSPsAnalytics from 'hooks/useCampaignAnalytics/useSSPsAnalytics'
 import { getRecommendedCPMRangeAdvanced, parseRange } from 'helpers/createCampaignHelpers'
 import { useMemo, useState, useEffect } from 'react'
 import { campaignDataToSSPAnalyticsQuery, DAY } from 'helpers'
-import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import {
   ActionIcon,
   Stack,
@@ -41,12 +40,13 @@ const getCMPRangeMarks = (analytics: SSPsAnalyticsData[]) => {
   return cpms
 }
 
-export function CPMHelper() {
-  const {
-    campaign,
-    form: { setFieldValue }
-  } = useCreateCampaignContext()
-
+export function CPMHelper({
+  campaign,
+  onCPMRangeChange
+}: {
+  campaign: CampaignUI
+  onCPMRangeChange: (min: number | string, max: number | string) => void
+}) {
   const { analyticsData, getAnalyticsKeyAndUpdate } = useSSPsAnalytics()
 
   const [analyticsKey, setAnalyticsKey] = useState<
@@ -174,8 +174,7 @@ export function CPMHelper() {
             value={cpmSliderRange}
             onChange={(val) => {
               setCpmRange(val)
-              setFieldValue('cpmPricingBounds.min', cpmRangeData[val[0]]?.label)
-              setFieldValue('cpmPricingBounds.max', cpmRangeData[val[1]]?.label)
+              onCPMRangeChange(cpmRangeData[val[0]]?.label, cpmRangeData[val[1]]?.label)
             }}
             min={0}
             minRange={1}
