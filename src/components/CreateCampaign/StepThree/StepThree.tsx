@@ -185,7 +185,13 @@ const StepThree = () => {
           {...getInputProps('title')}
         />
       </Stack>
-      <CPMHelper campaign={campaign} onCPMRangeChange={() => {}} />
+      <CPMHelper
+        campaign={campaign}
+        onCPMRangeChange={(min, max) => {
+          setFieldValue('cpmPricingBounds.min', min.toString())
+          setFieldValue('cpmPricingBounds.max', max.toString())
+        }}
+      />
     </Group>
   )
 }
