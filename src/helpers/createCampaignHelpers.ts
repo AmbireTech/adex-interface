@@ -6,8 +6,11 @@ import {
   HTMLBannerDimensions,
   SupplyStats,
   SupplyStatsDetails,
-  SSPsAnalyticsData
+  SSPsAnalyticsData,
+  CampaignUI
 } from 'types'
+
+import { parseFromBigNumPrecision } from 'helpers/balances'
 
 export const checkSelectedDevices = (devices: Devices[]) => {
   if (!devices.length) return null
@@ -313,4 +316,33 @@ export const getRecommendedCPMRangeAdvanced = (
     )
 
   return { ...topRanges, supply: analytics.reduce((sum, cur) => sum + cur.count, 0) }
+}
+
+export const campaignToCampaignUI = (campaign: Campaign, currency: string): CampaignUI => {
+  return {
+    ...campaign,
+    devices: ['mobile', 'desktop'],
+    paymentModel: 'cpm',
+    autoUTMChecked: campaign.adUnits.every((adUnit) =>
+      hasUtmCampaign(adUnit.banner?.targetUrl || '')
+    ),
+    asapStartingDate: false,
+    startsAt: new Date(Number(campaign.activeFrom)),
+    endsAt: new Date(Number(campaign.activeTo)),
+    currency,
+    cpmPricingBounds: {
+      min: parseFromBigNumPrecision(
+        BigInt(Number(campaign.pricingBounds.IMPRESSION!.min) * 1000),
+        campaign.outpaceAssetDecimals
+      ).toString(),
+      max: parseFromBigNumPrecision(
+        BigInt(Number(campaign.pricingBounds.IMPRESSION!.max) * 1000),
+        campaign.outpaceAssetDecimals
+      ).toString()
+    },
+    budget: parseFromBigNumPrecision(
+      BigInt(Math.floor(Number(campaign.campaignBudget))),
+      campaign.outpaceAssetDecimals
+    )
+  }
 }
