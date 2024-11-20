@@ -367,7 +367,10 @@ const EditCampaign = ({ campaign, isAdmin }: { campaign: Campaign; isAdmin?: boo
               </Stack>
               <CPMHelper
                 campaign={campaignToCampaignUI(campaign, balanceToken.name)}
-                onCPMRangeChange={() => {}}
+                onCPMRangeChange={(min, max) => {
+                  form.setFieldValue('pricingBounds.IMPRESSION.min', Number(min))
+                  form.setFieldValue('pricingBounds.IMPRESSION.max', Number(max))
+                }}
               />
             </Group>
           </Tabs.Panel>
