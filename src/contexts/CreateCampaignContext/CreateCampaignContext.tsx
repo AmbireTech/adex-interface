@@ -49,7 +49,7 @@ type ReducedCampaign = Omit<
 
 const MIN_CAMPAIGN_BUDGET_VALUE_ADMIN = 20
 const MIN_CAMPAIGN_BUDGET_VALUE = 130
-const MIN_CPM_VALUE = 0.1
+const MIN_CPM_VALUE = 0.01
 const LS_KEY_CREATE_CAMPAIGN = 'createCampaign'
 const LS_KEY_CREATE_CAMPAIGN_STEP = 'createCampaignStep'
 
