@@ -20,7 +20,7 @@ const StepThree = () => {
   )
 
   return (
-    <Group align="top" grow>
+    <Group align="top" wrap="wrap">
       <Stack gap="xl">
         <Stack gap="xs">
           <Text c="secondaryText" size="sm" fw="bold">
@@ -185,7 +185,7 @@ const StepThree = () => {
           {...getInputProps('title')}
         />
       </Stack>
-      <CPMHelper />
+      <CPMHelper campaign={campaign} onCPMRangeChange={() => {}} />
     </Group>
   )
 }

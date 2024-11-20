@@ -23,6 +23,7 @@ import { CAT_GROUPS, CATEGORIES, COUNTRIES, REGION_GROUPS } from 'constants/crea
 import { parseBigNumTokenAmountToDecimal, parseToBigNumPrecision } from 'helpers'
 
 import {
+  campaignToCampaignUI,
   findArrayWithLengthInObjectAsValue,
   getRecommendedCPMRange
 } from 'helpers/createCampaignHelpers'
@@ -39,6 +40,7 @@ import throttle from 'lodash.throttle'
 import { defaultConfirmModalProps } from 'components/common/Modals/CustomConfirmModal'
 import Placements from 'components/CampaignAnalytics/Placements'
 import DefaultCustomAnchor from 'components/common/customAnchor'
+import { CPMHelper } from 'components/CreateCampaign/StepThree/CpmHelper'
 
 type TargetingInputEdit = {
   version: string
@@ -269,99 +271,105 @@ const EditCampaign = ({ campaign, isAdmin }: { campaign: Campaign; isAdmin?: boo
 
         <form onSubmit={form.onSubmit(throttledSbm)}>
           <Tabs.Panel value="budget">
-            <Stack gap="xl">
-              <Stack gap="xs">
-                <Group gap="xs">
-                  <Text color="secondaryText" size="sm" fw="bold">
-                    CPM
-                  </Text>
-                  <Tooltip
-                    label={`Recommended CPM: Min - ${recommendedPaymentBounds.min}; Max - ${recommendedPaymentBounds.max}`}
-                    ml="sm"
-                  >
-                    <ActionIcon variant="transparent" color="secondaryText" size="xs">
-                      <InfoFilledIcon />
-                    </ActionIcon>
-                  </Tooltip>
-                </Group>
-                <Group align="baseline">
-                  <NumberInput
-                    w="196px"
-                    size="md"
-                    placeholder="CPM min"
-                    rightSection={
-                      <Text c="brand" mr="sm" size="sm">
-                        Min
-                      </Text>
-                    }
-                    rightSectionWidth="auto"
-                    name="cpmPricingBoundsMin"
-                    decimalScale={2}
-                    {...form.getInputProps('pricingBounds.IMPRESSION.min')}
-                  />
-                  <NumberInput
-                    w="196px"
-                    size="md"
-                    placeholder="CPM max"
-                    inputWrapperOrder={['input', 'description', 'error']}
-                    rightSection={
-                      <Text color="brand" mr="sm" size="sm">
-                        Max
-                      </Text>
-                    }
-                    rightSectionWidth="md"
-                    name="cpmPricingBoundsMax"
-                    decimalScale={2}
-                    {...form.getInputProps('pricingBounds.IMPRESSION.max')}
-                  />
-                </Group>
-              </Stack>
-
-              <Stack gap="xs">
-                <Text c="secondaryText" size="sm" fw="bold">
-                  Advanced
-                </Text>
-                <Group>
-                  <Checkbox
-                    label="Limit average daily spending"
-                    {...form.getInputProps(
-                      'targetingInput.inputs.advanced.limitDailyAverageSpending',
-                      {
-                        type: 'checkbox'
+            <Group grow align="baseline">
+              <Stack gap="xl">
+                <Stack gap="xs">
+                  <Group gap="xs">
+                    <Text color="secondaryText" size="sm" fw="bold">
+                      CPM
+                    </Text>
+                    <Tooltip
+                      label={`Recommended CPM: Min - ${recommendedPaymentBounds.min}; Max - ${recommendedPaymentBounds.max}`}
+                      ml="sm"
+                    >
+                      <ActionIcon variant="transparent" color="secondaryText" size="xs">
+                        <InfoFilledIcon />
+                      </ActionIcon>
+                    </Tooltip>
+                  </Group>
+                  <Group align="baseline" grow>
+                    <NumberInput
+                      w="196px"
+                      size="md"
+                      placeholder="CPM min"
+                      rightSection={
+                        <Text c="brand" mr="sm" size="sm">
+                          Min
+                        </Text>
                       }
-                    )}
-                  />
-                  <DefaultCustomAnchor
-                    href="https://help.adex.network/hc/en-us/articles/15014607423260-How-to-limit-your-average-daily-spend"
-                    external
-                    c="blue"
-                    size="sm"
-                  >
-                    (learn more)
-                  </DefaultCustomAnchor>
-                </Group>
-                <Group>
-                  <Checkbox
-                    label="Aggressive bidding mode"
-                    {...form.getInputProps('targetingInput.inputs.advanced.aggressiveBidding', {
-                      type: 'checkbox'
-                    })}
-                  />
-                  <DefaultCustomAnchor
-                    href="https://help.adex.network/hc/en-us/articles/16075705207068-What-is-aggressive-bidding"
-                    external
-                    c="blue"
-                    size="sm"
-                  >
-                    (learn more)
-                  </DefaultCustomAnchor>
-                </Group>
-              </Stack>
+                      rightSectionWidth="auto"
+                      name="cpmPricingBoundsMin"
+                      decimalScale={2}
+                      {...form.getInputProps('pricingBounds.IMPRESSION.min')}
+                    />
+                    <NumberInput
+                      w="196px"
+                      size="md"
+                      placeholder="CPM max"
+                      inputWrapperOrder={['input', 'description', 'error']}
+                      rightSection={
+                        <Text color="brand" mr="sm" size="sm">
+                          Max
+                        </Text>
+                      }
+                      rightSectionWidth="md"
+                      name="cpmPricingBoundsMax"
+                      decimalScale={2}
+                      {...form.getInputProps('pricingBounds.IMPRESSION.max')}
+                    />
+                  </Group>
+                </Stack>
 
-              <Button disabled={!form.isDirty()} size="lg" type="submit" maw={200}>
-                Save Changes
-              </Button>
-            </Stack>
+                <Stack gap="xs">
+                  <Text c="secondaryText" size="sm" fw="bold">
+                    Advanced
+                  </Text>
+                  <Group>
+                    <Checkbox
+                      label="Limit average daily spending"
+                      {...form.getInputProps(
+                        'targetingInput.inputs.advanced.limitDailyAverageSpending',
+                        {
+                          type: 'checkbox'
+                        }
+                      )}
+                    />
+                    <DefaultCustomAnchor
+                      href="https://help.adex.network/hc/en-us/articles/15014607423260-How-to-limit-your-average-daily-spend"
+                      external
+                      c="blue"
+                      size="sm"
+                    >
+                      (learn more)
+                    </DefaultCustomAnchor>
+                  </Group>
+                  <Group>
+                    <Checkbox
+                      label="Aggressive bidding mode"
+                      {...form.getInputProps('targetingInput.inputs.advanced.aggressiveBidding', {
+                        type: 'checkbox'
+                      })}
+                    />
+                    <DefaultCustomAnchor
+                      href="https://help.adex.network/hc/en-us/articles/16075705207068-What-is-aggressive-bidding"
+                      external
+                      c="blue"
+                      size="sm"
+                    >
+                      (learn more)
+                    </DefaultCustomAnchor>
+                  </Group>
+                </Stack>
+
+                <Button disabled={!form.isDirty()} size="lg" type="submit" maw={200}>
+                  Save Changes
+                </Button>
+              </Stack>
+              <CPMHelper
+                campaign={campaignToCampaignUI(campaign, balanceToken.name)}
+                onCPMRangeChange={() => {}}
+              />
+            </Group>
           </Tabs.Panel>
 
           <Tabs.Panel value="targeting">
