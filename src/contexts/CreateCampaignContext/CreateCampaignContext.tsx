@@ -333,7 +333,7 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
             operator: 'in'
           }
         }),
-        limit: 150,
+        limit: 180,
         groupBy: 'format'
       })
       setSSPAnalKey(key?.key)
