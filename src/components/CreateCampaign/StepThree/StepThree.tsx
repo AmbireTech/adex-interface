@@ -1,4 +1,14 @@
-import { Alert, Checkbox, Stack, Group, NumberInput, Radio, Text, TextInput } from '@mantine/core'
+import {
+  Alert,
+  Checkbox,
+  Stack,
+  Group,
+  NumberInput,
+  Radio,
+  Text,
+  TextInput,
+  SimpleGrid
+} from '@mantine/core'
 import { useMemo } from 'react'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import InfoAlertMessage from 'components/common/InfoAlertMessage'
@@ -20,7 +30,7 @@ const StepThree = () => {
   )
 
   return (
-    <Group align="top" wrap="wrap">
+    <SimpleGrid cols={{ base: 1, lg: 2 }}>
       <Stack gap="xl">
         <Stack gap="xs">
           <Text c="secondaryText" size="sm" fw="bold">
@@ -192,7 +202,7 @@ const StepThree = () => {
           setFieldValue('cpmPricingBounds.max', max.toString())
         }}
       />
-    </Group>
+    </SimpleGrid>
   )
 }
 
