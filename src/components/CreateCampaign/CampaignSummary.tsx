@@ -31,7 +31,8 @@ const CampaignSummary = ({ onLaunchClick }: { onLaunchClick: () => void }) => {
     formattedLocs,
     adFormats,
     campaignBudgetFormatted,
-    advancedTargeInput
+    advancedTargeInput,
+    estimatedDailyImpressions
   } = useCreateCampaignData()
 
   const loading = useMemo(() => !allowedBannerSizes.length, [allowedBannerSizes.length])
@@ -90,14 +91,11 @@ const CampaignSummary = ({ onLaunchClick }: { onLaunchClick: () => void }) => {
         noBorder
         mb="xs"
       />
-
-      {/* Temporary disabled */}
-      {/* <Flex justify="space-between" className={classes.bg} p="lg">
-        <Text c="secondaryText" fw="bold">
-          Estimated Daily Impressions
-        </Text>
-        <Text c="secondaryText">0</Text>
-      </Flex> */}
+      <CampaignDetailsRow
+        title="Estimated Daily Impressions"
+        value={estimatedDailyImpressions}
+        textSize="sm"
+      />
       <Stack align="stretch" justify="space-between" gap="sm" mt="xl" px="md">
         {step === 3 ? (
           <Button onClick={onLaunchClick} size="lg" variant="filled">
