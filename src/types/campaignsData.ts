@@ -152,6 +152,7 @@ export type SSPsAnalyticsDataKeys = {
   country?: { values?: string[]; operator?: Operator }
   format?: string[]
   ssp?: SSPs
+  bidfloor?: string
 }
 
 export type SSPsAnalyticsDataQuery = SSPsAnalyticsDataKeys & {

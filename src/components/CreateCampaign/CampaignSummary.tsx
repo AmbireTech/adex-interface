@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import { Button, Group, Stack, Text } from '@mantine/core'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import LeftArrowIcon from 'resources/icons/LeftArrow'
@@ -20,7 +21,8 @@ const CampaignSummary = ({ onLaunchClick }: { onLaunchClick: () => void }) => {
     saveToDraftCampaign,
     step,
     nextStep,
-    prevStep
+    prevStep,
+    allowedBannerSizes
   } = useCreateCampaignContext()
   const {
     formattedSelectedDevice,
@@ -29,8 +31,11 @@ const CampaignSummary = ({ onLaunchClick }: { onLaunchClick: () => void }) => {
     formattedLocs,
     adFormats,
     campaignBudgetFormatted,
-    advancedTargeInput
+    advancedTargeInput,
+    estimatedDailyImpressions
   } = useCreateCampaignData()
+
+  const loading = useMemo(() => !allowedBannerSizes.length, [allowedBannerSizes.length])
 
   return (
     <Stack gap="xs">
@@ -86,21 +91,18 @@ const CampaignSummary = ({ onLaunchClick }: { onLaunchClick: () => void }) => {
         noBorder
         mb="xs"
       />
-
-      {/* Temporary disabled */}
-      {/* <Flex justify="space-between" className={classes.bg} p="lg">
-        <Text c="secondaryText" fw="bold">
-          Estimated Daily Impressions
-        </Text>
-        <Text c="secondaryText">0</Text>
-      </Flex> */}
+      <CampaignDetailsRow
+        title="Estimated Daily Impressions"
+        value={estimatedDailyImpressions}
+        textSize="sm"
+      />
       <Stack align="stretch" justify="space-between" gap="sm" mt="xl" px="md">
         {step === 3 ? (
           <Button onClick={onLaunchClick} size="lg" variant="filled">
             Launch Campaign
           </Button>
         ) : (
-          <Button size="lg" variant="filled" onClick={nextStep}>
+          <Button size="lg" variant="filled" onClick={nextStep} loading={loading}>
             Next Step
           </Button>
         )}

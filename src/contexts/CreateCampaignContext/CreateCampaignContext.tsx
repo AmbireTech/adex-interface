@@ -14,14 +14,11 @@ import useAccount from 'hooks/useAccount'
 import { useAdExApi } from 'hooks/useAdexServices'
 import {
   addUrlUtmTracking,
+  campaignToCampaignUI,
   // deepEqual,
   hasUtmCampaign
 } from 'helpers/createCampaignHelpers'
-import {
-  parseBigNumTokenAmountToDecimal,
-  parseFromBigNumPrecision,
-  parseToBigNumPrecision
-} from 'helpers/balances'
+import { parseBigNumTokenAmountToDecimal, parseToBigNumPrecision } from 'helpers/balances'
 import { AdUnit, Campaign, CampaignStatus } from 'adex-common'
 import { formatDateTime, MINUTE, WEEK, DAY, removeOptionalEmptyStringProps } from 'helpers'
 import { hasLength, isNotEmpty, useForm } from '@mantine/form'
@@ -49,7 +46,7 @@ type ReducedCampaign = Omit<
 
 const MIN_CAMPAIGN_BUDGET_VALUE_ADMIN = 20
 const MIN_CAMPAIGN_BUDGET_VALUE = 130
-const MIN_CPM_VALUE = 0.1
+const MIN_CPM_VALUE = 0.01
 const LS_KEY_CREATE_CAMPAIGN = 'createCampaign'
 const LS_KEY_CREATE_CAMPAIGN_STEP = 'createCampaignStep'
 
@@ -336,7 +333,7 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
             operator: 'in'
           }
         }),
-        limit: 150,
+        limit: 180,
         groupBy: 'format'
       })
       setSSPAnalKey(key?.key)
@@ -433,7 +430,6 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
 
   const updateCampaignFromDraft = useCallback(
     (draftCampaign: Campaign, isClone?: boolean) => {
-      console.log({ draftCampaign })
       const activeFrom: bigint = isClone
         ? BigInt(Date.now() + 10 * MINUTE)
         : BigInt(Math.max(Number(draftCampaign.activeFrom || 0), Date.now()))
@@ -444,7 +440,7 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
           : activeFrom + BigInt(30 * DAY)
 
       const mappedDraftCampaign: CampaignUI = {
-        ...draftCampaign,
+        ...campaignToCampaignUI(draftCampaign, balanceToken.name),
         activeFrom,
         activeTo,
         devices: ['mobile', 'desktop'],
@@ -455,21 +451,6 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
         asapStartingDate: false,
         startsAt: new Date(Number(activeFrom)),
         endsAt: new Date(Number(activeTo)),
-        currency: balanceToken.name,
-        cpmPricingBounds: {
-          min: parseFromBigNumPrecision(
-            BigInt(Number(draftCampaign.pricingBounds.IMPRESSION!.min) * 1000),
-            draftCampaign.outpaceAssetDecimals
-          ).toString(),
-          max: parseFromBigNumPrecision(
-            BigInt(Number(draftCampaign.pricingBounds.IMPRESSION!.max) * 1000),
-            draftCampaign.outpaceAssetDecimals
-          ).toString()
-        },
-        budget: parseFromBigNumPrecision(
-          BigInt(Math.floor(Number(draftCampaign.campaignBudget))),
-          draftCampaign.outpaceAssetDecimals
-        ),
         ...(isClone && {
           id: '',
           title: `Copy - ${draftCampaign.title}`,

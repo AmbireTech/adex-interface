@@ -26,6 +26,7 @@ import MultiSelectAndRadioButtons from 'components/CreateCampaign/StepTwo/MultiS
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import GlobeIcon from 'resources/icons/Globe'
 import InvoiceIcon from 'resources/icons/Invoice'
+import { parseRange } from 'helpers/createCampaignHelpers'
 
 const sspsData: Array<{ value: SSPs | ''; label: string }> = [
   { value: '', label: 'All SSPs' },
@@ -74,6 +75,11 @@ const mapSegmentLabel = (
     case 'placement':
       label = getEnumKeyByValue(RequestStatPlacement, segment)
       break
+    case 'bidfloor': {
+      const range = parseRange(segment.toString())
+      label = `${range.min} - ${range.max}`
+      break
+    }
 
     default:
       break

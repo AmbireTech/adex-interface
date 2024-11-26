@@ -1,12 +1,15 @@
 import { AppShell, Burger, Container, Flex } from '@mantine/core'
 import SideNav from 'components/SideNav'
 import TopBar from 'components/TopBar'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Outlet } from 'react-router-dom'
 import { SIDE_BAR_WIDTH } from 'themes/base'
 
 function UserPanel() {
   const [opened, setOpened] = useState(false)
+  useEffect(() => {
+    document.title = 'AdEx DSP'
+  }, [])
 
   // husky test
 
