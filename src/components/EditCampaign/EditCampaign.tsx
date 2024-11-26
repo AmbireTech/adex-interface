@@ -8,7 +8,8 @@ import {
   Checkbox,
   NumberInput,
   Paper,
-  Tabs
+  Tabs,
+  SimpleGrid
 } from '@mantine/core'
 import { useForm } from '@mantine/form'
 import { modals } from '@mantine/modals'
@@ -271,11 +272,11 @@ const EditCampaign = ({ campaign, isAdmin }: { campaign: Campaign; isAdmin?: boo
 
         <form onSubmit={form.onSubmit(throttledSbm)}>
           <Tabs.Panel value="budget">
-            <Group grow align="baseline">
-              <Stack gap="xl">
+            <SimpleGrid cols={{ base: 1, lg: 2 }}>
+              <Stack gap="xl" w="100%">
                 <Stack gap="xs">
                   <Group gap="xs">
-                    <Text color="secondaryText" size="sm" fw="bold">
+                    <Text c="secondaryText" size="sm" fw="bold">
                       CPM
                     </Text>
                     <Tooltip
@@ -372,7 +373,7 @@ const EditCampaign = ({ campaign, isAdmin }: { campaign: Campaign; isAdmin?: boo
                   form.setFieldValue('pricingBounds.IMPRESSION.max', Number(max))
                 }}
               />
-            </Group>
+            </SimpleGrid>
           </Tabs.Panel>
 
           <Tabs.Panel value="targeting">
