@@ -140,7 +140,12 @@ export function CPMHelper({
     <Stack gap="xs">
       <Group>
         <Text size="sm">🔮 AI CPM helper ✨</Text>
-        <Tooltip label="Play with the CPM if you want play" ml="sm">
+        <Tooltip
+          multiline
+          w={220}
+          label="This tool will help you select the optimal CPM for your specific campaign. Everything is considered - selected placements, devices, countries, categories and creatives formats"
+          ml="sm"
+        >
           <ActionIcon variant="transparent" color="info" size="xs">
             <InfoFilledIcon />
           </ActionIcon>
