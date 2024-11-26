@@ -190,9 +190,8 @@ export function CPMHelper({
           />
           <Space h="xl" />
           <Text>
-            {' '}
-            Expected impressions: Min{' '}
-            <NumberFormatter value={estimatedMinImpressions} thousandSeparator /> - Max:{' '}
+            {'Expected impressions: Min: '}
+            <NumberFormatter value={estimatedMinImpressions} thousandSeparator /> {'- Max: '}
             <NumberFormatter value={estimatedMaxImpressions} thousandSeparator />
           </Text>
           <Group>
