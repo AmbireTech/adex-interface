@@ -7,6 +7,8 @@ import GoBack from 'components/common/GoBack/GoBack'
 import { StickyPanel } from 'components/TopBar/TopBarStickyPanel'
 import { AdminBadge } from 'components/common/AdminBadge'
 import { useCampaignsData } from 'hooks/useCampaignsData'
+import SSPsAnalytics from 'components/AdminPanel/SSPsAnalytics'
+import { campaignDataToSSPAnalyticsQuery } from 'helpers'
 import Placements from './Placements'
 import Creatives from './Creatives'
 import SSPs from './SSPs'
@@ -70,6 +72,7 @@ const CampaignAnalytics = ({ isAdminPanel = false }: { isAdminPanel?: boolean })
             <Tabs.Tab value="country">REGIONS</Tabs.Tab>
             <Tabs.Tab value="adUnit">CREATIVES</Tabs.Tab>
             {isAdminPanel && <Tabs.Tab value="ssp">SSPs</Tabs.Tab>}
+            {isAdminPanel && <Tabs.Tab value="sspAnalytics">SSPs request analytics</Tabs.Tab>}
           </Tabs.List>
         </Flex>
         <Tabs.Panel value="timeframe">
@@ -86,6 +89,9 @@ const CampaignAnalytics = ({ isAdminPanel = false }: { isAdminPanel?: boolean })
         </Tabs.Panel>
         <Tabs.Panel value="ssp">
           <SSPs campaignId={id} forAdmin={isAdminPanel} />
+        </Tabs.Panel>
+        <Tabs.Panel value="sspAnalytics">
+          <SSPsAnalytics {...(campaign ? campaignDataToSSPAnalyticsQuery(campaign) : {})} />
         </Tabs.Panel>
       </Tabs>
     </Container>

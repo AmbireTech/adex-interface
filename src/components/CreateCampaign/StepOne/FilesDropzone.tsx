@@ -8,7 +8,7 @@ import BlockIcon from 'resources/icons/Block'
 import { FileWithPath } from 'types'
 import IncludeIcon from 'resources/icons/Include'
 
-const FilesDropzone = () => {
+const FilesDropzone = ({ loading }: { loading: boolean }) => {
   const { onDrop, isLoading } = useDropzone()
   const [rejectedFiles, setRejectedFiles] = useState<FileRejection[]>([])
   const handleOnDrop = useCallback(
@@ -23,7 +23,7 @@ const FilesDropzone = () => {
       acceptColor="success"
       rejectColor="warning"
       variant="light"
-      loading={isLoading}
+      loading={loading || isLoading}
       onDrop={handleOnDrop}
       onReject={(files: FileRejection[]) => {
         setRejectedFiles(files)

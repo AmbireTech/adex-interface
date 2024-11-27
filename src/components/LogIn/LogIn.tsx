@@ -46,6 +46,10 @@ function LogIn() {
   const navigate = useNavigate()
 
   useEffect(() => {
+    document.title = 'AdEx Login'
+  }, [])
+
+  useEffect(() => {
     if (authenticated) navigate('/dashboard', { replace: true })
   }, [authenticated, navigate])
 

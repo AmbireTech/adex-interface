@@ -40,7 +40,8 @@ const Regions = ({ forAdmin, campaignId }: { forAdmin: boolean; campaignId: stri
       campaignMappedAnalytics?.map((item) => ({
         id: item.segment,
         columns: [
-          { value: CountryData.get(item.segment)?.name },
+          // NOTE: fix backend/validator bug where counties can be lower case
+          { value: CountryData.get(item.segment.toUpperCase())?.name },
           {
             value: item.paid / paid,
             element: `${((item.paid / paid) * 100).toFixed(2)} %`

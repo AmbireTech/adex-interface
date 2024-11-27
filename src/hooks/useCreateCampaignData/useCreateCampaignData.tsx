@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { Flex, Text, Stack } from '@mantine/core'
+import { Flex, Text, Stack, NumberFormatter } from '@mantine/core'
 import { checkSelectedDevices, findDuplicates } from 'helpers/createCampaignHelpers'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import DesktopIcon from 'resources/icons/Desktop'
@@ -10,6 +10,7 @@ import ImageUrlInput from 'components/CreateCampaign/StepOne/ImageUrlInput'
 import RangeText from 'components/common/RangeText'
 import dayjs from 'dayjs'
 import CatsLocsFormatted from 'components/CampaignDetails/CatsLocsFormatted'
+import { DAY } from 'helpers'
 
 const useCreateCampaignData = () => {
   const {
@@ -30,7 +31,9 @@ const useCreateCampaignData = () => {
       budget,
       title,
       startsAt,
-      endsAt
+      endsAt,
+      activeFrom,
+      activeTo
     }
   } = useCreateCampaignContext()
 
@@ -133,6 +136,25 @@ const useCreateCampaignData = () => {
     [adUnits]
   )
 
+  const estimatedDailyImpressions = useMemo(() => {
+    const estimatedMinImpressions = Math.floor(
+      (budget / (Number(cpmPricingBounds.max) || 0.01)) * 1000
+    )
+    const estimatedMaxImpressions = Math.floor(
+      (budget / (Number(cpmPricingBounds.min) || 0.01)) * 1000
+    )
+    const campaignDays = Number(activeTo - activeFrom) / DAY
+    const min = (estimatedMinImpressions / campaignDays).toFixed(0)
+    const max = (estimatedMaxImpressions / campaignDays).toFixed(0)
+
+    return (
+      <Stack gap={0} align="end" c="attention" fw="bold">
+        <NumberFormatter prefix="min: " value={min} thousandSeparator />
+        <NumberFormatter prefix="max: " value={max} thousandSeparator />
+      </Stack>
+    )
+  }, [activeFrom, activeTo, budget, cpmPricingBounds.max, cpmPricingBounds.min])
+
   return {
     formattedSelectedDevice,
     priceBoundsFormatted,
@@ -145,7 +167,8 @@ const useCreateCampaignData = () => {
     adUnitsFormatted,
     campaignPeriodFormatted,
     uniqueSizesWithCount,
-    formattedSelectedPlacement
+    formattedSelectedPlacement,
+    estimatedDailyImpressions
   }
 }
 

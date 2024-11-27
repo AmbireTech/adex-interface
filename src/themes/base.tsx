@@ -166,7 +166,7 @@ const themeOverride: MantineThemeOverride = createTheme({
               : '',
             svg: {
               color: custom ? theme.colors[color || theme.primaryColor][DEFAULT_PRIMARY_SHADE] : '',
-              marginTop: custom ? theme.spacing.md : '',
+              // marginTop: custom ? theme.spacing.md : '',
               width: rem(30),
               height: rem(30)
             }

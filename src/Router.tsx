@@ -12,7 +12,11 @@ import useAccount from 'hooks/useAccount'
 import Deposit from 'components/Deposit'
 import CreateCampaign from 'components/CreateCampaign'
 import { CreateCampaignContextProvider } from 'contexts/CreateCampaignContext/CreateCampaignContext'
-import { CampaignsDataProvider, CampaignsAnalyticsProvider } from 'contexts/CampaignsContext'
+import {
+  CampaignsDataProvider,
+  CampaignsAnalyticsProvider,
+  SSPsAnalyticsProvider
+} from 'contexts/CampaignsContext'
 import NotFound404 from 'components/404/404'
 // import AdminPanel from './admin/Admin'
 import { AccountDetails } from 'components/AdminPanel/AccountDetails'
@@ -78,9 +82,11 @@ export const router = createBrowserRouter(
         <RequireAuth>
           <CampaignsDataProvider type="user">
             <CampaignsAnalyticsProvider>
-              <CreateCampaignContextProvider>
-                <UserPanel />
-              </CreateCampaignContextProvider>
+              <SSPsAnalyticsProvider>
+                <CreateCampaignContextProvider>
+                  <UserPanel />
+                </CreateCampaignContextProvider>
+              </SSPsAnalyticsProvider>
             </CampaignsAnalyticsProvider>
           </CampaignsDataProvider>
         </RequireAuth>

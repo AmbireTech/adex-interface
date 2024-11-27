@@ -1,8 +1,20 @@
 import { useCallback, useMemo, useState } from 'react'
-import { MantineTheme, MultiSelect, Radio, Stack, Text, getPrimaryShade } from '@mantine/core'
+import {
+  MantineTheme,
+  MultiSelect,
+  SegmentedControl,
+  Stack,
+  getPrimaryShade,
+  Center,
+  ThemeIcon,
+  MantineSize
+} from '@mantine/core'
 import { TargetingInputApplyProp } from 'adex-common/dist/types'
 import { useColorScheme } from '@mantine/hooks'
 import { createStyles } from '@mantine/emotion'
+import CheckMarkIcon from 'resources/icons/CheckMark'
+import IncludeIcon from 'resources/icons/Include'
+import ExcludeIcon from 'resources/icons/Exclude'
 
 type MultiSelectAndRadioButtonsProps = {
   multiSelectData: { value: string; label: string }[]
@@ -12,25 +24,21 @@ type MultiSelectAndRadioButtonsProps = {
   onCategoriesChange: (selectedRadio: TargetingInputApplyProp, categories: string[]) => void
   groups: { [key: string]: string[] }
   error?: string
+  size?: MantineSize
 }
 
 const useStyles = createStyles(
-  (
-    theme: MantineTheme,
-    { selectedRadio, error }: { selectedRadio: TargetingInputApplyProp; error: boolean }
-  ) => {
+  (theme: MantineTheme, { color, error }: { color: string; error: boolean }) => {
     const colorScheme = useColorScheme()
     const primaryShade = getPrimaryShade(theme, colorScheme)
+    const stylesColor = theme.colors[color][primaryShade]
 
     return {
       input: {
         textTransform: 'capitalize',
         ...(!error
           ? {
-              borderColor:
-                selectedRadio === 'nin'
-                  ? theme.colors.warning[primaryShade]
-                  : theme.colors.brand[primaryShade]
+              borderColor: stylesColor
             }
           : {}),
         backgroundColor: theme.colors.mainBackground[primaryShade],
@@ -39,14 +47,8 @@ const useStyles = createStyles(
       pill: {
         textTransform: 'capitalize',
         border: '1px solid',
-        borderColor:
-          selectedRadio === 'nin'
-            ? theme.colors.warning[primaryShade]
-            : theme.colors.brand[primaryShade],
-        color:
-          selectedRadio === 'nin'
-            ? theme.colors.warning[primaryShade]
-            : theme.colors.brand[primaryShade]
+        borderColor: stylesColor,
+        color: stylesColor
       }
     }
   }
@@ -59,7 +61,8 @@ const MultiSelectAndRadioButtons = ({
   defaultRadioValue = 'all',
   onCategoriesChange,
   groups,
-  error
+  error,
+  size = 'md'
 }: MultiSelectAndRadioButtonsProps) => {
   const extendedData = useMemo(() => {
     const groupsArr = [
@@ -82,7 +85,21 @@ const MultiSelectAndRadioButtons = ({
   const data = useMemo(() => [...extendedData], [extendedData])
   const [selectedRadio, setSelectedRadio] = useState<TargetingInputApplyProp>(defaultRadioValue)
   const [selectedValue, setSelectedValue] = useState<string[]>(defaultSelectValue)
-  const { classes } = useStyles({ selectedRadio, error: !!error })
+
+  const color = useMemo(() => {
+    switch (selectedRadio) {
+      case 'all':
+        return 'success'
+      case 'nin':
+        return 'warning'
+      case 'in':
+        return 'brand'
+      default:
+        return 'grey'
+    }
+  }, [selectedRadio])
+
+  const { classes } = useStyles({ color, error: !!error })
 
   const handleRadioChange = useCallback(
     (value: string) => {
@@ -118,33 +135,56 @@ const MultiSelectAndRadioButtons = ({
     [groups, onCategoriesChange, selectedRadio]
   )
 
-  const labelText = useMemo(() => {
-    if (selectedRadio === 'in') return `Select ${label}`
-    if (selectedRadio === 'nin') return `Select ${label} to exclude`
-    if (selectedRadio === 'all') return 'All selected'
-    return ''
-  }, [selectedRadio, label])
-
   return (
-    <>
-      <Radio.Group value={selectedRadio} onChange={handleRadioChange} mb="md">
-        <Stack gap="xs">
-          <Radio label="Select All" value="all" />
-          <Radio label={`Select ${label}`} value="in" />
-          <Radio label={`Select All ${label} Except`} value="nin" />
-        </Stack>
-      </Radio.Group>
+    <Stack gap="xs">
+      <SegmentedControl
+        color={color}
+        size={size}
+        value={selectedRadio}
+        onChange={handleRadioChange}
+        withItemsBorders={false}
+        data={[
+          {
+            label: (
+              <Center style={{ gap: 10 }}>
+                <ThemeIcon size="sm" variant="transparent" c="inherit">
+                  <CheckMarkIcon />
+                </ThemeIcon>
+                <span>All Selected</span>
+              </Center>
+            ),
+            value: 'all'
+          },
+          {
+            label: (
+              <Center style={{ gap: 10 }}>
+                <ThemeIcon size="xs" variant="transparent" c="inherit">
+                  <IncludeIcon />
+                </ThemeIcon>
+                <span>Include Selected</span>
+              </Center>
+            ),
+            value: 'in'
+          },
+          {
+            label: (
+              <Center style={{ gap: 10 }}>
+                <ThemeIcon size="xs" variant="transparent" c="inherit">
+                  <ExcludeIcon />
+                </ThemeIcon>
+                <span>Exclude Selected</span>
+              </Center>
+            ),
+            value: 'nin'
+          }
+        ]}
+      />
       <MultiSelect
-        label={
-          <Text c="secondaryText" size="sm" fw="bold" mb="xs">
-            {labelText}
-          </Text>
-        }
         clearable
         searchable
         variant="filled"
-        size="lg"
-        radius="lg"
+        size={size}
+        radius="md"
         // NOTE: just visually show the nothing but keeps the value in case of change - will not need to select again
         value={selectedRadio === 'all' ? [] : selectedValue}
         disabled={selectedRadio === 'all'}
@@ -157,7 +197,7 @@ const MultiSelectAndRadioButtons = ({
           pill: classes.pill
         }}
       />
-    </>
+    </Stack>
   )
 }
 
