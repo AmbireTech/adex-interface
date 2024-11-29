@@ -145,7 +145,8 @@ const SSPsAnalytics = ({
           format: selectedFormats
         }),
         limit: 666,
-        groupBy
+        groupBy,
+        showBidCount: true
       })
       setAnalyticsKey(key)
       console.log('key', key)
@@ -171,7 +172,8 @@ const SSPsAnalytics = ({
   const data: { elements: DataElement[]; totalRequests: number } = useMemo(() => {
     return {
       elements:
-        analytics?.data.map(({ count, value }) => {
+        analytics?.data.map(({ count, value, bids, imps }) => {
+          const bidsToImpressionRation = ((imps || 0) / (bids || 1)) * 100
           return {
             id: value.toString() + count.toString(),
             columns: [
@@ -179,7 +181,10 @@ const SSPsAnalytics = ({
                 value: value.toString(),
                 element: mapSegmentLabel(groupBy, value).label
               },
-              { value: count, element: <NumberFormatter value={count} thousandSeparator /> }
+              { value: count, element: <NumberFormatter value={count} thousandSeparator /> },
+              { value: bids, element: <NumberFormatter value={bids} thousandSeparator /> },
+              { value: imps, element: <NumberFormatter value={imps} thousandSeparator /> },
+              { value: bidsToImpressionRation, element: `${bidsToImpressionRation.toFixed(2)} %` }
             ]
           }
         }) || [],
@@ -327,7 +332,13 @@ const SSPsAnalytics = ({
       <Stack>
         <CustomTable
           pageSize={10}
-          headings={[groupBy?.toString() || 'data', 'count']}
+          headings={[
+            groupBy?.toString() || 'data',
+            'slots',
+            'bids',
+            'impressions',
+            'bids success rate'
+          ]}
           data={data.elements}
           loading={loading}
         />
