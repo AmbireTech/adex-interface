@@ -269,7 +269,7 @@ const EditCampaign = ({ campaign, isAdmin }: { campaign: Campaign; isAdmin?: boo
 
         <form onSubmit={form.onSubmit(throttledSbm)}>
           <Tabs.Panel value="budget">
-            <SimpleGrid cols={{ base: 1, lg: 2 }}>
+            <SimpleGrid cols={{ base: 1, xl: 2 }}>
               <Stack gap="xl" w="100%">
                 <Stack gap="xs">
                   <Group gap="xs">

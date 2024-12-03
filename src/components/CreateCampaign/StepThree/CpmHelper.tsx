@@ -10,13 +10,15 @@ import {
   Text,
   Tooltip,
   RangeSlider,
-  RingProgress,
+  // RingProgress,
   Paper,
   Center,
   Overlay,
   Loader,
   Space,
-  NumberFormatter
+  NumberFormatter,
+  SemiCircleProgress,
+  Divider
 } from '@mantine/core'
 import InfoFilledIcon from 'resources/icons/InfoFilled'
 import { Sparkline } from '@mantine/charts'
@@ -37,9 +39,9 @@ const getCMPRangeMarks = (analytics: SSPsAnalyticsData[]) => {
       return self.indexOf(item) === pos
     })
     .map((x, i) => {
-      console.log({ x })
+      const price = x * MAGIC_NUMBER
       return {
-        label: (x * MAGIC_NUMBER).toPrecision(2),
+        label: price.toPrecision(price < 100 ? 2 : 3),
         value: i
       }
     })
@@ -95,8 +97,6 @@ export function CPMHelper({
     [analytics?.data, cpmSliderRange, cpmRangeData]
   )
 
-  // console.log({ cpmData })
-
   const estimatedMaxImpressions = useMemo(() => {
     const totalImps = Math.floor(
       (campaign.budget / (Number(campaign.cpmPricingBounds.min) || 0.1)) * 1000
@@ -119,7 +119,7 @@ export function CPMHelper({
   const impressionsCovered = useMemo(() => {
     const dailySupply =
       (cpmData.count / 2) *
-      ((cpmData.imps || 0) / (cpmData.bids || 1) || EXPECTED_WINNING_BIDS_RATE)
+      Math.max((cpmData.imps || 0) / (cpmData.bids || 1), EXPECTED_WINNING_BIDS_RATE)
     const campaignDays = Number(campaign.activeTo - campaign.activeFrom) / DAY
     const dailyImpressions = estimatedMaxImpressions / campaignDays
     const percentCovered = Number(((dailySupply / dailyImpressions) * 100).toFixed(2))
@@ -182,11 +182,14 @@ export function CPMHelper({
         <Stack gap="xs" justify="stretch">
           <Text>Supply CPM distribution</Text>
           <Sparkline
+            px={6} // TODO:  Magic atm to match the slider fix it with proper theme prop
             h={180}
             data={cpmDistributionChartData}
+            // data={[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17]}
             color="info"
             strokeWidth={5}
-            curveType="monotone"
+            curveType="stepAfter"
+            fillOpacity={0.69}
           />
           <Space h="xl" />
           <RangeSlider
@@ -195,7 +198,6 @@ export function CPMHelper({
             thumbSize={25}
             value={cpmSliderRange}
             onChange={(val) => {
-              console.log({ val })
               setCpmRange(val)
               onCPMRangeChange(cpmRangeData[val[0]]?.label, cpmRangeData[val[1]]?.label)
             }}
@@ -208,12 +210,8 @@ export function CPMHelper({
             labelAlwaysOn
           />
           <Space h="xl" />
-          <Text>
-            {'Expected impressions: Min: '}
-            <NumberFormatter value={estimatedMinImpressions} thousandSeparator /> {'- Max: '}
-            <NumberFormatter value={estimatedMaxImpressions} thousandSeparator />
-          </Text>
-          <Group>
+
+          {/* <Group>
             <RingProgress
               size={200}
               thickness={16}
@@ -256,8 +254,81 @@ export function CPMHelper({
                   </Text>
                 </Center>
               }
-            />
+            /> */}
+          <Group>
+            <Stack gap={0}>
+              <Tooltip
+                label={`CPM range: ${cpmSliderRange[0]} - ${
+                  cpmSliderRange[1]
+                } covers ${supplyCovered.toFixed(
+                  2
+                )}% of the total supply matching campaign targeting and creatives formats`}
+              >
+                <SemiCircleProgress
+                  size={200}
+                  thickness={16}
+                  value={supplyCovered}
+                  filledSegmentColor="info"
+                  // emptySegmentColor="brandDarker"
+                  labelPosition="bottom"
+                  // sections={[
+                  //   {
+                  //     value: supplyCovered,
+                  //     color: 'info',
+                  //     tooltip: `CPM range: ${cpmSliderRange[0]} - ${
+                  //       cpmSliderRange[1]
+                  //     } covers ${supplyCovered.toFixed(
+                  //       2
+                  //     )}% of the total supply matching campaign targeting and creatives formats`
+                  //   }
+                  // ]}
+                  label={
+                    <Center>
+                      <Text c="info" fw="bolder" ta="center" size="md">
+                        Supply <br />
+                        {supplyCovered.toFixed(2)}%
+                      </Text>
+                    </Center>
+                  }
+                />
+              </Tooltip>
+              <Divider size={0} label="coverage" />
+              <Tooltip
+                label={`CPM range: ${cpmSliderRange[0]} - ${cpmSliderRange[1]} covers  ${impressionsCovered}% of the total expected maximum impressions for the selected budged and period of the campaign`}
+              >
+                <SemiCircleProgress
+                  size={200}
+                  thickness={16}
+                  value={impressionsCovered}
+                  orientation="down"
+                  filledSegmentColor="success"
+                  labelPosition="bottom"
+                  // sections={[
+                  //   {
+                  //     value: impressionsCovered,
+                  //     color: 'info',
+                  //     tooltip: `CPM range: ${cpmSliderRange[0]} - ${cpmSliderRange[1]} covers  ${impressionsCovered}% of the total expected maximum impressions for the selected budged and period of the campaign`
+                  //   }
+                  // ]}
+                  label={
+                    <Center>
+                      <Text c="success" fw="bolder" ta="center" size="md">
+                        Campaign <br />
+                        {impressionsCovered}%
+                      </Text>
+                    </Center>
+                  }
+                />
+              </Tooltip>
+            </Stack>
+            <Text>
+              {'Expected impressions: Min: '}
+              <br />
+              <NumberFormatter value={estimatedMinImpressions} thousandSeparator /> {'- Max: '}
+              <NumberFormatter value={estimatedMaxImpressions} thousandSeparator />
+            </Text>
           </Group>
+          {/* </Group> */}
         </Stack>
       </Paper>
     </Stack>

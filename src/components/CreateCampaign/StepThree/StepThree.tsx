@@ -30,7 +30,7 @@ const StepThree = () => {
   )
 
   return (
-    <SimpleGrid cols={{ base: 1, lg: 2 }}>
+    <SimpleGrid cols={{ base: 1, xl: 2 }}>
       <Stack gap="xl">
         <Stack gap="xs">
           <Text c="secondaryText" size="sm" fw="bold">

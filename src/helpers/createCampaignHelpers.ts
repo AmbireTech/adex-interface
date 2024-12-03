@@ -12,7 +12,7 @@ import {
 
 import { parseFromBigNumPrecision } from 'helpers/balances'
 
-export const MAGIC_NUMBER = 1.5
+export const MAGIC_NUMBER = 1.42
 
 export const checkSelectedDevices = (devices: Devices[]) => {
   if (!devices.length) return null
