@@ -200,6 +200,7 @@ export function CPMHelper({
               onCPMRangeChange(cpmRangeData[val[0]]?.label, cpmRangeData[val[1]]?.label)
             }}
             min={0}
+            step={1}
             minRange={1}
             max={cpmRangeData[cpmRangeData.length - 1]?.value}
             marks={cpmRangeData}

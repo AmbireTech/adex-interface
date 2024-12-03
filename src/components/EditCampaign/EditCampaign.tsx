@@ -31,11 +31,8 @@ import {
 import useAccount from 'hooks/useAccount'
 import { useCallback, useEffect, useMemo } from 'react'
 import { useCampaignsData } from 'hooks/useCampaignsData'
-import type {
-  unstable_Blocker as Blocker,
-  unstable_BlockerFunction as BlockerFunction
-} from 'react-router-dom'
-import { unstable_useBlocker as useBlocker, useParams, useNavigate } from 'react-router-dom'
+import type { Blocker, BlockerFunction } from 'react-router-dom'
+import { useBlocker, useParams, useNavigate } from 'react-router-dom'
 import InfoFilledIcon from 'resources/icons/InfoFilled'
 import throttle from 'lodash.throttle'
 import { defaultConfirmModalProps } from 'components/common/Modals/CustomConfirmModal'
@@ -168,7 +165,7 @@ const EditCampaign = ({ campaign, isAdmin }: { campaign: Campaign; isAdmin?: boo
 
   useEffect(() => {
     if (blocker.state === 'blocked') {
-      return modals.openConfirmModal(
+      modals.openConfirmModal(
         defaultConfirmModalProps({
           text: 'You did not save your changes. Are you sure you want to leave this page?',
           color: 'attention',
