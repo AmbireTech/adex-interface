@@ -1,6 +1,6 @@
 import { SSPsAnalyticsData, CampaignUI } from 'types'
 import useSSPsAnalytics from 'hooks/useCampaignAnalytics/useSSPsAnalytics'
-import { getRecommendedCPMRangeAdvanced, parseRange } from 'helpers/createCampaignHelpers'
+import { getCPMRangeAdvancedData, parseRange, MAGIC_NUMBER } from 'helpers/createCampaignHelpers'
 import { useMemo, useState, useEffect } from 'react'
 import { campaignDataToSSPAnalyticsQuery, DAY } from 'helpers'
 import {
@@ -26,17 +26,23 @@ const EXPECTED_WINNING_BIDS_RATE = 0.05
 
 const getCMPRangeMarks = (analytics: SSPsAnalyticsData[]) => {
   const cpms = analytics
-    .map((x) => [parseRange(x.value.toString()).min, parseRange(x.value.toString()).max])
+    .map((x) => {
+      const { min, max } = parseRange(x.value.toString())
+      return [min, max]
+    })
     .flat()
     .filter((c) => typeof c === 'number' && !Number.isNaN(c))
     .sort((a, b) => a - b)
     .filter((item, pos, self) => {
       return self.indexOf(item) === pos
     })
-    .map((x, i) => ({
-      label: x.toString(),
-      value: i
-    }))
+    .map((x, i) => {
+      console.log({ x })
+      return {
+        label: (x * MAGIC_NUMBER).toPrecision(2),
+        value: i
+      }
+    })
   return cpms
 }
 
@@ -77,17 +83,19 @@ export function CPMHelper({
 
   const [cpmSliderRange, setCpmRange] = useState<[number, number]>([0, 1])
 
-  const recommendedCPM = useMemo(
+  const cpmData = useMemo(
     () =>
       analytics?.data.length
-        ? getRecommendedCPMRangeAdvanced(
+        ? getCPMRangeAdvancedData(
             analytics.data,
             Number(cpmRangeData.find((x) => x.value === cpmSliderRange[0])?.label) || 0,
             Number(cpmRangeData.find((x) => x.value === cpmSliderRange[1])?.label) || 0
           )
-        : { min: 'N/A', max: 'N/A', count: 0, supply: 0 },
+        : { min: 'N/A', max: 'N/A', count: 0, supply: 0, bids: 0, imps: 0 },
     [analytics?.data, cpmSliderRange, cpmRangeData]
   )
+
+  // console.log({ cpmData })
 
   const estimatedMaxImpressions = useMemo(() => {
     const totalImps = Math.floor(
@@ -104,24 +112,33 @@ export function CPMHelper({
   }, [campaign])
 
   const supplyCovered = useMemo(
-    () => (recommendedCPM.count / recommendedCPM.supply) * 100,
-    [recommendedCPM.count, recommendedCPM.supply]
+    () => (cpmData.count / cpmData.supply) * 100,
+    [cpmData.count, cpmData.supply]
   )
 
   const impressionsCovered = useMemo(() => {
-    const dailySupply = (recommendedCPM.count / 2) * EXPECTED_WINNING_BIDS_RATE
+    const dailySupply =
+      (cpmData.count / 2) *
+      ((cpmData.imps || 0) / (cpmData.bids || 1) || EXPECTED_WINNING_BIDS_RATE)
     const campaignDays = Number(campaign.activeTo - campaign.activeFrom) / DAY
     const dailyImpressions = estimatedMaxImpressions / campaignDays
     const percentCovered = Number(((dailySupply / dailyImpressions) * 100).toFixed(2))
 
     return percentCovered > 100 ? 100 : percentCovered
-  }, [campaign.activeFrom, campaign.activeTo, estimatedMaxImpressions, recommendedCPM.count])
+  }, [
+    campaign.activeFrom,
+    campaign.activeTo,
+    estimatedMaxImpressions,
+    cpmData.bids,
+    cpmData.count,
+    cpmData.imps
+  ])
 
   const cpmDistributionChartData = useMemo(() => {
     return analytics?.data.length
       ? cpmRangeData.map(
           (_x, i) =>
-            getRecommendedCPMRangeAdvanced(
+            getCPMRangeAdvancedData(
               analytics?.data,
               Number(cpmRangeData[i]?.label),
               Number(cpmRangeData[i + 1]?.label || cpmRangeData[i]?.label)
@@ -178,6 +195,7 @@ export function CPMHelper({
             thumbSize={25}
             value={cpmSliderRange}
             onChange={(val) => {
+              console.log({ val })
               setCpmRange(val)
               onCPMRangeChange(cpmRangeData[val[0]]?.label, cpmRangeData[val[1]]?.label)
             }}
