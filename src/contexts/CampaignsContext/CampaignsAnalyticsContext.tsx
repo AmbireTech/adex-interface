@@ -131,7 +131,7 @@ const analyticsDataToMappedAnalytics = (
         : b.impressions - a.impressions
     )
 
-  console.log({ resMap })
+  // console.log({ resMap })
 
   return resMap
 }
@@ -194,7 +194,7 @@ const CampaignsAnalyticsProvider: FC<PropsWithChildren> = ({ children }) => {
           )
         })
 
-        console.log({ analyticsDataRes })
+        // console.log({ analyticsDataRes })
 
         if (!analyticsDataRes?.aggr) {
           throw new Error('invalid analytics data response')

@@ -2,11 +2,8 @@ import { Flex, Stack, Paper, Text, Box } from '@mantine/core'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { modals } from '@mantine/modals'
-import type {
-  unstable_Blocker as Blocker,
-  unstable_BlockerFunction as BlockerFunction
-} from 'react-router-dom'
-import { unstable_useBlocker as useBlocker, useNavigate } from 'react-router-dom'
+import type { Blocker, BlockerFunction } from 'react-router-dom'
+import { useBlocker, useNavigate } from 'react-router-dom'
 import { defaultConfirmModalProps } from 'components/common/Modals/CustomConfirmModal'
 import throttle from 'lodash.throttle'
 import { SuccessModal } from 'components/common/Modals'

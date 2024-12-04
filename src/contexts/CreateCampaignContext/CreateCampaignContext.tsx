@@ -128,8 +128,11 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
                 : undefined
             }
           },
-          targetUrl: (value, { adUnits }) => {
-            console.log({ adUnits })
+          targetUrl: (
+            value
+            // { adUnits }
+          ) => {
+            // console.log({ adUnits })
             if (step === 0 && !isValidHttpUrl(value)) {
               return 'Please enter a valid URL (https://...)'
             }
@@ -337,7 +340,6 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
         groupBy: 'format'
       })
       setSSPAnalKey(key?.key)
-      console.log('key', key?.key)
     }
 
     checkAnalytics()

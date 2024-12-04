@@ -54,13 +54,13 @@ export function useCampaignsAnalyticsData({
     [analyticsKey, mappedAnalytics]
   )
 
-  useEffect(() => {
-    console.log('useCampaignsAnalyticsData', { campaignId, analyticsType, forAdmin })
-  }, [analyticsType, campaignId, forAdmin])
+  // useEffect(() => {
+  //   console.log('useCampaignsAnalyticsData', { campaignId, analyticsType, forAdmin })
+  // }, [analyticsType, campaignId, forAdmin])
 
   useEffect(() => {
     if (campaignId && !campaign?.id) {
-      console.log({ campaignId })
+      // console.log({ campaignId })
       updateCampaignDataById(campaignId)
     }
   }, [campaign?.id, campaignId, updateCampaignDataById])
@@ -72,7 +72,7 @@ export function useCampaignsAnalyticsData({
     const checkAnalytics = async () => {
       const key = await getAnalyticsKeyAndUpdate(analyticsType, campaign, !!forAdmin)
       setAnalyticsKey(key)
-      console.log('key', key)
+      // console.log('key', key)
     }
 
     checkAnalytics()

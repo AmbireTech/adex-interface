@@ -12,6 +12,8 @@ import {
 
 import { parseFromBigNumPrecision } from 'helpers/balances'
 
+export const MAGIC_NUMBER = 1.42
+
 export const checkSelectedDevices = (devices: Devices[]) => {
   if (!devices.length) return null
   if (devices.length === 1) {
@@ -291,31 +293,44 @@ export const getRecommendedCPMRange = (supplyStats: SupplyStats, campaign: Campa
   }
 }
 
-export const getRecommendedCPMRangeAdvanced = (
+export const cpmToStatisticsPrecision = (price: number): number => {
+  return Number(price.toPrecision(4))
+}
+export const getCPMRangeAdvancedData = (
   analytics: SSPsAnalyticsData[],
   min: number,
   max: number
 ) => {
   const topRanges = analytics
-    .map(({ value, count }) => ({
-      count,
-      ...parseRange(value.toString())
-    }))
+    .map(({ value, count, bids, imps }) => {
+      const { min: minParsed, max: maxParsed } = parseRange(value.toString())
+      return {
+        value,
+        count,
+        bids: bids || 0,
+        imps: imps || 0,
+        min: cpmToStatisticsPrecision(minParsed * MAGIC_NUMBER),
+        max: cpmToStatisticsPrecision(maxParsed * MAGIC_NUMBER)
+      }
+    })
     .sort((a, b) => a.min - b.min)
     .filter((x) => x.min >= min && x.max <= max)
-    .reduce(
-      (data, current) => {
-        return {
-          ...data,
-          min: Math.min(data.min, current.min) || Math.max(data.min, current.min),
-          max: Math.max(data.max, current.max),
-          count: data.count + current.count
-        }
-      },
-      { min: 0, max: 0, count: 0 }
-    )
 
-  return { ...topRanges, supply: analytics.reduce((sum, cur) => sum + cur.count, 0) }
+  const topData = topRanges.reduce(
+    (data, current) => {
+      return {
+        ...data,
+        min: Math.min(data.min, current.min) || Math.max(data.min, current.min),
+        max: Math.max(data.max, current.max),
+        count: data.count + current.count,
+        bids: data.bids + current.bids,
+        imps: data.imps + current.imps
+      }
+    },
+    { min: 0, max: 0, count: 0, bids: 0, imps: 0 }
+  )
+
+  return { ...topData, supply: analytics.reduce((sum, cur) => sum + cur.count, 0) }
 }
 
 export const campaignToCampaignUI = (campaign: Campaign, currency: string): CampaignUI => {

@@ -108,7 +108,7 @@ const AdminProvider: FC<PropsWithChildren> = ({ children }) => {
             })
           }
 
-          console.log({ body })
+          // console.log({ body })
 
           await adexServicesRequest('backend', {
             route: `/dsp/admin/accounts/${id}/info`,

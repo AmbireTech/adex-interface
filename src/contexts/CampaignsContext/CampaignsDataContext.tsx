@@ -203,7 +203,7 @@ const CampaignsDataProvider: FC<PropsWithChildren & { type: 'user' | 'admin' }> 
 
   const updateCampaignDataById = useCallback(
     async (campaignId: string) => {
-      console.log({ campaignId })
+      // console.log({ campaignId })
       try {
         const campaignDetailsRes = await adexServicesRequest<CamapignBackendDataRes>('backend', {
           route: `/dsp/campaigns/by-id/${campaignId}`,
@@ -432,7 +432,7 @@ const CampaignsDataProvider: FC<PropsWithChildren & { type: 'user' | 'admin' }> 
         throw new Error('invalid campaign ')
       }
 
-      console.log({ sources })
+      // console.log({ sources })
       const cleanNin = [...campaign.targetingInput.inputs.publishers.nin].filter(
         (x) => !sources.some((s) => s.srcId === x)
       )

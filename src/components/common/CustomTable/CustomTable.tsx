@@ -119,8 +119,6 @@ export const CustomTable = ({
   const filteredData = useMemo(() => {
     const { sortIndex, sortDirection } = sorting
 
-    console.log({ sortIndex })
-
     const next = [...data]
       .sort((a, b) => {
         if (sortIndex < 0) {
