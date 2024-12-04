@@ -1,6 +1,11 @@
 import { SSPsAnalyticsData, CampaignUI } from 'types'
 import useSSPsAnalytics from 'hooks/useCampaignAnalytics/useSSPsAnalytics'
-import { getCPMRangeAdvancedData, parseRange, MAGIC_NUMBER } from 'helpers/createCampaignHelpers'
+import {
+  getCPMRangeAdvancedData,
+  parseRange,
+  MAGIC_NUMBER,
+  cpmToStatisticsPrecision
+} from 'helpers/createCampaignHelpers'
 import { useMemo, useState, useEffect } from 'react'
 import { campaignDataToSSPAnalyticsQuery, DAY } from 'helpers'
 import {
@@ -23,8 +28,9 @@ import {
 import InfoFilledIcon from 'resources/icons/InfoFilled'
 import { Sparkline } from '@mantine/charts'
 
-// TODO: get some real time stats about that
-const EXPECTED_WINNING_BIDS_RATE = 0.05
+// NOTE: default value if there is no recent data (no active campaigns past 48 hours)
+// Most probably it will be ~ 0.2 but let's keep it lower
+const EXPECTED_WINNING_BIDS_RATE = 0.06942
 
 const getCMPRangeMarks = (analytics: SSPsAnalyticsData[]) => {
   const cpms = analytics
@@ -41,7 +47,7 @@ const getCMPRangeMarks = (analytics: SSPsAnalyticsData[]) => {
     .map((x, i) => {
       const price = x * MAGIC_NUMBER
       return {
-        label: price.toPrecision(price < 100 ? 2 : 3),
+        label: cpmToStatisticsPrecision(price).toString(),
         value: i
       }
     })
@@ -191,7 +197,6 @@ export function CPMHelper({
             curveType="stepAfter"
             fillOpacity={0.69}
           />
-          <Space h="xl" />
           <RangeSlider
             color="info"
             size="xl"
@@ -208,6 +213,7 @@ export function CPMHelper({
             marks={cpmRangeData}
             label={(val) => cpmRangeData[val]?.label}
             labelAlwaysOn
+            styles={{ markLabel: { transform: 'rotate(45deg)', transformOrigin: 'top left' } }}
           />
           <Space h="xl" />
 
