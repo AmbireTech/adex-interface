@@ -149,7 +149,7 @@ const SSPsAnalytics = ({
         showBidCount: true
       })
       setAnalyticsKey(key)
-      console.log('key', key)
+      // console.log('key', key)
     }
 
     checkAnalytics()

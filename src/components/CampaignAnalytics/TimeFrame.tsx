@@ -38,8 +38,6 @@ export const TimeFrame = ({ forAdmin, campaignId }: { forAdmin: boolean; campaig
   const { width: windowWidth } = useViewportSize()
   const [filteredData, setFilteredData] = useState<FilteredAnalytics[]>([])
 
-  // console.log({ kors: Array.isArray(timeFrames) })
-
   const [metricsToShow, setMetricsToShow] = useState<MetricsToShow>({
     // segment: true,
     impressions: true,

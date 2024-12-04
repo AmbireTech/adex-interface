@@ -90,7 +90,7 @@ const SSPsAnalyticsProvider: FC<PropsWithChildren> = ({ children }) => {
           }
         )
 
-        console.log({ analyticsDataRes })
+        // console.log({ analyticsDataRes })
 
         if (!analyticsDataRes) {
           throw new Error('invalid analytics data response')
@@ -113,7 +113,7 @@ const SSPsAnalyticsProvider: FC<PropsWithChildren> = ({ children }) => {
             )
           }
 
-          console.log({ nextAggr })
+          // console.log({ nextAggr })
           next.set(dataKey, nextAggr)
           return next
         })

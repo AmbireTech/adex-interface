@@ -14,8 +14,6 @@ const AdminPanel = () => {
   const navigate = useNavigate()
   const { tabValue = 'campaigns', accountId } = useParams()
 
-  console.log({ tabValue })
-
   return (
     <Container fluid>
       <StickyPanel>

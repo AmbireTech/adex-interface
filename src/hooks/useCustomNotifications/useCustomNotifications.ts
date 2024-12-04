@@ -23,7 +23,7 @@ const useCustomNotifications = () => {
           notificationTitle = title || 'Info'
           break
       }
-      console.log({ notificationTitle })
+      // console.log({ notificationTitle })
       notifications.show({
         // NOTE: just in case if somewhere is passed error objet
         title: notificationTitle.toString(),
