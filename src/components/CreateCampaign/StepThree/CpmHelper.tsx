@@ -15,15 +15,15 @@ import {
   Text,
   Tooltip,
   RangeSlider,
-  // RingProgress,
+  RingProgress,
   Paper,
   Center,
   Overlay,
   Loader,
   Space,
-  NumberFormatter,
-  SemiCircleProgress,
-  Divider
+  NumberFormatter
+  // SemiCircleProgress
+  // Divider
 } from '@mantine/core'
 import InfoFilledIcon from 'resources/icons/InfoFilled'
 import { Sparkline } from '@mantine/charts'
@@ -185,7 +185,7 @@ export function CPMHelper({
             </Stack>
           </Overlay>
         )}
-        <Stack gap="xs" justify="stretch">
+        <Stack gap="sm" justify="stretch">
           <Text>Supply CPM distribution</Text>
           <Sparkline
             px={6} // TODO:  Magic atm to match the slider fix it with proper theme prop
@@ -206,7 +206,6 @@ export function CPMHelper({
               setCpmRange(val)
               onCPMRangeChange(cpmRangeData[val[0]]?.label, cpmRangeData[val[1]]?.label)
             }}
-            min={0}
             step={1}
             minRange={1}
             max={cpmRangeData[cpmRangeData.length - 1]?.value}
@@ -216,10 +215,15 @@ export function CPMHelper({
             styles={{ markLabel: { transform: 'rotate(45deg)', transformOrigin: 'top left' } }}
           />
           <Space h="xl" />
+          <Text>
+            {'Expected total impressions: Min: '}
+            <NumberFormatter value={estimatedMinImpressions} thousandSeparator /> {'- Max: '}
+            <NumberFormatter value={estimatedMaxImpressions} thousandSeparator />
+          </Text>
 
-          {/* <Group>
+          <Group>
             <RingProgress
-              size={200}
+              size={180}
               thickness={16}
               sections={[
                 {
@@ -243,97 +247,26 @@ export function CPMHelper({
             />
 
             <RingProgress
-              size={200}
+              size={180}
               thickness={16}
               sections={[
                 {
                   value: impressionsCovered,
-                  color: 'info',
+                  color: 'success',
                   tooltip: `CPM range: ${cpmSliderRange[0]} - ${cpmSliderRange[1]} covers  ${impressionsCovered}% of the total expected maximum impressions for the selected budged and period of the campaign`
                 }
               ]}
               label={
                 <Center>
-                  <Text c="info" fw="bolder" ta="center" size="md">
+                  <Text c="success" fw="bolder" ta="center" size="md">
                     Campaign <br />
                     {impressionsCovered}%
                   </Text>
                 </Center>
               }
-            /> */}
-          <Group>
-            <Stack gap={0}>
-              <Tooltip
-                label={`CPM range: ${cpmSliderRange[0]} - ${
-                  cpmSliderRange[1]
-                } covers ${supplyCovered.toFixed(
-                  2
-                )}% of the total supply matching campaign targeting and creatives formats`}
-              >
-                <SemiCircleProgress
-                  size={200}
-                  thickness={16}
-                  value={supplyCovered}
-                  filledSegmentColor="info"
-                  // emptySegmentColor="brandDarker"
-                  labelPosition="bottom"
-                  // sections={[
-                  //   {
-                  //     value: supplyCovered,
-                  //     color: 'info',
-                  //     tooltip: `CPM range: ${cpmSliderRange[0]} - ${
-                  //       cpmSliderRange[1]
-                  //     } covers ${supplyCovered.toFixed(
-                  //       2
-                  //     )}% of the total supply matching campaign targeting and creatives formats`
-                  //   }
-                  // ]}
-                  label={
-                    <Center>
-                      <Text c="info" fw="bolder" ta="center" size="md">
-                        Supply <br />
-                        {supplyCovered.toFixed(2)}%
-                      </Text>
-                    </Center>
-                  }
-                />
-              </Tooltip>
-              <Divider size={0} label="coverage" />
-              <Tooltip
-                label={`CPM range: ${cpmSliderRange[0]} - ${cpmSliderRange[1]} covers  ${impressionsCovered}% of the total expected maximum impressions for the selected budged and period of the campaign`}
-              >
-                <SemiCircleProgress
-                  size={200}
-                  thickness={16}
-                  value={impressionsCovered}
-                  orientation="down"
-                  filledSegmentColor="success"
-                  labelPosition="bottom"
-                  // sections={[
-                  //   {
-                  //     value: impressionsCovered,
-                  //     color: 'info',
-                  //     tooltip: `CPM range: ${cpmSliderRange[0]} - ${cpmSliderRange[1]} covers  ${impressionsCovered}% of the total expected maximum impressions for the selected budged and period of the campaign`
-                  //   }
-                  // ]}
-                  label={
-                    <Center>
-                      <Text c="success" fw="bolder" ta="center" size="md">
-                        Campaign <br />
-                        {impressionsCovered}%
-                      </Text>
-                    </Center>
-                  }
-                />
-              </Tooltip>
-            </Stack>
-            <Text>
-              {'Expected impressions: Min: '}
-              <br />
-              <NumberFormatter value={estimatedMinImpressions} thousandSeparator /> {'- Max: '}
-              <NumberFormatter value={estimatedMaxImpressions} thousandSeparator />
-            </Text>
+            />
           </Group>
+
           {/* </Group> */}
         </Stack>
       </Paper>

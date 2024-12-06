@@ -10,7 +10,6 @@ import ImageUrlInput from 'components/CreateCampaign/StepOne/ImageUrlInput'
 import RangeText from 'components/common/RangeText'
 import dayjs from 'dayjs'
 import CatsLocsFormatted from 'components/CampaignDetails/CatsLocsFormatted'
-import { DAY } from 'helpers'
 
 const useCreateCampaignData = () => {
   const {
@@ -31,9 +30,7 @@ const useCreateCampaignData = () => {
       budget,
       title,
       startsAt,
-      endsAt,
-      activeFrom,
-      activeTo
+      endsAt
     }
   } = useCreateCampaignContext()
 
@@ -136,24 +133,24 @@ const useCreateCampaignData = () => {
     [adUnits]
   )
 
-  const estimatedDailyImpressions = useMemo(() => {
+  const estimatedImpressions = useMemo(() => {
     const estimatedMinImpressions = Math.floor(
       (budget / (Number(cpmPricingBounds.max) || 0.01)) * 1000
     )
     const estimatedMaxImpressions = Math.floor(
       (budget / (Number(cpmPricingBounds.min) || 0.01)) * 1000
     )
-    const campaignDays = Number(activeTo - activeFrom) / DAY
-    const min = (estimatedMinImpressions / campaignDays).toFixed(0)
-    const max = (estimatedMaxImpressions / campaignDays).toFixed(0)
+
+    const min = estimatedMinImpressions.toFixed(0)
+    const max = estimatedMaxImpressions.toFixed(0)
 
     return (
-      <Stack gap={0} align="end" c="attention" fw="bold">
+      <Stack gap={0} align="end" c="success" fw="bold">
         <NumberFormatter prefix="min: " value={min} thousandSeparator />
         <NumberFormatter prefix="max: " value={max} thousandSeparator />
       </Stack>
     )
-  }, [activeFrom, activeTo, budget, cpmPricingBounds.max, cpmPricingBounds.min])
+  }, [budget, cpmPricingBounds.max, cpmPricingBounds.min])
 
   return {
     formattedSelectedDevice,
@@ -168,7 +165,7 @@ const useCreateCampaignData = () => {
     campaignPeriodFormatted,
     uniqueSizesWithCount,
     formattedSelectedPlacement,
-    estimatedDailyImpressions
+    estimatedImpressions
   }
 }
 

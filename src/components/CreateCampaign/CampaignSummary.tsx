@@ -32,7 +32,7 @@ const CampaignSummary = ({ onLaunchClick }: { onLaunchClick: () => void }) => {
     adFormats,
     campaignBudgetFormatted,
     advancedTargeInput,
-    estimatedDailyImpressions
+    estimatedImpressions
   } = useCreateCampaignData()
 
   const loading = useMemo(() => !allowedBannerSizes.length, [allowedBannerSizes.length])
@@ -92,8 +92,8 @@ const CampaignSummary = ({ onLaunchClick }: { onLaunchClick: () => void }) => {
         mb="xs"
       />
       <CampaignDetailsRow
-        title="Estimated Daily Impressions"
-        value={estimatedDailyImpressions}
+        title="Estimated Impressions"
+        value={estimatedImpressions}
         textSize="sm"
       />
       <Stack align="stretch" justify="space-between" gap="sm" mt="xl" px="md">
