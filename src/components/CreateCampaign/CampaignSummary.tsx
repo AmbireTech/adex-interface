@@ -92,7 +92,7 @@ const CampaignSummary = ({ onLaunchClick }: { onLaunchClick: () => void }) => {
         mb="xs"
       />
       <CampaignDetailsRow
-        title="Estimated Daily Impressions"
+        title="Estimated Impressions"
         value={estimatedImpressions}
         textSize="sm"
       />
