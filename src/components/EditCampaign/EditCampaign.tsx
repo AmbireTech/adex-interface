@@ -146,7 +146,8 @@ const EditCampaign = ({ campaign, isAdmin }: { campaign: Campaign; isAdmin?: boo
               typeof value !== 'boolean' ? 'Invalid value' : null,
             limitDailyAverageSpending: (value) =>
               typeof value !== 'boolean' ? 'Invalid value' : null,
-            aggressiveBidding: (value) => (typeof value !== 'boolean' ? 'Invalid value' : null)
+            aggressiveBidding: (value) => (typeof value !== 'boolean' ? 'Invalid value' : null),
+            looseSourceCTR: (value) => (typeof value !== 'boolean' ? 'Invalid value' : null)
           }
         }
       }
@@ -357,6 +358,12 @@ const EditCampaign = ({ campaign, isAdmin }: { campaign: Campaign; isAdmin?: boo
                       (learn more)
                     </DefaultCustomAnchor>
                   </Group>
+                  <Checkbox
+                    label="Bid on loose sources"
+                    {...form.getInputProps('targetingInput.inputs.advanced.looseSourceCTR', {
+                      type: 'checkbox'
+                    })}
+                  />
                 </Stack>
 
                 <Button disabled={!form.isDirty()} size="lg" type="submit" maw={200}>

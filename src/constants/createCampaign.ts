@@ -86,7 +86,8 @@ export const CREATE_CAMPAIGN_DEFAULT_VALUE: CampaignUI = {
         includeIncentivized: false,
         disableFrequencyCapping: false,
         limitDailyAverageSpending: false,
-        aggressiveBidding: false
+        aggressiveBidding: false,
+        looseSourceCTR: false
       }
     }
   },

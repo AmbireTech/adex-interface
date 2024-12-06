@@ -78,6 +78,13 @@ const CampaignSummary = ({ onLaunchClick }: { onLaunchClick: () => void }) => {
 
       <CampaignDetailsRow
         lighterColor
+        title="Loose source bidding"
+        value={advancedTargeInput.looseSourceCTR ? 'Yes' : 'No'}
+        textSize="sm"
+      />
+
+      <CampaignDetailsRow
+        lighterColor
         title="Auto UTM tracking"
         value={
           <Group gap="sm">

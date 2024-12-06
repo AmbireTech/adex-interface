@@ -32,6 +32,10 @@ const StepFour = () => {
         title: 'Aggressive bidding',
         value: advancedTargeInput.aggressiveBidding ? 'Yes' : 'No'
       },
+      {
+        title: 'Loose source bidding',
+        value: advancedTargeInput.looseSourceCTR ? 'Yes' : 'No'
+      },
       { title: 'Campaign Period', value: campaignPeriodFormatted },
       { title: 'Placements', value: formattedSelectedPlacement },
       { title: 'Device Type', value: formattedSelectedDevice },
