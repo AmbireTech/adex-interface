@@ -1,7 +1,12 @@
 import React from 'react'
 import { AppIconProps, defaultProps } from 'types/components/Icon'
 
-const CopyIcon: React.FC<AppIconProps> = ({ color, size, strokeWidth, ...rest }) => {
+const CopyIcon: React.FC<AppIconProps> = ({
+  color = defaultProps.color,
+  size = defaultProps.size,
+  strokeWidth = defaultProps.strokeWidth,
+  ...rest
+}) => {
   return (
     <svg
       viewBox="0 0 25.5 25.5"
@@ -29,7 +34,5 @@ const CopyIcon: React.FC<AppIconProps> = ({ color, size, strokeWidth, ...rest })
     </svg>
   )
 }
-
-CopyIcon.defaultProps = defaultProps
 
 export default CopyIcon

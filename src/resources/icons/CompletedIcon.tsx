@@ -1,7 +1,11 @@
 import React from 'react'
 import { AppIconProps, defaultProps } from 'types/components/Icon'
 
-const CompletedIcon: React.FC<AppIconProps> = ({ color, size, ...rest }) => {
+const CompletedIcon: React.FC<AppIconProps> = ({
+  color = defaultProps.color,
+  size = defaultProps.size,
+  ...rest
+}) => {
   return (
     <svg
       viewBox="0 0 14 14"
@@ -26,7 +30,5 @@ const CompletedIcon: React.FC<AppIconProps> = ({ color, size, ...rest }) => {
     </svg>
   )
 }
-
-CompletedIcon.defaultProps = defaultProps
 
 export default CompletedIcon

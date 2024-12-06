@@ -1,7 +1,12 @@
 import React from 'react'
 import { AppIconProps, defaultProps } from 'types/components/Icon'
 
-const MapIcon: React.FC<AppIconProps> = ({ color, size, strokeWidth, ...rest }) => {
+const MapIcon: React.FC<AppIconProps> = ({
+  color = defaultProps.color,
+  size = defaultProps.size,
+  strokeWidth = defaultProps.strokeWidth,
+  ...rest
+}) => {
   return (
     <svg
       viewBox="0 0 21.21 18.931"
@@ -27,7 +32,5 @@ const MapIcon: React.FC<AppIconProps> = ({ color, size, strokeWidth, ...rest }) 
     </svg>
   )
 }
-
-MapIcon.defaultProps = defaultProps
 
 export default MapIcon

@@ -1,7 +1,12 @@
 import React from 'react'
 import { AppIconProps, defaultProps } from 'types/components/Icon'
 
-const CloseIcon: React.FC<AppIconProps> = ({ color, size, strokeWidth, ...rest }) => {
+const CloseIcon: React.FC<AppIconProps> = ({
+  color = defaultProps.color,
+  size = defaultProps.size,
+  strokeWidth = defaultProps.strokeWidth,
+  ...rest
+}) => {
   return (
     <svg
       viewBox="0 0 32 32"
@@ -36,7 +41,5 @@ const CloseIcon: React.FC<AppIconProps> = ({ color, size, strokeWidth, ...rest }
     </svg>
   )
 }
-
-CloseIcon.defaultProps = defaultProps
 
 export default CloseIcon

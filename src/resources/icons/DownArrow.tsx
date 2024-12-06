@@ -1,7 +1,12 @@
 import React from 'react'
 import { AppIconProps, defaultProps } from 'types/components/Icon'
 
-const DownArrowIcon: React.FC<AppIconProps> = ({ color, size, strokeWidth, ...rest }) => {
+const DownArrowIcon: React.FC<AppIconProps> = ({
+  color = defaultProps.color,
+  size = defaultProps.size,
+  strokeWidth = defaultProps.strokeWidth,
+  ...rest
+}) => {
   return (
     <svg
       viewBox="0 0 10.519 6.01"
@@ -23,7 +28,5 @@ const DownArrowIcon: React.FC<AppIconProps> = ({ color, size, strokeWidth, ...re
     </svg>
   )
 }
-
-DownArrowIcon.defaultProps = defaultProps
 
 export default DownArrowIcon

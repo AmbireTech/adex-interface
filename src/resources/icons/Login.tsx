@@ -1,7 +1,12 @@
 import React from 'react'
 import { AppIconProps, defaultProps } from 'types/components/Icon'
 
-const LoginIcon: React.FC<AppIconProps> = ({ color, size, strokeWidth, ...rest }) => {
+const LoginIcon: React.FC<AppIconProps> = ({
+  color = defaultProps.color,
+  size = defaultProps.size,
+  strokeWidth = defaultProps.strokeWidth,
+  ...rest
+}) => {
   return (
     <svg
       viewBox="0 0 21.5 20.54"
@@ -21,7 +26,5 @@ const LoginIcon: React.FC<AppIconProps> = ({ color, size, strokeWidth, ...rest }
     </svg>
   )
 }
-
-LoginIcon.defaultProps = defaultProps
 
 export default LoginIcon

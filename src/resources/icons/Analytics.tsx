@@ -1,7 +1,12 @@
 import React from 'react'
 import { AppIconProps, defaultProps } from 'types/components/Icon'
 
-const AnalyticsIcon: React.FC<AppIconProps> = ({ color, size, strokeWidth, ...rest }) => {
+const AnalyticsIcon: React.FC<AppIconProps> = ({
+  color = defaultProps.color,
+  size = defaultProps.size,
+  strokeWidth = defaultProps.strokeWidth,
+  ...rest
+}) => {
   return (
     <svg
       viewBox="0 0 21.5 21.5"
@@ -30,7 +35,5 @@ const AnalyticsIcon: React.FC<AppIconProps> = ({ color, size, strokeWidth, ...re
     </svg>
   )
 }
-
-AnalyticsIcon.defaultProps = defaultProps
 
 export default AnalyticsIcon

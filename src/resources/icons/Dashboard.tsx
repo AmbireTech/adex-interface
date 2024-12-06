@@ -1,7 +1,12 @@
 import React from 'react'
 import { AppIconProps, defaultProps } from 'types/components/Icon'
 
-const DashboardIcon: React.FC<AppIconProps> = ({ color, size, strokeWidth, ...rest }) => {
+const DashboardIcon: React.FC<AppIconProps> = ({
+  color = defaultProps.color,
+  size = defaultProps.size,
+  strokeWidth = defaultProps.strokeWidth,
+  ...rest
+}) => {
   return (
     <svg
       viewBox="0 0 26 26"
@@ -27,7 +32,5 @@ const DashboardIcon: React.FC<AppIconProps> = ({ color, size, strokeWidth, ...re
     </svg>
   )
 }
-
-DashboardIcon.defaultProps = defaultProps
 
 export default DashboardIcon

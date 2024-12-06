@@ -1,7 +1,12 @@
 import React from 'react'
 import { AppIconProps, defaultProps } from 'types/components/Icon'
 
-const ExcludeIcon: React.FC<AppIconProps> = ({ color, size, strokeWidth, ...rest }) => {
+const ExcludeIcon: React.FC<AppIconProps> = ({
+  color = defaultProps.color,
+  size = defaultProps.size,
+  strokeWidth = defaultProps.strokeWidth,
+  ...rest
+}) => {
   return (
     <svg
       viewBox="0 0 13.5 1.5"
@@ -20,7 +25,5 @@ const ExcludeIcon: React.FC<AppIconProps> = ({ color, size, strokeWidth, ...rest
     </svg>
   )
 }
-
-ExcludeIcon.defaultProps = defaultProps
 
 export default ExcludeIcon

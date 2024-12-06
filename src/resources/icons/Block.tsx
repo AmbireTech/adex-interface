@@ -1,7 +1,7 @@
 import React from 'react'
 import { AppIconProps, defaultProps } from 'types/components/Icon'
 
-const ActiveIcon: React.FC<AppIconProps> = ({ color, size, strokeWidth, ...rest }) => {
+const ActiveIcon: React.FC<AppIconProps> = ({ size = defaultProps.size, ...rest }) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -35,7 +35,5 @@ const ActiveIcon: React.FC<AppIconProps> = ({ color, size, strokeWidth, ...rest 
     </svg>
   )
 }
-
-ActiveIcon.defaultProps = defaultProps
 
 export default ActiveIcon

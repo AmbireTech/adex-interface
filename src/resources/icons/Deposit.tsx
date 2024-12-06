@@ -1,7 +1,12 @@
 import React from 'react'
 import { AppIconProps, defaultProps } from 'types/components/Icon'
 
-const DepositIcon: React.FC<AppIconProps> = ({ color, size, strokeWidth, ...rest }) => {
+const DepositIcon: React.FC<AppIconProps> = ({
+  color = defaultProps.color,
+  size = defaultProps.size,
+  strokeWidth = defaultProps.strokeWidth,
+  ...rest
+}) => {
   return (
     <svg
       viewBox="0 0 38.757 36"
@@ -43,7 +48,5 @@ const DepositIcon: React.FC<AppIconProps> = ({ color, size, strokeWidth, ...rest
     </svg>
   )
 }
-
-DepositIcon.defaultProps = defaultProps
 
 export default DepositIcon

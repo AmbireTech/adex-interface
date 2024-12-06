@@ -1,7 +1,12 @@
 import React from 'react'
 import { AppIconProps, defaultProps } from 'types/components/Icon'
 
-const EditIcon: React.FC<AppIconProps> = ({ color, size, strokeWidth, ...rest }) => {
+const EditIcon: React.FC<AppIconProps> = ({
+  color = defaultProps.color,
+  size = defaultProps.size,
+  strokeWidth = defaultProps.strokeWidth,
+  ...rest
+}) => {
   return (
     <svg
       viewBox="0 0 21.751 21.76"
@@ -27,7 +32,5 @@ const EditIcon: React.FC<AppIconProps> = ({ color, size, strokeWidth, ...rest })
     </svg>
   )
 }
-
-EditIcon.defaultProps = defaultProps
 
 export default EditIcon

@@ -1,7 +1,12 @@
 import React from 'react'
 import { AppIconProps, defaultProps } from 'types/components/Icon'
 
-const CheckMarkFilledIcon: React.FC<AppIconProps> = ({ color, size, strokeWidth, ...rest }) => {
+const CheckMarkFilledIcon: React.FC<AppIconProps> = ({
+  color = defaultProps.color,
+  size = defaultProps.size,
+  strokeWidth = defaultProps.strokeWidth,
+  ...rest
+}) => {
   return (
     <svg
       viewBox="0 0 20 20"
@@ -28,7 +33,5 @@ const CheckMarkFilledIcon: React.FC<AppIconProps> = ({ color, size, strokeWidth,
     </svg>
   )
 }
-
-CheckMarkFilledIcon.defaultProps = defaultProps
 
 export default CheckMarkFilledIcon

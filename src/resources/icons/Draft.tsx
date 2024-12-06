@@ -1,7 +1,11 @@
 import React from 'react'
 import { AppIconProps, defaultProps } from 'types/components/Icon'
 
-const DraftIcon: React.FC<AppIconProps> = ({ color, size, ...rest }) => {
+const DraftIcon: React.FC<AppIconProps> = ({
+  color = defaultProps.color,
+  size = defaultProps.size,
+  ...rest
+}) => {
   return (
     <svg
       viewBox="0 0 14 14"
@@ -33,7 +37,5 @@ const DraftIcon: React.FC<AppIconProps> = ({ color, size, ...rest }) => {
     </svg>
   )
 }
-
-DraftIcon.defaultProps = defaultProps
 
 export default DraftIcon

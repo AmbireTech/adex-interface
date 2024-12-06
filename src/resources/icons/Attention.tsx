@@ -1,7 +1,12 @@
 import React from 'react'
 import { AppIconProps, defaultProps } from 'types/components/Icon'
 
-const AttentionIcon: React.FC<AppIconProps> = ({ color, size, strokeWidth, ...rest }) => {
+const AttentionIcon: React.FC<AppIconProps> = ({
+  color = defaultProps.color,
+  size = defaultProps.size,
+  strokeWidth = defaultProps.strokeWidth,
+  ...rest
+}) => {
   return (
     <svg
       viewBox="0 0 27.051 25.5"
@@ -22,7 +27,5 @@ const AttentionIcon: React.FC<AppIconProps> = ({ color, size, strokeWidth, ...re
     </svg>
   )
 }
-
-AttentionIcon.defaultProps = defaultProps
 
 export default AttentionIcon

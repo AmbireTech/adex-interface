@@ -1,7 +1,11 @@
 import React from 'react'
 import { AppIconProps, defaultProps } from 'types/components/Icon'
 
-const InfoFilledIcon: React.FC<AppIconProps> = ({ color, size, ...rest }) => {
+const InfoFilledIcon: React.FC<AppIconProps> = ({
+  color = defaultProps.color,
+  size = defaultProps.size,
+  ...rest
+}) => {
   return (
     <svg
       viewBox="0 0 20 20"
@@ -18,7 +22,5 @@ const InfoFilledIcon: React.FC<AppIconProps> = ({ color, size, ...rest }) => {
     </svg>
   )
 }
-
-InfoFilledIcon.defaultProps = defaultProps
 
 export default InfoFilledIcon
