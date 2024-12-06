@@ -135,7 +135,7 @@ export type SSPsAnalyticsDataResp = {
   adSlotCount: number
   reqCount?: number
   bidsCount?: number
-  bidsWonCount: number
+  bidsBilledCount: number
   impsCount: number
 }
 
@@ -143,7 +143,7 @@ export type SSPsAnalyticsData = {
   value: string | number
   count: number
   bids?: number
-  wins?: number
+  billed?: number
   imps?: number
 }
 

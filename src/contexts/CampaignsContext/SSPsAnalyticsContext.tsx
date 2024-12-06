@@ -101,14 +101,14 @@ const SSPsAnalyticsProvider: FC<PropsWithChildren> = ({ children }) => {
           const nextAggr: { status: DataStatus; data: SSPsAnalyticsData[] } = {
             status: 'processed',
             data: analyticsDataRes.data.map(
-              ({ value, adSlotCount, reqCount, bidsCount, bidsWonCount, impsCount }) => ({
+              ({ value, adSlotCount, reqCount, bidsCount, bidsBilledCount, impsCount }) => ({
                 // NOTE: hack because it can not be 0
                 // changing here will avoid fixing it on backend and entire frontend
                 // value: (value === '0_00-0_10' ? '0_01-0_10' : value) || '',
                 value,
                 count: reqCount !== undefined ? reqCount : adSlotCount,
                 bids: bidsCount,
-                wins: bidsWonCount,
+                billed: bidsBilledCount,
                 imps: impsCount
               })
             )
