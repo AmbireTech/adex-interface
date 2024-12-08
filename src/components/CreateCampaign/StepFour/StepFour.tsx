@@ -56,7 +56,8 @@ const StepFour = () => {
       formattedCats,
       formattedLocs,
       advancedTargeInput.limitDailyAverageSpending,
-      advancedTargeInput.aggressiveBidding
+      advancedTargeInput.aggressiveBidding,
+      advancedTargeInput.looseSourceCTR
     ]
   )
 
