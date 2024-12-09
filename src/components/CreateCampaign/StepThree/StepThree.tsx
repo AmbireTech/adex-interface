@@ -193,9 +193,9 @@ const StepThree = () => {
             <Tooltip
               multiline
               maw={420}
-              label={`Enabling bidding on sources that perform low on Clickthrough rate (CTR)
-                        will result on higher chance of winning bids but will lower the overall CTR if the campaign.
-                        This option can be useful when the purpose of the campaign is brand awareness not strictly click turnover.`}
+              label={`Enabling bidding on sources with a low Clickthrough Rate (CTR) increases the chances of winning bids
+                but may reduce the campaign’s overall CTR. This option is helpful for campaigns focused on brand awareness
+                rather than driving clicks.`}
             >
               <ActionIcon size="sm" variant="transparent">
                 <InfoIcon />
