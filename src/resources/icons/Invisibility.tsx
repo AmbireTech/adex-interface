@@ -1,7 +1,12 @@
 import React from 'react'
 import { AppIconProps, defaultProps } from 'types/components/Icon'
 
-const InvisibilityIcon: React.FC<AppIconProps> = ({ color, size, strokeWidth, ...rest }) => {
+const InvisibilityIcon: React.FC<AppIconProps> = ({
+  color = defaultProps.color,
+  size = defaultProps.size,
+  strokeWidth = defaultProps.strokeWidth,
+  ...rest
+}) => {
   return (
     <svg
       viewBox="0 0 22.557 22.557"
@@ -27,7 +32,5 @@ const InvisibilityIcon: React.FC<AppIconProps> = ({ color, size, strokeWidth, ..
     </svg>
   )
 }
-
-InvisibilityIcon.defaultProps = defaultProps
 
 export default InvisibilityIcon

@@ -1,7 +1,12 @@
 import React from 'react'
 import { AppIconProps, defaultProps } from 'types/components/Icon'
 
-const RefreshIcon: React.FC<AppIconProps> = ({ color, size, strokeWidth, ...rest }) => {
+const RefreshIcon: React.FC<AppIconProps> = ({
+  color = defaultProps.color,
+  size = defaultProps.size,
+  strokeWidth = defaultProps.strokeWidth,
+  ...rest
+}) => {
   return (
     <svg
       viewBox="0 0 21.779 21.5"
@@ -20,7 +25,5 @@ const RefreshIcon: React.FC<AppIconProps> = ({ color, size, strokeWidth, ...rest
     </svg>
   )
 }
-
-RefreshIcon.defaultProps = defaultProps
 
 export default RefreshIcon

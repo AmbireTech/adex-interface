@@ -1,7 +1,7 @@
 import React from 'react'
 import { AppIconProps, defaultProps } from 'types/components/Icon'
 
-const StakingIcon: React.FC<AppIconProps> = ({ color, size, ...rest }) => {
+const StakingIcon: React.FC<AppIconProps> = ({ size = defaultProps.size, ...rest }) => {
   return (
     <svg
       viewBox="0 0 21.5 22.25"
@@ -44,7 +44,5 @@ const StakingIcon: React.FC<AppIconProps> = ({ color, size, ...rest }) => {
     </svg>
   )
 }
-
-StakingIcon.defaultProps = defaultProps
 
 export default StakingIcon

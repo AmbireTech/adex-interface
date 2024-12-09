@@ -1,7 +1,12 @@
 import React from 'react'
 import { AppIconProps, defaultProps } from 'types/components/Icon'
 
-const LeftArrowIcon: React.FC<AppIconProps> = ({ color, size, strokeWidth, ...rest }) => {
+const LeftArrowIcon: React.FC<AppIconProps> = ({
+  color = defaultProps.color,
+  size = defaultProps.size,
+  strokeWidth = defaultProps.strokeWidth,
+  ...rest
+}) => {
   return (
     <svg
       viewBox="0 0 18.384 10.202"
@@ -23,7 +28,5 @@ const LeftArrowIcon: React.FC<AppIconProps> = ({ color, size, strokeWidth, ...re
     </svg>
   )
 }
-
-LeftArrowIcon.defaultProps = defaultProps
 
 export default LeftArrowIcon

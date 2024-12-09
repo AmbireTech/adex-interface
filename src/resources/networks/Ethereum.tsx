@@ -1,7 +1,7 @@
 import React from 'react'
 import { AppIconProps, defaultProps } from 'types/components/Icon'
 
-const EthereumIcon: React.FC<AppIconProps> = ({ color, size, ...rest }) => {
+const EthereumIcon: React.FC<AppIconProps> = ({ size = defaultProps.size, ...rest }) => {
   return (
     <svg
       viewBox="0 0 32 32"
@@ -27,7 +27,5 @@ const EthereumIcon: React.FC<AppIconProps> = ({ color, size, ...rest }) => {
     </svg>
   )
 }
-
-EthereumIcon.defaultProps = defaultProps
 
 export default EthereumIcon

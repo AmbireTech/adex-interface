@@ -1,7 +1,7 @@
 import React from 'react'
 import { AppIconProps, defaultProps } from 'types/components/Icon'
 
-const TreeDotsMenu: React.FC<AppIconProps> = ({ color, size, strokeWidth, ...rest }) => {
+const TreeDotsMenu: React.FC<AppIconProps> = ({ size = defaultProps.size, ...rest }) => {
   return (
     <svg
       id="three-dots-menu"
@@ -42,7 +42,5 @@ const TreeDotsMenu: React.FC<AppIconProps> = ({ color, size, strokeWidth, ...res
     </svg>
   )
 }
-
-TreeDotsMenu.defaultProps = defaultProps
 
 export default TreeDotsMenu

@@ -1,7 +1,12 @@
 import React from 'react'
 import { AppIconProps, defaultProps } from 'types/components/Icon'
 
-const IncludeIcon: React.FC<AppIconProps> = ({ color, size, strokeWidth, ...rest }) => {
+const IncludeIcon: React.FC<AppIconProps> = ({
+  color = defaultProps.color,
+  size = defaultProps.size,
+  strokeWidth = defaultProps.strokeWidth,
+  ...rest
+}) => {
   return (
     <svg
       viewBox="0 0 13.5 13.5"
@@ -17,7 +22,5 @@ const IncludeIcon: React.FC<AppIconProps> = ({ color, size, strokeWidth, ...rest
     </svg>
   )
 }
-
-IncludeIcon.defaultProps = defaultProps
 
 export default IncludeIcon

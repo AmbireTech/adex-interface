@@ -1,7 +1,12 @@
 import React from 'react'
 import { AppIconProps, defaultProps } from 'types/components/Icon'
 
-const NotificationIcon: React.FC<AppIconProps> = ({ color, size, strokeWidth, ...rest }) => {
+const NotificationIcon: React.FC<AppIconProps> = ({
+  color = defaultProps.color,
+  size = defaultProps.size,
+  strokeWidth = defaultProps.strokeWidth,
+  ...rest
+}) => {
   return (
     <svg
       viewBox="0 0 17.565 21.62"
@@ -26,7 +31,5 @@ const NotificationIcon: React.FC<AppIconProps> = ({ color, size, strokeWidth, ..
     </svg>
   )
 }
-
-NotificationIcon.defaultProps = defaultProps
 
 export default NotificationIcon

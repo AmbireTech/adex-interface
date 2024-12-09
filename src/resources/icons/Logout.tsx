@@ -1,7 +1,12 @@
 import React from 'react'
 import { AppIconProps, defaultProps } from 'types/components/Icon'
 
-const LogoutIcon: React.FC<AppIconProps> = ({ color, size, strokeWidth, ...rest }) => {
+const LogoutIcon: React.FC<AppIconProps> = ({
+  color = defaultProps.color,
+  size = defaultProps.size,
+  strokeWidth = defaultProps.strokeWidth,
+  ...rest
+}) => {
   return (
     <svg
       viewBox="0 0 21.5 20.54"
@@ -21,7 +26,5 @@ const LogoutIcon: React.FC<AppIconProps> = ({ color, size, strokeWidth, ...rest 
     </svg>
   )
 }
-
-LogoutIcon.defaultProps = defaultProps
 
 export default LogoutIcon

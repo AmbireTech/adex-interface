@@ -1,7 +1,12 @@
 import React from 'react'
 import { AppIconProps, defaultProps } from 'types/components/Icon'
 
-const InfoCurlyBorder: React.FC<AppIconProps> = ({ color, size, strokeWidth, ...rest }) => {
+const InfoCurlyBorder: React.FC<AppIconProps> = ({
+  color = defaultProps.color,
+  size = defaultProps.size,
+  strokeWidth = defaultProps.strokeWidth,
+  ...rest
+}) => {
   return (
     <svg
       viewBox="0 0 26.293 26.301"
@@ -27,7 +32,5 @@ const InfoCurlyBorder: React.FC<AppIconProps> = ({ color, size, strokeWidth, ...
     </svg>
   )
 }
-
-InfoCurlyBorder.defaultProps = defaultProps
 
 export default InfoCurlyBorder

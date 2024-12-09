@@ -1,7 +1,11 @@
 import React from 'react'
 import { AppIconProps, defaultProps } from 'types/components/Icon'
 
-const GlobeIcon: React.FC<AppIconProps> = ({ color, size, strokeWidth, ...rest }) => {
+const GlobeIcon: React.FC<AppIconProps> = ({
+  color = defaultProps.color,
+  size = defaultProps.size,
+  ...rest
+}) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -65,7 +69,5 @@ const GlobeIcon: React.FC<AppIconProps> = ({ color, size, strokeWidth, ...rest }
     </svg>
   )
 }
-
-GlobeIcon.defaultProps = defaultProps
 
 export default GlobeIcon

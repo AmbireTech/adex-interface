@@ -1,7 +1,12 @@
 import React from 'react'
 import { AppIconProps, defaultProps } from 'types/components/Icon'
 
-const StatementsIcon: React.FC<AppIconProps> = ({ color, size, strokeWidth, ...rest }) => {
+const StatementsIcon: React.FC<AppIconProps> = ({
+  color = defaultProps.color,
+  size = defaultProps.size,
+  strokeWidth = defaultProps.strokeWidth,
+  ...rest
+}) => {
   return (
     <svg
       viewBox="0 0 24.057 25.861"
@@ -32,7 +37,5 @@ const StatementsIcon: React.FC<AppIconProps> = ({ color, size, strokeWidth, ...r
     </svg>
   )
 }
-
-StatementsIcon.defaultProps = defaultProps
 
 export default StatementsIcon

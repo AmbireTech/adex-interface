@@ -1,7 +1,12 @@
 import React from 'react'
 import { AppIconProps, defaultProps } from 'types/components/Icon'
 
-const BellIcon: React.FC<AppIconProps> = ({ color, size, strokeWidth, ...rest }) => {
+const BellIcon: React.FC<AppIconProps> = ({
+  color = defaultProps.color,
+  size = defaultProps.size,
+  strokeWidth = defaultProps.strokeWidth,
+  ...rest
+}) => {
   return (
     <svg
       viewBox="0 0 17.565 21.62"
@@ -26,7 +31,5 @@ const BellIcon: React.FC<AppIconProps> = ({ color, size, strokeWidth, ...rest })
     </svg>
   )
 }
-
-BellIcon.defaultProps = defaultProps
 
 export default BellIcon
