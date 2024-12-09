@@ -180,6 +180,13 @@ const StepThree = () => {
               (learn more)
             </DefaultCustomAnchor>
           </Group>
+          <Checkbox
+            label="Bid on loose sources"
+            key={key('targetingInput.inputs.advanced.looseSourceCTR')}
+            {...getInputProps('targetingInput.inputs.advanced.looseSourceCTR', {
+              type: 'checkbox'
+            })}
+          />
         </Stack>
 
         <TextInput
