@@ -4,8 +4,6 @@ import {
   ImageSizes,
   FileWithPath,
   HTMLBannerDimensions,
-  SupplyStats,
-  SupplyStatsDetails,
   SSPsAnalyticsData,
   CampaignUI
 } from 'types'
@@ -24,14 +22,6 @@ export const checkSelectedDevices = (devices: Devices[]) => {
 
 export const findArrayWithLengthInObjectAsValue = (obj: object) =>
   Object.entries(obj).find(([, value]) => Array.isArray(value) && value.length > 0)
-
-export const selectBannerSizes = (
-  supplyStats: SupplyStats
-): Record<string, SupplyStatsDetails[][]> => ({
-  app: [supplyStats.appBannerFormats, supplyStats.appBidFloors],
-  mobile: [supplyStats.siteBannerFormatsMobile, supplyStats.siteMobileBidFloors],
-  desktop: [supplyStats.siteBannerFormatsDesktop, supplyStats.siteDesktopBidFloors]
-})
 
 export const findDuplicates = (array: string[]) => {
   const countMap: any = {}
@@ -267,30 +257,6 @@ export const parseRange = (str: string): { min: number; max: number } => {
   const max = parseFloat(`${match?.[3]}.${match?.[4]}`)
 
   return { min, max }
-}
-
-export const getRecommendedCPMRange = (supplyStats: SupplyStats, campaign: Campaign) => {
-  if (!supplyStats || !campaign) {
-    return { min: 0, max: 0 }
-  }
-  const mostRequests = campaign.targetingInput.inputs.placements.in
-    .map((placement) => {
-      switch (placement) {
-        case 'app':
-          return supplyStats.appBidFloors
-
-        case 'site':
-          return [...supplyStats.siteDesktopBidFloors, ...supplyStats.siteMobileBidFloors]
-        default:
-          return []
-      }
-    })
-    .flat()
-    .sort((a, b) => b.count - a.count)?.[0]
-
-  return {
-    ...parseRange(mostRequests?.value || '0_42-0_69')
-  }
 }
 
 export const cpmToStatisticsPrecision = (price: number): number => {

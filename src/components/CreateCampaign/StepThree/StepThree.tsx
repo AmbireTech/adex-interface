@@ -7,7 +7,9 @@ import {
   Radio,
   Text,
   TextInput,
-  SimpleGrid
+  SimpleGrid,
+  Tooltip,
+  ActionIcon
 } from '@mantine/core'
 import { useMemo } from 'react'
 import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
@@ -180,13 +182,26 @@ const StepThree = () => {
               (learn more)
             </DefaultCustomAnchor>
           </Group>
-          <Checkbox
-            label="Bid on loose sources"
-            key={key('targetingInput.inputs.advanced.looseSourceCTR')}
-            {...getInputProps('targetingInput.inputs.advanced.looseSourceCTR', {
-              type: 'checkbox'
-            })}
-          />
+          <Group>
+            <Checkbox
+              label="Bid on loose sources"
+              key={key('targetingInput.inputs.advanced.looseSourceCTR')}
+              {...getInputProps('targetingInput.inputs.advanced.looseSourceCTR', {
+                type: 'checkbox'
+              })}
+            />
+            <Tooltip
+              multiline
+              maw={420}
+              label={`Enabling bidding on sources with a low Clickthrough Rate (CTR) increases the chances of winning bids
+                but may reduce the campaign’s overall CTR. This option is helpful for campaigns focused on brand awareness
+                rather than driving clicks.`}
+            >
+              <ActionIcon size="sm" variant="transparent">
+                <InfoIcon />
+              </ActionIcon>
+            </Tooltip>
+          </Group>
         </Stack>
 
         <TextInput
