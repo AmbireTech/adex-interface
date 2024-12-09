@@ -7,7 +7,9 @@ import {
   NumberInput,
   Paper,
   Tabs,
-  SimpleGrid
+  SimpleGrid,
+  Tooltip,
+  ActionIcon
 } from '@mantine/core'
 import { useForm } from '@mantine/form'
 import { modals } from '@mantine/modals'
@@ -35,6 +37,7 @@ import { defaultConfirmModalProps } from 'components/common/Modals/CustomConfirm
 import Placements from 'components/CampaignAnalytics/Placements'
 import DefaultCustomAnchor from 'components/common/customAnchor'
 import { CPMHelper } from 'components/CreateCampaign/StepThree/CpmHelper'
+import InfoIcon from 'resources/icons/Info'
 
 type TargetingInputEdit = {
   version: string
@@ -340,12 +343,25 @@ const EditCampaign = ({ campaign, isAdmin }: { campaign: Campaign; isAdmin?: boo
                       (learn more)
                     </DefaultCustomAnchor>
                   </Group>
-                  <Checkbox
-                    label="Bid on loose sources"
-                    {...form.getInputProps('targetingInput.inputs.advanced.looseSourceCTR', {
-                      type: 'checkbox'
-                    })}
-                  />
+                  <Group>
+                    <Checkbox
+                      label="Bid on low CTR sources"
+                      {...form.getInputProps('targetingInput.inputs.advanced.looseSourceCTR', {
+                        type: 'checkbox'
+                      })}
+                    />
+                    <Tooltip
+                      multiline
+                      maw={420}
+                      label={`Enabling bidding on sources that perform low on Clickthrough rate (CTR)
+                        will result on higher chance of winning bids but will lower the overall CTR if the campaign.
+                        This option can be useful when the purpose of the campaign is brand awareness not strictly click turnover.`}
+                    >
+                      <ActionIcon size="sm" variant="transparent">
+                        <InfoIcon />
+                      </ActionIcon>
+                    </Tooltip>
+                  </Group>
                 </Stack>
 
                 <Button disabled={!form.isDirty()} size="lg" type="submit" maw={200}>
