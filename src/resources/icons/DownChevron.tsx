@@ -1,7 +1,12 @@
 import React from 'react'
 import { AppIconProps, defaultProps } from 'types/components/Icon'
 
-const DownChevronIcon: React.FC<AppIconProps> = ({ color, size, strokeWidth, ...rest }) => {
+const DownChevronIcon: React.FC<AppIconProps> = ({
+  color = defaultProps.color,
+  size = defaultProps.size,
+  strokeWidth = defaultProps.strokeWidth,
+  ...rest
+}) => {
   return (
     <svg
       viewBox="0 0 21.5 21.5"
@@ -26,7 +31,5 @@ const DownChevronIcon: React.FC<AppIconProps> = ({ color, size, strokeWidth, ...
     </svg>
   )
 }
-
-DownChevronIcon.defaultProps = defaultProps
 
 export default DownChevronIcon

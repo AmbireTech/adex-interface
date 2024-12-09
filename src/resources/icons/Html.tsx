@@ -1,7 +1,12 @@
 import React from 'react'
 import { AppIconProps, defaultProps } from 'types/components/Icon'
 
-const HtmlIcon: React.FC<AppIconProps> = ({ color, size, strokeWidth, ...rest }) => {
+const HtmlIcon: React.FC<AppIconProps> = ({
+  color = defaultProps.color,
+  size = defaultProps.size,
+  strokeWidth = defaultProps.strokeWidth,
+  ...rest
+}) => {
   return (
     <svg
       viewBox="0 0 19.316 21.495"
@@ -26,7 +31,5 @@ const HtmlIcon: React.FC<AppIconProps> = ({ color, size, strokeWidth, ...rest })
     </svg>
   )
 }
-
-HtmlIcon.defaultProps = defaultProps
 
 export default HtmlIcon

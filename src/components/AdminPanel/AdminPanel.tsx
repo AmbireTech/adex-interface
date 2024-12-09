@@ -7,14 +7,11 @@ import Invoices from 'components/Billing/Invoices'
 import AdminAnalytics from './AdminAnalytics'
 import Accounts from './Accounts'
 import SSPsAnalytics from './SSPsAnalytics'
-import { SspStats } from './SspStats'
 // import { AccountDetails } from './AccountDetails'
 
 const AdminPanel = () => {
   const navigate = useNavigate()
   const { tabValue = 'campaigns', accountId } = useParams()
-
-  console.log({ tabValue })
 
   return (
     <Container fluid>
@@ -31,7 +28,6 @@ const AdminPanel = () => {
           <Tabs.Tab value="invoices">Invoices</Tabs.Tab>
           <Tabs.Tab value="validatorAnalytics">Validator Analytics</Tabs.Tab>
           <Tabs.Tab value="sspAnalytics">SSPs Analytics</Tabs.Tab>
-          <Tabs.Tab value="sspStats">SSP stats</Tabs.Tab>
           <Tabs.Tab value="accounts">Accounts</Tabs.Tab>
           <Tabs.Tab value="user-account" disabled>
             Account details
@@ -53,10 +49,6 @@ const AdminPanel = () => {
 
           <Tabs.Panel value="sspAnalytics" pt="xs">
             <SSPsAnalytics />
-          </Tabs.Panel>
-
-          <Tabs.Panel value="sspStats" pt="xs">
-            <SspStats />
           </Tabs.Panel>
 
           <Tabs.Panel value="accounts" pt="xs">

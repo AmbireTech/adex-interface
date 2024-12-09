@@ -1,7 +1,7 @@
 import React from 'react'
 import { AppIconProps, defaultProps } from 'types/components/Icon'
 
-const PolygonIcon: React.FC<AppIconProps> = ({ color, size, ...rest }) => {
+const PolygonIcon: React.FC<AppIconProps> = ({ size = defaultProps.size, ...rest }) => {
   return (
     <svg
       viewBox="0 0 32 32"
@@ -20,7 +20,5 @@ const PolygonIcon: React.FC<AppIconProps> = ({ color, size, ...rest }) => {
     </svg>
   )
 }
-
-PolygonIcon.defaultProps = defaultProps
 
 export default PolygonIcon

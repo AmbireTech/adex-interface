@@ -90,7 +90,7 @@ const SSPsAnalyticsProvider: FC<PropsWithChildren> = ({ children }) => {
           }
         )
 
-        console.log({ analyticsDataRes })
+        // console.log({ analyticsDataRes })
 
         if (!analyticsDataRes) {
           throw new Error('invalid analytics data response')
@@ -100,15 +100,21 @@ const SSPsAnalyticsProvider: FC<PropsWithChildren> = ({ children }) => {
           const next = new Map(prev)
           const nextAggr: { status: DataStatus; data: SSPsAnalyticsData[] } = {
             status: 'processed',
-            data: analyticsDataRes.data.map(({ value, adSlotCount, reqCount }) => ({
-              // NOTE: hack because it can not be 0
-              // changing here will avoid fixing it on backend and entire frontend
-              value: value === '0_00-0_10' ? '0_01-0_10' : value,
-              count: reqCount !== undefined ? reqCount : adSlotCount
-            }))
+            data: analyticsDataRes.data.map(
+              ({ value, adSlotCount, reqCount, bidsCount, bidsBilledCount, impsCount }) => ({
+                // NOTE: hack because it can not be 0
+                // changing here will avoid fixing it on backend and entire frontend
+                // value: (value === '0_00-0_10' ? '0_01-0_10' : value) || '',
+                value,
+                count: reqCount !== undefined ? reqCount : adSlotCount,
+                bids: bidsCount,
+                billed: bidsBilledCount,
+                imps: impsCount
+              })
+            )
           }
 
-          console.log({ nextAggr })
+          // console.log({ nextAggr })
           next.set(dataKey, nextAggr)
           return next
         })

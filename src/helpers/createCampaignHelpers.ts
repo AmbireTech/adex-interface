@@ -4,13 +4,13 @@ import {
   ImageSizes,
   FileWithPath,
   HTMLBannerDimensions,
-  SupplyStats,
-  SupplyStatsDetails,
   SSPsAnalyticsData,
   CampaignUI
 } from 'types'
 
 import { parseFromBigNumPrecision } from 'helpers/balances'
+
+export const MAGIC_NUMBER = 1.42
 
 export const checkSelectedDevices = (devices: Devices[]) => {
   if (!devices.length) return null
@@ -22,14 +22,6 @@ export const checkSelectedDevices = (devices: Devices[]) => {
 
 export const findArrayWithLengthInObjectAsValue = (obj: object) =>
   Object.entries(obj).find(([, value]) => Array.isArray(value) && value.length > 0)
-
-export const selectBannerSizes = (
-  supplyStats: SupplyStats
-): Record<string, SupplyStatsDetails[][]> => ({
-  app: [supplyStats.appBannerFormats, supplyStats.appBidFloors],
-  mobile: [supplyStats.siteBannerFormatsMobile, supplyStats.siteMobileBidFloors],
-  desktop: [supplyStats.siteBannerFormatsDesktop, supplyStats.siteDesktopBidFloors]
-})
 
 export const findDuplicates = (array: string[]) => {
   const countMap: any = {}
@@ -267,55 +259,44 @@ export const parseRange = (str: string): { min: number; max: number } => {
   return { min, max }
 }
 
-export const getRecommendedCPMRange = (supplyStats: SupplyStats, campaign: Campaign) => {
-  if (!supplyStats || !campaign) {
-    return { min: 0, max: 0 }
-  }
-  const mostRequests = campaign.targetingInput.inputs.placements.in
-    .map((placement) => {
-      switch (placement) {
-        case 'app':
-          return supplyStats.appBidFloors
-
-        case 'site':
-          return [...supplyStats.siteDesktopBidFloors, ...supplyStats.siteMobileBidFloors]
-        default:
-          return []
-      }
-    })
-    .flat()
-    .sort((a, b) => b.count - a.count)?.[0]
-
-  return {
-    ...parseRange(mostRequests?.value || '0_42-0_69')
-  }
+export const cpmToStatisticsPrecision = (price: number): number => {
+  return Number(price.toPrecision(4))
 }
-
-export const getRecommendedCPMRangeAdvanced = (
+export const getCPMRangeAdvancedData = (
   analytics: SSPsAnalyticsData[],
   min: number,
   max: number
 ) => {
   const topRanges = analytics
-    .map(({ value, count }) => ({
-      count,
-      ...parseRange(value.toString())
-    }))
+    .map(({ value, count, bids, imps }) => {
+      const { min: minParsed, max: maxParsed } = parseRange(value.toString())
+      return {
+        value,
+        count,
+        bids: bids || 0,
+        imps: imps || 0,
+        min: cpmToStatisticsPrecision(minParsed * MAGIC_NUMBER),
+        max: cpmToStatisticsPrecision(maxParsed * MAGIC_NUMBER)
+      }
+    })
     .sort((a, b) => a.min - b.min)
     .filter((x) => x.min >= min && x.max <= max)
-    .reduce(
-      (data, current) => {
-        return {
-          ...data,
-          min: Math.min(data.min, current.min) || Math.max(data.min, current.min),
-          max: Math.max(data.max, current.max),
-          count: data.count + current.count
-        }
-      },
-      { min: 0, max: 0, count: 0 }
-    )
 
-  return { ...topRanges, supply: analytics.reduce((sum, cur) => sum + cur.count, 0) }
+  const topData = topRanges.reduce(
+    (data, current) => {
+      return {
+        ...data,
+        min: Math.min(data.min, current.min) || Math.max(data.min, current.min),
+        max: Math.max(data.max, current.max),
+        count: data.count + current.count,
+        bids: data.bids + current.bids,
+        imps: data.imps + current.imps
+      }
+    },
+    { min: 0, max: 0, count: 0, bids: 0, imps: 0 }
+  )
+
+  return { ...topData, supply: analytics.reduce((sum, cur) => sum + cur.count, 0) }
 }
 
 export const campaignToCampaignUI = (campaign: Campaign, currency: string): CampaignUI => {

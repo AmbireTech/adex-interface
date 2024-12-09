@@ -134,11 +134,17 @@ export type SSPsAnalyticsDataResp = {
   value: string | number
   adSlotCount: number
   reqCount?: number
+  bidsCount?: number
+  bidsBilledCount: number
+  impsCount: number
 }
 
 export type SSPsAnalyticsData = {
   value: string | number
   count: number
+  bids?: number
+  billed?: number
+  imps?: number
 }
 
 export type Operator = 'in' | 'nin'
@@ -157,6 +163,7 @@ export type SSPsAnalyticsDataKeys = {
 
 export type SSPsAnalyticsDataQuery = SSPsAnalyticsDataKeys & {
   groupBy?: keyof SSPsAnalyticsDataKeys
+  showBidCount?: boolean
 }
 
 export type DataStatus = 'loading' | 'updating' | 'processed' | 'error'

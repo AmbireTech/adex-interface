@@ -1,7 +1,11 @@
 import React from 'react'
 import { AppIconProps, defaultProps } from 'types/components/Icon'
 
-const CalendarIcon: React.FC<AppIconProps> = ({ color, size, ...rest }) => {
+const CalendarIcon: React.FC<AppIconProps> = ({
+  color = defaultProps.color,
+  size = defaultProps.size,
+  ...rest
+}) => {
   return (
     <svg
       viewBox="0 0 21.767 24"
@@ -49,7 +53,5 @@ const CalendarIcon: React.FC<AppIconProps> = ({ color, size, ...rest }) => {
     </svg>
   )
 }
-
-CalendarIcon.defaultProps = defaultProps
 
 export default CalendarIcon

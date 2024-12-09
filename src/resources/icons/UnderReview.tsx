@@ -1,7 +1,11 @@
 import React from 'react'
 import { AppIconProps, defaultProps } from 'types/components/Icon'
 
-const UnderReviewIcon: React.FC<AppIconProps> = ({ color, size, ...rest }) => {
+const UnderReviewIcon: React.FC<AppIconProps> = ({
+  color = defaultProps.color,
+  size = defaultProps.size,
+  ...rest
+}) => {
   return (
     <svg
       viewBox="0 0 14 14"
@@ -33,7 +37,5 @@ const UnderReviewIcon: React.FC<AppIconProps> = ({ color, size, ...rest }) => {
     </svg>
   )
 }
-
-UnderReviewIcon.defaultProps = defaultProps
 
 export default UnderReviewIcon

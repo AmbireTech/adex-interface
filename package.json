@@ -1,6 +1,6 @@
 {
   "name": "adex-interface",
-  "version": "0.69.685",
+  "version": "0.69.69",
   "private": true,
   "dependencies": {
     "@ambire/login-sdk-core": "^0.0.21",
@@ -36,7 +36,7 @@
     "@visx/scale": "^3.3.0",
     "@visx/xychart": "^3.3.0",
     "@visx/zoom": "^3.3.0",
-    "adex-common": "github:AmbireTech/adex-common#f73432e90edbeb60f6714e446f5c607fecb1ab1a",
+    "adex-common": "github:AmbireTech/adex-common#eb2d0bd0c10ef2baed38391d59dec5055646bce4",
     "blockies-ts": "^1.0.0",
     "d3-geo": "^3.1.0",
     "dayjs": "^1.11.10",

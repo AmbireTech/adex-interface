@@ -1,7 +1,12 @@
 import React from 'react'
 import { AppIconProps, defaultProps } from 'types/components/Icon'
 
-const SendCryptoIcon: React.FC<AppIconProps> = ({ color, size, strokeWidth, ...rest }) => {
+const SendCryptoIcon: React.FC<AppIconProps> = ({
+  color = defaultProps.color,
+  size = defaultProps.size,
+  strokeWidth = defaultProps.strokeWidth,
+  ...rest
+}) => {
   return (
     <svg
       viewBox="0 0 34.533 34.533"
@@ -29,7 +34,5 @@ const SendCryptoIcon: React.FC<AppIconProps> = ({ color, size, strokeWidth, ...r
     </svg>
   )
 }
-
-SendCryptoIcon.defaultProps = defaultProps
 
 export default SendCryptoIcon

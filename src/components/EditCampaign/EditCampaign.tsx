@@ -3,13 +3,13 @@ import {
   Button,
   Group,
   Text,
-  Tooltip,
-  ActionIcon,
   Checkbox,
   NumberInput,
   Paper,
   Tabs,
-  SimpleGrid
+  SimpleGrid,
+  Tooltip,
+  ActionIcon
 } from '@mantine/core'
 import { useForm } from '@mantine/form'
 import { modals } from '@mantine/modals'
@@ -25,23 +25,19 @@ import { parseBigNumTokenAmountToDecimal, parseToBigNumPrecision } from 'helpers
 
 import {
   campaignToCampaignUI,
-  findArrayWithLengthInObjectAsValue,
-  getRecommendedCPMRange
+  findArrayWithLengthInObjectAsValue
 } from 'helpers/createCampaignHelpers'
 import useAccount from 'hooks/useAccount'
 import { useCallback, useEffect, useMemo } from 'react'
 import { useCampaignsData } from 'hooks/useCampaignsData'
-import type {
-  unstable_Blocker as Blocker,
-  unstable_BlockerFunction as BlockerFunction
-} from 'react-router-dom'
-import { unstable_useBlocker as useBlocker, useParams, useNavigate } from 'react-router-dom'
-import InfoFilledIcon from 'resources/icons/InfoFilled'
+import type { Blocker, BlockerFunction } from 'react-router-dom'
+import { useBlocker, useParams, useNavigate } from 'react-router-dom'
 import throttle from 'lodash.throttle'
 import { defaultConfirmModalProps } from 'components/common/Modals/CustomConfirmModal'
 import Placements from 'components/CampaignAnalytics/Placements'
 import DefaultCustomAnchor from 'components/common/customAnchor'
 import { CPMHelper } from 'components/CreateCampaign/StepThree/CpmHelper'
+import InfoIcon from 'resources/icons/Info'
 
 type TargetingInputEdit = {
   version: string
@@ -66,12 +62,7 @@ const EditCampaign = ({ campaign, isAdmin }: { campaign: Campaign; isAdmin?: boo
   } = useAccount()
   const { tabValue = 'budget' } = useParams()
   const navigate = useNavigate()
-  const { supplyStats, editCampaign } = useCampaignsData()
-
-  const recommendedPaymentBounds = useMemo(
-    () => getRecommendedCPMRange(supplyStats, campaign),
-    [campaign, supplyStats]
-  )
+  const { editCampaign } = useCampaignsData()
 
   const form = useForm<FormProps>({
     initialValues: {
@@ -149,7 +140,8 @@ const EditCampaign = ({ campaign, isAdmin }: { campaign: Campaign; isAdmin?: boo
               typeof value !== 'boolean' ? 'Invalid value' : null,
             limitDailyAverageSpending: (value) =>
               typeof value !== 'boolean' ? 'Invalid value' : null,
-            aggressiveBidding: (value) => (typeof value !== 'boolean' ? 'Invalid value' : null)
+            aggressiveBidding: (value) => (typeof value !== 'boolean' ? 'Invalid value' : null),
+            looseSourceCTR: (value) => (typeof value !== 'boolean' ? 'Invalid value' : null)
           }
         }
       }
@@ -168,7 +160,7 @@ const EditCampaign = ({ campaign, isAdmin }: { campaign: Campaign; isAdmin?: boo
 
   useEffect(() => {
     if (blocker.state === 'blocked') {
-      return modals.openConfirmModal(
+      modals.openConfirmModal(
         defaultConfirmModalProps({
           text: 'You did not save your changes. Are you sure you want to leave this page?',
           color: 'attention',
@@ -272,22 +264,13 @@ const EditCampaign = ({ campaign, isAdmin }: { campaign: Campaign; isAdmin?: boo
 
         <form onSubmit={form.onSubmit(throttledSbm)}>
           <Tabs.Panel value="budget">
-            <SimpleGrid cols={{ base: 1, lg: 2 }}>
+            <SimpleGrid cols={{ base: 1, xl: 2 }}>
               <Stack gap="xl" w="100%">
                 <Stack gap="xs">
-                  <Group gap="xs">
-                    <Text c="secondaryText" size="sm" fw="bold">
-                      CPM
-                    </Text>
-                    <Tooltip
-                      label={`Recommended CPM: Min - ${recommendedPaymentBounds.min}; Max - ${recommendedPaymentBounds.max}`}
-                      ml="sm"
-                    >
-                      <ActionIcon variant="transparent" color="secondaryText" size="xs">
-                        <InfoFilledIcon />
-                      </ActionIcon>
-                    </Tooltip>
-                  </Group>
+                  <Text c="secondaryText" size="sm" fw="bold">
+                    CPM
+                  </Text>
+
                   <Group align="baseline" grow>
                     <NumberInput
                       w="196px"
@@ -359,6 +342,25 @@ const EditCampaign = ({ campaign, isAdmin }: { campaign: Campaign; isAdmin?: boo
                     >
                       (learn more)
                     </DefaultCustomAnchor>
+                  </Group>
+                  <Group>
+                    <Checkbox
+                      label="Bid on low CTR sources"
+                      {...form.getInputProps('targetingInput.inputs.advanced.looseSourceCTR', {
+                        type: 'checkbox'
+                      })}
+                    />
+                    <Tooltip
+                      multiline
+                      maw={420}
+                      label={`Enabling bidding on sources with a low Clickthrough Rate (CTR) increases the chances of winning bids
+                        but may reduce the campaign’s overall CTR. This option is helpful for campaigns focused on brand awareness
+                        rather than driving clicks.`}
+                    >
+                      <ActionIcon size="sm" variant="transparent">
+                        <InfoIcon />
+                      </ActionIcon>
+                    </Tooltip>
                   </Group>
                 </Stack>
 

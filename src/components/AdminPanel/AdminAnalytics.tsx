@@ -126,23 +126,27 @@ const AdminAnalytics = () => {
   const headings = useMemo(() => [analType.toString(), ...headingsDefault], [analType])
 
   // TODO: change campaign analytics to analytics
-  const { analyticsData, getAnalyticsKeyAndUpdate, mappedAnalytics } = useCampaignAnalytics()
+  const {
+    //  analyticsData,
+    getAnalyticsKeyAndUpdate,
+    mappedAnalytics
+  } = useCampaignAnalytics()
 
-  const analytics = useMemo(
-    () => analyticsData.get(analyticsKey?.key || ''),
-    [analyticsData, analyticsKey]
-  )
+  // const analytics = useMemo(
+  //   () => analyticsData.get(analyticsKey?.key || ''),
+  //   [analyticsData, analyticsKey]
+  // )
 
   const adminMappedAnalytics = useMemo(
     () => mappedAnalytics.get(analyticsKey?.key || ''),
     [analyticsKey, mappedAnalytics]
   )
 
-  useEffect(() => {
-    console.log({ analytics })
-    console.log({ mappedAnalytics })
-    console.log({ adminMappedAnalytics })
-  }, [analytics, mappedAnalytics, adminMappedAnalytics])
+  // useEffect(() => {
+  //   console.log({ analytics })
+  //   console.log({ mappedAnalytics })
+  //   console.log({ adminMappedAnalytics })
+  // }, [analytics, mappedAnalytics, adminMappedAnalytics])
 
   useEffect(() => {
     setAnalyticsKey(undefined)
@@ -164,7 +168,7 @@ const AdminAnalytics = () => {
         placement || undefined
       )
       setAnalyticsKey(key)
-      console.log('key', key)
+      // console.log('key', key)
     }
 
     checkAnalytics()

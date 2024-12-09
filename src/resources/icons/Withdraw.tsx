@@ -1,7 +1,12 @@
 import React from 'react'
 import { AppIconProps, defaultProps } from 'types/components/Icon'
 
-const WithdrawIcon: React.FC<AppIconProps> = ({ color, size, strokeWidth, ...rest }) => {
+const WithdrawIcon: React.FC<AppIconProps> = ({
+  color = defaultProps.color,
+  size = defaultProps.size,
+  strokeWidth = defaultProps.strokeWidth,
+  ...rest
+}) => {
   return (
     <svg
       viewBox="0 0 21.811 18.5"
@@ -24,7 +29,5 @@ const WithdrawIcon: React.FC<AppIconProps> = ({ color, size, strokeWidth, ...res
     </svg>
   )
 }
-
-WithdrawIcon.defaultProps = defaultProps
 
 export default WithdrawIcon

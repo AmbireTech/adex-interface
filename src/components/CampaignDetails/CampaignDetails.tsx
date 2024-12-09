@@ -391,6 +391,11 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
                     />
                     <CampaignDetailsRow
                       textSize="sm"
+                      title="Loose source bidding"
+                      value={campaign.targetingInput.inputs.advanced.looseSourceCTR ? 'Yes' : 'No'}
+                    />
+                    <CampaignDetailsRow
+                      textSize="sm"
                       title="Last modified by"
                       noBorder
                       value={

@@ -1,7 +1,12 @@
 import React from 'react'
 import { AppIconProps, defaultProps } from 'types/components/Icon'
 
-const DesktopIcon: React.FC<AppIconProps> = ({ color, size, strokeWidth, ...rest }) => {
+const DesktopIcon: React.FC<AppIconProps> = ({
+  color = defaultProps.color,
+  size = defaultProps.size,
+  strokeWidth = defaultProps.strokeWidth,
+  ...rest
+}) => {
   return (
     <svg
       viewBox="0 0 36.8 36.783"
@@ -24,7 +29,5 @@ const DesktopIcon: React.FC<AppIconProps> = ({ color, size, strokeWidth, ...rest
     </svg>
   )
 }
-
-DesktopIcon.defaultProps = defaultProps
 
 export default DesktopIcon

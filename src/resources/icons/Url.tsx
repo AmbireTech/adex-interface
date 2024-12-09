@@ -1,7 +1,12 @@
 import React from 'react'
 import { AppIconProps, defaultProps } from 'types/components/Icon'
 
-const UrlIcon: React.FC<AppIconProps> = ({ color, size, strokeWidth, ...rest }) => {
+const UrlIcon: React.FC<AppIconProps> = ({
+  color = defaultProps.color,
+  size = defaultProps.size,
+  strokeWidth = defaultProps.strokeWidth,
+  ...rest
+}) => {
   return (
     <svg
       viewBox="0 0 19.682 11.5"
@@ -24,7 +29,5 @@ const UrlIcon: React.FC<AppIconProps> = ({ color, size, strokeWidth, ...rest }) 
     </svg>
   )
 }
-
-UrlIcon.defaultProps = defaultProps
 
 export default UrlIcon

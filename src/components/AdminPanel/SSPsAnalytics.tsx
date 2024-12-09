@@ -145,10 +145,11 @@ const SSPsAnalytics = ({
           format: selectedFormats
         }),
         limit: 666,
-        groupBy
+        groupBy,
+        showBidCount: true
       })
       setAnalyticsKey(key)
-      console.log('key', key)
+      // console.log('key', key)
     }
 
     checkAnalytics()
@@ -171,7 +172,9 @@ const SSPsAnalytics = ({
   const data: { elements: DataElement[]; totalRequests: number } = useMemo(() => {
     return {
       elements:
-        analytics?.data.map(({ count, value }) => {
+        analytics?.data.map(({ count, value, bids, billed, imps }) => {
+          const bidsToImpressionRation = ((imps || 0) / (bids || 1)) * 100
+          const billedToImpressionsRate = ((imps || 0) / (billed || 1)) * 100
           return {
             id: value.toString() + count.toString(),
             columns: [
@@ -179,7 +182,12 @@ const SSPsAnalytics = ({
                 value: value.toString(),
                 element: mapSegmentLabel(groupBy, value).label
               },
-              { value: count, element: <NumberFormatter value={count} thousandSeparator /> }
+              { value: count, element: <NumberFormatter value={count} thousandSeparator /> },
+              { value: bids, element: <NumberFormatter value={bids} thousandSeparator /> },
+              { value: billed, element: <NumberFormatter value={billed} thousandSeparator /> },
+              { value: imps, element: <NumberFormatter value={imps} thousandSeparator /> },
+              { value: bidsToImpressionRation, element: `${bidsToImpressionRation.toFixed(2)} %` },
+              { value: billedToImpressionsRate, element: `${billedToImpressionsRate.toFixed(2)} %` }
             ]
           }
         }) || [],
@@ -327,7 +335,15 @@ const SSPsAnalytics = ({
       <Stack>
         <CustomTable
           pageSize={10}
-          headings={[groupBy?.toString() || 'data', 'count']}
+          headings={[
+            groupBy?.toString() || 'data',
+            'slots',
+            'bids',
+            'billed impressions',
+            'verified impressions',
+            'bids success rate',
+            'billed to verified impressions rate'
+          ]}
           data={data.elements}
           loading={loading}
         />

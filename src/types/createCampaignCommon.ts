@@ -29,24 +29,6 @@ export type ImageSizes = {
   height: number
 }
 
-type SupplyStatsTypes =
-  | 'appBannerFormats'
-  | 'siteBannerFormatsDesktop'
-  | 'siteBannerFormatsMobile'
-  | 'appBidFloors'
-  | 'siteDesktopBidFloors'
-  | 'siteMobileBidFloors'
-
-export type SupplyStatsDetails = {
-  value: string
-  count: number
-  checked?: boolean
-}
-
-export type SupplyStats = {
-  [key in SupplyStatsTypes]: SupplyStatsDetails[]
-}
-
 export type CreateCampaignType = {
   step: number
   nextStep: () => void

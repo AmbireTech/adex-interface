@@ -1,7 +1,11 @@
 import React from 'react'
 import { AppIconProps, defaultProps } from 'types/components/Icon'
 
-const StopIcon: React.FC<AppIconProps> = ({ color, size, strokeWidth, ...rest }) => {
+const StopIcon: React.FC<AppIconProps> = ({
+  color = defaultProps.color,
+  size = defaultProps.size,
+  ...rest
+}) => {
   return (
     <svg viewBox="0 0 9 9" xmlns="http://www.w3.org/2000/svg" width={size} height={size} {...rest}>
       <path
@@ -14,7 +18,5 @@ const StopIcon: React.FC<AppIconProps> = ({ color, size, strokeWidth, ...rest })
     </svg>
   )
 }
-
-StopIcon.defaultProps = defaultProps
 
 export default StopIcon

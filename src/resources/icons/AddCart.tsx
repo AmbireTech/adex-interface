@@ -1,7 +1,12 @@
 import React from 'react'
 import { AppIconProps, defaultProps } from 'types/components/Icon'
 
-const AddCartIcon: React.FC<AppIconProps> = ({ color, size, strokeWidth, ...rest }) => {
+const AddCartIcon: React.FC<AppIconProps> = ({
+  color = defaultProps.color,
+  size = defaultProps.size,
+  strokeWidth = defaultProps.strokeWidth,
+  ...rest
+}) => {
   return (
     <svg
       viewBox="0 0 24 24"
@@ -43,7 +48,5 @@ const AddCartIcon: React.FC<AppIconProps> = ({ color, size, strokeWidth, ...rest
     </svg>
   )
 }
-
-AddCartIcon.defaultProps = defaultProps
 
 export default AddCartIcon
