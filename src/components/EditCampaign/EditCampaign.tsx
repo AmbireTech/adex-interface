@@ -3,7 +3,6 @@ import {
   Button,
   Group,
   Text,
-  ActionIcon,
   Checkbox,
   NumberInput,
   Paper,
@@ -31,7 +30,6 @@ import { useCallback, useEffect, useMemo } from 'react'
 import { useCampaignsData } from 'hooks/useCampaignsData'
 import type { Blocker, BlockerFunction } from 'react-router-dom'
 import { useBlocker, useParams, useNavigate } from 'react-router-dom'
-import InfoFilledIcon from 'resources/icons/InfoFilled'
 import throttle from 'lodash.throttle'
 import { defaultConfirmModalProps } from 'components/common/Modals/CustomConfirmModal'
 import Placements from 'components/CampaignAnalytics/Placements'
@@ -266,15 +264,10 @@ const EditCampaign = ({ campaign, isAdmin }: { campaign: Campaign; isAdmin?: boo
             <SimpleGrid cols={{ base: 1, xl: 2 }}>
               <Stack gap="xl" w="100%">
                 <Stack gap="xs">
-                  <Group gap="xs">
-                    <Text c="secondaryText" size="sm" fw="bold">
-                      CPM
-                    </Text>
+                  <Text c="secondaryText" size="sm" fw="bold">
+                    CPM
+                  </Text>
 
-                    <ActionIcon variant="transparent" color="secondaryText" size="xs">
-                      <InfoFilledIcon />
-                    </ActionIcon>
-                  </Group>
                   <Group align="baseline" grow>
                     <NumberInput
                       w="196px"
