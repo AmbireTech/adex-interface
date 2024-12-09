@@ -3,7 +3,6 @@ import {
   Button,
   Group,
   Text,
-  Tooltip,
   ActionIcon,
   Checkbox,
   NumberInput,
@@ -25,8 +24,7 @@ import { parseBigNumTokenAmountToDecimal, parseToBigNumPrecision } from 'helpers
 
 import {
   campaignToCampaignUI,
-  findArrayWithLengthInObjectAsValue,
-  getRecommendedCPMRange
+  findArrayWithLengthInObjectAsValue
 } from 'helpers/createCampaignHelpers'
 import useAccount from 'hooks/useAccount'
 import { useCallback, useEffect, useMemo } from 'react'
@@ -63,12 +61,7 @@ const EditCampaign = ({ campaign, isAdmin }: { campaign: Campaign; isAdmin?: boo
   } = useAccount()
   const { tabValue = 'budget' } = useParams()
   const navigate = useNavigate()
-  const { supplyStats, editCampaign } = useCampaignsData()
-
-  const recommendedPaymentBounds = useMemo(
-    () => getRecommendedCPMRange(supplyStats, campaign),
-    [campaign, supplyStats]
-  )
+  const { editCampaign } = useCampaignsData()
 
   const form = useForm<FormProps>({
     initialValues: {
@@ -277,14 +270,10 @@ const EditCampaign = ({ campaign, isAdmin }: { campaign: Campaign; isAdmin?: boo
                     <Text c="secondaryText" size="sm" fw="bold">
                       CPM
                     </Text>
-                    <Tooltip
-                      label={`Recommended CPM: Min - ${recommendedPaymentBounds.min}; Max - ${recommendedPaymentBounds.max}`}
-                      ml="sm"
-                    >
-                      <ActionIcon variant="transparent" color="secondaryText" size="xs">
-                        <InfoFilledIcon />
-                      </ActionIcon>
-                    </Tooltip>
+
+                    <ActionIcon variant="transparent" color="secondaryText" size="xs">
+                      <InfoFilledIcon />
+                    </ActionIcon>
                   </Group>
                   <Group align="baseline" grow>
                     <NumberInput
