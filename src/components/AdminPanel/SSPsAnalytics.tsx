@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from 'react'
+import { useCallback, useState, useMemo, useEffect } from 'react'
 import {
   Select,
   Stack,
@@ -12,7 +12,8 @@ import {
   Fieldset,
   Divider,
   ThemeIcon,
-  Center
+  Center,
+  Button
 } from '@mantine/core'
 import { SSPs, RequestStatPlacement, SSPsAnalyticsDataQuery } from 'types'
 import useSSPsAnalytics from 'hooks/useCampaignAnalytics/useSSPsAnalytics'
@@ -132,7 +133,13 @@ const SSPsAnalytics = ({
     [analyticsData, analyticsKey]
   )
 
+  const [fieldChanged, setFieldChanged] = useState(true)
+
   useEffect(() => {
+    setFieldChanged(true)
+  }, [groupBy, selectedCategories, selectedCountries, selectedFormats, selectedPlacement, ssp])
+
+  const updateAnalytics = useCallback(() => {
     setAnalyticsKey(undefined)
 
     const checkAnalytics = async () => {
@@ -149,17 +156,14 @@ const SSPsAnalytics = ({
         showBidCount: true
       })
       setAnalyticsKey(key)
+      setFieldChanged(false)
       // console.log('key', key)
     }
 
     checkAnalytics()
   }, [
-    category,
-    country,
-    format,
     getAnalyticsKeyAndUpdate,
     groupBy,
-    placement,
     selectedCategories,
     selectedCountries,
     selectedFormats,
@@ -201,7 +205,7 @@ const SSPsAnalytics = ({
         * This analytics are for the actual processed request from our SSRs (oRtb: BidRequest) for
         the <strong>48 hours</strong>
       </Text>
-      <Fieldset>
+      <Fieldset pos="relative">
         <Stack>
           <Group align="start" justify="left" gap="xl" grow>
             <Stack gap="xs">
@@ -312,6 +316,10 @@ const SSPsAnalytics = ({
               />
             </Stack>
           </Group>
+
+          <Button onClick={updateAnalytics} loading={loading} disabled={!fieldChanged}>
+            Get analytics
+          </Button>
         </Stack>
       </Fieldset>
       <Group align="center" justify="left" gap="xs" pos="relative">
