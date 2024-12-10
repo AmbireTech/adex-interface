@@ -316,9 +316,14 @@ const SSPsAnalytics = ({
               />
             </Stack>
           </Group>
-
-          <Button onClick={updateAnalytics} loading={loading} disabled={!fieldChanged}>
-            Get analytics
+          <Button
+            size="sm"
+            onClick={updateAnalytics}
+            loading={loading}
+            disabled={!fieldChanged}
+            color="attention"
+          >
+            Submit
           </Button>
         </Stack>
       </Fieldset>
