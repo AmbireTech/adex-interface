@@ -158,7 +158,6 @@ const SSPsAnalytics = ({
       })
       setAnalyticsKey(key)
       setFieldChanged(false)
-      // console.log('key', key)
     }
 
     checkAnalytics()
@@ -316,6 +315,7 @@ const SSPsAnalytics = ({
             loading={loading}
             disabled={!fieldChanged}
             color="attention"
+            loaderProps={{ type: 'dots' }}
           >
             Submit
           </Button>
@@ -353,6 +353,7 @@ const SSPsAnalytics = ({
           ]}
           data={data.elements}
           loading={loading}
+          dataLoaded={analyticsKey && !loading}
         />
         <Code block>
           {JSON.stringify(
