@@ -13,7 +13,8 @@ import {
   Divider,
   ThemeIcon,
   Center,
-  Button
+  Button,
+  SimpleGrid
 } from '@mantine/core'
 import { SSPs, RequestStatPlacement, SSPsAnalyticsDataQuery } from 'types'
 import useSSPsAnalytics from 'hooks/useCampaignAnalytics/useSSPsAnalytics'
@@ -157,7 +158,6 @@ const SSPsAnalytics = ({
       })
       setAnalyticsKey(key)
       setFieldChanged(false)
-      // console.log('key', key)
     }
 
     checkAnalytics()
@@ -207,56 +207,50 @@ const SSPsAnalytics = ({
       </Text>
       <Fieldset pos="relative">
         <Stack>
-          <Group align="start" justify="left" gap="xl" grow>
-            <Stack gap="xs">
-              <Select
-                label="Group by"
-                value={groupBy}
-                onChange={(val) => setGrop(val as SSPsAnalyticsDataQuery['groupBy'])}
-                data={groupByData}
-                searchable
-                size="sm"
-              />
-              <MultiSelect
-                label="Formats"
-                value={selectedFormats}
-                onChange={setFormats}
-                data={allowedBannerSizes}
-                clearable
-                searchable
-                size="sm"
-              />
-            </Stack>
-            <Stack>
-              <Select
-                label="SSP"
-                value={ssp}
-                onChange={(val) => setSsp(val as SSPs)}
-                data={sspsData}
-                searchable
-                size="sm"
-              />
-              <MultiSelect
-                label="Placement"
-                value={selectedPlacement?.values?.map((x) => x.toString())}
-                // @ts-ignore
-                onChange={(val) =>
-                  setPlacement(() => ({
-                    values: [...val.map((x) => Number(x))],
-                    operator: 'in'
-                  }))
-                }
-                clearable
-                data={placementsData}
-                size="sm"
-              />
-            </Stack>
-          </Group>
-
-          <Group grow gap="xl" align="baseline">
+          <SimpleGrid cols={{ md: 1, xl: 2 }} spacing="xl">
+            <Select
+              label="Group by"
+              value={groupBy}
+              onChange={(val) => setGrop(val as SSPsAnalyticsDataQuery['groupBy'])}
+              data={groupByData}
+              searchable
+              size="sm"
+            />
+            <MultiSelect
+              label="Formats"
+              value={selectedFormats}
+              onChange={setFormats}
+              data={allowedBannerSizes}
+              clearable
+              searchable
+              size="sm"
+            />
+            <Select
+              label="SSP"
+              value={ssp}
+              onChange={(val) => setSsp(val as SSPs)}
+              data={sspsData}
+              searchable
+              size="sm"
+            />
+            <MultiSelect
+              label="Placement"
+              value={selectedPlacement?.values?.map((x) => x.toString())}
+              // @ts-ignore
+              onChange={(val) =>
+                setPlacement(() => ({
+                  values: [...val.map((x) => Number(x))],
+                  operator: 'in'
+                }))
+              }
+              clearable
+              data={placementsData}
+              size="sm"
+            />
+          </SimpleGrid>
+          <SimpleGrid cols={{ md: 1, xl: 2 }} spacing="xl" mt="xl">
             <Stack>
               <Divider
-                mt="xl"
                 labelPosition="left"
                 label={
                   <Center style={{ gap: 10 }}>
@@ -286,7 +280,6 @@ const SSPsAnalytics = ({
             </Stack>
             <Stack>
               <Divider
-                mt="xl"
                 labelPosition="left"
                 label={
                   <Center style={{ gap: 10 }}>
@@ -315,13 +308,14 @@ const SSPsAnalytics = ({
                 size="sm"
               />
             </Stack>
-          </Group>
+          </SimpleGrid>
           <Button
             size="sm"
             onClick={updateAnalytics}
             loading={loading}
             disabled={!fieldChanged}
             color="attention"
+            loaderProps={{ type: 'dots' }}
           >
             Submit
           </Button>
@@ -359,6 +353,7 @@ const SSPsAnalytics = ({
           ]}
           data={data.elements}
           loading={loading}
+          dataLoaded={analyticsKey && !loading}
         />
         <Code block>
           {JSON.stringify(
