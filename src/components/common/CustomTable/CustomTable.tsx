@@ -55,6 +55,7 @@ export type CustomTableProps = PropsWithChildren &
     actions?: TableRowAction[]
     shadow?: MantineShadow
     loading?: boolean
+    dataLoaded?: boolean
     selectedActions?: TableRowAction[]
     tableActions?: ReactNode
     error?: string | boolean
@@ -85,6 +86,7 @@ export const CustomTable = ({
   actions,
   shadow = 'none',
   loading,
+  dataLoaded,
   selectedActions,
   tableActions,
   error,
@@ -408,7 +410,7 @@ export const CustomTable = ({
         />
       )}
 
-      {!error && !loading && !rows.length && (
+      {!error && !loading && !rows.length && dataLoaded && (
         <Alert variant="outline" color="info" title="No data found" />
       )}
 

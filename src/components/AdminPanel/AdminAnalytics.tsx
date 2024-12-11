@@ -1,5 +1,5 @@
-import { useEffect, useState, useMemo, useCallback } from 'react'
-import { Select, Box, Text, Badge, ActionIcon, Stack, Group, LoadingOverlay } from '@mantine/core'
+import { useState, useEffect, useMemo, useCallback } from 'react'
+import { Select, Box, Text, Badge, ActionIcon, Stack, Group, Button, Loader } from '@mantine/core'
 import { AnalyticsPeriod, Timeframe, AnalyticsType, SSPs } from 'types'
 import useCampaignAnalytics from 'hooks/useCampaignAnalytics'
 import CustomTable from 'components/common/CustomTable'
@@ -126,29 +126,20 @@ const AdminAnalytics = () => {
   const headings = useMemo(() => [analType.toString(), ...headingsDefault], [analType])
 
   // TODO: change campaign analytics to analytics
-  const {
-    //  analyticsData,
-    getAnalyticsKeyAndUpdate,
-    mappedAnalytics
-  } = useCampaignAnalytics()
-
-  // const analytics = useMemo(
-  //   () => analyticsData.get(analyticsKey?.key || ''),
-  //   [analyticsData, analyticsKey]
-  // )
+  const { getAnalyticsKeyAndUpdate, mappedAnalytics } = useCampaignAnalytics()
 
   const adminMappedAnalytics = useMemo(
     () => mappedAnalytics.get(analyticsKey?.key || ''),
     [analyticsKey, mappedAnalytics]
   )
 
-  // useEffect(() => {
-  //   console.log({ analytics })
-  //   console.log({ mappedAnalytics })
-  //   console.log({ adminMappedAnalytics })
-  // }, [analytics, mappedAnalytics, adminMappedAnalytics])
+  const [fieldChanged, setFieldChanged] = useState(true)
 
   useEffect(() => {
+    setFieldChanged(true)
+  }, [analType, timeframe, startDate, placement, ssp])
+
+  const updateAnalytics = useCallback(() => {
     setAnalyticsKey(undefined)
 
     const end = dayjs(
@@ -168,7 +159,7 @@ const AdminAnalytics = () => {
         placement || undefined
       )
       setAnalyticsKey(key)
-      // console.log('key', key)
+      setFieldChanged(false)
     }
 
     checkAnalytics()
@@ -290,8 +281,17 @@ const AdminAnalytics = () => {
       </Group>
 
       <Stack>
+        <Button
+          size="sm"
+          onClick={updateAnalytics}
+          loading={loading}
+          loaderProps={{ type: 'dots' }}
+          disabled={!fieldChanged}
+          color="attention"
+        >
+          Submit
+        </Button>
         <Group align="center" justify="left" gap="xs" pos="relative">
-          <LoadingOverlay visible={loading} loaderProps={{ children: ' ' }} />
           <Box>Totals: </Box>
           <Badge
             leftSection={
@@ -301,9 +301,11 @@ const AdminAnalytics = () => {
             }
             size="lg"
           >
-            {typeof data.paid === 'number'
-              ? Number(data.paid.toFixed(2)).toLocaleString()
-              : data.paid}
+            {loading ? (
+              <Loader color="white" type="dots" size="sm" />
+            ) : (
+              Number(data.paid).toFixed(2).toLocaleString()
+            )}
           </Badge>
 
           <Badge
@@ -314,7 +316,7 @@ const AdminAnalytics = () => {
               </ActionIcon>
             }
           >
-            {data.imps.toLocaleString()}
+            {loading ? <Loader color="white" type="dots" size="sm" /> : data.imps.toLocaleString()}
           </Badge>
 
           <Badge
@@ -325,7 +327,11 @@ const AdminAnalytics = () => {
               </ActionIcon>
             }
           >
-            {data.clicks.toLocaleString()}
+            {loading ? (
+              <Loader color="white" type="dots" size="sm" />
+            ) : (
+              data.clicks.toLocaleString()
+            )}
           </Badge>
 
           <DownloadCSV
@@ -341,6 +347,7 @@ const AdminAnalytics = () => {
               ? 'Error occurred while loading analytics'
               : undefined
           }
+          dataLoaded={analyticsKey && !loading}
           defaultSortIndex={3}
           loading={loading}
           headings={headings}
