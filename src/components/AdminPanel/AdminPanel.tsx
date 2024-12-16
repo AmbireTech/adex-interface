@@ -29,7 +29,7 @@ const AdminPanel = () => {
           <Tabs.Tab value="invoices">Invoices</Tabs.Tab>
           <Tabs.Tab value="validatorAnalytics">Validator Analytics</Tabs.Tab>
           <Tabs.Tab value="sspAnalytics">SSPs Analytics</Tabs.Tab>
-          <Tabs.Tab value="dspStats">DSP stats</Tabs.Tab>
+          <Tabs.Tab value="dspStats">DSP info</Tabs.Tab>
           <Tabs.Tab value="accounts">Accounts</Tabs.Tab>
           <Tabs.Tab value="user-account" disabled>
             Account details
