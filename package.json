@@ -36,7 +36,7 @@
     "@visx/scale": "^3.3.0",
     "@visx/xychart": "^3.3.0",
     "@visx/zoom": "^3.3.0",
-    "adex-common": "github:AmbireTech/adex-common#eb2d0bd0c10ef2baed38391d59dec5055646bce4",
+    "adex-common": "github:AmbireTech/adex-common#119affb121179d181a9e4dc219121dc7a68cac04",
     "blockies-ts": "^1.0.0",
     "d3-geo": "^3.1.0",
     "dayjs": "^1.11.10",
