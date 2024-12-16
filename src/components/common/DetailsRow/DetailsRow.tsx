@@ -1,6 +1,6 @@
 import { Divider, Flex, Text, FlexProps, MantineFontSize } from '@mantine/core'
 
-export type CampaignDetailsRowProps = FlexProps & {
+export type DetailsRowProps = FlexProps & {
   title: string
   value: any | undefined
   lighterColor?: boolean | undefined
@@ -9,7 +9,7 @@ export type CampaignDetailsRowProps = FlexProps & {
   column?: boolean
 }
 
-const CampaignDetailsRow = ({
+const DetailsRow = ({
   title,
   value,
   lighterColor,
@@ -17,7 +17,7 @@ const CampaignDetailsRow = ({
   noBorder = false,
   column = false,
   ...flexProps
-}: CampaignDetailsRowProps) => {
+}: DetailsRowProps) => {
   return (
     <>
       <Flex
@@ -44,4 +44,4 @@ const CampaignDetailsRow = ({
   )
 }
 
-export default CampaignDetailsRow
+export default DetailsRow

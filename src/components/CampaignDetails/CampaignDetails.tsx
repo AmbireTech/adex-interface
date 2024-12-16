@@ -8,7 +8,7 @@ import { AdUnit, CampaignStatus } from 'adex-common/dist/types'
 import MediaThumb from 'components/common/MediaThumb'
 import { formatDateTime } from 'helpers/formatters'
 import GoBack from 'components/common/GoBack'
-import CampaignDetailsRow from 'components/common/CampainDetailsRow/CampaignDetailsRow'
+import DetailsRow from 'components/common/DetailsRow/DetailsRow'
 import { useCampaignsData } from 'hooks/useCampaignsData'
 import ActiveIcon from 'resources/icons/Active'
 import StopIcon from 'resources/icons/Stop'
@@ -275,7 +275,7 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
                 <Paper bg="lightBackground" p="md" withBorder>
                   <Stack gap="xs">
                     {isAdminPanel && (
-                      <CampaignDetailsRow
+                      <DetailsRow
                         textSize="sm"
                         title="Owner"
                         value={
@@ -290,9 +290,9 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
                         }
                       />
                     )}
-                    <CampaignDetailsRow textSize="sm" title="Title" value={campaign?.title} />
-                    <CampaignDetailsRow textSize="sm" title="Id" value={campaign?.id} />
-                    <CampaignDetailsRow
+                    <DetailsRow textSize="sm" title="Title" value={campaign?.title} />
+                    <DetailsRow textSize="sm" title="Id" value={campaign?.id} />
+                    <DetailsRow
                       textSize="sm"
                       title="Status"
                       value={
@@ -304,14 +304,14 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
                       }
                     />
                     {/* TODO: Add data for it */}
-                    <CampaignDetailsRow
+                    <DetailsRow
                       textSize="sm"
                       title="Served"
                       // value={campaignData?.share}
                       value=""
                     />
                     {/* TODO: Add data for it */}
-                    <CampaignDetailsRow
+                    <DetailsRow
                       textSize="sm"
                       title="Budget"
                       value={
@@ -323,11 +323,11 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
                         />
                       }
                     />
-                    <CampaignDetailsRow
+                    <DetailsRow
                       title="Created"
                       value={formatDateTime(new Date(Number(campaign.created)))}
                     />
-                    <CampaignDetailsRow
+                    <DetailsRow
                       textSize="sm"
                       title="Starts"
                       value={
@@ -336,7 +336,7 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
                           : 'N/A'
                       }
                     />
-                    <CampaignDetailsRow
+                    <DetailsRow
                       textSize="sm"
                       title="Ends"
                       value={
@@ -345,7 +345,7 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
                           : 'N/A'
                       }
                     />
-                    <CampaignDetailsRow
+                    <DetailsRow
                       title="CPM min"
                       value={
                         campaign.pricingBounds.IMPRESSION?.min && (
@@ -359,7 +359,7 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
                         )
                       }
                     />
-                    <CampaignDetailsRow
+                    <DetailsRow
                       title="CPM max"
                       value={
                         campaign.pricingBounds.IMPRESSION?.max && (
@@ -373,7 +373,7 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
                         )
                       }
                     />
-                    <CampaignDetailsRow
+                    <DetailsRow
                       textSize="sm"
                       title="Limit average daily spending"
                       value={
@@ -382,19 +382,19 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
                           : 'No'
                       }
                     />
-                    <CampaignDetailsRow
+                    <DetailsRow
                       textSize="sm"
                       title="Aggressive bidding"
                       value={
                         campaign.targetingInput.inputs.advanced.aggressiveBidding ? 'Yes' : 'No'
                       }
                     />
-                    <CampaignDetailsRow
+                    <DetailsRow
                       textSize="sm"
                       title="Loose source bidding"
                       value={campaign.targetingInput.inputs.advanced.looseSourceCTR ? 'Yes' : 'No'}
                     />
-                    <CampaignDetailsRow
+                    <DetailsRow
                       textSize="sm"
                       title="Last modified by"
                       noBorder
@@ -443,7 +443,7 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
                         {campaign.adUnits.map((item: AdUnit, index: number) => {
                           const isLast = index === campaign.adUnits.length - 1
                           return (
-                            <CampaignDetailsRow
+                            <DetailsRow
                               key={item.id}
                               textSize="sm"
                               title={`${item.banner?.format.w}x${item.banner?.format.h}`}
