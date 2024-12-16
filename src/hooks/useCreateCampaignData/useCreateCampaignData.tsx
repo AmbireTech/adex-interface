@@ -5,7 +5,7 @@ import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import DesktopIcon from 'resources/icons/Desktop'
 import MobileIcon from 'resources/icons/Mobile'
 import { AdUnit } from 'adex-common/dist/types'
-import { CATEGORIES, COUNTRIES } from 'constants/createCampaign'
+import { CATEGORIES, COUNTRIES, SSPs } from 'constants/createCampaign'
 import ImageUrlInput from 'components/CreateCampaign/StepOne/ImageUrlInput'
 import RangeText from 'components/common/RangeText'
 import dayjs from 'dayjs'
@@ -20,6 +20,7 @@ const useCreateCampaignData = () => {
           advanced,
           location,
           categories,
+          ssp,
           placements: {
             in: [placement]
           }
@@ -104,6 +105,11 @@ const useCreateCampaignData = () => {
     [location]
   )
 
+  const formattedSSPs = useMemo(
+    () => ssp && <CatsLocsFormatted inputValues={ssp} selectData={SSPs} align="end" />,
+    [ssp]
+  )
+
   const sizes = useMemo(
     () => adUnits.map((adUnit: AdUnit) => `${adUnit.banner?.format.w}x${adUnit.banner?.format.h}`),
     [adUnits]
@@ -157,6 +163,7 @@ const useCreateCampaignData = () => {
     priceBoundsFormatted,
     formattedCats,
     formattedLocs,
+    formattedSSPs,
     adFormats,
     advancedTargeInput: advanced,
     campaignBudgetFormatted,

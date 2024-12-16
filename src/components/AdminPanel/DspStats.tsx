@@ -2,6 +2,7 @@ import { NumberFormatter, Stack, Divider, Space } from '@mantine/core'
 import DetailsRow from 'components/common/DetailsRow'
 import useAdmin from 'hooks/useAdmin'
 import { useEffect } from 'react'
+import { SSPQPSStats } from 'types/dspStats'
 
 const DspStats = () => {
   const { dspStats, getDspStats } = useAdmin()
@@ -45,7 +46,7 @@ const DspStats = () => {
         value={<NumberFormatter thousandSeparator value={dspStats.throttledRequestsPerSecond} />}
       />
       <Space />
-      {dspStats.ssp.map((ssp) => (
+      {dspStats.ssp.map((ssp: SSPQPSStats) => (
         <Stack gap={0}>
           <DetailsRow id={ssp.name} title="ssp" value={ssp.name} />
           <DetailsRow
