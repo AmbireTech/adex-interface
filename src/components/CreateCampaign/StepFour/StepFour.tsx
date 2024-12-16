@@ -1,5 +1,5 @@
 import { Paper, Stack } from '@mantine/core'
-import CampaignDetailsRow from 'components/common/CampainDetailsRow/CampaignDetailsRow'
+import DetailsRow from 'components/common/DetailsRow/DetailsRow'
 import useCreateCampaignData from 'hooks/useCreateCampaignData/useCreateCampaignData'
 import { useMemo } from 'react'
 import { CreateCampaignOverview } from 'types'
@@ -68,7 +68,7 @@ const StepFour = () => {
         const fullTitle = `${item.title}`
 
         return (
-          <CampaignDetailsRow
+          <DetailsRow
             key={fullTitle}
             lighterColor
             title={fullTitle}
