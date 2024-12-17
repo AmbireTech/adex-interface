@@ -20,7 +20,7 @@ import {
   TargetingInputSingle
 } from 'adex-common'
 import MultiSelectAndRadioButtons from 'components/CreateCampaign/StepTwo/MultiSelectAndRadioButtons'
-import { CAT_GROUPS, CATEGORIES, COUNTRIES, REGION_GROUPS } from 'constants/createCampaign'
+import { CAT_GROUPS, CATEGORIES, COUNTRIES, REGION_GROUPS, SSPs } from 'constants/createCampaign'
 import { parseBigNumTokenAmountToDecimal, parseToBigNumPrecision } from 'helpers'
 
 import {
@@ -45,6 +45,7 @@ type TargetingInputEdit = {
     location: TargetingInputSingle
     categories: TargetingInputSingle
     advanced: AdvancedInputSingle
+    ssp?: TargetingInputSingle
   }
 }
 
@@ -58,6 +59,7 @@ type FormProps = {
 
 const EditCampaign = ({ campaign, isAdmin }: { campaign: Campaign; isAdmin?: boolean }) => {
   const {
+    isAdmin: isAdminEdit,
     adexAccount: { balanceToken }
   } = useAccount()
   const { tabValue = 'budget' } = useParams()
@@ -134,6 +136,16 @@ const EditCampaign = ({ campaign, isAdmin }: { campaign: Campaign; isAdmin?: boo
             }
             return null
           },
+          ssp: (sspVal) => {
+            if (!sspVal) return 'Invalid ssp value'
+            if (sspVal.apply === 'in' && !sspVal.in.length) {
+              return 'SSP list cannot be empty'
+            }
+            if (sspVal.apply === 'nin' && !sspVal.nin.length) {
+              return 'SSP list cannot be empty'
+            }
+            return null
+          },
           advanced: {
             includeIncentivized: (value) => (typeof value !== 'boolean' ? 'Invalid value' : null),
             disableFrequencyCapping: (value) =>
@@ -186,6 +198,14 @@ const EditCampaign = ({ campaign, isAdmin }: { campaign: Campaign; isAdmin?: boo
     [campaign]
   )
 
+  const sspSelectedRadioAndValuesArray = useMemo(
+    () =>
+      campaign && campaign.targetingInput.inputs.ssp
+        ? findArrayWithLengthInObjectAsValue(campaign.targetingInput.inputs.ssp)
+        : [],
+    [campaign]
+  )
+
   const handleCategories = useCallback(
     (selectedRadio: TargetingInputApplyProp, categoriesValue: string[]) => {
       form.setFieldValue('targetingInput.inputs.categories', {
@@ -203,6 +223,17 @@ const EditCampaign = ({ campaign, isAdmin }: { campaign: Campaign; isAdmin?: boo
         apply: selectedRadio,
         in: selectedRadio === 'in' ? locationsValue : [],
         nin: selectedRadio === 'nin' ? locationsValue : []
+      })
+    },
+    [form]
+  )
+
+  const handleSSps = useCallback(
+    (selectedRadio: TargetingInputApplyProp, sspValue: string[]) => {
+      form.setFieldValue('targetingInput.inputs.ssp', {
+        apply: selectedRadio,
+        in: selectedRadio === 'in' ? sspValue : [],
+        nin: selectedRadio === 'nin' ? sspValue : []
       })
     },
     [form]
@@ -406,7 +437,7 @@ const EditCampaign = ({ campaign, isAdmin }: { campaign: Campaign; isAdmin?: boo
                   Countries
                 </Text>
                 <MultiSelectAndRadioButtons
-                  onCategoriesChange={handleCountries}
+                  onCategoriesChange={handleSSps}
                   defaultRadioValue={
                     locSelectedRadioAndValuesArray &&
                     (locSelectedRadioAndValuesArray[0] as TargetingInputApplyProp)
@@ -417,10 +448,33 @@ const EditCampaign = ({ campaign, isAdmin }: { campaign: Campaign; isAdmin?: boo
                   }
                   multiSelectData={COUNTRIES}
                   groups={REGION_GROUPS}
-                  label="Countries"
-                  error={form.errors['targetingInput.inputs.location']?.toString()}
+                  label="SSPs"
+                  error={form.errors['targetingInput.inputs.ssp']?.toString()}
                 />
               </Stack>
+
+              {isAdminEdit && (
+                <Stack gap="xs">
+                  <Text c="secondaryText" size="sm" fw="bold">
+                    SSPs
+                  </Text>
+                  <MultiSelectAndRadioButtons
+                    onCategoriesChange={handleCountries}
+                    groups={{}}
+                    defaultRadioValue={
+                      sspSelectedRadioAndValuesArray &&
+                      (sspSelectedRadioAndValuesArray[0] as TargetingInputApplyProp)
+                    }
+                    defaultSelectValue={
+                      sspSelectedRadioAndValuesArray &&
+                      (sspSelectedRadioAndValuesArray[1] as string[])
+                    }
+                    multiSelectData={SSPs}
+                    label="SSPs"
+                    error={form.errors['targetingInput.inputs.ssp']?.toString()}
+                  />
+                </Stack>
+              )}
 
               <Button disabled={!form.isDirty()} size="lg" type="submit" maw={200}>
                 Save Changes
