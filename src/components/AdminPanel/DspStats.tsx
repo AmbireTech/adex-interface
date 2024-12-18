@@ -5,33 +5,65 @@ import useAdmin from 'hooks/useAdmin'
 import { useEffect } from 'react'
 import { BaseDSPStats, SSPQPSStats } from 'types/dspStats'
 
+const getPercent = (total: number, part: number): string => {
+  return ` (${((part / total) * 100).toFixed(2)}%) `
+}
+
 const BaseStats = ({ dspStats }: { dspStats: BaseDSPStats }) => {
   return (
     <Stack gap="xs">
       <DetailsRow
-        title="Total ORTB requests"
-        value={<NumberFormatter thousandSeparator value={dspStats.ortbRequests} />}
-      />
-      <DetailsRow
-        title="Bid requests with no bids"
-        value={<NumberFormatter thousandSeparator value={dspStats.bidRequestsWithNoBids} />}
-      />
-      <DetailsRow
-        title="Bid requests in time"
-        value={<NumberFormatter thousandSeparator value={dspStats.bidRequestsBidsInTime} />}
+        title="Total requests (any kind)"
+        value={<NumberFormatter thousandSeparator value={dspStats.totalRequests} />}
       />
 
       <DetailsRow
-        title="Total requests"
-        value={<NumberFormatter thousandSeparator value={dspStats.totalRequests} />}
+        title="Bid requests - total"
+        value={
+          <div>
+            {getPercent(dspStats.totalRequests, dspStats.ortbRequests)}
+            <NumberFormatter thousandSeparator value={dspStats.ortbRequests} />
+          </div>
+        }
+      />
+
+      <DetailsRow
+        title="Bid requests - throttled"
+        value={
+          <div>
+            {getPercent(dspStats.ortbRequests, dspStats.throttledRequests)}
+            <NumberFormatter thousandSeparator value={dspStats.throttledRequests} />
+          </div>
+        }
+      />
+
+      <DetailsRow
+        title="Bid requests - no bids"
+        value={
+          <div>
+            {getPercent(dspStats.ortbRequests, dspStats.bidRequestsWithNoBids)}
+            <NumberFormatter thousandSeparator value={dspStats.bidRequestsWithNoBids} />
+          </div>
+        }
       />
       <DetailsRow
-        title="Throttled requests"
-        value={<NumberFormatter thousandSeparator value={dspStats.throttledRequests} />}
+        title="Bid requests - in time response"
+        value={
+          <div>
+            {getPercent(dspStats.ortbRequests, dspStats.bidRequestsBidsInTime)}
+            <NumberFormatter thousandSeparator value={dspStats.bidRequestsBidsInTime} />
+          </div>
+        }
       />
+
       <DetailsRow
-        title="Bid requests with late bids"
-        value={<NumberFormatter thousandSeparator value={dspStats.bidRequestsWithBidsLate} />}
+        title="Bid requests - NOT in time response"
+        value={
+          <div>
+            {getPercent(dspStats.ortbRequests, dspStats.bidRequestsWithBidsLate)}
+            <NumberFormatter thousandSeparator value={dspStats.bidRequestsWithBidsLate} />
+          </div>
+        }
       />
     </Stack>
   )
