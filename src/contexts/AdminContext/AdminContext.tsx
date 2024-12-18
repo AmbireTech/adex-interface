@@ -23,7 +23,7 @@ interface IAdminContext {
   ) => Promise<void>
 }
 
-const dspStatsDefault = {
+const dspStatsDefault: DspStats = {
   totalRequests: 0,
   ortbRequests: 0,
   throttledRequests: 0,
@@ -32,6 +32,14 @@ const dspStatsDefault = {
   bidRequestsWithNoBids: 0,
   bidRequestsBidsInTime: 0,
   bidRequestsWithBidsLate: 0,
+  last24h: {
+    totalRequests: 0,
+    ortbRequests: 0,
+    throttledRequests: 0,
+    bidRequestsWithNoBids: 0,
+    bidRequestsBidsInTime: 0,
+    bidRequestsWithBidsLate: 0
+  },
   ssp: []
 }
 

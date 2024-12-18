@@ -1,18 +1,13 @@
-import { NumberFormatter, Stack, Divider, Space } from '@mantine/core'
+import { NumberFormatter, Stack, SimpleGrid, Fieldset } from '@mantine/core'
+import CustomTable from 'components/common/CustomTable'
 import DetailsRow from 'components/common/DetailsRow'
 import useAdmin from 'hooks/useAdmin'
 import { useEffect } from 'react'
-import { SSPQPSStats } from 'types/dspStats'
+import { BaseDSPStats, SSPQPSStats } from 'types/dspStats'
 
-const DspStats = () => {
-  const { dspStats, getDspStats } = useAdmin()
-
-  useEffect(() => {
-    getDspStats()
-  }, [])
-
+const BaseStats = ({ dspStats }: { dspStats: BaseDSPStats }) => {
   return (
-    <Stack maw={420} gap="xs">
+    <Stack gap="xs">
       <DetailsRow
         title="Total ORTB requests"
         value={<NumberFormatter thousandSeparator value={dspStats.ortbRequests} />}
@@ -25,14 +20,7 @@ const DspStats = () => {
         title="Bid requests in time"
         value={<NumberFormatter thousandSeparator value={dspStats.bidRequestsBidsInTime} />}
       />
-      <DetailsRow
-        title="Bid requests with late bids"
-        value={<NumberFormatter thousandSeparator value={dspStats.bidRequestsWithBidsLate} />}
-      />
-      <DetailsRow
-        title="Total Bid requests per second"
-        value={<NumberFormatter thousandSeparator value={dspStats.ortbRequestsPerSecond} />}
-      />
+
       <DetailsRow
         title="Total requests"
         value={<NumberFormatter thousandSeparator value={dspStats.totalRequests} />}
@@ -42,33 +30,58 @@ const DspStats = () => {
         value={<NumberFormatter thousandSeparator value={dspStats.throttledRequests} />}
       />
       <DetailsRow
-        title="Throttled requests per second"
-        value={<NumberFormatter thousandSeparator value={dspStats.throttledRequestsPerSecond} />}
+        title="Bid requests with late bids"
+        value={<NumberFormatter thousandSeparator value={dspStats.bidRequestsWithBidsLate} />}
       />
-      <Space />
-      {dspStats.ssp.map((ssp: SSPQPSStats) => (
-        <Stack gap={0}>
-          <DetailsRow id={ssp.name} title="ssp" value={ssp.name} />
-          <DetailsRow
-            id={ssp.name}
-            title="qps cfg"
-            value={<NumberFormatter thousandSeparator value={ssp.qpsConfig} />}
-          />
-          <DetailsRow
-            id={ssp.name}
-            title="qps current"
-            value={<NumberFormatter thousandSeparator value={ssp.qpsCurrent} />}
-          />
-          <DetailsRow
-            id={ssp.name}
-            title="qps dropped"
-            value={<NumberFormatter thousandSeparator value={ssp.qpsDropped} />}
-            noBorder
-          />
-          <Divider size="xl" />
-        </Stack>
-      ))}
     </Stack>
+  )
+}
+
+const DspStats = () => {
+  const { dspStats, getDspStats } = useAdmin()
+
+  useEffect(() => {
+    getDspStats()
+  }, [])
+
+  return (
+    <SimpleGrid cols={{ md: 1, xl: 2 }} spacing="xl">
+      <Fieldset p="lg" legend="Totals">
+        <BaseStats dspStats={dspStats} />
+      </Fieldset>
+
+      <Fieldset p="lg" legend="Past 24h">
+        {dspStats.last24h && <BaseStats dspStats={dspStats.last24h} />}
+      </Fieldset>
+      <Fieldset p="lg" legend="Current">
+        <Stack gap="xs">
+          <DetailsRow
+            title="Total Bid requests per second"
+            value={<NumberFormatter thousandSeparator value={dspStats.ortbRequestsPerSecond} />}
+          />
+          <DetailsRow
+            title="Throttled requests per second"
+            value={
+              <NumberFormatter thousandSeparator value={dspStats.throttledRequestsPerSecond} />
+            }
+          />
+        </Stack>
+      </Fieldset>
+      <Fieldset p="lg" legend="SSPs (per second)">
+        <CustomTable
+          headings={['SSP', 'cfg QPS', 'current QPS', 'current dropped']}
+          data={dspStats.ssp.map((ssp: SSPQPSStats) => ({
+            id: ssp.name,
+            columns: [
+              { value: ssp.name },
+              { value: ssp.qpsConfig },
+              { value: ssp.qpsCurrent },
+              { value: ssp.qpsDropped }
+            ]
+          }))}
+        />
+      </Fieldset>
+    </SimpleGrid>
   )
 }
 
