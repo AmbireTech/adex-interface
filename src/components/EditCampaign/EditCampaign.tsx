@@ -437,7 +437,7 @@ const EditCampaign = ({ campaign, isAdmin }: { campaign: Campaign; isAdmin?: boo
                   Countries
                 </Text>
                 <MultiSelectAndRadioButtons
-                  onCategoriesChange={handleSSps}
+                  onCategoriesChange={handleCountries}
                   defaultRadioValue={
                     locSelectedRadioAndValuesArray &&
                     (locSelectedRadioAndValuesArray[0] as TargetingInputApplyProp)
@@ -448,8 +448,8 @@ const EditCampaign = ({ campaign, isAdmin }: { campaign: Campaign; isAdmin?: boo
                   }
                   multiSelectData={COUNTRIES}
                   groups={REGION_GROUPS}
-                  label="SSPs"
-                  error={form.errors['targetingInput.inputs.ssp']?.toString()}
+                  label="Countries"
+                  error={form.errors['targetingInput.inputs.location']?.toString()}
                 />
               </Stack>
 
@@ -459,7 +459,7 @@ const EditCampaign = ({ campaign, isAdmin }: { campaign: Campaign; isAdmin?: boo
                     SSPs
                   </Text>
                   <MultiSelectAndRadioButtons
-                    onCategoriesChange={handleCountries}
+                    onCategoriesChange={handleSSps}
                     groups={{}}
                     defaultRadioValue={
                       sspSelectedRadioAndValuesArray &&
