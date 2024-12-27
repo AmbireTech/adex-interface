@@ -3,7 +3,7 @@ import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { Grid, Text, Button, Paper, Stack, Group, Divider, Box, Anchor } from '@mantine/core'
 import { modals } from '@mantine/modals'
 import BadgeStatusCampaign from 'components/Dashboard/BadgeStatusCampaign'
-import { CATEGORIES, COUNTRIES } from 'constants/createCampaign'
+import { CATEGORIES, COUNTRIES, SSPs } from 'constants/createCampaign'
 import { AdUnit, CampaignStatus } from 'adex-common/dist/types'
 import MediaThumb from 'components/common/MediaThumb'
 import { formatDateTime } from 'helpers/formatters'
@@ -430,6 +430,13 @@ const CampaignDetails = ({ isAdminPanel }: { isAdminPanel?: boolean }) => {
                         inputValues={campaign.targetingInput.inputs.location}
                         selectData={COUNTRIES}
                       />
+                      {campaign.targetingInput.inputs.ssp && (
+                        <CatsLocsFormatted
+                          title="Selected SSPs"
+                          inputValues={campaign.targetingInput.inputs.ssp}
+                          selectData={SSPs}
+                        />
+                      )}
                     </Stack>
                   </Paper>
                 </Stack>
