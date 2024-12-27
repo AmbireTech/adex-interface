@@ -3190,9 +3190,9 @@ address@^1.0.1, address@^1.1.2:
   resolved "https://registry.yarnpkg.com/address/-/address-1.2.2.tgz#2b5248dac5485a6390532c6a517fda2e3faac89e"
   integrity sha512-4B/qKCfeE/ODUaAUpSwfzazo5x29WD4r3vXiWsB7I2mSDAihwEqKO+g8GELZUQSSAo5e1XTYh3ZVfLyxBc12nA==
 
-"adex-common@github:AmbireTech/adex-common#eb2d0bd0c10ef2baed38391d59dec5055646bce4":
+"adex-common@github:AmbireTech/adex-common#119affb121179d181a9e4dc219121dc7a68cac04":
   version "1.0.1"
-  resolved "https://codeload.github.com/AmbireTech/adex-common/tar.gz/eb2d0bd0c10ef2baed38391d59dec5055646bce4"
+  resolved "https://codeload.github.com/AmbireTech/adex-common/tar.gz/119affb121179d181a9e4dc219121dc7a68cac04"
   dependencies:
     i18n-iso-countries "^7.11.0"
 

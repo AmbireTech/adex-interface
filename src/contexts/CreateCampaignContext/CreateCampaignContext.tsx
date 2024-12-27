@@ -180,6 +180,18 @@ const CreateCampaignContextProvider: FC<PropsWithChildren> = ({ children }) => {
               }
             }
           },
+          ssp: (rule) => {
+            if (!rule) return
+            if (!isAdmin) return 'Invalid filter - available only for admins'
+            if (step === 1) {
+              if (rule.apply === 'in' && !rule.in.length) {
+                return 'Ssp list cannot be empty'
+              }
+              if (rule.apply === 'nin' && !rule.nin.length) {
+                return 'Ssp list cannot be empty'
+              }
+            }
+          },
           advanced: {
             limitDailyAverageSpending: (value) =>
               step === 2 && typeof value !== 'boolean' ? 'Invalid value' : undefined

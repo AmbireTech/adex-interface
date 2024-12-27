@@ -16,7 +16,8 @@ const StepFour = () => {
     campaignNameFormatted,
     adUnitsFormatted,
     campaignPeriodFormatted,
-    formattedSelectedPlacement
+    formattedSelectedPlacement,
+    formattedSSPs
   } = useCreateCampaignData()
 
   const campaignOverview: CreateCampaignOverview[] = useMemo(
@@ -42,12 +43,16 @@ const StepFour = () => {
       { title: 'Ad Format', value: adFormats },
       { title: 'Creatives', value: adUnitsFormatted, isColumn: true },
       { title: 'Selected Categories', value: formattedCats },
-      { title: 'Selected Countries', value: formattedLocs }
+      { title: 'Selected Countries', value: formattedLocs },
+      ...(formattedSSPs ? [{ title: 'Selected SSPs', value: formattedSSPs }] : [])
     ],
     [
       campaignNameFormatted,
       campaignBudgetFormatted,
       priceBoundsFormatted,
+      advancedTargeInput.limitDailyAverageSpending,
+      advancedTargeInput.aggressiveBidding,
+      advancedTargeInput.looseSourceCTR,
       campaignPeriodFormatted,
       formattedSelectedPlacement,
       formattedSelectedDevice,
@@ -55,9 +60,7 @@ const StepFour = () => {
       adUnitsFormatted,
       formattedCats,
       formattedLocs,
-      advancedTargeInput.limitDailyAverageSpending,
-      advancedTargeInput.aggressiveBidding,
-      advancedTargeInput.looseSourceCTR
+      formattedSSPs
     ]
   )
 

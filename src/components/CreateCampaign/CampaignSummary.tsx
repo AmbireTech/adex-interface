@@ -4,6 +4,7 @@ import useCreateCampaignContext from 'hooks/useCreateCampaignContext'
 import LeftArrowIcon from 'resources/icons/LeftArrow'
 import useCreateCampaignData from 'hooks/useCreateCampaignData/useCreateCampaignData'
 import DetailsRow from 'components/common/DetailsRow'
+import useAccount from 'hooks/useAccount'
 import { UtmInfo } from './CreateCampaignCommon'
 
 const CampaignSummary = ({ onLaunchClick }: { onLaunchClick: () => void }) => {
@@ -29,11 +30,14 @@ const CampaignSummary = ({ onLaunchClick }: { onLaunchClick: () => void }) => {
     priceBoundsFormatted,
     formattedCats,
     formattedLocs,
+    formattedSSPs,
     adFormats,
     campaignBudgetFormatted,
     advancedTargeInput,
     estimatedImpressions
   } = useCreateCampaignData()
+
+  const { isAdmin } = useAccount()
 
   const loading = useMemo(() => !allowedBannerSizes.length, [allowedBannerSizes.length])
 
@@ -53,6 +57,7 @@ const CampaignSummary = ({ onLaunchClick }: { onLaunchClick: () => void }) => {
       <DetailsRow lighterColor title="Ad Format" value={adFormats} textSize="sm" />
       <DetailsRow lighterColor title="Categories" value={formattedCats} textSize="sm" />
       <DetailsRow lighterColor title="Countries" value={formattedLocs} textSize="sm" />
+      {isAdmin && <DetailsRow lighterColor title="SSPss" value={formattedSSPs} textSize="sm" />}
       <DetailsRow
         lighterColor
         title="Limit average daily spending"

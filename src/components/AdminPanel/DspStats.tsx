@@ -1,7 +1,73 @@
-import { NumberFormatter, Stack, Divider, Space } from '@mantine/core'
+import { NumberFormatter, Stack, SimpleGrid, Fieldset } from '@mantine/core'
+import CustomTable from 'components/common/CustomTable'
 import DetailsRow from 'components/common/DetailsRow'
 import useAdmin from 'hooks/useAdmin'
 import { useEffect } from 'react'
+import { BaseDSPStats, SSPQPSStats } from 'types/dspStats'
+
+const getPercent = (total: number, part: number): string => {
+  return ` (${((part / total) * 100).toFixed(2)}%) `
+}
+
+const BaseStats = ({ dspStats }: { dspStats: BaseDSPStats }) => {
+  return (
+    <Stack gap="xs">
+      <DetailsRow
+        title="Total requests (any kind)"
+        value={<NumberFormatter thousandSeparator value={dspStats.totalRequests} />}
+      />
+
+      <DetailsRow
+        title="Bid requests - total"
+        value={
+          <div>
+            {getPercent(dspStats.totalRequests, dspStats.ortbRequests)}
+            <NumberFormatter thousandSeparator value={dspStats.ortbRequests} />
+          </div>
+        }
+      />
+
+      <DetailsRow
+        title="Bid requests - throttled"
+        value={
+          <div>
+            {getPercent(dspStats.ortbRequests, dspStats.throttledRequests)}
+            <NumberFormatter thousandSeparator value={dspStats.throttledRequests} />
+          </div>
+        }
+      />
+
+      <DetailsRow
+        title="Bid requests - no bids"
+        value={
+          <div>
+            {getPercent(dspStats.ortbRequests, dspStats.bidRequestsWithNoBids)}
+            <NumberFormatter thousandSeparator value={dspStats.bidRequestsWithNoBids} />
+          </div>
+        }
+      />
+      <DetailsRow
+        title="Bid requests - in time response"
+        value={
+          <div>
+            {getPercent(dspStats.ortbRequests, dspStats.bidRequestsBidsInTime)}
+            <NumberFormatter thousandSeparator value={dspStats.bidRequestsBidsInTime} />
+          </div>
+        }
+      />
+
+      <DetailsRow
+        title="Bid requests - NOT in time response"
+        value={
+          <div>
+            {getPercent(dspStats.ortbRequests, dspStats.bidRequestsWithBidsLate)}
+            <NumberFormatter thousandSeparator value={dspStats.bidRequestsWithBidsLate} />
+          </div>
+        }
+      />
+    </Stack>
+  )
+}
 
 const DspStats = () => {
   const { dspStats, getDspStats } = useAdmin()
@@ -11,63 +77,43 @@ const DspStats = () => {
   }, [])
 
   return (
-    <Stack maw={420} gap="xs">
-      <DetailsRow
-        title="Total ORTB requests"
-        value={<NumberFormatter thousandSeparator value={dspStats.ortbRequests} />}
-      />
-      <DetailsRow
-        title="Bid requests with no bids"
-        value={<NumberFormatter thousandSeparator value={dspStats.bidRequestsWithNoBids} />}
-      />
-      <DetailsRow
-        title="Bid requests in time"
-        value={<NumberFormatter thousandSeparator value={dspStats.bidRequestsBidsInTime} />}
-      />
-      <DetailsRow
-        title="Bid requests with late bids"
-        value={<NumberFormatter thousandSeparator value={dspStats.bidRequestsWithBidsLate} />}
-      />
-      <DetailsRow
-        title="Total Bid requests per second"
-        value={<NumberFormatter thousandSeparator value={dspStats.ortbRequestsPerSecond} />}
-      />
-      <DetailsRow
-        title="Total requests"
-        value={<NumberFormatter thousandSeparator value={dspStats.totalRequests} />}
-      />
-      <DetailsRow
-        title="Throttled requests"
-        value={<NumberFormatter thousandSeparator value={dspStats.throttledRequests} />}
-      />
-      <DetailsRow
-        title="Throttled requests per second"
-        value={<NumberFormatter thousandSeparator value={dspStats.throttledRequestsPerSecond} />}
-      />
-      <Space />
-      {dspStats.ssp.map((ssp) => (
-        <Stack gap={0}>
-          <DetailsRow id={ssp.name} title="ssp" value={ssp.name} />
+    <SimpleGrid cols={{ md: 1, xl: 2 }} spacing="xl">
+      <Fieldset p="lg" legend="Totals">
+        <BaseStats dspStats={dspStats} />
+      </Fieldset>
+
+      <Fieldset p="lg" legend="Past 24h">
+        {dspStats.last24h && <BaseStats dspStats={dspStats.last24h} />}
+      </Fieldset>
+      <Fieldset p="lg" legend="Current">
+        <Stack gap="xs">
           <DetailsRow
-            id={ssp.name}
-            title="qps cfg"
-            value={<NumberFormatter thousandSeparator value={ssp.qpsConfig} />}
+            title="Total Bid requests per second"
+            value={<NumberFormatter thousandSeparator value={dspStats.ortbRequestsPerSecond} />}
           />
           <DetailsRow
-            id={ssp.name}
-            title="qps current"
-            value={<NumberFormatter thousandSeparator value={ssp.qpsCurrent} />}
+            title="Throttled requests per second"
+            value={
+              <NumberFormatter thousandSeparator value={dspStats.throttledRequestsPerSecond} />
+            }
           />
-          <DetailsRow
-            id={ssp.name}
-            title="qps dropped"
-            value={<NumberFormatter thousandSeparator value={ssp.qpsDropped} />}
-            noBorder
-          />
-          <Divider size="xl" />
         </Stack>
-      ))}
-    </Stack>
+      </Fieldset>
+      <Fieldset p="lg" legend="SSPs (per second)">
+        <CustomTable
+          headings={['SSP', 'cfg QPS', 'current QPS', 'current dropped']}
+          data={dspStats.ssp.map((ssp: SSPQPSStats) => ({
+            id: ssp.name,
+            columns: [
+              { value: ssp.name },
+              { value: ssp.qpsConfig },
+              { value: ssp.qpsCurrent },
+              { value: ssp.qpsDropped }
+            ]
+          }))}
+        />
+      </Fieldset>
+    </SimpleGrid>
   )
 }
 

@@ -4,14 +4,18 @@ export type SSPQPSStats = {
   qpsCurrent: number
   qpsDropped: number
 }
-export type DspStats = {
+
+export type BaseDSPStats = {
   totalRequests: number
   ortbRequests: number
   throttledRequests: number
-  ortbRequestsPerSecond: number
-  throttledRequestsPerSecond: number
   bidRequestsWithNoBids: number
   bidRequestsBidsInTime: number
   bidRequestsWithBidsLate: number
+}
+export type DspStats = BaseDSPStats & {
+  ortbRequestsPerSecond: number
+  throttledRequestsPerSecond: number
+  last24h: BaseDSPStats
   ssp: SSPQPSStats[]
 }
