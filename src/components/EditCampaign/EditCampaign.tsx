@@ -258,6 +258,7 @@ const EditCampaign = ({ campaign, isAdmin }: { campaign: Campaign; isAdmin?: boo
       const inputs: Partial<Campaign['targetingInput']['inputs']> = {
         categories: values.targetingInput.inputs.categories,
         location: values.targetingInput.inputs.location,
+        ssp: values.targetingInput.inputs.ssp,
         advanced: values.targetingInput.inputs.advanced
       }
 

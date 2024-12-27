@@ -350,6 +350,7 @@ const CampaignsDataProvider: FC<PropsWithChildren & { type: 'user' | 'admin' }> 
             ...(inputs?.categories && {
               categories: inputs.categories
             }),
+            ...(inputs?.ssp && { ssp: inputs.ssp }),
             ...(inputs?.publishers && {
               publishers: inputs.publishers
             }),
