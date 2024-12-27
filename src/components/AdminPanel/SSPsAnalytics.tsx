@@ -248,7 +248,7 @@ const SSPsAnalytics = ({
               size="sm"
             />
           </SimpleGrid>
-          <SimpleGrid cols={{ md: 1, xl: 2 }} spacing="xl" mt="xl">
+          <SimpleGrid cols={{ base: 1, xl: 2 }} spacing="xl" mt="xl">
             <Stack>
               <Divider
                 labelPosition="left"

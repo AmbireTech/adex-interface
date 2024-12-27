@@ -2,10 +2,13 @@ import { createContext, FC, PropsWithChildren, useMemo, useState, useCallback } 
 import { Account, AdminTransfer, AdminTransferType } from 'types'
 import { useAdExApi } from 'hooks/useAdexServices'
 import { removeOptionalEmptyStringProps } from 'helpers'
+import { DspStats } from 'types/dspStats'
 
 interface IAdminContext {
   accounts: Map<string, Account>
   getAllAccounts: () => void
+  dspStats: DspStats
+  getDspStats: () => void
   initialDataLoading: boolean
   makeTransfer: (
     values: AdminTransfer,
@@ -20,12 +23,33 @@ interface IAdminContext {
   ) => Promise<void>
 }
 
+const dspStatsDefault: DspStats = {
+  totalRequests: 0,
+  ortbRequests: 0,
+  throttledRequests: 0,
+  ortbRequestsPerSecond: 0,
+  throttledRequestsPerSecond: 0,
+  bidRequestsWithNoBids: 0,
+  bidRequestsBidsInTime: 0,
+  bidRequestsWithBidsLate: 0,
+  last24h: {
+    totalRequests: 0,
+    ortbRequests: 0,
+    throttledRequests: 0,
+    bidRequestsWithNoBids: 0,
+    bidRequestsBidsInTime: 0,
+    bidRequestsWithBidsLate: 0
+  },
+  ssp: []
+}
+
 const AdminContext = createContext<IAdminContext | null>(null)
 
 const AdminProvider: FC<PropsWithChildren> = ({ children }) => {
   const { adexServicesRequest } = useAdExApi()
   const [initialDataLoading, setLoading] = useState(true)
   const [accounts, setAccounts] = useState<Map<string, Account>>(new Map<string, Account>())
+  const [dspStats, setDspStats] = useState<DspStats>(dspStatsDefault)
 
   const getAllAccounts = useCallback(async () => {
     try {
@@ -131,15 +155,43 @@ const AdminProvider: FC<PropsWithChildren> = ({ children }) => {
     [adexServicesRequest]
   )
 
+  const getDspStats = useCallback(async () => {
+    try {
+      const res = await adexServicesRequest<DspStats>('backend', {
+        route: '/dsp/admin/sysinfo',
+        method: 'GET',
+        headers: {
+          'content-type': 'application/json'
+        }
+      })
+
+      if (res) {
+        setDspStats(res)
+      }
+    } catch (err) {
+      console.log({ err })
+    }
+  }, [adexServicesRequest])
+
   const contextValue = useMemo(
     () => ({
       accounts,
       getAllAccounts,
+      getDspStats,
+      dspStats,
       initialDataLoading,
       makeTransfer,
       updateAccountInfo
     }),
-    [accounts, initialDataLoading, makeTransfer, getAllAccounts, updateAccountInfo]
+    [
+      accounts,
+      getAllAccounts,
+      getDspStats,
+      dspStats,
+      initialDataLoading,
+      makeTransfer,
+      updateAccountInfo
+    ]
   )
 
   return <AdminContext.Provider value={contextValue}>{children}</AdminContext.Provider>

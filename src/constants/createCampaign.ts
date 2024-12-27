@@ -101,6 +101,11 @@ export const CREATE_CAMPAIGN_DEFAULT_VALUE: CampaignUI = {
 
 export const CATEGORIES: SelectData[] = parseCats()
 export const COUNTRIES: SelectData[] = parseLocs()
+export const SSPs: SelectData[] = [
+  { value: 'Qortex', label: 'Qortex' },
+  { value: 'Eskimi', label: 'Eskimi' },
+  { value: 'Epom', label: 'Epom' }
+]
 
 export const CAT_GROUPS = {
   Finance: ['IAB13', 'IAB13-7'],

@@ -1,5 +1,5 @@
 import { Paper, Stack } from '@mantine/core'
-import CampaignDetailsRow from 'components/common/CampainDetailsRow/CampaignDetailsRow'
+import DetailsRow from 'components/common/DetailsRow/DetailsRow'
 import useCreateCampaignData from 'hooks/useCreateCampaignData/useCreateCampaignData'
 import { useMemo } from 'react'
 import { CreateCampaignOverview } from 'types'
@@ -16,7 +16,8 @@ const StepFour = () => {
     campaignNameFormatted,
     adUnitsFormatted,
     campaignPeriodFormatted,
-    formattedSelectedPlacement
+    formattedSelectedPlacement,
+    formattedSSPs
   } = useCreateCampaignData()
 
   const campaignOverview: CreateCampaignOverview[] = useMemo(
@@ -42,12 +43,16 @@ const StepFour = () => {
       { title: 'Ad Format', value: adFormats },
       { title: 'Creatives', value: adUnitsFormatted, isColumn: true },
       { title: 'Selected Categories', value: formattedCats },
-      { title: 'Selected Countries', value: formattedLocs }
+      { title: 'Selected Countries', value: formattedLocs },
+      ...(formattedSSPs ? [{ title: 'Selected SSPs', value: formattedSSPs }] : [])
     ],
     [
       campaignNameFormatted,
       campaignBudgetFormatted,
       priceBoundsFormatted,
+      advancedTargeInput.limitDailyAverageSpending,
+      advancedTargeInput.aggressiveBidding,
+      advancedTargeInput.looseSourceCTR,
       campaignPeriodFormatted,
       formattedSelectedPlacement,
       formattedSelectedDevice,
@@ -55,9 +60,7 @@ const StepFour = () => {
       adUnitsFormatted,
       formattedCats,
       formattedLocs,
-      advancedTargeInput.limitDailyAverageSpending,
-      advancedTargeInput.aggressiveBidding,
-      advancedTargeInput.looseSourceCTR
+      formattedSSPs
     ]
   )
 
@@ -68,7 +71,7 @@ const StepFour = () => {
         const fullTitle = `${item.title}`
 
         return (
-          <CampaignDetailsRow
+          <DetailsRow
             key={fullTitle}
             lighterColor
             title={fullTitle}
