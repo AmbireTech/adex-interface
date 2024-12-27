@@ -74,7 +74,7 @@ const DspStats = () => {
 
   useEffect(() => {
     getDspStats()
-  }, [])
+  }, [getDspStats])
 
   return (
     <SimpleGrid cols={{ md: 1, xl: 2 }} spacing="xl">
