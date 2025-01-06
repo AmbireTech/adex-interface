@@ -22,7 +22,8 @@ const headingsDefault = [
   'CTR',
   'Avg CPM',
   'Avg CPC',
-  'Spent'
+  'Spent',
+  'Paid to SSP'
 ]
 
 const csvHeaders = {
@@ -68,6 +69,10 @@ const placementData: Array<{ value: Placements; label: string }> = [
   { value: 'app', label: 'App' },
   { value: 'site', label: 'Site' }
 ]
+
+const toSSPAmount = (amount: number) => {
+  return amount / 1.07
+}
 
 const mapSegmentLabel = (analType: AnalyticsType, segment: string): { segementLabel: string } => {
   let segementLabel = segment
@@ -187,7 +192,7 @@ const AdminAnalytics = () => {
         adminMappedAnalytics.data.map((item) => ({
           id: item.segment.toString(),
           columns: [
-            { value: mapSegmentLabel(analType, item.segment).segementLabel },
+            { value: item.segment, element: mapSegmentLabel(analType, item.segment).segementLabel },
             { value: item.paid, element: `${((item.paid / (paid || 1)) * 100).toFixed(2)} %` },
             {
               value: item.impressions,
@@ -198,7 +203,8 @@ const AdminAnalytics = () => {
             { value: item.ctr, element: `${item.ctr?.toLocaleString()} %` },
             { value: item.avgCpm, element: item.avgCpm?.toLocaleString() },
             { value: item.avgCpc, element: item.avgCpc?.toLocaleString() },
-            { value: item.paid, element: `${item.paid.toFixed(4)}` }
+            { value: item.paid, element: `${item.paid.toFixed(4)}` },
+            { value: toSSPAmount(item.paid), element: `${toSSPAmount(item.paid)?.toFixed(2)}` }
           ]
         })) || []
     }
